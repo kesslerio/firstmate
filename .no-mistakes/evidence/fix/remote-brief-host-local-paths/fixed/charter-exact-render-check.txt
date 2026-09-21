@@ -1,0 +1,7 @@
+fixed charter == parent brief with the two paths rewritten (independent python rewrite): True
+fixed charter contains leaked '"' or '"' quote sequences: False
+old charter contains leaked '"' quote sequences (bash 3.2 leak): True
+old charter still mentions parent-absolute inbox: False
+fixed charter mentions of host-local inbox: 4
+fixed charter mentions of parent-absolute inbox: 0
+CORRECTION (old run's own PARENT path): old charter still mentions parent-absolute inbox: True count= 4

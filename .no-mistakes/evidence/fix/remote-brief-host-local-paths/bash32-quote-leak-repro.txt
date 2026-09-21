@@ -1,0 +1,6 @@
+bash: 3.2.57(1)-release
+input      : Append replies to '/Users/mac/fm/state/ios.status' when done.
+old pattern: Append replies to '"/home/build/fm/state/parent-replies.status"' when done.
+new pattern: Append replies to '/home/build/fm/state/parent-replies.status' when done.
+old pattern: MISMATCH (leaked quote characters)
+new pattern: exact match

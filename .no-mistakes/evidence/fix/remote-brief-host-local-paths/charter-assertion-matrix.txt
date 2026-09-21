@@ -1,0 +1,28 @@
+===== old render: inbox / status lines in remote charter =====
+22:Nobody reads this chat: the captain and the main firstmate see only what is appended to '"/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.fmU9Kz/remote-home/state/parent-replies.status"', and a captain-facing sentence that is not appended there has not been sent.
+39:A request arriving through the instruction inbox below follows the same marker and reply rules.
+41:# Firstmate instruction inbox
+42:Firstmate steers you through durable message files in '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.fmU9Kz/parent/state/ios.inbox'.
+43:When a terminal message says an instruction is waiting there - and at any natural checkpoint when you are unsure - list '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.fmU9Kz/parent/state/ios.inbox'/*.msg, read and act on each message in numeric order, then acknowledge each handled message by moving it: `mv '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.fmU9Kz/parent/state/ios.inbox'/NNN.msg '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.fmU9Kz/parent/state/ios.inbox'/handled/`.
+44:The move IS the acknowledgement: without it firstmate rings again and eventually treats you as stuck. An empty or absent inbox needs no action.
+49:   `echo "{state} [at=<epoch>]: {one short line}" >> '"/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.fmU9Kz/remote-home/state/parent-replies.status"'`
+
+-- individual new assertions against old render --
+host-local inbox present: FAIL
+parent-absolute inbox absent: FAIL (still present)
+ack move rendered host-local: FAIL
+
+===== fixed render: inbox / status lines in remote charter =====
+22:Nobody reads this chat: the captain and the main firstmate see only what is appended to '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.U2CO6C/remote-home/state/parent-replies.status', and a captain-facing sentence that is not appended there has not been sent.
+39:A request arriving through the instruction inbox below follows the same marker and reply rules.
+41:# Firstmate instruction inbox
+42:Firstmate steers you through durable message files in '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.U2CO6C/remote-home/state/parent-route/ios.inbox'.
+43:When a terminal message says an instruction is waiting there - and at any natural checkpoint when you are unsure - list '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.U2CO6C/remote-home/state/parent-route/ios.inbox'/*.msg, read and act on each message in numeric order, then acknowledge each handled message by moving it: `mv '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.U2CO6C/remote-home/state/parent-route/ios.inbox'/NNN.msg '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.U2CO6C/remote-home/state/parent-route/ios.inbox'/handled/`.
+44:The move IS the acknowledgement: without it firstmate rings again and eventually treats you as stuck. An empty or absent inbox needs no action.
+49:   `echo "{state} [at=<epoch>]: {one short line}" >> '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-remote-secondmate-e2e.U2CO6C/remote-home/state/parent-replies.status'`
+
+-- individual new assertions against fixed render --
+host-local inbox present: PASS
+parent-absolute inbox absent: PASS
+ack move rendered host-local: PASS
+
