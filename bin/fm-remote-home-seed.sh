@@ -127,10 +127,12 @@ BRIEF="$DATA/$ID/brief.md"
 BRIEF_CREATED=0
 if [ ! -f "$BRIEF" ]; then
   [ -n "${FM_SECONDMATE_CHARTER:-}" ] || die "no filled charter at $BRIEF; set FM_SECONDMATE_CHARTER or scaffold one first"
+  # A fresh scaffold renders the remote host's local paths itself
+  # (FM_SECONDMATE_REMOTE_HOME to bin/fm-brief.sh).
   if [ "$NO_PROJECTS" -eq 1 ]; then
-    "$SCRIPT_DIR/fm-brief.sh" "$ID" --secondmate --no-projects >/dev/null
+    FM_SECONDMATE_REMOTE_HOME="$REMOTE_HOME" "$SCRIPT_DIR/fm-brief.sh" "$ID" --secondmate --no-projects >/dev/null
   else
-    "$SCRIPT_DIR/fm-brief.sh" "$ID" --secondmate "${PROJECT_NAMES[@]}" >/dev/null
+    FM_SECONDMATE_REMOTE_HOME="$REMOTE_HOME" "$SCRIPT_DIR/fm-brief.sh" "$ID" --secondmate "${PROJECT_NAMES[@]}" >/dev/null
   fi
   BRIEF_CREATED=1
 fi
@@ -146,7 +148,11 @@ TMP=$(mktemp -d "${TMPDIR:-/tmp}/fm-remote-home-seed.XXXXXX") || die "cannot cre
 REG_EXISTED=0
 [ -f "$REG" ] && { cp "$REG" "$TMP/registry.before"; REG_EXISTED=1; }
 
-# Keep the parent charter as its durable source, but publish a remote copy whose
+# A charter scaffolded here already renders these host-local paths itself
+# (FM_SECONDMATE_REMOTE_HOME to bin/fm-brief.sh), so the two rewrites below are
+# a no-op there and remain the convergence net for a parent charter scaffolded
+# before that input existed. Keep the parent charter as its durable source, but
+# publish a remote copy whose
 # status path is the remote append-only relay log and whose steering-inbox path
 # is the host-local parent-route inbox the remote control plane writes to,
 # rather than local Mac paths. The two parents differ only by suffix, so the

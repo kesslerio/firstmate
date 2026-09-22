@@ -32,6 +32,12 @@
 #   omitting both still fails loudly so an accidental omission is never silent.
 #   Set FM_SECONDMATE_CHARTER='<charter>' to fill the charter text.
 #   Set FM_SECONDMATE_SCOPE='<scope>' to write a routing scope distinct from the charter text.
+#   Set FM_SECONDMATE_REMOTE_HOME='<absolute-path>' to scaffold a remote-route
+#   charter: its steering-inbox and parent-reply paths then name the remote
+#   host's local surfaces (<remote-home>/state/parent-route/<id>.inbox and
+#   <remote-home>/state/parent-replies.status) instead of this parent home's
+#   $STATE paths, which name nothing on that host. Without it a charter keeps
+#   the local-route rendering.
 #   --herdr-lab is mandatory when the task will issue Herdr lifecycle commands.
 #   It adds the hard isolation contract backed by bin/fm-herdr-lab.sh.
 #   The flag must be explicit because {TASK} and {FIRSTMATE_SPEC} are filled
@@ -202,6 +208,29 @@ if [ "$NO_PROJECTS" -eq 1 ] && [ "$KIND" != secondmate ]; then
   exit 1
 fi
 
+# A remote route's charter must name the surfaces that exist on the remote
+# host, never this parent home's absolute $STATE paths: the mate's steering
+# inbox is the host-local parent-route inbox the remote control plane writes
+# (bin/fm-remote-secondmate-control.sh), and its parent channel is the
+# append-only parent-replies relay log the parent's reply adapter mirrors
+# (bin/fm-parent-channel-lib.sh). A local route keeps the parent-home paths,
+# which are the real surfaces on the shared host.
+SECONDMATE_REMOTE_HOME=
+if [ -n "${FM_SECONDMATE_REMOTE_HOME:-}" ]; then
+  if [ "$KIND" != secondmate ]; then
+    echo "error: FM_SECONDMATE_REMOTE_HOME applies only to --secondmate charters" >&2
+    exit 1
+  fi
+  case "$FM_SECONDMATE_REMOTE_HOME" in
+    /*) ;;
+    *) echo "error: FM_SECONDMATE_REMOTE_HOME must be an absolute path on the remote host: $FM_SECONDMATE_REMOTE_HOME" >&2; exit 1 ;;
+  esac
+  case "$FM_SECONDMATE_REMOTE_HOME" in
+    *$'\n'*) echo "error: FM_SECONDMATE_REMOTE_HOME must not contain a newline" >&2; exit 1 ;;
+  esac
+  SECONDMATE_REMOTE_HOME=$FM_SECONDMATE_REMOTE_HOME
+fi
+
 # The optional home-local include is read before anything is written, so an
 # unusable file never leaves a partial scaffold behind.
 BRIEF_INCLUDE_FILE="$CONFIG/brief-include.md"
@@ -244,6 +273,10 @@ shell_quote() {
 
 STATUS_FILE=$(shell_quote "$STATE/$ID.status")
 INBOX_DIR=$(shell_quote "$STATE/$ID.inbox")
+if [ -n "$SECONDMATE_REMOTE_HOME" ]; then
+  STATUS_FILE=$(shell_quote "$SECONDMATE_REMOTE_HOME/state/parent-replies.status")
+  INBOX_DIR=$(shell_quote "$SECONDMATE_REMOTE_HOME/state/parent-route/$ID.inbox")
+fi
 
 # The receive-and-ack half of the steering-inbox contract, included in every
 # scaffold kind. The record format, doorbell line, and re-ring ladder are

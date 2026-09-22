@@ -665,6 +665,16 @@ assert_no_grep "$PARENT/state/ios.status" "$REMOTE_HOME/data/charter.md" "remote
 assert_grep "$PARENT_ROUTE_INBOX" "$REMOTE_HOME/data/charter.md" "remote charter did not name its host-local steering inbox"
 assert_no_grep "$PARENT/state/ios.inbox" "$REMOTE_HOME/data/charter.md" "remote charter retained the inaccessible local steering inbox path"
 assert_grep "$PARENT_ROUTE_INBOX'/NNN.msg '$PARENT_ROUTE_INBOX'/handled/" "$REMOTE_HOME/data/charter.md" "remote charter did not render the inbox acknowledgement move host-local"
+# A fresh scaffold renders the host-local paths itself, so the parent-home
+# durable charter names them too; only a charter scaffolded before
+# FM_SECONDMATE_REMOTE_HOME existed still carries parent-home paths for the
+# publish-time rewrite to converge.
+assert_grep "$REMOTE_HOME/state/parent-replies.status" "$PARENT/data/ios/brief.md" \
+  "remote seed scaffold did not render the host-local reply log into the parent charter"
+assert_no_grep "$PARENT/state/ios.status" "$PARENT/data/ios/brief.md" \
+  "fresh remote scaffold still quotes the parent-home status path the remote host cannot reach"
+assert_no_grep "$PARENT/state/ios.inbox" "$PARENT/data/ios/brief.md" \
+  "fresh remote scaffold still quotes the parent-home steering-inbox path the remote host cannot reach"
 if FM_SECONDMATE_CHARTER='Own iOS delivery on the build Mac.' \
   FM_SECONDMATE_SCOPE='iOS implementation and Xcode validation' \
   remote_env "$ROOT/bin/fm-remote-home-seed.sh" ios remote-mac "$REMOTE_ROOT" "$TMP_ROOT/other-home" alpha \
