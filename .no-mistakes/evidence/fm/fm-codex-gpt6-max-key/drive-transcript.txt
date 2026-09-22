@@ -1,0 +1,45 @@
+=== worktree: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M35CSPDYP15AWF68E5P4TXBB
+=== git head: add70db4dba5bf58d5b854ef0ba50c7846b1f064
+
+=== Scenario A: fm-spawn.sh codex max-effort gate (launch construction)
+--- spawn case newkey (model=gpt-6-luna effort=max)
+    spawn stdout: warning: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6drive.newkey.REvCq8/home/data/gpt6-newkey/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches spawned gpt6-newkey harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-gpt6-newkey worktree=/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6drive.newkey.REvCq8/wt 
+    launch command: export COMPACT_ADVISER_DISABLE=1; env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI codex --model 'gpt-6-luna' -c 'model_reasoning_effort="max"' --dangerously-bypass-approvals-and-sandbox --disable hooks -c "notify=[\"bash\",\"-c\",\"touch '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/gpt6drive.newkey.REvCq8/home/state/gpt6-newkey.turn-ended'\"]" "$('/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M35CSPDYP15AWF68E5P4TXBB/bin/fm-operational-input.sh' encode launch-brief < '/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6drive.newkey.REvCq8/home/data/gpt6-newkey/launch-brief.md')"
+    meta: harness=codex model=gpt-6-luna effort=max 
+
+--- spawn case retiredkey (model=gpt-5.6-luna effort=max)
+    spawn stdout: warning: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6drive.retiredkey.GKv2Ob/home/data/gpt6-retiredkey/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches spawned gpt6-retiredkey harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-gpt6-retiredkey worktree=/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6drive.retiredkey.GKv2Ob/wt 
+    launch command: export COMPACT_ADVISER_DISABLE=1; env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI codex --model 'gpt-5.6-luna' --dangerously-bypass-approvals-and-sandbox --disable hooks -c "notify=[\"bash\",\"-c\",\"touch '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/gpt6drive.retiredkey.GKv2Ob/home/state/gpt6-retiredkey.turn-ended'\"]" "$('/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M35CSPDYP15AWF68E5P4TXBB/bin/fm-operational-input.sh' encode launch-brief < '/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6drive.retiredkey.GKv2Ob/home/data/gpt6-retiredkey/launch-brief.md')"
+    meta: harness=codex model=gpt-5.6-luna effort=max 
+
+--- spawn case othersol (model=gpt-6-sol effort=max)
+    spawn stdout: warning: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6drive.othersol.ZqM5p6/home/data/gpt6-othersol/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches spawned gpt6-othersol harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-gpt6-othersol worktree=/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6drive.othersol.ZqM5p6/wt 
+    launch command: export COMPACT_ADVISER_DISABLE=1; env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI codex --model 'gpt-6-sol' --dangerously-bypass-approvals-and-sandbox --disable hooks -c "notify=[\"bash\",\"-c\",\"touch '/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/gpt6drive.othersol.ZqM5p6/home/state/gpt6-othersol.turn-ended'\"]" "$('/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M35CSPDYP15AWF68E5P4TXBB/bin/fm-operational-input.sh' encode launch-brief < '/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6drive.othersol.ZqM5p6/home/data/gpt6-othersol/launch-brief.md')"
+    meta: harness=codex model=gpt-6-sol effort=max 
+
+PASS: A1: codex gpt-6-luna max spawn succeeds
+PASS: A1: launch threads -c 'model_reasoning_effort="max"' for gpt-6-luna
+PASS: A1: launch binds the flag to the gpt-6-luna model flag order
+PASS: A1: meta records model=gpt-6-luna effort=max
+PASS: A2: retired gpt-5.6-luna max spawn still succeeds (record-and-omit)
+PASS: A2: launch does NOT thread model_reasoning_effort=max for gpt-5.6-luna
+PASS: A2: meta still records the requested effort=max for traceability
+PASS: A3: gpt-6-sol (non-key model) max also omits the flag
+=== Scenario B: fm-bootstrap.sh crew-dispatch validation
+--- bootstrap case newkey exit=0 output: <silent>
+PASS: B1: bootstrap accepts codex gpt-6-luna max (no CREW_DISPATCH diagnostic)
+--- bootstrap case retiredkey exit=0 output: CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: codex:max
+PASS: B2: bootstrap REJECTS retired gpt-5.6-luna max with the invalid-effort diagnostic
+--- bootstrap case plainkey exit=0 output: CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: codex:max
+PASS: B3: bootstrap still rejects non-key gpt-5 max
+=== Scenario C: fm-dispatch-resolve.sh effort gate (validation before network)
+--- resolve case retiredkey exit=2 stderr: error: malformed rules file: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//gpt6res.retiredkey.q3mhKg/config/crew-dispatch.json - each use profile effort must be supported by its harness and model 
+    stdout: 
+PASS: C1: resolve REJECTS retired gpt-5.6-luna max with the validation error (exit 2)
+PASS: C1: the rejection is a validation error, not the missing-curl error
+--- resolve case newkey exit=0 stderr: dispatch-resolve: error (curl not installed) 
+    stdout: dispatch-resolve:   status: error   reason: curl not installed 
+PASS: C2: resolve ACCEPTS gpt-6-luna max (no validation error)
+PASS: C2: the only failure is the absent network tool (expected in this env)
+
+ALL DIRECT DRIVES PASSED
