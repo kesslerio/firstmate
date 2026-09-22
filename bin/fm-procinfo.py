@@ -2,18 +2,27 @@
 """fm-procinfo.py - ps-free process facts for bin/fm-session-lock-lib.sh.
 
 Prints one line: <ppid>TAB<comm>TAB<args> for the pid given as argv[1],
-using only sysctl(3) and libproc - the same kernel state `ps` reads, just
-without executing /bin/ps. It exists because an EDR-style policy can deny
-the ps binary's exec outright (even `ps -V`), and a session lock whose
+using only sysctl(3) - the same kernel state `ps` reads, just without
+executing /bin/ps. It exists because an EDR-style policy can deny the
+ps binary's exec outright (even `ps -V`), and a session lock whose
 identity walk needs ps can then never be acquired at all.
 
-comm is the full executable path, matching `ps -o comm=`'s macOS semantics
-of reporting argv[0]'s path, so the library's path-component harness match
-keeps its evidence. args is the executable path followed by the recorded
-argv tail.
+Identity keeps ps's exact shape on macOS: comm is argv[0] and args is
+the full argv joined with spaces, both taken from the kernel's per-
+process argv region - the same region ps itself reports. That is a
+correctness requirement, not a preference: the session lock compares a
+process's identity across routes, and any process ps calls a verified
+harness while this route calls it a non-harness turns a foreign
+owner's fail-closed refusal into a lock takeover. A resolved exec path
+(libproc proc_pidpath) is deliberately NOT reported - it is a
+different fact that disagrees with ps for renamed, symlinked, or
+argv[0]-wrapping harnesses, which is precisely the population the
+denied-ps hosts are expected to run.
 
 Fail-closed by design: every read is verified against the requested pid
-before anything is printed. No pid, no verification, no output - exit 1.
+before anything is printed, and an argv that cannot be read to exactly
+its declared length yields no identity rather than a partial one. No
+pid, no verification, no output - exit 1.
 
 Usage: fm-procinfo.py <pid>
 """
@@ -27,7 +36,6 @@ CTL_KERN = 1
 KERN_PROC = 14        # CTL_KERN, KERN_PROC, KERN_PROC_PID: one kinfo_proc
 KERN_PROC_PID = 1
 KERN_PROCARGS2 = 49   # CTL_KERN, KERN_PROCARGS2, pid: exec path + argv + env
-PROC_PIDPATHINFO_MAXSIZE = 4 * 4096
 
 # kinfo_proc LP64 offsets: p_pid lives in kp_proc, the real parent pid in
 # kp_eproc.e_ppid. These are assumptions, so _self_kinfo() proves them
@@ -102,51 +110,50 @@ def ppid_of(pid, offsets_verified):
     return struct.unpack_from("<i", buf, E_PPID_OFF)[0]
 
 
-def exec_path(pid):
-    """Return the executable path via libproc proc_pidpath, or None."""
-    buf = ctypes.create_string_buffer(PROC_PIDPATHINFO_MAXSIZE)
-    n = libc().proc_pidpath(
-        ctypes.c_int(pid), buf, ctypes.c_uint(PROC_PIDPATHINFO_MAXSIZE)
-    )
-    if n <= 0:
-        return None
-    try:
-        return buf.raw[:n].split(b"\0", 1)[0].decode("utf-8")
-    except UnicodeDecodeError:
-        return None
-
-
 def _procargs(pid):
-    """Return (exec_path, argv_tail) via KERN_PROCARGS2, or (None, None)."""
+    """Return this pid's full argv via KERN_PROCARGS2, or None.
+
+    Layout: int32 argc, exec path (NUL), NUL padding, argc NUL-terminated
+    argv strings (argv[0] is the invoked name - the same fact
+    `ps -o comm=` reports), then NUL padding, then env strings we do not
+    need. Strings are collected positionally: an empty argv element is
+    data, not padding, so the only skips allowed are the padding runs
+    before argv[0]. Anything that stops short of exactly argc strings is
+    an incomplete identity and returns None rather than a shifted or
+    env-leaking guess.
+    """
     buf = _sysctl((CTL_KERN, KERN_PROCARGS2, pid))
     if buf is None or len(buf) < 4:
-        return None, None
+        return None
     argc = struct.unpack_from("<i", buf, 0)[0]
     if argc <= 0 or argc > 4096:
-        return None, None
-    # Layout: int32 argc, exec path (NUL), NUL padding, argc NUL-terminated
-    # argv strings (argv[0] repeats the invoked name), then NUL padding,
-    # then env strings we do not need.
+        return None
     strings = buf[4:].split(b"\0")
     if not strings or not strings[0]:
-        return None, None
-    try:
-        execfile = strings[0].decode("utf-8")
-    except UnicodeDecodeError:
-        return None, None
+        return None
     argv = []
+    collecting = False
     for raw in strings[1:]:
+        if not collecting:
+            if not raw:
+                continue  # padding between the exec path and argv[0]
+            collecting = True
         if not raw:
-            continue  # padding before argv, and between argv and env
-        if len(argv) >= argc:
-            break
+            return None  # padding before argc strings: collection short
         try:
             argv.append(raw.decode("utf-8"))
         except UnicodeDecodeError:
             argv.append("?")
-    # argv[0] is the invoked name; the caller already holds a verified
-    # executable path, so only the tail after argv[0] adds information.
-    return execfile, argv[1:]
+        if len(argv) == argc:
+            return argv
+    return None
+
+
+def _flat(s):
+    """Collapse field and record delimiters so one read is one line."""
+    for ch in ("\t", "\r", "\n"):
+        s = s.replace(ch, " ")
+    return s
 
 
 def main():
@@ -158,20 +165,16 @@ def main():
     ppid = ppid_of(pid, verified)
     if ppid is None:
         return 1
-    path = exec_path(pid)
-    if path is None:
-        # proc_pidpath covers same-user processes unprivileged today, but if
-        # it ever fails the argv exec field is the second source, and only a
-        # verified exec path is worth reporting as comm.
-        path, _ = _procargs(pid)
-        if path is None:
-            return 1
-    _, argv_tail = _procargs(pid)
-    if argv_tail is None:
-        args = path
-    else:
-        args = " ".join([path] + argv_tail)
-    sys.stdout.write("%d\t%s\t%s\n" % (ppid, path, args))
+    argv = _procargs(pid)
+    if not argv or not argv[0]:
+        # No argv means no identity. ps gets its comm/args from this
+        # same region, so a process unreadable here is unreadable
+        # there - substituting a resolved path from elsewhere would
+        # hand the two routes different facts about one process.
+        return 1
+    comm = _flat(argv[0])
+    args = _flat(" ".join(argv))
+    sys.stdout.write("%d\t%s\t%s\n" % (ppid, comm, args))
     return 0
 
 

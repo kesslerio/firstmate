@@ -87,6 +87,123 @@ ROWS
 
 # --- the fallback decision table ---------------------------------------------
 
+test_denied_route_fields_parse_exactly() {
+  # Pin every field the 126-route parse produces. The original table rows
+  # named claude in both identity fields, so a parse that swapped comm
+  # and args, or shifted a field, still passed the walk tests. An
+  # asymmetric record plus per-field assertions is what fails such a
+  # regression here.
+  local dir fakebin table got
+  dir="$TMP_ROOT/fields"
+  fakebin=$(fm_fakebin "$dir"); make_denied_ps "$fakebin"
+  table="$dir/t"
+  cat > "$table" <<'ROWS'
+700|1|claude|/opt/tools/x --resume
+ROWS
+  got=$(lib_eval_denied "$fakebin" "$table" \
+    'fm_proc_info 700 && printf "%s|%s|%s\n" "$FM_PROC_PPID" "$FM_PROC_COMM" "$FM_PROC_ARGS"') \
+    || fail "126-route fm_proc_info refused a well-formed record"
+  [ "$got" = "1|claude|/opt/tools/x --resume" ] \
+    || fail "126-route parse produced '$got', expected '1|claude|/opt/tools/x --resume'"
+  # A record whose ppid field is empty is malformed even when the rest
+  # reads fine, and must be refused rather than carried as a blank id.
+  cat > "$table" <<'ROWS'
+5||bash|bash x
+ROWS
+  if lib_eval_denied "$fakebin" "$table" 'fm_proc_info 5' >/dev/null 2>&1; then
+    fail "126-route accepted a record with an empty ppid field"
+  fi
+  pass "126-route parse assigns each field and refuses a blank ppid"
+}
+
+check_shape_rejected() {  # <dir> <fakebin> <label> <record-bytes>
+  local bad="$1/bad"
+  printf '%b' "$4" > "$bad"
+  if FM_BAD_TRIPLE="$bad" lib_eval_denied "$2" "$1/t" \
+    'fm_os_proc_triple() { cat "$FM_BAD_TRIPLE"; return 0; }; fm_proc_info 700' \
+    >/dev/null 2>&1; then
+    fail "provider record shape '$3' was accepted instead of refused"
+  fi
+}
+
+test_provider_shape_violations_rejected() {
+  # The 126-route parser defines one record: one line, exactly three
+  # TAB-separated fields, a numeric ppid, none of them empty. Each
+  # record below is a shape a broken or future provider might emit;
+  # every one must stop the walk, never half-parse into a plausible
+  # but wrong identity.
+  local dir fakebin
+  dir="$TMP_ROOT/shape"
+  fakebin=$(fm_fakebin "$dir"); make_denied_ps "$fakebin"
+  : > "$dir/t"
+  check_shape_rejected "$dir" "$fakebin" 'two-field' '700\tclaude\n'
+  check_shape_rejected "$dir" "$fakebin" 'blank-comm' '700\t\tclaude --resume\n'
+  check_shape_rejected "$dir" "$fakebin" 'newline-payload' '700\tclaude\tok\nmore\n'
+  check_shape_rejected "$dir" "$fakebin" 'four-field' '700\tclaude\tclaude --resume\tx\n'
+  check_shape_rejected "$dir" "$fakebin" 'non-numeric-ppid' 'abc\tclaude\tclaude --resume\n'
+  pass "provider records off the defined shape are refused, not parsed"
+}
+
+test_ps_failure_statuses_route_correctly() {
+  # ps exit 1 is "ps ran and this pid gives no answer" - a refusal that
+  # must pass through as a stop WITHOUT consulting the OS provider.
+  # Only a ps that cannot execute at all (126/127) may route to it.
+  local dir fakebin calls rc
+  dir="$TMP_ROOT/rc-contract"
+  fakebin=$(fm_fakebin "$dir")
+  cat > "$fakebin/ps" <<'SH'
+#!/usr/bin/env bash
+exit "${FM_TEST_PS_RC:-1}"
+SH
+  chmod +x "$fakebin/ps"
+  calls="$dir/provider-calls"
+  : > "$calls"
+  rc=0
+  FM_TEST_PS_RC=1 FM_MARKER_FILE="$calls" PATH="$fakebin:$PATH" bash -c '
+    . "$0"
+    fm_os_proc_triple() { printf "called\n" >> "$FM_MARKER_FILE"; return 1; }
+    fm_proc_info 700
+  ' "$LIB" >/dev/null 2>&1 || rc=$?
+  [ "$rc" -ne 0 ] || fail "ps exit 1 was reported as a readable pid"
+  [ ! -s "$calls" ] || fail "ps exit 1 still consulted the OS provider"
+  rc=0
+  FM_TEST_PS_RC=127 FM_MARKER_FILE="$calls" PATH="$fakebin:$PATH" bash -c '
+    . "$0"
+    fm_os_proc_triple() { printf "called\n" >> "$FM_MARKER_FILE"; return 1; }
+    fm_proc_info 700
+  ' "$LIB" >/dev/null 2>&1 || rc=$?
+  [ "$rc" -ne 0 ] || fail "a missing ps with an unreadable provider was reported as readable"
+  [ -s "$calls" ] || fail "ps exit 127 did not route to the OS provider"
+  pass "ps 1 stays a stop with the provider untouched; ps 127 routes to it"
+}
+
+test_linux_provider_fixture_tree() {
+  # The stat-line parser is a pure seam, so its shapes are pinned on any
+  # host; the full route through FM_PROC_ROOT_OVERRIDE (the same hook
+  # bin/fm-cursor-lib.sh and friends take for their fixture trees)
+  # drives the real Linux branch against a saved /proc directory.
+  local got
+  got=$(bash -c '
+    . "$0"
+    fm_linux_stat_triple "700 (weird (comm) name) S 41 700 700 0 -1 4194304" "claude --resume"
+  ' "$LIB") || fail "linux stat seam refused a well-formed line"
+  [ "$got" = "$(printf '41\tweird (comm) name\tclaude --resume')" ] \
+    || fail "linux stat seam parsed '$got', expected ppid/comm/args split at the last ) "
+  if [ "$(uname -s)" = Linux ]; then
+    mkdir -p "$TMP_ROOT/proc/700"
+    printf '700 (claude) S 1 700 700 0 -1 4194304\n' > "$TMP_ROOT/proc/700/stat"
+    printf 'claude\0--resume\0' > "$TMP_ROOT/proc/700/cmdline"
+    got=$(env FM_PROC_ROOT_OVERRIDE="$TMP_ROOT/proc" \
+      bash -c '. "$0"; fm_os_proc_triple 700' "$LIB") \
+      || fail "fixture-tree route returned nothing"
+    [ "$got" = "$(printf '1\tclaude\tclaude --resume')" ] \
+      || fail "fixture-tree route printed '$got', expected ppid/comm/args"
+    pass "linux route parses a fixture /proc tree through the repo's override hook"
+  else
+    pass "linux stat seam pinned (fixture /proc tree is Linux-only)"
+  fi
+}
+
 test_denied_ps_still_finds_the_harness() {
   local dir fakebin table got
   dir="$TMP_ROOT/denied-found"
@@ -162,13 +279,12 @@ SH
   marker="$dir/provider-was-called"; : > "$marker"
   table="$dir/t"; : > "$table"
   # Provider override records any call by writing to the marker file.
-  env PATH="$fakebin:$PATH" bash -c "
+  env FM_MARKER_FILE="$marker" PATH="$fakebin:$PATH" bash -c "
     . \"\$0\"
-    fm_os_proc_triple() { : > \"\$FM_MARKER_FILE\"; return 1; }
+    fm_os_proc_triple() { printf 'called\n' > \"\$FM_MARKER_FILE\"; return 1; }
     fm_harness_ancestry_pid >/dev/null || exit 3
   " "$LIB" || fail "the ps-primary walk itself failed"
-  [ ! -s "$marker" ] \
-    || fail "with a working ps the provider was still consulted"
+  [ -s "$marker" ] && fail "with a working ps the provider was still consulted"
   pass "ps works: the fallback provider is never consulted"
 }
 
@@ -178,6 +294,12 @@ SH
 # symlink), a child shell whose PATH shadows ps with a denied stub, running
 # the real platform provider against real pids.
 test_e2e_real_tree_with_blocked_ps() {
+  # The real Darwin provider needs python3; without it there is nothing
+  # real to drive, so the case skips rather than fails.
+  if [ "$(uname -s)" = Darwin ] && ! command -v python3 >/dev/null 2>&1; then
+    pass "e2e blocked ps: no python3 for the Darwin provider, skipped"
+    return
+  fi
   local dir fakebin path_with_shim named
   dir="$TMP_ROOT/e2e-blocked"
   fakebin=$(fm_fakebin "$dir"); make_denied_ps "$fakebin"
@@ -194,6 +316,11 @@ test_e2e_real_tree_with_blocked_ps() {
   fi
 
   named="$dir/bin"; mkdir -p "$named"
+  # Identity is argv[0] on both routes, which the caller sets at exec
+  # time, so a symlink named claude is enough to make this process
+  # "named claude" for either reader. (A COPY of /bin/bash cannot even
+  # execute here: SIP kills relocated platform binaries.) Route
+  # equivalence itself is pinned by test_helper_identity_matches_ps_route.
   ln -s /bin/bash "$named/claude"
 
   # The child resolves the anchor for its real named parent through the
@@ -246,15 +373,94 @@ test_procinfo_helper_reports_real_facts() {
   comm=$(printf '%s' "$out" | cut -f2)
   [ "$ppid" = "$$" ] \
     || fail "fm-procinfo.py reported ppid '$ppid', expected $$"
-  case "$comm" in */sleep) ;; *) fail "fm-procinfo.py reported comm '$comm', expected a sleep path" ;; esac
-  pass "fm-procinfo.py: ppid and exec path verified against a real process"
+  [ -n "$comm" ] \
+    || fail "fm-procinfo.py reported an empty comm for a live pid"
+  pass "fm-procinfo.py: ppid verified exact and identity reported for a real process"
 }
 
+test_procinfo_helper_fails_closed() {
+  # The helper's promise is that an unverified read yields NOTHING, not
+  # a partial guess. Case 1: a pid that is gone. Case 2: the same
+  # helper with its p_pid struct offset deliberately broken - the
+  # self-verification exists for exactly this, so it must produce an
+  # empty refusal, never fields read from the wrong offsets.
+  [ "$(uname -s)" = Darwin ] || { pass "fm-procinfo.py fail-closed: macOS-only, skipped"; return; }
+  command -v python3 >/dev/null 2>&1 || { pass "fm-procinfo.py fail-closed: python3 absent, skipped"; return; }
+  local out rc mutated child
+  rc=0
+  out=$(python3 "$ROOT/bin/fm-procinfo.py" 999999 2>/dev/null) || rc=$?
+  [ "$rc" -ne 0 ] || fail "helper reported facts for pid 999999"
+  [ -z "$out" ] || fail "helper printed '$out' for a nonexistent pid"
+  mutated="$TMP_ROOT/procinfo-broken.py"
+  sed 's/^P_PID_OFF = 40$/P_PID_OFF = 4/' "$ROOT/bin/fm-procinfo.py" > "$mutated"
+  grep -q '^P_PID_OFF = 4$' "$mutated" \
+    || fail "offset mutation did not apply - helper internals drifted"
+  sleep 30 &
+  child=$!
+  rc=0
+  out=$(python3 "$mutated" "$child" 2>/dev/null) || rc=$?
+  kill "$child" 2>/dev/null
+  [ "$rc" -ne 0 ] || fail "offset-broken helper still reported a ppid"
+  [ -z "$out" ] || fail "offset-broken helper printed '$out' instead of refusing"
+  pass "fm-procinfo.py: dead pid and broken offsets both produce an empty refusal"
+}
+
+test_helper_identity_matches_ps_route() {
+  # Route equivalence, the invariant that keeps a denied-ps host from
+  # handing the foreign-owner guard a different verdict than ps gives:
+  # on macOS both routes read identity from argv, so a process invoked
+  # under a DIFFERENT name - the case where a resolved exec path would
+  # disagree - must read identically through ps and through the helper.
+  [ "$(uname -s)" = Darwin ] || { pass "route equivalence: macOS-only, skipped"; return; }
+  command -v python3 >/dev/null 2>&1 || { pass "route equivalence: python3 absent, skipped"; return; }
+  # This case compares the two routes, so it needs a working ps as the
+  # reference side; where ps itself cannot run there is nothing to
+  # compare against, and the case skips.
+  ps -o comm= -p $$ >/dev/null 2>&1 \
+    || { pass "route equivalence: ps unavailable on this host, skipped"; return; }
+  local marker="$TMP_ROOT/renamed-ready" child ps_comm ps_args got h_comm h_args i
+  rm -f "$marker"
+  /bin/bash -c ': > "$1"; exec -a claude-fake /bin/sleep 40' x "$marker" &
+  child=$!
+  # Wait for the exec to land, then require ps itself to agree before
+  # judging the helper - this pins the two routes against each other.
+  ps_comm=''
+  i=0
+  while [ ! -f "$marker" ] && [ "$i" -lt 40 ]; do sleep 0.25; i=$((i + 1)); done
+  i=0
+  while [ "$i" -lt 40 ]; do
+    ps_comm=$(ps -o comm= -p "$child" 2>/dev/null | tr -d ' ')
+    [ "$ps_comm" = "claude-fake" ] && break
+    sleep 0.25; i=$((i + 1))
+  done
+  if [ "$ps_comm" != "claude-fake" ]; then
+    kill "$child" 2>/dev/null
+    fail "renamed child never settled as 'claude-fake' under ps (got '$ps_comm')"
+  fi
+  ps_args=$(ps -o args= -p "$child" 2>/dev/null)
+  got=$(python3 "$ROOT/bin/fm-procinfo.py" "$child") \
+    || { kill "$child" 2>/dev/null; fail "helper refused the renamed child ps just verified"; }
+  kill "$child" 2>/dev/null
+  h_comm=$(printf '%s' "$got" | cut -f2)
+  h_args=$(printf '%s' "$got" | cut -f3-)
+  [ "$h_comm" = "$ps_comm" ] \
+    || fail "routes disagree on comm: helper '$h_comm', ps '$ps_comm'"
+  [ "$h_args" = "$ps_args" ] \
+    || fail "routes disagree on args: helper '$h_args', ps '$ps_args'"
+  pass "renamed process: the ps route and the ps-free route report one identity"
+}
+
+test_denied_route_fields_parse_exactly
+test_provider_shape_violations_rejected
+test_ps_failure_statuses_route_correctly
+test_linux_provider_fixture_tree
 test_denied_ps_still_finds_the_harness
 test_denied_ps_without_provider_fails_closed
 test_denied_ps_rejects_a_foreign_chain
 test_ps_primary_never_touches_the_provider
 test_e2e_real_tree_with_blocked_ps
 test_procinfo_helper_reports_real_facts
+test_procinfo_helper_fails_closed
+test_helper_identity_matches_ps_route
 
 echo "ALL PASS"
