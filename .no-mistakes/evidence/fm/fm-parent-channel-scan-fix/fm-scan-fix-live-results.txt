@@ -1,0 +1,24 @@
+SCENARIO R1: PRE-FIX watcher phantom-wakes on a remote mate's channel (base tree)
+ok   pre-fix watcher surfaced the phantom 'signal: .../parent-replies.status'
+SCENARIO R2: PRE-FIX heartbeat backstop resurrects the channel the per-wake path absorbed (base tree)
+ok   pre-fix heartbeat backstop fired ('heartbeat' wake) on a channel-only home
+SCENARIO S1: remote-mate watcher stays quiet while the channel is its only unreported file (target tree)
+ok   watcher alive 6s over a home whose only unreported file is the channel: no phantom wake, empty queue
+SCENARIO S1b: remote-mate watcher absorbs a channel append DURING the run, wakes on a real task append
+ok   channel append during the run produced no signal wake (watcher still alive, queue clean)
+ok   real task append surfaced as 'signal: .../task-a.status'
+SCENARIO S2: remote-mate heartbeat backstop absorbs a channel-only heartbeat; fires on a genuine task
+ok   heartbeat backstop ran and absorbed: watcher alive, streak advanced, no parent-replies wake
+ok   heartbeat backstop fired on the genuine task and never named the channel
+SCENARIO S3a: away-mode daemon's catch-all scan skips a remote mate's channel
+ok   daemon + watcher child ran with a fresh captain-facing channel line: no escalation, no phantom parent-replies tracking
+SCENARIO S3b: away-mode daemon's catch-all still escalates a genuine task's captain-relevant line
+ok   catch-all scan escalated the genuine task and never the channel: task-a.status: blocked: the api task is wedged for real (catch-all scan)
+SCENARIO S4: real drain presents no channel content from a remote mate home
+ok   drain: no parent-replies row anywhere; genuine task's open decision + note still presented
+SCENARIO S4b: stale channel records from an older watcher are dropped by the real drain
+ok   stale channel fold + manifest row dropped; presentation manifest rebuilt with only genuine tasks
+SCENARIO S5: real drain still folds a parent-replies.status in a MAIN home
+ok   main home's name-sharing parent-replies.status still folds and presents
+SCENARIO S6: real drain still folds a parent-replies.status in a LOCAL mate
+ok   local mate's parent-replies.status still folds and presents

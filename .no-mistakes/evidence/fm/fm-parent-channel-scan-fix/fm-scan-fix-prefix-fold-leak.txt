@@ -1,0 +1,16 @@
+Pre-fix fleet-wide fold leak (base commit f9f74a1, real scan functions from the base tree)
+driven by tests/fm-parent-channel-scan-exclusion.test.sh's behavior checks over the same remote-mate
+fixture the fixed tree passes:
+
+not ok - the channel leaked into the remote mate's folds: WHOLE:
+parent-replies	captain-hold-pr-7-1	needs-decision	captain hold pr-7: merge the green PR?
+real-task	api-shape	needs-decision	pick REST or RPC
+SNAPSHOT:
+parent-replies	182	strong:16777233:149266362:1790075621.548091116
+real-task	80	strong:16777233:149266363:1790075621.548336410
+UNREAD:
+parent-replies	note: the release branch is cut
+real-task	note: benchmark results are in
+
+On the fixed tree (target ff1673b) the same drive passes all 14 checks; the channel is absent and the
+genuine task still folds (see fm-scan-fix-live-results.txt).

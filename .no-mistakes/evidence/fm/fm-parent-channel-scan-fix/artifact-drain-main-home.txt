@@ -1,0 +1,4 @@
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+other-task [key=other-task] needs-decision: a genuine sibling task decision
+parent-replies [key=name-only] needs-decision: an ordinary task file that shares the name
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'

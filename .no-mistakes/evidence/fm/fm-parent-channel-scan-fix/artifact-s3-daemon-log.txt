@@ -1,0 +1,3 @@
+[2026-09-22T03:52:44-0700] daemon starting (pid 63325); target=fake-supervisor; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=999999s
+[2026-09-22T03:52:54-0700] inject deferred: supervisor composer not confirmed-empty (state=unknown: pending input, dead-shell prompt, or unreadable pane)
+[2026-09-22T03:52:54-0700] daemon shutting down

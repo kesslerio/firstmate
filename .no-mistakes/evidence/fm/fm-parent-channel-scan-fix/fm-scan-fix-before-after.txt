@@ -1,0 +1,27 @@
+Before/after live drive — fm-parent-channel-scan-fix (real bin/fm-watch.sh process, remote-mate fixture)
+===================================================================
+
+[BEFORE - base commit f9f74a1] watcher started in a remote mate home
+whose task log is already reported; the outbound parent channel
+state/parent-replies.status is the only unreported file:
+--- watcher stdout (exited ~4s later):
+signal: /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-live-scan.ZjnUi4/r1-remote/state/parent-replies.status
+--- pre-fix watcher tracked the channel as a task:
+.hb-surfaced-parent-replies
+.seen-parent-replies_status
+
+[BEFORE - base commit f9f74a1] heartbeat backstop drive (per-wake path primed quiet on both files, FM_HEARTBEAT=1):
+--- watcher stdout (exited):
+heartbeat
+--- durable queue after the pre-fix heartbeat:
+1790074335	1	heartbeat	heartbeat	heartbeat
+--- channel tracked by the pre-fix backstop marker:
+.hb-surfaced-parent-replies
+
+[AFTER - target ff1673b] same fixtures through the fixed watcher:
+--- S1 (channel the only unreported file, 6s window): watcher stayed alive, stdout empty, queue empty
+--- S1b: channel append during the run -> no wake; real task append -> 'signal: .../task-a.status'
+signal: /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-live-scan.ZjnUi4/s1b-remote/state/task-a.status
+--- S2: channel-only heartbeat -> absorbed (watcher alive, .heartbeat-streak advanced), no parent-replies row
+--- S2b: genuine task's blocked line -> heartbeat backstop fired, never naming the channel:
+heartbeat
