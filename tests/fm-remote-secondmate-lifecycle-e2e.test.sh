@@ -1325,4 +1325,30 @@ assert_no_grep 'session stop' "$HERDR_LOG" "remote retirement stopped the shared
 assert_no_grep 'server stop' "$HERDR_LOG" "remote retirement stopped the shared fm-remote server"
 pass "remote retirement refuses child work, then removes only its own endpoint while a shared-session sibling survives"
 
+# Retirement drops the route and its state but leaves the durable charter under
+# data/<id>, so re-seeding the same id onto a replacement host publishes from a
+# charter that still names the retired host. Publishing must normalize it to the
+# destination home: otherwise the rehomed mate appends its escalations to, and
+# reads its steers from, a host nobody watches.
+assert_present "$PARENT/data/ios/brief.md" \
+  "remote retirement removed the durable charter a rehome re-seeds from"
+assert_grep "$REMOTE_HOME/state/parent-replies.status" "$PARENT/data/ios/brief.md" \
+  "the durable charter no longer names the retired host, so a rehome cannot regress"
+REHOME_HOME="$TMP_ROOT/rehome-home"
+REHOME_INBOX="$REHOME_HOME/state/parent-route/ios.inbox"
+out=$(remote_env "$ROOT/bin/fm-remote-home-seed.sh" ios remote-mac "$REMOTE_ROOT" "$REHOME_HOME" alpha 2>&1) \
+  || fail "re-seeding a retired id onto a replacement host failed"$'\n'"$out"
+assert_contains "$out" "home=remote-mac:$REHOME_HOME" "the rehome seed did not report the replacement home"
+assert_grep "$REHOME_HOME/state/parent-replies.status" "$REHOME_HOME/data/charter.md" \
+  "the rehomed charter did not name the replacement host's reply log"
+assert_grep "$REHOME_INBOX" "$REHOME_HOME/data/charter.md" \
+  "the rehomed charter did not name the replacement host's steering inbox"
+assert_grep "$REHOME_INBOX'/NNN.msg '$REHOME_INBOX'/handled/" "$REHOME_HOME/data/charter.md" \
+  "the rehomed charter did not render the inbox acknowledgement on the replacement host"
+assert_no_grep "$REMOTE_HOME/state/parent-replies.status" "$REHOME_HOME/data/charter.md" \
+  "the rehomed charter still appends escalations to the retired host's reply log"
+assert_no_grep "$REMOTE_HOME/state/parent-route/ios.inbox" "$REHOME_HOME/data/charter.md" \
+  "the rehomed charter still reads steers from the retired host's parent-route inbox"
+pass "re-seeding a retired id onto a replacement host publishes the destination host's paths"
+
 echo "ALL TESTS PASSED"
