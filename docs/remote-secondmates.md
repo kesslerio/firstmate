@@ -134,7 +134,8 @@ bin/fm-remote-home-seed.sh <id> <ssh-alias> <remote-root> <remote-home> {<projec
 ```
 
 Without that variable the charter quotes this primary home's own `state/` paths, which name nothing on the remote host.
-Seeding always publishes the remote copy with the destination home's paths, whichever home the durable charter under `data/<id>` names, so re-seeding a retired id onto a replacement host never publishes the old host's paths.
+Publishing renders the destination's own paths for every shape the charter scaffold emits - this primary home's `state/<id>` paths, or a remote home an earlier seed published to - because teardown retires a route without removing the durable charter under `data/<id>`.
+Re-seeding a retired id onto a replacement host, or back onto a local home here with `bin/fm-home-seed.sh`, therefore never publishes the retired host's paths.
 
 `<remote-root>` is the remote Firstmate code clone that supplies tracked scripts.
 `<remote-home>` is a separate absolute path for the persistent secondmate home and must not overlap the code root.

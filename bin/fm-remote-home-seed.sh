@@ -75,6 +75,7 @@ for path in "$REMOTE_ROOT" "$REMOTE_HOME"; do
   case "/$path/" in */../*|*/./*) die "remote root or home contains traversal components" ;; esac
   case "$path" in *'//'*) die "remote root or home contains an empty path component" ;; esac
 done
+case "$REMOTE_HOME" in *"'"*) die "remote home must not contain a single quote: the published charter renders it into shell commands" ;; esac
 [ "$REMOTE_ROOT" != "$REMOTE_HOME" ] || die "remote root and home must be separate"
 case "$REMOTE_HOME/" in "$REMOTE_ROOT/"*) die "remote home must not be inside the remote code root" ;; esac
 case "$REMOTE_ROOT/" in "$REMOTE_HOME/"*) die "remote code root must not be inside the remote home" ;; esac
@@ -148,56 +149,10 @@ TMP=$(mktemp -d "${TMPDIR:-/tmp}/fm-remote-home-seed.XXXXXX") || die "cannot cre
 REG_EXISTED=0
 [ -f "$REG" ] && { cp "$REG" "$TMP/registry.before"; REG_EXISTED=1; }
 
-# Keep the parent charter as its durable source, but publish a remote copy
-# whose status path is the remote append-only relay log and whose
-# steering-inbox path is the host-local parent-route inbox the remote control
-# plane writes to, rather than paths that name nothing on that host. Publishing
-# is the only owner of the published copy's correctness, so it converges both
-# spellings a durable charter can carry: this parent home's own $STATE paths,
-# and the host-local paths bin/fm-brief.sh renders for a remote scaffold
-# (FM_SECONDMATE_REMOTE_HOME). The second one matters because teardown retires
-# a route without removing data/<id>/brief.md, so re-seeding that id onto a
-# replacement host publishes from a charter still naming the retired host.
-# Every parent differs from the others by suffix, so no rewrite can consume
-# another's text and every mention - bare path, /*.msg listing, and handled/
-# acknowledgement - lands host-local. Each rewrite stays its own plain
-# assignment: on stock macOS bash a quoted substitution nested inside a
-# double-quoted argument leaks literal quotes into the replacement text.
-STATUS_SUFFIX="/state/parent-replies.status"
-INBOX_SUFFIX="/state/parent-route/$ID.inbox"
-PARENT_STATUS="$STATE/$ID.status"
-REMOTE_STATUS="$REMOTE_HOME$STATUS_SUFFIX"
-PARENT_INBOX="$STATE/$ID.inbox"
-REMOTE_INBOX="$REMOTE_HOME$INBOX_SUFFIX"
-# bin/fm-brief.sh renders every path shell-quoted, so the remote home a charter
-# already names is the absolute prefix of its quoted parent-channel token. A
-# spelling that does not yield an absolute prefix is left alone rather than
-# rewritten on a guess.
-charter_remote_home() {
-  local line prefix
-  while IFS= read -r line || [ -n "$line" ]; do
-    case "$line" in *"'"*"$STATUS_SUFFIX'"*) ;; *) continue ;; esac
-    prefix=${line%%"$STATUS_SUFFIX'"*}
-    prefix=${prefix##*"'"}
-    case "$prefix" in /*) printf '%s\n' "$prefix"; return 0 ;; esac
-  done < "$1"
-  return 1
-}
-PRIOR_STATUS=
-PRIOR_INBOX=
-if PRIOR_HOME=$(charter_remote_home "$BRIEF") && [ "$PRIOR_HOME" != "$REMOTE_HOME" ]; then
-  PRIOR_STATUS="$PRIOR_HOME$STATUS_SUFFIX"
-  PRIOR_INBOX="$PRIOR_HOME$INBOX_SUFFIX"
-fi
-while IFS= read -r line || [ -n "$line" ]; do
-  line=${line//"$PARENT_STATUS"/"$REMOTE_STATUS"}
-  line=${line//"$PARENT_INBOX"/"$REMOTE_INBOX"}
-  if [ -n "$PRIOR_STATUS" ]; then
-    line=${line//"$PRIOR_STATUS"/"$REMOTE_STATUS"}
-    line=${line//"$PRIOR_INBOX"/"$REMOTE_INBOX"}
-  fi
-  printf '%s\n' "$line"
-done < "$BRIEF" > "$TMP/charter.remote"
+# Keep the parent charter as its durable source and publish a copy rendered for
+# this destination host, whichever home the durable charter names;
+# bin/fm-secondmate-charter-lib.sh owns that contract for every route.
+secondmate_charter_publish "$BRIEF" "$ID" "$STATE" "$REMOTE_HOME" > "$TMP/charter.remote"
 
 PROJECTS_CSV=
 : > "$TMP/project.records"

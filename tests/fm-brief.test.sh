@@ -856,6 +856,16 @@ test_secondmate_remote_home_input_is_validated() {
   assert_absent "$home/data/remote-input-newline/brief.md" \
     "a refused newline scaffold still wrote a brief"
 
+  out=$(FM_HOME="$home" FM_SECONDMATE_CHARTER=x \
+    FM_SECONDMATE_REMOTE_HOME="/mates/o'brien" \
+    "$ROOT/bin/fm-brief.sh" remote-input-quote --secondmate --no-projects 2>&1)
+  status=$?
+  [ "$status" -ne 0 ] || fail "a single quote in the remote home must stop the scaffold"
+  assert_contains "$out" "must not contain a single quote" \
+    "quote refusal did not explain the contract"
+  assert_absent "$home/data/remote-input-quote/brief.md" \
+    "a refused quoted-home scaffold still wrote a brief"
+
   out=$(FM_HOME="$home" FM_SECONDMATE_REMOTE_HOME=/mates/alpha \
     "$ROOT/bin/fm-brief.sh" remote-input-ship some-proj --mode no-mistakes 2>&1)
   status=$?
