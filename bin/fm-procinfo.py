@@ -138,12 +138,15 @@ def _procargs(pid):
             if not raw:
                 continue  # padding between the exec path and argv[0]
             collecting = True
-        if not raw:
-            return None  # padding before argc strings: collection short
-        try:
-            argv.append(raw.decode("utf-8"))
-        except UnicodeDecodeError:
-            argv.append("?")
+        if raw:
+            try:
+                argv.append(raw.decode("utf-8"))
+            except UnicodeDecodeError:
+                argv.append("?")
+        else:
+            # An empty element inside argv is real data - ps reports it
+            # too - so it is collected as "", never treated as padding.
+            argv.append("")
         if len(argv) == argc:
             return argv
     return None

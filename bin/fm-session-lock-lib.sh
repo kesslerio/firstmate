@@ -197,6 +197,33 @@ fm_os_proc_triple() {  # <pid>
   esac
 }
 
+# Confirm once per process run that the ps BINARY cannot execute, the
+# only environment this fallback exists for. A lone call's 126/127 can
+# also come from a sandbox acting on that single call, and an actual
+# binary block refuses every call including `ps -V`; only the second
+# justifies routing identity off ps. The probe result is cached, so a
+# refused walk of 16 pids costs one probe. (Busybox-era ps -V failures
+# would read as "ps works" and keep the stop - the price of requiring
+# positive proof of the denial.)
+_fm_ps_exec_denied() {
+  local rc=0
+  if [ -n "${_FM_PS_EXEC_DENIED+x}" ]; then
+    if [ "$_FM_PS_EXEC_DENIED" = 1 ]; then
+      return 0
+    fi
+    return 1
+  fi
+  ps -V >/dev/null 2>&1 || rc=$?
+  case $rc in
+    126 | 127) _FM_PS_EXEC_DENIED=1 ;;
+    *) _FM_PS_EXEC_DENIED=0 ;;
+  esac
+  if [ "$_FM_PS_EXEC_DENIED" = 1 ]; then
+    return 0
+  fi
+  return 1
+}
+
 # Read the identity fields of pid $1 into FM_PROC_COMM, FM_PROC_ARGS, and
 # FM_PROC_PPID.
 #
@@ -219,6 +246,9 @@ fm_proc_info() {  # <pid>
   case $rc in
     0) ;;
     126 | 127)
+      # Confirmed, once per process: only a ps binary that cannot
+      # execute at all justifies the second provider.
+      _fm_ps_exec_denied || return 1
       local triple f1 f2 f3 f4
       triple=$(fm_os_proc_triple "$pid") || return 1
       # Exactly one line, exactly three TAB-separated fields, a numeric
@@ -249,6 +279,10 @@ EOF
       return 1
       ;;
   esac
+  # ps ran but named nothing: that is "no answer", not an identity.
+  # Reporting a verified empty comm would hand the next caller a
+  # "not a harness" conclusion about a process it just saw.
+  [ -n "$out" ] || return 1
   FM_PROC_COMM=$out
   out=$(ps -o args= -p "$pid" 2>/dev/null) && FM_PROC_ARGS=$out
   out=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ') && FM_PROC_PPID=$out

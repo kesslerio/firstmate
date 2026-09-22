@@ -177,6 +177,112 @@ SH
   pass "ps 1 stays a stop with the provider untouched; ps 127 routes to it"
 }
 
+test_ps_denial_must_be_confirmed_before_routing() {
+  # A lone call's 126 is NOT the denial environment if ps itself still
+  # runs: a sandbox refusing one call must never flip identity onto
+  # the second provider. Only a ps that also refuses `ps -V` is the
+  # blocked binary. The probe runs once per process run, not once per
+  # refused pid.
+  local dir fakebin calls rc log
+  dir="$TMP_ROOT/denial-confirmed"
+  fakebin=$(fm_fakebin "$dir")
+  mkdir -p "$dir"
+  cat > "$fakebin/ps" <<'SH'
+#!/usr/bin/env bash
+set -u
+printf '%s\n' "$*" >> "$FM_PS_CALLS"
+for a in "$@"; do
+  case "$a" in -p) exit 126 ;; esac
+done
+exit 0
+SH
+  chmod +x "$fakebin/ps"
+  calls="$dir/provider-calls"; : > "$calls"
+  log="$dir/ps-calls"; : > "$log"
+  rc=0
+  FM_PS_CALLS="$log" FM_MARKER_FILE="$calls" PATH="$fakebin:$PATH" bash -c '
+    . "$0"
+    fm_os_proc_triple() { printf "called\n" >> "$FM_MARKER_FILE"; return 1; }
+    fm_proc_info 700; first=$?
+    fm_proc_info 701; second=$?
+    [ "$first" -ne 0 ] && [ "$second" -ne 0 ] || exit 9
+  ' "$LIB" >/dev/null 2>&1 || rc=$?
+  [ "$rc" -eq 0 ] || fail "ps that only refuses -p was still routed to the provider"
+  [ ! -s "$calls" ] || fail "provider was consulted while ps itself runs"
+  local probes
+  probes=$(grep -c '^[-]V$' "$log" || true)
+  [ "$probes" = 1 ] \
+    || fail "the denial check ran $probes times across two refused pids, expected 1"
+  pass "refused -p with a live ps -V stays a stop; the denial check is cached once"
+}
+
+test_ps_success_with_empty_comm_refuses() {
+  # ps exit 0 with no name is "no answer", not a verified empty
+  # identity: accepting it would let a caller conclude "not a harness"
+  # about a process ps just confirmed exists.
+  local dir fakebin rc
+  dir="$TMP_ROOT/empty-comm"
+  fakebin=$(fm_fakebin "$dir")
+  cat > "$fakebin/ps" <<'SH'
+#!/usr/bin/env bash
+field=
+while [ "$#" -gt 0 ]; do
+  case "$1" in -o) field=$2; shift 2 ;; *) shift ;; esac
+done
+case "$field" in
+  comm=) exit 0 ;;
+  args=) printf '%s\n' 'claude --resume'; exit 0 ;;
+  ppid=) printf '%s\n' 1; exit 0 ;;
+esac
+exit 0
+SH
+  chmod +x "$fakebin/ps"
+  rc=0
+  PATH="$fakebin:$PATH" bash -c '
+    . "$0"
+    fm_proc_info 700 && exit 9
+    [ -z "$FM_PROC_COMM" ] && [ -z "$FM_PROC_ARGS" ] && [ -z "$FM_PROC_PPID" ] || exit 8
+  ' "$LIB" >/dev/null 2>&1 || rc=$?
+  [ "$rc" -eq 0 ] || fail "ps rc0-with-empty-comm was not refused as no-answer (rc $rc)"
+  pass "ps returning no name is refused and leaves every field cleared"
+}
+
+test_denied_ps_lock_decision_chain() {
+  # The lock-level promise at lib level with a fake provider: a
+  # provider-readable harness in THIS ancestry reads as our own lock,
+  # and a provider-readable live harness OUTSIDE it reads as a
+  # foreign live owner that must be refused, named, and never
+  # reclaimed. The ps-working suites cover the same decisions against
+  # real ps; this one proves the denied-ps route reaches them at all.
+  local dir fakebin table state rc out
+  dir="$TMP_ROOT/lock-chain"
+  fakebin=$(fm_fakebin "$dir"); make_denied_ps "$fakebin"
+  table="$dir/t"
+  cat > "$table" <<'ROWS'
+700|1|claude|claude --resume
+701|1|claude|claude --other-home
+1|0|launchd|/sbin/launchd
+default|700|bash|bash run.sh
+ROWS
+  state="$dir/state"; mkdir -p "$state"
+  # Ours: recorded pid 700 is a harness ancestor of this walk.
+  printf '700\n' > "$state/.lock"
+  FM_TEST_STATE="$state" lib_eval_denied "$fakebin" "$table" \
+    'fm_session_lock_owned_by_self "$FM_TEST_STATE"' >/dev/null 2>&1 \
+    || fail "denied ps: the walk did not recognize its own harness lock"
+  # Foreign: 701 is a live readable harness, but not in this ancestry.
+  printf '701\n' > "$state/.lock"
+  rc=0
+  out=$(FM_TEST_STATE="$state" lib_eval_denied "$fakebin" "$table" '
+    fm_session_lock_foreign_owner_live "$FM_TEST_STATE" || exit 7
+    [ "$FM_SESSION_LOCK_FOREIGN_OWNER_PID" = 701 ] || exit 6
+    if fm_session_lock_owned_by_self "$FM_TEST_STATE"; then exit 5; fi
+    exit 0
+  ' 2>&1) || rc=$?
+  [ "$rc" -eq 0 ] || fail "denied ps: a foreign live harness was not reported as foreign (rc $rc): $out"
+  pass "denied ps: own lock is owned, foreign live harness is refused and named"
+}
+
 test_linux_provider_fixture_tree() {
   # The stat-line parser is a pure seam, so its shapes are pinned on any
   # host; the full route through FM_PROC_ROOT_OVERRIDE (the same hook
@@ -331,7 +437,8 @@ test_e2e_real_tree_with_blocked_ps() {
 set -u
 . "\$1"
 anchor=\$(fm_session_lock_anchor_pid) || { echo anchor-failed; exit 1; }
-printf '%s\n' "\$anchor"
+fm_proc_info "\$anchor" || { echo identity-read-failed; exit 1; }
+printf '%s|%s\n' "\$anchor" "\$FM_PROC_COMM"
 CHILD
   chmod +x "$dir/child.sh"
 
@@ -350,13 +457,21 @@ CHILD
     wait "$childpid" 2>/dev/null || true
   ' x "$dir/parent.pid" "$dir/child.sh" "$path_with_shim" "$LIB"
 
-  local want got2
+  local want got2 pid_part comm_part
   want=$(cat "$dir/parent.pid") || fail "e2e: the named parent did not record its pid"
   got2=$(cat "$dir/parent.pid.anchor") \
     || fail "e2e: no anchor output from the child"
-  [ "$got2" = "$want" ] \
-    || fail "e2e blocked ps: child resolved '$got2', expected the real named-parent pid $want"
-  pass "e2e blocked ps: the real platform provider identified a real harness tree"
+  pid_part=${got2%%|*}
+  comm_part=${got2#*|}
+  [ "$pid_part" = "$want" ] \
+    || fail "e2e blocked ps: child resolved '$pid_part', expected the real named-parent pid $want"
+  # Identity, not just the ppid chain: the anchor's own name must
+  # arrive through the provider as "claude". On macOS that fact is
+  # argv[0], so an implementation reading the resolved exec path would
+  # answer "bash" here and fail this assertion.
+  [ "$(basename -- "$comm_part")" = claude ] \
+    || fail "e2e blocked ps: anchor identity read as '$comm_part', expected a name ending in claude"
+  pass "e2e blocked ps: the real platform provider identified a real harness tree, identity included"
 }
 
 test_procinfo_helper_reports_real_facts() {
@@ -450,9 +565,51 @@ test_helper_identity_matches_ps_route() {
   pass "renamed process: the ps route and the ps-free route report one identity"
 }
 
+test_procinfo_helper_survives_empty_argv_element() {
+  # The reported blocker: a provider that refuses any argv containing
+  # an empty element cannot name a harness whose argv carries one
+  # (verified on a real Pi primary), so the lock refusal survives even
+  # with the fallback in place. ps reads the same argv and answers, so
+  # route equivalence requires collecting the empty element as the
+  # data it is. This case is that exact shape: bash -c with a trailing
+  # empty argument, checked against live ps.
+  [ "$(uname -s)" = Darwin ] || { pass "empty argv element: macOS-only, skipped"; return; }
+  command -v python3 >/dev/null 2>&1 \
+    || { pass "empty argv element: python3 absent, skipped"; return; }
+  ps -o comm= -p $$ >/dev/null 2>&1 \
+    || { pass "empty argv element: ps unavailable, skipped"; return; }
+  local child out comm args ps_comm ps_args i
+  python3 -c 'import os; os.execv("/bin/bash", ["/bin/bash", "-c", "sleep 20; :", ""])' &
+  child=$!
+  i=0
+  while [ "$i" -lt 40 ]; do
+    ps_comm=$(ps -o comm= -p "$child" 2>/dev/null | tr -d ' ')
+    [ "$ps_comm" = "/bin/bash" ] && break
+    sleep 0.25; i=$((i + 1))
+  done
+  if [ "$ps_comm" != "/bin/bash" ]; then
+    kill "$child" 2>/dev/null
+    fail "empty-element child never settled as bash under ps (got '$ps_comm')"
+  fi
+  out=$(python3 "$ROOT/bin/fm-procinfo.py" "$child") \
+    || { kill "$child" 2>/dev/null; fail "provider refused a live argv holding only an empty element"; }
+  ps_args=$(ps -o args= -p "$child" 2>/dev/null)
+  kill "$child" 2>/dev/null
+  comm=$(printf '%s' "$out" | cut -f2)
+  args=$(printf '%s' "$out" | cut -f3-)
+  [ "$comm" = "$ps_comm" ] \
+    || fail "comm: provider '$comm', ps '$ps_comm'"
+  [ "${args%"${args##*[![:space:]]}"}" = "${ps_args%"${ps_args##*[![:space:]]}"}" ] \
+    || fail "args: provider '$args', ps '$ps_args'"
+  pass "empty argv element is collected as data; provider and ps stay one fact"
+}
+
 test_denied_route_fields_parse_exactly
 test_provider_shape_violations_rejected
 test_ps_failure_statuses_route_correctly
+test_ps_denial_must_be_confirmed_before_routing
+test_ps_success_with_empty_comm_refuses
+test_denied_ps_lock_decision_chain
 test_linux_provider_fixture_tree
 test_denied_ps_still_finds_the_harness
 test_denied_ps_without_provider_fails_closed
@@ -462,5 +619,6 @@ test_e2e_real_tree_with_blocked_ps
 test_procinfo_helper_reports_real_facts
 test_procinfo_helper_fails_closed
 test_helper_identity_matches_ps_route
+test_procinfo_helper_survives_empty_argv_element
 
 echo "ALL PASS"
