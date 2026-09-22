@@ -678,7 +678,7 @@ jq '
     ($account | .accountKey = "codex-home" |
       .quotaSemantics.effectiveAvailability |= map(.effectivePercentRemaining = 80 | .runway.status = "through_reset"))]
 ' "$SCHEMA6" > "$SCHEMA6_NATIVE"
-for model in default gpt-5.6-sol; do
+for model in default gpt-6-sol; do
   out=$(call_choose --snapshot "$SCHEMA6_NATIVE" --candidate "codex:$model" --candidate cursor:default)
   [ "$out" = "codex $model" ] || fail "native Codex did not select codex-home for $model: $out"
 done
