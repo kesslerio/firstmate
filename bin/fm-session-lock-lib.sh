@@ -95,6 +95,96 @@ fm_harness_process_matches() {  # <comm> <args>
   return 1
 }
 
+# --- one field reader, ps primary, ps-free route as fallback -----------------
+# Every identity read of a live process (comm, args, ppid) goes through
+# fm_proc_info below, so the denied-ps fallback has exactly one place to
+# apply. The verdict rules never change: the fallback changes only which
+# route the same kernel facts arrive by.
+
+# OS provider for one pid: prints "<ppid>TAB<comm>TAB<args>", or returns 1.
+# Called only when the ps binary itself cannot execute. Tests override this
+# whole function to drive a deterministic table.
+fm_os_proc_triple() {  # <pid>
+  case "$(uname -s 2>/dev/null)" in
+    Linux)
+      local line rest comm ppid args
+      [ -r "/proc/$1/stat" ] || return 1
+      line=$(cat "/proc/$1/stat" 2>/dev/null) || return 1
+      # "<pid> (<comm>) <state> <ppid> ...": comm may contain spaces and
+      # parentheses, so cut the rest off the last ") ", not the first.
+      comm=${line#*(}
+      comm=${comm%*) *}
+      comm=${comm//$'\t'/ }
+      rest=${line##*") "}
+      local -a fields
+      IFS=' ' read -r -a fields <<< "$rest"
+      ppid=${fields[1]:-}
+      [ -n "$ppid" ] || return 1
+      args=''
+      if [ -r "/proc/$1/cmdline" ]; then
+        args=$(tr '\0' ' ' < "/proc/$1/cmdline" 2>/dev/null)
+        args=${args% }
+      fi
+      printf '%s\t%s\t%s\n' "$ppid" "$comm" "$args"
+      ;;
+    Darwin)
+      # bin/fm-procinfo.py reads ppid through a self-verified
+      # KERN_PROC_PID chain and comm/args through libproc proc_pidpath plus
+      # KERN_PROCARGS2, failing closed on any mismatch. python3 is an
+      # optional toolchain member (Herdr ordering already depends on it);
+      # without it the denied-ps route degrades to today's fail-closed
+      # refusal rather than to a guess.
+      command -v python3 >/dev/null 2>&1 || return 1
+      python3 "$(dirname -- "${BASH_SOURCE[0]}")/fm-procinfo.py" "$1" 2>/dev/null
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+# Read the identity fields of pid $1 into FM_PROC_COMM, FM_PROC_ARGS, and
+# FM_PROC_PPID.
+#
+# ps stays primary everywhere it runs: while it executes, its output is
+# used verbatim, so behavior is byte-identical to every session that ever
+# worked. Only a ps that cannot execute at all - bash exits 126 for a
+# refused exec, 127 for a missing binary, while a pid merely being gone
+# exits ps 1 - routes one read to the OS provider. This exists because an
+# EDR-style policy can deny the ps binary's exec itself (observed:
+# /bin/ps refused even for `ps -V`, while kill, head, sysctl, pgrep, and
+# lsof all ran) while every fact the identity walk needs remains readable
+# through /proc or the kernel syscalls.
+#
+# Returning 1 means "no route can read this pid", which stops a walk
+# exactly as a dead pid always has: nothing here ever fabricates a field.
+fm_proc_info() {  # <pid>
+  local pid=$1 rc=0 out
+  FM_PROC_COMM='' FM_PROC_ARGS='' FM_PROC_PPID=''
+  out=$(ps -o comm= -p "$pid" 2>/dev/null) || rc=$?
+  case $rc in
+    0) ;;
+    126 | 127)
+      local triple rest
+      triple=$(fm_os_proc_triple "$pid") || return 1
+      FM_PROC_PPID=${triple%%$'\t'*}
+      rest=${triple#*$'\t'}
+      [ "$rest" != "$triple" ] || return 1
+      FM_PROC_COMM=${rest%%$'\t'*}
+      FM_PROC_ARGS=${rest#*$'\t'}
+      [ -n "$FM_PROC_PPID" ]
+      return
+      ;;
+    *)
+      return $rc
+      ;;
+  esac
+  FM_PROC_COMM=$out
+  out=$(ps -o args= -p "$pid" 2>/dev/null) && FM_PROC_ARGS=$out
+  out=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ') && FM_PROC_PPID=$out
+  return 0
+}
+
 # Walk the current process ancestry (up to 16 hops) and print this session's
 # contiguous verified-harness ancestry, innermost pid first.
 #
@@ -114,11 +204,10 @@ fm_harness_process_matches() {  # <comm> <args>
 # session cannot be read off the ancestry at all, so the whole contiguous run is
 # reported and the callers below decide what they need from it.
 fm_harness_ancestry_pids() {
-  local pid=$$ comm args extending=0 printed=0
+  local pid=$$ extending=0 printed=0
   for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16; do
-    comm=$(ps -o comm= -p "$pid" 2>/dev/null) || break
-    args=$(ps -o args= -p "$pid" 2>/dev/null)
-    if fm_harness_process_matches "$comm" "$args"; then
+    fm_proc_info "$pid" || break
+    if fm_harness_process_matches "$FM_PROC_COMM" "$FM_PROC_ARGS"; then
       printf '%s\n' "$pid"
       printed=1
       [ "$FM_HARNESS_IS_CLAUDE" -eq 1 ] || break
@@ -126,7 +215,7 @@ fm_harness_ancestry_pids() {
     elif [ "$extending" -eq 1 ]; then
       break
     fi
-    pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
+    pid=$FM_PROC_PPID
     # Examine the top of the chain before stopping. Inside a PID namespace the
     # harness itself is pid 1, so stopping as soon as the next pid is 1 hides the
     # very process this walk exists to find. A host's real pid 1 (init, systemd,
@@ -162,11 +251,10 @@ EOF
 
 # True if $1 is a live process that looks like a verified harness.
 fm_harness_pid_alive() {
-  local pid=$1 comm args
+  local pid=$1
   kill -0 "$pid" 2>/dev/null || return 1
-  comm=$(ps -o comm= -p "$pid" 2>/dev/null) || return 1
-  args=$(ps -o args= -p "$pid" 2>/dev/null)
-  fm_harness_process_matches "$comm" "$args"
+  fm_proc_info "$pid" || return 1
+  fm_harness_process_matches "$FM_PROC_COMM" "$FM_PROC_ARGS"
 }
 
 # --- trusted same-session identity -------------------------------------------
@@ -196,7 +284,7 @@ fm_harness_pid_alive() {
 # ancestry list an earlier walk already produced, so a caller that walked once
 # need not walk again.
 fm_session_lock_trusted_session_id() {  # [<ancestry-pids>]
-  local id=${CLAUDE_CODE_SESSION_ID:-} claude_pid=${CLAUDE_PID:-} pids=${1:-} pid comm args
+  local id=${CLAUDE_CODE_SESSION_ID:-} claude_pid=${CLAUDE_PID:-} pids=${1:-} pid
   [ -n "$id" ] || return 1
   case "$id" in *$'\n'*|*$'\r'*) return 1 ;; esac
   case "$claude_pid" in ''|*[!0-9]*) return 1 ;; esac
@@ -205,9 +293,8 @@ fm_session_lock_trusted_session_id() {  # [<ancestry-pids>]
   fi
   while IFS= read -r pid; do
     [ "$pid" = "$claude_pid" ] || continue
-    comm=$(ps -o comm= -p "$pid" 2>/dev/null) || return 1
-    args=$(ps -o args= -p "$pid" 2>/dev/null)
-    fm_harness_process_matches "$comm" "$args" || return 1
+    fm_proc_info "$pid" || return 1
+    fm_harness_process_matches "$FM_PROC_COMM" "$FM_PROC_ARGS" || return 1
     [ "$FM_HARNESS_IS_CLAUDE" -eq 1 ] || return 1
     printf '%s\n' "$id"
     return 0
@@ -373,7 +460,7 @@ fm_session_lock_inspect() {  # <state>
     fi
     return 0
   fi
-  if ps -o comm= -p "$pid" >/dev/null 2>&1; then
+  if fm_proc_info "$pid"; then
     FM_LOCK_INSPECT_STATE=unknown
     return 0
   fi
