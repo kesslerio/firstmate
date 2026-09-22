@@ -1,0 +1,14 @@
+== PRE-FIX DAEMON HEARTBEAT CATCH-ALL (base commit, away-mode daemon via bin/fm-afk-start.sh, remote secondmate home) ==
+--- state/.subsuper-escalations after the catch-all scan ran (phantom escalation for the mate's own channel):
+parent-replies.status: needs-decision [key=captain-hold-pr-7-1]: captain hold pr-7: merge the green PR? (catch-all scan)
+
+--- daemon log (watcher child also woke on the channel):
+[2026-09-22T00:57:42-0700] daemon starting (pid 38494); target=fm-scanfix-lab:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=90s
+[2026-09-22T00:57:50-0700] wake: signal: /tmp/fm-scanfix-lab-75684/p1b-remote/state/parent-replies.status
+[2026-09-22T00:57:53-0700] self-handle: needs-decision: /tmp/fm-scanfix-lab-75684/p1b-remote/state/parent-replies.status -> signal already escalated (catch-all scan): parent-replies.status: needs-decision [key=captain-hold-pr-7-1]: captain hold pr-7: merge the green PR?
+[2026-09-22T00:58:25-0700] daemon shutting down
+
+--- phantom state markers the unfixed daemon wrote:
+.parent-replies.open-decisions-cursor
+.seen-parent-replies_status
+.subsuper-seen-status-parent-replies

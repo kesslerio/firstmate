@@ -1,0 +1,15 @@
+== BOUNDARY: parent-replies.status OUTSIDE a remote mate home stays an ordinary task ==
+--- MAIN HOME: fixed watcher stdout after a captain-relevant append to its own parent-replies.status:
+signal: /tmp/fm-scanfix-lab-75684/p2-main/state/parent-replies.status
+--- main home drain OPEN DECISIONS:
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+parent-replies [key=name-only] needs-decision: an ordinary task file that shares the name
+parent-replies [key=second-decision] needs-decision: main home keeps its own task file
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'
+
+--- LOCAL MATE: fixed watcher stdout after a captain-relevant append:
+signal: /tmp/fm-scanfix-lab-75684/p2-local/state/parent-replies.status
+--- local mate drain OPEN DECISIONS:
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+parent-replies [key=local-shape] needs-decision: still an ordinary self-home file
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'

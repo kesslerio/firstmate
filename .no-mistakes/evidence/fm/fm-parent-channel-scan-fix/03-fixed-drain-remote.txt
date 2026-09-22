@@ -1,0 +1,11 @@
+== FIXED DRAIN (real bin/fm-wake-drain.sh, remote secondmate home) ==
+OPEN DECISIONS folds only the genuine task; the mate's own parent channel never appears:
+1790063970	2	signal	real-task.status	needs-decision: /tmp/fm-scanfix-lab-75684/p2-remote/state/real-task.status
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 56896.1790063970.tkHrwC
+wake annotation: unread wake-EVENT since last drain, not current state: real-task.status: note: benchmark sweep finished
+wake annotation: latest wake-EVENT observed at drain, not current state: real-task.status: needs-decision [key=api-shape]: pick REST or RPC
+UNREAD STATUS (new since last drain, not re-printed after this presentation):
+real-task note: benchmark sweep finished
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+real-task [key=api-shape] needs-decision: pick REST or RPC
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'

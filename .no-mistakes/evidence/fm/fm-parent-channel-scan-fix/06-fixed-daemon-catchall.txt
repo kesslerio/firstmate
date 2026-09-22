@@ -1,0 +1,13 @@
+== FIXED DAEMON HEARTBEAT CATCH-ALL (worktree, away-mode via bin/fm-afk-start.sh, remote secondmate home) ==
+--- channel pre-seeded with needs-decision; catch-all scan ran >=5 times (FM_HEARTBEAT_SCAN_SECS=2, ~12s observed):
+    escalation buffer: (empty), no .subsuper-seen-status-parent-replies, no phantom fold record, no wake
+
+--- appended 'blocked [key=wedge]: the crew is stuck' to state/real-task.status (genuine task):
+--- escalation buffer (genuine backstop preserved; no parent-replies content):
+real-task.status: blocked [key=wedge]: the crew is stuck (catch-all scan)
+
+--- daemon log (channel never escalated; genuine task escalated once and self-handled):
+[2026-09-22T01:01:27-0700] daemon starting (pid 54582); target=fm-scanfix-lab:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=0s
+[2026-09-22T01:02:19-0700] wake: signal: /tmp/fm-scanfix-lab-75684/p4-remote/state/real-task.status
+[2026-09-22T01:02:22-0700] self-handle: signal: /tmp/fm-scanfix-lab-75684/p4-remote/state/real-task.status -> signal already escalated (catch-all scan): real-task.status: blocked [key=wedge]: the crew is stuck
+[2026-09-22T01:03:31-0700] daemon shutting down

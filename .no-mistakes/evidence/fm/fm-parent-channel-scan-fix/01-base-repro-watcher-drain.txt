@@ -1,0 +1,17 @@
+== PRE-FIX REPRODUCTION (base commit da9607d, real bin/fm-watch.sh in a remote secondmate home) ==
+--- watcher stdout after appending a needs-decision line to state/parent-replies.status (the mate's own parent channel):
+signal: /tmp/fm-scanfix-lab-75684/p1-remote/state/parent-replies.status
+
+--- state/.wake-queue (phantom wake rows for task parent-replies):
+1790063800	1	signal	parent-replies.status	needs-decision: /tmp/fm-scanfix-lab-75684/p1-remote/state/parent-replies.status
+1790063800	2	signal	parent-replies.status	needs-decision: /tmp/fm-scanfix-lab-75684/p1-remote/state/parent-replies.status
+
+--- base fm-wake-drain.sh presentation (phantom OPEN DECISIONS fold):
+1790063800	2	signal	parent-replies.status	needs-decision: /tmp/fm-scanfix-lab-75684/p1-remote/state/parent-replies.status
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 77770.1790063800.iGUBnd
+wake annotation: latest wake-EVENT observed at drain, not current state: parent-replies.status: needs-decision [key=captain-hold-pr-7-1]: captain hold pr-7: merge the green PR?
+UNREAD STATUS (new since last drain, not re-printed after this presentation):
+real-task note: benchmark sweep finished
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+parent-replies [key=captain-hold-pr-7-1] needs-decision: captain hold pr-7: merge the green PR?
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'

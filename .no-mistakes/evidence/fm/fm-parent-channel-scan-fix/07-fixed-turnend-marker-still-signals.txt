@@ -1,0 +1,6 @@
+== NO OTHER SCAN BEHAVIOR CHANGED: turn-end markers still signal in a remote mate home ==
+fixed bin/fm-watch.sh, remote secondmate home, baseline statuses pre-reported;
+appended real-task.turn-ended (the turn-end hook's marker):
+--- watcher stdout:
+signal: <lab>/home/state/real-task.turn-ended
+(watcher woke one-shot on the turn-end marker; the channel file beside it never fired)

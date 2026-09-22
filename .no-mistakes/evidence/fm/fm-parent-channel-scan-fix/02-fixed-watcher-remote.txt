@@ -1,0 +1,12 @@
+== FIXED PRODUCT (worktree b78db0b, real bin/fm-watch.sh, remote secondmate home) ==
+--- baseline: watcher alive and quiet (no wake, empty queue)
+--- appended the same needs-decision line to state/parent-replies.status:
+result: watcher stayed running, stdout empty, wake queue empty, no parent-replies seen markers
+
+--- appended 'needs-decision [key=api-shape]: pick REST or RPC' to state/real-task.status (genuine task):
+--- watcher stdout (genuine wake preserved):
+signal: /tmp/fm-scanfix-lab-75684/p2-remote/state/real-task.status
+
+--- state/.wake-queue (rows name real-task, never parent-replies):
+1790063970	1	signal	real-task.status	needs-decision: /tmp/fm-scanfix-lab-75684/p2-remote/state/real-task.status
+1790063970	2	signal	real-task.status	needs-decision: /tmp/fm-scanfix-lab-75684/p2-remote/state/real-task.status

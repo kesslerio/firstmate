@@ -1,0 +1,15 @@
+== FIXED DRAIN DROPS STALE PHANTOM RECORDS FROM AN OLDER WATCHER ==
+seeded: .parent-replies.open-decisions-cursor with 'needs-decision [key=old-phantom]' and
+        .status-presentation-cursor row 'parent-replies strong:1:2:3 99 0'
+--- drain output (nothing parent-replies presented):
+1790063970	2	signal	real-task.status	needs-decision: /tmp/fm-scanfix-lab-75684/p2-remote/state/real-task.status
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 56896.1790063970.tkHrwC
+wake annotation: unread wake-EVENT since last drain, not current state: real-task.status: note: benchmark sweep finished
+wake annotation: latest wake-EVENT observed at drain, not current state: real-task.status: needs-decision [key=api-shape]: pick REST or RPC
+UNREAD STATUS (new since last drain, not re-printed after this presentation):
+real-task note: benchmark sweep finished
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+real-task [key=api-shape] needs-decision: pick REST or RPC
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'
+--- presentation manifest after the drain (only real-task remains):
+real-task	strong:16777233:148691867:1790063713.471600731	80	0
