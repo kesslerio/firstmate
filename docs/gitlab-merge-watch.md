@@ -144,6 +144,7 @@ $ fm-pr-poll.sh --validated $(tr '\n' ' ' < state/e3.pr-poll)
 
 The merged fixture merge request produces exactly one `merged` line.
 The open one produces nothing, and the unreachable placeholder host produces nothing rather than a false merge.
+A GitLab merge request reports no comment or review activity, because glab's one standard read of a merge request yields its fields and not its notes, and this poll spends one forge call per sweep by contract; a GitHub pull request reports that activity from the same read it already made.
 
 The same bytes work in the watcher's sidecar-driven mode, where the published check locates its own record:
 

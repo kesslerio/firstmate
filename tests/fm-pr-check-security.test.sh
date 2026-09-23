@@ -146,6 +146,34 @@ case "${1:-} ${2:-}" in
     ;;
   "pr view")
     case " $* " in
+      *state,comments,reviews*)
+        # The single read a static poll now makes. gh reads these three fields
+        # in one call and its --jq prints one tab-separated line each, so the
+        # fixture prints exactly that shape: S for the state, C for a top-level
+        # comment, R for a submitted review. An entry is pipe-separated and its
+        # last field keeps every remaining pipe, so a body may hold one.
+        [ "${FM_TEST_GH_FAIL:-0}" = 0 ] || exit 1
+        [ -z "${FM_TEST_GH_STATE_STARTED:-}" ] || : > "$FM_TEST_GH_STATE_STARTED"
+        [ "${FM_TEST_GH_SLEEP:-0}" = 0 ] || sleep "$FM_TEST_GH_SLEEP"
+        if [ -n "${FM_TEST_GH_POLL_RAW+set}" ]; then
+          printf '%s\n' "$FM_TEST_GH_POLL_RAW"
+          exit 0
+        fi
+        printf 'S\t%s\n' "${FM_TEST_GH_STATE:-OPEN}"
+        while IFS='|' read -r poll_c_id poll_c_author poll_c_body; do
+          [ -n "$poll_c_id" ] || continue
+          printf 'C\t%s\t%s\t%s\n' "$poll_c_id" "$poll_c_author" "$poll_c_body"
+        done <<ROWS
+${FM_TEST_GH_POLL_COMMENTS-}
+ROWS
+        while IFS='|' read -r poll_r_id poll_r_author poll_r_state poll_r_body; do
+          [ -n "$poll_r_id" ] || continue
+          printf 'R\t%s\t%s\t%s\t%s\n' "$poll_r_id" "$poll_r_author" "$poll_r_state" "$poll_r_body"
+        done <<ROWS
+${FM_TEST_GH_POLL_REVIEWS-}
+ROWS
+        exit 0
+        ;;
       *statusCheckRollup*)
         printf '%s\n' "{\"state\":\"OPEN\",\"isDraft\":false,\"mergeable\":\"MERGEABLE\",\"mergeStateStatus\":\"CLEAN\",\"headRefOid\":\"${FM_TEST_GH_HEAD:-0123456789abcdef0123456789abcdef01234567}\",\"baseRefName\":\"main\",\"statusCheckRollup\":[{\"__typename\":\"CheckRun\",\"name\":\"ci\",\"status\":\"COMPLETED\",\"conclusion\":\"SUCCESS\"}]}"
         exit 0
@@ -813,6 +841,329 @@ test_static_poll_contract() {
   pass "static poll is silent except for one merged line and remains watcher-bounded"
 }
 
+# --- activity detection ------------------------------------------------------
+
+# A home's state directory is legitimately 0755, which is what a real home
+# presents, so an activity fixture pins that mode instead of inheriting whatever
+# the temporary root's umask happened to produce.
+activity_fixture() {
+  make_poll_fixture "$1"
+  chmod 755 "$1/home/state"
+}
+
+# Comments and reviews are pipe-separated entries, one per line, mirroring the
+# one forge read the poll consumes.
+ONE_COMMENT='IC_one|maintainer|please rebase'
+TWO_COMMENTS='IC_one|maintainer|please rebase
+IC_two|reviewer|rebased and pushed'
+ONE_REVIEW='PRR_one|judge|CHANGES_REQUESTED|guard the null case'
+
+run_poll_validated() { # <dir> [sidecar]
+  local dir=$1
+  local sidecar=${2-$dir/home/state/task-a.pr-poll}
+  FM_TEST_GH_LOG="$dir/gh.log" PATH="$dir/fakebin:$BASE_PATH" \
+    bash "$POLL" --validated github https://github.com/o/r/pull/1 github.com o/r 1 "$sidecar"
+}
+
+cursor_path() { printf '%s/home/state/task-a.pr-activity' "$1"; }
+
+# The recorded ids, one per line, header excluded.
+cursor_records() { sed -n '1!p' "$1"; }
+
+test_poll_activity_seeds_without_waking() {
+  local dir out
+  dir=$(make_case poll-activity-seed)
+  activity_fixture "$dir"
+
+  out=$(FM_TEST_GH_POLL_COMMENTS="$TWO_COMMENTS" FM_TEST_GH_POLL_REVIEWS="$ONE_REVIEW" \
+    run_poll "$dir")
+  [ -z "$out" ] || fail "first sweep woke on history that was already there"
+  [ -f "$(cursor_path "$dir")" ] || fail "first sweep left no cursor behind"
+  [ "$(file_mode "$(cursor_path "$dir")")" = 600 ] || fail "cursor was not written private"
+  [ "$(cursor_records "$(cursor_path "$dir")" | tr '\t' ' ' | tr -s ' ' | tr '\n' ' ' | sed -e 's/ *$//')" = \
+    "C IC_one C IC_two R PRR_one" ] || fail "first sweep did not seed every visible id"
+  pass "first sweep seeds the cursor privately and reports nothing"
+}
+
+test_poll_activity_reports_a_new_comment_once() {
+  local dir out cursor
+  dir=$(make_case poll-activity-comment)
+  activity_fixture "$dir"
+  cursor=$(cursor_path "$dir")
+
+  FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll "$dir" > /dev/null
+
+  out=$(FM_TEST_GH_POLL_COMMENTS="$TWO_COMMENTS" run_poll "$dir")
+  [ "$out" = "pr-activity: https://github.com/o/r/pull/1 comment reviewer: rebased and pushed" ] \
+    || fail "a fresh comment did not produce exactly one activity line: $out"
+  [ "$(cursor_records "$cursor" | wc -l | tr -d ' ')" = 2 ] \
+    || fail "the reported comment did not advance the cursor"
+
+  out=$(FM_TEST_GH_POLL_COMMENTS="$TWO_COMMENTS" run_poll "$dir")
+  [ -z "$out" ] || fail "replaying the same state woke again: $out"
+  pass "a fresh comment wakes once and replay stays silent"
+}
+
+test_poll_activity_batches_a_group_into_one_line() {
+  local dir out cursor
+  dir=$(make_case poll-activity-batch)
+  activity_fixture "$dir"
+  cursor=$(cursor_path "$dir")
+  FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll "$dir" > /dev/null
+
+  # Two arrivals in one sweep are still one line, counted, and carrying the
+  # newest item's author and first line rather than one line each.
+  out=$(FM_TEST_GH_POLL_COMMENTS="${TWO_COMMENTS}
+IC_three|third|second new comment" run_poll "$dir")
+  [ "$out" = "pr-activity: https://github.com/o/r/pull/1 comment third: 2 new - second new comment" ] \
+    || fail "a group of new comments did not batch into one counted line: $out"
+  [ "$(cursor_records "$cursor" | wc -l | tr -d ' ')" = 3 ] \
+    || fail "a batched group did not record every id it swallowed"
+  pass "a group of new items batches into one counted line"
+}
+
+test_poll_activity_reports_a_submitted_review() {
+  local dir out
+  dir=$(make_case poll-activity-review)
+  activity_fixture "$dir"
+  run_poll "$dir" > /dev/null
+
+  out=$(FM_TEST_GH_POLL_REVIEWS="$ONE_REVIEW" run_poll "$dir")
+  [ "$out" = "pr-activity: https://github.com/o/r/pull/1 review judge: CHANGES_REQUESTED - guard the null case" ] \
+    || fail "a submitted review did not wake with its state and text: $out"
+
+  # An unsubmitted review is not engagement, and skipping it must not cost the
+  # review its place in the cursor, so a review that later reaches a submitted
+  # state is still reported rather than having been burned as already seen.
+  out=$(FM_TEST_GH_POLL_REVIEWS="${ONE_REVIEW}
+PRR_two|judge|PENDING|work in progress" run_poll "$dir")
+  [ -z "$out" ] || fail "an unsubmitted review woke anyway: $out"
+  out=$(FM_TEST_GH_POLL_REVIEWS="${ONE_REVIEW}
+PRR_two|judge|PENDING|work in progress
+PRR_three|judge|APPROVED|" run_poll "$dir")
+  [ "$out" = "pr-activity: https://github.com/o/r/pull/1 review judge: APPROVED" ] \
+    || fail "a review that later reached a submitted state was not still reportable: $out"
+  pass "submitted reviews wake and a pending review stays silent"
+}
+
+test_poll_activity_reports_one_line_per_sweep() {
+  local dir out cursor
+  dir=$(make_case poll-activity-one-line)
+  activity_fixture "$dir"
+  cursor=$(cursor_path "$dir")
+  run_poll "$dir" > /dev/null
+
+  # Comments and reviews both arriving in one sweep is still a single line: the
+  # stronger signal carries it, and both groups are recorded as consumed so
+  # neither can arrive again on a later sweep.
+  out=$(FM_TEST_GH_POLL_COMMENTS="$TWO_COMMENTS" FM_TEST_GH_POLL_REVIEWS="$ONE_REVIEW" \
+    run_poll "$dir")
+  [ "$out" = "pr-activity: https://github.com/o/r/pull/1 review judge: CHANGES_REQUESTED - guard the null case" ] \
+    || fail "two new groups did not reduce to one review line: $out"
+  case "$out" in
+    *$'\n'*) fail "one sweep emitted more than one line" ;;
+  esac
+  [ "$(cursor_records "$cursor" | wc -l | tr -d ' ')" = 3 ] \
+    || fail "the group that did not speak was left unrecorded"
+  out=$(FM_TEST_GH_POLL_COMMENTS="$TWO_COMMENTS" FM_TEST_GH_POLL_REVIEWS="$ONE_REVIEW" \
+    run_poll "$dir")
+  [ -z "$out" ] || fail "a consumed group resurfaced: $out"
+  pass "one sweep carries one line and consumes both groups"
+}
+
+test_poll_activity_stays_silent_on_every_error() {
+  local dir out cursor before kind
+  dir=$(make_case poll-activity-errors)
+  activity_fixture "$dir"
+  cursor=$(cursor_path "$dir")
+  FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll "$dir" > /dev/null
+  before=$(cat "$cursor")
+
+  # A failing forge read, an empty or truncated payload, a payload with no state
+  # line, an unreadable cursor, and a directory this poll may not write into all
+  # stay silent, and none of them touches the cursor.
+  for kind in fail raw-empty raw-truncated raw-no-state dir-not-writable; do
+    case "$kind" in
+      fail) FM_TEST_GH_FAIL=1 run_poll "$dir" > "$dir/out" 2> /dev/null ;;
+      raw-empty) FM_TEST_GH_POLL_RAW='' run_poll "$dir" > "$dir/out" 2> /dev/null ;;
+      raw-truncated) FM_TEST_GH_POLL_RAW='S' run_poll "$dir" > "$dir/out" 2> /dev/null ;;
+      raw-no-state) FM_TEST_GH_POLL_RAW=$'C\tbad\tauthor\tbody' run_poll "$dir" > "$dir/out" 2> /dev/null ;;
+      dir-not-writable)
+        chmod 500 "$dir/home/state"
+        run_poll "$dir" > "$dir/out" 2> /dev/null
+        ;;
+    esac
+    [ ! -s "$dir/out" ] || fail "the $kind error path emitted: $(cat "$dir/out")"
+    chmod 755 "$dir/home/state"
+    [ "$(cat "$cursor" 2>/dev/null)" = "$before" ] || fail "the $kind error path changed the cursor"
+  done
+
+  # A malformed cursor is refused rather than rewritten under way, so it stays
+  # refused until an operator corrects it instead of silently re-seeding.
+  printf 'nope\n' > "$cursor"
+  chmod 600 "$cursor"
+  FM_TEST_GH_POLL_COMMENTS="${ONE_COMMENT}
+IC_next|author|next comment" run_poll "$dir" > "$dir/out" 2> /dev/null
+  [ ! -s "$dir/out" ] || fail "a malformed cursor was reported through anyway"
+  [ "$(cat "$cursor")" = "nope" ] || fail "a malformed cursor was rewritten"
+  pass "every error path stays silent and leaves the cursor untouched"
+}
+
+test_poll_activity_merged_line_and_short_circuit() {
+  local dir out
+  dir=$(make_case poll-activity-merged)
+  activity_fixture "$dir"
+
+  # The merged verdict keeps its exact bytes even with new activity beside it,
+  # because downstream contracts parse that one word.
+  out=$(FM_TEST_GH_STATE=MERGED FM_TEST_GH_POLL_COMMENTS="$TWO_COMMENTS" \
+    FM_TEST_GH_POLL_REVIEWS="$ONE_REVIEW" run_poll "$dir")
+  [ "$out" = merged ] || fail "a merge with new activity did not emit the bare merged line: $out"
+  [ ! -e "$(cursor_path "$dir")" ] || fail "a merge did activity work it never reports"
+  pass "a merge keeps its exact line and skips activity"
+}
+
+test_poll_activity_legacy_sidecar_and_validated_forms() {
+  local dir out cursor
+  dir=$(make_case poll-activity-legacy)
+  write_poll_meta "$dir/home/state" task-a https://github.com/o/r/pull/1
+  fm_pr_poll_prepare "$dir/home/state" task-a github https://github.com/o/r/pull/1 github.com o/r 1 "$POLL" \
+    || fail "could not prepare a producer-published sidecar"
+  fm_pr_poll_publish_prepared || fail "could not publish a producer-published sidecar"
+  chmod 755 "$dir/home/state"
+  cursor=$(cursor_path "$dir")
+
+  # A sidecar already armed in the field has no cursor at all, and the seven
+  # argument form the watcher now uses must seed it with zero re-arming.
+  out=$(FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll_validated "$dir")
+  [ -z "$out" ] || fail "a legacy sidecar did not seed quietly: $out"
+  [ -f "$cursor" ] || fail "a legacy sidecar received no cursor"
+  out=$(FM_TEST_GH_POLL_COMMENTS="${ONE_COMMENT}
+IC_next|author|next" run_poll_validated "$dir")
+  [ "$out" = "pr-activity: https://github.com/o/r/pull/1 comment author: next" ] \
+    || fail "the validated form reported no activity: $out"
+
+  # The six argument form names no cursor, so it stays merged-only exactly as it
+  # has always been, and it writes nothing.
+  rm -f "$cursor"
+  out=$(FM_TEST_GH_STATE=MERGED PATH="$dir/fakebin:$BASE_PATH" \
+    bash "$POLL" --validated github https://github.com/o/r/pull/1 github.com o/r 1)
+  [ "$out" = merged ] || fail "the six argument form lost the merged line: $out"
+  out=$(PATH="$dir/fakebin:$BASE_PATH" \
+    bash "$POLL" --validated github https://github.com/o/r/pull/1 github.com o/r 1)
+  [ -z "$out" ] || fail "the six argument form reported activity: $out"
+  [ ! -e "$cursor" ] || fail "the six argument form wrote a cursor it cannot own"
+  pass "a legacy sidecar seeds in place and the bare validated form stays merged-only"
+}
+
+test_poll_activity_refuses_hijacked_paths() {
+  local dir out cursor escape sidecar
+  dir=$(make_case poll-activity-escape)
+  activity_fixture "$dir"
+  cursor=$(cursor_path "$dir")
+  escape="$dir/home/escape.txt"
+  printf 'do not touch\n' > "$escape"
+  chmod 600 "$escape"
+
+  # A cursor replaced by a link is refused, and nothing is written through it.
+  rm -f "$cursor"
+  ln -s "$escape" "$cursor"
+  out=$(FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll "$dir")
+  [ -z "$out" ] || fail "a symlinked cursor was followed: $out"
+  [ -L "$cursor" ] || fail "a symlinked cursor was replaced"
+  [ "$(cat "$escape")" = "do not touch" ] || fail "a symlinked cursor was written through"
+
+  # A dangling link at the cursor name is refused too, so a seed can never be
+  # renamed onto a target an attacker chose.
+  rm -f "$cursor"
+  printf 'x\n' > "$dir/link-source"
+  ln -s "$escape" "$cursor"
+  out=$(FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll "$dir")
+  [ -z "$out" ] || fail "a dangling cursor link was seeded through: $out"
+  [ "$(cat "$escape")" = "do not touch" ] || fail "a dangling cursor link was written through"
+  rm -f "$cursor"
+
+  # A missing sidecar names no cursor, and a linked one is refused outright.
+  rm -f "$dir/home/state/task-a.pr-poll"
+  out=$(FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll "$dir")
+  [ -z "$out" ] || fail "a missing sidecar still reported activity: $out"
+  ln -s "$escape" "$dir/home/state/task-a.pr-poll"
+  out=$(FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll "$dir")
+  [ -z "$out" ] || fail "a symlinked sidecar reported activity: $out"
+  [ "$(cat "$escape")" = "do not touch" ] || fail "a symlinked sidecar was written through"
+  rm -f "$dir/home/state/task-a.pr-poll"
+  printf '%s\n%s\n%s\n%s\n%s\n' github https://github.com/o/r/pull/1 github.com o/r 1 > "$dir/home/state/task-a.pr-poll"
+  chmod 600 "$dir/home/state/task-a.pr-poll"
+
+  # A sidecar name that is not a plain task id cannot name a file to write.
+  sidecar="$dir/home/state/.task-a.pr-poll"
+  cp "$dir/home/state/task-a.pr-poll" "$sidecar"
+  chmod 600 "$sidecar"
+  out=$(FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll_validated "$dir" "$sidecar")
+  [ -z "$out" ] || fail "a dotted sidecar name named a cursor: $out"
+  [ ! -e "$dir/home/state/.task-a.pr-activity" ] || fail "a dotted sidecar name wrote a cursor"
+
+  # A sidecar whose bytes are not this identity cannot borrow another task's
+  # cursor, which is the one thing a caller-supplied name could have reached.
+  printf '%s\n%s\n%s\n%s\n%s\n' github https://github.com/o/r/pull/2 github.com o/r 2 > "$sidecar"
+  chmod 600 "$sidecar"
+  out=$(FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll_validated "$dir" "$sidecar")
+  [ -z "$out" ] || fail "a mismatched sidecar was accepted: $out"
+  [ ! -e "$dir/home/state/.task-a.pr-activity" ] || fail "a mismatched sidecar wrote a cursor"
+
+  # A directory other users may write into is refused, so no foreign process can
+  # race a link into the place this poll renames into.
+  chmod 775 "$dir/home/state"
+  out=$(FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll "$dir")
+  [ -z "$out" ] || fail "a group-writable state directory was accepted: $out"
+  [ "$(cat "$escape")" = "do not touch" ] || fail "a refused sweep still wrote somewhere"
+  pass "no linked, borrowed, dotted, or group-writable path is written to"
+}
+
+test_poll_activity_leaves_no_temporary_files() {
+  local dir strays
+  dir=$(make_case poll-activity-tmp)
+  activity_fixture "$dir"
+  FM_TEST_GH_POLL_COMMENTS="$ONE_COMMENT" run_poll "$dir" > /dev/null
+  FM_TEST_GH_POLL_COMMENTS="${ONE_COMMENT}
+IC_next|author|next" run_poll "$dir" > /dev/null
+  strays=$(find "$dir/home/state" -name '*.tmp.*' -print)
+  [ -z "$strays" ] || fail "activity left temporary files behind: $strays"
+  pass "activity leaves no temporary files behind"
+}
+
+test_poll_activity_cursor_stays_bounded() {
+  local dir cursor entries n want
+  dir=$(make_case poll-activity-bound)
+  activity_fixture "$dir"
+  cursor=$(cursor_path "$dir")
+  run_poll "$dir" > /dev/null
+
+  # A cursor grown past its ceiling is rewritten to its newest tail, so a
+  # long-lived poll stays bounded instead of growing without limit.
+  entries=$(
+    printf 'fm-pr-activity-v1\n'
+    n=1
+    while [ "$n" -le 800 ]; do
+      printf 'C\tIC_seed%s\n' "$n"
+      n=$((n + 1))
+    done
+  )
+  printf '%s\n' "$entries" > "$cursor"
+  chmod 600 "$cursor"
+  [ "$(sed -n '$=' "$cursor")" -eq 801 ] || fail "the bound fixture is not at its ceiling"
+  FM_TEST_GH_POLL_COMMENTS='IC_fresh|author|a new one' run_poll "$dir" > "$dir/out"
+  [ "$(cat "$dir/out")" = "pr-activity: https://github.com/o/r/pull/1 comment author: a new one" ] \
+    || fail "an over-full cursor stopped reporting: $(cat "$dir/out")"
+  n=$(sed -n '$=' "$cursor")
+  [ "$n" -le 402 ] || fail "an over-full cursor was not pruned: $n lines"
+  want=$'C\tIC_fresh'
+  grep -qF "$want" "$cursor" || fail "pruning dropped the newest record"
+  want=$'C\tIC_seed800'
+  grep -qF "$want" "$cursor" || fail "pruning dropped the newest prior record"
+  pass "an over-full cursor is pruned to its newest tail"
+}
+
 test_atomic_interruption_leaves_no_partial_artifact() {
   local dir rc
   dir=$(make_case interrupted-write)
@@ -1269,6 +1620,9 @@ test_teardown_removes_poll_artifacts() {
   printf 'data\n' > "$dir/home/state/task-a.pr-poll"
   printf 'registration\n' > "$dir/home/state/task-a.pr-poll-registration"
   printf 'trust\n' > "$dir/home/state/task-a.check-trust"
+  # The activity cursor is the poll's own record, so it retires with the poll.
+  printf 'fm-pr-activity-v1\nC\tIC_teardown\n' > "$dir/home/state/task-a.pr-activity"
+  chmod 600 "$dir/home/state/task-a.pr-activity"
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
 exit 0
@@ -1283,6 +1637,7 @@ SH
   [ ! -e "$dir/home/state/task-a.pr-poll" ] || fail "teardown left the sidecar"
   [ ! -e "$dir/home/state/task-a.pr-poll-registration" ] || fail "teardown left the PR poll registration"
   [ ! -e "$dir/home/state/task-a.check-trust" ] || fail "teardown left the custom check registration"
+  [ ! -e "$dir/home/state/task-a.pr-activity" ] || fail "teardown left the activity cursor"
 
   dir=$(make_case teardown-retirement-receipt)
   fakebin="$dir/fakebin"
@@ -2815,6 +3170,17 @@ test_draft_pull_request_is_not_armed
 test_valid_recording_and_merge_derivation
 test_rejected_metacharacter_bytes_are_inert
 test_static_poll_contract
+test_poll_activity_seeds_without_waking
+test_poll_activity_reports_a_new_comment_once
+test_poll_activity_batches_a_group_into_one_line
+test_poll_activity_reports_a_submitted_review
+test_poll_activity_reports_one_line_per_sweep
+test_poll_activity_stays_silent_on_every_error
+test_poll_activity_merged_line_and_short_circuit
+test_poll_activity_legacy_sidecar_and_validated_forms
+test_poll_activity_refuses_hijacked_paths
+test_poll_activity_leaves_no_temporary_files
+test_poll_activity_cursor_stays_bounded
 test_atomic_interruption_leaves_no_partial_artifact
 test_concurrent_watcher_sees_only_complete_publication
 test_poll_publication_refuses_unsafe_destinations
