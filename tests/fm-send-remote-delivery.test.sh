@@ -30,11 +30,8 @@
 #      --resolve-key decision unconfirmed, and keeps a marked expectation
 #      armed.
 #   9. A delivered remote steer never leaves its caller to infer delivery: a
-#      `sent:` confirmation names the far-side record the remote leg reported,
-#      no advisory line may stand alone without the delivered fact, and a
-#      remote leg that reports no record at all still reports delivery. The
-#      far-side record is asserted at the exact path the report names, never
-#      by listing a directory.
+#      `sent:` confirmation states the remote inbox delivery, and no advisory
+#      line may stand alone without the delivered fact.
 set -u
 
 # shellcheck source=tests/lib.sh
@@ -136,15 +133,8 @@ while IFS= read -r -d '' a; do rargs+=("$a"); done \
   < <(perl -MMIME::Base64=decode_base64 -e 'print decode_base64($ARGV[0])' "$argv_b64")
 cmd=${rargs[0]}
 rc=0
-if [ "${FM_FAKE_SSH_DROP_REPORT:-0}" = 1 ]; then
-  # An older remote leg: it delivers the record but reports nothing back, so
-  # the parent has no steer_record line to name.
-  env FM_HOME="$remote_home" FM_ROOT_OVERRIDE="$FM_REMOTE_CODE_ROOT" \
-    "$FM_REMOTE_CODE_ROOT/bin/$cmd" "${rargs[@]:1}" >/dev/null || rc=$?
-else
-  env FM_HOME="$remote_home" FM_ROOT_OVERRIDE="$FM_REMOTE_CODE_ROOT" \
-    "$FM_REMOTE_CODE_ROOT/bin/$cmd" "${rargs[@]:1}" || rc=$?
-fi
+env FM_HOME="$remote_home" FM_ROOT_OVERRIDE="$FM_REMOTE_CODE_ROOT" \
+  "$FM_REMOTE_CODE_ROOT/bin/$cmd" "${rargs[@]:1}" || rc=$?
 if [ "${FM_FAKE_SSH_AMBIGUOUS:-0}" = 1 ] \
   || { [ "${FM_FAKE_SSH_AFTER_AMBIGUOUS_RC:-0}" -ne 0 ] && [ "$count" -eq 1 ]; }; then
   exit 255
@@ -218,12 +208,6 @@ pending_record() {  # <home>
 
 drain_out() {  # <home>
   FM_STATE_OVERRIDE="$1/state" "$DRAIN" 2>/dev/null
-}
-
-# The far-side record path a delivered send's confirmation names, or empty.
-sent_named_record() {  # <report-file>
-  sed -n -e 's/^sent: .* durably recorded at \(.*\) - delivery is complete.*$/\1/p' "$1" \
-    | head -1
 }
 
 # Assert no labelled advisory line of a DELIVERED send stands without the
@@ -826,12 +810,10 @@ test_local_pending_does_not_close_resolve_key() {
 
 # --- delivered remote steer reporting ---------------------------------------
 # A remote steer whose only report is an advisory gets read as a refused send
-# and sent again. These pin the positive verdict instead: the exit code, and the
-# far-side record named by the report and asserted to exist where it was
-# written - never a listing of the parent's own directory.
+# and sent again. These pin the positive verdict and the remote inbox write.
 
-test_delivered_remote_steer_names_the_far_side_record() {
-  local dir fb ssh_log home rhome rc err named
+test_delivered_remote_steer_reports_delivery() {
+  local dir fb ssh_log home rhome rc err recs count
   dir="$TMP_ROOT/sent-confirm"; mkdir -p "$dir"
   fb=$(make_stubs "$dir"); ssh_log="$dir/sent.ssh.log"; : > "$ssh_log"
   rhome=$(setup_remote_secondmate_home sent-confirm)
@@ -842,26 +824,24 @@ test_delivered_remote_steer_names_the_far_side_record() {
     "$SEND" rsm "please rename the metric" >"$dir/out" 2>"$dir/err" || rc=$?
   err=$(cat "$dir/err")
   expect_code 0 "$rc" "a delivered remote steer must exit 0: $err"
-  assert_contains "$err" "sent: steer to remote secondmate rsm durably recorded at " \
+  assert_contains "$err" "sent: steer to remote secondmate rsm durably recorded in its steering inbox" \
     "a delivered remote steer must report its own delivery"
   assert_contains "$err" "do not resend" \
     "the delivery report must state that a resend is not wanted"
   assert_not_contains "$err" "error:" "a delivered remote steer must not carry an error report"
-  named=$(sent_named_record "$dir/err")
-  [ -n "$named" ] || fail "the delivery report must name the far-side record: $err"
-  case "$named" in
-    "$rhome"/*) : ;;
-    *) fail "the named record must live in the remote home, not the parent: $named" ;;
-  esac
-  [ -f "$named" ] || fail "the named far-side record must exist: $named"
+  recs=$(remote_inbox_records "$rhome")
+  count=$(printf '%s\n' "$recs" | grep -c . || true)
+  [ "$count" = 1 ] || fail "exactly one far-side record must exist, found $count: $recs"
+  assert_contains "$(cat "$recs")" "please rename the metric" \
+    "the far-side record must carry the steer text"
   assert_no_bare_advisory "$dir/err" \
     "every advisory a delivered remote steer reports must carry the delivery fact"
   [ ! -s "$dir/out" ] || fail "a delivered send must keep stdout clean: $(cat "$dir/out")"
-  pass "fm-send remote: a delivered steer reports sent with the far-side record it wrote"
+  pass "fm-send remote: a delivered steer reports sent and writes its remote record"
 }
 
 test_delivered_remote_steer_advisory_cannot_read_as_refusal() {
-  local dir fb ssh_log home rhome rc err named advisory
+  local dir fb ssh_log home rhome rc err recs count advisory
   dir="$TMP_ROOT/sent-advisory"; mkdir -p "$dir"
   fb=$(make_stubs "$dir"); ssh_log="$dir/advisory.ssh.log"; : > "$ssh_log"
   rhome=$(setup_remote_secondmate_home sent-advisory)
@@ -888,48 +868,22 @@ SH
   err=$(cat "$dir/err")
   expect_code 0 "$rc" \
     "lost reply bookkeeping must never report a delivered remote steer as a failed send: $err"
-  named=$(sent_named_record "$dir/err")
-  [ -n "$named" ] || fail "a delivered remote steer must still name its far-side record: $err"
-  [ -f "$named" ] || fail "the named far-side record must exist: $named"
+  assert_contains "$err" "sent: steer to remote secondmate rsm durably recorded in its steering inbox" \
+    "a delivered remote steer must still report delivery when reply tracking fails"
+  recs=$(remote_inbox_records "$rhome")
+  count=$(printf '%s\n' "$recs" | grep -c . || true)
+  [ "$count" = 1 ] || fail "exactly one far-side record must exist, found $count: $recs"
   assert_contains "$err" "reply-tracking-degraded" \
     "lost reply bookkeeping must still be named on a delivered steer"
   advisory=$(printf '%s\n' "$err" | grep -F 'reply-tracking-degraded' | head -1)
   assert_contains "$advisory" "advisory (steer delivered)" \
     "trouble reported after a delivered send must be labelled as advisory on a delivered steer"
-  assert_contains "$advisory" "durably recorded at $named" \
-    "the advisory must name the same far-side record the delivery report named"
+  assert_contains "$advisory" "durably recorded in the remote inbox" \
+    "the advisory must state that remote delivery succeeded"
   assert_not_contains "$err" "error:" "lost reply bookkeeping is not a send failure"
   assert_no_bare_advisory "$dir/err" \
     "no advisory may stand alone without the delivered fact on a delivered steer"
   pass "fm-send remote: a reply-bookkeeping advisory cannot be read as a refused send"
-}
-
-test_delivered_remote_steer_without_a_report_still_reports_delivery() {
-  local dir fb ssh_log home rhome rc err recs count
-  dir="$TMP_ROOT/sent-noreport"; mkdir -p "$dir"
-  fb=$(make_stubs "$dir"); ssh_log="$dir/noreport.ssh.log"; : > "$ssh_log"
-  rhome=$(setup_remote_secondmate_home sent-noreport)
-  home=$(setup_remote_parent_home sent-noreport "$rhome")
-
-  # A remote home older than the steer_record report: the parent cannot name
-  # the far-side record, and still reports the delivery its exit status proves.
-  rc=0
-  send_env "$fb" "$home" "$ssh_log" FM_FAKE_SSH_DROP_REPORT=1 \
-    "$SEND" rsm "please rename the metric" >"$dir/out" 2>"$dir/err" || rc=$?
-  err=$(cat "$dir/err")
-  expect_code 0 "$rc" "a delivered remote steer must exit 0 without a remote report: $err"
-  assert_contains "$err" "sent: steer to remote secondmate rsm durably recorded in remote secondmate rsm's own steering inbox" \
-    "a delivered remote steer must report delivery even when the remote leg names no path"
-  assert_not_contains "$err" "steer_record=" "no internal report line may be replayed"
-  assert_no_bare_advisory "$dir/err" \
-    "every line reported without a remote report must still carry the delivery fact"
-  recs=$(remote_inbox_records "$rhome")
-  count=$(printf '%s\n' "$recs" | grep -c . || true)
-  [ "$count" = 1 ] \
-    || fail "exactly one far-side record must exist, found $count: $recs"
-  assert_contains "$(cat "$recs")" "please rename the metric" \
-    "the far-side record must carry the steer text"
-  pass "fm-send remote: delivery is reported even when the remote leg names no record"
 }
 
 test_remote_steer_lands_in_remote_inbox
@@ -948,8 +902,7 @@ test_remote_send_budget_bounds_busy_lane
 test_local_pending_reports_delivered_unconfirmed
 test_local_pending_does_not_close_resolve_key
 test_local_secondmate_pending_keeps_expectation_armed
-test_delivered_remote_steer_names_the_far_side_record
+test_delivered_remote_steer_reports_delivery
 test_delivered_remote_steer_advisory_cannot_read_as_refusal
-test_delivered_remote_steer_without_a_report_still_reports_delivery
 
 echo "all fm-send-remote-delivery tests passed"
