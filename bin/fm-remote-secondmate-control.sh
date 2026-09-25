@@ -280,12 +280,6 @@ cmd_send() {
     die "steering-inbox record could not be written under $CONTROL_STATE/$id.inbox"
   fi
   fm_lock_release "$meta_lock"
-  # Report the far-side record on stdout for the parent's confirmation.
-  # This line is decoration only: the parent proves delivery from this leg's
-  # exit status and prints its own `sent:` line, so a parent that cannot read
-  # this report still reports a delivered steer instead of staying silent and
-  # inviting a resend (bin/fm-send.sh owns that confirmation).
-  printf 'steer_record=%s\n' "$rec"
   case "$rec" in
     */handled/*)
       # The dedup landed on a record the worker already acknowledged: the
