@@ -428,14 +428,31 @@ test_codex_threads_model_and_max_effort() {
   rec=$(make_spawn_case profile-codex-max codex "$id")
   read_case_record "$rec"
 
-  out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --model gpt-5.6-luna --effort max)
+  out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --model gpt-6-luna --effort max)
   status=$?
   expect_code 0 "$status" "codex Luna spawn with max effort should succeed"
-  assert_meta_profile "$HOME_DIR/state/$id.meta" codex gpt-5.6-luna max
+  assert_meta_profile "$HOME_DIR/state/$id.meta" codex gpt-6-luna max
   launch=$(cat "$LAUNCH_LOG")
-  assert_contains "$launch" "codex --model 'gpt-5.6-luna' -c 'model_reasoning_effort=\"max\"' --dangerously-bypass-approvals-and-sandbox" \
+  assert_contains "$launch" "codex --model 'gpt-6-luna' -c 'model_reasoning_effort=\"max\"' --dangerously-bypass-approvals-and-sandbox" \
     "codex launch did not thread Luna's max reasoning effort config"
   pass "codex Luna receives --model and model_reasoning_effort max profile flags"
+}
+
+# The max key is one model, not the catalog's whole `max`-capable set, so a
+# sibling model that advertises max without the key keeps the omitted axis.
+test_codex_omits_max_effort_for_a_sibling_model_without_the_key() {
+  local rec id out status launch
+  id=profile-codex-max-unkeyed-z4e
+  rec=$(make_spawn_case profile-codex-max-unkeyed codex "$id")
+  read_case_record "$rec"
+
+  out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" --model gpt-5.6-luna --effort max)
+  status=$?
+  expect_code 0 "$status" "codex spawn for an unkeyed max model should omit the effort flag"
+  assert_meta_profile "$HOME_DIR/state/$id.meta" codex gpt-5.6-luna max
+  launch=$(cat "$LAUNCH_LOG")
+  assert_not_contains "$launch" "model_reasoning_effort" "codex launch carried max for a model outside the single max key"
+  pass "codex omits max for a sibling model without the key"
 }
 
 test_codex_omits_max_effort_for_unsupported_model() {
@@ -1496,6 +1513,7 @@ test_active_dispatch_profile_allows_raw_launch_command
 test_claude_threads_model_and_effort
 test_codex_threads_model_and_effort
 test_codex_threads_model_and_max_effort
+test_codex_omits_max_effort_for_a_sibling_model_without_the_key
 test_codex_omits_max_effort_for_unsupported_model
 test_codex_crewmate_launch_disables_the_hook_layer
 test_codex_secondmate_launch_keeps_the_hook_layer
