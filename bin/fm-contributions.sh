@@ -46,6 +46,13 @@
 # genuine forge failure or head change records an error.
 # API failure leaves error evidence; an expired or absent observation is not
 # silence. FM_CONTRIBUTIONS_MAX_AGE (default 900 seconds) bounds freshness.
+# Every paginated read is projected as one array-of-pages document. gh added
+# api --slurp at v2.48.0, so a host on an older gh - gh 2.45 among them - has no
+# such flag and prints each --paginate page back-to-back instead of publishing
+# one wrapped array; there the pages are assembled into that same document
+# locally. Both a version floor and a flag probe must agree before --slurp is
+# used, so an older CLI, a fork, or an unreadable answer to either takes the
+# plain-paginate assembly, which every gh supports.
 # A URL whose last good observation is merged or closed is final: it is
 # never re-read, stays fresh, and a stale error beside it is cleared once.
 # A genuine failure prints its unavailable line only when it starts an episode
@@ -105,6 +112,9 @@ jq_lib() { # jq options/program via final argument
   set -- "${@:1:$#-1}"
   jq -L "$SCRIPT_DIR" "$@" "include \"fm-contributions\"; $program"
 }
+
+# The first gh release whose api command publishes one array of pages.
+GH_SLURP_MIN='2.48.0'
 
 read_saved() {
   local file
@@ -210,25 +220,88 @@ wait_forges() { # background forge pids from one independent read wave
   return "$rc"
 }
 
+gh_slurp_supported() { # cached once per run, before any read wave is forked
+  local parts major minor patch extra min_major min_minor min_patch
+  case "${GH_SLURP_SUPPORTED:-}" in
+    yes) return 0 ;;
+    no) return 1 ;;
+  esac
+  GH_SLURP_SUPPORTED=no
+  parts=$(gh_version_parts) || return 1
+  [ -n "$parts" ] || return 1
+  IFS=' ' read -r major minor patch extra <<< "$parts"
+  # An unparseable version is never assumed new enough, so a development or
+  # forked build cannot claim a flag it was never checked against.
+  [ -n "$major" ] && [ -n "$minor" ] && [ -n "$patch" ] && [ -z "$extra" ] || return 1
+  IFS='.' read -r min_major min_minor min_patch <<< "$GH_SLURP_MIN"
+  if [ "$major" -gt "$min_major" ] ||
+    { [ "$major" -eq "$min_major" ] && [ "$minor" -gt "$min_minor" ]; } ||
+    { [ "$major" -eq "$min_major" ] && [ "$minor" -eq "$min_minor" ] && [ "$patch" -ge "$min_patch" ]; }; then
+    # The floor alone is not a verdict: a stripped or forked build can print a
+    # current version and still not carry the flag.
+    if gh_api_has_slurp_flag; then GH_SLURP_SUPPORTED=yes; fi
+  fi
+  [ "$GH_SLURP_SUPPORTED" = yes ]
+}
+
+gh_version_parts() {
+  local output
+  command -v gh >/dev/null 2>&1 || return 1
+  output=$(fm_run_timed 5 env GH_NO_UPDATE_NOTIFIER=1 gh --version 2>/dev/null) || return 1
+  printf '%s\n' "$output" |
+    sed -n 's/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1 \2 \3/p' |
+    head -1
+}
+
+gh_api_has_slurp_flag() {
+  local output
+  command -v gh >/dev/null 2>&1 || return 1
+  output=$(fm_run_timed 5 env GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 \
+    gh api --help 2>&1) || return 1
+  printf '%s\n' "$output" | grep -F -- '--slurp' >/dev/null
+}
+
+forge_pages() { # paginated endpoint -> one array-of-pages document on stdout
+  local endpoint=$1 raw rc=0
+  if gh_slurp_supported; then
+    forge api "$endpoint" --paginate --slurp
+    return $?
+  fi
+  # An older gh prints each --paginate page back-to-back, which is several
+  # documents and not what any projection below reads. Assembling them locally
+  # keeps one document and every later read honest on a gh that has no --slurp.
+  # The pages go through a file, not a capture, so forge keeps reporting its own
+  # exit status and its own budget and unavailability markers.
+  raw=$(mktemp "$TMP/pages.XXXXXX") || return 1
+  forge api "$endpoint" --paginate > "$raw" || rc=$?
+  if [ "$rc" -ne 0 ]; then rm -f -- "$raw"; return "$rc"; fi
+  jq -s . "$raw" || rc=$?
+  rm -f -- "$raw"
+  return "$rc"
+}
+
 observe() { # canonical GitHub URL -> normalized JSON
   local url=$1 part number kind endpoint head after label
   case "$url" in https://github.com/*) ;; *) return 1 ;; esac
   part=${url#https://github.com/}; number=${part##*/}; part=${part%/*}; kind=${part##*/}; part=${part%/*}
   case "$kind" in pull) endpoint="repos/$part/pulls/$number" ;; issues) endpoint="repos/$part/issues/$number" ;; *) return 1 ;; esac
   rm -f -- "$TMP/budget-exhausted" "$TMP/forge-unavailable"
+  # Cache the capability here, in the calling shell, so every read forked below
+  # inherits one probe instead of paying for one of its own.
+  gh_slurp_supported || true
   forge api "$endpoint" > "$TMP/core.json" || return 1
   jq -e '(.state == "open" or .state == "closed") and (.user.login | type == "string")' "$TMP/core.json" >/dev/null || return 1
   if [ "$kind" = pull ]; then
     head=$(jq -er '.head.sha | select(test("^[a-fA-F0-9]{40}$"))' "$TMP/core.json") || return 1
-    FORGE_ERR="$TMP/comments.err" forge api "repos/$part/issues/$number/comments?per_page=100" --paginate --slurp > "$TMP/comments.json" &
+    FORGE_ERR="$TMP/comments.err" forge_pages "repos/$part/issues/$number/comments?per_page=100" > "$TMP/comments.json" &
     local comments_pid=$!
-    FORGE_ERR="$TMP/reviews.err" forge api "$endpoint/reviews?per_page=100" --paginate --slurp > "$TMP/reviews.json" &
+    FORGE_ERR="$TMP/reviews.err" forge_pages "$endpoint/reviews?per_page=100" > "$TMP/reviews.json" &
     local reviews_pid=$!
-    FORGE_ERR="$TMP/inline.err" forge api "$endpoint/comments?per_page=100" --paginate --slurp > "$TMP/inline.json" &
+    FORGE_ERR="$TMP/inline.err" forge_pages "$endpoint/comments?per_page=100" > "$TMP/inline.json" &
     local inline_pid=$!
-    FORGE_ERR="$TMP/checks.err" forge api "repos/$part/commits/$head/check-runs?filter=all&per_page=100" --paginate --slurp > "$TMP/checks.json" &
+    FORGE_ERR="$TMP/checks.err" forge_pages "repos/$part/commits/$head/check-runs?filter=all&per_page=100" > "$TMP/checks.json" &
     local checks_pid=$!
-    FORGE_ERR="$TMP/statuses.err" forge api "repos/$part/commits/$head/statuses?per_page=100" --paginate --slurp > "$TMP/statuses.json" &
+    FORGE_ERR="$TMP/statuses.err" forge_pages "repos/$part/commits/$head/statuses?per_page=100" > "$TMP/statuses.json" &
     local statuses_pid=$!
     FORGE_ERR="$TMP/repo.err" forge api "repos/$part" > "$TMP/repo.json" &
     local repo_pid=$!
@@ -258,9 +331,9 @@ observe() { # canonical GitHub URL -> normalized JSON
                  author:.user.login,body:(.body // "" | .[:500])}))}' > "$TMP/observation.json" || return 1
   else
     label=${FM_CONTRIBUTIONS_READY_LABEL:-ready-for-pr}
-    FORGE_ERR="$TMP/comments.err" forge api "repos/$part/issues/$number/comments?per_page=100" --paginate --slurp > "$TMP/comments.json" &
+    FORGE_ERR="$TMP/comments.err" forge_pages "repos/$part/issues/$number/comments?per_page=100" > "$TMP/comments.json" &
     local comments_pid=$!
-    FORGE_ERR="$TMP/issue-events.err" forge api "repos/$part/issues/$number/events?per_page=100" --paginate --slurp > "$TMP/issue-events.json" &
+    FORGE_ERR="$TMP/issue-events.err" forge_pages "repos/$part/issues/$number/events?per_page=100" > "$TMP/issue-events.json" &
     local events_pid=$!
     wait_forges "$comments_pid" "$events_pid" || return 1
     jq -e 'type == "array" and all(.[]; type == "array")' "$TMP/comments.json" >/dev/null || return 1
