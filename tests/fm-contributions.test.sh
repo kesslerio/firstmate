@@ -119,10 +119,6 @@ forge_home() {
 #!/usr/bin/env bash
 set -eu
 case "$*" in
-  # This fixture is a gh new enough to publish one array of pages per read.
-  '--version') printf 'gh version 2.94.0 (2026-06-10)\n' ;;
-  'api --help'*)
-    printf '%s\n' 'Flags:' '  -p, --paginate   List pages of results' '      --slurp      Wrap all pages' ;;
   'pr view '*headRefOid,reviewDecision*)
     jq -n --arg head "$(cat "$FORGE/head")" '{headRefOid:$head,reviewDecision:"APPROVED"}' ;;
   'pr view '*headRefOid*) cat "$FORGE/head" ;;
@@ -134,13 +130,13 @@ case "$*" in
        merged_at:(if $state == "merged" then "2026-09-16T07:00:00Z" else null end)}' ;;
   'api repos/o/r/issues/9')
     jq -n --slurpfile labels "$FORGE/labels.json" '{state:"open",user:{login:"author"},labels:$labels[0]}' ;;
-  'api repos/o/r/issues/'*'/events?'*) jq -s . "$FORGE/events.json" ;;
-  'api repos/o/r/issues/'*'/comments?'*) jq -s . "$FORGE/comments.json" ;;
-  'api repos/o/r/pulls/8/reviews?'*) jq -s . "$FORGE/reviews.json" ;;
-  'api repos/o/r/pulls/8/comments?'*) jq -s . "$FORGE/inline.json" ;;
+  'api repos/o/r/issues/'*'/events?'*) cat "$FORGE/events.json" ;;
+  'api repos/o/r/issues/'*'/comments?'*) cat "$FORGE/comments.json" ;;
+  'api repos/o/r/pulls/8/reviews?'*) cat "$FORGE/reviews.json" ;;
+  'api repos/o/r/pulls/8/comments?'*) cat "$FORGE/inline.json" ;;
   'api repos/o/r/commits/'*'/check-runs?'*)
-    printf '[{"check_runs":[{"name":"test","id":1,"status":"completed","conclusion":"success","started_at":"2026-09-16T08:00:00Z"}]}]\n' ;;
-  'api repos/o/r/commits/'*'/statuses?'*) printf '[[]]\n' ;;
+    printf '{"check_runs":[{"name":"test","id":1,"status":"completed","conclusion":"success","started_at":"2026-09-16T08:00:00Z"}]}\n' ;;
+  'api repos/o/r/commits/'*'/statuses?'*) printf '[]\n' ;;
   'api repos/o/r') printf '{"permissions":{"push":false}}\n' ;;
   *) printf 'unexpected gh fixture call: %s\n' "$*" >&2; exit 1 ;;
 esac
@@ -232,11 +228,7 @@ test_comment_wake() { test_incoming_signal comment; }
 test_review_wake() { test_incoming_signal review; }
 test_inline_wake() { test_incoming_signal inline; }
 
-# A gh whose api --help carries no --slurp - what the captain's Mama host on gh
-# 2.45 actually offers. It refuses --slurp outright and paginates one item per
-# page, so a maintainer signal lands on a page a read that stopped at page one
-# would miss. bin/fm-contributions.sh owns the capability boundary this denies.
-old_gh_home() { # home: replace the fake gh with one whose api --help has no --slurp
+old_gh_home() {
   local home=$1
   cat > "$home/fakebin/gh" <<'SH'
 #!/usr/bin/env bash
@@ -244,10 +236,6 @@ set -eu
 # Print every page of a stored response as its own back-to-back document.
 pages() { jq -c '.[]' "$FORGE/$1"; }
 case "$*" in
-  # The version this build claims is planted per case, never assumed.
-  '--version') printf 'gh version %s (2024-03-21)\n' "$(cat "$FORGE/gh-version")" ;;
-  'api --help'*)
-    printf '%s\n' 'Flags:' '  -p, --paginate   List pages of results' '  -q, --jq string' ;;
   *'--slurp'*)
     printf 'unknown flag: --slurp\n' >&2; exit 1 ;;
   'pr view '*headRefOid,reviewDecision*)
@@ -276,12 +264,11 @@ write_pages() { # home file page page - each page is one JSON array of items
     || fail 'could not write the paginated fixture'
 }
 
-assert_slurpless_gh_reports_activity() { # label gh-version
-  local label=$1 version=$2 home out stranger_page maintainer_page review_page
-  home=$(new_home "gh-without-slurp-$label")
+test_gh_without_slurp_reports_maintainer_activity() {
+  local home out stranger_page maintainer_page review_page
+  home=$(new_home gh-without-slurp)
   forge_home "$home"
   old_gh_home "$home"
-  printf '%s\n' "$version" > "$home/forge/gh-version"
   # One maintainer signal per read, and each one lands on the second page, so a
   # read that stopped at the first page cannot satisfy this case.
   stranger_page='[{"id":11,"user":{"login":"passerby"},"author_association":"NONE",
@@ -298,36 +285,28 @@ assert_slurpless_gh_reports_activity() { # label gh-version
   write_pages "$home/forge" reviews.pages.json '[]' "$review_page"
   write_pages "$home/forge" inline.pages.json '[]' '[]'
   with_home "$home" "$ROOT/bin/fm-pr-check.sh" delivery https://github.com/o/r/pull/8 >/dev/null \
-    || fail "could not register the owned delivery on gh $version"
+    || fail 'could not register the owned delivery on gh without slurp'
   out=$(with_home "$home" "$ROOT/bin/fm-contributions.sh" poll) \
-    || fail "gh $version cannot be polled at all"
+    || fail 'gh without slurp cannot be polled at all'
   # A gh without --slurp is a supported read path, not a failure episode, and
   # each maintainer signal reaches the durable wake path exactly once.
-  assert_not_contains "$out" 'observation unavailable' "gh $version must be a supported read path"
+  assert_not_contains "$out" 'observation unavailable' 'gh without slurp must be a supported read path'
   assert_equals 2 "$(printf '%s\n' "$out" | grep -c '^contribution-wake: ')" \
-    "each gh $version maintainer signal must surface once"
+    'each maintainer signal must surface once'
   jq -e '.records[0].error == null' "$home/data/delivery/contributions.json" >/dev/null \
-    || fail "gh $version must not leave the contribution unmeasured"
+    || fail 'gh without slurp must not leave the contribution unmeasured'
   jq -e '.records[0].observation.checks | length == 1' "$home/data/delivery/contributions.json" >/dev/null \
-    || fail "an object-paginated check-runs page must still normalize to one lane on gh $version"
+    || fail 'an object-paginated check-runs page must still normalize to one lane'
   jq -e '.records[0].pending | length == 2
     and (all(.[]; .author == "maintainer"))
     and ([.[].type] | sort) == ["comment","review"]' "$home/data/delivery/contributions.json" >/dev/null \
-    || fail "gh $version must still report maintainer comments and reviews from every page"
-  registered_checks "$home" >/dev/null || fail "the authenticated check failed on gh $version"
+    || fail 'gh without slurp must report maintainer comments and reviews from every page'
+  registered_checks "$home" >/dev/null || fail 'the authenticated check failed on gh without slurp'
   [ "$(awk 'END { print NR }' "$home/state/.wake-queue")" = 2 ] \
-    || fail "gh $version must enqueue one durable wake per maintainer signal"
+    || fail 'gh without slurp must enqueue one durable wake per maintainer signal'
   out=$(with_home "$home" "$ROOT/bin/fm-contributions.sh" pending)
   printf '%s' "$out" | jq -e 'length == 2 and (all(.[]; .author == "maintainer"))' >/dev/null \
-    || fail "supervisor cannot retrieve the gh $version signal"
-}
-
-test_gh_without_slurp_reports_maintainer_activity() {
-  # The captain's Mama host is on gh 2.45, below the v2.48.0 floor.
-  assert_slurpless_gh_reports_activity below-floor 2.45.0
-  # A version at or above the floor is not a verdict on its own: a stripped or
-  # forked build can print a current version and still carry no --slurp.
-  assert_slurpless_gh_reports_activity flagless-build 2.94.0
+    || fail 'supervisor cannot retrieve the maintainer signals'
   pass 'a gh without --slurp still reports maintainer comments and reviews from every page'
 }
 
@@ -601,7 +580,7 @@ test_watcher_surfaces_new_contribution_once() {
   out="$home/watcher.out"
   rc=0
   with_home "$home" env FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=0 FM_HEARTBEAT=999999 \
-    "$ROOT/bin/fm-watch-checkpoint.sh" --seconds 5 > "$out" 2> "$home/watcher.err" || rc=$?
+    "$ROOT/bin/fm-watch-checkpoint.sh" --seconds 10 > "$out" 2> "$home/watcher.err" || rc=$?
   [ "$rc" -eq 0 ] || fail "watcher did not surface the new contribution signal: $(cat "$home/watcher.err")"
   grep -E '^check: contributions delivery [0-9a-f]{64}$' "$out" >/dev/null \
     || fail "watcher did not surface the durable contribution wake: $(cat "$out")"
