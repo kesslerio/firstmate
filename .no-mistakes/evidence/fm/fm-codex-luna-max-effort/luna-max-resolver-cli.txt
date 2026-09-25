@@ -1,0 +1,4 @@
+CASE: resolve gpt-5.6-luna max
+exit=2
+stdout=
+stderr=error: malformed rules file: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3B3R3TZXMFV9JCNHSXD6TGV/.luna-resolver-live.ydcfubl2/config/crew-dispatch.json - each use profile effort must be supported by its harness and model
