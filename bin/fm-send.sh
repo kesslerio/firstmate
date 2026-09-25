@@ -40,9 +40,9 @@
 # id. A still-unconfirmed reply-bearing request keeps its reply expectation
 # preserved for the record that may have landed.
 # Pending-reply bookkeeping trouble after a durable enqueue NEVER exits
-# nonzero: with the recovery marker stored the watcher reconciles it silently,
-# and with both the commit and the marker lost the send prints a distinct
-# "reply-tracking-degraded (steer delivered, do not resend)" warning instead,
+# nonzero: with the recovery marker stored the watcher reconciles it,
+# and with both the commit and the marker lost the send reports
+# "reply-tracking-degraded" as a warning locally or a delivered advisory remotely,
 # because a resend-inviting status there would duplicate a delivered
 # instruction. There is no delivered-unconfirmed
 # outcome on this plane: "did the doorbell land" is no longer the question -
@@ -112,7 +112,7 @@
 # bookkeeping commit fails after its durable recovery marker is stored, the
 # send remains successful and watcher reconciliation owns the repair, and when
 # the commit and marker are BOTH lost the send still remains successful with a
-# reply-tracking-degraded warning naming the expectation an operator must
+# reply-tracking-degraded report naming the expectation an operator must
 # inspect (it can no longer reconcile or escalate on its own). Only a
 # failed enqueue discards the expectation. On the typed plane an unconfirmed submit (exit 3) keeps
 # it armed rather than dropping it, and only a proven send failure discards it.
