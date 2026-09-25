@@ -1,0 +1,20 @@
+gh version 2.45.0 (2024-03-04)
+Old gh --slurp probe: unknown flag: --slurp
+
+Firstmate PR 3543 after real poll and repeat:
+{"task":"gh245-live","record":{"url":"https://github.com/kunchenguid/firstmate/pull/3543","error":null,"pending":[{"type":"comment","author":"kunchenguid","source":"https://github.com/kunchenguid/firstmate/pull/3543#issuecomment-5536915222"},{"type":"comment","author":"kunchenguid","source":"https://github.com/kunchenguid/firstmate/pull/3543#issuecomment-5693107901"},{"type":"review","author":"kunchenguid","source":"https://github.com/kunchenguid/firstmate/pull/3543#pullrequestreview-5109997126"},{"type":"review","author":"kunchenguid","source":"https://github.com/kunchenguid/firstmate/pull/3543#pullrequestreview-5219252454"}],"observed_checks":15,"observed_reviews":5}}
+durable_wakes=       4
+
+Openclaw PR 149880 after real paginated poll:
+{
+  "url": "https://github.com/openclaw/openclaw/pull/149880",
+  "error": null,
+  "page_two_comments": 9,
+  "page_two_all_captured": true,
+  "non_maintainer_comments": 29,
+  "non_maintainers_excluded": true,
+  "pending_count": 80
+}
+durable_wakes=      80
+repeat_poll_new_wakes=0
+durable_wakes_after_repeat=      80
