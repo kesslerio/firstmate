@@ -1,0 +1,28 @@
+BEFORE FIX, Orca stale offer:
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+AFTER FIX, Orca stale offer:
+eligible=1
+status=safe
+corrupted=0
+rows=1
+tasks=task-a
+unscoped=0
+CAPTAIN-HELD Orca stale offer:
+eligible=0
+status=unsafe
+corrupted=0
+rows=
+tasks=
+unscoped=0
+UNKNOWN terminal offer:
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0

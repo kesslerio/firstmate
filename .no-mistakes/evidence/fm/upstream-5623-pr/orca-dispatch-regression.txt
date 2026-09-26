@@ -1,0 +1,5 @@
+ok - Orca terminal stale wake and co-queued signal reach supervision
+ok - signal trigger keeps the mixed batch on supervision
+ok - captain-held Orca stale wake stays with main
+ok - unknown Orca terminal refuses the whole batch
+ok - existing window alias remains claimable

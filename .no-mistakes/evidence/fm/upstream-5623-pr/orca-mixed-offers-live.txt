@@ -1,0 +1,21 @@
+MIXED QUEUE: stale trigger
+eligible=1
+status=safe
+corrupted=0
+rows=1 2
+tasks=task-a
+unscoped=0
+MIXED QUEUE: signal trigger
+eligible=1
+status=safe
+corrupted=0
+rows=1 2
+tasks=task-a
+unscoped=0
+WINDOW BACKWARD COMPATIBILITY
+eligible=1
+status=safe
+corrupted=0
+rows=3
+tasks=task-b
+unscoped=0
