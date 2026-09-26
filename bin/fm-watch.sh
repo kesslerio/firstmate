@@ -41,7 +41,8 @@
 #                          closer look instead of another routine supervision
 #                          resume. Unless afk is active. A pane about to escalate
 #                          that can account for its quiet - a `paused:` external
-#                          wait or a verified `captain-held` transfer its worker
+#                          wait, a verified `captain-held` transfer, or a
+#                          still-latest `blocked:`/`needs-decision:` its worker
 #                          declared, or, where config/wedge-defer-parked-gate
 #                          arms it, a validation gate of its own awaiting a
 #                          supervisor decision nobody has answered yet - is
@@ -1193,9 +1194,19 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 # The evidence that a quiet pane is a BOUNDED WAIT rather than a wedge suspect,
 # read at the one moment it decides anything: when an escalation is about to
 # fire. Two records answer it, and they are independent: the worker's own status
-# line - a declared `paused:` external wait, or a verified `captain-held`
-# transfer - and, when that line explains nothing, the crew's authoritative
+# line - a declared `paused:` external wait, a verified `captain-held`
+# transfer, or a latest event that is still a `blocked:` or `needs-decision:`
+# line - and, when that line explains nothing, the crew's authoritative
 # current state.
+#
+# A latest `blocked:` or `needs-decision:` event is the worker saying it is
+# parked on firstmate, and that line already woke firstmate when it landed, so
+# re-escalating the same quiet as a possible wedge re-proves a reported fact and
+# climbs the escalation count on nothing new. Only the LATEST event counts: any
+# later line - a `resolved` for any key, a `working:` - means the worker moved
+# on, and the pane keeps the unchanged schedule. A `working:` line that merely
+# says it is holding is NOT a declaration; the parked-lane contract is to write
+# `paused:`, `blocked:`, or `needs-decision:` as the newest status event.
 #
 # The generated brief promises that declaring one buys the long recheck cadence
 # instead of a wedge, and the wedge timer is reachable while that declaration
@@ -1248,8 +1259,9 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 #     crewmate's OWN next move;
 #   - the crewmate parked at a human-owed gate and went quiet before escalating
 #     it at all: nobody was ever told, so there is no wait to defer to.
-# A `blocked` record does not count: a blocker is not an unanswered gate decision
-# and a different action clears it. A gate awaiting the CREWMATE's own answer is
+# A `blocked` record does not count as this second record: a blocker is not an
+# unanswered gate decision and a different action clears it (a blocker that is
+# still the latest event is caught by the first record above). A gate awaiting the CREWMATE's own answer is
 # deliberately NOT evidence either: a crewmate that goes quiet before answering
 # its own gate is exactly the wedge this ladder exists to catch, so those keep
 # the unchanged schedule, reason and demand-deep-inspection wording.
@@ -1263,7 +1275,7 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 # `needs-decision` at all, and only in the at-threshold branch - at most once per
 # window per STALE_ESCALATE_SECS, never on an ordinary poll.
 wedge_wait_evidence() {  # <task> -> one wait_record on stdout
-  local task=$1 last until statusf run
+  local task=$1 last until statusf run verb
   [ -n "$task" ] || return 1
   statusf="$STATE/$task.status"
   last=$(status_declared_wait_line "$statusf")
@@ -1280,6 +1292,19 @@ wedge_wait_evidence() {  # <task> -> one wait_record on stdout
       external 'confirm the wait still holds' "$statusf"
     return 0
   fi
+  status_line_verb "$(last_status_line "$statusf")" verb
+  case "$verb" in
+    blocked)
+      wait_record 'declared blocker' 'awaiting firstmate - its blocker was already reported' \
+        supervisor 'clear the reported blocker and resolve it with fm-send --resolve-key' "$statusf"
+      return 0
+      ;;
+    needs-decision)
+      wait_record 'declared decision' 'awaiting firstmate - its decision was already reported' \
+        supervisor 'answer the reported decision with fm-send --resolve-key' "$statusf"
+      return 0
+      ;;
+  esac
   [ -e "$CONFIG/wedge-defer-parked-gate" ] || return 1
   if status_has_open_needs_decision "$statusf" \
     && run=$(crew_gate_awaits_human_decision "$task") \
