@@ -1,0 +1,24 @@
+
+  detached worktree ~/.n/w/8036f35f7c08/01M3FVJ7GE12… 54K / 500K │ [Dashboard]
+
+
+
+     ❯ In this disposable test session, run a shell command that     3:24 PM
+       sleeps for 60 seconds and then answer done. Do not modify
+       files.
+
+
+     ◆ Task started: Sleep 60 seconds then print done
+     ◆ Task completed in 45s: Sleep 60 seconds then print done
+
+     Captain, done.                                                  3:25 PM
+
+     Worked for 1m5s                                                           █
+                                                                               █
+
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰────────────────────────────────────────────────────── Grok 4.5 (medium) ─╯
+
+  Shift+Tab:mode  │  Ctrl+x:shortcuts
+

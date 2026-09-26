@@ -1,0 +1,25 @@
+Private tmux lab: primary session with a real Grok CLI lane and the real bin/fm-watch.sh.
+Status event log:
+working: Holding the build per 002: tell me which PR is the third
+working: third PR landed, building now
+blocked: signing host refuses the key upload
+needs-decision [key=release-key]: choose option A or B
+working: [key=holding] compiling the release build
+
+Watcher stdout — newest working hold:
+stale: primary:groklane (idle 2s, waiting 117s - declared hold, holding per its own newest working: line, rechecked on a long cadence not a wedge; confirm what it is holding for; a holding lane should write paused: or needs-decision:)
+
+Watcher stdout — later active working line:
+stale: primary:groklane (idle 109s, possible wedge, escalation 1)
+
+Watcher stdout — newest blocked line:
+stale: primary:groklane (idle 3s, waiting 69s - declared blocker, awaiting firstmate - its blocker was already reported, rechecked on a long cadence not a wedge; clear the reported blocker and resolve it with fm-send --resolve-key)
+
+Watcher stdout — newest needs-decision line:
+stale: primary:groklane (idle 96s, waiting 60s - declared decision, awaiting firstmate - its decision was already reported, rechecked on a long cadence not a wedge; answer the reported decision with fm-send --resolve-key)
+
+Watcher stdout — metadata key containing holding:
+stale: primary:groklane (idle 109s, possible wedge, escalation 2)
+
+Final escalation counter:
+2
