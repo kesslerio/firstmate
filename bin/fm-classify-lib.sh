@@ -357,19 +357,17 @@ status_is_paused_or_captain_held() {  # <status-line>
 
 # 0 if a `working:` status line's own text says the worker is holding or
 # waiting rather than running - "Holding the build per 002", "waiting on the
-# third PR", "standing by". The words are read only after the first colon, so a
-# stamp or key cannot match, and only whole words count, so "withholding" or
-# "unwaiting" do not. This is a free-text read of the worker's prose, weaker
+# third PR", "standing by". This is a free-text read of the worker's prose, weaker
 # than a `paused:` verb, which is why its only consumer (fm-watch.sh's
 # wedge_wait_evidence) uses it to DEFER a wedge escalation onto the bounded
 # recheck cadence, never to drop one.
-FM_CLASSIFY_HOLD_RE_DEFAULT='(^|[^[:alpha:]])(holding|on hold|waiting (on|for)|awaiting|standing by)([^[:alpha:]]|$)'
 status_is_working_hold() {  # <status-line>
-  local line=$1 verb
+  local line=$1 verb note
   [ -n "$line" ] || return 1
   status_line_verb "$line" verb
   [ "$verb" = working ] || return 1
-  _fm_classify_matches "${line#*:}" "${FM_CLASSIFY_HOLD_RE:-$FM_CLASSIFY_HOLD_RE_DEFAULT}"
+  note=$(status_line_note "$line")
+  _fm_classify_matches "$note" '(^|[^[:alnum:]_])(holding|on hold|waiting (on|for)|awaiting|standing by)([^[:alnum:]_]|$)'
 }
 
 # The status line that holds a crew in a declared wait, or nothing when it is in

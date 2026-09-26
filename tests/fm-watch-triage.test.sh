@@ -3617,6 +3617,9 @@ test_wedge_threshold_defers_to_a_newest_status_that_declares_a_wait() {
   # Controls: a working line with no hold words, and a hold the worker has since
   # moved past, both keep the unchanged schedule, count, and wording.
   for log in 'working: still compiling the release build' \
+    'working: [key=holding] compiling the release build' \
+    'working [at=holding]: compiling the release build' \
+    'working: editing holding_lease' \
     'working: Holding the build for the third PR
 working: third PR landed, building now'; do
     dir=$(wedge_threshold_fixture newest-wait-control "$log" 0)
