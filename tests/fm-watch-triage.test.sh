@@ -3571,7 +3571,7 @@ resolved [key=nm-01RUNGATE-review]: firstmate chose the second fix' 2000)
 # threshold. Both directions are pinned: the same lane whose newest line has
 # moved on, or never said it was waiting, keeps the unchanged ladder.
 test_wedge_threshold_defers_to_a_newest_status_that_declares_a_wait() {
-  local dir state fakebin out capture window key n case_name log label timer
+  local dir state fakebin out capture window key n case_name log label timer phrase_index
   local working='state: working · source: run-step · ci running'
   window="test:fm-wedge"; key=$(printf '%s' "$window" | tr ':/.' '___')
 
@@ -3614,9 +3614,30 @@ test_wedge_threshold_defers_to_a_newest_status_that_declares_a_wait() {
       || fail "the $case_name recheck was not worded as a bounded wait: $(cat "$out")"
   done
 
+  # Each accepted phrase must work through the watcher, not merely match a
+  # classifier regex in isolation. The reported "Holding" form is covered by
+  # the repeated-threshold case above.
+  phrase_index=0
+  for log in 'working: on hold for review' \
+    'working: waiting on the third PR' \
+    'working: waiting for the build' \
+    'working: awaiting a decision' \
+    'working: standing by for release'; do
+    phrase_index=$((phrase_index + 1))
+    dir=$(wedge_threshold_fixture "newest-wait-phrase-$phrase_index" "$log" 0)
+    state="$dir/state"; fakebin="$dir/fakebin"; out="$dir/watch.out"; capture="$dir/pane.txt"
+    wedge_threshold_round "$state" "$fakebin" "$out" "$capture" "$window" "$working" absorb \
+      || fail "a newest status declaring '$log' wedge-escalated: $(cat "$out")"
+    [ "$(wedge_stale_wakes "$state" "$window")" -eq 0 ] \
+      || fail "a newest status declaring '$log' queued a wedge wake"
+    [ ! -e "$state/.wedge-escalations-$key" ] \
+      || fail "a newest status declaring '$log' climbed the escalation count"
+  done
+
   # Controls: a working line with no hold words, and a hold the worker has since
   # moved past, both keep the unchanged schedule, count, and wording.
   for log in 'working: still compiling the release build' \
+    'working: still parked at that gate' \
     'working: [key=holding] compiling the release build' \
     'working [at=holding]: compiling the release build' \
     'working: editing holding_lease' \
