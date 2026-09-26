@@ -42,8 +42,8 @@
 #                          resume. Unless afk is active. A pane about to escalate
 #                          that can account for its quiet - a `paused:` external
 #                          wait, a verified `captain-held` transfer, or a
-#                          still-latest `blocked:`/`needs-decision:` its worker
-#                          declared, or, where config/wedge-defer-parked-gate
+#                          newest `blocked:`, `needs-decision:`, or holding
+#                          `working:` line its worker declared, or, where config/wedge-defer-parked-gate
 #                          arms it, a validation gate of its own awaiting a
 #                          supervisor decision nobody has answered yet - is
 #                          deferred to that same long recheck cadence instead
@@ -1229,18 +1229,20 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 # read at the one moment it decides anything: when an escalation is about to
 # fire. Two records answer it, and they are independent: the worker's own status
 # line - a declared `paused:` external wait, a verified `captain-held`
-# transfer, or a latest event that is still a `blocked:` or `needs-decision:`
-# line - and, when that line explains nothing, the crew's authoritative
-# current state.
+# transfer, or a latest event that is a `blocked:` or `needs-decision:` line
+# or a `working:` line whose own words say it is holding
+# (status_is_working_hold in fm-classify-lib.sh) - and, when that line explains
+# nothing, the crew's authoritative current state.
 #
-# A latest `blocked:` or `needs-decision:` event is the worker saying it is
-# parked on firstmate, and that line already woke firstmate when it landed, so
-# re-escalating the same quiet as a possible wedge re-proves a reported fact and
+# Each of those latest events is the worker saying it is parked, and a
+# `blocked:` or `needs-decision:` line already woke firstmate when it landed, so
+# re-escalating the same quiet as a possible wedge re-proves a stated fact and
 # climbs the escalation count on nothing new. Only the LATEST event counts: any
-# later line - a `resolved` for any key, a `working:` - means the worker moved
-# on, and the pane keeps the unchanged schedule. A `working:` line that merely
-# says it is holding is NOT a declaration; the parked-lane contract is to write
-# `paused:`, `blocked:`, or `needs-decision:` as the newest status event.
+# later line - a `resolved` for any key, a `working:` without hold words - means
+# the worker moved on, and the pane keeps the unchanged schedule. The hold-word
+# read is prose, so it is the weakest of these; like the others it only defers
+# onto the bounded recheck, and `paused:` stays the declaration workers should
+# write.
 #
 # The generated brief promises that declaring one buys the long recheck cadence
 # instead of a wedge, and the wedge timer is reachable while that declaration
@@ -1309,7 +1311,7 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 # `needs-decision` at all, and only in the at-threshold branch - at most once per
 # window per STALE_ESCALATE_SECS, never on an ordinary poll.
 wedge_wait_evidence() {  # <task> -> one wait_record on stdout
-  local task=$1 last until statusf run verb
+  local task=$1 last until statusf run verb latest
   [ -n "$task" ] || return 1
   statusf="$STATE/$task.status"
   last=$(status_declared_wait_line "$statusf")
@@ -1326,8 +1328,16 @@ wedge_wait_evidence() {  # <task> -> one wait_record on stdout
       external 'confirm the wait still holds' "$statusf"
     return 0
   fi
-  status_line_verb "$(last_status_line "$statusf")" verb
+  latest=$(last_status_line "$statusf")
+  status_line_verb "$latest" verb
   case "$verb" in
+    working)
+      if status_is_working_hold "$latest"; then
+        wait_record 'declared hold' 'holding per its own newest working: line' \
+          supervisor 'confirm what it is holding for; a holding lane should write paused: or needs-decision:' "$statusf"
+        return 0
+      fi
+      ;;
     blocked)
       wait_record 'declared blocker' 'awaiting firstmate - its blocker was already reported' \
         supervisor 'clear the reported blocker and resolve it with fm-send --resolve-key' "$statusf"
