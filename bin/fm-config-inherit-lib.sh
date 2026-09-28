@@ -25,8 +25,8 @@
 # secondmate's own claude crewmates launch on the same permission posture.
 # Primary config/keep-ai-trailers is a home-wide commit-attribution choice, so
 # a secondmate's own crewmates keep AI co-author trailers too.
-# Primary config/fleet-seats declares the fleet-wide seat pools, so a home that
-# cannot reach the primary's seat accounting still knows which models to refuse
+# Primary config/fleet-seats declares the fleet-wide seat pools, so a remote home
+# knows which models must wait for a seat granted by the primary
 # (bin/fm-fleet-seats.sh).
 # It also pushes
 # the one primary-authoritative shared captain-preference file,
