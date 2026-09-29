@@ -1,0 +1,2 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab.dl7jcx
+stopped grok144 harness=grok backend=tmux endpoint=primary:fm-grok144 worktree=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3PRFX2SZ7YQJT6CABTPXFJY
