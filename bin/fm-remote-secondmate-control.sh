@@ -71,6 +71,7 @@ REMOTE_HERDR_SESSION=fm-remote
 . "$SCRIPT_DIR/fm-task-inbox-lib.sh"
 
 die() { printf 'error: %s\n' "$1" >&2; exit 1; }
+prelaunch_die() { printf 'relaunch_failure=prelaunch\n' >&2; die "$1"; }
 usage() { sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
 validate_id() { case "$1" in ''|*[!A-Za-z0-9._-]*) die "invalid secondmate id: $1" ;; esac; }
 
@@ -239,10 +240,10 @@ cmd_relaunch() {
   validate_home "$id"
   case "$harness" in
     claude|codex|opencode|pi|pi-signed|grok|kimi|cursor) ;;
-    *) die "unverified remote secondmate harness: $harness" ;;
+    *) prelaunch_die "unverified remote secondmate harness: $harness" ;;
   esac
-  case "$effort" in -|default|low|medium|high|xhigh|max|ultra) ;; *) die "invalid remote secondmate effort: $effort" ;; esac
-  case "$model" in *[[:space:]]*) die "invalid remote secondmate model: $model" ;; esac
+  case "$effort" in -|default|low|medium|high|xhigh|max|ultra) ;; *) prelaunch_die "invalid remote secondmate effort: $effort" ;; esac
+  case "$model" in *[[:space:]]*) prelaunch_die "invalid remote secondmate model: $model" ;; esac
   if [ "$effort" = ultra ]; then
     "$SCRIPT_DIR/fm-harness.sh" validate-native-effort "$harness" "$model" "$effort" || return 1
   fi
