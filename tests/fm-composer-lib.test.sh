@@ -789,7 +789,7 @@ test_matrix_grok_144_approval_titled_bottom_border() {
   # top border and appends its approval mode (` · always-approve`). The mid-dot
   # used to survive the geometry residue test, so an idle pane read unknown and
   # the guarded exit/relaunch refused to type /exit.
-  local top empty_row typed_row rule bottom idle typed
+  local top empty_row typed_row bottom idle typed
   top='  ╭'$(_grok_rule 74)'╮'
   empty_row='  │ ❯'"$(printf '%*s' 72 '')"'│'
   typed_row='  │ ❯ deploy the fix'"$(printf '%*s' 57 '')"'│'
