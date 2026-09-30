@@ -1230,7 +1230,7 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 # fire. Two records answer it, and they are independent: the worker's own status
 # line - a declared `paused:` external wait, a verified `captain-held`
 # transfer, or a latest event that is a `blocked:` or `needs-decision:` line
-# or a `working:` line whose own words say it is holding
+# or a `working:` line with an explicit hold declaration
 # (status_is_working_hold in fm-classify-lib.sh) - and, when that line explains
 # nothing, the crew's authoritative current state.
 #
@@ -1238,9 +1238,9 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 # `blocked:` or `needs-decision:` line already woke firstmate when it landed, so
 # re-escalating the same quiet as a possible wedge re-proves a stated fact and
 # climbs the escalation count on nothing new. Only the LATEST event counts: any
-# later line - a `resolved` for any key, a `working:` without hold words - means
-# the worker moved on, and the pane keeps the unchanged schedule. The hold-word
-# read is prose, so it is the weakest of these; like the others it only defers
+# later line - a `resolved` for any key, a `working:` without a hold declaration -
+# means the worker moved on, and the pane keeps the unchanged schedule. The
+# working hold is the weakest of these; like the others it only defers
 # onto the bounded recheck, and `paused:` stays the declaration workers should
 # write.
 #

@@ -355,24 +355,18 @@ status_is_paused_or_captain_held() {  # <status-line>
   status_is_paused "$line" || status_is_captain_held "$line"
 }
 
-# 0 if a `working:` status line's own text says the worker is holding or
-# waiting rather than running - "Holding the build per 002", "waiting on the
-# third PR", "standing by". This is a free-text read of the worker's prose, weaker
-# than a `paused:` verb, which is why its only consumer (fm-watch.sh's
-# wedge_wait_evidence) uses it to DEFER a wedge escalation onto the bounded
-# recheck cadence, never to drop one.
+# 0 if a `working:` note declares a hold at its start or after a period or
+# semicolon followed by whitespace - "Holding the build per 002", "waiting on the third PR",
+# "standing by". Embedded prose and negated phrases are not declarations.
+# Weaker than a `paused:` verb, this only lets fm-watch.sh's wedge_wait_evidence
+# DEFER a wedge escalation onto the bounded recheck cadence, never drop one.
 status_is_working_hold() {  # <status-line>
   local line=$1 verb note hold_re='(holding|on hold|waiting (on|for)|awaiting|standing by)'
   [ -n "$line" ] || return 1
   status_line_verb "$line" verb
   [ "$verb" = working ] || return 1
   note=$(status_line_note "$line")
-  # Retracted phrases are not current waits; any separate affirmative wait
-  # still counts. Keep the same phrase set and identifier boundaries for both.
-  while _fm_classify_matches "$note" "(^|[^[:alnum:]_])(not|no longer)[[:space:]]+((currently|still)[[:space:]]+)?$hold_re([^[:alnum:]_]|$)"; do
-    note=${note/"${BASH_REMATCH[0]}"/ }
-  done
-  _fm_classify_matches "$note" "(^|[^[:alnum:]_])$hold_re([^[:alnum:]_]|$)"
+  _fm_classify_matches "$note" "(^|[.;][[:space:]]+)$hold_re([^[:alnum:]_]|$)"
 }
 
 # The status line that holds a crew in a declared wait, or nothing when it is in

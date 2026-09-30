@@ -3564,7 +3564,7 @@ resolved [key=nm-01RUNGATE-review]: firstmate chose the second fix' 2000)
 
 # --- a lane whose newest status says it is waiting is not a wedge -------------
 # The worker's newest status event is its own account of its quiet. A `working:`
-# line whose words say it is holding (the release lane that wrote "Holding the
+# line with an explicit hold declaration (the release lane that wrote "Holding the
 # build per 002 ... tell me which PR"), or a newest `blocked:` or
 # `needs-decision:` line that already woke firstmate, is deferred onto the
 # bounded recheck instead of climbing "possible wedge, escalation N" once per
@@ -3674,6 +3674,46 @@ working: third PR landed, building now'; do
     rm -rf "$dir"
   done
   pass "a newest status that declares a hold, a blocker, or a decision defers the wedge timer without climbing its count, while a lane that never said it was waiting or has moved on keeps the unchanged ladder"
+}
+
+test_wedge_working_prose_is_not_a_hold_declaration() {
+  local case_name log mode dir state fakebin out capture
+  local window='test:fm-wedge' key='test_fm-wedge'
+  local working='state: working · source: run-step · ci running'
+  for case_name in prose declaration; do
+    case "$case_name" in
+      prose) log='working: investigating why the build is waiting for input'; mode='exit' ;;
+      declaration) log='working: waiting for input'; mode=absorb ;;
+    esac
+    dir=$(wedge_threshold_fixture "working-hold-$case_name" "$log" 0)
+    state="$dir/state"; fakebin="$dir/fakebin"; out="$dir/watch.out"; capture="$dir/pane.txt"
+    wedge_threshold_round "$state" "$fakebin" "$out" "$capture" "$window" "$working" "$mode" \
+      || fail "the $case_name note took the wrong wedge path: $(cat "$out")"
+    if [ "$case_name" = prose ]; then
+      [ "$(wedge_stale_wakes "$state" "$window")" -eq 1 ] \
+        || fail "working prose did not queue its wedge escalation"
+      grep -F 'possible wedge, escalation 1' "$out" >/dev/null \
+        || fail "working prose lost the wedge escalation reason: $(cat "$out")"
+      [ "$(cat "$state/.wedge-escalations-$key")" = 1 ] \
+        || fail "working prose did not advance the escalation count"
+    else
+      [ "$(wedge_stale_wakes "$state" "$window")" -eq 0 ] \
+        || fail "an explicit working hold queued a wedge escalation"
+      [ ! -e "$state/.wedge-escalations-$key" ] \
+        || fail "an explicit working hold advanced the escalation count"
+    fi
+  done
+  for log in 'working: investigating why the build is holding a lock' \
+    'working: checking whether the build is on hold' \
+    'working: investigating why the build is waiting on input' \
+    'working: investigating why the build is waiting for input' \
+    'working: checking which build is awaiting input' \
+    'working: checking why the build is standing by' \
+    'working: build started. investigating why the build is waiting for input' \
+    'working: editing build.holding'; do
+    status_is_working_hold "$log" && fail "ordinary working prose was classified as a hold: $log"
+  done
+  pass "working prose keeps wedge escalation while an explicit working hold defers it"
 }
 
 test_wedge_hold_recheck_uses_configured_pause_verb() {
@@ -6856,6 +6896,7 @@ test_wedge_threshold_defers_to_a_parked_gate_awaiting_a_human
 test_wedge_threshold_parked_gate_needs_an_unanswered_decision
 test_wedge_threshold_parked_gate_is_off_until_armed
 test_wedge_threshold_defers_to_a_newest_status_that_declares_a_wait
+test_wedge_working_prose_is_not_a_hold_declaration
 test_wedge_hold_recheck_uses_configured_pause_verb
 test_wedge_defer_refuses_a_half_filled_wait_record
 test_open_captain_call_bounds_stale_churn
