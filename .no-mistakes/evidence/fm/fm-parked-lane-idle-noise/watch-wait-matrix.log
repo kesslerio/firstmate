@@ -1,0 +1,1 @@
+ok - a newest status that declares a hold, a blocker, or a decision defers the wedge timer without climbing its count, while a lane that never said it was waiting or has moved on keeps the unchanged ladder

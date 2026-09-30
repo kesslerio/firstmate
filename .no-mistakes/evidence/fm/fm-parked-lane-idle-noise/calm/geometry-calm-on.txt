@@ -1,0 +1,44 @@
+durable-objects, find-qualified-titles, find-skills, flux-local, hyperframes, hyperframes-animation,
+hyperframes-audio, hyperframes-cli, hyperframes-core, hyperframes-creative, hyperframes-keyframes,
+hyperframes-registry, impeccable, kb, kun, linkedin-url-lookup, logo-designer, media-use,
+minimax-h3-video, niche-signal-discovery, no-mistakes, orca-cli, orchestration, paseo,
+paseo-advisor, paseo-committee, paseo-handoff, paseo-help, paseo-plugin, portfolio-prospecting,
+sandbox-sdk, shapescale-i2i, shapescale-sim-capture, turnstile-spin, web-perf,
+workers-best-practices, workflow-hello-world, wrangler
+
+[Extensions]
+  fm-calm.ts, geometry-provider.ts
+
+
+ [skill] ahoy (ctrl+o to expand)
+
+
+ CALM_GEOMETRY_FINAL
+
+ - visible row one
+ - visible row two
+
+ Tool output: collapsed
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/8036f35f7c08/01M3RK329DHZNXX4RDA2SWGNY2/.tools/test-phase/tmp/fm-calm-pi...
+↑9.7k ↓50 R19k W9.7k CH99.5% 236.9%/4.1k (auto)                               deterministic • medium
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

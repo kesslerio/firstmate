@@ -1,0 +1,70 @@
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK329DHZNXX4RDA2SWGNY2/.l
+.tools/test-phase/live-watcher.sh: line 62: 39306 Terminated: 15          FM_CLASSIFY_PAUSED_VERB="$pause" FM_WATCH_HANDLING_SUCCESSOR=1 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_STALE_ESCALATE_SECS=1 FM_PAUSE_RESURFACE_SECS=240 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 FM_SECONDMATE_LIVENESS_SECS=99999999 "$ROOT/bin/fm-watch.sh" > "$EV/live-$name.out" 2>&1
+
+CASE hold
+status: working: Holding the build per 002
+expected: absorb
+[2026-09-30T00:36:27-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 602s): primary:fm-lane
+.tools/test-phase/live-watcher.sh: line 62: 60437 Terminated: 15          FM_CLASSIFY_PAUSED_VERB="$pause" FM_WATCH_HANDLING_SUCCESSOR=1 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_STALE_ESCALATE_SECS=1 FM_PAUSE_RESURFACE_SECS=240 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 FM_SECONDMATE_LIVENESS_SECS=99999999 "$ROOT/bin/fm-watch.sh" > "$EV/live-$name.out" 2>&1
+
+CASE blocker
+status: blocked: the signing host refuses key upload
+expected: absorb
+[2026-09-30T00:36:32-0700] absorbed stale (overridden terminal status) (declared blocker explains the quiet, idle 602s): primary:fm-lane
+.tools/test-phase/live-watcher.sh: line 62: 79217 Terminated: 15          FM_CLASSIFY_PAUSED_VERB="$pause" FM_WATCH_HANDLING_SUCCESSOR=1 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_STALE_ESCALATE_SECS=1 FM_PAUSE_RESURFACE_SECS=240 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 FM_SECONDMATE_LIVENESS_SECS=99999999 "$ROOT/bin/fm-watch.sh" > "$EV/live-$name.out" 2>&1
+
+CASE decision
+status: needs-decision [key=release]: option A or B
+expected: absorb
+[2026-09-30T00:36:36-0700] absorbed stale (overridden terminal status) (declared decision explains the quiet, idle 602s): primary:fm-lane
+
+CASE hold-recheck
+status: working: Holding the build per 002
+expected: recheck
+stale: primary:fm-lane (idle 602s, waiting 2003s - declared hold, holding per its own newest working: line, rechecked on a long cadence not a wedge; confirm what it is holding for; a holding lane should write paused: or needs-decision:)
+1790753801	1	stale	primary:fm-lane	stale: primary:fm-lane (idle 602s, waiting 2003s - declared hold, holding per its own newest working: line, rechecked on a long cadence not a wedge; confirm what it is holding for; a holding lane should write paused: or needs-decision:)
+
+CASE blocker-recheck
+status: blocked: the signing host refuses key upload
+expected: recheck
+stale: primary:fm-lane (idle 603s, waiting 2003s - declared blocker, awaiting firstmate - its blocker was already reported, rechecked on a long cadence not a wedge; clear the reported blocker and resolve it with fm-send --resolve-key)
+1790753805	1	stale	primary:fm-lane	stale: primary:fm-lane (idle 603s, waiting 2003s - declared blocker, awaiting firstmate - its blocker was already reported, rechecked on a long cadence not a wedge; clear the reported blocker and resolve it with fm-send --resolve-key)
+
+CASE decision-recheck
+status: needs-decision [key=release]: option A or B
+expected: recheck
+stale: primary:fm-lane (idle 603s, waiting 2003s - declared decision, awaiting firstmate - its decision was already reported, rechecked on a long cadence not a wedge; answer the reported decision with fm-send --resolve-key)
+1790753810	1	stale	primary:fm-lane	stale: primary:fm-lane (idle 603s, waiting 2003s - declared decision, awaiting firstmate - its decision was already reported, rechecked on a long cadence not a wedge; answer the reported decision with fm-send --resolve-key)
+
+CASE custom-pause
+status: working: waiting for review
+expected: recheck
+stale: primary:fm-lane (idle 603s, waiting 2003s - declared hold, holding per its own newest working: line, rechecked on a long cadence not a wedge; confirm what it is holding for; a holding lane should write holding: or needs-decision:)
+1790753814	1	stale	primary:fm-lane	stale: primary:fm-lane (idle 603s, waiting 2003s - declared hold, holding per its own newest working: line, rechecked on a long cadence not a wedge; confirm what it is holding for; a holding lane should write holding: or needs-decision:)
+
+CASE negated
+status: working: no longer holding the build; building now
+expected: wedge
+stale: primary:fm-lane (idle 603s, possible wedge, escalation 1)
+1790753819	1	stale	primary:fm-lane	stale: primary:fm-lane (idle 603s, possible wedge, escalation 1)
+.tools/test-phase/live-watcher.sh: line 62:  8234 Terminated: 15          FM_CLASSIFY_PAUSED_VERB="$pause" FM_WATCH_HANDLING_SUCCESSOR=1 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_STALE_ESCALATE_SECS=1 FM_PAUSE_RESURFACE_SECS=240 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 FM_SECONDMATE_LIVENESS_SECS=99999999 "$ROOT/bin/fm-watch.sh" > "$EV/live-$name.out" 2>&1
+
+CASE mixed
+status: working: not holding the build; waiting for review
+expected: absorb
+[2026-09-30T00:37:04-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 603s): primary:fm-lane
+
+CASE superseded
+status: working: Holding the build
+working: building now
+expected: wedge
+stale: primary:fm-lane (idle 603s, possible wedge, escalation 1)
+1790753830	1	stale	primary:fm-lane	stale: primary:fm-lane (idle 603s, possible wedge, escalation 1)
+
+CASE ordinary
+status: working: still compiling
+expected: wedge
+stale: primary:fm-lane (idle 603s, possible wedge, escalation 1)
+1790753834	1	stale	primary:fm-lane	stale: primary:fm-lane (idle 603s, possible wedge, escalation 1)
+
+All real-pane watcher checks completed; private Pi server and lab removed by cleanup.

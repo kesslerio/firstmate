@@ -1,0 +1,8 @@
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK329DHZNXX4RDA2SWGNY2/.tools/test-phase/sdk
+├── @earendil-works/pi-coding-agent@0.99.1 extraneous
+├── node@22.23.3 extraneous
+└── playwright@1.63.0 extraneous
+
+v22.23.3
+0.99.1
+Google Chrome for Testing 153.0.8010.12

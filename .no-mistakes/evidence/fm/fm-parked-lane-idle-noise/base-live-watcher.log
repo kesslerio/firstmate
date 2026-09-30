@@ -1,0 +1,9 @@
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK329DHZNXX4RDA2SWGNY2/.l
+
+CASE base-hold
+status: working: Holding the build per 002
+expected: wedge
+stale: primary:fm-lane (idle 606s, possible wedge, escalation 1)
+1790754441	1	stale	primary:fm-lane	stale: primary:fm-lane (idle 606s, possible wedge, escalation 1)
+
+Base commit reproduces the incorrect wedge escalation for a current declared hold.

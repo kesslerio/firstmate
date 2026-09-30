@@ -1,0 +1,24 @@
+{
+  "head": "960fcf2eb7f88f1259902cd6ac482dde44cd632b",
+  "ancestors": {
+    "eb77f02b16aeca9533102070de34b1f8812f4fa2": true,
+    "65de44179e3bd8f39543ca6fd7596456500381d9": true
+  },
+  "environment": {
+    "node": "22.23.3",
+    "pi": "0.99.1",
+    "chrome": "153.0.8010.12"
+  },
+  "live_watcher": "Real Pi pane on private tmux socket, 120x40 grid; marked disposable FM_HOME. Seeded previously observed stale markers with the actual pane hash and a 600-second-old wedge timer. Production watcher/backend reads and durable wake queue were used with no fake tmux or crew-state command.",
+  "live_cases": [
+    "Current hold/blocker/decision: no escalation",
+    "Aged hold/blocker/decision: bounded named recheck",
+    "Configured holding pause guidance",
+    "Negated/superseded/ordinary working: escalation",
+    "Mixed negation with affirmative wait: defer"
+  ],
+  "live_branch": "Real Pi restored a disposable transcript containing both registered branch tools and normal/error results. Ctrl+O expanded previews; /calm hid and restored rows; /export retained tool data. Browser clicks expanded both results to row 12 and preserved the error state.",
+  "baseline": "The same real-pane setup with base fm-watch.sh incorrectly escalated a fresh declared hold. The SDK consumer comparison with the base branch extension reproduced the stock-rendering mismatch.",
+  "supplemental": "Watch-arm suite, two selected watch-triage cases, full branch-extension suite, and full Calm-extension suite including native terminal and browser export DOM cases passed with no skips. A disposable Calm test copy only adjusted its helper path and retained generated artifacts during cleanup.",
+  "scope": "Test phase only; no lint/static analysis, CI, publication, other branch operation, or shared fleet mutation."
+}
