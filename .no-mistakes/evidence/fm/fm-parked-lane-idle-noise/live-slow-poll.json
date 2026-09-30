@@ -1,0 +1,9 @@
+{
+  "poll_seconds": 12,
+  "alive_at_old_ten_second_budget": true,
+  "gone_within_current_forty_second_budget": true,
+  "exit_after_seconds": 11.94,
+  "arm_exit": 1,
+  "product_output": "watcher: started pid=20410 (beacon fresh)\nwatcher: exiting - state directory no longer exists: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QTPEXZQCR13W9QA1PV6M34/.live-watch/slow-poll-home/state\nwatcher: FAILED - watcher cycle exited 1 without an actionable reason\n",
+  "result": "pass"
+}

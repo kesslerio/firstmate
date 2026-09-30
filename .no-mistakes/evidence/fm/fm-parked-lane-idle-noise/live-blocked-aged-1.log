@@ -1,0 +1,1 @@
+stale: primary:fm-lane (idle 601s, waiting 2001s - declared blocker, awaiting firstmate - its blocker was already reported, rechecked on a long cadence not a wedge; clear the reported blocker and resolve it with fm-send --resolve-key)

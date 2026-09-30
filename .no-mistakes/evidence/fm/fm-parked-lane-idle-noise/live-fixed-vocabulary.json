@@ -1,0 +1,30 @@
+[
+  {
+    "case": "override-cannot-add",
+    "round": 1,
+    "status": "working: compiling the release",
+    "expected": "wedge",
+    "result": "pass",
+    "elapsed_seconds": 1.07,
+    "exit": 0,
+    "watcher_output": "stale: primary:fm-lane (idle 601s, possible wedge, escalation 1)",
+    "wake_queue": "1790728143\t1\tstale\tprimary:fm-lane\tstale: primary:fm-lane (idle 601s, possible wedge, escalation 1)",
+    "escalation_count": "1",
+    "triage": "",
+    "evidence": "/Users/kesslerio/.no-mistakes/evidence/01M3QTPEXZQCR13W9QA1PV6M34/live-override-cannot-add-1.log"
+  },
+  {
+    "case": "override-cannot-remove",
+    "round": 1,
+    "status": "working: Holding the release",
+    "expected": "absorb",
+    "result": "pass",
+    "elapsed_seconds": 5.39,
+    "exit": -15,
+    "watcher_output": "",
+    "wake_queue": "",
+    "escalation_count": "0",
+    "triage": "[2026-09-29T17:29:04-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 601s): primary:fm-lane\n[2026-09-29T17:29:06-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 2s): primary:fm-lane\n[2026-09-29T17:29:07-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 1s): primary:fm-lane\n[2026-09-29T17:29:09-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 2s): primary:fm-lane",
+    "evidence": "/Users/kesslerio/.no-mistakes/evidence/01M3QTPEXZQCR13W9QA1PV6M34/live-override-cannot-remove-1.log"
+  }
+]

@@ -1,0 +1,2 @@
+{"case": "override-cannot-add", "round": 1, "expected": "wedge", "result": "pass", "elapsed_seconds": 1.07, "watcher_output": "stale: primary:fm-lane (idle 601s, possible wedge, escalation 1)"}
+{"case": "override-cannot-remove", "round": 1, "expected": "absorb", "result": "pass", "elapsed_seconds": 5.39, "watcher_output": ""}

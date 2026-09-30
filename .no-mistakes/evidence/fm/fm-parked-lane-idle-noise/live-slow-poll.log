@@ -1,0 +1,3 @@
+watcher: started pid=20410 (beacon fresh)
+watcher: exiting - state directory no longer exists: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QTPEXZQCR13W9QA1PV6M34/.live-watch/slow-poll-home/state
+watcher: FAILED - watcher cycle exited 1 without an actionable reason
