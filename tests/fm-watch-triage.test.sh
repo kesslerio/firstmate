@@ -3575,11 +3575,14 @@ test_wedge_threshold_defers_to_a_newest_status_that_declares_a_wait() {
   local working='state: working · source: run-step · ci running'
   window="test:fm-wedge"; key=$(printf '%s' "$window" | tr ':/.' '___')
 
-  for case_name in hold blocked decision; do
+  for case_name in hold qualified-hold blocked decision; do
     timer=''
     case "$case_name" in
       hold)
         log='working [at=1]: permanent key generated. Holding the build per 002: tell me which PR is the third'
+        label='declared hold' ;;
+      qualified-hold)
+        log='working: Currently waiting for CI'
         label='declared hold' ;;
       blocked)
         log='blocked [at=1]: the signing host refuses the key upload'
@@ -3677,13 +3680,14 @@ working: third PR landed, building now'; do
 }
 
 test_wedge_working_prose_is_not_a_hold_declaration() {
-  local case_name log mode dir state fakebin out capture
+  local case_name log mode dir state fakebin out capture phrase prefix
   local window='test:fm-wedge' key='test_fm-wedge'
   local working='state: working · source: run-step · ci running'
-  for case_name in prose declaration; do
+  for case_name in prose declaration qualified-declaration; do
     case "$case_name" in
       prose) log='working: investigating why the build is waiting for input'; mode='exit' ;;
       declaration) log='working: waiting for input'; mode=absorb ;;
+      qualified-declaration) log='working: Currently waiting for CI'; mode=absorb ;;
     esac
     dir=$(wedge_threshold_fixture "working-hold-$case_name" "$log" 0)
     state="$dir/state"; fakebin="$dir/fakebin"; out="$dir/watch.out"; capture="$dir/pane.txt"
@@ -3703,6 +3707,20 @@ test_wedge_working_prose_is_not_a_hold_declaration() {
         || fail "an explicit working hold advanced the escalation count"
     fi
   done
+  for phrase in 'holding the build' 'on hold for review' 'waiting on input' \
+    'waiting for CI' 'awaiting review' 'standing by for release'; do
+    for prefix in 'working: Currently ' \
+      'working [at=1] [key=ci]: build finished. Currently ' \
+      'working: build finished; currently '; do
+      status_is_working_hold "$prefix$phrase" \
+        || fail "a qualified working declaration was not classified as a hold: $prefix$phrase"
+    done
+    for prefix in 'working: not currently ' 'working: no longer currently ' \
+      'working: investigating why the build is currently '; do
+      status_is_working_hold "$prefix$phrase" \
+        && fail "working prose was classified as a qualified hold: $prefix$phrase"
+    done
+  done
   for log in 'working: investigating why the build is holding a lock' \
     'working: checking whether the build is on hold' \
     'working: investigating why the build is waiting on input' \
@@ -3713,7 +3731,7 @@ test_wedge_working_prose_is_not_a_hold_declaration() {
     'working: editing build.holding'; do
     status_is_working_hold "$log" && fail "ordinary working prose was classified as a hold: $log"
   done
-  pass "working prose keeps wedge escalation while an explicit working hold defers it"
+  pass "working prose keeps wedge escalation while explicit and qualified working holds defer it"
 }
 
 test_wedge_hold_recheck_uses_configured_pause_verb() {

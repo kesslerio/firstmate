@@ -357,7 +357,8 @@ status_is_paused_or_captain_held() {  # <status-line>
 
 # 0 if a `working:` note declares a hold at its start or after a period or
 # semicolon followed by whitespace - "Holding the build per 002", "waiting on the third PR",
-# "standing by". Embedded prose and negated phrases are not declarations.
+# "standing by", optionally prefixed by "currently". Embedded prose and
+# negated phrases are not declarations.
 # Weaker than a `paused:` verb, this only lets fm-watch.sh's wedge_wait_evidence
 # DEFER a wedge escalation onto the bounded recheck cadence, never drop one.
 status_is_working_hold() {  # <status-line>
@@ -366,7 +367,7 @@ status_is_working_hold() {  # <status-line>
   status_line_verb "$line" verb
   [ "$verb" = working ] || return 1
   note=$(status_line_note "$line")
-  _fm_classify_matches "$note" "(^|[.;][[:space:]]+)$hold_re([^[:alnum:]_]|$)"
+  _fm_classify_matches "$note" "(^|[.;][[:space:]]+)(currently[[:space:]]+)?$hold_re([^[:alnum:]_]|$)"
 }
 
 # The status line that holds a crew in a declared wait, or nothing when it is in
