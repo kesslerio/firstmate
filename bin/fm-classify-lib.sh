@@ -371,8 +371,8 @@ status_is_working_hold() {  # <status-line>
 }
 
 # The status line that holds a crew in a declared wait, or nothing when it is in
-# none. Supervisors decide the wait from this line, never from the raw latest
-# event: a resolved line is also how firstmate answers a decision (fm-send
+# none. Supervisors read paused and captain-held declarations from this line,
+# rather than the raw latest event: a resolved line also answers a decision (fm-send
 # --resolve-key), and one that lands after a pause for a different phase key -
 # including the stated default key a keyless decision shares - does not end the
 # pause. Only a resolved line for the pause's own phase key (the keyed

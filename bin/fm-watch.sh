@@ -1263,9 +1263,9 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 # The second record is OFF unless the home creates config/wedge-defer-parked-gate,
 # and that one guard is what makes an unconfigured home's behaviour identical to
 # having no second record at all: it is read before the fold, so no fold or
-# crew-state read is spent, no wait record exists to defer on, no recheck wording
-# is reachable, and the lane keeps the unchanged escalation schedule, reason and
-# demand-deep-inspection wording. Unlike the status line, which is the worker's
+# crew-state read is spent for gate evidence. The first record can still defer
+# independently; docs/architecture.md owns the shared wait-evidence contract.
+# Unlike the status line, which is the worker's
 # own declaration about its own silence, this record is derived from a pipeline's
 # gate state, so which lanes lose the ladder for it is a home's choice to make
 # rather than a default every fleet inherits - the same reason
@@ -1679,13 +1679,10 @@ handle_paused_stale() {  # <window> <task> <hash>
 # the busy verdict, so this exception does not suppress undeclared wedges or
 # alter the separate non-busy classification. handle_paused_stale keeps the
 # exception bounded by re-surfacing it once per PAUSE_RESURFACE_SECS.
-# A pane that declared nothing falls through to the shared wedge timer, which,
-# in a home that armed config/wedge-defer-parked-gate, applies the same rule to
-# the one wait a busy pane cannot declare: a validation gate of its own awaiting
-# a supervisor decision that is still open also takes the bounded recheck rather
-# than the ladder, because who owes that answer does not depend on what the pane
-# is rendering, and the recheck names that supervisor and the action that clears
-# it. An unconfigured home keeps the unchanged ladder there.
+# A pane without either declaration falls through to the shared wedge timer.
+# wedge_wait_evidence owns the remaining evidence reads, including newest-status
+# waits without a flag and gate-derived waits only in an armed home; the pane's
+# rendering cannot identify who owes a gate answer.
 # Away mode remains daemon-owned and receives the undecorated wake identity for
 # its own classification, which is why the declaration is read before the afk
 # branch rather than after it.
