@@ -1334,7 +1334,7 @@ wedge_wait_evidence() {  # <task> -> one wait_record on stdout
     working)
       if status_is_working_hold "$latest"; then
         wait_record 'declared hold' 'holding per its own newest working: line' \
-          supervisor 'confirm what it is holding for; a holding lane should write paused: or needs-decision:' "$statusf"
+          supervisor "confirm what it is holding for; a holding lane should write ${FM_CLASSIFY_PAUSED_VERB:-$FM_CLASSIFY_PAUSED_VERB_DEFAULT}: or needs-decision:" "$statusf"
         return 0
       fi
       ;;

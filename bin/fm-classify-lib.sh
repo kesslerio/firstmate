@@ -362,12 +362,17 @@ status_is_paused_or_captain_held() {  # <status-line>
 # wedge_wait_evidence) uses it to DEFER a wedge escalation onto the bounded
 # recheck cadence, never to drop one.
 status_is_working_hold() {  # <status-line>
-  local line=$1 verb note
+  local line=$1 verb note hold_re='(holding|on hold|waiting (on|for)|awaiting|standing by)'
   [ -n "$line" ] || return 1
   status_line_verb "$line" verb
   [ "$verb" = working ] || return 1
   note=$(status_line_note "$line")
-  _fm_classify_matches "$note" '(^|[^[:alnum:]_])(holding|on hold|waiting (on|for)|awaiting|standing by)([^[:alnum:]_]|$)'
+  # Retracted phrases are not current waits; any separate affirmative wait
+  # still counts. Keep the same phrase set and identifier boundaries for both.
+  while _fm_classify_matches "$note" "(^|[^[:alnum:]_])(not|no longer)[[:space:]]+((currently|still)[[:space:]]+)?$hold_re([^[:alnum:]_]|$)"; do
+    note=${note/"${BASH_REMATCH[0]}"/ }
+  done
+  _fm_classify_matches "$note" "(^|[^[:alnum:]_])$hold_re([^[:alnum:]_]|$)"
 }
 
 # The status line that holds a crew in a declared wait, or nothing when it is in

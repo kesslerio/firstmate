@@ -3622,7 +3622,9 @@ test_wedge_threshold_defers_to_a_newest_status_that_declares_a_wait() {
     'working: waiting on the third PR' \
     'working: waiting for the build' \
     'working: awaiting a decision' \
-    'working: standing by for release'; do
+    'working: standing by for release' \
+    'working: not holding the build; waiting for review' \
+    'working: awaiting review; no longer holding the build'; do
     phrase_index=$((phrase_index + 1))
     dir=$(wedge_threshold_fixture "newest-wait-phrase-$phrase_index" "$log" 0)
     state="$dir/state"; fakebin="$dir/fakebin"; out="$dir/watch.out"; capture="$dir/pane.txt"
@@ -3637,6 +3639,19 @@ test_wedge_threshold_defers_to_a_newest_status_that_declares_a_wait() {
   # Controls: a working line with no hold words, and a hold the worker has since
   # moved past, both keep the unchanged schedule, count, and wording.
   for log in 'working: still compiling the release build' \
+    'working: no longer holding the build; building now' \
+    'working: not holding the build; building now' \
+    'working: no longer on hold; building now' \
+    'working: not on hold; building now' \
+    'working: no longer waiting on the third PR; building now' \
+    'working: not waiting on the third PR; building now' \
+    'working: no longer waiting for the build; building now' \
+    'working: not waiting for the build; building now' \
+    'working: no longer awaiting a decision; building now' \
+    'working: not awaiting a decision; building now' \
+    'working: no longer standing by; building now' \
+    'working: not standing by; building now' \
+    'working: not currently awaiting review; no longer still holding the build' \
     'working: still parked at that gate' \
     'working: [key=holding] compiling the release build' \
     'working [at=holding]: compiling the release build' \
@@ -3659,6 +3674,34 @@ working: third PR landed, building now'; do
     rm -rf "$dir"
   done
   pass "a newest status that declares a hold, a blocker, or a decision defers the wedge timer without climbing its count, while a lane that never said it was waiting or has moved on keeps the unchanged ladder"
+}
+
+test_wedge_hold_recheck_uses_configured_pause_verb() {
+  local pause dir state fakebin out capture guidance window='test:fm-wedge'
+  local working='state: working · source: run-step · ci running'
+  local FM_CLASSIFY_PAUSED_VERB=''
+  export FM_CLASSIFY_PAUSED_VERB
+  for pause in paused holding; do
+    FM_CLASSIFY_PAUSED_VERB=''
+    if [ "$pause" != paused ]; then FM_CLASSIFY_PAUSED_VERB=$pause; fi
+    dir=$(wedge_threshold_fixture "hold-recheck-$pause" 'working: holding the build' 2000)
+    state="$dir/state"; fakebin="$dir/fakebin"; out="$dir/watch.out"; capture="$dir/pane.txt"
+    wedge_threshold_round "$state" "$fakebin" "$out" "$capture" "$window" "$working" exit \
+      || fail "a held lane did not emit its $pause recheck: $(cat "$out")"
+    guidance=$(sed -n 's/.*a holding lane should write \([^:]*:\) or needs-decision:.*/\1/p' "$out")
+    [ "$guidance" = "$pause:" ] \
+      || fail "the $pause recheck advised '$guidance': $(cat "$out")"
+    status_is_paused "$guidance waiting for the build" \
+      || fail "the classifier rejected the emitted $pause guidance"
+    ack_stopped_cycle "$state" || fail "could not acknowledge the $pause recheck"
+    printf '%s waiting for the build\n' "$guidance" >> "$state/wedge.status"
+    printf '%s' "$(seen_sig "$state/wedge.status")" > "$state/.seen-wedge_status"
+    wedge_threshold_round "$state" "$fakebin" "$out" "$capture" "$window" "$working" absorb \
+      || fail "following the $pause guidance restored wedge escalation: $(cat "$out")"
+    [ ! -e "$state/.wedge-escalations-test_fm-wedge" ] \
+      || fail "following the $pause guidance counted a wedge escalation"
+  done
+  pass "default and configured pause guidance declares a wait recognized by the classifier and watcher"
 }
 
 # --- a wait record that does not carry every field is refused ----------------
@@ -6813,6 +6856,7 @@ test_wedge_threshold_defers_to_a_parked_gate_awaiting_a_human
 test_wedge_threshold_parked_gate_needs_an_unanswered_decision
 test_wedge_threshold_parked_gate_is_off_until_armed
 test_wedge_threshold_defers_to_a_newest_status_that_declares_a_wait
+test_wedge_hold_recheck_uses_configured_pause_verb
 test_wedge_defer_refuses_a_half_filled_wait_record
 test_open_captain_call_bounds_stale_churn
 test_stale_churn_without_a_captain_call_still_alarms
