@@ -49,9 +49,10 @@
 # 1..25). A configured value rides the generated check shim into watcher runs
 # and is cut down to the watcher's own per-check bound (FM_CHECK_TIMEOUT,
 # default 30, read from the poll's environment because the watcher runs it as
-# a direct child) with a three-second margin. Every read is capped at five
-# seconds, and a read killed at that bound or at the deadline is budget
-# refusal, never a forge failure. A pull observation has three
+# a direct child) with a three-second margin. Every read, including retrieval
+# and local page assembly, is capped at five seconds. A read killed at that
+# bound or at the deadline is budget refusal, never a read failure.
+# A pull observation has three
 # dependent waves: core, six independent reads, then the closing head read;
 # an issue has two waves. Before starting a URL, poll reserves the smaller of
 # the effective budget and 15 seconds for those waves. URLs needing forge
@@ -65,10 +66,10 @@
 # A final observation applies
 # to every owner without another forge read. When the budget refuses a read
 # mid-observation, that URL's records stay untouched and the poll moves to the
-# next URL that still has a full observation reserve; only a genuine forge
-# failure or head change records an error.
-# API failure leaves error evidence; an expired or absent observation is not
-# silence. FM_CONTRIBUTIONS_MAX_AGE (default 900 seconds) bounds freshness.
+# next URL that still has a full observation reserve; only a genuine retrieval
+# or assembly failure or head change records an error.
+# An expired or absent observation is not silence.
+# FM_CONTRIBUTIONS_MAX_AGE (default 900 seconds) bounds freshness.
 # Every paginated read is assembled as one array-of-pages document from the
 # back-to-back JSON pages printed by gh api --paginate, including on gh 2.45.
 # A URL whose last good observation is merged or closed is final: it is
@@ -223,8 +224,8 @@ forge_read() { # command and arguments, including local page assembly
   [ "$remaining" -gt 0 ] || { BUDGET_EXHAUSTED=1; : > "$TMP/budget-exhausted"; return 1; }
   [ "$remaining" -le 5 ] || remaining=5
   fm_run_timed "$remaining" "$@" 2> "$forge_err" || rc=$?
-  # A kill at the read bound or the deadline is budget refusal too; only the
-  # forge's own nonzero exit is unavailable evidence.
+  # A kill at the read bound or the deadline is budget refusal too.
+  # Other nonzero exits from retrieval or assembly are unavailable evidence.
   if [ "$rc" -eq 124 ]; then
     BUDGET_EXHAUSTED=1
     : > "$TMP/budget-exhausted"
