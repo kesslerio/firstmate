@@ -1,0 +1,31 @@
+{
+  "families": [
+    {
+      "count": 1,
+      "duration_ms": 383037,
+      "failed": 0,
+      "name": "snapshot-bearings"
+    }
+  ],
+  "finished_at": "2026-09-30T07:43:09Z",
+  "run_id": "fm-test-run-1790753806655-38397",
+  "scripts": [
+    {
+      "duration_ms": 383037,
+      "exit": 0,
+      "expected_gate_skip": "optional-binary",
+      "family": "snapshot-bearings",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-contributions.test.sh"
+    }
+  ],
+  "selection": "scripts;jobs=1",
+  "started_at": "2026-09-30T07:36:46Z",
+  "summary": {
+    "duration_ms": 383318,
+    "failed": 0,
+    "skipped_gate": 0,
+    "total": 1
+  }
+}

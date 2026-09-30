@@ -1,0 +1,141 @@
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/.no-mistakes/test-phase/tools/gh-old/gh_2.45.0_macOS_arm64/bin/gh --version
+gh version 2.45.0 (2024-03-04)
+https://github.com/cli/cli/releases/tag/v2.45.0
+
+exit=0 elapsed=0.035s
+
+$ gh api ... --paginate --slurp
+unknown flag: --slurp
+
+Usage:  gh api <endpoint> [flags]
+
+Flags:
+      --cache duration        Cache the response, e.g. "3600s", "60m", "1h"
+  -F, --field key=value       Add a typed parameter in key=value format
+  -H, --header key:value      Add a HTTP request header in key:value format
+      --hostname string       The GitHub hostname for the request (default "github.com")
+  -i, --include               Include HTTP response status line and headers in the output
+      --input file            The file to use as body for the HTTP request (use "-" to read from standard input)
+  -q, --jq string             Query to select values from the response using jq syntax
+  -X, --method string         The HTTP method for the request (default "GET")
+      --paginate              Make additional HTTP requests to fetch all pages of results
+  -p, --preview names         GitHub API preview names to request (without the "-preview" suffix)
+  -f, --raw-field key=value   Add a string parameter in key=value format
+      --silent                Do not print the response body
+  -t, --template string       Format JSON output using a Go template; see "gh help formatting"
+      --verbose               Include full HTTP request and response in the output
+  
+exit=1
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/.no-mistakes/test-phase/tools/gh-old/gh_2.45.0_macOS_arm64/bin/gh api repos/o/r/issues/9/comments?per_page=100 --paginate
+[{"id": 11, "user": {"login": "outsider"}, "author_association": "NONE", "body": "Comment 11: please clarify", "html_url": "https://github.com/o/r/pull/8#issuecomment-11", "updated_at": "2026-09-30T08:00:00Z"}, {"id": 12, "user": {"login": "author"}, "author_association": "OWNER", "body": "Comment 12: please clarify", "html_url": "https://github.com/o/r/pull/8#issuecomment-12", "updated_at": "2026-09-30T08:00:00Z"},{"id": 13, "user": {"login": "maintainer"}, "author_association": "OWNER", "body": "Comment 13: please clarify", "html_url": "https://github.com/o/r/issues/9#issuecomment-13", "updated_at": "2026-09-30T08:00:00Z"}]
+exit=0 elapsed=0.038s
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/bin/fm-contributions.sh poll
+contribution-wake: check: contributions filed 6ec60f29937757be83f9ceabcb6aa2ba7a734bca6ec20d5ba5f8e538d0af3771
+contribution-wake: check: contributions filed ab31e67a3cf404359c62a426035151624b72ff9e24ebe01088262ed3f09df391
+contribution-wake: check: contributions delivery 43009b93b9d1aeee39436d658b07b6e715b2ce0e71569d741c8d410c3715f0f1
+contribution-wake: check: contributions delivery fc0d5069f79eb472fe2a07b236df976ddc596e40cebfd0aadb20cc3dfcee1628
+contribution-wake: check: contributions delivery fbb520231941b3668dbb4faea27e3f381fbc6c99da7de023c7856af7ff89ceb1
+
+exit=0 elapsed=1.876s
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/bin/fm-contributions.sh pending
+[
+  {
+    "token": "comment:13:2026-09-30T08:00:00Z:",
+    "type": "comment",
+    "source": "https://github.com/o/r/issues/8#issuecomment-13",
+    "head": null,
+    "author": "maintainer",
+    "body": "Comment 13: please clarify",
+    "task": "delivery",
+    "url": "https://github.com/o/r/pull/8"
+  },
+  {
+    "token": "review-comment:13:2026-09-30T08:00:00Z:",
+    "type": "review-comment",
+    "source": "https://github.com/o/r/issues/8#issuecomment-13",
+    "head": null,
+    "author": "maintainer",
+    "body": "Comment 13: please clarify",
+    "task": "delivery",
+    "url": "https://github.com/o/r/pull/8"
+  },
+  {
+    "token": "review:21:2026-09-30T08:00:00Z:CHANGES_REQUESTED",
+    "type": "review",
+    "source": "https://github.com/o/r/pull/8#pullrequestreview-21",
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "author": "maintainer",
+    "body": "Needs regression proof",
+    "task": "delivery",
+    "url": "https://github.com/o/r/pull/8"
+  },
+  {
+    "token": "comment:13:2026-09-30T08:00:00Z",
+    "type": "comment",
+    "source": "https://github.com/o/r/issues/9#issuecomment-13",
+    "head": null,
+    "author": "maintainer",
+    "body": "Comment 13: please clarify",
+    "task": "filed",
+    "url": "https://github.com/o/r/issues/9"
+  },
+  {
+    "token": "ready-for-pr:31",
+    "type": "ready-for-pr",
+    "source": "https://github.com/o/r/issues/9",
+    "head": null,
+    "body": "filed issue reached ready-for-pr",
+    "task": "filed",
+    "url": "https://github.com/o/r/issues/9"
+  }
+]
+
+exit=0 elapsed=0.072s
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/bin/fm-contributions.sh poll
+
+exit=0 elapsed=0.815s
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/bin/fm-contributions.sh ack filed https://github.com/o/r/issues/9 comment:13:2026-09-30T08:00:00Z
+
+exit=0 elapsed=0.291s
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/bin/fm-contributions.sh poll
+
+exit=0 elapsed=0.814s
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/bin/fm-contributions.sh poll
+
+exit=0 elapsed=5.497s
+
+Slow paginated response: prior observations retained byte-for-byte; no unavailable episode; bounded wall time.
+
+Real page assembly suspended after ownership proof; poll returned silently in 5.494s, retained prior records, and reaped the actual jq process.
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/bin/fm-contributions.sh poll
+contributions: observation unavailable for https://github.com/o/r/issues/9
+
+exit=0 elapsed=0.839s
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/bin/fm-contributions.sh poll
+
+exit=0 elapsed=1.123s
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/bin/fm-contributions.sh poll
+
+exit=0 elapsed=1.419s
+
+Unavailable service: one episode notification, subsequent suppression, successful recovery clears error.
+
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/.no-mistakes/test-phase/base-bin/fm-contributions.sh poll
+contributions: observation unavailable for https://github.com/o/r/issues/9
+contributions: observation unavailable for https://github.com/o/r/pull/8
+
+exit=0 elapsed=1.043s
+
+Base eb77f02b reproduced two unavailable observations on the identical real gh2.45/local API setup; target captured later-page signals.
+
+All real-product/gh2.45 pagination, ownership filtering, checks, wake dedup, ack, budget, and failure-recovery assertions passed.

@@ -1,0 +1,193 @@
+{
+  "pr": {
+    "url": "https://github.com/o/r/pull/8",
+    "kind": "pr",
+    "checked_at": "2026-09-30T08:00:00Z",
+    "observation": {
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "state": "open",
+      "draft": false,
+      "mergeable": "mergeable",
+      "can_merge": false,
+      "review_decision": "APPROVED",
+      "reviews": [
+        {
+          "id": 20,
+          "user": {
+            "login": "outsider"
+          },
+          "author_association": "NONE",
+          "body": "Not a maintainer review",
+          "html_url": "https://github.com/o/r/pull/8#pullrequestreview-20",
+          "submitted_at": "2026-09-30T08:00:00Z",
+          "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "state": "COMMENTED"
+        },
+        {
+          "id": 21,
+          "user": {
+            "login": "maintainer"
+          },
+          "author_association": "MEMBER",
+          "body": "Needs regression proof",
+          "html_url": "https://github.com/o/r/pull/8#pullrequestreview-21",
+          "submitted_at": "2026-09-30T08:00:00Z",
+          "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "state": "CHANGES_REQUESTED"
+        }
+      ],
+      "checks": [
+        {
+          "name": "test",
+          "id": 1,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-09-30T08:00:00Z"
+        },
+        {
+          "name": "test",
+          "id": 2,
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-09-30T08:00:00Z"
+        },
+        {
+          "name": "status-on-page-one",
+          "id": 50,
+          "started_at": "2026-09-30T08:00:00Z",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "status-on-page-two",
+          "id": 51,
+          "started_at": "2026-09-30T08:00:00Z",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "events": [
+        {
+          "token": "comment:13:2026-09-30T08:00:00Z:",
+          "type": "comment",
+          "source": "https://github.com/o/r/issues/8#issuecomment-13",
+          "head": null,
+          "author": "maintainer",
+          "body": "Comment 13: please clarify"
+        },
+        {
+          "token": "review:21:2026-09-30T08:00:00Z:CHANGES_REQUESTED",
+          "type": "review",
+          "source": "https://github.com/o/r/pull/8#pullrequestreview-21",
+          "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "author": "maintainer",
+          "body": "Needs regression proof"
+        },
+        {
+          "token": "review-comment:13:2026-09-30T08:00:00Z:",
+          "type": "review-comment",
+          "source": "https://github.com/o/r/issues/8#issuecomment-13",
+          "head": null,
+          "author": "maintainer",
+          "body": "Comment 13: please clarify"
+        }
+      ],
+      "absent_checks": []
+    },
+    "verdict": null,
+    "seen": [
+      "comment:13:2026-09-30T08:00:00Z:",
+      "review:21:2026-09-30T08:00:00Z:CHANGES_REQUESTED",
+      "review-comment:13:2026-09-30T08:00:00Z:"
+    ],
+    "pending": [
+      {
+        "token": "comment:13:2026-09-30T08:00:00Z:",
+        "type": "comment",
+        "source": "https://github.com/o/r/issues/8#issuecomment-13",
+        "head": null,
+        "author": "maintainer",
+        "body": "Comment 13: please clarify"
+      },
+      {
+        "token": "review-comment:13:2026-09-30T08:00:00Z:",
+        "type": "review-comment",
+        "source": "https://github.com/o/r/issues/8#issuecomment-13",
+        "head": null,
+        "author": "maintainer",
+        "body": "Comment 13: please clarify"
+      },
+      {
+        "token": "review:21:2026-09-30T08:00:00Z:CHANGES_REQUESTED",
+        "type": "review",
+        "source": "https://github.com/o/r/pull/8#pullrequestreview-21",
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": "maintainer",
+        "body": "Needs regression proof"
+      }
+    ],
+    "notified": [
+      "comment:13:2026-09-30T08:00:00Z:",
+      "review-comment:13:2026-09-30T08:00:00Z:",
+      "review:21:2026-09-30T08:00:00Z:CHANGES_REQUESTED"
+    ],
+    "error": null
+  },
+  "issue": {
+    "url": "https://github.com/o/r/issues/9",
+    "kind": "issue",
+    "checked_at": "2026-09-30T08:00:00Z",
+    "observation": {
+      "state": "open",
+      "head": null,
+      "ready": true,
+      "checks": [],
+      "reviews": [],
+      "events": [
+        {
+          "token": "comment:13:2026-09-30T08:00:00Z",
+          "type": "comment",
+          "source": "https://github.com/o/r/issues/9#issuecomment-13",
+          "head": null,
+          "author": "maintainer",
+          "body": "Comment 13: please clarify"
+        },
+        {
+          "token": "ready-for-pr:31",
+          "type": "ready-for-pr",
+          "source": "https://github.com/o/r/issues/9",
+          "head": null,
+          "body": "filed issue reached ready-for-pr"
+        }
+      ],
+      "absent_checks": []
+    },
+    "verdict": null,
+    "seen": [
+      "comment:13:2026-09-30T08:00:00Z",
+      "ready-for-pr:31"
+    ],
+    "pending": [
+      {
+        "token": "comment:13:2026-09-30T08:00:00Z",
+        "type": "comment",
+        "source": "https://github.com/o/r/issues/9#issuecomment-13",
+        "head": null,
+        "author": "maintainer",
+        "body": "Comment 13: please clarify"
+      },
+      {
+        "token": "ready-for-pr:31",
+        "type": "ready-for-pr",
+        "source": "https://github.com/o/r/issues/9",
+        "head": null,
+        "body": "filed issue reached ready-for-pr"
+      }
+    ],
+    "notified": [
+      "comment:13:2026-09-30T08:00:00Z",
+      "ready-for-pr:31"
+    ],
+    "error": null
+  }
+}

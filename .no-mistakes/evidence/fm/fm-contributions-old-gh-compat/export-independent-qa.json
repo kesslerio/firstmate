@@ -1,0 +1,231 @@
+{
+  "before": "12:47:49 AM\n\nShow a deterministic tool example.\n\n12:47:49 AM\nfirst internal reasoning block\n\nI will run one command.\n\n$ printf 'CALM_E2E_OUTPUT\n'\nCALM_E2E_OUTPUT\n12:47:49 AM\nsecond internal reasoning block\ngrep /CALM_EXPORT_GREP/ in .                                                                        \nsample.txt:1:CALM_EXPORT_GREP                                                                       \nfind CALM_EXPORT_FIND* in .                                                                         \nCALM_EXPORT_FIND.txt                                                                                \n12:47:49 AM\nthird internal reasoning block\nfm_watch_arm_pi                                                                                     \nwatcher: started Pi extension arm child 1                                                           \n12:47:49 AM\n\nFIRSTMATE WATCHER WAKE: can you explain this phrase?\n\n12:47:49 AM\n\nCaptain quote: ⁣FIRSTMATE_OP: v1 watcher: QUOTED_CURRENT_NEAR_MISS\n\n12:47:49 AM\n\nFIRSTMATE_OP: v1 watcher: ASCII_ONLY_NEAR_MISS\n\n12:47:49 AM\n\nOrdinary captain text before ⁣FIRSTMATE_OP: v1 watcher: EMBEDDED_CURRENT_NEAR_MISS\n\n12:47:49 AM\n\n⁣ordinary captain text after unrelated separator\n\n12:47:49 AM\n\nThe deterministic tool example is complete.\n\n12:47:55 AM\nSwitched to model: calm-e2e/operational-error\n12:47:55 AM\n\n⁣FIRSTMATE_OP: v1 watcher: CURRENT_WATCHER_E2E /tmp/active-probe.status\n\n12:47:55 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:56 AM\nSwitched to model: calm-e2e/operational-error\n12:47:56 AM\n\n⁣FIRSTMATE_OP: v1 turn-end-guard: CURRENT_TURN_END_E2E\n\n12:47:56 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:56 AM\nSwitched to model: calm-e2e/operational-error\n12:47:56 AM\n\n⁣FIRSTMATE_OP: v1 away-supervisor: CURRENT_AWAY_E2E\n\n12:47:56 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:57 AM\nSwitched to model: calm-e2e/operational-error\n12:47:57 AM\n\n[fm-from-firstmate]⁣corr=0123456789abcdef CURRENT_FROM_FIRSTMATE_E2E\n\n12:47:57 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:57 AM\nSwitched to model: calm-e2e/operational-error\n12:47:57 AM\n\n⁣FIRSTMATE_OP: v1 launch-brief: CURRENT_LAUNCH_BRIEF_E2E\n\n12:47:57 AM\nError: CALM_OPERATIONAL_E2E_ERROR",
+  "shown": "12:47:49 AM\n\nShow a deterministic tool example.\n\n12:47:49 AM\nfirst internal reasoning block\n\nI will run one command.\n\n$ printf 'CALM_E2E_OUTPUT\n'\nCALM_E2E_OUTPUT\n12:47:49 AM\nsecond internal reasoning block\ngrep /CALM_EXPORT_GREP/ in .                                                                        \nsample.txt:1:CALM_EXPORT_GREP                                                                       \nfind CALM_EXPORT_FIND* in .                                                                         \nCALM_EXPORT_FIND.txt                                                                                \n12:47:49 AM\nthird internal reasoning block\nfm_watch_arm_pi                                                                                     \nwatcher: started Pi extension arm child 1                                                           \n12:47:49 AM\n[firstmate-synthetic-input] · Hidden in terminal\n\nFIRSTMATE WATCHER WAKE: signal: /tmp/probe.status\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\n\n12:47:49 AM\n\nFIRSTMATE WATCHER WAKE: can you explain this phrase?\n\n12:47:49 AM\n\nCaptain quote: ⁣FIRSTMATE_OP: v1 watcher: QUOTED_CURRENT_NEAR_MISS\n\n12:47:49 AM\n\nFIRSTMATE_OP: v1 watcher: ASCII_ONLY_NEAR_MISS\n\n12:47:49 AM\n\nOrdinary captain text before ⁣FIRSTMATE_OP: v1 watcher: EMBEDDED_CURRENT_NEAR_MISS\n\n12:47:49 AM\n\n⁣ordinary captain text after unrelated separator\n\n12:47:49 AM\n\nThe deterministic tool example is complete.\n\n12:47:55 AM\nSwitched to model: calm-e2e/operational-error\n12:47:55 AM\n\n⁣FIRSTMATE_OP: v1 watcher: CURRENT_WATCHER_E2E /tmp/active-probe.status\n\n12:47:55 AM\n[firstmate-sessionstart-nudge] · Hidden in terminal\n\n⁣FIRSTMATE_OP: v1 session-start: Run bin/fm-session-start.sh now, exactly once, before executing any other instructions.\n\n12:47:55 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:56 AM\nSwitched to model: calm-e2e/operational-error\n12:47:56 AM\n\n⁣FIRSTMATE_OP: v1 turn-end-guard: CURRENT_TURN_END_E2E\n\n12:47:56 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:56 AM\nSwitched to model: calm-e2e/operational-error\n12:47:56 AM\n\n⁣FIRSTMATE_OP: v1 away-supervisor: CURRENT_AWAY_E2E\n\n12:47:56 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:57 AM\nSwitched to model: calm-e2e/operational-error\n12:47:57 AM\n\n[fm-from-firstmate]⁣corr=0123456789abcdef CURRENT_FROM_FIRSTMATE_E2E\n\n12:47:57 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:57 AM\nSwitched to model: calm-e2e/operational-error\n12:47:57 AM\n\n⁣FIRSTMATE_OP: v1 launch-brief: CURRENT_LAUNCH_BRIEF_E2E\n\n12:47:57 AM\nError: CALM_OPERATIONAL_E2E_ERROR",
+  "restored": "12:47:49 AM\n\nShow a deterministic tool example.\n\n12:47:49 AM\nfirst internal reasoning block\n\nI will run one command.\n\n$ printf 'CALM_E2E_OUTPUT\n'\nCALM_E2E_OUTPUT\n12:47:49 AM\nsecond internal reasoning block\ngrep /CALM_EXPORT_GREP/ in .                                                                        \nsample.txt:1:CALM_EXPORT_GREP                                                                       \nfind CALM_EXPORT_FIND* in .                                                                         \nCALM_EXPORT_FIND.txt                                                                                \n12:47:49 AM\nthird internal reasoning block\nfm_watch_arm_pi                                                                                     \nwatcher: started Pi extension arm child 1                                                           \n12:47:49 AM\n\nFIRSTMATE WATCHER WAKE: can you explain this phrase?\n\n12:47:49 AM\n\nCaptain quote: ⁣FIRSTMATE_OP: v1 watcher: QUOTED_CURRENT_NEAR_MISS\n\n12:47:49 AM\n\nFIRSTMATE_OP: v1 watcher: ASCII_ONLY_NEAR_MISS\n\n12:47:49 AM\n\nOrdinary captain text before ⁣FIRSTMATE_OP: v1 watcher: EMBEDDED_CURRENT_NEAR_MISS\n\n12:47:49 AM\n\n⁣ordinary captain text after unrelated separator\n\n12:47:49 AM\n\nThe deterministic tool example is complete.\n\n12:47:55 AM\nSwitched to model: calm-e2e/operational-error\n12:47:55 AM\n\n⁣FIRSTMATE_OP: v1 watcher: CURRENT_WATCHER_E2E /tmp/active-probe.status\n\n12:47:55 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:56 AM\nSwitched to model: calm-e2e/operational-error\n12:47:56 AM\n\n⁣FIRSTMATE_OP: v1 turn-end-guard: CURRENT_TURN_END_E2E\n\n12:47:56 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:56 AM\nSwitched to model: calm-e2e/operational-error\n12:47:56 AM\n\n⁣FIRSTMATE_OP: v1 away-supervisor: CURRENT_AWAY_E2E\n\n12:47:56 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:57 AM\nSwitched to model: calm-e2e/operational-error\n12:47:57 AM\n\n[fm-from-firstmate]⁣corr=0123456789abcdef CURRENT_FROM_FIRSTMATE_E2E\n\n12:47:57 AM\nError: CALM_OPERATIONAL_E2E_ERROR\n12:47:57 AM\nSwitched to model: calm-e2e/operational-error\n12:47:57 AM\n\n⁣FIRSTMATE_OP: v1 launch-brief: CURRENT_LAUNCH_BRIEF_E2E\n\n12:47:57 AM\nError: CALM_OPERATIONAL_E2E_ERROR",
+  "inventory": [
+    {
+      "tag": "BUTTON",
+      "id": "hamburger",
+      "text": "",
+      "type": "submit",
+      "title": "Open sidebar"
+    },
+    {
+      "tag": "INPUT",
+      "id": "tree-search",
+      "text": "",
+      "type": "text",
+      "title": ""
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "Default",
+      "type": "submit",
+      "title": "Hide settings entries"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "No-tools",
+      "type": "submit",
+      "title": "Default minus tool results"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "User",
+      "type": "submit",
+      "title": "Only user messages"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "Labeled",
+      "type": "submit",
+      "title": "Only labeled entries"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "All",
+      "type": "submit",
+      "title": "Show everything"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "sidebar-close",
+      "text": "✕",
+      "type": "submit",
+      "title": "Close"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "Toggle thinking",
+      "type": "button",
+      "title": "Toggle thinking (T)"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "Toggle tools",
+      "type": "button",
+      "title": "Toggle tools (O)"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "Show hidden messages",
+      "type": "button",
+      "title": "Show custom messages marked as hidden in the terminal (H)."
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "↓ JSONL",
+      "type": "button",
+      "title": "Download session as JSONL"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    },
+    {
+      "tag": "BUTTON",
+      "id": "",
+      "text": "\n          \n            \n            \n          \n        ",
+      "type": "submit",
+      "title": "Copy link to this message"
+    }
+  ]
+}

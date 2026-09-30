@@ -1,0 +1,11 @@
+gh version 2.45.0 (2024-03-04)
+https://github.com/cli/cli/releases/tag/v2.45.0
+v22.23.3
+0.99.1
+Google Chrome for Testing 153.0.8010.12
+pi-prefix@ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/.no-mistakes/test-phase/pi-prefix
+├── @earendil-works/pi-coding-agent@0.99.1
+└── playwright@1.63.0
+
+a0423acd5954932a817d531a8160b67cf0456ea6c9e68c11c054c19ea7a6714b  .no-mistakes/test-phase/tools/gh.zip
+23b25245dcfb9af7262f8ff142e9e2e0af025368117329e7a7458a51e5922f53  .no-mistakes/test-phase/tools/node.tar.gz

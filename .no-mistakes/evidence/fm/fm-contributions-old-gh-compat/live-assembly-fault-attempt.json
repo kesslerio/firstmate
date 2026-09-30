@@ -1,0 +1,15 @@
+{
+  "assembler_pid": 98808,
+  "product_pid": 93209,
+  "parent_chain": [
+    98808,
+    94754,
+    94726,
+    94708,
+    94623,
+    93209
+  ],
+  "command": "jq -s . /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RK3ZC6HPM3EB47S4VX8T41/.no-mistakes/test-phase/assembly-tmp/fm-contributions.pL8w54/pages.ptDMte",
+  "fault": "SIGSTOP on owned real jq process",
+  "elapsed_at_fault": 1.2984087499789894
+}

@@ -1,0 +1,71 @@
+{
+  "head": "1837cc263bdbc45832d105e97c4984b99a2b6510",
+  "scripts": [
+    {
+      "duration_ms": 383037,
+      "exit": 0,
+      "expected_gate_skip": "optional-binary",
+      "family": "snapshot-bearings",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-contributions.test.sh",
+      "report": "contributions-retry-results.json"
+    },
+    {
+      "duration_ms": 853071,
+      "exit": 0,
+      "expected_gate_skip": "none",
+      "family": "pr-forge",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-pr-check-security.test.sh",
+      "report": "targeted-results.json"
+    },
+    {
+      "duration_ms": 258906,
+      "exit": 0,
+      "expected_gate_skip": "none",
+      "family": "secondmate",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-remote-secondmate-trace-context.test.sh",
+      "report": "remote-retry-results.json"
+    },
+    {
+      "duration_ms": 701961,
+      "exit": 0,
+      "expected_gate_skip": "none",
+      "family": "secondmate",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-remote-secondmate-lifecycle-e2e.test.sh",
+      "report": "remote-lifecycle-final-results.json"
+    },
+    {
+      "duration_ms": 127668,
+      "exit": 0,
+      "expected_gate_skip": "none",
+      "family": "pure-contract-unit",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-calm-pi-extension.test.sh",
+      "report": "calm-final-results.json"
+    },
+    {
+      "duration_ms": 415700,
+      "exit": 0,
+      "expected_gate_skip": "none",
+      "family": "standalone",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-pi-branch-extension.test.sh",
+      "report": "pi-results.json"
+    }
+  ],
+  "setup_corrections": [
+    "Fixture homes outside the repository using toolchain TMPDIR=/tmp",
+    "Short private tmux paths",
+    "Workspace-local Chrome Headless Shell for command-line DOM rendering",
+    "Lifecycle runner bound raised from 900 to 1500 seconds to cover teardown"
+  ]
+}
