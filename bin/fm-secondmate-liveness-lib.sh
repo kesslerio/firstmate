@@ -19,8 +19,10 @@
 #   unverified  - the endpoint is recorded under a session this home does not
 #                 own, so probing is not authorized
 #
-# Only `dead` and `missing` are recovery-authorizing states: they prove the
-# agent is not running, so relaunching cannot produce a duplicate endpoint.
+# Only `dead` and `missing` are recovery candidates; the generation-bound
+# recheck and seat reclamation below must authorize replacement before any
+# endpoint is closed or spawn is attempted. In particular, a shell-only
+# endpoint from an unconfirmed submitted launch can still start its agent.
 # `ambiguous`, `unreadable`, and `unverified` leave the endpoint untouched -
 # relaunching on inconclusive evidence could create a second endpoint beside a
 # live one - and an unreachable remote host is never evidence of death, so a
