@@ -1,0 +1,18 @@
+entrypoint -> /home/art/projects/Firstmate/bin/fm-remote-entrypoint.sh
+[{"name":"default","running":false,"socket_path":"/home/art/.config/herdr/herdr.sock"},{"name":"fm-remote","running":true,"socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]
+[{"label":"2ndmate-mama","workspace_id":"w3","pane_count":1}]
+3726225
+total 108
+drwx------    6 art art  4096 2026-09-30T07:03:28 .
+drwx------    5 art art  4096 2026-09-19T20:42:07 ..
+drwx------    2 art art  4096 2026-09-30T07:03:23 jobs
+drwx------    2 art art  4096 2026-09-18T21:07:24 logs
+-rw-------    1 art art     6 2026-09-30T07:02:27 seq
+drwx------ 2307 art art 65536 2026-09-30T07:02:27 .seq-claims
+-rw-------    1 art art    11 2026-09-30T06:12:18 .seq-claims-reaped
+-rw-------    1 art art   123 2026-09-29T06:51:52 worker.identity
+drwx------    2 art art  4096 2026-09-29T06:51:52 worker.lock
+-rw-------    1 art art     8 2026-09-29T06:51:52 worker.pid
+-rw-------    1 art art     8 2026-09-30T07:03:28 worker.ready
+b759bf7a60cb3d60fbc297ad191ef11f  /home/art/.claude.json
+3feaedfb46eb4fb084e7233db21e75b4  /home/art/.codex/config.toml

@@ -1,0 +1,426 @@
+=== scenario 1 live run on mama, lab root /tmp/fm-lab-sixseat.iQMGXS (2026-09-30T14:04:11Z)
+
+## S1.0 seed the registered remote route (lab root and home on mama, isolated worker and herdr)
+
+$ bin/fm-remote-home-seed.sh smama mama /tmp/fm-lab-sixseat.iQMGXS/root /tmp/fm-lab-sixseat.iQMGXS/home --no-projects
+provisioned: /tmp/fm-lab-sixseat.iQMGXS/home projects=0
+home=mama:/tmp/fm-lab-sixseat.iQMGXS/home
+exit=0
+
+## S1.1 before pools exist: launch generation A with no seat accounting (opt-out)
+
+$ bin/fm-spawn.sh smama --secondmate
+warning: remote secondmate smama sync skipped before launch: error: remote home could not import ba4612611b9b6e795d10872256c181f685d0d20c from this host's Firstmate copy or the home's origin; run /updatefirstmate to refresh this host's copy, or push that commit first
+spawned smama harness=pi kind=secondmate mode=secondmate yolo=off window=remote:smama worktree=/tmp/fm-lab-sixseat.iQMGXS/home remote=mama backend=herdr
+exit=0
+
+## S1.2 enable pools around the running generation A
+$ cat config/fleet-seats
+{"pools":[{"name":".remote","capacity":1,"models":["z-ai/glm-5.3-flash"]}]}
+
+## S1.3 no certificate from the registered remote yet: admission must refuse rather than trust an absent snapshot
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 32210
+fleet-seats: no seat - remote secondmate(s) smama have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+
+## S1.4 ambiguous serve: the remote applies the serve but its reply is lost (exit 255); the pending marker must keep admission refused
+
+$ bin/fm-fleet-seats.sh serve-remotes
+unreachable smama
+exit=0
+total 24
+drwxr-xr-x@ 6 kesslerio  staff  192 Sep 30 07:05 .
+drwxr-xr-x@ 8 kesslerio  staff  256 Sep 30 07:05 ..
+drwxr-xr-x@ 2 kesslerio  staff   64 Sep 30 07:05 holders
+-rw-r--r--@ 1 kesslerio  staff   22 Sep 30 07:05 issuer
+-rw-r--r--@ 1 kesslerio  staff   24 Sep 30 07:05 remote-smama.pending
+-rw-r--r--@ 1 kesslerio  staff    2 Sep 30 07:05 remote-smama.seq
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 32210
+fleet-seats: no seat - remote secondmate(s) smama have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+$ cat state/fleet-seats/remote-smama.pending
+r17907771433323825706.1
+(the lost reply on mama was:)
+fleet-seats: no seat - the delivered policy is malformed (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+(driver fix: the fault shim had closed stdin on the injected call, so the host saw no policy; stdin now forwarded and the step is repeated)
+
+## S1.4 (repeat) ambiguous serve with stdin forwarded
+
+$ bin/fm-fleet-seats.sh serve-remotes
+unreachable smama (backing off)
+exit=0
+$ cat state/fleet-seats/remote-smama.pending
+r17907771433323825706.1
+holders
+issuer
+remote-smama.pending
+remote-smama.seq
+(the reply the host actually produced, lost in transport:)
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 12364
+fleet-seats: no seat - remote secondmate(s) smama have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+
+## S1.5 a later clean serve publishes a complete certificate; the running unmanaged generation A fills the one-seat pool
+
+$ bin/fm-fleet-seats.sh serve-remotes
+unreachable smama (backing off)
+exit=0
+holders
+issuer
+remote-smama.pending
+remote-smama.seq
+jq: error: Could not open file /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s1l/state/fleet-seats/remote-smama.cert: No such file or directory
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 12364
+fleet-seats: no seat - remote secondmate(s) smama have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+(the 120s post-failure serve backoff skipped the call; FM_FLEET_SEATS_TEST_BACKOFF=0 is used below so each step actually reaches the host)
+
+## S1.4 (repeat 2) ambiguous serve with stdin forwarded
+
+$ bin/fm-fleet-seats.sh serve-remotes
+unreachable smama
+exit=0
+$ cat state/fleet-seats/remote-smama.pending
+r17907771433323825706.2
+holders
+issuer
+remote-smama.pending
+remote-smama.seq
+(the reply the host actually produced, lost in transport:)
+{"schema":"fm-fleet-seats-serve.v2","policy_digest":"1966270802-76","epoch":"r17907771433323825706.2","complete":true,"holders":[]}
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 69478
+fleet-seats: no seat - remote secondmate(s) smama have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+
+## S1.5 a later clean serve publishes a complete certificate; the running unmanaged generation A fills the one-seat pool
+
+$ bin/fm-fleet-seats.sh serve-remotes
+served smama policy=1966270802-76 epoch=r17907771433323825706.3 holders=0
+exit=0
+holders
+issuer
+remote-smama.cert
+remote-smama.seq
+{"schema":"fm-fleet-seats-serve.v2","policy_digest":"1966270802-76","epoch":"r17907771433323825706.3","complete":true,"holders":[]}
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 69478
+fleet-seats: pool .remote is full (1 of 1 seats held); probe gets no seat for model z-ai/glm-5.3-flash - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s1l/state smama
+exit=4
+
+## S1.6 guard: with pools delivered, the host refuses a supervisor launch/relaunch that bypasses the parent's accounting
+
+$ bin/fm-on.sh smama fm-remote-secondmate-control.sh relaunch smama pi z-ai/glm-5.3-flash default
+relaunch_failure=prelaunch
+error: this home has fleet seat pools, so a supervisor relaunch must come from the parent's seat operation (bin/fm-remote-secondmate-relaunch.sh or fm-spawn); nothing was changed
+exit=1
+
+$ bin/fm-on.sh smama fm-remote-secondmate-control.sh route smama
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w1:p2
+herdr_session=fm-remote
+harness=pi
+model=z-ai/glm-5.3-flash
+effort=default
+spawn_gen=s1790777109.1610048.31194
+exit=0
+
+## S1.7 parent launch operation G while A still runs; the host's reply is lost after it acted (exit 255)
+
+$ bin/fm-spawn.sh smama --secondmate
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  watcher supervision needs Stop-owned automatic recovery; inspect the hook registration and startup status before ending the turn.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning: remote secondmate smama sync skipped before launch: error: remote home could not import ba4612611b9b6e795d10872256c181f685d0d20c from this host's Firstmate copy or the home's origin; run /updatefirstmate to refresh this host's copy, or push that commit first
+fleet-seats: reserved pool=.remote id=smama generation=s1790777203.72032.8672 (already held) used=1 capacity=1
+error: remote secondmate smama launch completion is unknown; its fleet seat stays counted for reconciliation and route mama:/tmp/fm-lab-sixseat.iQMGXS/home is preserved
+exit=255
+$ fm-fleet-seats.sh show smama
+{"generation":"s1790777203.72032.8672","previous_generation":null,"lifecycle":"reserved","launch_phase":"dispatching","startup_confirmed":false,"route_op":"s1790777203.72032.8672","route_gen":null,"disposition":null}
+(the reply the host actually produced, lost in transport:)
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"smama","operation":"s1790777203.72032.8672","requested_generation":"s1790777203.72032.8672","actual_generation":"s1790777109.1610048.31194","previous_generation":null,"disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w1:p2","home":"/tmp/fm-lab-sixseat.iQMGXS/home","host":null,"remote_root":null,"spawn_gen":"s1790777109.1610048.31194"},"actual_model":"z-ai/glm-5.3-flash","complete":true}
+spawn_gen=s1790777109.1610048.31194
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 71977
+fleet-seats: no seat - task record /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s1l/state/smama.meta names generation s1790777109.1610048.31194, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+
+## S1.8 bounded reconciliation asks the host for operation G's disposition; the first answer is lost too (still unknown, still counted)
+
+$ bin/fm-fleet-seats.sh reconcile --limit 8
+fleet-seats: skipped id=smama generation=s1790777203.72032.8672: fleet-seats: retained - the host did not report a disposition for smama operation s1790777203.72032.8672 (the seat stays counted until evidence resolves it)
+exit=0
+{"generation":"s1790777203.72032.8672","lifecycle":"reserved","launch_phase":"dispatching","startup_confirmed":false,"route_op":"s1790777203.72032.8672","route_gen":null}
+(lost disposition reply:)
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"smama","operation":"s1790777203.72032.8672","requested_generation":"s1790777203.72032.8672","actual_generation":"s1790777109.1610048.31194","previous_generation":null,"disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w1:p2","home":"/tmp/fm-lab-sixseat.iQMGXS/home","host":null,"remote_root":null,"spawn_gen":"s1790777109.1610048.31194"},"actual_model":"z-ai/glm-5.3-flash","complete":true}
+
+## S1.9 the next reconciliation reads existing(A) for operation G and imports A bound to G
+
+$ bin/fm-fleet-seats.sh reconcile --limit 8
+fleet-seats: existing id=smama generation=s1790777109.1610048.31194 (candidate s1790777203.72032.8672 released)
+exit=0
+$ fm-fleet-seats.sh show smama
+{"generation":"s1790777203.72032.8672","previous_generation":null,"lifecycle":"released","launch_phase":"dispatching","startup_confirmed":false,"route_op":"s1790777203.72032.8672","route_gen":null,"disposition":{"reason":"prelaunch","source":"reconcile-remote","generation":"s1790777203.72032.8672","route":{"placement":"remote","backend":"herdr","target":null,"home":"/tmp/fm-lab-sixseat.iQMGXS/home","host":"mama","remote_root":"/tmp/fm-lab-sixseat.iQMGXS/root","spawn_gen":null,"operation":"s1790777203.72032.8672"},"operation":"s1790777203.72032.8672"}}
+{"generation":"s1790777109.1610048.31194","previous_generation":null,"lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"route_op":"s1790777203.72032.8672","route_gen":"s1790777109.1610048.31194","disposition":null}
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 16596
+fleet-seats: pool .remote is full (1 of 1 seats held); probe gets no seat for model z-ai/glm-5.3-flash - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s1l/state smama
+exit=4
+
+## S1.10 generation A's agent dies on mama (its pi process is killed; the herdr pane shell survives)
+$ ssh mama: kill pi pid 1615695 (cwd /tmp/fm-lab-sixseat.iQMGXS/home, lab herdr pane w1:p2)
+["sh"]
+
+## S1.11 reclaim of A resolves through A's own bound host operation G (dead-after-start), not through a missing receipt A
+
+$ bin/fm-fleet-seats.sh reclaim smama --generation s1790777109.1610048.31194
+fleet-seats: reclaimed id=smama generation=s1790777109.1610048.31194
+exit=0
+{"generation":"s1790777109.1610048.31194","lifecycle":"reclaimed","disposition":{"reason":"dead-after-start","source":"reconcile-remote","operation":"s1790777203.72032.8672"}}
+14:07:44 fm-remote-secondmate-control.sh disposition smama --operation s1790777203.72032.8672
+14:08:09 fm-remote-secondmate-control.sh disposition smama --operation s1790777203.72032.8672
+
+## S1.12 recovery launches G2 replacing A; the host accepts A's predecessor evidence through the persisted G->A binding and starts G2 exactly once
+
+$ bin/fm-spawn.sh smama --secondmate
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warning: remote secondmate smama sync skipped before launch: error: remote home could not import ba4612611b9b6e795d10872256c181f685d0d20c from this host's Firstmate copy or the home's origin; run /updatefirstmate to refresh this host's copy, or push that commit first
+fleet-seats: reserved pool=.remote id=smama generation=s1790777298.85219.7671 used=1 capacity=1
+fleet-seats: confirmed id=smama generation=s1790777298.85219.7671
+spawned smama harness=pi kind=secondmate mode=secondmate yolo=off window=remote:smama worktree=/tmp/fm-lab-sixseat.iQMGXS/home remote=mama backend=herdr
+exit=0
+{"generation":"s1790777203.72032.8672","previous_generation":null,"lifecycle":"released","launch_phase":"dispatching","startup_confirmed":false,"route_op":"s1790777203.72032.8672","route_gen":null,"reason":"prelaunch"}
+{"generation":"s1790777109.1610048.31194","previous_generation":null,"lifecycle":"reclaimed","launch_phase":"started","startup_confirmed":true,"route_op":"s1790777203.72032.8672","route_gen":"s1790777109.1610048.31194","reason":"dead-after-start"}
+{"generation":"s1790777298.85219.7671","previous_generation":null,"lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"route_op":"s1790777298.85219.7671","route_gen":"s1790777298.85219.7671","reason":null}
+remote_target=fm-remote:w2:p2
+fleet_seat_generation=s1790777298.85219.7671
+remote_spawn_gen=s1790777298.85219.7671
+
+$ bin/fm-on.sh smama fm-remote-secondmate-control.sh route smama
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w2:p2
+herdr_session=fm-remote
+harness=pi
+model=z-ai/glm-5.3-flash
+effort=default
+spawn_gen=s1790777298.85219.7671
+exit=0
+14:08:59 fm-remote-inherit.sh absent data/captain-shared.md 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:09:02 fm-remote-secondmate-control.sh launch smama pi z-ai/glm-5.3-flash - herdr --operation s1790777298.85219.7671 --previous -
+14:09:10 fm-remote-secondmate-control.sh route smama
+
+## S1.13 second route smama2 on the same host: launch generation B before its pools exist (parent policy moved aside), so B has no host receipt
+
+$ bin/fm-remote-home-seed.sh smama2 mama /tmp/fm-lab-sixseat.iQMGXS/root /tmp/fm-lab-sixseat.iQMGXS/home2 --no-projects
+provisioned: /tmp/fm-lab-sixseat.iQMGXS/home2 projects=0
+home=mama:/tmp/fm-lab-sixseat.iQMGXS/home2
+exit=0
+$ mv config/fleet-seats aside
+
+$ bin/fm-spawn.sh smama2 --secondmate
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warning: remote secondmate smama2 sync skipped before launch: error: remote home could not import ba4612611b9b6e795d10872256c181f685d0d20c from this host's Firstmate copy or the home's origin; run /updatefirstmate to refresh this host's copy, or push that commit first
+spawned smama2 harness=pi kind=secondmate mode=secondmate yolo=off window=remote:smama2 worktree=/tmp/fm-lab-sixseat.iQMGXS/home2 remote=mama backend=herdr
+exit=0
+remote_target=fm-remote:w3:p2
+remote_spawn_gen=s1790777427.2003228.2498
+$ restore pools, capacity 2: {"pools":[{"name":".remote","capacity":2,"models":["z-ai/glm-5.3-flash"]}]}
+
+$ bin/fm-fleet-seats.sh serve-remotes
+served smama policy=479078885-76 epoch=r17907771433323825706.4 holders=0
+served smama2 policy=479078885-76 epoch=r17907771433323825706.1 holders=0
+exit=0
+
+$ bin/fm-on.sh smama2 fm-remote-secondmate-control.sh route smama2
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w3:p2
+herdr_session=fm-remote
+harness=pi
+model=z-ai/glm-5.3-flash
+effort=default
+spawn_gen=s1790777427.2003228.2498
+exit=0
+
+## S1.14 parent launch operation H while B runs: the host answers existing(B) and the parent imports B bound to H
+
+$ bin/fm-spawn.sh smama2 --secondmate
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warning: remote secondmate smama2 sync skipped before launch: error: remote home could not import ba4612611b9b6e795d10872256c181f685d0d20c from this host's Firstmate copy or the home's origin; run /updatefirstmate to refresh this host's copy, or push that commit first
+fleet-seats: reserved pool=.remote id=smama2 generation=s1790777451.41842.12171 (already held) used=2 capacity=2
+fleet-seats: existing id=smama2 generation=s1790777427.2003228.2498 (candidate s1790777451.41842.12171 released)
+spawned smama2 harness=pi kind=secondmate mode=secondmate yolo=off window=remote:smama2 worktree=/tmp/fm-lab-sixseat.iQMGXS/home2 remote=mama backend=herdr
+exit=0
+{"generation":"s1790777451.41842.12171","previous_generation":null,"lifecycle":"released","launch_phase":"dispatching","startup_confirmed":false,"route_op":"s1790777451.41842.12171","route_gen":null,"reason":"prelaunch"}
+{"generation":"s1790777427.2003228.2498","previous_generation":null,"lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"route_op":"s1790777451.41842.12171","route_gen":"s1790777427.2003228.2498","reason":null}
+
+## S1.15 B's agent dies on mama
+$ ssh mama: kill pi pid 2007469 (lab herdr pane w3:p2, cwd /tmp/fm-lab-sixseat.iQMGXS/home2)
+["sh"]
+
+## S1.16 automatic-style recovery (plain fm-spawn, no manual reclaim): spawn reclaims B through H's receipt, then asks the host to replace B; the host must accept B's evidence through the H binding
+
+$ bin/fm-spawn.sh smama2 --secondmate
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warning: remote secondmate smama2 sync skipped before launch: error: remote home could not import ba4612611b9b6e795d10872256c181f685d0d20c from this host's Firstmate copy or the home's origin; run /updatefirstmate to refresh this host's copy, or push that commit first
+fleet-seats: reclaimed id=smama2 generation=s1790777427.2003228.2498
+fleet-seats: reserved pool=.remote id=smama2 generation=s1790777501.55957.23891 used=2 capacity=2
+fleet-seats: confirmed id=smama2 generation=s1790777501.55957.23891
+spawned smama2 harness=pi kind=secondmate mode=secondmate yolo=off window=remote:smama2 worktree=/tmp/fm-lab-sixseat.iQMGXS/home2 remote=mama backend=herdr
+exit=0
+{"generation":"s1790777451.41842.12171","previous_generation":null,"lifecycle":"released","launch_phase":"dispatching","startup_confirmed":false,"route_op":"s1790777451.41842.12171","route_gen":null,"reason":"prelaunch"}
+{"generation":"s1790777427.2003228.2498","previous_generation":null,"lifecycle":"reclaimed","launch_phase":"started","startup_confirmed":true,"route_op":"s1790777451.41842.12171","route_gen":"s1790777427.2003228.2498","reason":"dead-after-start"}
+{"generation":"s1790777501.55957.23891","previous_generation":"s1790777427.2003228.2498","lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"route_op":"s1790777501.55957.23891","route_gen":"s1790777501.55957.23891","reason":null}
+remote_target=fm-remote:w4:p2
+fleet_seat_generation=s1790777501.55957.23891
+remote_spawn_gen=s1790777501.55957.23891
+14:11:33 fm-remote-secondmate-control.sh launch smama2 pi z-ai/glm-5.3-flash - herdr --operation s1790777451.41842.12171 --previous -
+14:11:44 fm-remote-secondmate-control.sh sync smama2 ba4612611b9b6e795d10872256c181f685d0d20c
+14:12:23 fm-remote-secondmate-control.sh disposition smama2 --operation s1790777451.41842.12171
+14:12:26 fm-remote-secondmate-control.sh launch smama2 pi z-ai/glm-5.3-flash - herdr --operation s1790777501.55957.23891 --previous s1790777427.2003228.2498
+(operator answered pi's project-trust prompt on w4:p2 with 'Trust (this session only)'; nothing persisted)
+
+## S1.17 remote relaunch with a stale expected generation refuses before anything is stopped
+
+$ bin/fm-remote-secondmate-relaunch.sh smama2 pi z-ai/glm-5.3-flash default --expect-generation s1790777427.2003228.2498
+error: generation-mismatch: remote secondmate smama2 now records generation 's1790777501.55957.23891', not the expected s1790777427.2003228.2498; nothing was changed
+exit=6
+{"generation":"s1790777501.55957.23891","lifecycle":"confirmed"}
+
+## S1.18 remote relaunch bound to the running generation; the host's reply is lost after it replaced the agent
+
+$ bin/fm-remote-secondmate-relaunch.sh smama2 pi z-ai/glm-5.3-flash default --expect-generation s1790777501.55957.23891
+fleet-seats: confirmed id=smama2 generation=s1790777501.55957.23891
+fleet-seats: reserved pool=.remote id=smama2 generation=s1790777601.69338.14515 (already held) used=2 capacity=2
+
+error: the relaunch outcome of smama2 is unknown; its fleet seat candidate s1790777601.69338.14515 stays counted for reconciliation
+exit=1
+{"generation":"s1790777451.41842.12171","previous_generation":null,"lifecycle":"released","launch_phase":"dispatching","startup_confirmed":false,"route_op":"s1790777451.41842.12171","route_gen":null,"reason":"prelaunch"}
+{"generation":"s1790777427.2003228.2498","previous_generation":null,"lifecycle":"reclaimed","launch_phase":"started","startup_confirmed":true,"route_op":"s1790777451.41842.12171","route_gen":"s1790777427.2003228.2498","reason":"dead-after-start"}
+{"generation":"s1790777501.55957.23891","previous_generation":"s1790777427.2003228.2498","lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"route_op":"s1790777501.55957.23891","route_gen":"s1790777501.55957.23891","reason":null}
+{"generation":"s1790777601.69338.14515","previous_generation":"s1790777501.55957.23891","lifecycle":"reserved","launch_phase":"dispatching","startup_confirmed":false,"route_op":"s1790777601.69338.14515","route_gen":null,"reason":null}
+(the reply the host actually produced, lost in transport:)
+relaunched smama2 harness=pi from=pi model=z-ai/glm-5.3-flash effort=default backend=herdr endpoint=fm-remote:w4:p2 worktree=/tmp/fm-lab-sixseat.iQMGXS/home2
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"smama2","operation":"s1790777601.69338.14515","requested_generation":"s1790777601.69338.14515","actual_generation":"s1790777601.69338.14515","previous_generation":"s1790777501.55957.23891","disposition":"started","startup_confirmed":true,"old_stopped":true,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w4:p2","home":"/tmp/fm-lab-sixseat.iQMGXS/home2","host":null,"remote_root":null,"spawn_gen":"s1790777601.69338.14515"},"actual_model":"z-ai/glm-5.3-flash","complete":true}
+spawn_gen=s1790777601.69338.14515
+
+## S1.19 reconciliation reads operation's durable disposition (started, old stopped): candidate confirmed, predecessor released as replaced, nothing launched twice
+
+$ bin/fm-fleet-seats.sh reconcile --limit 8
+fleet-seats: confirmed id=smama2 generation=s1790777601.69338.14515
+exit=0
+{"generation":"s1790777501.55957.23891","previous_generation":"s1790777427.2003228.2498","lifecycle":"released","launch_phase":"started","startup_confirmed":true,"reason":"old-stopped"}
+{"generation":"s1790777601.69338.14515","previous_generation":"s1790777501.55957.23891","lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"reason":null}
+remote_target=fm-remote:w4:p2
+fleet_seat_generation=s1790777501.55957.23891
+remote_spawn_gen=s1790777501.55957.23891
+$ lab herdr workspaces on mama
+[{"label":"2ndmate-smama","pane_count":1},{"label":"2ndmate-smama2","pane_count":1}]
+
+## S1.20 the parent record is now a stale projection (names the released predecessor); admission still counts exactly the two live holders
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 43150
+fleet-seats: pool .remote is full (2 of 2 seats held); probe gets no seat for model z-ai/glm-5.3-flash - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s1l/state smama
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s1l/state smama2
+exit=4
+
+## S1.21 persistence-gated restart of the remote mate: generation binding reads host vs recorded route; with a stale projection or no answer it nudges and stops nothing
+
+$ bin/fm-secondmate-restart.sh smama2
+nudged: smama2: its host launch generation does not match the recorded route, so an answer cannot safely authorize a restart
+summary: 0 of 1 restarted, 1 nudged, 0 unreached
+exit=3
+{"generation":"s1790777601.69338.14515","lifecycle":"confirmed"}
+
+$ bin/fm-on.sh smama2 fm-remote-secondmate-control.sh route smama2
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w4:p2
+herdr_session=fm-remote
+harness=pi
+model=z-ai/glm-5.3-flash
+effort=default
+spawn_gen=s1790777601.69338.14515
+exit=0
+(operator answered pi's project-trust prompt on w2:p2 with 'Trust (this session only)' before any doorbell could reach it)
+
+## S1.22 persistence-gated restart of remote smama bound to G2: the correlated answer is written in the REMOTE home and mirrored back by the parent's remote-reply listener
+$ fm-secondmate-restart.sh smama  (background, FM_SECONDMATE_PERSIST_POLL=5)
+pending correlation: df1ceccaf13f97e0
+
+$ bin/fm-on.sh smama fm-secondmate-report.sh done df1ceccaf13f97e0 no open work is held in conversation; nothing to record
+exit=0
+
+$ bin/fm-procevent.sh start remote-reply-smama
+autohandled: remote-reply-smama
+cannot retire terminal source; it remains registered: remote-reply-smama
+captured: /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s1l/state/procevent-inbox/remote-reply-smama.1.result
+bin/fm-procevent.sh: line 918: 41466 Terminated: 15          perl -e "$program" "$mode" "$@"
+exit=143
+phase=resolved
+done [corr=df1ceccaf13f97e0] [at=1790777728]: no open work is held in conversation; nothing to record (via-helper)
+/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s1c/bin/fm-procevent.sh: line 1087:  7317 Terminated: 15          "${ARGV[@]}" 1>&5 5>&- 4>&- 2> /dev/null
+restarted: smama on mama (pi)
+summary: 1 of 1 restarted, 0 nudged, 0 unreached
+exit=0
+{"generation":"s1790777298.85219.7671","previous_generation":null,"lifecycle":"released","startup_confirmed":true,"reason":"old-stopped"}
+{"generation":"s1790777739.74670.14169","previous_generation":"s1790777298.85219.7671","lifecycle":"confirmed","startup_confirmed":true,"reason":null}
+fleet_seat_generation=s1790777739.74670.14169
+remote_spawn_gen=s1790777739.74670.14169
+(the parent listener above was stopped by the operator after mirroring; its exit=143 is that kill)
+
+## S1.23 teardown of remote smama retires its host endpoint and releases exactly generation G5
+
+$ bin/fm-teardown.sh smama
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown smama complete (remote mama:/tmp/fm-lab-sixseat.iQMGXS/home)
+exit=0
+{"generation":"s1790777203.72032.8672","lifecycle":"released","reason":"prelaunch"}
+{"generation":"s1790777109.1610048.31194","lifecycle":"reclaimed","reason":"dead-after-start"}
+{"generation":"s1790777298.85219.7671","lifecycle":"released","reason":"old-stopped"}
+{"generation":"s1790777739.74670.14169","lifecycle":"released","reason":"teardown"}
+c28d16bee2ed6c24 task_id=smama2 phase=awaiting_report 
+
+## S1.24 teardown of smama2 while its parent record is a stale projection (names released s1790777501...; the ledger's live generation is s1790777601...)
+(first settle the S1.21 nudge's routed reply: answered in the remote home, mirrored by the parent listener, folded)
+
+$ bin/fm-on.sh smama2 fm-secondmate-report.sh done c28d16bee2ed6c24 re-read acknowledged
+exit=0
+done [corr=c28d16bee2ed6c24] [at=1790777894]: re-read acknowledged (via-helper)
+phase=resolved
+
+$ bin/fm-teardown.sh smama2
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown smama2 complete (remote mama:/tmp/fm-lab-sixseat.iQMGXS/home2)
+exit=0
+{"generation":"s1790777451.41842.12171","lifecycle":"released","reason":"prelaunch"}
+{"generation":"s1790777427.2003228.2498","lifecycle":"reclaimed","reason":"dead-after-start"}
+{"generation":"s1790777501.55957.23891","lifecycle":"released","reason":"old-stopped"}
+{"generation":"s1790777601.69338.14515","lifecycle":"released","reason":"teardown"}
+
+$ bin/fm-fleet-seats.sh reserve probe --generation p1 --kind ship --harness pi --model z-ai/glm-5.3-flash --holder-pid 65290
+fleet-seats: reserved pool=.remote id=probe generation=p1 used=1 capacity=2
+exit=0
+
+$ bin/fm-fleet-seats.sh release probe --generation p1 --reason prelaunch
+fleet-seats: released id=probe generation=p1 reason=prelaunch
+exit=0
+
+## S1.25 lab teardown on mama: stop the lab herdr server and the lab job worker, remove the lab directory, then re-read the operator tripwire
+lab workspaces before stop: []
+lab worker tree 1245778 stopped
+no lab processes remain
+removed /tmp/fm-lab-sixseat.iQMGXS

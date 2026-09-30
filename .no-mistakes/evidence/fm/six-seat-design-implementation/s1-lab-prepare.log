@@ -1,0 +1,13 @@
+# lab-scoped doctor --fix (worker in /tmp/fm-lab-sixseat.iQMGXS/jobs, herdr server in /tmp/fm-lab-sixseat.iQMGXS/xdg)
+fix remote-job-worker=applied: installed or reloaded dev.firstmate.remote-job
+fix herdr-server=applied: started the herdr server for session fm-remote
+check herdr=ok: /tmp/fm-lab-sixseat.iQMGXS/root/bin/herdr
+check gui-session=skip: no Aqua login session applies on linux
+check remote-job-worker=ok: the Linux remote job worker is running
+check remote-job-worker-loaded=skip: Aqua launch agents do not apply on linux
+check remote-job-probe=ok: the remote job worker completed the required-tool probe
+check launchagent=skip: launch agents apply only on darwin
+check launchagent-scope=skip: launch agents apply only on darwin
+check launchagent-loaded=skip: launch agents apply only on darwin
+check herdr-server=ok: session fm-remote is running
+check entrypoint-link=skip: this run did not come through the fixed remote entrypoint

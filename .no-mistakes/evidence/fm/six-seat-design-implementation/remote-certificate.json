@@ -1,0 +1,1 @@
+{"schema": "fm-fleet-seats-serve.v2", "policy_digest": "298057814-122", "epoch": "lab.2", "complete": true, "holders": [{"state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/r/state", "task": "remote-worker", "generation": "remote1", "model": "opus", "lifecycle": "reserved"}]}

@@ -1,0 +1,23 @@
+{
+  "tested_head_sha": "6a5b859e6445dcd487fd7feee0a98986e0e842d3",
+  "verdict": "inconclusive",
+  "tested": [
+    "FM_HERDR_LAB_STATE_DIR=\"$PWD/.six-seat-live-lab\" bash bin/fm-herdr-lab.sh prepare fm-lab-sixseat-gate"
+  ],
+  "testing_summary": "Lab preparation exited 1: fm-herdr-lab: herdr is required. Herdr is absent from PATH; the workspace missing-tool rule requires stopping without searching for or installing it. No source files changed and no live endpoints were created.",
+  "scenarios": [
+    {
+      "name": "A parent-accounted remote supervisor survives ambiguous replies and recovers an existing imported generation through its observing host operation",
+      "result": "untested",
+      "live": false,
+      "reason": "Required Herdr lab tooling is absent from PATH; no remote lifecycle actions attempted."
+    },
+    {
+      "name": "A supervisor completes relaunch, persistence-gated restart, rollback, and teardown while preserving generation ownership",
+      "result": "untested",
+      "live": false,
+      "reason": "Required Herdr lab tooling is absent from PATH; no supervisor lifecycle actions attempted."
+    }
+  ],
+  "source_changes": false
+}

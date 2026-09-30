@@ -1,0 +1,134 @@
+$ fm-spawn.sh labmate $MATE --secondmate --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l
+fleet-seats: reserved pool=.shared id=labmate generation=s1790776221.67553.10276 used=1 capacity=1
+error: /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m is not a firstmate home (missing bin/)
+spawn_exit=1
+--- meta
+cat: /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l/state/labmate.meta: No such file or directory
+--- seats
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l/state","task":"labmate","revision":2,"incarnations":[{"generation":"s1790776221.67553.10276","previous_generation":null,"kind":"secondmate","model":"omlx-minimal/d9beuD--Qwen3.6-35B-A3B-oQ8e-mtp","policy_digest_at_reserve":"1240769511-173","lifecycle":"released","launch_phase":"prepared","owner_pid":67553,"owner_pid_identity":"Wed Sep 30 06:50:21 2026     bash bin/fm-spawn.sh labmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m --secondmate --backend tmux","route":null,"startup_confirmed":false,"disposition":{"reason":"prelaunch","source":"release","generation":"s1790776221.67553.10276","route":null,"operation":null}}]}
+
+$ mkdir $MATE/bin; fm-spawn.sh labmate $MATE --secondmate --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l
+fleet-seats: reserved pool=.shared id=labmate generation=s1790776230.1619.11233 used=1 capacity=1
+warning: secondmate labmate sync skipped before launch: primary default-branch commit cannot be resolved
+fm-config-inherit: warning: skipped fleet-seats for /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m/config: destination does not allow inherited item (not gitignored or guard failed)
+error: secondmate labmate was launched into primary:fm-labmate but its startup was not confirmed (endpoint reads 'ambiguous'); its fleet seat stays counted and its route is preserved for recovery
+warning: the fleet seat for labmate generation s1790776230.1619.11233 stays counted: its launch was submitted to primary:fm-labmate and startup was not confirmed (reconcile with bin/fm-fleet-seats.sh reclaim labmate --generation s1790776230.1619.11233)
+spawn_exit=1
+--- meta
+window=primary:fm-labmate
+endpoint_task_id=labmate
+worktree=/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m
+project=/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m
+harness=omp
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-labmate
+model=omlx-minimal/d9beuD--Qwen3.6-35B-A3B-oQ8e-mtp
+effort=default
+spawn_gen=s1790776230.1619.11233
+home=/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m
+projects=
+--- seats
+{"generation":"s1790776221.67553.10276","previous_generation":null,"lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch","route":null}
+{"generation":"s1790776230.1619.11233","previous_generation":null,"lifecycle":"reserved","launch_phase":"dispatching","startup_confirmed":false,"disposition":null,"route":"primary:fm-labmate"}
+
+# omp on this Mac runs as 'bun', so the tmux classifier reads the endpoint as ambiguous: the seat must stay counted
+$ fm-fleet-seats.sh reclaim labmate --generation s1790776230.1619.11233
+fleet-seats: retained - the endpoint for labmate generation s1790776230.1619.11233 reads 'ambiguous' (the seat stays counted until evidence resolves it)
+exit=3
+$ fm-fleet-seats.sh reserve other --generation x1 --kind ship --harness omp --model <.shared model>  (pool full)
+fleet-seats: pool .shared is full (1 of 1 seats held); other gets no seat for model omlx-minimal/d9beuD--Qwen3.6-35B-A3B-oQ8e-mtp - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l/state labmate
+exit=4
+{"generation":"s1790776230.1619.11233","lifecycle":"reserved","launch_phase":"dispatching","startup_confirmed":false}
+torn-down
+=== pi driver run 2026-09-30T13:55:33Z
+
+## S2.1 pooled supervisor spawn confirms its exact generation
+$ bin/fm-spawn.sh labmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m --secondmate --backend tmux
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l
+fleet-seats: reserved pool=.shared id=labmate generation=s1790776533.57665.18633 used=1 capacity=1
+warning: secondmate labmate sync skipped before launch: primary default-branch commit cannot be resolved
+fm-config-inherit: warning: skipped fleet-seats for /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m/config: destination does not allow inherited item (not gitignored or guard failed)
+fleet-seats: retained - the endpoint for labmate generation s1790776533.57665.18633 reads 'dead', not alive (the seat stays counted until evidence resolves it)
+error: secondmate labmate started, but its fleet seat could not record the confirmed startup; it stays counted for reconciliation
+warning: the fleet seat for labmate generation s1790776533.57665.18633 stays counted: its launch was submitted to primary:fm-labmate and startup was not confirmed (reconcile with bin/fm-fleet-seats.sh reclaim labmate --generation s1790776533.57665.18633)
+exit=1
+{"generation":"s1790776533.57665.18633","previous_generation":null,"lifecycle":"reserved","launch_phase":"dispatching","startup_confirmed":false,"disposition":null}
+CHECK FAIL: [ "$(life $G1)" = confirmed ] && [ "$(confirmed $G1)" = true ]
+
+## S2.2 same-pool relaunch: replacement reserved before the stop, predecessor released only as replaced
+$ bin/fm-control.sh labmate relaunch
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l
+fleet-seats: reserved pool=.shared id=labmate generation=s1790776538.80720.1653 (already held) used=1 capacity=1
+fleet-seats: retained - the unconfirmed predecessor labmate generation s1790776533.57665.18633 holds only a shell; its submitted launch may still execute (the seat stays counted until evidence resolves it)
+error: labmate's previous fleet seat (generation s1790776533.57665.18633) is not proven stopped; no replacement was launched
+relaunch_failure=launch
+error: labmate's agent was stopped but the replacement did not launch; no agent is running, and its work plus the recorded progress note are preserved at /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m
+exit=1
+{"generation":"s1790776533.57665.18633","previous_generation":null,"lifecycle":"reserved","launch_phase":"dispatching","startup_confirmed":false,"disposition":null}
+{"generation":"s1790776538.80720.1653","previous_generation":"s1790776533.57665.18633","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+CHECK FAIL: [ "$G2" != "$G1" ] && [ "$(life $G2)" = confirmed ] && [ "$(life $G1)" = released ]
+CHECK FAIL: [ "$("$S" show labmate | jq -r --arg g "$G1" ".incarnations[]|select(.generation==\$g)|.disposition.reason")" = replaced ]
+
+## S2.3 rollback before touch: cross-pool relaunch into a full destination pool refuses and keeps G2 running
+$ bin/fm-fleet-seats.sh reserve blocker --generation b1 --kind ship --harness pi --model john-remote/other-model --holder-pid 57528
+fleet-seats: reserved pool=..other id=blocker generation=b1 used=1 capacity=1
+exit=0
+$ bin/fm-control.sh labmate relaunch --model john-remote/other-model
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l
+fleet-seats: pool ..other is full (1 of 1 seats held); labmate gets no seat for model john-remote/other-model - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l/state blocker
+error: relaunch of labmate refused: no fleet seat for model john-remote/other-model (see the fleet-seats line above); nothing was changed
+relaunch_failure=prelaunch
+error: relaunch of labmate was refused before its agent was touched; nothing changed
+exit=1
+v1
+task=labmate
+phase=failed:checkpoint
+ts=2026-09-30T13:55:40Z
+backend=tmux
+endpoint=primary:fm-labmate
+worktree=/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m
+kind=secondmate
+from_harness=pi
+from_model=john-remote/qwen3.8-flash-next
+from_effort=default
+to_harness=pi
+to_model=john-remote/other-model
+to_effort=default
+seat_generation=s1790776540.89000.27200
+seat_previous_generation=s1790776533.57665.18633
+rollback=instructions-restored
+{"generation":"s1790776533.57665.18633","previous_generation":null,"lifecycle":"reserved","launch_phase":"dispatching","startup_confirmed":false,"disposition":null}
+{"generation":"s1790776538.80720.1653","previous_generation":"s1790776533.57665.18633","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+CHECK FAIL: [ "$(gen)" = "$G2" ] && [ "$(life $G2)" = confirmed ]
+CHECK ok: grep -q "rollback=instructions-restored" "$LAB/state/labmate.control-relaunch"
+$ bin/fm-fleet-seats.sh release blocker --generation b1 --reason prelaunch
+fleet-seats: released id=blocker generation=b1 reason=prelaunch
+exit=0
+
+## S2.4 stale expected generation refuses with exit 6 and touches nothing
+$ fm-control.sh labmate relaunch --expect-generation s1790776533.57665.18633
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l
+fleet-seats: reserved pool=.shared id=labmate generation=s1790776541.93716.30478 (already held) used=1 capacity=1
+fleet-seats: retained - the unconfirmed predecessor labmate generation s1790776533.57665.18633 holds only a shell; its submitted launch may still execute (the seat stays counted until evidence resolves it)
+error: labmate's previous fleet seat (generation s1790776533.57665.18633) is not proven stopped; no replacement was launched
+relaunch_failure=launch
+error: labmate's agent was stopped but the replacement did not launch; no agent is running, and its work plus the recorded progress note are preserved at /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m
+exit=1
+CHECK FAIL: [ "$rc" = 6 ] && [ "$(gen)" = "$G2" ] && [ "$(life $G2)" = confirmed ]
+
+## S2.5 persistence gate: no answer within the bound means a nudge, never a restart
+$ FM_SECONDMATE_PERSIST_WAIT=4 fm-secondmate-restart.sh labmate
+unreached: labmate: the request to write down its open work could not be delivered: refusing fleet lifecycle from inside a no-mistakes gate worktree (/Users/kesslerio/.no-mistakes/repos/8036f35f7c08.git); the re-read message could not be delivered either: refusing fleet lifecycle from inside a no-mistakes gate worktree (/Users/kesslerio/.no-mistakes/repos/8036f35f7c08.git)
+summary: 0 of 1 restarted, 0 nudged, 1 unreached
+exit=3
+CHECK FAIL: [ "$rc" = 3 ] && [ "$(gen)" = "$G2" ] && [ "$(life $G2)" = confirmed ]
+unanswered S2.5 correlation: 
+
+## S2.6 persistence gate: the mate's correlated answer authorizes a restart bound to G2
+$ fm-secondmate-restart.sh labmate   (background)

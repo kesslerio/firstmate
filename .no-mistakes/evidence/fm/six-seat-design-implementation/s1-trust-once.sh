@@ -1,0 +1,3 @@
+# usage: s1-trust-once.sh <pane>  - answer pi's project-trust prompt with "Trust (this session only)" (not persisted)
+E=/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E; LR=$(cat $E/s1-remote-lab-root)
+timeout 60 ssh -o BatchMode=yes mama "H='env XDG_CONFIG_HOME=$LR/xdg herdr --session fm-remote'; for i in \$(seq 1 20); do \$H pane read $1 --lines 30 | grep -q 'Trust (this session only)' && break; sleep 1; done; \$H pane send-keys $1 Down Down >/dev/null && sleep 0.5 && \$H pane read $1 --lines 30 | grep -E '→' ; \$H pane send-keys $1 Enter >/dev/null; sleep 4; \$H pane read $1 --lines 8 | tail -5"

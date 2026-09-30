@@ -1,0 +1,8 @@
+entrypoint -> /home/art/projects/Firstmate/bin/fm-remote-entrypoint.sh
+[{"name":"default","running":false,"socket_path":"/home/art/.config/herdr/herdr.sock"},{"name":"fm-remote","running":true,"socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]
+[{"label":"2ndmate-mama","workspace_id":"w3","pane_count":1}]
+3726225
+-rw-------    1 art art   123 2026-09-29T06:51:52 worker.identity
+drwx------    2 art art  4096 2026-09-29T06:51:52 worker.lock
+-rw-------    1 art art     8 2026-09-29T06:51:52 worker.pid
+ls: cannot access '/tmp/fm-lab-sixseat.*': No such file or directory

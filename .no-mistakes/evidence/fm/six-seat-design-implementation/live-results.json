@@ -1,0 +1,58 @@
+[
+  {
+    "name": "No-pool launches opt out; pooled defaults and invalid names refuse while hidden pool names work",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-transcript.log",
+    "reason": ""
+  },
+  {
+    "name": "Concurrent homes share six seats, retries count once, and relaunch candidates respect destination capacity and terminal fencing",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-transcript.log",
+    "reason": ""
+  },
+  {
+    "name": "A submitted shell endpoint stays counted after owner death; tmux disappearance without socket proof also stays counted",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-transcript.log",
+    "reason": ""
+  },
+  {
+    "name": "Real Claude startup confirms its exact seat, live reclamation refuses, and lifecycle mutex ownership allows only verified descendants",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-transcript.log",
+    "reason": ""
+  },
+  {
+    "name": "A v1 holder imports once with a generation-bound route and confirms against the running Claude endpoint",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-transcript.log",
+    "reason": ""
+  },
+  {
+    "name": "Remote serving grants a real queued request, publishes a complete certificate, replays epochs without regranting, and rejects stale or conflicting epochs",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-transcript.log",
+    "reason": ""
+  },
+  {
+    "name": "A confirmed Claude task exits through real control; its recorded and imported legacy generations reclaim without reviving on stale retries",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-transcript.log",
+    "reason": ""
+  },
+  {
+    "name": "A pooled Codex spawn accepts a fractional startup wait, confirms the exact generation, and refuses a stale-generation relaunch before stopping it",
+    "result": "pass",
+    "live": true,
+    "evidence": "spawn-live.log",
+    "reason": ""
+  }
+]

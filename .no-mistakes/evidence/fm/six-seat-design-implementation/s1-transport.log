@@ -1,0 +1,150 @@
+14:04:12 fm-remote-doctor.sh 
+14:04:14 fm-remote-home-provision.sh 
+14:04:24 fm-remote-doctor.sh 
+14:04:26 fm-remote-secondmate-control.sh sync smama ba4612611b9b6e795d10872256c181f685d0d20c
+14:04:28 fm-remote-inherit.sh absent config/crew-dispatch.json 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:31 fm-remote-inherit.sh absent config/dispatch-never-send 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:33 fm-remote-inherit.sh absent config/fleet-seats 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:36 fm-remote-inherit.sh absent config/crew-harness 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:38 fm-remote-inherit.sh absent config/backlog-backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:41 fm-remote-inherit.sh absent config/backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:43 fm-remote-inherit.sh absent config/herdr-presentation-spaces 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:46 fm-remote-inherit.sh absent config/startup-memory-budget 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:48 fm-remote-inherit.sh absent config/trace-context 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:51 fm-remote-inherit.sh absent config/launch-env-allowlist 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:53 fm-remote-inherit.sh absent config/claude-permission-mode 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:56 fm-remote-inherit.sh absent config/lavish-axi-host 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:04:58 fm-remote-inherit.sh absent config/keep-ai-trailers 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:05:01 fm-remote-inherit.sh absent config/supervision-host-off 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:05:03 fm-remote-inherit.sh absent data/captain-shared.md 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:05:06 fm-remote-secondmate-control.sh launch smama pi z-ai/glm-5.3-flash - herdr
+14:05:43 fm-fleet-seats.sh serve --digest 1966270802-76 --epoch r17907771433323825706.1 --allowance .remote=0
+14:05:45   -> FAULT 1-fm-fleet-seats.sh-serve: remote exit 0, reply discarded, returning 255
+14:06:16 fm-fleet-seats.sh serve --digest 1966270802-76 --epoch r17907771433323825706.2 --allowance .remote=0
+14:06:19   -> FAULT 2-fm-fleet-seats.sh-serve: remote exit 0, reply discarded, returning 255
+14:06:19 fm-fleet-seats.sh serve --digest 1966270802-76 --epoch r17907771433323825706.3 --allowance .remote=0
+14:06:29 fm-remote-secondmate-control.sh relaunch smama pi z-ai/glm-5.3-flash default
+14:06:31 fm-remote-secondmate-control.sh route smama
+14:06:43 fm-remote-doctor.sh 
+14:06:46 fm-remote-secondmate-control.sh sync smama ba4612611b9b6e795d10872256c181f685d0d20c
+14:06:49 fm-remote-inherit.sh absent config/crew-dispatch.json 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:06:51 fm-remote-inherit.sh absent config/dispatch-never-send 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:06:54 fm-remote-inherit.sh put config/fleet-seats 76 2768d0c7b61588fb51ce2d8c980a5f62644349543c675246fb8daaf55a989318 2
+14:06:56 fm-remote-inherit.sh absent config/crew-harness 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:06:59 fm-remote-inherit.sh absent config/backlog-backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:01 fm-remote-inherit.sh absent config/backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:04 fm-remote-inherit.sh absent config/herdr-presentation-spaces 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:06 fm-remote-inherit.sh absent config/startup-memory-budget 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:09 fm-remote-inherit.sh absent config/trace-context 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:10 fm-remote-inherit.sh absent config/launch-env-allowlist 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:13 fm-remote-inherit.sh absent config/claude-permission-mode 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:15 fm-remote-inherit.sh absent config/lavish-axi-host 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:18 fm-remote-inherit.sh absent config/keep-ai-trailers 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:21 fm-remote-inherit.sh absent config/supervision-host-off 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:23 fm-remote-inherit.sh absent data/captain-shared.md 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:07:27 fm-remote-secondmate-control.sh launch smama pi z-ai/glm-5.3-flash - herdr --operation s1790777203.72032.8672 --previous -
+14:07:30   -> FAULT 3-fm-remote-secondmate-control.sh-launch: remote exit 0, reply discarded, returning 255
+14:07:40 fm-remote-secondmate-control.sh disposition smama --operation s1790777203.72032.8672
+14:07:43   -> FAULT 4-fm-remote-secondmate-control.sh-disposition: remote exit 0, reply discarded, returning 255
+14:07:44 fm-remote-secondmate-control.sh disposition smama --operation s1790777203.72032.8672
+14:08:09 fm-remote-secondmate-control.sh disposition smama --operation s1790777203.72032.8672
+14:08:19 fm-remote-doctor.sh 
+14:08:21 fm-remote-secondmate-control.sh sync smama ba4612611b9b6e795d10872256c181f685d0d20c
+14:08:24 fm-remote-inherit.sh absent config/crew-dispatch.json 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:27 fm-remote-inherit.sh absent config/dispatch-never-send 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:29 fm-remote-inherit.sh put config/fleet-seats 76 2768d0c7b61588fb51ce2d8c980a5f62644349543c675246fb8daaf55a989318 3
+14:08:32 fm-remote-inherit.sh absent config/crew-harness 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:35 fm-remote-inherit.sh absent config/backlog-backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:37 fm-remote-inherit.sh absent config/backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:40 fm-remote-inherit.sh absent config/herdr-presentation-spaces 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:42 fm-remote-inherit.sh absent config/startup-memory-budget 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:44 fm-remote-inherit.sh absent config/trace-context 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:46 fm-remote-inherit.sh absent config/launch-env-allowlist 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:49 fm-remote-inherit.sh absent config/claude-permission-mode 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:51 fm-remote-inherit.sh absent config/lavish-axi-host 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:54 fm-remote-inherit.sh absent config/keep-ai-trailers 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:56 fm-remote-inherit.sh absent config/supervision-host-off 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:08:59 fm-remote-inherit.sh absent data/captain-shared.md 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:09:02 fm-remote-secondmate-control.sh launch smama pi z-ai/glm-5.3-flash - herdr --operation s1790777298.85219.7671 --previous -
+14:09:10 fm-remote-secondmate-control.sh route smama
+14:09:36 fm-remote-doctor.sh 
+14:09:38 fm-remote-home-provision.sh 
+14:09:42 fm-remote-doctor.sh 
+14:09:44 fm-remote-secondmate-control.sh sync smama2 ba4612611b9b6e795d10872256c181f685d0d20c
+14:09:47 fm-remote-inherit.sh absent config/crew-dispatch.json 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:09:49 fm-remote-inherit.sh absent config/dispatch-never-send 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:09:51 fm-remote-inherit.sh absent config/fleet-seats 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:09:54 fm-remote-inherit.sh absent config/crew-harness 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:09:57 fm-remote-inherit.sh absent config/backlog-backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:09:59 fm-remote-inherit.sh absent config/backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:01 fm-remote-inherit.sh absent config/herdr-presentation-spaces 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:04 fm-remote-inherit.sh absent config/startup-memory-budget 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:07 fm-remote-inherit.sh absent config/trace-context 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:09 fm-remote-inherit.sh absent config/launch-env-allowlist 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:12 fm-remote-inherit.sh absent config/claude-permission-mode 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:14 fm-remote-inherit.sh absent config/lavish-axi-host 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:17 fm-remote-inherit.sh absent config/keep-ai-trailers 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:19 fm-remote-inherit.sh absent config/supervision-host-off 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:22 fm-remote-inherit.sh absent data/captain-shared.md 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 1
+14:10:24 fm-remote-secondmate-control.sh launch smama2 pi z-ai/glm-5.3-flash - herdr
+14:10:32 fm-fleet-seats.sh serve --digest 479078885-76 --epoch r17907771433323825706.4 --allowance .remote=0
+14:10:35 fm-fleet-seats.sh serve --digest 479078885-76 --epoch r17907771433323825706.1 --allowance .remote=0
+14:10:37 fm-remote-secondmate-control.sh route smama2
+14:10:51 fm-remote-doctor.sh 
+14:10:53 fm-remote-secondmate-control.sh sync smama2 ba4612611b9b6e795d10872256c181f685d0d20c
+14:10:56 fm-remote-inherit.sh absent config/crew-dispatch.json 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:10:58 fm-remote-inherit.sh absent config/dispatch-never-send 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:01 fm-remote-inherit.sh put config/fleet-seats 76 7047f70be8cad17a7a12d14bc544ed31f304dd95107bd2d1f377e421597aac3e 2
+14:11:02 fm-remote-inherit.sh absent config/crew-harness 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:05 fm-remote-inherit.sh absent config/backlog-backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:07 fm-remote-inherit.sh absent config/backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:10 fm-remote-inherit.sh absent config/herdr-presentation-spaces 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:12 fm-remote-inherit.sh absent config/startup-memory-budget 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:15 fm-remote-inherit.sh absent config/trace-context 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:17 fm-remote-inherit.sh absent config/launch-env-allowlist 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:20 fm-remote-inherit.sh absent config/claude-permission-mode 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:22 fm-remote-inherit.sh absent config/lavish-axi-host 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:25 fm-remote-inherit.sh absent config/keep-ai-trailers 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:27 fm-remote-inherit.sh absent config/supervision-host-off 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:30 fm-remote-inherit.sh absent data/captain-shared.md 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 2
+14:11:33 fm-remote-secondmate-control.sh launch smama2 pi z-ai/glm-5.3-flash - herdr --operation s1790777451.41842.12171 --previous -
+14:11:42 fm-remote-doctor.sh 
+14:11:44 fm-remote-secondmate-control.sh sync smama2 ba4612611b9b6e795d10872256c181f685d0d20c
+14:11:46 fm-remote-inherit.sh absent config/crew-dispatch.json 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:11:49 fm-remote-inherit.sh absent config/dispatch-never-send 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:11:51 fm-remote-inherit.sh put config/fleet-seats 76 7047f70be8cad17a7a12d14bc544ed31f304dd95107bd2d1f377e421597aac3e 3
+14:11:54 fm-remote-inherit.sh absent config/crew-harness 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:11:56 fm-remote-inherit.sh absent config/backlog-backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:11:59 fm-remote-inherit.sh absent config/backend 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:01 fm-remote-inherit.sh absent config/herdr-presentation-spaces 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:04 fm-remote-inherit.sh absent config/startup-memory-budget 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:06 fm-remote-inherit.sh absent config/trace-context 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:09 fm-remote-inherit.sh absent config/launch-env-allowlist 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:10 fm-remote-inherit.sh absent config/claude-permission-mode 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:12 fm-remote-inherit.sh absent config/lavish-axi-host 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:14 fm-remote-inherit.sh absent config/keep-ai-trailers 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:17 fm-remote-inherit.sh absent config/supervision-host-off 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:20 fm-remote-inherit.sh absent data/captain-shared.md 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 3
+14:12:23 fm-remote-secondmate-control.sh disposition smama2 --operation s1790777451.41842.12171
+14:12:26 fm-remote-secondmate-control.sh launch smama2 pi z-ai/glm-5.3-flash - herdr --operation s1790777501.55957.23891 --previous s1790777427.2003228.2498
+14:13:18 fm-remote-secondmate-control.sh disposition smama2 --operation s1790777501.55957.23891
+14:13:22 fm-remote-secondmate-control.sh relaunch smama2 pi z-ai/glm-5.3-flash default --expect-generation s1790777501.55957.23891 --operation s1790777601.69338.14515 --previous s1790777501.55957.23891
+14:13:36   -> FAULT 5-fm-remote-secondmate-control.sh-relaunch: remote exit 0, reply discarded, returning 255
+14:13:44 fm-remote-secondmate-control.sh disposition smama2 --operation s1790777601.69338.14515
+14:13:59 fm-remote-secondmate-control.sh route smama2
+14:14:02 fm-remote-secondmate-control.sh send smama2 [fm-from-firstmate]⁣corr=c28d16bee2ed6c24 firstmate was updated to the latest - please re-read your AGENTS.md to pick up the new instructions.
+14:14:07 fm-remote-secondmate-control.sh route smama2
+14:15:02 fm-remote-secondmate-control.sh route smama
+14:15:05 fm-remote-secondmate-control.sh send smama [fm-from-firstmate]⁣corr=df1ceccaf13f97e0 Firstmate was updated and I am about to restart your agent so it comes up on the current instructions and launch-time settings, which drops your conversation but keeps every durable record. Before that, persist the open work you are holding only in this conversation, following the /stow skill's "Open-record persistence" section and nothing else from that skill: file a task for each open record that exists only in this conversation, including any captain call you had formed but never registered, and correct any task whose status no longer reflects what you now know. Do NOT run the memory, learnings, or captain-preference sweeps. Then reply on your parent channel saying it is done, or saying what you deliberately left alone and why.
+14:15:25 fm-secondmate-report.sh done df1ceccaf13f97e0 no open work is held in conversation; nothing to record
+14:15:29 fm-remote-delta-read.sh state/parent-replies.status 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 55
+14:15:34 fm-remote-delta-read.sh state/parent-replies.status 115 b7988d0dddb0a682632141bcfd9f33b7dde28cecb0b99e736c9a346e8b25ce64 55
+14:15:36 fm-remote-secondmate-control.sh disposition smama --operation s1790777298.85219.7671
+14:15:38 fm-remote-delta-read.sh state/parent-replies.status 115 b7988d0dddb0a682632141bcfd9f33b7dde28cecb0b99e736c9a346e8b25ce64 55
+14:15:40 fm-remote-secondmate-control.sh relaunch smama pi z-ai/glm-5.3-flash default --expect-generation s1790777298.85219.7671 --operation s1790777739.74670.14169 --previous s1790777298.85219.7671
+14:15:42 fm-remote-delta-read.sh state/parent-replies.status 115 b7988d0dddb0a682632141bcfd9f33b7dde28cecb0b99e736c9a346e8b25ce64 55
+14:16:51 fm-remote-delta-read.sh state/parent-replies.status 115 b7988d0dddb0a682632141bcfd9f33b7dde28cecb0b99e736c9a346e8b25ce64 55
+14:17:56 fm-remote-secondmate-control.sh retire smama
+14:18:12 fm-secondmate-report.sh done c28d16bee2ed6c24 re-read acknowledged
+14:18:15 fm-remote-delta-read.sh state/parent-replies.status 0 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 55
+14:18:21 fm-remote-secondmate-control.sh retire smama2

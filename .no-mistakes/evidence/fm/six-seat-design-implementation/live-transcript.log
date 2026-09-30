@@ -1,0 +1,678 @@
+$ tmux -L fm-lab display-message -p -t primary #{socket_path},#{pid},0
+/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/tmux/tmux-502/fm-lab,64668,0
+exit=0
+
+SCENARIO No-pool launches opt out; pooled defaults and invalid names refuse while hidden pool names work
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve off --generation off --previous-generation - --kind ship --harness claude --model default --holder-pid 67287
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve implicit --generation implicit --previous-generation - --kind ship --harness claude --model default --holder-pid 67287
+fleet-seats: no seat - harness claude launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve invalid --generation invalid --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: no seat - /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/config/fleet-seats is malformed (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve invalid --generation invalid --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: no seat - /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/config/fleet-seats is malformed (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve invalid --generation invalid --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: no seat - /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/config/fleet-seats is malformed (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve grammar --generation grammar --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=grammar generation=grammar used=1 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release grammar --generation grammar --reason prelaunch
+fleet-seats: released id=grammar generation=grammar reason=prelaunch
+exit=0
+
+SCENARIO Concurrent homes share six seats, retries count once, and relaunch candidates respect destination capacity and terminal fencing
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c
+/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel0 --generation p0 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=parallel0 generation=p0 used=1 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel3 --generation p3 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=parallel3 generation=p3 used=2 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel11 --generation p11 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=parallel11 generation=p11 used=3 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel1 --generation p1 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=parallel1 generation=p1 used=4 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel6 --generation p6 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=parallel6 generation=p6 used=5 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel2 --generation p2 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=parallel2 generation=p2 used=6 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel8 --generation p8 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: pool .shared is full (6 of 6 seats held); parallel8 gets no seat for model opus - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel1
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel11
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel3
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel0
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel2
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel6
+exit=4
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel4 --generation p4 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: pool .shared is full (6 of 6 seats held); parallel4 gets no seat for model opus - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel1
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel11
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel3
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel0
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel2
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel6
+exit=4
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel10 --generation p10 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: pool .shared is full (6 of 6 seats held); parallel10 gets no seat for model opus - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel1
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel11
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel3
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel0
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel2
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel6
+exit=4
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel9 --generation p9 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: pool .shared is full (6 of 6 seats held); parallel9 gets no seat for model opus - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel1
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel11
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel3
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel0
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel2
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel6
+exit=4
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel5 --generation p5 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: pool .shared is full (6 of 6 seats held); parallel5 gets no seat for model opus - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel1
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel11
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel3
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel0
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel2
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel6
+exit=4
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve parallel7 --generation p7 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: pool .shared is full (6 of 6 seats held); parallel7 gets no seat for model opus - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel1
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel11
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/c/state parallel3
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel0
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel2
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state parallel6
+exit=4
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release parallel0 --generation p0 --reason prelaunch
+fleet-seats: released id=parallel0 generation=p0 reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release parallel1 --generation p1 --reason prelaunch
+fleet-seats: released id=parallel1 generation=p1 reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release parallel2 --generation p2 --reason prelaunch
+fleet-seats: released id=parallel2 generation=p2 reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release parallel3 --generation p3 --reason prelaunch
+fleet-seats: released id=parallel3 generation=p3 reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release parallel6 --generation p6 --reason prelaunch
+fleet-seats: released id=parallel6 generation=p6 reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release parallel11 --generation p11 --reason prelaunch
+fleet-seats: released id=parallel11 generation=p11 reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve handoff --generation g1 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=handoff generation=g1 used=1 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve handoff --generation g1 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=handoff generation=g1 (already reserved) used=1 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve handoff --generation g2 --previous-generation g1 --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: reserved pool=.shared id=handoff generation=g2 (already held) used=1 capacity=6
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve handoff --generation g3 --previous-generation g2 --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: refused - an earlier launch of handoff (generation g1) is still unresolved; reconcile or reclaim it before starting another
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve destination --generation d1 --previous-generation - --kind ship --harness claude --model haiku --holder-pid 67287
+fleet-seats: reserved pool=..other id=destination generation=d1 used=1 capacity=1
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve handoff --generation cross --previous-generation g2 --kind ship --harness claude --model haiku --holder-pid 67287
+fleet-seats: pool ..other is full (1 of 1 seats held); handoff gets no seat for model haiku - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state destination
+exit=4
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release handoff --generation g2 --reason prelaunch
+fleet-seats: released id=handoff generation=g2 reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve handoff --generation cross --previous-generation g1 --kind ship --harness claude --model haiku --holder-pid 67287
+fleet-seats: pool ..other is full (1 of 1 seats held); handoff gets no seat for model haiku - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state destination
+exit=4
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release destination --generation d1 --reason prelaunch
+fleet-seats: released id=destination generation=d1 reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve handoff --generation cross --previous-generation g1 --kind ship --harness claude --model haiku --holder-pid 67287
+fleet-seats: reserved pool=..other id=handoff generation=cross used=1 capacity=1
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release handoff --generation cross --reason prelaunch
+fleet-seats: released id=handoff generation=cross reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release handoff --generation g1 --reason prelaunch
+fleet-seats: released id=handoff generation=g1 reason=prelaunch
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve handoff --generation g1 --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: refused - generation g1 of handoff is already terminal; a new episode needs a new generation
+exit=5
+
+SCENARIO A submitted shell endpoint stays counted after owner death; tmux disappearance without socket proof also stays counted
+$ tmux -L fm-lab new-window -d -t primary: -n fm-buffer bash
+exit=0
+$ bash -c "$1" reserve "$2" --generation "$3" --kind "$4" --harness claude --model opus --holder-pid "$$" && "$1" dispatch "$2" --generation "$3" --route-file "$5" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh buffer buffer1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-buffer1
+fleet-seats: reserved pool=.shared id=buffer generation=buffer1 used=1 capacity=6
+fleet-seats: dispatched id=buffer generation=buffer1
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reclaim buffer --generation buffer1
+fleet-seats: retained - the endpoint for buffer generation buffer1 holds only a shell; a submitted launch may still execute there (the seat stays counted until evidence resolves it)
+exit=3
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release buffer --generation buffer1 --reason prelaunch
+fleet-seats: refused - generation buffer1 of buffer was already dispatched; only proven cancellation or recovery can release it
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release buffer --generation buffer1 --reason cancelled
+fleet-seats: retained - the submitted launch endpoint for buffer generation buffer1 is not proven destroyed (the seat stays counted until evidence resolves it)
+exit=3
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh show buffer
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state","task":"buffer","revision":2,"incarnations":[{"generation":"buffer1","previous_generation":null,"kind":"secondmate","model":"opus","policy_digest_at_reserve":"1461032304-122","lifecycle":"reserved","launch_phase":"dispatching","owner_pid":18659,"owner_pid_identity":"Wed Sep 30 06:27:20 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh buffer buffer1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-buffer1","route":{"placement":"local","backend":"tmux","target":"primary:fm-buffer","home":null,"host":null,"remote_root":null,"spawn_gen":"buffer1","operation":null},"startup_confirmed":false,"disposition":null}]}
+exit=0
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state",
+  "task": "buffer",
+  "revision": 2,
+  "incarnations": [
+    {
+      "generation": "buffer1",
+      "previous_generation": null,
+      "kind": "secondmate",
+      "model": "opus",
+      "policy_digest_at_reserve": "1461032304-122",
+      "lifecycle": "reserved",
+      "launch_phase": "dispatching",
+      "owner_pid": 18659,
+      "owner_pid_identity": "Wed Sep 30 06:27:20 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh buffer buffer1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-buffer1",
+      "route": {
+        "placement": "local",
+        "backend": "tmux",
+        "target": "primary:fm-buffer",
+        "home": null,
+        "host": null,
+        "remote_root": null,
+        "spawn_gen": "buffer1",
+        "operation": null
+      },
+      "startup_confirmed": false,
+      "disposition": null
+    }
+  ]
+}
+$ tmux -L fm-lab kill-window -t primary:fm-buffer
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh release buffer --generation buffer1 --reason cancelled
+fleet-seats: retained - the submitted launch endpoint for buffer generation buffer1 is not proven destroyed: tmux absence cannot be proven from a task record: the record does not carry the endpoint's socket identity, and a server-wide window inventory only describes the tmux server this process addresses, so a window absent from it may still be alive on another (the seat stays counted until evidence resolves it)
+exit=3
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh show buffer
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state","task":"buffer","revision":2,"incarnations":[{"generation":"buffer1","previous_generation":null,"kind":"secondmate","model":"opus","policy_digest_at_reserve":"1461032304-122","lifecycle":"reserved","launch_phase":"dispatching","owner_pid":18659,"owner_pid_identity":"Wed Sep 30 06:27:20 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh buffer buffer1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-buffer1","route":{"placement":"local","backend":"tmux","target":"primary:fm-buffer","home":null,"host":null,"remote_root":null,"spawn_gen":"buffer1","operation":null},"startup_confirmed":false,"disposition":null}]}
+exit=0
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state",
+  "task": "buffer",
+  "revision": 2,
+  "incarnations": [
+    {
+      "generation": "buffer1",
+      "previous_generation": null,
+      "kind": "secondmate",
+      "model": "opus",
+      "policy_digest_at_reserve": "1461032304-122",
+      "lifecycle": "reserved",
+      "launch_phase": "dispatching",
+      "owner_pid": 18659,
+      "owner_pid_identity": "Wed Sep 30 06:27:20 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh buffer buffer1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-buffer1",
+      "route": {
+        "placement": "local",
+        "backend": "tmux",
+        "target": "primary:fm-buffer",
+        "home": null,
+        "host": null,
+        "remote_root": null,
+        "spawn_gen": "buffer1",
+        "operation": null
+      },
+      "startup_confirmed": false,
+      "disposition": null
+    }
+  ]
+}
+
+SCENARIO Real Claude startup confirms its exact seat, live reclamation refuses, and lifecycle mutex ownership allows only verified descendants
+$ tmux -L fm-lab rename-window -t primary fm-live
+exit=0
+$ bash -c "$1" reserve "$2" --generation "$3" --kind "$4" --harness claude --model opus --holder-pid "$$" && "$1" dispatch "$2" --generation "$3" --route-file "$5" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh live live1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-live1
+fleet-seats: reserved pool=.shared id=live generation=live1 used=2 capacity=6
+fleet-seats: dispatched id=live generation=live1
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh confirm live --generation live1
+fleet-seats: confirmed id=live generation=live1
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh show live
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state","task":"live","revision":3,"incarnations":[{"generation":"live1","previous_generation":null,"kind":"secondmate","model":"opus","policy_digest_at_reserve":"1461032304-122","lifecycle":"confirmed","launch_phase":"started","owner_pid":26661,"owner_pid_identity":"Wed Sep 30 06:27:22 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh live live1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-live1","route":{"placement":"local","backend":"tmux","target":"primary:fm-live","home":null,"host":null,"remote_root":null,"spawn_gen":"live1","operation":null},"startup_confirmed":true,"disposition":null}]}
+exit=0
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state",
+  "task": "live",
+  "revision": 3,
+  "incarnations": [
+    {
+      "generation": "live1",
+      "previous_generation": null,
+      "kind": "secondmate",
+      "model": "opus",
+      "policy_digest_at_reserve": "1461032304-122",
+      "lifecycle": "confirmed",
+      "launch_phase": "started",
+      "owner_pid": 26661,
+      "owner_pid_identity": "Wed Sep 30 06:27:22 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh live live1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-live1",
+      "route": {
+        "placement": "local",
+        "backend": "tmux",
+        "target": "primary:fm-live",
+        "home": null,
+        "host": null,
+        "remote_root": null,
+        "spawn_gen": "live1",
+        "operation": null
+      },
+      "startup_confirmed": true,
+      "disposition": null
+    }
+  ]
+}
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reclaim live --generation live1
+fleet-seats: retained - the endpoint for live generation live1 is alive (the seat stays counted until evidence resolves it)
+exit=3
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh show live
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state","task":"live","revision":3,"incarnations":[{"generation":"live1","previous_generation":null,"kind":"secondmate","model":"opus","policy_digest_at_reserve":"1461032304-122","lifecycle":"confirmed","launch_phase":"started","owner_pid":26661,"owner_pid_identity":"Wed Sep 30 06:27:22 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh live live1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-live1","route":{"placement":"local","backend":"tmux","target":"primary:fm-live","home":null,"host":null,"remote_root":null,"spawn_gen":"live1","operation":null},"startup_confirmed":true,"disposition":null}]}
+exit=0
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state",
+  "task": "live",
+  "revision": 3,
+  "incarnations": [
+    {
+      "generation": "live1",
+      "previous_generation": null,
+      "kind": "secondmate",
+      "model": "opus",
+      "policy_digest_at_reserve": "1461032304-122",
+      "lifecycle": "confirmed",
+      "launch_phase": "started",
+      "owner_pid": 26661,
+      "owner_pid_identity": "Wed Sep 30 06:27:22 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh live live1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-live1",
+      "route": {
+        "placement": "local",
+        "backend": "tmux",
+        "target": "primary:fm-live",
+        "home": null,
+        "host": null,
+        "remote_root": null,
+        "spawn_gen": "live1",
+        "operation": null
+      },
+      "startup_confirmed": true,
+      "disposition": null
+    }
+  ]
+}
+fleet-seats: confirmed id=live generation=live1 (already)
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh confirm live --generation live1
+fleet-seats: refused - another lifecycle episode for supervisor live is active (pid 32350); retry after it finishes
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh confirm live --generation live1
+fleet-seats: confirmed id=live generation=live1 (already)
+exit=0
+
+SCENARIO A v1 holder imports once with a generation-bound route and confirms against the running Claude endpoint
+$ tmux -L fm-lab new-window -d -t primary: -n fm-recover -c /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E bash
+exit=0
+$ tmux -L fm-lab send-keys -t primary:fm-recover CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false claude Enter
+exit=0
+$ bash -c "$1" reserve "$2" --generation "$3" --kind "$4" --harness claude --model opus --holder-pid "$$" && "$1" dispatch "$2" --generation "$3" --route-file "$5" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh recover recover1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-recover1
+fleet-seats: reserved pool=.shared id=recover generation=recover1 used=3 capacity=6
+fleet-seats: dispatched id=recover generation=recover1
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh confirm recover --generation recover1
+fleet-seats: confirmed id=recover generation=recover1
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/v
+/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/v
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve contender --generation contender --previous-generation - --kind ship --harness claude --model opus --holder-pid 67287
+fleet-seats: pool .shared is full (1 of 1 seats held); contender gets no seat for model opus - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/v/state recover
+exit=4
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh show recover
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/v/state","task":"recover","revision":1,"incarnations":[{"generation":"legacy1","previous_generation":null,"kind":"secondmate","model":"opus","policy_digest_at_reserve":null,"lifecycle":"reserved","launch_phase":"unknown","owner_pid":99999999,"owner_pid_identity":"","route":{"placement":"local","backend":"tmux","target":"primary:fm-recover","home":null,"host":null,"remote_root":null,"spawn_gen":"legacy1","operation":null},"startup_confirmed":false,"disposition":null,"legacy":{"source":"v1","fingerprint":"317982453-131"}}]}
+exit=0
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/v/state",
+  "task": "recover",
+  "revision": 1,
+  "incarnations": [
+    {
+      "generation": "legacy1",
+      "previous_generation": null,
+      "kind": "secondmate",
+      "model": "opus",
+      "policy_digest_at_reserve": null,
+      "lifecycle": "reserved",
+      "launch_phase": "unknown",
+      "owner_pid": 99999999,
+      "owner_pid_identity": "",
+      "route": {
+        "placement": "local",
+        "backend": "tmux",
+        "target": "primary:fm-recover",
+        "home": null,
+        "host": null,
+        "remote_root": null,
+        "spawn_gen": "legacy1",
+        "operation": null
+      },
+      "startup_confirmed": false,
+      "disposition": null,
+      "legacy": {
+        "source": "v1",
+        "fingerprint": "317982453-131"
+      }
+    }
+  ]
+}
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh confirm recover --generation legacy1
+fleet-seats: confirmed id=recover generation=legacy1
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh show recover
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/v/state","task":"recover","revision":2,"incarnations":[{"generation":"legacy1","previous_generation":null,"kind":"secondmate","model":"opus","policy_digest_at_reserve":null,"lifecycle":"confirmed","launch_phase":"started","owner_pid":99999999,"owner_pid_identity":"","route":{"placement":"local","backend":"tmux","target":"primary:fm-recover","home":null,"host":null,"remote_root":null,"spawn_gen":"legacy1","operation":null},"startup_confirmed":true,"disposition":null,"legacy":{"source":"v1","fingerprint":"317982453-131"}}]}
+exit=0
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/v/state",
+  "task": "recover",
+  "revision": 2,
+  "incarnations": [
+    {
+      "generation": "legacy1",
+      "previous_generation": null,
+      "kind": "secondmate",
+      "model": "opus",
+      "policy_digest_at_reserve": null,
+      "lifecycle": "confirmed",
+      "launch_phase": "started",
+      "owner_pid": 99999999,
+      "owner_pid_identity": "",
+      "route": {
+        "placement": "local",
+        "backend": "tmux",
+        "target": "primary:fm-recover",
+        "home": null,
+        "host": null,
+        "remote_root": null,
+        "spawn_gen": "legacy1",
+        "operation": null
+      },
+      "startup_confirmed": true,
+      "disposition": null,
+      "legacy": {
+        "source": "v1",
+        "fingerprint": "317982453-131"
+      }
+    }
+  ]
+}
+
+SCENARIO Remote serving grants a real queued request, publishes a complete certificate, replays epochs without regranting, and rejects stale or conflicting epochs
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/r
+/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/r
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh serve --digest 298057814-122 --epoch lab.1 --allowance .shared=1 --allowance ..other=1
+{"schema":"fm-fleet-seats-serve.v2","policy_digest":"298057814-122","epoch":"lab.1","complete":true,"holders":[]}
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh serve --digest 298057814-122 --epoch lab.1 --allowance .shared=0
+{"schema":"fm-fleet-seats-serve.v2","policy_digest":"298057814-122","epoch":"lab.1","complete":true,"holders":[]}
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh serve --digest 298057814-122 --epoch lab.0
+fleet-seats: no seat - serve epoch lab.0 is older than the applied epoch lab.1 (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh serve --digest 2345612139-122 --epoch lab.1
+fleet-seats: no seat - serve epoch lab.1 was already applied to another policy (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh serve --digest 298057814-122 --epoch lab.2 --allowance .shared=1
+{"schema":"fm-fleet-seats-serve.v2","policy_digest":"298057814-122","epoch":"lab.2","complete":true,"holders":[{"state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/r/state","task":"remote-worker","generation":"remote1","model":"opus","lifecycle":"reserved"}]}
+exit=0
+fleet-seats: reserved pool=.shared id=remote-worker generation=remote1 (granted by the fleet root)
+exit=0
+
+SCENARIO A confirmed Claude task exits through real control; its recorded and imported legacy generations reclaim without reviving on stale retries
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-control.sh recover exit
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l
+stopped recover harness=claude backend=tmux endpoint=primary:fm-recover worktree=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reclaim recover --generation recover1
+fleet-seats: reclaimed id=recover generation=recover1 (dead-after-start)
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh show recover
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state","task":"recover","revision":4,"incarnations":[{"generation":"recover1","previous_generation":null,"kind":"secondmate","model":"opus","policy_digest_at_reserve":"1461032304-122","lifecycle":"reclaimed","launch_phase":"started","owner_pid":47564,"owner_pid_identity":"Wed Sep 30 06:27:27 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh recover recover1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-recover1","route":{"placement":"local","backend":"tmux","target":"primary:fm-recover","home":null,"host":null,"remote_root":null,"spawn_gen":"recover1","operation":null},"startup_confirmed":true,"disposition":{"reason":"dead-after-start","source":"reclaim","generation":"recover1","route":{"placement":"local","backend":"tmux","target":"primary:fm-recover","home":null,"host":null,"remote_root":null,"spawn_gen":"recover1","operation":null},"operation":null}}]}
+exit=0
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state",
+  "task": "recover",
+  "revision": 4,
+  "incarnations": [
+    {
+      "generation": "recover1",
+      "previous_generation": null,
+      "kind": "secondmate",
+      "model": "opus",
+      "policy_digest_at_reserve": "1461032304-122",
+      "lifecycle": "reclaimed",
+      "launch_phase": "started",
+      "owner_pid": 47564,
+      "owner_pid_identity": "Wed Sep 30 06:27:27 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh recover recover1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-recover1",
+      "route": {
+        "placement": "local",
+        "backend": "tmux",
+        "target": "primary:fm-recover",
+        "home": null,
+        "host": null,
+        "remote_root": null,
+        "spawn_gen": "recover1",
+        "operation": null
+      },
+      "startup_confirmed": true,
+      "disposition": {
+        "reason": "dead-after-start",
+        "source": "reclaim",
+        "generation": "recover1",
+        "route": {
+          "placement": "local",
+          "backend": "tmux",
+          "target": "primary:fm-recover",
+          "home": null,
+          "host": null,
+          "remote_root": null,
+          "spawn_gen": "recover1",
+          "operation": null
+        },
+        "operation": null
+      }
+    }
+  ]
+}
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reclaim recover --generation legacy1
+fleet-seats: reclaimed id=recover generation=legacy1 (dead-after-start)
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh show recover
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/v/state","task":"recover","revision":3,"incarnations":[{"generation":"legacy1","previous_generation":null,"kind":"secondmate","model":"opus","policy_digest_at_reserve":null,"lifecycle":"reclaimed","launch_phase":"started","owner_pid":99999999,"owner_pid_identity":"","route":{"placement":"local","backend":"tmux","target":"primary:fm-recover","home":null,"host":null,"remote_root":null,"spawn_gen":"legacy1","operation":null},"startup_confirmed":true,"disposition":{"reason":"dead-after-start","source":"reclaim","generation":"legacy1","route":{"placement":"local","backend":"tmux","target":"primary:fm-recover","home":null,"host":null,"remote_root":null,"spawn_gen":"legacy1","operation":null},"operation":null},"legacy":{"source":"v1","fingerprint":"317982453-131"}}]}
+exit=0
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/v/state",
+  "task": "recover",
+  "revision": 3,
+  "incarnations": [
+    {
+      "generation": "legacy1",
+      "previous_generation": null,
+      "kind": "secondmate",
+      "model": "opus",
+      "policy_digest_at_reserve": null,
+      "lifecycle": "reclaimed",
+      "launch_phase": "started",
+      "owner_pid": 99999999,
+      "owner_pid_identity": "",
+      "route": {
+        "placement": "local",
+        "backend": "tmux",
+        "target": "primary:fm-recover",
+        "home": null,
+        "host": null,
+        "remote_root": null,
+        "spawn_gen": "legacy1",
+        "operation": null
+      },
+      "startup_confirmed": true,
+      "disposition": {
+        "reason": "dead-after-start",
+        "source": "reclaim",
+        "generation": "legacy1",
+        "route": {
+          "placement": "local",
+          "backend": "tmux",
+          "target": "primary:fm-recover",
+          "home": null,
+          "host": null,
+          "remote_root": null,
+          "spawn_gen": "legacy1",
+          "operation": null
+        },
+        "operation": null
+      },
+      "legacy": {
+        "source": "v1",
+        "fingerprint": "317982453-131"
+      }
+    }
+  ]
+}
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reserve recover --generation recover1 --previous-generation - --kind secondmate --harness claude --model opus --holder-pid 67287
+fleet-seats: refused - generation recover1 of recover is already terminal; a new episode needs a new generation
+exit=5
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh reclaim recover --generation recover1
+fleet-seats: already terminal id=recover generation=recover1
+exit=0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh show recover
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state","task":"recover","revision":4,"incarnations":[{"generation":"recover1","previous_generation":null,"kind":"secondmate","model":"opus","policy_digest_at_reserve":"1461032304-122","lifecycle":"reclaimed","launch_phase":"started","owner_pid":47564,"owner_pid_identity":"Wed Sep 30 06:27:27 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh recover recover1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-recover1","route":{"placement":"local","backend":"tmux","target":"primary:fm-recover","home":null,"host":null,"remote_root":null,"spawn_gen":"recover1","operation":null},"startup_confirmed":true,"disposition":{"reason":"dead-after-start","source":"reclaim","generation":"recover1","route":{"placement":"local","backend":"tmux","target":"primary:fm-recover","home":null,"host":null,"remote_root":null,"spawn_gen":"recover1","operation":null},"operation":null}}]}
+exit=0
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state",
+  "task": "recover",
+  "revision": 4,
+  "incarnations": [
+    {
+      "generation": "recover1",
+      "previous_generation": null,
+      "kind": "secondmate",
+      "model": "opus",
+      "policy_digest_at_reserve": "1461032304-122",
+      "lifecycle": "reclaimed",
+      "launch_phase": "started",
+      "owner_pid": 47564,
+      "owner_pid_identity": "Wed Sep 30 06:27:27 2026     bash -c \"$1\" reserve \"$2\" --generation \"$3\" --kind \"$4\" --harness claude --model opus --holder-pid \"$$\" && \"$1\" dispatch \"$2\" --generation \"$3\" --route-file \"$5\" _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E/bin/fm-fleet-seats.sh recover recover1 secondmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/state/route-recover1",
+      "route": {
+        "placement": "local",
+        "backend": "tmux",
+        "target": "primary:fm-recover",
+        "home": null,
+        "host": null,
+        "remote_root": null,
+        "spawn_gen": "recover1",
+        "operation": null
+      },
+      "startup_confirmed": true,
+      "disposition": {
+        "reason": "dead-after-start",
+        "source": "reclaim",
+        "generation": "recover1",
+        "route": {
+          "placement": "local",
+          "backend": "tmux",
+          "target": "primary:fm-recover",
+          "home": null,
+          "host": null,
+          "remote_root": null,
+          "spawn_gen": "recover1",
+          "operation": null
+        },
+        "operation": null
+      }
+    }
+  ]
+}
+$ tmux -L fm-lab capture-pane -p -t primary:fm-live
+
+ ▐▛███▛█   Claude Code v2.1.285
+▝▜██████▀  Opus 5.5 with high effort · Claude Team
+ ▝▝   ▝▝   ~/.no-mistakes/worktrees/8036f35f7c08/01M3RP9FKDWJ4VTFQQY8Q2R70E
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ Try "write a test for herdr.sh"
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents
+exit=0
+$ tmux -L fm-lab kill-server
+exit=0
+$ tmux -L fm-lab kill-server
+no server running on /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/l/tmux/tmux-502/fm-lab
+exit=1
+TEARDOWN: private tmux server stopped; all disposable homes removed

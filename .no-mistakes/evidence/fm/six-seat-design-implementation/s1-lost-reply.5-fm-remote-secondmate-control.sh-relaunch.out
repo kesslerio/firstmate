@@ -1,0 +1,12 @@
+relaunched smama2 harness=pi from=pi model=z-ai/glm-5.3-flash effort=default backend=herdr endpoint=fm-remote:w4:p2 worktree=/tmp/fm-lab-sixseat.iQMGXS/home2
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"smama2","operation":"s1790777601.69338.14515","requested_generation":"s1790777601.69338.14515","actual_generation":"s1790777601.69338.14515","previous_generation":"s1790777501.55957.23891","disposition":"started","startup_confirmed":true,"old_stopped":true,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w4:p2","home":"/tmp/fm-lab-sixseat.iQMGXS/home2","host":null,"remote_root":null,"spawn_gen":"s1790777601.69338.14515"},"actual_model":"z-ai/glm-5.3-flash","complete":true}
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w4:p2
+herdr_session=fm-remote
+harness=pi
+model=z-ai/glm-5.3-flash
+effort=default
+spawn_gen=s1790777601.69338.14515
+seat_operation=s1790777601.69338.14515
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.

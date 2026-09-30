@@ -1,0 +1,136 @@
+=== pi driver run (candidate copy) 2026-09-30T13:57:03Z
+
+## S2.1 pooled supervisor spawn confirms its exact generation
+$ bin/fm-spawn.sh labmate /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m --secondmate --backend tmux
+fleet-seats: reserved pool=.shared id=labmate generation=s1790776624.56282.19895 used=1 capacity=1
+warning: secondmate labmate sync skipped before launch: 848eb0a7adaa6c8355e66c734fee7dbe69d29ddb does not exist
+spawned labmate harness=pi kind=secondmate mode=secondmate yolo=off window=primary:fm-labmate worktree=/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m
+exit=0
+{"generation":"s1790776624.56282.19895","previous_generation":null,"lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+CHECK ok: [ "$(life $G1)" = confirmed ] && [ "$(confirmed $G1)" = true ]
+
+## S2.2 same-pool relaunch: replacement reserved before the stop, predecessor released only as replaced
+$ bin/fm-control.sh labmate relaunch
+fleet-seats: reserved pool=.shared id=labmate generation=s1790776631.90591.9314 (already held) used=1 capacity=1
+error: task labmate's composer state is 'unknown', not proven empty; refusing to type the /quit exit command because it could concatenate onto existing text. Clear the composer, then retry 'relaunch'
+relaunch_failure=prelaunch
+error: relaunch of labmate failed while stopping the old agent, which is still running; its original instructions were restored
+exit=1
+{"generation":"s1790776624.56282.19895","previous_generation":null,"lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+{"generation":"s1790776631.90591.9314","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+CHECK FAIL: [ "$G2" != "$G1" ] && [ "$(life $G2)" = confirmed ] && [ "$(life $G1)" = released ]
+CHECK FAIL: [ "$("$S" show labmate | jq -r --arg g "$G1" ".incarnations[]|select(.generation==\$g)|.disposition.reason")" = replaced ]
+
+## S2.3 rollback before touch: cross-pool relaunch into a full destination pool refuses and keeps G2 running
+$ bin/fm-fleet-seats.sh reserve blocker --generation b1 --kind ship --harness pi --model john-remote/other-model --holder-pid 56168
+fleet-seats: reserved pool=..other id=blocker generation=b1 used=1 capacity=1
+exit=0
+$ bin/fm-control.sh labmate relaunch --model john-remote/other-model
+fleet-seats: pool ..other is full (1 of 1 seats held); labmate gets no seat for model john-remote/other-model - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l/state blocker
+error: relaunch of labmate refused: no fleet seat for model john-remote/other-model (see the fleet-seats line above); nothing was changed
+relaunch_failure=prelaunch
+error: relaunch of labmate was refused before its agent was touched; nothing changed
+exit=1
+v1
+task=labmate
+phase=failed:checkpoint
+ts=2026-09-30T13:57:13Z
+backend=tmux
+endpoint=primary:fm-labmate
+worktree=/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m
+kind=secondmate
+from_harness=pi
+from_model=john-remote/qwen3.8-flash-next
+from_effort=default
+to_harness=pi
+to_model=john-remote/other-model
+to_effort=default
+seat_generation=s1790776632.1112.30924
+seat_previous_generation=s1790776624.56282.19895
+rollback=instructions-restored
+{"generation":"s1790776624.56282.19895","previous_generation":null,"lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+{"generation":"s1790776631.90591.9314","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+CHECK ok: [ "$(gen)" = "$G2" ] && [ "$(life $G2)" = confirmed ]
+CHECK ok: grep -q "rollback=instructions-restored" "$LAB/state/labmate.control-relaunch"
+$ bin/fm-fleet-seats.sh release blocker --generation b1 --reason prelaunch
+fleet-seats: released id=blocker generation=b1 reason=prelaunch
+exit=0
+
+## S2.4 stale expected generation refuses with exit 6 and touches nothing
+$ fm-control.sh labmate relaunch --expect-generation s1790776624.56282.19895
+fleet-seats: reserved pool=.shared id=labmate generation=s1790776634.6422.10586 (already held) used=1 capacity=1
+error: task labmate's composer state is 'unknown', not proven empty; refusing to type the /quit exit command because it could concatenate onto existing text. Clear the composer, then retry 'relaunch'
+relaunch_failure=prelaunch
+error: relaunch of labmate failed while stopping the old agent, which is still running; its original instructions were restored
+exit=1
+CHECK FAIL: [ "$rc" = 6 ] && [ "$(gen)" = "$G2" ] && [ "$(life $G2)" = confirmed ]
+
+## S2.5 persistence gate: no answer within the bound means a nudge, never a restart
+$ FM_SECONDMATE_PERSIST_WAIT=4 fm-secondmate-restart.sh labmate
+nudged: labmate: it did not confirm within 4s that its open work is written down, so its conversation was not spent
+summary: 0 of 1 restarted, 1 nudged, 0 unreached
+exit=3
+CHECK ok: [ "$rc" = 3 ] && [ "$(gen)" = "$G2" ] && [ "$(life $G2)" = confirmed ]
+unanswered S2.5 correlation: 68645aeb3787c25b
+
+## S2.6 persistence gate: the mate's correlated answer authorizes a restart bound to G2
+$ fm-secondmate-restart.sh labmate   (background)
+pending correlation: 18602d7b08fe5502
+the real pi mate answered 18602d7b08fe5502 itself
+unreached: labmate: the restart outcome is unknown: fleet-seats: reserved pool=.shared id=labmate generation=s1790776737.59146.998 (already held) used=1 capacity=1
+summary: 0 of 1 restarted, 0 nudged, 1 unreached
+exit=3
+{"generation":"s1790776624.56282.19895","previous_generation":null,"lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+{"generation":"s1790776631.90591.9314","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+{"generation":"s1790776634.6422.10586","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+{"generation":"s1790776737.59146.998","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+CHECK FAIL: [ "$rc" = 0 ] && [ "$G3" != "$G2" ] && [ "$(life $G3)" = confirmed ] && [ "$(life $G2)" = released ]
+
+## S2.7 generation race: a newer incarnation replaces the mate while its persist answer is pending; the late answer nudges instead of stopping it
+$ fm-secondmate-restart.sh labmate   (background)
+$ bin/fm-control.sh labmate relaunch
+fleet-seats: reserved pool=.shared id=labmate generation=s1790776739.70147.8354 (already held) used=1 capacity=1
+error: task labmate's composer state is 'unknown', not proven empty; refusing to type the /quit exit command because it could concatenate onto existing text. Clear the composer, then retry 'relaunch'
+relaunch_failure=prelaunch
+error: relaunch of labmate failed while stopping the old agent, which is still running; its original instructions were restored
+exit=1
+pending correlation: c13f79a4032f4e5a
+the real pi mate answered c13f79a4032f4e5a itself
+unreached: labmate: the restart outcome is unknown: fleet-seats: reserved pool=.shared id=labmate generation=s1790776756.49642.20797 (already held) used=1 capacity=1
+summary: 0 of 1 restarted, 0 nudged, 1 unreached
+exit=3
+{"generation":"s1790776624.56282.19895","previous_generation":null,"lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+{"generation":"s1790776631.90591.9314","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+{"generation":"s1790776634.6422.10586","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+{"generation":"s1790776737.59146.998","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+{"generation":"s1790776739.70147.8354","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+{"generation":"s1790776756.49642.20797","previous_generation":"s1790776624.56282.19895","lifecycle":"released","launch_phase":"prepared","startup_confirmed":false,"disposition":"prelaunch"}
+CHECK FAIL: [ "$rc" = 3 ] && grep -q "^nudged: labmate" "$E/s2-restart2.out" && [ "$(gen)" = "$G4" ] && [ "$(life $G4)" = confirmed ]
+
+## S2.7b a late answer to the timed-out S2.5 request restarts nothing
+$ env FM_HOME=/Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2m bin/fm-secondmate-report.sh done 68645aeb3787c25b late answer
+exit=0
+CHECK ok: [ "$(gen)" = "$G4" ] && [ "$(life $G4)" = confirmed ]
+
+## S2.8 teardown releases exactly its own generation
+$ bin/fm-teardown.sh labmate
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: secondmate labmate still has an unresolved routed reply
+exit=1
+{"generation":"s1790776624.56282.19895","lifecycle":"confirmed","disposition":null}
+{"generation":"s1790776631.90591.9314","lifecycle":"released","disposition":"prelaunch"}
+{"generation":"s1790776634.6422.10586","lifecycle":"released","disposition":"prelaunch"}
+{"generation":"s1790776737.59146.998","lifecycle":"released","disposition":"prelaunch"}
+{"generation":"s1790776739.70147.8354","lifecycle":"released","disposition":"prelaunch"}
+{"generation":"s1790776756.49642.20797","lifecycle":"released","disposition":"prelaunch"}
+CHECK FAIL: [ "$("$S" show labmate | jq -r --arg g "$G4" ".incarnations[]|select(.generation==\$g)|.lifecycle")" = released ]
+CHECK FAIL: [ "$("$S" show labmate | jq -r --arg g "$G4" ".incarnations[]|select(.generation==\$g)|.disposition.reason")" = teardown ]
+$ bin/fm-fleet-seats.sh reserve fresh --generation f1 --kind ship --harness pi --model john-remote/qwen3.8-flash-next --holder-pid 56168
+fleet-seats: pool .shared is full (1 of 1 seats held); fresh gets no seat for model john-remote/qwen3.8-flash-next - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/evidence/01M3RP9FKDWJ4VTFQQY8Q2R70E/s2l/state labmate
+exit=4
+$ bin/fm-fleet-seats.sh release fresh --generation f1 --reason prelaunch
+fleet-seats: no seat held id=fresh generation=f1
+exit=0
+FAILS=7

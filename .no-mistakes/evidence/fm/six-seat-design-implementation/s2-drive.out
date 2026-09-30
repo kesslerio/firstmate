@@ -1,0 +1,48 @@
+
+## S2.1 pooled supervisor spawn confirms its exact generation
+{"generation":"s1790776970.41383.25050","previous_generation":null,"lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+CHECK ok: [ "$(life $G1)" = confirmed ] && [ "$(confirmed $G1)" = true ]
+
+## S2.2 same-pool relaunch: replacement reserved before the stop, predecessor released only as replaced
+{"generation":"s1790776970.41383.25050","previous_generation":null,"lifecycle":"released","launch_phase":"started","startup_confirmed":true,"disposition":"replaced"}
+{"generation":"s1790776977.72467.2183","previous_generation":"s1790776970.41383.25050","lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+CHECK ok: [ "$G2" != "$G1" ] && [ "$(life $G2)" = confirmed ] && [ "$(life $G1)" = released ]
+CHECK ok: [ "$("$S" show labmate | jq -r --arg g "$G1" ".incarnations[]|select(.generation==\$g)|.disposition.reason")" = replaced ]
+
+## S2.3 rollback before touch: cross-pool relaunch into a full destination pool refuses and keeps G2 running
+{"generation":"s1790776970.41383.25050","previous_generation":null,"lifecycle":"released","launch_phase":"started","startup_confirmed":true,"disposition":"replaced"}
+{"generation":"s1790776977.72467.2183","previous_generation":"s1790776970.41383.25050","lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+CHECK ok: [ "$(gen)" = "$G2" ] && [ "$(life $G2)" = confirmed ]
+CHECK ok: grep -q "rollback=instructions-restored" "$LAB/state/labmate.control-relaunch"
+
+## S2.4 stale expected generation refuses with exit 6 and touches nothing
+CHECK ok: [ "$rc" = 6 ] && [ "$(gen)" = "$G2" ] && [ "$(life $G2)" = confirmed ]
+
+## S2.5 persistence gate: no answer within the bound means a nudge, never a restart
+CHECK ok: [ "$rc" = 3 ] && [ "$(gen)" = "$G2" ] && [ "$(life $G2)" = confirmed ]
+
+## S2.6 persistence gate: the mate's correlated answer authorizes a restart bound to G2
+{"generation":"s1790776970.41383.25050","previous_generation":null,"lifecycle":"released","launch_phase":"started","startup_confirmed":true,"disposition":"replaced"}
+{"generation":"s1790776977.72467.2183","previous_generation":"s1790776970.41383.25050","lifecycle":"released","launch_phase":"started","startup_confirmed":true,"disposition":"replaced"}
+{"generation":"s1790777134.98636.2897","previous_generation":"s1790776977.72467.2183","lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+CHECK ok: [ "$rc" = 0 ] && [ "$G3" != "$G2" ] && [ "$(life $G3)" = confirmed ] && [ "$(life $G2)" = released ]
+
+## S2.7 generation race: a newer incarnation replaces the mate while its persist answer is pending; the late answer nudges instead of stopping it
+CHECK ok: [ "$G4" != "$G3" ] && [ "$(life $G4)" = confirmed ] && [ "$(life $G3)" = released ]
+{"generation":"s1790776970.41383.25050","previous_generation":null,"lifecycle":"released","launch_phase":"started","startup_confirmed":true,"disposition":"replaced"}
+{"generation":"s1790776977.72467.2183","previous_generation":"s1790776970.41383.25050","lifecycle":"released","launch_phase":"started","startup_confirmed":true,"disposition":"replaced"}
+{"generation":"s1790777134.98636.2897","previous_generation":"s1790776977.72467.2183","lifecycle":"released","launch_phase":"started","startup_confirmed":true,"disposition":"replaced"}
+{"generation":"s1790777289.45766.26568","previous_generation":"s1790777134.98636.2897","lifecycle":"confirmed","launch_phase":"started","startup_confirmed":true,"disposition":null}
+CHECK ok: [ "$rc" = 3 ] && grep -q "^nudged: labmate" "$E/s2-restart2.out" && [ "$(gen)" = "$G4" ] && [ "$(life $G4)" = confirmed ]
+
+## S2.7b a late answer to the timed-out S2.5 request restarts nothing
+CHECK ok: [ "$(gen)" = "$G4" ] && [ "$(life $G4)" = confirmed ]
+
+## S2.8 teardown releases exactly its own generation
+{"generation":"s1790776970.41383.25050","lifecycle":"released","disposition":"replaced"}
+{"generation":"s1790776977.72467.2183","lifecycle":"released","disposition":"replaced"}
+{"generation":"s1790777134.98636.2897","lifecycle":"released","disposition":"replaced"}
+{"generation":"s1790777289.45766.26568","lifecycle":"confirmed","disposition":null}
+CHECK FAIL: [ "$("$S" show labmate | jq -r --arg g "$G4" ".incarnations[]|select(.generation==\$g)|.lifecycle")" = released ]
+CHECK FAIL: [ "$("$S" show labmate | jq -r --arg g "$G4" ".incarnations[]|select(.generation==\$g)|.disposition.reason")" = teardown ]
+FAILS=2

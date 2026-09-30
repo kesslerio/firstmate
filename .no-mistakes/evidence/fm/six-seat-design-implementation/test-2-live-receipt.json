@@ -1,0 +1,43 @@
+{
+ "tested_head_sha": "6a5b859e6445dcd487fd7feee0a98986e0e842d3",
+ "round": "test-2 fix (live completion)",
+ "scenarios": [
+  {
+   "name": "Parent-accounted remote supervisor on mama survives ambiguous replies and recovers an existing imported generation through its observing host operation",
+   "result": "pass",
+   "live": true,
+   "evidence": [
+    "s1-transcript.log",
+    "s1-transport.log",
+    "s1-lost-reply.*.out",
+    "s1-tripwire-before.txt",
+    "s1-tripwire-after.txt"
+   ],
+   "highlights": [
+    "lost serve reply keeps remote-smama.pending and admission refused (exit 5); next serve publishes complete v2 certificate",
+    "host refuses unaccounted relaunch once pools are delivered",
+    "launch reply lost after host answered existing(A): candidate G stays counted, admission fails closed",
+    "lost disposition reply: still retained; next reconcile imports A bound to operation G and releases G prelaunch",
+    "A dies: reclaim via G's receipt = dead-after-start",
+    "second route: B imported via H, B dies, plain fm-spawn reclaims B and host accepts --previous B through the H binding; G' started and confirmed once",
+    "remote relaunch: stale --expect-generation exits 6; lost relaunch reply reconciled to started, predecessor released old-stopped, no double launch",
+    "remote persistence-gated restart: stale projection nudges; answered-in-remote-home request mirrored back authorizes a restart bound to the generation",
+    "teardown of both routes releases exactly the live generation (teardown), even with a stale parent projection"
+   ]
+  },
+  {
+   "name": "Pooled local supervisor completes relaunch, rollback, persistence-gated restart (incl. generation race) and teardown while preserving generation ownership",
+   "result": "pass",
+   "live": true,
+   "evidence": [
+    "s2-transcript.log",
+    "s2-restart1.out",
+    "s2-restart2.out",
+    "s2-attempt2-transcript.log",
+    "s2-attempts-transcript.log"
+   ]
+  }
+ ],
+ "isolation": "mama: disposable /tmp/fm-lab-sixseat.* root+home, FM_REMOTE_JOB_STATE_ROOT job worker, XDG_CONFIG_HOME-isolated herdr fm-remote server via FM_SSH_BIN shim s1-ssh.sh; operator entrypoint, live fm-remote session (2ndmate-mama) and operator worker unchanged per tripwire; lab removed.",
+ "source_changes": false
+}
