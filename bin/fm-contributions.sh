@@ -203,14 +203,13 @@ write_record() { # task record-json-file
   mv -f -- "$staged" "$file"
 }
 
-forge() {
+forge_read() { # command and arguments, including local page assembly
   local remaining rc=0 forge_err=${FORGE_ERR:-$TMP/forge.err}
   remaining=$((DEADLINE - $(date +%s)))
   # The budget, not the forge, refused this read.
   [ "$remaining" -gt 0 ] || { BUDGET_EXHAUSTED=1; : > "$TMP/budget-exhausted"; return 1; }
   [ "$remaining" -le 5 ] || remaining=5
-  fm_run_timed "$remaining" env GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 \
-    gh "$@" 2> "$forge_err" || rc=$?
+  fm_run_timed "$remaining" "$@" 2> "$forge_err" || rc=$?
   # A kill at the read bound or the deadline is budget refusal too; only the
   # forge's own nonzero exit is unavailable evidence.
   if [ "$rc" -eq 124 ]; then
@@ -220,6 +219,10 @@ forge() {
     : > "$TMP/forge-unavailable"
   fi
   return "$rc"
+}
+
+forge() {
+  forge_read env GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh "$@"
 }
 
 wait_forges() { # background forge pids from one independent read wave
@@ -235,12 +238,12 @@ wait_forges() { # background forge pids from one independent read wave
 
 forge_pages() { # paginated endpoint -> one array-of-pages document on stdout
   local endpoint=$1 raw rc=0
-  # The pages go through a file, not a capture, so forge keeps reporting its own
-  # exit status and its own budget and unavailability markers.
+  # Retrieval and assembly share one read bound and one failure classification.
   raw=$(mktemp "$TMP/pages.XXXXXX") || return 1
-  forge api "$endpoint" --paginate > "$raw" || rc=$?
-  if [ "$rc" -ne 0 ]; then rm -f -- "$raw"; return "$rc"; fi
-  jq -s . "$raw" || rc=$?
+  # shellcheck disable=SC2016 # Arguments are expanded by the bounded shell.
+  forge_read bash -c '
+    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"
+  ' _ "$endpoint" "$raw" || rc=$?
   rm -f -- "$raw"
   return "$rc"
 }
