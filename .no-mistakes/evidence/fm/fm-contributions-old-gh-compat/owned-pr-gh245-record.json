@@ -1,0 +1,162 @@
+{
+  "schema": "fm-contributions.v1",
+  "task": "proof",
+  "records": [
+    {
+      "url": "https://github.com/kunchenguid/firstmate/pull/5645",
+      "kind": "pr",
+      "checked_at": "2026-09-30T00:58:42Z",
+      "observation": {
+        "head": "f19a6dd95c7b04f68efe27ba4fe0ebad66fd7d88",
+        "state": "open",
+        "draft": false,
+        "mergeable": "conflicting",
+        "can_merge": false,
+        "review_decision": "",
+        "reviews": [],
+        "checks": [
+          {
+            "name": "Behavior timing aggregate",
+            "id": 107989348544,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:48:12Z"
+          },
+          {
+            "name": "Behavior portable serial 6",
+            "id": 107982797839,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:35:51Z"
+          },
+          {
+            "name": "Behavior portable serial 3",
+            "id": 107982797827,
+            "status": "completed",
+            "conclusion": "failure",
+            "started_at": "2026-09-25T07:32:51Z"
+          },
+          {
+            "name": "Behavior portable serial 8",
+            "id": 107982797816,
+            "status": "completed",
+            "conclusion": "failure",
+            "started_at": "2026-09-25T07:31:23Z"
+          },
+          {
+            "name": "Behavior portable serial 4",
+            "id": 107982797791,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:30:49Z"
+          },
+          {
+            "name": "Behavior tests (Herdr)",
+            "id": 107982797756,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:28:44Z"
+          },
+          {
+            "name": "Behavior portable serial 7",
+            "id": 107982797734,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:28:23Z"
+          },
+          {
+            "name": "Behavior portable serial 9",
+            "id": 107982797726,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:30:45Z"
+          },
+          {
+            "name": "Behavior portable serial 1",
+            "id": 107982797721,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:28:07Z"
+          },
+          {
+            "name": "PR must be raised via no-mistakes",
+            "id": 107982797720,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:23:20Z"
+          },
+          {
+            "name": "Behavior portable serial 2",
+            "id": 107982797719,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:29:44Z"
+          },
+          {
+            "name": "Repo invariants",
+            "id": 107982797688,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:27:30Z"
+          },
+          {
+            "name": "Behavior portable parallel 1",
+            "id": 107982797651,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:27:29Z"
+          },
+          {
+            "name": "Lint 2",
+            "id": 107982797632,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:28:15Z"
+          },
+          {
+            "name": "Behavior portable parallel 2",
+            "id": 107982797593,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:25:23Z"
+          },
+          {
+            "name": "Stock macOS Bash snapshot compatibility",
+            "id": 107982797570,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:24:09Z"
+          },
+          {
+            "name": "Lint 1",
+            "id": 107982797567,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:25:22Z"
+          },
+          {
+            "name": "Behavior portable serial 5",
+            "id": 107982797552,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:23:27Z"
+          },
+          {
+            "name": "Test coverage guard",
+            "id": 107982797423,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T07:25:04Z"
+          }
+        ],
+        "events": [],
+        "absent_checks": []
+      },
+      "verdict": null,
+      "seen": [],
+      "pending": [],
+      "notified": [],
+      "error": null
+    }
+  ]
+}

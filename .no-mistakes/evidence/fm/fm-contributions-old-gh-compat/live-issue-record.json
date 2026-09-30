@@ -1,0 +1,63 @@
+{
+  "schema": "fm-contributions.v1",
+  "task": "issue-proof",
+  "records": [
+    {
+      "url": "https://github.com/kunchenguid/firstmate/issues/6168",
+      "kind": "issue",
+      "checked_at": "2026-09-30T01:00:35Z",
+      "observation": {
+        "state": "open",
+        "head": null,
+        "ready": true,
+        "checks": [],
+        "reviews": [],
+        "events": [
+          {
+            "token": "comment:5900186728:2026-09-29T22:19:29Z",
+            "type": "comment",
+            "source": "https://github.com/kunchenguid/firstmate/issues/6168#issuecomment-5900186728",
+            "head": null,
+            "author": "kunchenguid",
+            "body": "Speaking as Kun's firstmate: whole thread read (body; no comments). Author lucaslim not blocked. Verified still real on latest main `1f2c9548f468`.\n\n**Evidence on main:** `fm_backend_herdr_workspace_prune_seeded_default_tab` (`bin/backends/herdr.sh` ~1878\u20131895) already receives the exact `seeded_tab_id` from `workspace create`, then still gates prune on `[ \"$current_label\" = \"1\" ]`. When Herdr 0.9.1 relabels the seeded tab to `1 \u00b7 <cwd-basename>` before prune runs, the function returns 0 without"
+          },
+          {
+            "token": "ready-for-pr:32118670474",
+            "type": "ready-for-pr",
+            "source": "https://github.com/kunchenguid/firstmate/issues/6168",
+            "head": null,
+            "body": "filed issue reached ready-for-pr"
+          }
+        ],
+        "absent_checks": []
+      },
+      "verdict": null,
+      "seen": [
+        "comment:5900186728:2026-09-29T22:19:29Z",
+        "ready-for-pr:32118670474"
+      ],
+      "pending": [
+        {
+          "token": "comment:5900186728:2026-09-29T22:19:29Z",
+          "type": "comment",
+          "source": "https://github.com/kunchenguid/firstmate/issues/6168#issuecomment-5900186728",
+          "head": null,
+          "author": "kunchenguid",
+          "body": "Speaking as Kun's firstmate: whole thread read (body; no comments). Author lucaslim not blocked. Verified still real on latest main `1f2c9548f468`.\n\n**Evidence on main:** `fm_backend_herdr_workspace_prune_seeded_default_tab` (`bin/backends/herdr.sh` ~1878\u20131895) already receives the exact `seeded_tab_id` from `workspace create`, then still gates prune on `[ \"$current_label\" = \"1\" ]`. When Herdr 0.9.1 relabels the seeded tab to `1 \u00b7 <cwd-basename>` before prune runs, the function returns 0 without"
+        },
+        {
+          "token": "ready-for-pr:32118670474",
+          "type": "ready-for-pr",
+          "source": "https://github.com/kunchenguid/firstmate/issues/6168",
+          "head": null,
+          "body": "filed issue reached ready-for-pr"
+        }
+      ],
+      "notified": [
+        "comment:5900186728:2026-09-29T22:19:29Z",
+        "ready-for-pr:32118670474"
+      ],
+      "error": null
+    }
+  ]
+}

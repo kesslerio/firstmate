@@ -1,0 +1,21 @@
+Live CLI validation with the official gh 2.45.0 macOS arm64 release.
+Archive SHA-256: a0423acd5954932a817d531a8160b67cf0456ea6c9e68c11c054c19ea7a6714b (matched official checksums).
+Actual gh 2.45.0 rejects --slurp with unknown flag before a forge read.
+All product calls used isolated marked lab homes inside the gate worktree, with no forge writes.
+
+owned-pr-gh245: pass; https://github.com/kunchenguid/firstmate/pull/5645; 0 pending signals; first poll 1.91s.
+multipage-pr-gh245: pass; https://github.com/cli/cli/pull/10513; 44 pending signals; first poll 20.47s.
+missing-pr-gh245: pass; https://github.com/cli/cli/pull/999999999; 0 pending signals; first poll 0.85s.
+
+Independent explicit-page reads for cli/cli PR #10513:
+comment: page sizes [6], eligible maintainer signals [2].
+review: page sizes [100, 17], eligible maintainer signals [4, 9].
+review-comment: page sizes [100, 93], eligible maintainer signals [0, 29].
+Product pending tokens and observed event tokens exactly matched all 44 eligible signals.
+Unrelated actors with NONE and CONTRIBUTOR association, bots, and the contribution author were excluded.
+Repeated polls did not duplicate the durable wake queue; exact acknowledgement removed one pending signal only.
+
+Issue #6168: pass; both its real OWNER comment and ready-for-pr timeline event persisted and woke once.
+Real missing PR: observation remained unavailable, with no maintainer signal and no repeated outage notification.
+
+Evidence uses CLI transcripts, persisted contribution JSON, and durable wake queues; this change has no rendered UI.

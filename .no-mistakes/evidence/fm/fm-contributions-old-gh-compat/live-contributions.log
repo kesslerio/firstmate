@@ -1,0 +1,293 @@
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh --version
+gh version 2.45.0 (2024-03-04)
+https://github.com/cli/cli/releases/tag/v2.45.0
+
+exit: 0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/kunchenguid/firstmate --paginate --slurp
+unknown flag: --slurp
+
+Usage:  gh api <endpoint> [flags]
+
+Flags:
+      --cache duration        Cache the response, e.g. "3600s", "60m", "1h"
+  -F, --field key=value       Add a typed parameter in key=value format
+  -H, --header key:value      Add a HTTP request header in key:value format
+      --hostname string       The GitHub hostname for the request (default "github.com")
+  -i, --include               Include HTTP response status line and headers in the output
+      --input file            The file to use as body for the HTTP request (use "-" to read from standard input)
+  -q, --jq string             Query to select values from the response using jq syntax
+  -X, --method string         The HTTP method for the request (default "GET")
+      --paginate              Make additional HTTP requests to fetch all pages of results
+  -p, --preview names         GitHub API preview names to request (without the "-preview" suffix)
+  -f, --raw-field key=value   Add a string parameter in key=value format
+      --silent                Do not print the response body
+  -t, --template string       Format JSON output using a Go template; see "gh help formatting"
+      --verbose               Include full HTTP request and response in the output
+  
+
+exit: 1
+$ bash bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/owned-pr-gh245
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/owned-pr-gh245
+
+exit: 0
+$ bash bin/fm-contributions.sh arm
+registered: state/contributions.check.sh
+
+exit: 0
+$ bash /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/owned-pr-gh245/state/contributions.check.sh
+exit: 0
+$ bash bin/fm-contributions.sh pending
+[]
+
+exit: 0
+$ bash /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/owned-pr-gh245/state/contributions.check.sh
+exit: 0
+SCENARIO RESULT {"name": "owned-pr-gh245", "result": "pass", "elapsed_seconds": 1.91, "pending_signals": 0, "url": "https://github.com/kunchenguid/firstmate/pull/5645", "head": "f19a6dd95c7b04f68efe27ba4fe0ebad66fd7d88"}
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/cli/cli/pulls/10513
+{"url":"https://api.github.com/repos/cli/cli/pulls/10513","id":2362815762,"node_id":"PR_kwDODKw3uc6M1bUS","html_url":"https://github.com/cli/cli/pull/10513","diff_url":"https://github.com/cli/cli/pull/10513.diff","patch_url":"https://github.com/cli/cli/pull/10513.patch","issue_url":"https://api.github.com/repos/cli/cli/issues/10513","number":10513,"state":"closed","locked":false,"title":"`gh pr create`: Support Git's `@{push}` revision syntax for determining head ref","user":{"login":"BagToad","id":47394200,"node_id":"MDQ6VXNlcjQ3Mzk0MjAw","avatar_url":"https://avatars.githubusercontent.com/u/47394200?v=4","gravatar_id":"","url":"https://api.github.com/users/BagToad","html_url":"https://github.com/BagToad","followers_url":"https://api.github.com/users/BagToad/followers","following_url":"https://api.github.com/users/BagToad/following{/other_user}","gists_url":"https://api.github.com/users/BagToad/gists{/gist_id}","starred_url":"https://api.github.com/users/BagToad/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/BagToad/subscriptions","organizations_url":"https://api.github.com/users/BagToad/orgs","repos_url":"https://api.github.com/users/BagToad/repos","events_url":"https://api.github.com/users/BagToad/events{/privacy}","received_events_url":"https://api.github.com/users/BagToad/received_events","type":"User","user_view_type":"public","site_admin":true},"body":"Fixes #575\r\n\r\n### Description\r\n\r\nThis adds support Git's `@{push}` revision syntax for determining head ref.\r\n\r\n## [Acceptance Criteria](https://github.com/cli/cli/issues/575#issuecomment-2634696871)\r\n\r\n> **Given** `git rev-parse --abbrev-ref @{push}` resolves\r\n> **when** I run `gh pr create`\r\n> **then** I should create a pr with the headRef pointing at the `@[push}` return value\r\n> \r\n> **Given** the `branch.<branchName>.pushremote` key is set on my current branch\r\n> **when** I run `gh pr create`\r\n> **then** I should create a pr with the headRef pointing at the remote value in the `branch.<branchName>.pushremote` key and the current branch name\r\n> \r\n> **Given** the `remote.pushDefault` key is set on my current repo\r\n> **when** I run `gh pr create`\r\n> **then** I should create a pr with the headRef pointing at the remote value in the `remote.pushDefault` key and the current branch name\r\n> \r\n> **Given** `git rev-parse --abbrev-ref @{push}` resolves\r\n> **and/or given** the `branch.<branchName>.pushremote` key is set on my current branch\r\n> **and/or given** the `remote.pushDefault` key is set on my current repo\r\n> **when** I run `gh pr create`\r\n> **then** I should create a pr with the headRef pointing at the given values in the following priority order: `@[push}` -> `branch.<branchName>.pushremote` -> `remote.pushDefault`\r\n\r\n\r\n### Acceptance Tests\r\n\r\n```\r\n--- PASS: TestPullRequests (0.01s)\r\n    --- PASS: TestPullRequests/pr-create-basic (8.67s)\r\n    --- PASS: TestPullRequests/pr-checkout-by-number (8.80s)\r\n    --- PASS: TestPullRequests/pr-create-from-manual-merge-base (8.90s)\r\n    --- PASS: TestPullRequests/pr-checkout (8.93s)\r\n    --- PASS: TestPullRequests/pr-comment (9.26s)\r\n    --- PASS: TestPullRequests/pr-create-with-metadata (9.66s)\r\n    --- PASS: TestPullRequests/pr-view-same-org-fork (11.64s)\r\n    --- PASS: TestPullRequests/pr-create-from-issue-develop-base (11.97s)\r\n    --- PASS: TestPullRequests/pr-view-outside-repo (6.51s)\r\n    --- PASS: TestPullRequests/pr-create-respects-remote-colon-branch-syntax (15.72s)\r\n    --- PASS: TestPullRequests/pr-list (7.05s)\r\n    --- PASS: TestPullRequests/pr-view-status-respects-remote-pushdefault (17.42s)\r\n    --- PASS: TestPullRequests/pr-view-status-respects-push-destination (8.35s)\r\n    --- PASS: TestPullRequests/pr-view (6.52s)\r\n    --- PASS: TestPullRequests/pr-merge-rebase-strategy (9.83s)\r\n    --- PASS: TestPullRequests/pr-merge-merge-strategy (9.97s)\r\n    --- PASS: TestPullRequests/pr-checkout-with-url-fr
+exit: 0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/cli/cli/issues/10513/comments?per_page=100&page=1
+[{"url":"https://api.github.com/repos/cli/cli/issues/comments/2704028719","html_url":"https://github.com/cli/cli/pull/10513#issuecomment-2704028719","issue_url":"https://api.github.com/repos/cli/cli/issues/10513","id":2704028719,"node_id":"IC_kwDODKw3uc6hLDQv","user":{"login":"andyfeller","id":2089743,"node_id":"MDQ6VXNlcjIwODk3NDM=","avatar_url":"https://avatars.githubusercontent.com/u/2089743?v=4","gravatar_id":"","url":"https://api.github.com/users/andyfeller","html_url":"https://github.com/andyfeller","followers_url":"https://api.github.com/users/andyfeller/followers","following_url":"https://api.github.com/users/andyfeller/following{/other_user}","gists_url":"https://api.github.com/users/andyfeller/gists{/gist_id}","starred_url":"https://api.github.com/users/andyfeller/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/andyfeller/subscriptions","organizations_url":"https://api.github.com/users/andyfeller/orgs","repos_url":"https://api.github.com/users/andyfeller/repos","events_url":"https://api.github.com/users/andyfeller/events{/privacy}","received_events_url":"https://api.github.com/users/andyfeller/received_events","type":"User","user_view_type":"public","site_admin":true},"created_at":"2025-03-06T14:35:12Z","updated_at":"2025-03-06T14:35:12Z","body":"On it! 🫡 ","author_association":"CONTRIBUTOR","reactions":{"url":"https://api.github.com/repos/cli/cli/issues/comments/2704028719/reactions","total_count":0,"+1":0,"-1":0,"laugh":0,"hooray":0,"confused":0,"heart":0,"rocket":0,"eyes":0},"performed_via_github_app":null,"minimized":null},{"url":"https://api.github.com/repos/cli/cli/issues/comments/2772259135","html_url":"https://github.com/cli/cli/pull/10513#issuecomment-2772259135","issue_url":"https://api.github.com/repos/cli/cli/issues/10513","id":2772259135,"node_id":"IC_kwDODKw3uc6lPVE_","user":{"login":"williammartin","id":1611510,"node_id":"MDQ6VXNlcjE2MTE1MTA=","avatar_url":"https://avatars.githubusercontent.com/u/1611510?v=4","gravatar_id":"","url":"https://api.github.com/users/williammartin","html_url":"https://github.com/williammartin","followers_url":"https://api.github.com/users/williammartin/followers","following_url":"https://api.github.com/users/williammartin/following{/other_user}","gists_url":"https://api.github.com/users/williammartin/gists{/gist_id}","starred_url":"https://api.github.com/users/williammartin/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/williammartin/subscriptions","organizations_url":"https://api.github.com/users/williammartin/orgs","repos_url":"https://api.github.com/users/williammartin/repos","events_url":"https://api.github.com/users/williammartin/events{/privacy}","received_events_url":"https://api.github.com/users/williammartin/received_events","type":"User","user_view_type":"public","site_admin":true},"created_at":"2025-04-02T11:25:48Z","updated_at":"2025-04-02T11:31:08Z","body":"@BagToad could you go through the Acceptance on this branch again?\r\n\r\nI think I've been too deep in the weeds on this one.","author_association":"MEMBER","reactions":{"url":"https://api.github.com/repos/cli/cli/issues/comments/2772259135/reactions","total_count":1,"+1":1,"-1":0,"laugh":0,"hooray":0,"confused":0,"heart":0,"rocket":0,"eyes":0},"performed_via_github_app":null,"minimized":null},{"url":"https://api.github.com/repos/cli/cli/issues/comments/2815354430","html_url":"https://github.com/cli/cli/pull/10513#issuecomment-2815354430","issue_url":"https://api.github.com/repos/cli/cli/issues/10513","id":2815354430,"node_id":"IC_kwDODKw3uc6nzuY-","user":{"login":"gibfahn","id":15943089,"node_id":"MDQ6VXNlcjE1OTQzMDg5","avatar_url":"https://avatars.githubusercontent.com/u/15943089?v=4","gravatar_id":"","url":"https://api.github.com/users/gibfahn","html_url":"https://github.com/gibfahn","followers_url":"https://api.github.com/users/gibfahn/followers","following_url":"https://api.github.com/users/gibfahn/following{/other_user}","gists_url":"https://api.gith
+exit: 0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/cli/cli/pulls/10513/reviews?per_page=100&page=1
+[{"id":2648611960,"node_id":"PRR_kwDODKw3uc6d3px4","user":{"login":"copilot-pull-request-reviewer[bot]","id":175728472,"node_id":"BOT_kgDOCnlnWA","avatar_url":"https://avatars.githubusercontent.com/in/946600?v=4","gravatar_id":"","url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D","html_url":"https://github.com/apps/copilot-pull-request-reviewer","followers_url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/followers","following_url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/following{/other_user}","gists_url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/gists{/gist_id}","starred_url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/subscriptions","organizations_url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/orgs","repos_url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/repos","events_url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/events{/privacy}","received_events_url":"https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/received_events","type":"Bot","user_view_type":"public","site_admin":false},"body":"## PR Overview\n\nThis PR adds support for Git's @{push} revision syntax for determining the head reference when creating pull requests. Key changes include updating the push destination logic in create.go, modifying test stubs in create_test.go to support the new git commands, and updating documentation in finder.go regarding PR reference order.\n\n### Reviewed Changes\n\n| File                                | Description                                                                            |\n| ----------------------------------- | -------------------------------------------------------------------------------------- |\n| pkg/cmd/pr/create/create.go         | Refactored push destination prompting and remote branch determination logic             |\n| pkg/cmd/pr/create/create_test.go    | Updated test stubs to simulate the new @{push} revision syntax command responses          |\n| pkg/cmd/pr/shared/finder.go         | Updated comment to reflect the correct PR ref direction for head and base repositories      |\n\nCopilot reviewed 7 out of 7 changed files in this pull request and generated 1 comment.\n\n<details>\n<summary>Comments suppressed due to low confidence (1)</summary>\n\n**pkg/cmd/pr/create/create_test.go:1678**\n* The removal of Test_tryDetermineTrackingRef may reduce test coverage for tracking reference resolution. Consider adding tests that specifically validate the new behavior for push revision resolution.\n```\nfunc Test_tryDetermineTrackingRef(t *testing.T) {\n```\n</details>\n\n**Tip:** Turn on automatic Copilot reviews for this repository to get quick feedback on every pull request.  [Learn more](https://gh.io/copilot-code-reviews-docs)","state":"COMMENTED","html_url":"https://github.com/cli/cli/pull/10513#pullrequestreview-2648611960","pull_request_url":"https://api.github.com/repos/cli/cli/pulls/10513","author_association":"CONTRIBUTOR","_links":{"html":{"href":"https://github.com/cli/cli/pull/10513#pullrequestreview-2648611960"},"pull_request":{"href":"https://api.github.com/repos/cli/cli/pulls/10513"}},"submitted_at":"2025-02-27T17:51:06Z","commit_id":"4483236d71f92abb6e5217ad8c2e8300709e838b"},{"id":2648648367,"node_id":"PRR_kwDODKw3uc6d3yqv","user":{"login":"BagToad","id":47394200,"node_id":"MDQ6VXNlcjQ3Mzk0MjAw","avatar_url":"https://avatars.githubusercontent.com/u/47394200?u=38155c9aa3b997813620b354b92bae0516cb8b86&v=4","gravatar_id":"","url":"https://api.github.com/users/BagToad","html_url":"https://github.com/BagToad","followers_url":"https://api.github.com/users/BagToad/followers","following_url":"https://api.github.com/users/BagToad/following{/other_user}","gists_url":"h
+exit: 0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/cli/cli/pulls/10513/reviews?per_page=100&page=2
+[{"id":2679190347,"node_id":"PRR_kwDODKw3uc6fsTNL","user":{"login":"BagToad","id":47394200,"node_id":"MDQ6VXNlcjQ3Mzk0MjAw","avatar_url":"https://avatars.githubusercontent.com/u/47394200?u=38155c9aa3b997813620b354b92bae0516cb8b86&v=4","gravatar_id":"","url":"https://api.github.com/users/BagToad","html_url":"https://github.com/BagToad","followers_url":"https://api.github.com/users/BagToad/followers","following_url":"https://api.github.com/users/BagToad/following{/other_user}","gists_url":"https://api.github.com/users/BagToad/gists{/gist_id}","starred_url":"https://api.github.com/users/BagToad/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/BagToad/subscriptions","organizations_url":"https://api.github.com/users/BagToad/orgs","repos_url":"https://api.github.com/users/BagToad/repos","events_url":"https://api.github.com/users/BagToad/events{/privacy}","received_events_url":"https://api.github.com/users/BagToad/received_events","type":"User","user_view_type":"public","site_admin":true},"body":"","state":"COMMENTED","html_url":"https://github.com/cli/cli/pull/10513#pullrequestreview-2679190347","pull_request_url":"https://api.github.com/repos/cli/cli/pulls/10513","author_association":"MEMBER","_links":{"html":{"href":"https://github.com/cli/cli/pull/10513#pullrequestreview-2679190347"},"pull_request":{"href":"https://api.github.com/repos/cli/cli/pulls/10513"}},"submitted_at":"2025-03-12T16:41:27Z","commit_id":"3bc3af1a8d3a76a884a7b3795520c1eea5a7ecf2"},{"id":2679195943,"node_id":"PRR_kwDODKw3uc6fsUkn","user":{"login":"BagToad","id":47394200,"node_id":"MDQ6VXNlcjQ3Mzk0MjAw","avatar_url":"https://avatars.githubusercontent.com/u/47394200?u=38155c9aa3b997813620b354b92bae0516cb8b86&v=4","gravatar_id":"","url":"https://api.github.com/users/BagToad","html_url":"https://github.com/BagToad","followers_url":"https://api.github.com/users/BagToad/followers","following_url":"https://api.github.com/users/BagToad/following{/other_user}","gists_url":"https://api.github.com/users/BagToad/gists{/gist_id}","starred_url":"https://api.github.com/users/BagToad/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/BagToad/subscriptions","organizations_url":"https://api.github.com/users/BagToad/orgs","repos_url":"https://api.github.com/users/BagToad/repos","events_url":"https://api.github.com/users/BagToad/events{/privacy}","received_events_url":"https://api.github.com/users/BagToad/received_events","type":"User","user_view_type":"public","site_admin":true},"body":"","state":"COMMENTED","html_url":"https://github.com/cli/cli/pull/10513#pullrequestreview-2679195943","pull_request_url":"https://api.github.com/repos/cli/cli/pulls/10513","author_association":"MEMBER","_links":{"html":{"href":"https://github.com/cli/cli/pull/10513#pullrequestreview-2679195943"},"pull_request":{"href":"https://api.github.com/repos/cli/cli/pulls/10513"}},"submitted_at":"2025-03-12T16:43:27Z","commit_id":"3bc3af1a8d3a76a884a7b3795520c1eea5a7ecf2"},{"id":2679254184,"node_id":"PRR_kwDODKw3uc6fsiyo","user":{"login":"BagToad","id":47394200,"node_id":"MDQ6VXNlcjQ3Mzk0MjAw","avatar_url":"https://avatars.githubusercontent.com/u/47394200?u=38155c9aa3b997813620b354b92bae0516cb8b86&v=4","gravatar_id":"","url":"https://api.github.com/users/BagToad","html_url":"https://github.com/BagToad","followers_url":"https://api.github.com/users/BagToad/followers","following_url":"https://api.github.com/users/BagToad/following{/other_user}","gists_url":"https://api.github.com/users/BagToad/gists{/gist_id}","starred_url":"https://api.github.com/users/BagToad/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/BagToad/subscriptions","organizations_url":"https://api.github.com/users/BagToad/orgs","repos_url":"https://api.github.com/users/BagToad/repos","events_url":"https://api.github.com/users/BagToad/events{/privacy}","received_events_url":"https://api.github.com/users/BagToad/received_events","type":"User","user_view_type":"public","site
+exit: 0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/cli/cli/pulls/10513/comments?per_page=100&page=1
+[{"url":"https://api.github.com/repos/cli/cli/pulls/comments/1974078574","pull_request_review_id":2648611960,"id":1974078574,"node_id":"PRRC_kwDODKw3uc51qgxu","diff_hunk":"@@ -659,51 +613,81 @@ func NewCreateContext(opts *CreateOptions) (*CreateContext, error) {\n \t\treturn nil, err\n \t}\n \n-\tisPushEnabled := false\n+\tgitClient := opts.GitClient\n+\tif ucc, err := gitClient.UncommittedChangeCount(context.Background()); err == nil && ucc > 0 {\n+\t\tfmt.Fprintf(opts.IO.ErrOut, \"Warning: %s\\n\", text.Pluralize(ucc, \"uncommitted change\"))\n+\t}\n+\n \theadBranch := opts.HeadBranch\n \theadBranchLabel := opts.HeadBranch\n-\tif headBranch == \"\" {\n+\tpromptForPushDestination := true // Whether we will prompt the user for where to push the branch.\n+\tvar headRepo ghrepo.Interface\n+\tvar headRemote *ghContext.Remote\n+\tvar headBranchConfig git.BranchConfig\n+\t// If --head was provided, then we don't ever ask where to push.\n+\tif headBranch != \"\" {\n+\t\tpromptForPushDestination = false\n+\t\t// If the --head provided contains a colon, that means\n+\t\t// this is <remote>:<branch> syntax.\n+\t\tif idx := strings.IndexRune(headBranch, ':'); idx >= 0 {\n+\t\t\theadBranch = headBranch[idx+1:]\n+\t\t}\n+\t\theadBranchConfig, err = gitClient.ReadBranchConfig(context.Background(), headBranch)\n+\t\tif err != nil {\n+\t\t\treturn nil, err\n+\t\t}\n+\t} else {\n+\t\t// If --head is not specified, we'll try to determine the ref\n+\t\t// from the current branch. If we can't, we'll prompt the user later.\n \t\theadBranch, err = opts.Branch()\n \t\tif err != nil {\n \t\t\treturn nil, fmt.Errorf(\"could not determine the current branch: %w\", err)\n \t\t}\n \t\theadBranchLabel = headBranch\n-\t\tisPushEnabled = true\n-\t} else if idx := strings.IndexRune(headBranch, ':'); idx >= 0 {\n-\t\theadBranch = headBranch[idx+1:]\n-\t}\n \n-\tgitClient := opts.GitClient\n-\tif ucc, err := gitClient.UncommittedChangeCount(context.Background()); err == nil && ucc > 0 {\n-\t\tfmt.Fprintf(opts.IO.ErrOut, \"Warning: %s\\n\", text.Pluralize(ucc, \"uncommitted change\"))\n-\t}\n+\t\theadBranchConfig, err = gitClient.ReadBranchConfig(context.Background(), headBranch)\n+\t\tif err != nil {\n+\t\t\treturn nil, err\n+\t\t}\n \n-\tvar headRepo ghrepo.Interface\n-\tvar headRemote *ghContext.Remote\n+\t\t// Suppressing these errors as we have other means of computing the PullRequestRefs when these fail.\n+\t\tparsedPushRevision, _ := opts.GitClient.ParsePushRevision(ctx, headBranch)\n \n-\theadBranchConfig, err := gitClient.ReadBranchConfig(context.Background(), headBranch)\n-\tif err != nil {\n-\t\treturn nil, err\n-\t}\n-\tif isPushEnabled {\n-\t\t// TODO: This doesn't respect the @{push} revision resolution or triagular workflows assembled with\n-\t\t// remote.pushDefault, or branch.<branchName>.pushremote config settings. The finder's ParsePRRefs\n-\t\t// may be able to replace this function entirely.\n-\t\tif trackingRef, found := tryDetermineTrackingRef(gitClient, remotes, headBranch, headBranchConfig); found {\n-\t\t\tisPushEnabled = false\n-\t\t\tif r, err := remotes.FindByName(trackingRef.remoteName); err == nil {\n-\t\t\t\theadRepo = r\n-\t\t\t\theadRemote = r\n-\t\t\t\theadBranchLabel = trackingRef.branchName\n-\t\t\t\tif !ghrepo.IsSame(baseRepo, headRepo) {\n-\t\t\t\t\theadBranchLabel = fmt.Sprintf(\"%s:%s\", headRepo.RepoOwner(), trackingRef.branchName)\n-\t\t\t\t}\n+\t\tremotePushDefault, err := opts.GitClient.RemotePushDefault(ctx)\n+\t\tif err != nil {\n+\t\t\treturn nil, err\n+\t\t}\n+\n+\t\tpushDefault, err := opts.GitClient.PushDefault(ctx)\n+\t\tif err != nil {\n+\t\t\treturn nil, err\n+\t\t}\n+\n+\t\tprRefs, err := shared.ParsePRRefs(headBranch, headBranchConfig, parsedPushRevision, pushDefault, remotePushDefault, baseRepo, remotes)\n+\t\tif err != nil {\n+\t\t\treturn nil, err\n+\t\t}\n+\n+\t\tremoteHeadCurrent := isRemoteHeadCurrent(gitClient, prRefs, remotes)\n+\t\t// If the remote head is up-to-date, and we have the headRef, we 
+exit: 0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/cli/cli/pulls/10513/comments?per_page=100&page=2
+[{"url":"https://api.github.com/repos/cli/cli/pulls/comments/1987869437","pull_request_review_id":2671623240,"id":1987869437,"node_id":"PRRC_kwDODKw3uc52fHr9","diff_hunk":"@@ -429,7 +427,7 @@ func createRun(opts *CreateOptions) error {\n \t\t}\n \n \t\tallowPreview := !state.HasMetadata() && shared.ValidURL(openURL) && !opts.DryRun\n-\t\tallowMetadata := ctx.BaseRepo.ViewerCanTriage()\n+\t\tallowMetadata := ctx.PrRefs.BaseRepo.(*api.Repository).ViewerCanTriage()","path":"pkg/cmd/pr/create/create.go","commit_id":"a9dbda69135631511eebfa8173f80e93e726c7b2","original_commit_id":"dde7e24847970df859ca883ba316b4e09d039a71","user":{"login":"andyfeller","id":2089743,"node_id":"MDQ6VXNlcjIwODk3NDM=","avatar_url":"https://avatars.githubusercontent.com/u/2089743?v=4","gravatar_id":"","url":"https://api.github.com/users/andyfeller","html_url":"https://github.com/andyfeller","followers_url":"https://api.github.com/users/andyfeller/followers","following_url":"https://api.github.com/users/andyfeller/following{/other_user}","gists_url":"https://api.github.com/users/andyfeller/gists{/gist_id}","starred_url":"https://api.github.com/users/andyfeller/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/andyfeller/subscriptions","organizations_url":"https://api.github.com/users/andyfeller/orgs","repos_url":"https://api.github.com/users/andyfeller/repos","events_url":"https://api.github.com/users/andyfeller/events{/privacy}","received_events_url":"https://api.github.com/users/andyfeller/received_events","type":"User","user_view_type":"public","site_admin":true},"body":"Sadly, we'll never know.","created_at":"2025-03-10T19:07:01Z","updated_at":"2025-03-10T20:50:05Z","html_url":"https://github.com/cli/cli/pull/10513#discussion_r1987869437","pull_request_url":"https://api.github.com/repos/cli/cli/pulls/10513","_links":{"self":{"href":"https://api.github.com/repos/cli/cli/pulls/comments/1987869437"},"html":{"href":"https://github.com/cli/cli/pull/10513#discussion_r1987869437"},"pull_request":{"href":"https://api.github.com/repos/cli/cli/pulls/10513"}},"reactions":{"url":"https://api.github.com/repos/cli/cli/pulls/comments/1987869437/reactions","total_count":0,"+1":0,"-1":0,"laugh":0,"hooray":0,"confused":0,"heart":0,"rocket":0,"eyes":0},"start_line":null,"original_start_line":null,"start_side":null,"line":null,"original_line":430,"side":"RIGHT","in_reply_to_id":1983739533,"author_association":"CONTRIBUTOR","original_position":63,"position":1,"subject_type":"line"},{"url":"https://api.github.com/repos/cli/cli/pulls/comments/1987872162","pull_request_review_id":2671957368,"id":1987872162,"node_id":"PRRC_kwDODKw3uc52fIWi","diff_hunk":"@@ -659,64 +588,110 @@ func NewCreateContext(opts *CreateOptions) (*CreateContext, error) {\n \t\treturn nil, err\n \t}\n \n-\tisPushEnabled := false\n-\theadBranch := opts.HeadBranch\n-\theadBranchLabel := opts.HeadBranch\n-\tif headBranch == \"\" {\n-\t\theadBranch, err = opts.Branch()\n+\t// Resolve target head branch name from either\n+\t// --head or the current branch.\n+\tvar targetHeadBranch string\n+\tvar targetHeadRepoOwner string\n+\n+\tpromptForHeadRepo := true\n+\n+\tif opts.HeadBranch != \"\" {\n+\t\tpromptForHeadRepo = false\n+\t\ttargetHeadBranch = opts.HeadBranch\n+\t\t// If the --head provided contains a colon, that means\n+\t\t// this is <repo_name>:<branch> syntax.\n+\t\tif idx := strings.IndexRune(opts.HeadBranch, ':'); idx >= 0 {\n+\t\t\ttargetHeadRepoOwner = opts.HeadBranch[:idx]\n+\t\t\ttargetHeadBranch = opts.HeadBranch[idx+1:]\n+\t\t}\n+\t} else {\n+\t\t// Use the current branch as the target local head branch when\n+\t\t// --head is not provided.\n+\t\ttargetHeadBranch, err = opts.Branch()\n \t\tif err != nil {\n \t\t\treturn nil, fmt.Errorf(\"could not determine the current branch: %w\", err)\n \t\t}\n-\t\theadBranchLabel = headBranch\n-\t\tisPushEnabled = true\n-\t} else if idx := strings.IndexRune(headBranch, ':'); idx >= 0 {\n-\t\theadBranch = headBranch[idx+1:]\n \t}\n \n-\t
+exit: 0
+$ bash bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/multipage-pr-gh245
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/multipage-pr-gh245
+
+exit: 0
+$ bash bin/fm-contributions.sh arm
+registered: state/contributions.check.sh
+
+exit: 0
+$ bash /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/multipage-pr-gh245/state/contributions.check.sh
+contribution-wake: check: contributions proof efa7c98554c44e09388ec49c6c2c0bbcf60f3966ed0699a4f3317cdd8a7bc161
+contribution-wake: check: contributions proof 16c01d743dbb133cdb9de104f4ea8e7e4d8fbc0e35fb1aab27315e193108767d
+contribution-wake: check: contributions proof a25987cb69d8ed6a6ae70debb88868ae44af9f2197bfebff7513347d4e69ac30
+contribution-wake: check: contributions proof 4c020fe50e91567c9693ee8b16ef2c1d4d8dd1df3170281734478c67dfa0c1b3
+contribution-wake: check: contributions proof 9de9cd8e35e1a584e26764f20a4ce2dd1548e8c94d75bf4a27d424a49813769e
+contribution-wake: check: contributions proof 3a40a6538f92c5e66d4e362761bcc0b88ad17aedc49d90d3aa83b94623e9aa55
+contribution-wake: check: contributions proof 0b2c8e523aba0b40078b1a6eb3973e5474712bebb88ae8812b51aaef1c02eae6
+contribution-wake: check: contributions proof ce814cc315ffe19cde3d9e986573ada00cdf1e79c8355d17cc57d0f00b779288
+contribution-wake: check: contributions proof d7aad942b033bd4a56a50da0358a7c9ca63740665cbf75037a74ee8f2ad0134b
+contribution-wake: check: contributions proof 0e093343b7a649d102a1a8d81fd48c6e09003e8661b109130900bc3e38ca3943
+contribution-wake: check: contributions proof e426c97c831be44da520ff7e9003372bb9f7a086ebce07f0d746b8d943406c22
+contribution-wake: check: contributions proof 1cb7afcb495a88ee434dab015a182cea2d850b7feeadafa123537ce34126e86d
+contribution-wake: check: contributions proof 04c4c7e0dbce7abea62a53c317453888d512f3182246047148ebfef96751bf4c
+contribution-wake: check: contributions proof 91556aaaca906df3a1dd6e172264d985e0ce33edfc5572b3a2e4741d545ed8eb
+contribution-wake: check: contributions proof aa9dae4ee6751ddf138b9da1137c162cd1570274b184f9f6a67fb54e3dab14ec
+contribution-wake: check: contributions proof c985ad4d1c1206a2f0bc110badd35cd67d42839f7c37e8c772561d30f08978ea
+contribution-wake: check: contributions proof 8258c3b05884cec49833ec0c4a0769b0d90eb9aeb3f9059b15dd799de7c0a7fd
+contribution-wake: check: contributions proof b4ff3082e051792c2be142eea3e0698db58b5ab6ca91e4d58e1a69ae7dd43875
+contribution-wake: check: contributions proof aed7aca8ba192e845e146cebfa976da7dffa7566f6814751fa185c4f5e7ddb7d
+contribution-wake: check: contributions proof 969f6b2bebb16b4ee3d2e12636e5f50ee12631758cc8720287fd076afe15955c
+contribution-wake: check: contributions proof 175ef6409a48f09cc7964c3154b431839289719ec2148cbe25fbefe36f8f3f76
+contribution-wake: check: contributions proof 85c557dc47542e9b27cdcbf4a95b728639d170af873694160b2200917f934491
+contribution-wake: check: contributions proof fc3d6b03fb49a2c95435d579a82d5f09aa64145b75d7337452c49aa0b1736238
+contribution-wake: check: contributions proof c7c3b290f6e586451b8b41479f37528a103fbe9fcc31691fea7435352ffbfad1
+contribution-wake: check: contributions proof c47e2a70906433c9ba5063332c787e42a1a7f29f21f160809f874623dac654a0
+contribution-wake: check: contributions proof bbad4548e10b1ee979a3dcab9814ac8a2b30686bb47198668425e604173e935f
+contribution-wake: check: contributions proof 8bebcbc5747d1db20777fd9131923477647c1cdcba0db2d33a90c0cb71423f19
+contribution-wake: check: contributions proof 3123b367527ba5838b75d0ebe5a2da386c0e62827a050b7f98fc0e5ce073786a
+contribution-wake: check: contributions proof 435a2af112750d3cf67bce5abb56b27b815bcfd84a7d02477933ea66931a1ee1
+contribution-wake: check: contributions proof 188e23cf3a68fa125dc098bc103967001c3c5d7fe0ad2467fc4de72bf294bf51
+contribution-wake: check: contributions proof d58d32d242c095a22a36bc1c2f9e5bb71d1926387796ffa0c19448926cc05a47
+contribution-wake: check: contributions proof 4a9f34a0921944bc7cc6431a5b778076456a6507cc46cb11ff16c1d59d43b82f
+contribution-wake: check: contributions proof 6d737f159634988a459319486502752ea555d8f65a28f2c361bea66c3f20a934
+contribution-wake: check: contributions proof b17fb51afb986f595683350bd2064d1a884d61e23885285695e2aa12668349b6
+contribution-wake: check: contributions proof f3c9387889b213406a77586c8759563c8174c3c60c4884269d2c5f20297e07a9
+contribution-wake: check: contributions proof b6f244f93d2178401264cd1740a5fec3e270203c1a42d929485b3055aa1770c7
+cont
+exit: 0
+$ bash bin/fm-contributions.sh pending
+[
+  {
+    "token": "comment:2772259135:2025-04-02T11:31:08Z:",
+    "type": "comment",
+    "source": "https://github.com/cli/cli/pull/10513#issuecomment-2772259135",
+    "head": null,
+    "author": "williammartin",
+    "body": "@BagToad could you go through the Acceptance on this branch again?\r\n\r\nI think I've been too deep in the weeds on this one.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "comment:2815931488:2025-04-18T17:55:13Z:",
+    "type": "comment",
+    "source": "https://github.com/cli/cli/pull/10513#issuecomment-2815931488",
+    "head": null,
+    "author": "williammartin",
+    "body": "@gibfahn just curious (you may have described this elsewhere), what is your workflow / what are your git settings? Just nice to know which one of the settings we now respect solved this for you.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1989340180:2025-03-11T13:57:54Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1989340180",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "`gh repo set-default` has an `--unset` flag.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1989369116:2025-03-11T14:09:20Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1989369116",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "Sam told me that Mislav discovered this pattern in a blog post once early on and thought it looked good. It's not good, sorry if you ever read this Mislav!",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1991562207:2025-03-12T13:57:20Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1991562207",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "**Non-blocking**\r\n\r\nIf anything, I think the whole struct, constructor (`NewCreateContext`) and `NewIssueState` (which should probably be named something else altogether) should be unexported. None of these really make sense for use outside this package.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1991575221:2025-03-12T16:31:46Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1991575221",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "**Nit**\r\n\r\nI'd like to see us lean on `{}` in all new testscripts and also naming the `REPO`.\r\n\r\n```\r\n# Setup environment variables used for testscript\r\nenv REPO=${SCRIPT_NAME}-${RANDOM_STRING}\r\n```\r\n\r\nMaybe we need to push this up into the Go code, but not now.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1991667697:2025-03-12T16:31:46Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1991667697",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "**Question**\r\n\r\nDo we really need 5 seconds here to avoid flakiness? Real pain if we have to add 5 seconds to every single fork test.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1991710838:2025-03-12T16:31:46Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1991710838",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "**Question**\r\n\r\nAny reason you used two lines here instead of `exec git checkout -b feature-branch upstream/main` which you used above
+exit: 0
+$ bash /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/multipage-pr-gh245/state/contributions.check.sh
+exit: 0
+$ bash bin/fm-contributions.sh ack proof https://github.com/cli/cli/pull/10513 comment:2772259135:2025-04-02T11:31:08Z:
+exit: 0
+$ bash bin/fm-contributions.sh pending
+[
+  {
+    "token": "comment:2815931488:2025-04-18T17:55:13Z:",
+    "type": "comment",
+    "source": "https://github.com/cli/cli/pull/10513#issuecomment-2815931488",
+    "head": null,
+    "author": "williammartin",
+    "body": "@gibfahn just curious (you may have described this elsewhere), what is your workflow / what are your git settings? Just nice to know which one of the settings we now respect solved this for you.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1989340180:2025-03-11T13:57:54Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1989340180",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "`gh repo set-default` has an `--unset` flag.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1989369116:2025-03-11T14:09:20Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1989369116",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "Sam told me that Mislav discovered this pattern in a blog post once early on and thought it looked good. It's not good, sorry if you ever read this Mislav!",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1991562207:2025-03-12T13:57:20Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1991562207",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "**Non-blocking**\r\n\r\nIf anything, I think the whole struct, constructor (`NewCreateContext`) and `NewIssueState` (which should probably be named something else altogether) should be unexported. None of these really make sense for use outside this package.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1991575221:2025-03-12T16:31:46Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1991575221",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "**Nit**\r\n\r\nI'd like to see us lean on `{}` in all new testscripts and also naming the `REPO`.\r\n\r\n```\r\n# Setup environment variables used for testscript\r\nenv REPO=${SCRIPT_NAME}-${RANDOM_STRING}\r\n```\r\n\r\nMaybe we need to push this up into the Go code, but not now.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1991667697:2025-03-12T16:31:46Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1991667697",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "**Question**\r\n\r\nDo we really need 5 seconds here to avoid flakiness? Real pain if we have to add 5 seconds to every single fork test.",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1991710838:2025-03-12T16:31:46Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1991710838",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin",
+    "body": "**Question**\r\n\r\nAny reason you used two lines here instead of `exec git checkout -b feature-branch upstream/main` which you used above? I think they are the same if we use `origin/main`?\r\n\r\nMaybe just being really clear?",
+    "task": "proof",
+    "url": "https://github.com/cli/cli/pull/10513"
+  },
+  {
+    "token": "review-comment:1991843003:2025-03-12T16:31:46Z:",
+    "type": "review-comment",
+    "source": "https://github.com/cli/cli/pull/10513#discussion_r1991843003",
+    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2",
+    "author": "williammartin"
+exit: 0
+SCENARIO RESULT {"name": "multipage-pr-gh245", "result": "pass", "elapsed_seconds": 20.47, "pending_signals": 44, "url": "https://github.com/cli/cli/pull/10513", "head": "a9dbda69135631511eebfa8173f80e93e726c7b2"}
+$ bash bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/missing-pr-gh245
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/missing-pr-gh245
+
+exit: 0
+$ bash bin/fm-contributions.sh arm
+registered: state/contributions.check.sh
+
+exit: 0
+$ bash /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/missing-pr-gh245/state/contributions.check.sh
+contributions: observation unavailable for https://github.com/cli/cli/pull/999999999
+
+exit: 0
+$ bash bin/fm-contributions.sh pending
+[]
+
+exit: 0
+$ bash /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-homes/missing-pr-gh245/state/contributions.check.sh
+exit: 0
+SCENARIO RESULT {"name": "missing-pr-gh245", "result": "pass", "elapsed_seconds": 0.85, "pending_signals": 0, "url": "https://github.com/cli/cli/pull/999999999", "head": null}

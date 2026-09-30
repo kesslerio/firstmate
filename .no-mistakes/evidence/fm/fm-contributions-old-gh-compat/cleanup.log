@@ -1,0 +1,1 @@
+Disposable lab homes, downloaded gh executable, and temporary test selectors removed. The timed-out lifecycle fixture worker tree was stopped with fm_remote_job_stop_worker_tree; its exact owned fixture was cleaned with tests/lib.sh. No targeted test fixture processes remain. Source worktree is clean.

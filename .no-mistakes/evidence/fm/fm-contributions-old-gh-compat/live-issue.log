@@ -1,0 +1,57 @@
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/kunchenguid/firstmate/issues/6168
+{"url":"https://api.github.com/repos/kunchenguid/firstmate/issues/6168","repository_url":"https://api.github.com/repos/kunchenguid/firstmate","labels_url":"https://api.github.com/repos/kunchenguid/firstmate/issues/6168/labels{/name}","comments_url":"https://api.github.com/repos/kunchenguid/firstmate/issues/6168/comments","events_url":"https://api.github.com/repos/kunchenguid/firstmate/issues/6168/events","html_url":"https://github.com/kunchenguid/firstmate/issues/6168","id":5637714313,"node_id":"I_kwDOS4Me3c8AAAABUAixiQ","number":6168,"title":"Herdr presentation spawn fails once the seeded tab is relabeled '1 · <folder>' (prune checks label == 1)","user":{"login":"lucaslim","id":3439106,"node_id":"MDQ6VXNlcjM0MzkxMDY=","avatar_url":"https://avatars.githubusercontent.com/u/3439106?v=4","gravatar_id":"","url":"https://api.github.com/users/lucaslim","html_url":"https://github.com/lucaslim","followers_url":"https://api.github.com/users/lucaslim/followers","following_url":"https://api.github.com/users/lucaslim/following{/other_user}","gists_url":"https://api.github.com/users/lucaslim/gists{/gist_id}","starred_url":"https://api.github.com/users/lucaslim/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/lucaslim/subscriptions","organizations_url":"https://api.github.com/users/lucaslim/orgs","repos_url":"https://api.github.com/users/lucaslim/repos","events_url":"https://api.github.com/users/lucaslim/events{/privacy}","received_events_url":"https://api.github.com/users/lucaslim/received_events","type":"User","user_view_type":"public","site_admin":false},"labels":[{"id":11902410164,"node_id":"LA_kwDOS4Me3c8AAAACxXBdtA","url":"https://api.github.com/repos/kunchenguid/firstmate/labels/ready-for-pr","name":"ready-for-pr","color":"0E8A16","default":false,"description":"Triage: real bug or VISION-aligned feature, open for a PR","archived_at":null,"archived_by":null}],"state":"open","locked":false,"assignees":[],"milestone":null,"comments":1,"created_at":"2026-09-29T22:05:42Z","updated_at":"2026-09-29T22:19:29Z","closed_at":null,"assignee":null,"author_association":"NONE","active_lock_reason":null,"sub_issues_summary":{"total":0,"completed":0,"percent_completed":0},"issue_dependencies_summary":{"blocked_by":0,"total_blocked_by":0,"blocking":0,"total_blocking":0},"body":"Herdr presentation spawns fail with `error: disposable herdr presentation workspace did not converge to exactly one task pane` once Herdr has relabeled the seeded tab. The retry then falls back to a flat tab in the parent workspace.\n\n**Cause**\n\n`fm_backend_herdr_workspace_prune_seeded_default_tab` (`bin/backends/herdr.sh:1885`) prunes the seeded tab only when its label is exactly `1`:\n\n```sh\n[ \"$current_label\" = \"1\" ] || return 0\n```\n\nAbout a second after `workspace create`, Herdr 0.9.1 relabels the seeded tab with its working directory, e.g. `1 · edealer-web-v2`. If the task-tab create and focus checks take longer than that, the prune returns 0 without closi  exit: 0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/kunchenguid/firstmate/issues/6168/comments?per_page=100
+[{"url":"https://api.github.com/repos/kunchenguid/firstmate/issues/comments/5900186728","html_url":"https://github.com/kunchenguid/firstmate/issues/6168#issuecomment-5900186728","issue_url":"https://api.github.com/repos/kunchenguid/firstmate/issues/6168","id":5900186728,"node_id":"IC_kwDOS4Me3c8AAAABX620aA","user":{"login":"kunchenguid","id":3233006,"node_id":"MDQ6VXNlcjMyMzMwMDY=","avatar_url":"https://avatars.githubusercontent.com/u/3233006?v=4","gravatar_id":"","url":"https://api.github.com/users/kunchenguid","html_url":"https://github.com/kunchenguid","followers_url":"https://api.github.com/users/kunchenguid/followers","following_url":"https://api.github.com/users/kunchenguid/following{/other_user}","gists_url":"https://api.github.com/users/kunchenguid/gists{/gist_id}","starred_url":"https://api.github.com/users/kunchenguid/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/kunchenguid/subscriptions","organizations_url":"https://api.github.com/users/kunchenguid/orgs","repos_url":"https://api.github.com/users/kunchenguid/repos","events_url":"https://api.github.com/users/kunchenguid/events{/privacy}","received_events_url":"https://api.github.com/users/kunchenguid/received_events","type":"User","user_view_type":"public","site_admin":false},"created_at":"2026-09-29T22:19:29Z","updated_at":"2026-09-29T22:19:29Z","body":"Speaking as Kun's firstmate: whole thread read (body; no comments). Author lucaslim not blocked. Verified still real on latest main `1f2c9548f468`.\n\n**Evidence on main:** `fm_backend_herdr_workspace_prune_seeded_default_tab` (`bin/backends/herdr.sh` ~1878–1895) already receives the exact `seeded_tab_id` from `workspace create`, then still gates prune on `[ \"$current_label\" = \"1\" ]`. When Herdr 0.9.1 relabels the seeded tab to `1 · <cwd-basename>` before prune runs, the function returns 0 without closing, the shape check sees two tabs, and presentation spawn fails / falls back flat. Comment above the function still documents the label-`\"1\"` re-verify. No open helping PR found.\n\n**VISION.md (each rule):**\n- **One captain, one interface:** Aligns — silent fall-back to a flat parent tab hides the intended per-task workspace.\n- **Authority is explicit and never inferred:** Aligns — prune must key the exact seeded id already captured, not infer from a display label Herdr may rewrite.\n- **Scripts own the mechanics, agents own the judgment:** Aligns — label/id prune is exact script mechanics.\n- **A restart is a non-event:** Aligns — failed converge leaves presentation journal quarantined across retries.\n- **Delegation with a spine:** Aligns — presentation spawn is an existing ship/scout path; restore reliability.\n- **The fleet outlives any vendor:** Aligns — adapter must tolerate Herdr's cwd-derived label rewrite (already documented elsewhere as display behavior).\n- **Scope:** Aligns — herdr backend prune path only; no new task shape.\n\n**contract-class:** restore — concrete existing default herdr-p  exit: 0
+$ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-gh245/gh_2.45.0_macOS_arm64/bin/gh api repos/kunchenguid/firstmate/issues/6168/events?per_page=100
+[{"id":32118670474,"node_id":"LE_lADOS4Me3c8AAAABUAixic8AAAAHemwEig","url":"https://api.github.com/repos/kunchenguid/firstmate/issues/events/32118670474","actor":{"login":"kunchenguid","id":3233006,"node_id":"MDQ6VXNlcjMyMzMwMDY=","avatar_url":"https://avatars.githubusercontent.com/u/3233006?v=4","gravatar_id":"","url":"https://api.github.com/users/kunchenguid","html_url":"https://github.com/kunchenguid","followers_url":"https://api.github.com/users/kunchenguid/followers","following_url":"https://api.github.com/users/kunchenguid/following{/other_user}","gists_url":"https://api.github.com/users/kunchenguid/gists{/gist_id}","starred_url":"https://api.github.com/users/kunchenguid/starred{/owner}{/repo}","subscriptions_url":"https://api.github.com/users/kunchenguid/subscriptions","organizations_url":"https://api.github.com/users/kunchenguid/orgs","repos_url":"https://api.github.com/users/kunchenguid/repos","events_url":"https://api.github.com/users/kunchenguid/events{/privacy}","received_events_url":"https://api.github.com/users/kunchenguid/received_events","type":"User","user_view_type":"public","site_admin":false},"event":"labeled","commit_id":null,"commit_url":null,"created_at":"2026-09-29T22:19:27Z","label":{"name":"ready-for-pr","color":"0E8A16"},"intent":null,"performed_via_github_app":null}]  exit: 0
+$ bash bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-issue
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-issue
+  exit: 0
+$ bash bin/fm-contributions.sh arm
+registered: state/contributions.check.sh
+  exit: 0
+$ bash /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-issue/state/contributions.check.sh
+contribution-wake: check: contributions issue-proof f772d24a58072213b9c179eb81d1a9f1602ddbeecf10a2f7e895b92ab2cf95d0
+contribution-wake: check: contributions issue-proof 6e466bc81090fc45e9da66a108366da08bdf7f6a1962ffcbc4414acfd741cfcb
+  exit: 0
+$ bash bin/fm-contributions.sh pending
+[
+  {
+    "token": "comment:5900186728:2026-09-29T22:19:29Z",
+    "type": "comment",
+    "source": "https://github.com/kunchenguid/firstmate/issues/6168#issuecomment-5900186728",
+    "head": null,
+    "author": "kunchenguid",
+    "body": "Speaking as Kun's firstmate: whole thread read (body; no comments). Author lucaslim not blocked. Verified still real on latest main `1f2c9548f468`.\n\n**Evidence on main:** `fm_backend_herdr_workspace_prune_seeded_default_tab` (`bin/backends/herdr.sh` ~1878–1895) already receives the exact `seeded_tab_id` from `workspace create`, then still gates prune on `[ \"$current_label\" = \"1\" ]`. When Herdr 0.9.1 relabels the seeded tab to `1 · <cwd-basename>` before prune runs, the function returns 0 without",
+    "task": "issue-proof",
+    "url": "https://github.com/kunchenguid/firstmate/issues/6168"
+  },
+  {
+    "token": "ready-for-pr:32118670474",
+    "type": "ready-for-pr",
+    "source": "https://github.com/kunchenguid/firstmate/issues/6168",
+    "head": null,
+    "body": "filed issue reached ready-for-pr",
+    "task": "issue-proof",
+    "url": "https://github.com/kunchenguid/firstmate/issues/6168"
+  }
+]
+  exit: 0
+$ bash /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3QWKSRJRB00RM226TH7K477/.no-mistakes/test-phase-live-issue/state/contributions.check.sh
+  exit: 0
+$ bash bin/fm-contributions.sh ack issue-proof https://github.com/kunchenguid/firstmate/issues/6168 comment:5900186728:2026-09-29T22:19:29Z
+  exit: 0
+$ bash bin/fm-contributions.sh pending
+[
+  {
+    "token": "ready-for-pr:32118670474",
+    "type": "ready-for-pr",
+    "source": "https://github.com/kunchenguid/firstmate/issues/6168",
+    "head": null,
+    "body": "filed issue reached ready-for-pr",
+    "task": "issue-proof",
+    "url": "https://github.com/kunchenguid/firstmate/issues/6168"
+  }
+]
+  exit: 0
+SCENARIO RESULT: maintainer comment and ready-for-pr event persist once; exact ack preserves the other signal

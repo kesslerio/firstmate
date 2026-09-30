@@ -1,0 +1,17 @@
+{
+  "schema": "fm-contributions.v1",
+  "task": "proof",
+  "records": [
+    {
+      "url": "https://github.com/cli/cli/pull/999999999",
+      "kind": "pr",
+      "checked_at": "2026-09-30T00:59:14Z",
+      "observation": null,
+      "verdict": null,
+      "seen": [],
+      "pending": [],
+      "notified": [],
+      "error": "forge observation unavailable or changed during read"
+    }
+  ]
+}

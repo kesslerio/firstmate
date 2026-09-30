@@ -1,0 +1,9 @@
+{
+  "result": "pass",
+  "url": "https://github.com/kunchenguid/firstmate/issues/6168",
+  "expected_tokens": [
+    "comment:5900186728:2026-09-29T22:19:29Z",
+    "ready-for-pr:32118670474"
+  ],
+  "pending_signals": 2
+}
