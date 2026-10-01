@@ -1,0 +1,33 @@
+### watcher run 1 (first poll: the new status log surfaces as a signal):
+signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab.J04K2r/state/orca-task.status
+### watcher run 2 (pane and log unchanged -> the pane-stale path owns this poll):
+stale: term-lab-orca-1
+
+--- wake rows the watcher itself wrote (tab shown as <TAB>):
+1790846128<TAB>1<TAB>signal<TAB>orca-task.status<TAB>signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab.J04K2r/state/orca-task.status
+1790846128<TAB>2<TAB>signal<TAB>orca-task.status<TAB>signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab.J04K2r/state/orca-task.status
+1790846134<TAB>3<TAB>stale<TAB>term-lab-orca-1<TAB>stale: term-lab-orca-1
+--- keys the watcher queued, by kind:
+signal	key=orca-task.status
+stale	key=term-lab-orca-1
+
+--- bin/fm-branch-dispatch.mjs scope on the watcher-written queue:
+status=safe
+corrupted=0
+rows=1 2 3
+tasks=orca-task
+unscoped=0
+--- bin/fm-branch-dispatch.mjs offer for the watcher's own reason line:
+eligible=1
+status=safe
+corrupted=0
+rows=1 2 3
+tasks=orca-task
+unscoped=0
+
+--- pre-fix dispatch entry (base commit 549e07f) on the same watcher-written queue:
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0

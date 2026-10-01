@@ -1,0 +1,18 @@
+### S8: one Orca record; stale rows keyed by BOTH its window alias and its terminal handle
+status=safe
+corrupted=0
+rows=1 2
+tasks=orca-task
+unscoped=0
+### S9 adversarial: an Orca record with a terminal= line but no project= (fail closed)
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+### S10 adversarial: a meta line whose key merely starts with 'terminal' must not be read as a handle
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0

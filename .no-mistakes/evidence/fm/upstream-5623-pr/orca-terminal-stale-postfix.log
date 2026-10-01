@@ -1,0 +1,115 @@
+### lab home: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab.J04K2r
+### Orca task record (state/orca-task.meta), as bin/fm-spawn.sh writes one for backend=orca:
+project=/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab.J04K2r/projects/approved
+terminal=term-lab-orca-1
+window=fm-orca-task
+backend=orca
+harness=claude
+kind=ship
+endpoint_task_id=orca-task
+
+====================================================================
+### S1 routine scan: a terminal-keyed Orca stale row queued with a routine row
+--- wake queue as the product's own writer serialized it:
+1790845608<TAB>1<TAB>stale<TAB>term-lab-orca-1<TAB>stale: term-lab-orca-1 (idle pane; the Orca terminal handle names this row)
+1790845608<TAB>2<TAB>signal<TAB>orca-task.status<TAB>signal: orca-task.status
+--- bin/fm-branch-dispatch.mjs scope
+status=safe
+corrupted=0
+rows=1 2
+tasks=orca-task
+unscoped=0
+exit=0
+
+====================================================================
+### S2 supervision-host offer for the stale:<terminal> close (the branch/main decision)
+eligible=1
+status=safe
+corrupted=0
+rows=1 2
+tasks=orca-task
+unscoped=0
+exit=0
+
+====================================================================
+### S3 heartbeat scan over the same two rows
+status=safe
+corrupted=0
+rows=1 2
+tasks=orca-task
+unscoped=1
+exit=0
+
+====================================================================
+### S4 adversarial: stale row keyed by a terminal no task record names
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+exit=0
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+exit=0
+
+====================================================================
+### S5 adversarial: the Orca task has an OPEN needs-decision
+--- attended scan:
+status=safe
+corrupted=0
+rows=2
+tasks=window-task
+unscoped=0
+exit=0
+--- attended offer for that stale close:
+eligible=0
+status=safe
+corrupted=0
+rows=2
+tasks=window-task
+unscoped=0
+exit=0
+--- away-posture scan (--afk):
+status=safe
+corrupted=0
+rows=1 2
+tasks=orca-task window-task
+unscoped=0
+exit=0
+
+====================================================================
+### S6 regression: a window-keyed (tmux) stale row still resolves next to the Orca row
+status=safe
+corrupted=0
+rows=1 2
+tasks=window-task orca-task
+unscoped=0
+exit=0
+
+====================================================================
+### S7 the branch actor actually drains the terminal-keyed row
+--- scan the branch claims from:
+status=safe
+corrupted=0
+rows=1 2
+tasks=orca-task
+unscoped=0
+publish exit=0
+--- state/.branch-eligible-rows:
+1
+2
+--- queue before the branch drain:
+1790845614<TAB>1<TAB>signal<TAB>orca-task.status<TAB>signal: orca-task.status
+1790845615<TAB>2<TAB>stale<TAB>term-lab-orca-1<TAB>stale: term-lab-orca-1 (idle pane)
+--- branch-actor drain:
+1790845614	1	signal	orca-task.status	signal: orca-task.status
+1790845615	2	stale	term-lab-orca-1	stale: term-lab-orca-1 (idle pane)
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 86191.1790845614.m6p2qD
+wake annotation: latest wake-EVENT observed at drain, not current state: orca-task.status: working: lab scenario step
+--- queue after the branch drain:
+1790845614<TAB>1<TAB>signal<TAB>orca-task.status<TAB>signal: orca-task.status
+1790845615<TAB>2<TAB>stale<TAB>term-lab-orca-1<TAB>stale: term-lab-orca-1 (idle pane)

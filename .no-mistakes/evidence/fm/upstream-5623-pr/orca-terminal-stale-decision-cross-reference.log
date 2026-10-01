@@ -1,0 +1,23 @@
+### S11: an unread decision ROW for the Orca task keeps a terminal-keyed stale trigger for that same task on main
+--- queue:
+1790847738<TAB>1<TAB>signal<TAB>orca-task.status<TAB>needs-decision: pick the release target
+1790847739<TAB>2<TAB>stale<TAB>term-lab-orca-1<TAB>stale: term-lab-orca-1 (idle Orca pane)
+--- attended scan:
+status=safe
+corrupted=0
+rows=2
+tasks=orca-task
+unscoped=0
+--- attended offer for the terminal-keyed stale close (must be main's, eligible=0):
+eligible=0
+status=safe
+corrupted=0
+rows=2
+tasks=orca-task
+unscoped=0
+--- the same two rows, but the decision belongs to ANOTHER task (window-task): the Orca stale row stays branch-owned
+status=safe
+corrupted=0
+rows=2
+tasks=orca-task
+unscoped=0

@@ -1,0 +1,5 @@
+Pi SDK: 0.99.1
+--- POST-FIX (this change): the Pi branch's own verdict on one Orca terminal-keyed stale wake
+  result: {"offerEligible":true,"offerAccepted":true,"offerProjects":["orca-probe"],"branchGrantRows":"","mainGotWake":true}
+--- PRE-FIX (base commit 549e07f), identical fixture and Pi runtime:
+  result: {"offerEligible":false,"offerAccepted":false,"offerProjects":[],"branchGrantRows":"","mainGotWake":true}

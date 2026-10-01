@@ -1,0 +1,17 @@
+--- branch scan of the Orca terminal-keyed wake:
+status=safe
+corrupted=0
+rows=1
+tasks=orca-task
+unscoped=0
+--- (window-task is queued on nothing: the branch may report only the task the terminal key resolved to)
+--- branch report for the Orca task the terminal-keyed row resolved to:
+recorded seq 3 [routine]; it waits in the outcome store for MAIN
+exit=0
+--- branch report for a task the wake never named (must stay refused):
+report refused: the wake being handled (row 1) names orca-task, not window-task; report only that task, never fleet or a task from memory
+exit=3
+--- durable outcome store after the accepted report:
+{"seq":1,"epoch":1790847182,"task":"orca-task","wake":"stale: term-lab-orca-1 (idle Orca pane)","verdict":"routine","summary":"orca pane idle, nothing to do","silent":false,"statusEndpoint":27,"statusIdent":"strong:16777231:194276126:1790846125.620316021"}
+{"seq":2,"epoch":1790847267,"task":"orca-task","wake":"stale: term-lab-orca-1 (idle Orca pane)","verdict":"routine","summary":"orca pane idle, nothing to do","silent":false,"statusEndpoint":27,"statusIdent":"strong:16777231:194276126:1790846125.620316021"}
+{"seq":3,"epoch":1790847439,"task":"orca-task","wake":"stale: term-lab-orca-1 (idle Orca pane)","verdict":"routine","summary":"orca pane idle, nothing to do","silent":false,"statusEndpoint":27,"statusIdent":"strong:16777231:194276126:1790846125.620316021"}
