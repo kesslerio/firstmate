@@ -1,0 +1,158 @@
+# manual live drive: fm-send remote steer delivery reporting
+# worktree: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3V39ASW08C7S0FGR7BDVWKD
+
+S1 exit=0 sent_lines=1 error_lines=0 records=1
+== Scenario 1: operator sends a remote steer (delivered) ==
+-- fm-send exit status: 0
+-- fm-send transcript (stderr as the operator sees it):
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-sent.S9IUWw
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+notice: steer durably recorded at /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-sent.S9IUWw/rhome/state/parent-route/rsm.inbox/001.msg for recovery; doorbell not typed because the agent in fm-remote:p1 has exited
+sent: steer to remote secondmate rsm durably recorded in its steering inbox - delivery is complete, do not resend
+-- remote steering inbox records (far-side durable state):
+record: /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-sent.S9IUWw/rhome/state/parent-route/rsm.inbox/001.msg
+-- parent pending-reply records:
+record: /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-sent.S9IUWw/state/pending-replies/0efdd374a29c659b
+    schema=fm-pending-reply.v1
+    corr_id=0efdd374a29c659b
+    task_id=rsm
+    parent_home=/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-sent.S9IUWw
+    parent_status=/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-sent.S9IUWw/state/rsm.status
+    parent_status_scan_signature=
+    request_summary=please rename the metric
+    created_epoch=1790839665
+    phase=awaiting_report
+    turn_seen_busy=0
+    request_turn_completed_epoch=
+    recovery_attempted_epoch=
+    recovery_sender_pid=
+    recovery_sender_identity=
+    recovery_sent_epoch=
+    recovery_delivery_outcome=
+    recovery_turn_seen_busy=0
+    recovery_turn_completed_epoch=
+    escalated_epoch=
+    resolved_epoch=
+    resolved_via=
+    wrong_home_hits=0
+    wrong_home_first_sighting=
+    wrong_home_sightings=
+    wrong_home_scan_signature=
+    grace_secs=120
+    delivered_epoch=1790839666
+
+S2 exit=0 sent_lines=1 advisory_lines=1 error_lines=0
+== Scenario 2: delivered steer with lost reply bookkeeping reports a delivered-advisory ==
+-- fm-send exit status: 0
+-- fm-send transcript (stderr as the operator sees it):
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-adv.LT8wmL
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+notice: steer durably recorded at /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-adv.LT8wmL/rhome/state/parent-route/rsm.inbox/001.msg for recovery; doorbell not typed because the agent in fm-remote:p1 has exited
+sent: steer to remote secondmate rsm durably recorded in its steering inbox - delivery is complete, do not resend
+advisory (steer delivered): reply-tracking-degraded - the steer is durably recorded in the remote inbox, but its pending-reply delivery commit and recovery marker both failed, so the reply expectation for this request may not reconcile on its own; inspect /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-adv.LT8wmL/state; do not resend.
+-- remote steering inbox records (far-side durable state):
+record: /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-adv.LT8wmL/rhome/state/parent-route/rsm.inbox/001.msg
+-- parent pending-reply records:
+record: /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-adv.LT8wmL/state/pending-replies/d5a254eb33759a4a
+    schema=fm-pending-reply.v1
+    corr_id=d5a254eb33759a4a
+    task_id=rsm
+    parent_home=/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-adv.LT8wmL
+    parent_status=/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-adv.LT8wmL/state/rsm.status
+    parent_status_scan_signature=
+    request_summary=please rename the metric
+    created_epoch=1790839667
+    delivered_epoch=
+    phase=awaiting_report
+    turn_seen_busy=0
+    request_turn_completed_epoch=
+    recovery_attempted_epoch=
+    recovery_sender_pid=
+    recovery_sender_identity=
+    recovery_sent_epoch=
+    recovery_delivery_outcome=
+    recovery_turn_seen_busy=0
+    recovery_turn_completed_epoch=
+    escalated_epoch=
+    resolved_epoch=
+    resolved_via=
+    wrong_home_hits=0
+    wrong_home_first_sighting=
+    wrong_home_sightings=
+    wrong_home_scan_signature=
+    grace_secs=120
+
+S3 exit=1 sent_lines=0 error_lines=2 records=0
+== Scenario 3 (adversarial): a genuinely refused remote steer reports failure ==
+-- fm-send exit status: 1
+-- fm-send transcript (stderr as the operator sees it):
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-refuse.3gyze7
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: remote secondmate rsm endpoint metadata is invalid; refusing access until it is explicitly migrated
+error: steer not sent to remote secondmate rsm (the remote steering-inbox record could not be written; the remote leg's stderr above has the reason)
+-- remote steering inbox records (far-side durable state):
+-- parent pending-reply records:
+
+S4 exit=1 sent_lines=0 attempts=2 records=0
+== Scenario 4 (adversarial): lost transport reports unconfirmed, never delivered-do-not-resend ==
+-- fm-send exit status: 1
+-- fm-send transcript (stderr as the operator sees it):
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-lost.HSgaS0
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: steer to remote secondmate rsm is unconfirmed (transport lost twice; remote completion unknown). Only the correlation-reusing resend below is idempotent and lands on the same remote inbox record:
+FM_HOME=/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-lost.HSgaS0 FM_PENDING_REPLY_EXISTING_CORR=9339a7600d03f1bf /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M3V39ASW08C7S0FGR7BDVWKD/bin/fm-send.sh rsm please\ rename\ the\ metric
+-- remote steering inbox records (far-side durable state):
+-- parent pending-reply records:
+record: /private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-lost.HSgaS0/state/pending-replies/9339a7600d03f1bf
+    schema=fm-pending-reply.v1
+    corr_id=9339a7600d03f1bf
+    task_id=rsm
+    parent_home=/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-lost.HSgaS0
+    parent_status=/private/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-rsm-drive.AYkSG6/lab-lost.HSgaS0/state/rsm.status
+    parent_status_scan_signature=
+    request_summary=please rename the metric
+    created_epoch=1790839672
+    delivered_epoch=
+    turn_seen_busy=0
+    request_turn_completed_epoch=
+    recovery_attempted_epoch=
+    recovery_sender_pid=
+    recovery_sender_identity=
+    recovery_sent_epoch=
+    recovery_delivery_outcome=
+    recovery_turn_seen_busy=0
+    recovery_turn_completed_epoch=
+    escalated_epoch=
+    resolved_epoch=
+    resolved_via=
+    wrong_home_hits=0
+    wrong_home_first_sighting=
+    wrong_home_sightings=
+    wrong_home_scan_signature=
+    grace_secs=120
+    phase=delivery_unknown
+
