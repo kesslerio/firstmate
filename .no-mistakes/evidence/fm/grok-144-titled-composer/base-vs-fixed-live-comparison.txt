@@ -1,0 +1,12 @@
+# base-commit vs branch: the SAME live panes, read through the same real adapter
+# bin/fm-composer-lib.sh swapped to 589ccec (pre-fix) and back, no pane was redrawn
+
+live grok 1.0.46 idle pane (title: 'Grok 4.7 (high) · always-approve'):
+  pre-fix  fm_tmux_composer_state -> pending-unproven
+  branch   fm_tmux_composer_state -> empty
+fixture pane, equal-width approval title (t_ok):
+  pre-fix  -> unknown   (the reported failure: approval missed, pane unreadable)
+  branch   -> empty
+fixture pane, Grok 1.0.5 3-column overhang, typed title (t_105):
+  pre-fix  -> empty
+  branch   -> empty   (1.0.5 tolerance preserved)

@@ -1,0 +1,28 @@
+# live verdicts - real tmux adapter (bin/fm-tmux-lib.sh) on a private lab socket
+# grok grok 1.0.46 (2765805b9442) [stable], pane launched as `grok --always-approve`
+
+WINDOW               VERDICT   INJECTION_GUARD
+grok-idle            empty     injectable
+blankshell           unknown   defers
+t_ok                 empty     injectable
+t_low                empty     injectable
+t_105                empty     injectable
+t_overh              unknown   defers
+t_badw               unknown   defers
+t_bad                unknown   defers
+t_trail              unknown   defers
+t_other              unknown   defers
+t_effort             unknown   defers
+t_dot                unknown   defers
+t_dot2               unknown   defers
+
+# cursorless re-read of the real idle pane (herdr/zellij profile, then cmux/orca profile)
+herdr_profile=empty
+cmux_orca_profile=empty
+
+# adversarial: real draft typed into the live approval-titled composer
+grok-typed verdict=pending guard=defers
+  ╭────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  │ ❯ deploy the fix                                                                                       │
+  ╰───────────────────────────────────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+  Enter:send  │  Opt+Enter:newline  │  Shift+Tab:mode  │  Ctrl+x:shortcuts

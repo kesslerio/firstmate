@@ -1,0 +1,77 @@
+<!doctype html><meta charset="utf-8">
+<title>Live Grok approval-titled composer: real panes, real adapters</title>
+<style>body{background:#0b0f14;color:#d7e0ea;font:14px/1.5 ui-monospace,Menlo,monospace;margin:26px;max-width:1150px}
+pre{background:#0f151c;border:1px solid #223040;padding:12px;overflow-x:auto}
+h1{font-size:19px}h2{font-size:15px;color:#8fd0a8;margin-top:26px}
+.note{color:#9fb0c2}.ok{color:#8fd0a8}.bad{color:#e59a9a}</style>
+<h1>Real Grok 1.0.46 pane, launched <code>grok --always-approve</code>, read by the real Firstmate tmux adapter</h1>
+<p class="note">Captured with <code>tmux capture-pane -p</code> from a disposable lab home on a private
+<code>tmux -L fm-lab2</code> socket. The composer's bottom border carries
+<code>Grok 4.7 (high) · always-approve</code> at exactly the top-border width.</p>
+<h2>Idle pane: approval shown, composer body empty</h2><pre>   ╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯
+   Tip: Use @ to attach files like @src/main.rs.
+  ╭────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                                                      │
+  ╰───────────────────────────────────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+                                                                                                    [stable]</pre>
+<p><span class="ok">branch: empty - injection guard allows the steer</span> ·
+<span class="bad">pre-fix (589ccec) lib, same pane: pending-unproven/unknown - the approval is missed</span></p>
+<h2>Adversarial: real draft typed into that composer</h2><pre>  detached worktree ~/.n/w/8036f35f7c08/01M3VG2XT06ZJK831A1ZYK8CV6                 1.8K / 256K │ [Dashboard]
+  ╭────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  │ ❯ deploy the fix                                                                                       │
+  ╰───────────────────────────────────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+  Enter:send  │  Opt+Enter:newline  │  Shift+Tab:mode  │  Ctrl+x:shortcuts</pre>
+<p class="note">branch: <code>pending</code>, guard defers - the new acceptance never swallows a real draft.</p>
+<h2>Live verdicts through bin/fm-tmux-lib.sh (adversarial title/width fixtures, strict blank row, cursorless profiles)</h2><pre># live verdicts - real tmux adapter (bin/fm-tmux-lib.sh) on a private lab socket
+# grok grok 1.0.46 (2765805b9442) [stable], pane launched as `grok --always-approve`
+WINDOW               VERDICT   INJECTION_GUARD
+grok-idle            empty     injectable
+blankshell           unknown   defers
+t_ok                 empty     injectable
+t_low                empty     injectable
+t_105                empty     injectable
+t_overh              unknown   defers
+t_badw               unknown   defers
+t_bad                unknown   defers
+t_trail              unknown   defers
+t_other              unknown   defers
+t_effort             unknown   defers
+t_dot                unknown   defers
+t_dot2               unknown   defers
+# cursorless re-read of the real idle pane (herdr/zellij profile, then cmux/orca profile)
+herdr_profile=empty
+cmux_orca_profile=empty
+# adversarial: real draft typed into the live approval-titled composer
+grok-typed verdict=pending guard=defers
+  ╭────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  │ ❯ deploy the fix                                                                                       │
+  ╰───────────────────────────────────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+  Enter:send  │  Opt+Enter:newline  │  Shift+Tab:mode  │  Ctrl+x:shortcuts</pre>
+<h2>Same shape through the real Herdr adapter (named fm-lab-* session)</h2><pre>Live Herdr-adapter run (disposable lab session, grok 1.0.46, 2026-10-01 UTC)
+Lab session: fm-lab-grokappr-79719-22278  (bin/fm-herdr-lab.sh name/prepare/provision)
+Workspace:   w1 (label grokappr, --no-focus, cwd = gate worktree)
+Pane:        w1:p1, launched with `herdr ... pane run w1:p1 &quot;grok --always-approve&quot;`
+Idle pane, last rows of `herdr --session &lt;lab&gt; pane read w1:p1 --source visible`:
+  ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                                                               │
+  ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+Verdict through the real herdr adapter (bin/backends/herdr.sh, fm_backend_herdr_composer_state &quot;&lt;lab&gt;:w1:p1&quot;):
+  fixed tree (this branch)          herdr_adapter_fixed=empty
+  base commit 589ccec lib swap-in   herdr_adapter_base=unknown
+Adversarial on the same live pane:
+  `pane send-text w1:p1 &quot;deploy the fix&quot;`   -&gt; herdr_adapter_fixed=pending
+  (composer shows &quot;│ ❯ deploy the fix …&quot;)
+  clear the draft (Backspace x N)           -&gt; herdr_adapter_fixed=empty
+Teardown: `fm-herdr-lab.sh stop` then `teardown` both exit 0; session list afterwards
+reports only the default session, stopped (its pre-run state).</pre>
+<h2>Pre-fix vs branch on the identical panes</h2><pre># base-commit vs branch: the SAME live panes, read through the same real adapter
+# bin/fm-composer-lib.sh swapped to 589ccec (pre-fix) and back, no pane was redrawn
+live grok 1.0.46 idle pane (title: &#x27;Grok 4.7 (high) · always-approve&#x27;):
+  pre-fix  fm_tmux_composer_state -&gt; pending-unproven
+  branch   fm_tmux_composer_state -&gt; empty
+fixture pane, equal-width approval title (t_ok):
+  pre-fix  -&gt; unknown   (the reported failure: approval missed, pane unreadable)
+  branch   -&gt; empty
+fixture pane, Grok 1.0.5 3-column overhang, typed title (t_105):
+  pre-fix  -&gt; empty
+  branch   -&gt; empty   (1.0.5 tolerance preserved)</pre>

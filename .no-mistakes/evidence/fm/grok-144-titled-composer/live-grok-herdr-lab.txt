@@ -1,0 +1,24 @@
+Live Herdr-adapter run (disposable lab session, grok 1.0.46, 2026-10-01 UTC)
+
+Lab session: fm-lab-grokappr-79719-22278  (bin/fm-herdr-lab.sh name/prepare/provision)
+Workspace:   w1 (label grokappr, --no-focus, cwd = gate worktree)
+Pane:        w1:p1, launched with `herdr ... pane run w1:p1 "grok --always-approve"`
+
+Idle pane, last rows of `herdr --session <lab> pane read w1:p1 --source visible`:
+
+  ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                                                               │
+  ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+
+Verdict through the real herdr adapter (bin/backends/herdr.sh, fm_backend_herdr_composer_state "<lab>:w1:p1"):
+
+  fixed tree (this branch)          herdr_adapter_fixed=empty
+  base commit 589ccec lib swap-in   herdr_adapter_base=unknown
+
+Adversarial on the same live pane:
+  `pane send-text w1:p1 "deploy the fix"`   -> herdr_adapter_fixed=pending
+  (composer shows "│ ❯ deploy the fix …")
+  clear the draft (Backspace x N)           -> herdr_adapter_fixed=empty
+
+Teardown: `fm-herdr-lab.sh stop` then `teardown` both exit 0; session list afterwards
+reports only the default session, stopped (its pre-run state).
