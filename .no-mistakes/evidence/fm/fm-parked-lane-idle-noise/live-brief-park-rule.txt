@@ -1,0 +1,13 @@
+scaffolded: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-brief-drive.ataUWV/data/briefdrive/brief.md (ship, mode=no-mistakes; replace {TASK} and {FIRSTMATE_SPEC})
+--- park rule in the emitted brief:
+44-   Name what you are waiting for and what will let you resume; do not repeat the declaration on every poll.
+45-   Do not declare active implementation or reasoning as a wait.
+46-   Firstmate may still raise one first-sight alert; the declared wait then uses the existing long recheck cadence instead of repeated possible-wedge alarms.
+47-   When you know when the wait clears, include `until <YYYY-MM-DDTHH:MMZ>` (UTC) for a recheck at that time.
+48-   Follow the resolution rule below when the wait clears, then resume the task.
+49-   Use `blocked:` when you are stuck and need help.
+50:   Whenever you park, make `paused:`, `blocked:`, or `needs-decision:` your newest status line rather than a `working:` line that only mentions holding.
+51-
+52-5. If you hit the same obstacle twice, append `blocked [at=<epoch>]: {why}` and stop; firstmate will help.
+--- with a configured pause verb:
+50:   Whenever you park, make `awaiting:`, `blocked:`, or `needs-decision:` your newest status line rather than a `working:` line that only mentions holding.

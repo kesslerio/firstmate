@@ -1,0 +1,44 @@
+
+ ▀▀█  v0.99.1
+ █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  fm-branch-supervision.ts, fm-calm.ts
+
+
+ What did the supervision branch handle?
+
+
+ Three routine outcomes, none captain-facing.
+
+ Warning: Could not restore model anthropic/claude-sonnet-4-5. Using openai/gpt-5.5
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to ~/.tmux.conf and restart tmux.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T/fm-pi-tui.O4tGtL/project
+↑2 ↓2 0.0%/272k (auto)                                                                                                      gpt-5.5 • medium
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

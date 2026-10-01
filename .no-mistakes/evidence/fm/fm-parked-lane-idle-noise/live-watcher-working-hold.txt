@@ -1,0 +1,85 @@
+=== case: working-hold-fresh
+=== newest status line: working: waiting for CI to go green
+=== watcher outcome: ABSORBED (watcher still supervising)
+=== watcher output:
+=== watcher triage log:
+[2026-10-01T07:11:23-0700] absorbed non-terminal stale timer reset: lab:fm-drive
+[2026-10-01T07:11:25-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 2s): lab:fm-drive
+[2026-10-01T07:11:27-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 2s): lab:fm-drive
+[2026-10-01T07:11:29-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 2s): lab:fm-drive
+[2026-10-01T07:11:31-0700] absorbed non-terminal stale (declared hold explains the quiet, idle 2s): lab:fm-drive
+=== durable wake queue:
+(empty)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+(none)
+
+=== case: working-hold-aged
+=== newest status line: working: waiting for CI to go green
+=== watcher outcome: EXITED (it surfaced a wake)
+=== watcher output:
+stale: lab:fm-drive (idle 2s, waiting 2004s - declared hold, holding per its own newest working: line, rechecked on a long cadence not a wedge; confirm what it is holding for; a holding lane should write paused: or needs-decision:)
+=== watcher triage log:
+[2026-10-01T07:11:35-0700] absorbed non-terminal stale timer reset: lab:fm-drive
+=== durable wake queue:
+1790863897	1	stale	lab:fm-drive	stale: lab:fm-drive (idle 2s, waiting 2004s - declared hold, holding per its own newest working: line, rechecked on a long cadence not a wedge; confirm what it is holding for; a holding lane should write paused: or needs-decision:)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+1790863897
+
+=== case: working-hold-aged-configured
+=== newest status line: working: holding the build for the third PR
+=== watcher outcome: EXITED (it surfaced a wake)
+=== watcher output:
+stale: lab:fm-drive (idle 2s, waiting 2004s - declared hold, holding per its own newest working: line, rechecked on a long cadence not a wedge; confirm what it is holding for; a holding lane should write holding: or needs-decision:)
+=== watcher triage log:
+[2026-10-01T07:11:40-0700] absorbed non-terminal stale timer reset: lab:fm-drive
+=== durable wake queue:
+1790863902	1	stale	lab:fm-drive	stale: lab:fm-drive (idle 2s, waiting 2004s - declared hold, holding per its own newest working: line, rechecked on a long cadence not a wedge; confirm what it is holding for; a holding lane should write holding: or needs-decision:)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+1790863902
+
+=== case: working-prose-control
+=== newest status line: working: investigating why the build is waiting for input
+=== watcher outcome: EXITED (it surfaced a wake)
+=== watcher output:
+stale: lab:fm-drive (idle 3s, possible wedge, escalation 1)
+=== watcher triage log:
+[2026-10-01T07:11:44-0700] absorbed non-terminal stale timer reset: lab:fm-drive
+=== durable wake queue:
+1790863908	1	stale	lab:fm-drive	stale: lab:fm-drive (idle 3s, possible wedge, escalation 1)
+=== wedge escalation count:
+1
+=== wait recheck throttle:
+(none)
+=== case: superseded-hold
+=== newest status line: working: Holding the build for the third PR
+working: third PR landed, building now
+=== watcher outcome: EXITED (it surfaced a wake)
+=== watcher output:
+stale: lab:fm-drive (idle 2s, possible wedge, escalation 1)
+=== watcher triage log:
+[2026-10-01T07:12:29-0700] absorbed non-terminal stale timer reset: lab:fm-drive
+=== durable wake queue:
+1790863952	1	stale	lab:fm-drive	stale: lab:fm-drive (idle 2s, possible wedge, escalation 1)
+=== wedge escalation count:
+1
+=== wait recheck throttle:
+(none)
+
+[adversarial: a paused: wait whose written clearing time already passed must not keep deferring (until=2026-10-01T12:40Z)]
+=== watcher outcome: EXITED (it surfaced a wake)
+=== watcher output:
+stale: lab:fm-drive (idle 2013s, possible wedge, escalation 1)
+=== watcher triage log:
+(none)
+=== durable wake queue:
+1790865673	1	stale	lab:fm-drive	stale: lab:fm-drive (idle 2013s, possible wedge, escalation 1)
+=== wedge escalation count:
+1
+=== wait recheck throttle:
+(none)

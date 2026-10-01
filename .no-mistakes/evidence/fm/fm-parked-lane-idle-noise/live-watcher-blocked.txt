@@ -1,0 +1,57 @@
+=== case: blocked-fresh
+=== newest status line: blocked [key=nm-lab-review]: the lane cannot reach its dependency
+=== watcher outcome: ABSORBED (watcher still supervising)
+=== watcher output:
+=== watcher triage log:
+[2026-10-01T07:10:24-0700] absorbed stale (overridden terminal status) (declared blocker explains the quiet, idle 601s): lab:fm-drive
+=== durable wake queue:
+(empty)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+(none)
+
+=== case: blocked-aged
+=== newest status line: blocked [key=nm-lab-review]: the lane cannot reach its dependency
+=== watcher outcome: EXITED (it surfaced a wake)
+=== watcher output:
+stale: lab:fm-drive (idle 601s, waiting 2002s - declared blocker, awaiting firstmate - its blocker was already reported, rechecked on a long cadence not a wedge; clear the reported blocker and resolve it with fm-send --resolve-key)
+=== watcher triage log:
+(none)
+=== durable wake queue:
+1790863828	1	stale	lab:fm-drive	stale: lab:fm-drive (idle 601s, waiting 2002s - declared blocker, awaiting firstmate - its blocker was already reported, rechecked on a long cadence not a wedge; clear the reported blocker and resolve it with fm-send --resolve-key)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+1790863829
+
+[adversarial, accepted behavior: a blocker raised by a supervisor library (reserved key namespace) still parks the lane under this branch's rule]
+=== case: supervisor-raised-blocker
+=== newest status line: blocked [key=pending-reply-corr42]: waiting on a reply that never arrived
+=== watcher outcome: EXITED (it surfaced a wake)
+=== watcher output:
+stale: lab:fm-drive (idle 2003s, waiting 603s - declared blocker, awaiting firstmate - its blocker was already reported, rechecked on a long cadence not a wedge; clear the reported blocker and resolve it with fm-send --resolve-key)
+=== watcher triage log:
+(none)
+=== durable wake queue:
+1790866816	1	stale	lab:fm-drive	stale: lab:fm-drive (idle 2003s, waiting 603s - declared blocker, awaiting firstmate - its blocker was already reported, rechecked on a long cadence not a wedge; clear the reported blocker and resolve it with fm-send --resolve-key)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+1790866816
+
+[adversarial: a blocker that was already resolved must not keep deferring the wedge timer]
+=== case: resolved-blocker
+=== newest status line: blocked [key=nm-7-run-step]: PR needs review
+resolved [key=nm-7-run-step]: review landed, merging
+=== watcher outcome: EXITED (it surfaced a wake)
+=== watcher output:
+stale: lab:fm-drive (idle 2008s, possible wedge, escalation 1)
+=== watcher triage log:
+(none)
+=== durable wake queue:
+1790865613	1	stale	lab:fm-drive	stale: lab:fm-drive (idle 2008s, possible wedge, escalation 1)
+=== wedge escalation count:
+1
+=== wait recheck throttle:
+(none)

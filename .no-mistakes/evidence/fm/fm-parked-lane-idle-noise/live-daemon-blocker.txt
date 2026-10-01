@@ -1,0 +1,21 @@
+=== away-mode case: blocker
+=== newest status line: blocked: PR needs review
+--- what the away supervisor classifies this quiet pane as:
+    pause|parked lane, rechecked on a long cadence: blocked: PR needs review
+
+--- handle_wake on the lane's quiet (a wedge marker was pending before the park):
+    pause marker to age on: yes
+    possible-wedge marker kept: no
+    escalations raised: 0
+--- housekeeping past the wedge bound:
+    escalations after the bound: 0  (0 = no possible-wedge alarm)
+--- housekeeping past the recheck cadence:
+    escalations now: 1
+      parked 5000s (its own newest status parks it, recheck whether the wait still holds): sess:fm-parked
+    recheck window reset: age 0s
+--- the lane moves on: handle_wake after a newer status line:
+    back on the wedge ladder: yes
+    pause tracking dropped: yes
+--- housekeeping after resume:
+    escalations after resume:
+      stale persisted 500s (possible wedge): sess:fm-parked

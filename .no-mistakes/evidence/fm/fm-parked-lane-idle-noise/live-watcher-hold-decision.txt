@@ -1,0 +1,53 @@
+=== case: working-hold-fresh
+=== newest status line: working: waiting for CI to go green
+=== watcher outcome: ABSORBED (watcher still supervising)
+=== watcher output:
+=== watcher triage log:
+[2026-10-01T07:10:52-0700] absorbed non-terminal stale timer reset: lab:fm-drive
+=== durable wake queue:
+(empty)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+(none)
+
+=== case: working-hold-aged
+=== newest status line: working: waiting for CI to go green
+=== watcher outcome: ABSORBED (watcher still supervising)
+=== watcher output:
+=== watcher triage log:
+[2026-10-01T07:10:57-0700] absorbed non-terminal stale timer reset: lab:fm-drive
+=== durable wake queue:
+(empty)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+(none)
+
+=== case: decision-parked
+=== newest status line: needs-decision [key=release-key]: option A or option B
+=== watcher outcome: ABSORBED (watcher still supervising)
+=== watcher output:
+=== watcher triage log:
+[2026-10-01T07:11:02-0700] absorbed stale (overridden terminal status) (declared decision explains the quiet, idle 603s): lab:fm-drive
+=== durable wake queue:
+(empty)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+(none)
+
+[aged needs-decision: one bounded recheck, decision wording]
+=== case: decision-aged
+=== newest status line: needs-decision [key=release-key]: option A or option B
+=== watcher outcome: EXITED (it surfaced a wake)
+=== watcher output:
+stale: lab:fm-drive (idle 2013s, waiting 614s - declared decision, awaiting firstmate - its decision was already reported, rechecked on a long cadence not a wedge; answer the reported decision with fm-send --resolve-key)
+=== watcher triage log:
+(none)
+=== durable wake queue:
+1790865640	1	stale	lab:fm-drive	stale: lab:fm-drive (idle 2013s, waiting 614s - declared decision, awaiting firstmate - its decision was already reported, rechecked on a long cadence not a wedge; answer the reported decision with fm-send --resolve-key)
+=== wedge escalation count:
+(none)
+=== wait recheck throttle:
+1790865641
