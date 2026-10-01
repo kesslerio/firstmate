@@ -821,6 +821,19 @@ outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, re
 if (restoredCall.render(100).join("\n") !== calmOffCall.render(100).join("\n")) {
   throw new Error("fm_branch_outcomes did not restore ordinary rendering when Calm was turned off");
 }
+// A call Calm hid stores no stock row, and a call's visibility class is not
+// required to stay coupled to its result's: a result render that finds no stored
+// row must yield an empty row, not throw inside Pi's render of that transcript.
+pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: false });
+const hiddenCall = outcomesTool.renderCall({}, renderTheme, { state: {}, isError: false, isPartial: false });
+pi.events.emit("firstmate:calm-presentation", { active: false, stockExportRendering: false });
+if (hiddenCall.constructor.name !== "Container" || hiddenCall.render(100).length !== 0) {
+  throw new Error("a Calm-hidden fm_branch_outcomes call stopped rendering as an empty container");
+}
+const unpairedResult = outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, { state: {}, isError: false, isPartial: false });
+if (unpairedResult.constructor.name !== "Container" || unpairedResult.render(100).length !== 0) {
+  throw new Error("a result render with no stored stock row did not degrade to an empty container");
+}
 pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: true });
 let exportCallFellBack = false;
 let exportResultFellBack = false;

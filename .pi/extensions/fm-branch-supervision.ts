@@ -2119,7 +2119,8 @@ ${context.command}
     renderResult: (result, options, _theme, context) => {
       if (calmPresentation.stockExportRendering) throw new Error("Use Pi stock export rendering");
       if (calmHides("tool-result")) return new Container();
-      const row = (context.state as { stockRow: ToolExecutionComponent }).stockRow;
+      const row = (context.state as { stockRow?: ToolExecutionComponent }).stockRow;
+      if (!row) return new Container();
       row.setExpanded(options.expanded);
       row.updateResult({ ...result, isError: context.isError }, options.isPartial);
       return new Container();

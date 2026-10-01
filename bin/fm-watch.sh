@@ -1229,9 +1229,10 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 # read at the one moment it decides anything: when an escalation is about to
 # fire. Two records answer it, and they are independent: the worker's own status
 # line - a declared `paused:` external wait, a verified `captain-held`
-# transfer, or a latest event that is a `blocked:` or `needs-decision:` line
-# or a `working:` line with an explicit hold declaration
-# (status_is_working_hold in fm-classify-lib.sh) - and, when that line explains
+# transfer, or a latest event that parks the lane
+# (status_is_parked_lane in fm-classify-lib.sh, which admits a `blocked:` or
+# `needs-decision:` line and a `working:` line with an explicit hold
+# declaration) - and, when that line explains
 # nothing, the crew's authoritative current state.
 #
 # Each of those latest events is the worker saying it is parked, and a
@@ -1330,25 +1331,23 @@ wedge_wait_evidence() {  # <task> -> one wait_record on stdout
   fi
   latest=$(last_status_line "$statusf")
   status_line_verb "$latest" verb
-  case "$verb" in
-    working)
-      if status_is_working_hold "$latest"; then
+  if status_is_parked_lane "$latest"; then
+    case "$verb" in
+      working)
         wait_record 'declared hold' 'holding per its own newest working: line' \
           supervisor "confirm what it is holding for; a holding lane should write ${FM_CLASSIFY_PAUSED_VERB:-$FM_CLASSIFY_PAUSED_VERB_DEFAULT}: or needs-decision:" "$statusf"
-        return 0
-      fi
-      ;;
-    blocked)
-      wait_record 'declared blocker' 'awaiting firstmate - its blocker was already reported' \
-        supervisor 'clear the reported blocker and resolve it with fm-send --resolve-key' "$statusf"
-      return 0
-      ;;
-    needs-decision)
-      wait_record 'declared decision' 'awaiting firstmate - its decision was already reported' \
-        supervisor 'answer the reported decision with fm-send --resolve-key' "$statusf"
-      return 0
-      ;;
-  esac
+        ;;
+      blocked)
+        wait_record 'declared blocker' 'awaiting firstmate - its blocker was already reported' \
+          supervisor 'clear the reported blocker and resolve it with fm-send --resolve-key' "$statusf"
+        ;;
+      needs-decision)
+        wait_record 'declared decision' 'awaiting firstmate - its decision was already reported' \
+          supervisor 'answer the reported decision with fm-send --resolve-key' "$statusf"
+        ;;
+    esac
+    return 0
+  fi
   [ -e "$CONFIG/wedge-defer-parked-gate" ] || return 1
   if status_has_open_needs_decision "$statusf" \
     && run=$(crew_gate_awaits_human_decision "$task") \
