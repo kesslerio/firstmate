@@ -1082,7 +1082,7 @@ _fm_composer_grok_typed_title_ok() {  # <title>
 # inner (corners already stripped) still starts and ends with the family's own
 # rule glyph, so the title is embedded IN the rule rather than replacing it.
 _fm_composer_titled_bottom_ok() {  # <family> <bottom-inner> <top-spaces>
-  local family=$1 inner=$2 expected=$3 dash spaces title approval=0
+  local family=$1 inner=$2 expected=$3 dash spaces title
   fm_composer_normalize_trim_var inner
   case "$family" in
     rounded|light) dash='─' ;;
@@ -1105,7 +1105,6 @@ _fm_composer_titled_bottom_ok() {  # <family> <bottom-inner> <top-spaces>
     *' · always-approve')
       _fm_composer_grok_typed_title_ok "${title%' · always-approve'}" || return 1
       inner=${inner/' · always-approve'/' . always-approve'}
-      approval=1
       ;;
   esac
   spaces=${inner//"$dash"/ }
@@ -1114,16 +1113,16 @@ _fm_composer_titled_bottom_ok() {  # <family> <bottom-inner> <top-spaces>
     *[![:space:]]*) return 1 ;;
   esac
   [ "$spaces" = "$expected" ] && return 0
-  # 1.0.44 draws the approval-mode title at the aligned width; no overhang
-  # shape with that suffix has been observed, so none is accepted.
-  [ "$approval" = 0 ] || return 1
 
   # Grok 1.0.5 renders its real model title FM_COMPOSER_GROK_TITLE_OVERHANG
   # columns wider than the otherwise aligned top and content rows (issue
   # #3436; see the constant's definition for provenance and caveats). Accept
   # only that exact overhang and only the typed Grok model/effort title
-  # shape. This keeps arbitrary malformed bottoms ambiguous while preserving
-  # the complete-box proof around a genuinely idle or pending Grok composer.
+  # shape, which Grok 1.0.44's approval suffix can never match: 1.0.44 draws
+  # that title at the aligned width, so no overhang shape carrying it has
+  # been observed and none is accepted. This keeps arbitrary malformed bottoms
+  # ambiguous while preserving the complete-box proof around a genuinely idle
+  # or pending Grok composer.
   local overhang
   overhang=$(printf '%*s' "$FM_COMPOSER_GROK_TITLE_OVERHANG" '')
   [ "$spaces" = "$expected$overhang" ] || return 1

@@ -829,17 +829,22 @@ test_matrix_grok_144_approval_titled_bottom_border() {
   pass "matrix: grok 1.0.44's approval-titled equal-width bottom is empty while typed and unknown titles stay safe"
 }
 
-# <count> box-drawing rule glyphs.
-_grok_rule() {
-  local n=$1 out=
-  while [ "${#out}" -lt "$n" ]; do out+='─'; done
+# <count> box-drawing rule glyphs, one glyph per iteration so the emitted width
+# never depends on whether ${#} counts bytes or characters in the ambient locale.
+_grok_rule() {  # <count>
+  local n=$1 i=0 out=
+  while [ "$i" -lt "$n" ]; do out+='─'; i=$((i + 1)); done
   printf '%s' "$out"
 }
 
 # Bottom border of total inner width <width> carrying <title> before a trailing rule.
+# Every non-ASCII glyph these fixtures use is one column wide, so the width is
+# measured on an ASCII twin: the rule stays byte-exact and ${#} equals the column
+# count under any locale, including LC_ALL=C.
 _grok_titled_bottom() {  # <width> <title>
-  local width=$1 title=" $2 " lead
-  lead=$((width - ${#title} - 1))
+  local width=$1 title=" $2 " cols lead
+  cols=${title//·/.}
+  lead=$((width - ${#cols} - 1))
   printf '  ╰%s%s─╯' "$(_grok_rule "$lead")" "$title"
 }
 
