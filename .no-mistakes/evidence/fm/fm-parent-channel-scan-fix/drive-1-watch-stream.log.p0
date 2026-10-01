@@ -1,0 +1,2 @@
+signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab-live.dbUOnt/state/real-task.status
+check: rearm-resurface

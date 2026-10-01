@@ -1,0 +1,12 @@
+== phase 0: settle a quiet remote mate home, then drain to a clean queue ==
+--- phase 0: wake lines the watcher emitted ---
+    signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab-fixed.Fq7IVi/state/real-task.status
+1790845124	2	signal	real-task.status	signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab-fixed.Fq7IVi/state/real-task.status
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 65805.1790845121.MrRQGP
+wake annotation: latest wake-EVENT observed at drain, not current state: real-task.status: note: benchmark results are in
+UNREAD STATUS (new since last drain, not re-printed after this presentation):
+real-task note: benchmark results are in
+wake-queue rows after settle+ack: 0
+channel file before the publish: <absent>
+
+== phase 1: publish a captain decision onto the mate's OWN parent channel ==

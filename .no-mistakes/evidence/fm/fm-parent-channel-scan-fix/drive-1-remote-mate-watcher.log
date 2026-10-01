@@ -1,0 +1,46 @@
+== phase 0: settle a quiet remote mate home (1s polls) ==
+--- phase 0: wake lines the watcher emitted ---
+    signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab-live.dbUOnt/state/real-task.status
+    check: rearm-resurface
+wake-queue rows after settle: 2
+channel file before the publish: <absent>
+
+== phase 1: publish a captain decision onto the mate's OWN parent channel ==
+channel file now:
+    needs-decision [key=captain-hold-pr-7-1] [at=1790844939]: captain hold pr-7: merge the green PR?
+--- phase 1: wake lines the watcher emitted ---
+    check: rearm-resurface
+    check: rearm-resurface
+    check: rearm-resurface
+wake-queue rows:
+    1790844936	1	signal	real-task.status	signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab-live.dbUOnt/state/real-task.status
+    1790844936	2	signal	real-task.status	signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab-live.dbUOnt/state/real-task.status
+state entries whose name mentions parent-replies:
+    parent-replies.status
+
+== phase 2: control - a genuine task gains a captain-relevant line ==
+--- phase 2: wake lines the watcher emitted ---
+    check: rearm-resurface
+    check: rearm-resurface
+    check: rearm-resurface
+
+== phase 3: the captain's own drain surface (bin/fm-wake-drain.sh) ==
+drain rc=0
+    1790844936	2	signal	real-task.status	signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab-live.dbUOnt/state/real-task.status
+    WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 45469.1790844951.h1E5eT
+    wake annotation: unread wake-EVENT since last drain, not current state: real-task.status: note: benchmark results are in
+    wake annotation: latest wake-EVENT observed at drain, not current state: real-task.status: blocked [key=wedge]: the crew is stuck
+    UNREAD STATUS (new since last drain, not re-printed after this presentation):
+    real-task note: benchmark results are in
+    OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+    real-task [key=wedge] blocked: the crew is stuck
+    OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'
+presentation manifest (.status-presentation-cursor):
+    real-task	strong:16777231:194233872:1790844934.219067726	70	0
+
+== assertions ==
+PASS: no wake named the mate's own parent channel across 6 poll cycles
+PASS: the captain drain presents no parent-channel content
+PASS: the genuine task's open decision still reaches the captain
+PASS: no phantom parent-replies task record in the home state
+overall rc=0

@@ -1,0 +1,5 @@
+UNREAD STATUS (new since last drain, not re-printed after this presentation):
+real-task note: benchmark results are in
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+real-task [key=api-shape] needs-decision: pick REST or RPC
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'

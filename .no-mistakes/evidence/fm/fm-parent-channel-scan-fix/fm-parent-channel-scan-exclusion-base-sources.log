@@ -1,0 +1,2 @@
+_: line 3: status_scan_parent_channel_exclude: command not found
+not ok - the remote mate's channel must resolve for exclusion, got rc=127

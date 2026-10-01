@@ -1,0 +1,9 @@
+1790844936	2	signal	real-task.status	signal: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-lab-live.dbUOnt/state/real-task.status
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 45469.1790844951.h1E5eT
+wake annotation: unread wake-EVENT since last drain, not current state: real-task.status: note: benchmark results are in
+wake annotation: latest wake-EVENT observed at drain, not current state: real-task.status: blocked [key=wedge]: the crew is stuck
+UNREAD STATUS (new since last drain, not re-printed after this presentation):
+real-task note: benchmark results are in
+OPEN DECISIONS (still open, folded from the durable status logs - not just the latest line):
+real-task [key=wedge] blocked: the crew is stuck
+OPEN DECISIONS: close one by answering it: bin/fm-send.sh <task> --resolve-key <key> '<answer>'

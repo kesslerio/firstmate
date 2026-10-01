@@ -1,0 +1,20 @@
+1072:status_scan_parent_channel_exclude() {  # <state>
+1073-  return 0
+1074-  local state=$1 exclude
+--- helper neutered (exclude resolves to nothing, as before the fix) ---
+
+### watcher scan_signals over a remote mate home
+  enumerated: /var/folders/lw/83_wpdv92g5ff57h6hflw6wr0000gp/T//fm-probe.z0vzKE/watch/home/state/parent-replies.status
+  => LEAK: channel enumerated
+
+### away-mode daemon catch-all scan over a remote mate home
+  escalation buffer: parent-replies.status: needs-decision [key=captain-hold-pr-7-1]: captain hold pr-7: merge the green PR? (catch-all scan)
+  phantom seen-file: v2	r1:313832007374726f6e673a31363737373233313a3139343330343437363a313739303834373732392e30343731373736393300526567756c61722046696c653a313030363434002d007265616461626c65007265616461626c65	182@strong:16777231:194304476:1790847729.047177693
+
+### real fm-wake-drain.sh over a remote mate home
+  drain says: 2:parent-replies note: the release branch is cut
+  drain says: 4:parent-replies [key=captain-hold-pr-7-1] needs-decision: captain hold pr-7: merge the green PR?
+  => LEAK: channel content presented
+
+### fixed tree (helper active) for comparison
+  channel lines in drain output: 0
