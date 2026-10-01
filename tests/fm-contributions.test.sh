@@ -347,11 +347,15 @@ test_page_assembly_timeout_preserves_record() {
   local home out started elapsed pid real_jq
   home=$(new_home slow-page-assembly)
   forge_home "$home"
+  pin_clock "$home"
+  # Hold the budget open: the read must be attempted however long setup takes.
+  /bin/date +%s > "$home/forge/clock"
   cp "$home/data/delivery/contributions.json" "$home/prior.json"
   real_jq=$(command -v jq)
   cat > "$home/fakebin/jq" <<'SH'
 #!/usr/bin/env bash
 if [ "${1:-}" = -s ] && [ "${2:-}" = . ] && [[ "${3:-}" == */pages.* ]]; then
+  /bin/date +%s > "$FORGE/assembly-start"
   sleep 12 &
   printf '%s\n' "$!" >> "$FORGE/assembly-pids"
   wait
@@ -359,10 +363,10 @@ fi
 exec "$REAL_JQ" "$@"
 SH
   chmod +x "$home/fakebin/jq"
-  started=$(/bin/date +%s)
   out=$(with_home "$home" env REAL_JQ="$real_jq" FM_CONTRIBUTIONS_BUDGET=5 "$ROOT/bin/fm-contributions.sh" poll) || fail 'slow assembly poll failed'
-  elapsed=$(($( /bin/date +%s ) - started))
   [ -s "$home/forge/assembly-pids" ] || fail 'slow page assembly was not exercised'
+  started=$(cat "$home/forge/assembly-start")
+  elapsed=$(( $(/bin/date +%s) - started ))
   [ "$elapsed" -lt 10 ] || fail "page assembly exceeded the read budget: $elapsed seconds"
   [ -z "$out" ] || fail 'page assembly timeout reported forge unavailability'
   cmp -s "$home/prior.json" "$home/data/delivery/contributions.json" || fail 'page assembly timeout rewrote prior observation'
@@ -770,6 +774,17 @@ test_read_only_views_create_no_state() {
   pass 'snapshot and pending create nothing in a home without state'
 }
 
+# A controllable clock lets a budget expire or hold still between two forge
+# calls: date +%s answers from $FORGE/clock once a test seeds it.
+pin_clock() { # home: route date +%s through $FORGE/clock
+  local home=$1
+  cat > "$home/fakebin/date" <<'SH'
+#!/bin/sh
+if [ "$*" = +%s ] && [ -f "$FORGE/clock" ]; then cat "$FORGE/clock"; else exec /bin/date "$@"; fi
+SH
+  chmod +x "$home/fakebin/date"
+}
+
 wrap_forge() { # home: log gh calls and apply per-call faults from $FORGE/fault
   local home=$1
   mv "$home/fakebin/gh" "$home/fakebin/gh-fixture"
@@ -804,12 +819,8 @@ case "$fault:$*" in
 esac
 exec "$(dirname "$0")/gh-fixture" "$@"
 SH
-  # A controllable clock lets the budget expire between two forge calls.
-  cat > "$home/fakebin/date" <<'SH'
-#!/bin/sh
-if [ "$*" = +%s ] && [ -f "$FORGE/clock" ]; then cat "$FORGE/clock"; else exec /bin/date "$@"; fi
-SH
-  chmod +x "$home/fakebin/gh" "$home/fakebin/date"
+  chmod +x "$home/fakebin/gh"
+  pin_clock "$home"
 }
 
 test_budget_exhaustion_keeps_prior_record() { # exhaust|hang
