@@ -1,0 +1,6 @@
+api repos/o/r/issues/9
+api repos/o/r/issues/9/comments?per_page=100 --paginate
+api repos/o/r/issues/9/events?per_page=100 --paginate
+api repos/o/r/issues/9
+api repos/o/r/issues/9/events?per_page=100 --paginate
+api repos/o/r/issues/9/comments?per_page=100 --paginate

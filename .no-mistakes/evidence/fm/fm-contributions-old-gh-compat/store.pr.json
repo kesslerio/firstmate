@@ -1,0 +1,173 @@
+{
+ "/repos/o/r": [
+  {
+   "permissions": {
+    "push": false
+   }
+  }
+ ],
+ "/repos/o/r/pulls/8": [
+  {
+   "state": "open",
+   "user": {
+    "login": "author"
+   },
+   "head": {
+    "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   },
+   "draft": false,
+   "mergeable": true,
+   "merged_at": null
+  }
+ ],
+ "/repos/o/r/issues/8/comments": [
+  [
+   {
+    "id": 11,
+    "user": {
+     "login": "passerby"
+    },
+    "author_association": "NONE",
+    "body": "page-one noise",
+    "html_url": "https://github.com/o/r/pull/8#issuecomment-11",
+    "updated_at": "2026-09-16T08:01:00Z"
+   }
+  ],
+  [
+   {
+    "id": 12,
+    "user": {
+     "login": "maintainer"
+    },
+    "author_association": "OWNER",
+    "body": "Please clarify the contract",
+    "html_url": "https://github.com/o/r/pull/8#issuecomment-12",
+    "updated_at": "2026-09-16T08:02:00Z"
+   }
+  ]
+ ],
+ "/repos/o/r/pulls/8/reviews": [
+  [
+   {
+    "id": 20,
+    "user": {
+     "login": "passerby"
+    },
+    "author_association": "NONE",
+    "body": "not a review",
+    "html_url": "https://github.com/o/r/pull/8#review-20",
+    "submitted_at": "2026-09-16T08:02:00Z",
+    "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "state": "COMMENTED"
+   }
+  ],
+  [
+   {
+    "id": 21,
+    "user": {
+     "login": "maintainer"
+    },
+    "author_association": "MEMBER",
+    "body": "Needs a regression test",
+    "html_url": "https://github.com/o/r/pull/8#review-21",
+    "submitted_at": "2026-09-16T08:03:00Z",
+    "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "state": "CHANGES_REQUESTED"
+   }
+  ]
+ ],
+ "/repos/o/r/pulls/8/comments": [
+  []
+ ],
+ "/repos/o/r/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs": [
+  {
+   "total_count": 1,
+   "check_runs": [
+    {
+     "name": "page-one-lane",
+     "id": 1,
+     "status": "completed",
+     "conclusion": "success",
+     "started_at": "2026-09-16T08:00:00Z"
+    }
+   ]
+  },
+  {
+   "total_count": 1,
+   "check_runs": [
+    {
+     "name": "page-two-lane",
+     "id": 2,
+     "status": "completed",
+     "conclusion": "success",
+     "started_at": "2026-09-16T08:00:01Z"
+    }
+   ]
+  }
+ ],
+ "/repos/o/r/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses": [
+  []
+ ],
+ "/repos/o/r/issues/9": [
+  {
+   "state": "open",
+   "user": {
+    "login": "author"
+   },
+   "labels": []
+  }
+ ],
+ "/repos/o/r/issues/9/comments": [
+  [
+   {
+    "id": 31,
+    "user": {
+     "login": "passerby"
+    },
+    "author_association": "NONE",
+    "body": "page-one noise",
+    "html_url": "https://github.com/o/r/pull/8#issuecomment-31",
+    "updated_at": "2026-09-16T08:01:00Z"
+   }
+  ],
+  [
+   {
+    "id": 32,
+    "user": {
+     "login": "maintainer"
+    },
+    "author_association": "OWNER",
+    "body": "Please clarify the contract",
+    "html_url": "https://github.com/o/r/pull/8#issuecomment-32",
+    "updated_at": "2026-09-16T08:02:00Z"
+   },
+   {
+    "id": 33,
+    "user": {
+     "login": "author"
+    },
+    "author_association": "OWNER",
+    "body": "Please clarify the contract",
+    "html_url": "https://github.com/o/r/pull/8#issuecomment-33",
+    "updated_at": "2026-09-16T08:02:30Z"
+   }
+  ]
+ ],
+ "/repos/o/r/issues/9/events": [
+  [
+   {
+    "event": "mentioned",
+    "id": 87
+   }
+  ],
+  [
+   {
+    "event": "labeled",
+    "id": 88,
+    "label": {
+     "name": "ready-for-pr"
+    }
+   }
+  ]
+ ]
+}

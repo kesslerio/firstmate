@@ -1,0 +1,63 @@
+{
+  "schema": "fm-contributions.v1",
+  "task": "filed",
+  "records": [
+    {
+      "url": "https://github.com/o/r/issues/9",
+      "kind": "issue",
+      "checked_at": "2026-09-16T08:00:00Z",
+      "observation": {
+        "state": "open",
+        "head": null,
+        "ready": false,
+        "checks": [],
+        "reviews": [],
+        "events": [
+          {
+            "token": "comment:32:2026-09-16T08:02:00Z",
+            "type": "comment",
+            "source": "https://github.com/o/r/pull/8#issuecomment-32",
+            "head": null,
+            "author": "maintainer",
+            "body": "Please clarify the contract"
+          },
+          {
+            "token": "ready-for-pr:88",
+            "type": "ready-for-pr",
+            "source": null,
+            "head": null,
+            "body": "filed issue reached ready-for-pr"
+          }
+        ],
+        "absent_checks": []
+      },
+      "verdict": null,
+      "seen": [
+        "comment:32:2026-09-16T08:02:00Z",
+        "ready-for-pr:88"
+      ],
+      "pending": [
+        {
+          "token": "comment:32:2026-09-16T08:02:00Z",
+          "type": "comment",
+          "source": "https://github.com/o/r/pull/8#issuecomment-32",
+          "head": null,
+          "author": "maintainer",
+          "body": "Please clarify the contract"
+        },
+        {
+          "token": "ready-for-pr:88",
+          "type": "ready-for-pr",
+          "source": null,
+          "head": null,
+          "body": "filed issue reached ready-for-pr"
+        }
+      ],
+      "notified": [
+        "comment:32:2026-09-16T08:02:00Z",
+        "ready-for-pr:88"
+      ],
+      "error": null
+    }
+  ]
+}

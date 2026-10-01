@@ -1,0 +1,15 @@
+Real older GitHub CLI used by the "real gh 2.45" scenario (live-drive.sh mode=real,
+GH_245_BIN=<path>).
+
+  binary: gh_2.45.0_macOS_arm64/bin/gh  (gh version 2.45.0, 2024-03-04)
+  source: https://github.com/cli/cli/releases/download/v2.45.0/gh_2.45.0_macOS_arm64.zip
+  state:  unmodified upstream release binary, extracted into the run's throwaway
+          scratch directory (deleted after the run); see README.md for the re-run
+          recipe that re-downloads it.
+
+Verified properties of that binary before it drove the product:
+  * `gh api --help` lists no --slurp flag.
+  * `gh api <local-url> --paginate --slurp` fails with "unknown flag: --slurp" (exit 1)
+    - the exact failure mode this change removes.
+  * `gh api <local-url> --paginate` follows the fixture's Link rel="next" headers and
+    fetched both pages (see artifact-real-gh-245-poll/api-request-log.txt).

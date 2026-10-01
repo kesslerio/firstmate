@@ -1,0 +1,26 @@
+{
+  "schema": "fm-contributions.v1",
+  "task": "delivery",
+  "records": [
+    {
+      "url": "https://github.com/o/r/pull/8",
+      "kind": "pr",
+      "checked_at": "2026-09-16T08:00:00Z",
+      "error": "forge observation unavailable or changed during read",
+      "pending": [],
+      "seen": [],
+      "verdict": null,
+      "observation": {
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "open",
+        "draft": false,
+        "mergeable": "mergeable",
+        "review_decision": "APPROVED",
+        "can_merge": false,
+        "checks": [],
+        "reviews": [],
+        "events": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# gh stand-in that reproduces an older GitHub CLI: `api` supports --paginate but
+# NOT --slurp, and paginated output is the back-to-back page documents the older
+# CLI prints. Retrieval is real HTTP against the local API fixture.
+set -eu
+printf '%s\n' "$*" >> "$GH_EMU_LOG"
+# In emu mode this stand-in is the older CLI, so it refuses --slurp itself.
+# In real* modes the real binary decides, and an older one refuses on its own.
+case "${GH_EMU_MODE:-emu}:$*" in
+  emu:*'--slurp'*)
+    printf 'unknown flag: --slurp\n' >&2
+    exit 1 ;;
+esac
+exec python3 "$GH_EMU_PY" "$@"

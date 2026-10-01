@@ -1,0 +1,75 @@
+== scenario: a gh that rejects api --slurp still polls an owned PR
+  ok - poll exits successfully on a gh that rejects --slurp
+  poll stdout: contribution-wake: check: contributions delivery b3b2d75475c74d48b8e18bc92e34bda851c26ed7429aadb52b102b4fc93ad3a1|contribution-wake: check: contributions delivery ae14d4e2ef3ec2c1d2de66115ffc4e677a1ae5c640988e71ff6d853c1fc10163
+  ok - poll reports no forge unavailability on a gh without --slurp
+  ok - poll surfaced two contribution wakes
+  ok - the product never asked gh for --slurp
+  gh calls: 8 -> api repos/o/r/pulls/8|api repos/o/r/pulls/8/comments?per_page=100 --paginate|api repos/o/r/issues/8/comments?per_page=100 --paginate|api repos/o/r|api repos/o/r/pulls/8/r
+  ok - later pages were fetched over real HTTP (page=2 requests: 3)
+  ok - check lanes from BOTH pages are in the observation (page-one-lane,page-two-lane)
+  ok - the observation carries no read error
+  ok - second-page maintainer comment and review are both pending ([{"type":"comment","author":"maintainer"},{"type":"review","author":"maintainer"}])
+  ok - both signals are recorded as notified
+  ok - the durable wake queue holds exactly two keys
+  fixture requests: GET /repos/o/r/pulls/8 GET /repos/o/r/pulls/8/comments?per_page=100 GET /repos/o/r/issues/8/comments?per_page=100 GET /repos/o/r/issues/8/comments?per_page=100&page=2 GET /repos/o/r GET /repos/o/r/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100 GET /repos/o/r/comm
+== scenario: re-poll does not re-ring, ack clears the second-page signals
+  ok - a repeat poll surfaces nothing new
+  ok - a repeat poll does not duplicate durable wakes
+  ok - the supervisor reads both pending signals
+  ok - acknowledged second-page signals do not replay
+  ok - acknowledging does not add wakes
+== scenario: a gh without --slurp reports second-page issue activity
+  poll stdout: contribution-wake: check: contributions filed 16361fe0af34e282fb5e17e79d14e6a5ad4d1a23382cf9066407f3cfbadbf2b0|contribution-wake: check: contributions filed 4ef4cb953fa1ad82875f3198b922a6cef4bf34379a797cd72ee29ba1fa9332a2
+  ok - the filed issue gets a record on a gh without --slurp
+  ok - the issue observation has no read error
+  ok - second-page comment + ready-for-pr surface, author/outsider filtered
+  ok - two issue wakes surface once
+  ok - a repeat issue poll replays nothing
+  ok - a repeat issue poll does not duplicate issue wakes
+  issue requests: issues/9 issues/9/comments?per_page=100 issues/9/events?per_page=100 issues/9/comments?per_page=100&page=2 issues/9/events?per_page=100&page=2 issues/9 issues/9/events?per_page=100 issues/9/events?per_page=100&page=2 issues/9/comments?per_page=100 issues/9/comments?per_page=100&page=2 
+== scenario: a current GitHub CLI still polls correctly (real gh binary)
+  ok - poll exits successfully with the installed gh binary
+  poll stdout: contribution-wake: check: contributions delivery b3b2d75475c74d48b8e18bc92e34bda851c26ed7429aadb52b102b4fc93ad3a1|contribution-wake: check: contributions delivery ae14d4e2ef3ec2c1d2de66115ffc4e677a1ae5c640988e71ff6d853c1fc10163
+  ok - modern gh reports no unavailability
+  ok - modern gh assembles check lanes from every page (page-one-lane,page-two-lane)
+  ok - modern gh reports the second-page maintainer comment and review
+  real gh: gh version 2.101.0 (2026-09-15)
+== scenario: a real gh 2.45.0 CLI, which has no api --slurp, still polls an owned PR
+  ok - poll exits successfully under gh 2.45.0
+  poll stdout: contribution-wake: check: contributions delivery b3b2d75475c74d48b8e18bc92e34bda851c26ed7429aadb52b102b4fc93ad3a1|contribution-wake: check: contributions delivery ae14d4e2ef3ec2c1d2de66115ffc4e677a1ae5c640988e71ff6d853c1fc10163
+  ok - gh 2.45.0 reports no unavailability
+  ok - gh 2.45.0 assembles check lanes from every page (page-one-lane,page-two-lane)
+  ok - gh 2.45.0 reports the second-page maintainer comment and review
+  ok - the durable wake queue holds both second-page signals
+  ok - no read asked gh 2.45.0 for --slurp
+  real gh: gh version 2.45.0 (2024-03-04)
+  later-page fetches: 3 page-2 requests
+== scenario: the authenticated check surfaces second-page signals on a gh without --slurp
+  register rc=0 output: armed: state/delivery.check.sh
+  registered check #1 rc=0 output: contribution-wake: check: contributions delivery b3b2d75475c74d48b8e18bc92e34bda851c26ed7429aadb52b102b4fc93ad3a1|contribution-wake: check: contributions delivery ae14d4e2ef3ec2c1d2de66115ffc4e677a1ae5c640988e71ff6d853c1fc10163
+  ok - registered check #1 ran without error on a gh without --slurp
+  registered check #2 rc=0 output: 
+  ok - registered check #2 ran without error on a gh without --slurp
+  ok - the registered checks surfaced each second-page signal exactly once (2)
+  ok - contribution checks were registered (2)
+== scenario: a corrupt page is a read failure, never silence
+  poll stdout: contributions: observation unavailable for https://github.com/o/r/pull/8
+  ok - a corrupt assembled page is disclosed as unavailable
+  ok - the record keeps a read error instead of a fake observation
+  ok - the prior observation is preserved beside the error
+  ok - a corrupt page queues no wake
+== scenario: page assembly that never finishes is bounded and harmless
+  ok - the poll returns successfully with a hung assembly
+  ok - the hung assembly was actually attempted
+  ok - the whole poll returns inside the five-second read bound plus setup (10 s < 15 s)
+  poll stdout: 
+  ok - a slow assembly is budget refusal, not a forge failure
+  ok - the slow assembly leaves the prior observation untouched
+  ok - no wake was queued by the timed-out assembly
+  ok - the bound killed the assembly it owns (children left running: 0)
+== scenario: the pre-change script fails on the same real gh 2.45.0 CLI
+  poll stdout: contributions: observation unavailable for https://github.com/o/r/pull/8
+  ok - the pre-change script reports the read unavailable
+  ok - the pre-change record is left unmeasured with an error
+  ok - the pre-change poll surfaces no maintainer wake
+== totals: 49 assertions passed, 0 failed
