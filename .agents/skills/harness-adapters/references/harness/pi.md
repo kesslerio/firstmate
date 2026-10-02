@@ -34,6 +34,7 @@ A project trust dialog can appear on the first Pi run in any not-yet-trusted dir
 Saved decisions are keyed per canonical directory with a walk up through the parents, the closest one winning, in `<$PI_CODING_AGENT_DIR or ~/.pi/agent>/trust.json`.
 For a qualifying linked pool worktree, both canonical and raw launch commands for ships, scouts, and local secondmates carry Pi's own `--approve`, a per-run decision consulted before saved decisions that persists nothing.
 Secondmate seed markers do not grant folder trust: both Pi identities require a linked pool worktree for `--approve`, while standalone and other attended checkouts keep manual folder approval.
+For an attended checkout, accept the selected Trust option with Enter and verify the instructions begin processing.
 Approval loads the directory's `.pi` resources and project extensions for that run.
 The [maintainer verification record](../../../../../docs/verification/runtime-backends.md#folder-and-project-trust-on-a-fresh-worktree) owns versioned vendor observations and the live refresh command.
 The store's per-directory scope is why a launch flag is the right shape here rather than a pre-registered entry: a pooled worktree path would otherwise add one store entry per slot, and a worker account pin relocates that store, so a writer would have to resolve the pin first.
