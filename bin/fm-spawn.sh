@@ -2265,7 +2265,7 @@ try:
     if harness == "codex":
         values = dict((name, value) for name, value, _ in prefix)
         for name, value, _ in prefix:
-            if name in ("CODEX_HOME", "HOME") and any(char in value for char in "$`\n\r\t"):
+            if name in ("CODEX_HOME", "HOME") and any(char in value for char in "$\x60\n\r\t"):
                 raise ValueError(f"raw Codex {name} must be a literal path; use an explicit absolute store")
         store = values.get("CODEX_HOME", os.environ.get("CODEX_HOME", ""))
         home = values.get("HOME", os.environ.get("HOME", ""))

@@ -225,6 +225,7 @@ if [ -L "$STORE" ]; then
   STORE=$STORE_REAL
 fi
 TRUST_LIB_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=bin/fm-wake-lib.sh
 FM_STATE_OVERRIDE=$(dirname -- "$STORE") . "$TRUST_LIB_DIR/fm-wake-lib.sh"
 fm_treehouse_pool_slot "$TRUST_ROOT" "$TARGET_REAL" \
   || refuse "'$TARGET_REAL' is not a qualifying linked pool worktree; approve its folder trust during attended provisioning"
