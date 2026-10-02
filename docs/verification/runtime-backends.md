@@ -2440,3 +2440,40 @@ A throwaway scout was spawned through `bin/fm-spawn.sh --scout --harness omp --m
 6. `bin/fm-control.sh <id> exit` stopped the agent and `bin/fm-teardown.sh` returned the worktree and closed the item.
 
 `FM_OMP_LIVE_E2E=1 tests/fm-omp-primary-live-e2e.test.sh` refreshes the primary evidence; the worker path above is refreshed by repeating the scout dispatch after any omp upgrade.
+
+## Folder and project trust on a fresh worktree
+
+Every fresh pool slot is a directory neither runtime has seen, so both used to stop there and wait for a person to press Enter.
+The two runtimes persist that decision at two different scopes, and the spawn now answers each with the mechanism that runtime documents rather than with a keystroke.
+
+Verified 2026-10-02 on Linux with codex-cli 0.159.2 and Pi 0.99.2, both against a throwaway config root (`CODEX_HOME`, `PI_CODING_AGENT_DIR`) so the operator's own stores were untouched:
+
+| Fact | Observed |
+| --- | --- |
+| Codex store | `[projects."<path>"] trust_level = "trusted"` in `${CODEX_HOME:-~/.codex}/config.toml`, the table Codex itself writes |
+| Codex scope | answering "Trust this folder?" inside a LINKED WORKTREE persists the entry for the REPOSITORY ROOT, and a root entry written ahead of launch removes the dialog for that worktree |
+| Codex scope, negative | an entry for a directory above the repository root does not remove it, so one entry per project is the whole grant and each project still asks once |
+| Codex, command line | `-c 'projects."<path>".trust_level="trusted"'` is accepted and ignored for this decision, so the persisted store is the only non-interactive path |
+| Codex, decline path | Escape records nothing, so a registered entry never overwrites a decision a human gave |
+| Pi store | `<$PI_CODING_AGENT_DIR or ~/.pi/agent>/trust.json`, keyed per canonical directory with the closest parent entry winning |
+| Pi, per-run flag | `--approve` is consulted before the saved decisions, suppresses "Trust project folder?", still loads that directory's `.pi` resources and project extensions, and writes no store entry |
+
+Refresh the vendor half with the live guard, which replays the real launch flags Firstmate builds and reads the rendered pane, and the mechanics with the portable regression:
+
+```sh
+bin/fm-test-run.sh tests/fm-folder-trust-live-e2e.test.sh
+bin/fm-test-run.sh tests/fm-codex-trust.test.sh
+```
+
+Observed output on the versions above:
+
+```text
+ok - live: codex codex-cli 0.159.2 gates an unregistered fresh worktree on the folder-trust dialog
+ok - live: codex codex-cli 0.159.2 launches into a pre-registered fresh worktree with no dialog
+ok - live: codex codex-cli 0.159.2 keys folder trust on the repository root, not an ancestor
+ok - live: pi 0.99.2 gates an untrusted fresh directory on the project-trust prompt
+ok - live: pi 0.99.2 launches with --approve, shows no prompt, and persists nothing
+```
+
+The portable suite reports `total=24 failed=0`, covering the store write, its preservation of every unrelated line of the operator's config, idempotence, and each structural refusal.
+Hook trust is a separate and deliberately untouched decision: the crewmate launch still disables Codex's hook layer outright instead of pre-accepting that modal, and the live guard for that posture is `tests/fm-codex-hook-layer-live-e2e.test.sh`.

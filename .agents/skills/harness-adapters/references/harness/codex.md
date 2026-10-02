@@ -16,9 +16,10 @@ Verified on 2026-06-11 with codex-cli 0.139.0 unless a fact gives a newer versio
 | Model discovery | Open the current interactive session's `/model` picker. |
 | Marker | None; identity comes from ancestry, and `../../../bin/fm-harness.sh` is what keeps a retained foreign `CLAUDECODE` from renaming it. Verified on 2026-09-01 with codex-cli 0.152.0: the pane process is the `node` npm shim and the native `codex` binary runs as its foreground child, so a tool subprocess reaches the native name directly while the shim itself is identified from its script path. |
 
-A directory trust dialog appears on the first run for a repository root: "Do you trust the contents of this directory?"
-Accept it with Enter and verify the instructions begin processing.
-The decision persists for the repository, so later worktrees of the same project skip it.
+A directory trust dialog appears on the first run for a repository root: "Folder access … Trust this folder?", with "Trust and continue" already selected and "Quit" second.
+The decision persists per REPOSITORY ROOT in `[projects."<root>"] trust_level = "trusted"` inside `${CODEX_HOME:-~/.codex}/config.toml`, so answering it once covers every later worktree of that repository; verified on codex-cli 0.159.2, where answering inside a linked worktree wrote the entry for the primary checkout, and an entry for a directory merely above the repository root left the dialog standing.
+A crewmate launch never waits on it: `../../../bin/fm-spawn.sh` pre-registers exactly that entry through `../../../bin/fm-codex-trust.sh` before launch, which writes the same key the Enter key would have written, and the live guard `../../../tests/fm-folder-trust-live-e2e.test.sh` refreshes the fact against the installed binary.
+Two vendor details that shaped that choice, both verified on codex-cli 0.159.2: a `-c 'projects."<path>".trust_level="trusted"'` command-line override is accepted and ignored for this decision, so only the persisted store works, and declining the prompt with Escape records nothing, so a registered entry is never overwriting an answer a human gave.
 
 ## Hook trust
 

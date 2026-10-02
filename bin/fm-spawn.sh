@@ -407,6 +407,14 @@
 # busy turn - answering the dialog first if it renders anyway - before
 # reporting success (the rovo/kimi launch-then-confirm shape). Its busy state
 # is a screen-scrape fallback like grok and rovo, and it is crewmate/scout only.
+# codex and pi gate a fresh directory the same way, and both are answered without
+# a human and without a keystroke: the codex launch pre-registers the repository
+# root in the operator's own Codex config through bin/fm-codex-trust.sh (the
+# claude shape, non-fatal, because codex's dialog preselects "Trust and
+# continue"), and the pi launch passes pi's own per-run trust flag, which is pi's
+# documented answer for an automated run and writes nothing. Both helpers' and
+# both templates' comments own the verified scope each runtime keys on - codex
+# the repository root, pi the launch directory.
 # cursor installs no per-task hook either: it writes state/<id>.cursor-session to
 # bind the pane to cursor's own conversation transcript (projects root, the exact
 # workspace path cursor records in .workspace-trusted, and the conversations that
@@ -2049,12 +2057,24 @@ launch_template() {
     fi
     ;;
   opencode) printf '%s' 'OPENCODE_CONFIG_CONTENT='\''{"permission":{"*":"allow"}__EFFORTFLAG__}'\'' opencode __MODELFLAG__--prompt "$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
+  # Pi has no permission system, so the only launch dialog is project trust: a
+  # directory holding .pi resources or an ancestor .agents/skills parks on
+  # "Trust project folder?" until someone answers it. --approve is pi's own
+  # documented per-run decision for an automated run (docs/security.md
+  # "Project trust without an interactive prompt"), it is consulted before pi's
+  # saved decisions, and it persists nothing, so the trust.json store keeps
+  # holding only the decisions a human actually made. What it does change is
+  # what loads: the project's .pi resources and project extensions load for this
+  # run, which is exactly what answering the prompt by hand already did for every
+  # pooled worktree a human ever trusted. Pi's store is keyed per directory with
+  # a parent walk, so a per-run flag is also the only shape that does not grow a
+  # new store entry per pool slot.
   pi | pi-signed)
     printf '%s' '__PIBIN____PITUIMODE____PIAPPROVE____PIRESUME__'
     if [ "$kind" = secondmate ]; then
-      printf '%s' ' __MODELFLAG____EFFORTFLAG__-e __PITURNEND__ -e __PIWATCH__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
+      printf '%s' ' --approve __MODELFLAG____EFFORTFLAG__-e __PITURNEND__ -e __PIWATCH__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
     else
-      printf '%s' ' __MODELFLAG____EFFORTFLAG__-e __PIEXT__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
+      printf '%s' ' --approve __MODELFLAG____EFFORTFLAG__-e __PIEXT__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
     fi
     ;;
   # omp (Oh My Pi), a Pi fork. Same one-positional-brief, --model, --thinking,
@@ -4365,7 +4385,27 @@ spawn_assert_agent_worktree
 # path that was not pre-registered, refuses to count a busy turn as ready until
 # it has done so. agy is crewmate/scout only (refused above for secondmate), so
 # only the worktree shape applies.
+# codex gates a fresh directory on "Trust this folder?" and honours the entry its
+# own Enter key writes, so the same pre-registration removes it: one
+# `[projects."<repository root>"]` entry per project, registered by
+# bin/fm-codex-trust.sh, covers every worktree of that repository, including
+# every pool slot that project has not used yet. Folder trust only - the hook
+# trust modal stays unautomated and the crewmate template above keeps disabling
+# codex's hook layer. Like agy and unlike claude, codex's dialog preselects the
+# affirmative, so a failed registration warns and launches: the pane is left
+# exactly as it was before this control existed, answerable by hand, rather than
+# the spawn failing over a config the operator may be editing.
 AGY_TRUST_PREREGISTERED=0
+# codex gates a fresh directory on "Trust this folder?" and honours the entry its
+# own Enter key writes, so the same pre-registration removes it: one
+# `[projects."<repository root>"]` entry per project, registered by
+# bin/fm-codex-trust.sh, covers every worktree of that repository, including
+# every pool slot that project has not used yet. Folder trust only - the hook
+# trust modal stays unautomated and the crewmate template above keeps disabling
+# codex's hook layer. Like agy and unlike claude, codex's dialog preselects the
+# affirmative, so a failed registration warns and launches: the pane is left
+# exactly as it was before this control existed, answerable by hand, rather than
+# the spawn failing over a config the operator may be editing.
 case "$HARNESS" in
 claude*)
   if [ "$KIND" = secondmate ]; then
@@ -4376,6 +4416,16 @@ claude*)
   if ! "$FM_ROOT/bin/fm-claude-trust.sh" "${spawn_trust_args[@]}" >/dev/null; then
     echo "error: could not pre-register Claude workspace trust for $WT; refusing to launch a claude worker that would wedge on the trust dialog; inspect window $T" >&2
     exit 1
+  fi
+  ;;
+codex)
+  if [ "$KIND" = secondmate ]; then
+    spawn_trust_args=(--secondmate-home "$PROJ_ABS" "$ID")
+  else
+    spawn_trust_args=("$WT" "$PROJ_ABS")
+  fi
+  if ! "$FM_ROOT/bin/fm-codex-trust.sh" "${spawn_trust_args[@]}" >/dev/null; then
+    echo "warning: could not pre-register codex folder trust for $WT; the launch may park on the folder-trust dialog in window $T" >&2
   fi
   ;;
 agy)
