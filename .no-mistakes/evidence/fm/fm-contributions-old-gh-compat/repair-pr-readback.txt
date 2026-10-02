@@ -1,0 +1,11 @@
+base: 8690c4117a298ee870f0f72f571c72b846b4c5fb
+branch: fm/fm-contributions-old-gh-compat
+head: 23fa8f79f4da60736464f57cdde177fa175d9f69
+html_url: "https://github.com/kunchenguid/firstmate/pull/5645"
+mergeable: true
+mergeable_state: unstable
+merged: false
+number: 5645
+state: open
+title: "fix: support older GitHub CLI versions in contribution polling"
+updated_at: "2026-10-02T06:09:11Z"

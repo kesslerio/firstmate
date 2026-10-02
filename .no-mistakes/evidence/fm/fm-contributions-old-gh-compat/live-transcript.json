@@ -1,0 +1,687 @@
+[
+  {
+    "home": "old-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.681,
+    "stdout": "contribution-wake: check: contributions delivery 3039dbaa25cf55e515b8c1b425b2b80ca03bb141b7563442a7418c7e51e0c9b8\ncontribution-wake: check: contributions delivery bde7073842c9f069afab1284fcbda5c48eb30c9510870fdda2f8dbced34bf7b2\ncontribution-wake: check: contributions delivery 4976de3e43b6eb3a9e56bf43d0c88730092bfdd931c63379b8cffb7c24e8367f\n",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.371,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.021,
+    "stdout": "[\n  {\n    \"token\": \"comment:12:2026-10-02T08:02:00Z:\",\n    \"type\": \"comment\",\n    \"source\": \"https://github.com/o/r/pull/8#issuecomment-12\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review-comment:31:2026-10-02T08:02:00Z:\",\n    \"type\": \"review-comment\",\n    \"source\": \"https://github.com/o/r/pull/8#discussion_r31\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED\",\n    \"type\": \"review\",\n    \"source\": \"https://github.com/o/r/pull/8#pullrequestreview-21\",\n    \"head\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n    \"author\": \"maintainer\",\n    \"body\": \"regression please\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "comment:12:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.124,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review-comment:31:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.131,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED"
+    ],
+    "rc": 0,
+    "elapsed": 0.137,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.403,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.021,
+    "stdout": "[]\n",
+    "stderr": ""
+  },
+  {
+    "home": "modern-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.617,
+    "stdout": "contribution-wake: check: contributions delivery 3039dbaa25cf55e515b8c1b425b2b80ca03bb141b7563442a7418c7e51e0c9b8\ncontribution-wake: check: contributions delivery bde7073842c9f069afab1284fcbda5c48eb30c9510870fdda2f8dbced34bf7b2\ncontribution-wake: check: contributions delivery 4976de3e43b6eb3a9e56bf43d0c88730092bfdd931c63379b8cffb7c24e8367f\n",
+    "stderr": ""
+  },
+  {
+    "home": "modern-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.386,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "modern-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.021,
+    "stdout": "[\n  {\n    \"token\": \"comment:12:2026-10-02T08:02:00Z:\",\n    \"type\": \"comment\",\n    \"source\": \"https://github.com/o/r/pull/8#issuecomment-12\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review-comment:31:2026-10-02T08:02:00Z:\",\n    \"type\": \"review-comment\",\n    \"source\": \"https://github.com/o/r/pull/8#discussion_r31\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED\",\n    \"type\": \"review\",\n    \"source\": \"https://github.com/o/r/pull/8#pullrequestreview-21\",\n    \"head\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n    \"author\": \"maintainer\",\n    \"body\": \"regression please\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "home": "modern-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "comment:12:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.143,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "modern-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review-comment:31:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.126,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "modern-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED"
+    ],
+    "rc": 0,
+    "elapsed": 0.128,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "modern-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.413,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "modern-gh-pr",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.021,
+    "stdout": "[]\n",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-issue",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.497,
+    "stdout": "contribution-wake: check: contributions filed 08f6b91c367a7a0812f3227a8f35daa42bd29d9610a84ad257383494bfb46230\ncontribution-wake: check: contributions filed 4ef4cb953fa1ad82875f3198b922a6cef4bf34379a797cd72ee29ba1fa9332a2\n",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-issue",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.298,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-issue",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.025,
+    "stdout": "[\n  {\n    \"token\": \"comment:12:2026-10-02T08:02:00Z\",\n    \"type\": \"comment\",\n    \"source\": \"https://github.com/o/r/pull/8#issuecomment-12\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"filed\",\n    \"url\": \"https://github.com/o/r/issues/9\"\n  },\n  {\n    \"token\": \"ready-for-pr:88\",\n    \"type\": \"ready-for-pr\",\n    \"source\": \"https://github.com/o/r/issues/9\",\n    \"head\": null,\n    \"body\": \"filed issue reached ready-for-pr\",\n    \"task\": \"filed\",\n    \"url\": \"https://github.com/o/r/issues/9\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-issue",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "filed",
+      "https://github.com/o/r/issues/9",
+      "comment:12:2026-10-02T08:02:00Z"
+    ],
+    "rc": 0,
+    "elapsed": 0.12,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-issue",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "filed",
+      "https://github.com/o/r/issues/9",
+      "ready-for-pr:88"
+    ],
+    "rc": 0,
+    "elapsed": 0.122,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-issue",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.294,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "old-gh-issue",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.02,
+    "stdout": "[]\n",
+    "stderr": ""
+  },
+  {
+    "home": "corrupt",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.76,
+    "stdout": "contribution-wake: check: contributions delivery 3039dbaa25cf55e515b8c1b425b2b80ca03bb141b7563442a7418c7e51e0c9b8\ncontribution-wake: check: contributions delivery bde7073842c9f069afab1284fcbda5c48eb30c9510870fdda2f8dbced34bf7b2\ncontribution-wake: check: contributions delivery 4976de3e43b6eb3a9e56bf43d0c88730092bfdd931c63379b8cffb7c24e8367f\n",
+    "stderr": ""
+  },
+  {
+    "home": "corrupt",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.023,
+    "stdout": "[\n  {\n    \"token\": \"comment:12:2026-10-02T08:02:00Z:\",\n    \"type\": \"comment\",\n    \"source\": \"https://github.com/o/r/pull/8#issuecomment-12\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review-comment:31:2026-10-02T08:02:00Z:\",\n    \"type\": \"review-comment\",\n    \"source\": \"https://github.com/o/r/pull/8#discussion_r31\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED\",\n    \"type\": \"review\",\n    \"source\": \"https://github.com/o/r/pull/8#pullrequestreview-21\",\n    \"head\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n    \"author\": \"maintainer\",\n    \"body\": \"regression please\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "home": "corrupt",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "comment:12:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.123,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "corrupt",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review-comment:31:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.118,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "corrupt",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED"
+    ],
+    "rc": 0,
+    "elapsed": 0.117,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "corrupt",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.396,
+    "stdout": "contributions: observation unavailable for https://github.com/o/r/pull/8\n",
+    "stderr": ""
+  },
+  {
+    "home": "corrupt",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.311,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "corrupt",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.592,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "http-error",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.615,
+    "stdout": "contribution-wake: check: contributions delivery 3039dbaa25cf55e515b8c1b425b2b80ca03bb141b7563442a7418c7e51e0c9b8\ncontribution-wake: check: contributions delivery bde7073842c9f069afab1284fcbda5c48eb30c9510870fdda2f8dbced34bf7b2\ncontribution-wake: check: contributions delivery 4976de3e43b6eb3a9e56bf43d0c88730092bfdd931c63379b8cffb7c24e8367f\n",
+    "stderr": ""
+  },
+  {
+    "home": "http-error",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.021,
+    "stdout": "[\n  {\n    \"token\": \"comment:12:2026-10-02T08:02:00Z:\",\n    \"type\": \"comment\",\n    \"source\": \"https://github.com/o/r/pull/8#issuecomment-12\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review-comment:31:2026-10-02T08:02:00Z:\",\n    \"type\": \"review-comment\",\n    \"source\": \"https://github.com/o/r/pull/8#discussion_r31\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED\",\n    \"type\": \"review\",\n    \"source\": \"https://github.com/o/r/pull/8#pullrequestreview-21\",\n    \"head\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n    \"author\": \"maintainer\",\n    \"body\": \"regression please\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "home": "http-error",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "comment:12:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.118,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "http-error",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review-comment:31:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.13,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "http-error",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED"
+    ],
+    "rc": 0,
+    "elapsed": 0.129,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "http-error",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.331,
+    "stdout": "contributions: observation unavailable for https://github.com/o/r/pull/8\n",
+    "stderr": ""
+  },
+  {
+    "home": "http-error",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.331,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "http-error",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.466,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "changed",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.817,
+    "stdout": "contribution-wake: check: contributions delivery 3039dbaa25cf55e515b8c1b425b2b80ca03bb141b7563442a7418c7e51e0c9b8\ncontribution-wake: check: contributions delivery bde7073842c9f069afab1284fcbda5c48eb30c9510870fdda2f8dbced34bf7b2\ncontribution-wake: check: contributions delivery 4976de3e43b6eb3a9e56bf43d0c88730092bfdd931c63379b8cffb7c24e8367f\n",
+    "stderr": ""
+  },
+  {
+    "home": "changed",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.028,
+    "stdout": "[\n  {\n    \"token\": \"comment:12:2026-10-02T08:02:00Z:\",\n    \"type\": \"comment\",\n    \"source\": \"https://github.com/o/r/pull/8#issuecomment-12\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review-comment:31:2026-10-02T08:02:00Z:\",\n    \"type\": \"review-comment\",\n    \"source\": \"https://github.com/o/r/pull/8#discussion_r31\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED\",\n    \"type\": \"review\",\n    \"source\": \"https://github.com/o/r/pull/8#pullrequestreview-21\",\n    \"head\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n    \"author\": \"maintainer\",\n    \"body\": \"regression please\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "home": "changed",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "comment:12:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.14,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "changed",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review-comment:31:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.118,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "changed",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED"
+    ],
+    "rc": 0,
+    "elapsed": 0.119,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "changed",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.705,
+    "stdout": "contributions: observation unavailable for https://github.com/o/r/pull/8\n",
+    "stderr": ""
+  },
+  {
+    "home": "changed",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.371,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "changed",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.477,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "slow-assembly",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.623,
+    "stdout": "contribution-wake: check: contributions delivery 3039dbaa25cf55e515b8c1b425b2b80ca03bb141b7563442a7418c7e51e0c9b8\ncontribution-wake: check: contributions delivery bde7073842c9f069afab1284fcbda5c48eb30c9510870fdda2f8dbced34bf7b2\ncontribution-wake: check: contributions delivery 4976de3e43b6eb3a9e56bf43d0c88730092bfdd931c63379b8cffb7c24e8367f\n",
+    "stderr": ""
+  },
+  {
+    "home": "slow-assembly",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "pending"
+    ],
+    "rc": 0,
+    "elapsed": 0.022,
+    "stdout": "[\n  {\n    \"token\": \"comment:12:2026-10-02T08:02:00Z:\",\n    \"type\": \"comment\",\n    \"source\": \"https://github.com/o/r/pull/8#issuecomment-12\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review-comment:31:2026-10-02T08:02:00Z:\",\n    \"type\": \"review-comment\",\n    \"source\": \"https://github.com/o/r/pull/8#discussion_r31\",\n    \"head\": null,\n    \"author\": \"maintainer\",\n    \"body\": \"please clarify\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  },\n  {\n    \"token\": \"review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED\",\n    \"type\": \"review\",\n    \"source\": \"https://github.com/o/r/pull/8#pullrequestreview-21\",\n    \"head\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n    \"author\": \"maintainer\",\n    \"body\": \"regression please\",\n    \"task\": \"delivery\",\n    \"url\": \"https://github.com/o/r/pull/8\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "home": "slow-assembly",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "comment:12:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.137,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "slow-assembly",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review-comment:31:2026-10-02T08:02:00Z:"
+    ],
+    "rc": 0,
+    "elapsed": 0.127,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "slow-assembly",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "ack",
+      "delivery",
+      "https://github.com/o/r/pull/8",
+      "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED"
+    ],
+    "rc": 0,
+    "elapsed": 0.119,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "slow-assembly",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 5.213,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "registered-check",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh",
+      "arm"
+    ],
+    "rc": 0,
+    "elapsed": 0.106,
+    "stdout": "registered: state/contributions.check.sh\n",
+    "stderr": ""
+  },
+  {
+    "home": "registered-check",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/live/registered-check/state/contributions.check.sh"
+    ],
+    "rc": 0,
+    "elapsed": 0.68,
+    "stdout": "contribution-wake: check: contributions delivery 3039dbaa25cf55e515b8c1b425b2b80ca03bb141b7563442a7418c7e51e0c9b8\ncontribution-wake: check: contributions delivery bde7073842c9f069afab1284fcbda5c48eb30c9510870fdda2f8dbced34bf7b2\ncontribution-wake: check: contributions delivery 4976de3e43b6eb3a9e56bf43d0c88730092bfdd931c63379b8cffb7c24e8367f\n",
+    "stderr": ""
+  },
+  {
+    "home": "registered-check",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/live/registered-check/state/contributions.check.sh"
+    ],
+    "rc": 0,
+    "elapsed": 0.813,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "home": "before-fix",
+    "command": [
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/baseline-bin/fm-contributions.sh",
+      "poll"
+    ],
+    "rc": 0,
+    "elapsed": 0.275,
+    "stdout": "contributions: observation unavailable for https://github.com/o/r/pull/8\n",
+    "stderr": ""
+  }
+]

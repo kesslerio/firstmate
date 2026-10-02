@@ -1,26 +1,72 @@
 [
   {
-    "name": "owned-pr-gh245",
+    "name": "gh old-gh-pr: all pages, maintainer filtering, exactly-once wakes and ack",
     "result": "pass",
-    "elapsed_seconds": 1.91,
-    "pending_signals": 0,
-    "url": "https://github.com/kunchenguid/firstmate/pull/5645",
-    "head": "f19a6dd95c7b04f68efe27ba4fe0ebad66fd7d88"
+    "live": true,
+    "evidence": "/home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/old-gh-pr",
+    "reason": ""
   },
   {
-    "name": "multipage-pr-gh245",
+    "name": "gh modern-gh-pr: all pages, maintainer filtering, exactly-once wakes and ack",
     "result": "pass",
-    "elapsed_seconds": 20.47,
-    "pending_signals": 44,
-    "url": "https://github.com/cli/cli/pull/10513",
-    "head": "a9dbda69135631511eebfa8173f80e93e726c7b2"
+    "live": true,
+    "evidence": "/home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/modern-gh-pr",
+    "reason": ""
   },
   {
-    "name": "missing-pr-gh245",
+    "name": "Old gh issue: later-page comment and label survive filtering, deduplication and ack",
     "result": "pass",
-    "elapsed_seconds": 0.85,
-    "pending_signals": 0,
-    "url": "https://github.com/cli/cli/pull/999999999",
-    "head": null
+    "live": true,
+    "evidence": "/home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/old-gh-issue",
+    "reason": ""
+  },
+  {
+    "name": "Adversarial corrupt: preserve coherent prior state, bound work, prevent false/repeated wakes",
+    "result": "pass",
+    "live": true,
+    "evidence": "/home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/corrupt",
+    "reason": ""
+  },
+  {
+    "name": "Adversarial http-error: preserve coherent prior state, bound work, prevent false/repeated wakes",
+    "result": "pass",
+    "live": true,
+    "evidence": "/home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/http-error",
+    "reason": ""
+  },
+  {
+    "name": "Adversarial changed: preserve coherent prior state, bound work, prevent false/repeated wakes",
+    "result": "pass",
+    "live": true,
+    "evidence": "/home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/changed",
+    "reason": ""
+  },
+  {
+    "name": "Adversarial slow-assembly: preserve coherent prior state, bound work, prevent false/repeated wakes",
+    "result": "pass",
+    "live": true,
+    "evidence": "/home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/slow-assembly",
+    "reason": ""
+  },
+  {
+    "name": "Authenticated generated contribution check surfaces later-page signals once",
+    "result": "pass",
+    "live": true,
+    "evidence": "/home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/registered-check",
+    "reason": ""
+  },
+  {
+    "name": "Regression: base executable fails on genuine gh 2.45.0 while changed executable succeeds",
+    "result": "pass",
+    "live": true,
+    "evidence": "/home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/before-fix",
+    "reason": ""
+  },
+  {
+    "name": "Contribution observation performs no forge mutations",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-http-requests.json",
+    "reason": ""
   }
 ]

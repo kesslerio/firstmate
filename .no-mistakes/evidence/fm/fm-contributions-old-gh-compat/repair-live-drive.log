@@ -1,0 +1,9 @@
+PASS gh old-gh-pr: all pages, maintainer filtering, exactly-once wakes and ack
+PASS gh modern-gh-pr: all pages, maintainer filtering, exactly-once wakes and ack
+PASS Old gh issue: later-page comment and label survive filtering, deduplication and ack
+PASS Adversarial corrupt: preserve coherent prior state, bound work, prevent false/repeated wakes
+PASS Adversarial http-error: preserve coherent prior state, bound work, prevent false/repeated wakes
+PASS Adversarial changed: preserve coherent prior state, bound work, prevent false/repeated wakes
+PASS Adversarial slow-assembly: preserve coherent prior state, bound work, prevent false/repeated wakes
+PASS Authenticated generated contribution check surfaces later-page signals once
+PASS Regression: base executable fails on genuine gh 2.45.0 while changed executable succeeds

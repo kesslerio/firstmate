@@ -1,0 +1,130 @@
+ok - only required-captain contributions are rows; other actors are counted
+ok - replaced-head verdict is stale and cannot create a captain requirement
+ok - unchecked ownership is disclosed and cannot prove silence
+ok - newest check with no verdict is distinct from passing and pending
+ok - new maintainer comment wakes once and stays pending until acknowledged
+ok - new maintainer review wakes once and stays pending until acknowledged
+ok - new maintainer inline wakes once and stays pending until acknowledged
+ok - a gh without --slurp still reports maintainer comments and reviews from every page
+ok - old-gh issue pagination filters comments and deduplicates and acknowledges later-page signals
+tests/fm-contributions.test.sh: line 352: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/slow-page-assembly/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/slow-page-assembly/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh: line 400: DEADLINE - : arithmetic syntax error: operand expected (error token is "- ")
+not ok - slow assembly poll failed
+ok - ready-for-pr on a filed issue becomes a planning wake
+ok - a fresh open issue remains measured maintainer triage
+ok - an absent check lane remains missing across repeated observations
+ok - mixed freshness retains measured captain work and discloses the gap
+ok - malformed durable evidence cannot prove silence
+ok - a transient ready-for-pr label wakes and its exact acknowledgement survives replay
+ok - recorded judgment keeps its exact head and is stale immediately on a published replacement
+ok - verdict help and refusal name exactly the actors the command accepts
+ok - a current forge observation refreshes a verdict after a replacement
+ok - an unavailable current head leaves verdict freshness unknown
+ok - away yolo delivery is fleet work without granting merge authority
+actionable: PR https://github.com/o/r/pull/8 is registered but its ready line did not reach the parent channel (rc=3)
+not ok - cross-home away yolo delivery requiring a merge remained captain work
+ok - retired ownership persists and unsupported forge remains visibly unmeasured
+ok - unsupported forge coverage is disclosed without inventing fleet work
+ok - held unsupported forge coverage remains unmeasured
+ok - shared contribution signal wakes once while retaining both acknowledgements
+ok - watcher keeps observer diagnostics separate from contribution wakes
+not ok - expired child unsupported-forge coverage became fleet work
+ok - watcher surfaces one newly durable contribution signal without re-ringing it
+not ok - measured child coverage did not reach parent
+ok - unreadable pending signals refuse an empty-inbox claim
+ok - record task identity is the directory dirname/basename named
+ok - snapshot and pending create nothing in a home without state
+tests/fm-contributions.test.sh: line 835: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/budget-exhaust/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/budget-exhaust/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh: line 400: DEADLINE - : arithmetic syntax error: operand expected (error token is "- ")
+not ok - poll failed when its budget ran out (exhaust)
+tests/fm-contributions.test.sh: line 835: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/budget-hang/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/budget-hang/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh: line 400: DEADLINE - : arithmetic syntax error: operand expected (error token is "- ")
+not ok - poll failed when its budget ran out (hang)
+tests/fm-contributions.test.sh: line 857: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/genuine-failure/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/genuine-failure/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh: line 400: DEADLINE - : arithmetic syntax error: operand expected (error token is "- ")
+not ok - poll failed on a genuine forge failure
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/shared-once-ok/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/shared-once-ok/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/shared-once-ok/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/shared-once-ok/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/shared-once-ok/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - shared-owner poll failed (ok)
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-merged/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-merged/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-merged/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-merged/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-merged/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - terminal observation poll failed (merged)
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-late-owner/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-late-owner/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-late-owner/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-late-owner/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/terminal-late-owner/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - initial terminal observation poll failed
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/multi-owner-open/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/multi-owner-open/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/multi-owner-open/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/multi-owner-open/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/multi-owner-open/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - interrupted multi-owner poll failed
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/done-open/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/done-open/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/done-open/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/done-open/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/done-open/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - poll of a done task failed
+tests/fm-contributions.test.sh: line 1024: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/reservation/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/reservation/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh: line 400: DEADLINE - : arithmetic syntax error: operand expected (error token is "- ")
+not ok - reservation poll failed
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/three-second-pr/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/three-second-pr/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/three-second-pr/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/three-second-pr/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/three-second-pr/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - a 3-second-read PR observation failed
+tests/fm-contributions.test.sh: line 1062: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/slow-kill/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/slow-kill/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh: line 400: DEADLINE - : arithmetic syntax error: operand expected (error token is "- ")
+not ok - poll failed on a deadline-killed slow read
+tests/fm-contributions.test.sh: line 1085: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/unmeasured-tail/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/unmeasured-tail/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/unmeasured-tail/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/unmeasured-tail/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/unmeasured-tail/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - poll failed after an unmeasured first URL
+tests/fm-contributions.test.sh: line 1161: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/check-bound-budget/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/check-bound-budget/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh: line 400: DEADLINE - : arithmetic syntax error: operand expected (error token is "- ")
+not ok - poll failed under a small watcher check bound
+tests/fm-contributions.test.sh: line 1179: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/arm-budget-configured/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/arm-budget-configured/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/bin/fm-contributions.sh: line 400: DEADLINE - : arithmetic syntax error: operand expected (error token is "- ")
+not ok - configured check shim failed
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - poll at 2026-09-16T09:00:00Z failed
+not ok - the first failure of an episode did not wake: 
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/late-owner-failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/late-owner-failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/late-owner-failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/late-owner-failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/tmp/fm-contributions.mzE0wR/late-owner-failure-episode/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - initial failing poll failed
+not ok - 20 contribution regressions

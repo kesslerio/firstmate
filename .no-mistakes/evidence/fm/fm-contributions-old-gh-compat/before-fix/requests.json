@@ -1,0 +1,10 @@
+[
+  {
+    "method": "GET",
+    "path": "/repos/o/r/pulls/8"
+  },
+  {
+    "method": "GET",
+    "path": "/repos/o/r"
+  }
+]

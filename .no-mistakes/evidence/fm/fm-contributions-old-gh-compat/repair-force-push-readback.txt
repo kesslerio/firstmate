@@ -1,0 +1,20 @@
+data:
+  repository:
+    pullRequest:
+      timelineItems:
+        nodes[3]:
+          - createdAt: "2026-10-01T00:42:57Z"
+            beforeCommit:
+              oid: 325fff5fa8e47d5ce4b90b209b5c8756fd881ce2
+            afterCommit:
+              oid: 15e6b84faef759666068177bc39a67375bede17d
+          - createdAt: "2026-10-01T13:20:32Z"
+            beforeCommit:
+              oid: 15e6b84faef759666068177bc39a67375bede17d
+            afterCommit:
+              oid: 9aa0e8a8f31d3c273efa67476ad86436ea24a4fb
+          - createdAt: "2026-10-02T06:06:43Z"
+            beforeCommit:
+              oid: 9aa0e8a8f31d3c273efa67476ad86436ea24a4fb
+            afterCommit:
+              oid: 23fa8f79f4da60736464f57cdde177fa175d9f69

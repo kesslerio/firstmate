@@ -1,0 +1,18 @@
+spawned ios harness=codex kind=secondmate mode=secondmate yolo=off window=remote:ios worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/data/fm-remote-trace-context.uopGsZ/remote-home remote=remote-mac backend=herdr
+ok - disabled: a remote-routed second mate records and receives no carrier and stays enabled-off end to end
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+spawned ios harness=codex kind=secondmate mode=secondmate yolo=off window=remote:ios worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/data/fm-remote-trace-context.uopGsZ/remote-home remote=remote-mac backend=herdr
+ok - enabled: a remote-routed second mate receives one carrier in its pane, identical to the parent's recorded identity, before launch
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+spawned ios harness=codex kind=secondmate mode=secondmate yolo=off window=remote:ios worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XQ033JEYWZVQ6AHD4N27BN/.test-scratch/data/fm-remote-trace-context.uopGsZ/remote-home remote=remote-mac backend=herdr
+ok - relaunch: a remote-routed second mate keeps one stable identity across restarts
+ok - boundary: each remote-routed second mate roots its own trace and never adopts the spawning environment's carrier
+ok - allowlist: the remote receiver accepts exactly the declared inherited-material set, including the enablement flag
+ok - delivery: a parent-supplied carrier is accepted only for a secondmate launch and only as a strict W3C value
+ALL TESTS PASSED

@@ -1,0 +1,137 @@
+{
+  "schema": "fm-contributions.v1",
+  "task": "delivery",
+  "records": [
+    {
+      "url": "https://github.com/o/r/pull/8",
+      "kind": "pr",
+      "checked_at": "2026-10-02T08:05:00Z",
+      "observation": {
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "open",
+        "draft": false,
+        "mergeable": "mergeable",
+        "can_merge": false,
+        "review_decision": "CHANGES_REQUESTED",
+        "reviews": [
+          {
+            "id": 20,
+            "user": {
+              "login": "outsider"
+            },
+            "author_association": "NONE",
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "state": "COMMENTED"
+          },
+          {
+            "id": 21,
+            "user": {
+              "login": "maintainer"
+            },
+            "author_association": "MEMBER",
+            "body": "regression please",
+            "html_url": "https://github.com/o/r/pull/8#pullrequestreview-21",
+            "submitted_at": "2026-10-02T08:03:00Z",
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "state": "CHANGES_REQUESTED"
+          }
+        ],
+        "checks": [
+          {
+            "name": "page-1-lane",
+            "id": 1,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-10-02T08:01:00Z"
+          },
+          {
+            "name": "page-2-lane",
+            "id": 2,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-10-02T08:01:00Z"
+          },
+          {
+            "name": "status-first",
+            "id": 3,
+            "started_at": "2026-10-02T08:01:00Z",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "status-lane",
+            "id": 4,
+            "started_at": "2026-10-02T08:01:00Z",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ],
+        "events": [
+          {
+            "token": "comment:12:2026-10-02T08:02:00Z:",
+            "type": "comment",
+            "source": "https://github.com/o/r/pull/8#issuecomment-12",
+            "head": null,
+            "author": "maintainer",
+            "body": "please clarify"
+          },
+          {
+            "token": "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED",
+            "type": "review",
+            "source": "https://github.com/o/r/pull/8#pullrequestreview-21",
+            "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "author": "maintainer",
+            "body": "regression please"
+          },
+          {
+            "token": "review-comment:31:2026-10-02T08:02:00Z:",
+            "type": "review-comment",
+            "source": "https://github.com/o/r/pull/8#discussion_r31",
+            "head": null,
+            "author": "maintainer",
+            "body": "please clarify"
+          }
+        ],
+        "absent_checks": []
+      },
+      "verdict": null,
+      "seen": [
+        "comment:12:2026-10-02T08:02:00Z:",
+        "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED",
+        "review-comment:31:2026-10-02T08:02:00Z:"
+      ],
+      "pending": [
+        {
+          "token": "comment:12:2026-10-02T08:02:00Z:",
+          "type": "comment",
+          "source": "https://github.com/o/r/pull/8#issuecomment-12",
+          "head": null,
+          "author": "maintainer",
+          "body": "please clarify"
+        },
+        {
+          "token": "review-comment:31:2026-10-02T08:02:00Z:",
+          "type": "review-comment",
+          "source": "https://github.com/o/r/pull/8#discussion_r31",
+          "head": null,
+          "author": "maintainer",
+          "body": "please clarify"
+        },
+        {
+          "token": "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED",
+          "type": "review",
+          "source": "https://github.com/o/r/pull/8#pullrequestreview-21",
+          "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "author": "maintainer",
+          "body": "regression please"
+        }
+      ],
+      "notified": [
+        "comment:12:2026-10-02T08:02:00Z:",
+        "review-comment:31:2026-10-02T08:02:00Z:",
+        "review:21:2026-10-02T08:03:00Z:CHANGES_REQUESTED"
+      ],
+      "error": null
+    }
+  ]
+}

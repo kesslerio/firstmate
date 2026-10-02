@@ -1,71 +1,15 @@
-# Live validation: contribution polling on a gh too old for `api --slurp`
+# Test phase evidence
 
-Change under test: `bin/fm-contributions.sh` now retrieves each paginated forge
-read with `gh api <endpoint> --paginate` and assembles the pages locally with
-`jq -s .` inside the same bounded read, instead of asking gh for
-`--paginate --slurp` (a flag older GitHub CLI releases do not have).
+The real `bin/fm-contributions.sh poll`, `pending`, `ack`, `arm`, and its generated registered check ran against a disposable local HTTP GitHub service. A routing wrapper redirects REST endpoints to that service and translates the closing `pr view` read into a real GraphQL query through `gh api`; it does not synthesize CLI responses. Retrieval used the unmodified upstream gh 2.45.0 release binary and installed gh 2.83.2. All runtime commands, private homes, GH_CONFIG_DIRs, temporary files, and the downloaded binary lived under worktree `.test-scratch`. Each home used a synthetic token and synthetic records. The server served two pages with real Link headers. The first page was nonempty, matching valid GitHub pagination; gh 2.45 coalesces array pages while object pages remain adjacent JSON documents. Both formats were exercised.
 
-## How the product was stood up
+`live-transcript.json` records exact product commands, timing, stdout, stderr, and exit status. `live-results.json` identifies ten passing live scenarios. Each scenario directory holds generated product records, HTTP requests, gh argv, and wake-queue state. `live-http-requests.json` accounts for all reads; REST used GET and the closing GraphQL operation was a query. `gh245-proof.txt` records version, binary hash and the genuine CLI's rejection of --slurp. `before-fix` demonstrates that the base executable failed with the same genuine old CLI; this run's changed executable succeeds.
 
-`live-drive.sh` runs the real `bin/fm-contributions.sh` (`poll`, `pending`,
-`ack`, plus the registered check shim) against a disposable `FM_HOME` and a
-local GitHub REST fixture (`api_server.py`) that serves **two pages per
-paginated endpoint with real `Link: rel="next"` headers**. Every maintainer
-signal sits on the second page, so a read that stops at page one cannot satisfy
-the assertions. `harness-bin/gh` is the `gh` on PATH; it logs every invocation
-and, in `real` modes, forwards `api` calls to a real GitHub CLI binary.
+Live adversarial cases cover malformed page JSON, HTTP 503 on a later page, a closing head mismatch, and a page assembler that sleeps beyond the read bound. Prior observations survive; errors surface once per episode and clear on recovery. Timeout leaves the serialized record byte-identical, emits no wake, and leaves no owned assembler child alive. PR and issue signals on later pages survive filtering, deduplication and acknowledgement. The registered check runs the same command with authenticated saved bytes.
 
-* `emu` mode — a stand-in that reproduces an older CLI: pages printed
-  back-to-back, `--slurp` refused.
-* `real` + `GH_245_BIN` — the unmodified upstream **gh 2.45.0** release binary
-  (which has no `api --slurp`), pointed at the local fixture.
-* `real` + installed gh — **gh 2.101.0**, for the no-regression case.
+Focused checks: the entire contributions behavior file passed after two test-only fixture repairs (resolve date from PATH rather than /bin/date, and use a disposable code root so workspace-local child homes are valid sibling homes). The affected child-home cases passed separately before the final suite run. The PR security behavior file passed with a workspace-local standard-tool PATH supplied through its documented FM_TEST_BASE_PATH option; its initial attempts lacked standard utilities and jq on NixOS. The changed Pi renderer consumer assertions passed against the installed Pi package. A focused selector executed the existing test function, including pending, success, denied, collapsed and expanded comparisons plus HTML export. No product renderer changed, so this phase's runtime surface is CLI/state output and no screenshot was captured.
 
-`api-request-log.txt` proves later pages were fetched (`...&page=2` requests);
-`gh-argv-log.txt` proves the shipped code never asks for `--slurp`;
-`contributions.json` is the durable persisted record.
+The remote trace test was attempted and failed during fixture setup: its real copied remote worker has an absolute /bin/bash interpreter, which is absent here. The available PATH Bash cannot satisfy that kernel executable path, and this phase cannot create /bin/bash outside the worktree. The test cannot exercise remote worker cleanup on this host without adapting its interpreter deployment or using a compatible host; no remote behavior pass is claimed. Its trace and cleanup code were not modified in this phase.
 
-## Scenarios driven (all pass, 49 assertions)
+Live GitHub readback confirms PR 5645 has its restored descriptive title, remains open and unmerged, is mergeable, and retains the same branch. Compare shows published head 23fa8f79 contains required base f5930603 with no commits behind that base. GitHub's force-push event records before-head 9aa0e8a8 and after-head 23fa8f79. GitHub cannot prove whether the publisher used --force-with-lease; that command's execution record belongs to the outer delivery workflow. This Test phase does not publish, change the PR, merge, or control a pipeline. Final attestation rebinding to the head approved after these test fixes remains the outer executor's Push/PR/CI responsibility.
 
-| scenario | result |
-| --- | --- |
-| poll an owned PR on a gh that rejects `api --slurp`: observation recorded from both pages, no unavailability, both second-page maintainer signals wake once | pass |
-| re-poll does not re-ring; `pending` shows both signals; `ack` clears them with no replay | pass |
-| poll a filed issue on that gh: second-page comment + `ready-for-pr` event surface, author/outsider comments filtered, no duplicates | pass |
-| poll an owned PR with the **real gh 2.45.0** binary (no `api --slurp` at all) | pass |
-| poll an owned PR with the installed gh 2.101.0 (no regression for current CLIs) | pass |
-| the authenticated registered check surfaces the second-page signals on that gh | pass |
-| adversarial: a corrupt page is a disclosed read failure with an error on the record, never silence | pass |
-| adversarial: a page assembly that never returns is killed at the five-second read bound; poll stays silent (budget refusal, not forge failure), the prior record is byte-identical, no orphaned child survives | pass |
-| regression reproduction: the pre-change script (`549e07f`) against the same **real gh 2.45.0** asks for `--paginate --slurp`, reports `observation unavailable`, records an error and wakes nothing | pass |
-
-## Also exercised
-
-* `bash tests/fm-contributions.test.sh` — the whole contributions behaviour
-  suite, every case green (includes the old-gh pagination cases and the
-  clock-pinned bounded-assembly case).
-* `focused-contributions-clock.test.sh` — the three cases this change owns,
-  run repeatedly to show the five-second reserve no longer depends on
-  wall-clock seconds after the review round's clock pinning.
-* `pr-check-security-suite.log` — `bash tests/fm-pr-check-security.test.sh`
-  (45 assertions, no failures), whose fake gh now answers the product's
-  bare-page reads, exercising the same retrieval surface through
-  `bin/fm-pr-check.sh`.
-
-## Re-run
-
-```sh
-SCRATCH=$(mktemp -d)
-mkdir -p "$SCRATCH/base_pre"
-git archive 549e07f37fd73aa01d74cd126b1111c99175abed bin | tar -x -C "$SCRATCH/base_pre"
-curl -sSL -o "$SCRATCH/gh.zip" \
-  https://github.com/cli/cli/releases/download/v2.45.0/gh_2.45.0_macOS_arm64.zip
-(cd "$SCRATCH" && unzip -q gh.zip)
-ROOT="$PWD" SCRATCH="$SCRATCH" EVIDENCE_DIR="$SCRATCH/out" \
-  GH_245_BIN="$SCRATCH/gh_2.45.0_macOS_arm64/bin/gh" \
-  bash live-drive.sh
-```
-
-Nothing here touched the operator's real `FM_HOME`, configuration, or gh
-credentials: every run used a throwaway home, a throwaway `GH_CONFIG_DIR`, and a
-fixture token, and the scratch tree was deleted afterwards.
+Scratch download materialization for reproducing `live-drive.py`: download https://github.com/cli/cli/releases/download/v2.45.0/gh_2.45.0_linux_amd64.tar.gz into worktree .test-scratch, extract it there, then run `python3 /home/art/.no-mistakes/evidence/01M3XQ033JEYWZVQ6AHD4N27BN/live-drive.py` from the run worktree. Stop and remove scratch after the run. This turn stopped its HTTP server and all bounded test commands and removed transient worktree scratch; evidence remains here.
