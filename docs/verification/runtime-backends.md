@@ -2478,6 +2478,8 @@ Repeat the hooked-worker check above before publication if watcher or task-inbox
 
 Every fresh pool slot is a directory neither runtime has seen, so both used to stop there and wait for a person to press Enter.
 The two runtimes persist that decision at two different scopes, and the spawn now answers each with the mechanism that runtime documents rather than with a keystroke.
+Automatic folder trust applies to qualifying linked pool worktrees, including pooled secondmate homes; standalone secondmate checkouts retain attended approval.
+Codex registration failure stops an eligible launch before the worker starts.
 
 Verified 2026-10-02 on Linux with codex-cli 0.159.2 and Pi 0.99.2, both against a throwaway config root (`CODEX_HOME`, `PI_CODING_AGENT_DIR`) so the operator's own stores were untouched:
 

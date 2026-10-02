@@ -21,6 +21,7 @@ set -u
 . "$(dirname "${BASH_SOURCE[0]}")/fixtures.sh"
 
 TMP_ROOT=$(fm_test_tmproot fm-codex-trust)
+printf '{}\n' > "$TMP_ROOT/treehouse-state.json"
 
 TRUST="$ROOT/bin/fm-codex-trust.sh"
 
@@ -412,16 +413,17 @@ test_missing_python_is_refused() {
 
 # --- secondmate homes -------------------------------------------------------
 
-test_secondmate_standalone_clone_home_is_trusted() {
+test_secondmate_standalone_clone_home_requires_attended_trust() {
   local rec home out
   rec=$(make_case sm-clone)
   read_case "$rec"
   home="$CASE_DIR/home"
   seed_secondmate_home "$home" "android"
   out=$(run_home_trust "$CODEX_HOME" "$home" android)
-  expect_code 0 $? "a seeded standalone-clone secondmate home must be trusted: $out"
-  assert_trusted_root "$CODEX_HOME" "$home" "the home itself was not recorded as trusted"
-  pass "fm-codex-trust.sh: a seeded secondmate home that is a standalone clone is trusted"
+  expect_code 1 $? "a standalone-clone secondmate home must not be pre-trusted: $out"
+  assert_contains "$out" "attended provisioning" "the refusal did not name the attended approval step"
+  assert_absent "$(store_of "$CODEX_HOME")" "the standalone home gained automatic trust"
+  pass "fm-codex-trust.sh: standalone secondmate homes keep attended folder trust"
 }
 
 test_secondmate_leased_worktree_home_is_trusted() {
@@ -477,21 +479,34 @@ test_codex_spawn_pretrusts_the_repository_root() {
   pass "fm-spawn.sh: a codex crewmate pre-registers folder trust and launches"
 }
 
-# A refused registration must degrade to the pre-existing behavior - a dialog a
-# human can answer, with codex's own affirmative already selected - rather than
-# fail a spawn over a config file the operator may be editing.
-test_codex_spawn_launches_when_registration_is_refused() {
-  local case_dir=$TMP_ROOT/spawn-codex-refused fakebin out
-  mkdir -p "$case_dir"
-  fakebin=$(make_launch_home "$case_dir" codex codex)
-  out=$(FM_TEST_CODEX_HOME=relative-codex-home \
-    spawn_with_fakebin "$case_dir" "$case_dir/home" spawn-codex-2 "$case_dir/project" \
-    "$case_dir/wt" "$fakebin")
-  expect_code 0 $? "a codex spawn whose trust registration was refused must still launch: $out"
-  assert_contains "$out" "could not pre-register codex folder trust" \
-    "the spawn did not report the refused registration"
-  assert_contains "$(cat "$case_dir/launch.log")" "codex" "the refused registration stopped the launch"
-  pass "fm-spawn.sh: a refused codex trust registration warns and launches anyway"
+test_codex_spawn_stops_when_registration_is_refused() {
+  local kind case_dir fakebin home id out status
+  for kind in ship scout secondmate; do
+    case_dir="$TMP_ROOT/spawn-codex-refused-$kind"
+    id="codex-refused-$kind"
+    mkdir -p "$case_dir"
+    fakebin=$(make_launch_home "$case_dir" codex codex)
+    if [ "$kind" = secondmate ]; then
+      home="$case_dir/secondmate"
+      seed_secondmate_home "$home" "$id" worktree
+      out=$(FM_TEST_CODEX_HOME=relative-codex-home spawn_secondmate_with_fakebin "$case_dir" "$home" "$id" "$fakebin")
+    elif [ "$kind" = scout ]; then
+      fm_test_spawn_brief "$case_dir/home" "$id"
+      : > "$case_dir/launch.log"
+      out=$(FM_TEST_CODEX_HOME=relative-codex-home FM_FAKE_LAUNCH_LOG="$case_dir/launch.log" \
+        fm_test_run_spawn "$case_dir/home" "$case_dir/wt" "$fakebin" "$id" "$case_dir/project" --scout)
+    else
+      out=$(FM_TEST_CODEX_HOME=relative-codex-home \
+        spawn_with_fakebin "$case_dir" "$case_dir/home" "$id" "$case_dir/project" "$case_dir/wt" "$fakebin")
+    fi
+    status=$?
+    expect_code 1 "$status" "a $kind Codex spawn whose trust registration was refused must stop: $out"
+    assert_contains "$out" "could not pre-register codex folder trust" "the spawn did not report the refused registration"
+    assert_contains "$out" "relative path" "the refusal did not identify the registration cause"
+    assert_equals '' "$(cat "$case_dir/launch.log")" "a worker launched after trust refusal"
+    assert_absent "$case_dir/home/state/$id.meta" "refused trust published a worker record"
+  done
+  pass "fm-spawn.sh: a refused codex trust registration stops before worker launch"
 }
 
 test_pi_spawn_launches_with_the_trust_flag() {
@@ -513,7 +528,7 @@ test_pi_secondmate_launch_carries_the_trust_flag() {
   local case_dir=$TMP_ROOT/spawn-pi-secondmate fakebin home out launch
   mkdir -p "$case_dir"
   home="$case_dir/sm-home"
-  seed_secondmate_home "$home" spawn-pi-2
+  seed_secondmate_home "$home" spawn-pi-2 worktree
   fakebin=$(make_launch_home "$case_dir" pi pi)
   out=$(spawn_secondmate_with_fakebin "$case_dir" "$home" spawn-pi-2 "$fakebin")
   expect_code 0 $? "a pi secondmate spawn should succeed: $out"
@@ -640,7 +655,7 @@ test_concurrent_store_writers_keep_both_projects() {
 }
 
 test_codex_launch_reads_the_registered_store() {
-  local kind case_dir fakebin worker_home launch selected override out
+  local kind case_dir fakebin worker_home expected_root launch selected override out
   for kind in ship scout secondmate; do
     case_dir="$TMP_ROOT/store-launch-$kind"
     mkdir -p "$case_dir"
@@ -666,10 +681,12 @@ SH
     printf 'FM_CODEX_STORE_RESULT\nFM_CODEX_EXPECT_ROOT\n' > "$case_dir/home/config/launch-env-allowlist"
     if [ "$kind" = secondmate ]; then
       worker_home="$case_dir/secondmate"
-      seed_secondmate_home "$worker_home" store-launch-secondmate
+      seed_secondmate_home "$worker_home" store-launch-secondmate worktree
+      expected_root="$worker_home.src"
       out=$(FM_TEST_CODEX_HOME="$override" spawn_secondmate_with_fakebin "$case_dir" "$worker_home" store-launch-secondmate "$fakebin")
     else
       worker_home="$case_dir/project"
+      expected_root=$worker_home
       if [ "$kind" = scout ]; then
         fm_test_spawn_brief "$case_dir/home" "store-launch-$kind"
         : > "$case_dir/launch.log"
@@ -682,7 +699,7 @@ SH
     expect_code 0 $? "store-pinned $kind spawn failed: $out"
     launch=$(cat "$case_dir/launch.log")
     env -i HOME="$case_dir/destination-home" CODEX_HOME="$case_dir/wrong-store" \
-      FM_CODEX_STORE_RESULT="$case_dir/worker-store" FM_CODEX_EXPECT_ROOT="$worker_home" \
+      FM_CODEX_STORE_RESULT="$case_dir/worker-store" FM_CODEX_EXPECT_ROOT="$expected_root" \
       PATH="$fakebin:$PATH" TERM=xterm bash -c "$launch" || fail "worker did not consume the registered store"
     assert_equals "$selected" "$(cat "$case_dir/worker-store")" "worker selected a different Codex store"
     assert_absent "$case_dir/wrong-store/config.toml" "registration wrote a second store"
@@ -702,8 +719,75 @@ test_spawn_fixture_isolates_an_exported_codex_home() {
   pass "spawn fixture: exported Codex profiles remain untouched"
 }
 
+test_secondmate_automatic_trust_is_limited_to_linked_pool_homes() {
+  local harness shape case_dir fakebin home out launch status argv store
+  for harness in codex pi pi-signed; do
+    for shape in standalone nonpool pool; do
+      case_dir="$TMP_ROOT/scope-$harness-$shape"
+      mkdir -p "$case_dir"
+      fakebin=$(make_launch_home "$case_dir" "$harness" "$harness")
+      home="$case_dir/secondmate"
+      if [ "$shape" = standalone ]; then
+        seed_secondmate_home "$home" "scope-$harness-$shape"
+      else
+        if [ "$shape" = nonpool ]; then
+          home="$case_dir/attended/secondmate"
+        fi
+        seed_secondmate_home "$home" "scope-$harness-$shape" worktree
+      fi
+      cat > "$fakebin/$harness" <<'SH'
+#!/usr/bin/env bash
+case "${1:-}" in
+  --help) exit 0 ;;
+  --version) printf '0.99.2\n'; exit 0 ;;
+esac
+printf '%s\n' "$@" > "$FM_FOLDER_ARGV"
+SH
+      chmod +x "$fakebin/$harness"
+      out=$(spawn_secondmate_with_fakebin "$case_dir" "$home" "scope-$harness-$shape" "$fakebin")
+      status=$?
+      expect_code 0 "$status" "$harness $shape secondmate launch failed: $out"
+      launch=$(cat "$case_dir/launch.log")
+      env -i HOME="$case_dir/destination" PATH="$fakebin:$PATH" TERM=xterm \
+        FM_FOLDER_ARGV="$case_dir/argv" bash -c "$launch" || fail "secondmate launch did not reach $harness"
+      argv="$case_dir/argv"
+      store="$case_dir/home/user-home/.codex"
+      if [ "$harness" = codex ]; then
+        if [ "$shape" = pool ]; then
+          assert_trusted_root "$store" "$home.src" "pooled Codex home was not registered"
+        else
+          assert_absent "$store/config.toml" "attended Codex home gained automatic trust"
+        fi
+      elif [ "$shape" = pool ]; then
+        grep -Fxq -- --approve "$argv" || fail "pooled Pi home lost its per-run approval"
+      else
+        if grep -Fxq -- --approve "$argv"; then
+          fail "attended Pi home gained automatic approval"
+        fi
+      fi
+    done
+  done
+  pass "fm-spawn.sh: Codex and both Pi identities automate only linked pool secondmate homes"
+}
+
+test_direct_registration_refuses_linked_homes_outside_the_pool() {
+  local rec home out
+  rec=$(make_case sm-nonpool)
+  read_case "$rec"
+  home="$CASE_DIR/attended/home"
+  seed_secondmate_home "$home" nonpool worktree
+  out=$(run_home_trust "$CODEX_HOME" "$home" nonpool)
+  expect_code 1 $? "direct registration trusted a linked home outside the pool: $out"
+  assert_contains "$out" "qualifying linked pool" "the refusal did not identify the scope"
+  assert_absent "$(store_of "$CODEX_HOME")" "nonpool secondmate trust was persisted"
+  out=$(run_trust "$CODEX_HOME" "$home" "$home.src")
+  expect_code 1 $? "worktree mode trusted a linked home outside the pool: $out"
+  assert_absent "$(store_of "$CODEX_HOME")" "worktree mode persisted nonpool trust"
+  pass "fm-codex-trust.sh: both registration modes refuse linked paths outside the pool"
+}
+
 test_live_guard_requires_editor_and_owns_cleanup() {
-  local case_dir="$TMP_ROOT/live-guard" fakebin screen out status socket root
+  local case_dir="$TMP_ROOT/live-guard" fakebin scenario screen signal expected out status socket root
   mkdir -p "$case_dir/home/.codex"
   printf '{}\n' > "$case_dir/home/.codex/auth.json"
   fakebin=$(fm_fakebin "$case_dir")
@@ -721,6 +805,9 @@ case "$1" in
   new-session)
     mkdir -p "$(dirname "$socket")"
     : > "$socket"
+    if [ -n "${FM_LIVE_TEST_SIGNAL:-}" ]; then
+      kill -s "$FM_LIVE_TEST_SIGNAL" "$(cat "$FM_LIVE_TEST_PID_FILE")"
+    fi
     if [ "$4" = fmft-codex-above ]; then
       python3 - "${@: -1}" <<'PY'
 import re
@@ -746,24 +833,46 @@ PY
       *) exit 2 ;;
     esac
     ;;
-  kill-server) [ -e "$socket" ] && rm "$socket" ;;
+  kill-server)
+    [ -e "$socket" ]
+    printf '%s\n' "$socket" > "$FM_LIVE_TMUX_STOPPED"
+    rm "$socket"
+    ;;
   *) exit 2 ;;
 esac
 SH
   chmod +x "$fakebin/tmux"
-  for screen in '' 'sh: codex: command not found' 'Ask Codex to do anything'; do
+  for scenario in empty crashed editor hup quit; do
+    signal=''
+    case "$scenario" in
+      empty) screen=''; expected=1 ;;
+      crashed) screen='sh: codex: command not found'; expected=1 ;;
+      editor) screen='Ask Codex to do anything'; expected=0 ;;
+      hup) screen=''; signal=HUP; expected=129 ;;
+      quit) screen=''; signal=QUIT; expected=131 ;;
+    esac
     : > "$case_dir/tmux.log"
+    rm -f "$case_dir/stopped"
     out=$(HOME="$case_dir/home" FM_FOLDER_TRUST_LIVE=1 FM_LIVE_TMUX_LOG="$case_dir/tmux.log" \
+      FM_LIVE_TMUX_STOPPED="$case_dir/stopped" FM_LIVE_TEST_SIGNAL="$signal" \
+      FM_LIVE_TEST_PID_FILE="$case_dir/live.pid" \
       FM_LIVE_REGISTERED_SCREEN="$screen" PATH="$fakebin:$PATH" \
-      bash "$ROOT/tests/fm-folder-trust-live-e2e.test.sh" 2>&1)
+      python3 - "$ROOT/tests/fm-folder-trust-live-e2e.test.sh" "$case_dir/live.pid" 2>&1 <<'PY'
+import os
+import pathlib
+import signal
+import sys
+pathlib.Path(sys.argv[2]).write_text(str(os.getpid()))
+signal.signal(signal.SIGHUP, signal.SIG_DFL)
+signal.signal(signal.SIGQUIT, signal.SIG_DFL)
+os.execvp("bash", ["bash", sys.argv[1]])
+PY
+)
     status=$?
-    if [ "$screen" = 'Ask Codex to do anything' ]; then
-      expect_code 0 "$status" "live guard rejected the synthetic editor: $out"
-    else
-      expect_code 1 "$status" "live guard accepted an empty or failed pane: $out"
-    fi
+    expect_code "$expected" "$status" "live guard failed the $scenario exit contract: $out"
     socket=$(head -1 "$case_dir/tmux.log" | cut -f1)
     root=${socket%/*}
+    assert_equals "$socket" "$(cat "$case_dir/stopped")" "live guard removed its socket before stopping tmux"
     assert_absent "$root" "live guard leaked its registered fixture root"
     python3 - "$case_dir/tmux.log" "$socket" <<'PY' || fail "live guard did not clean up exactly its own socket"
 import pathlib
@@ -777,6 +886,8 @@ PY
 }
 
 test_live_guard_requires_editor_and_owns_cleanup
+test_secondmate_automatic_trust_is_limited_to_linked_pool_homes
+test_direct_registration_refuses_linked_homes_outside_the_pool
 test_equivalent_toml_entries_preserve_operator_decisions
 test_unsupported_and_malformed_toml_is_unchanged
 test_concurrent_store_writers_keep_both_projects
@@ -798,11 +909,11 @@ test_non_git_and_missing_directories_are_refused
 test_foreign_worktree_and_subdirectory_are_refused
 test_project_argument_that_is_itself_a_worktree_registers_the_primary_checkout
 test_missing_python_is_refused
-test_secondmate_standalone_clone_home_is_trusted
+test_secondmate_standalone_clone_home_requires_attended_trust
 test_secondmate_leased_worktree_home_is_trusted
 test_secondmate_home_refuses_everything_unseeded
 test_codex_spawn_pretrusts_the_repository_root
-test_codex_spawn_launches_when_registration_is_refused
+test_codex_spawn_stops_when_registration_is_refused
 test_pi_spawn_launches_with_the_trust_flag
 test_pi_secondmate_launch_carries_the_trust_flag
 test_pi_launch_flag_reaches_the_pi_process

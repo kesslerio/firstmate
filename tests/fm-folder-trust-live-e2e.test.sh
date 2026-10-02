@@ -44,6 +44,8 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
+trap 'exit 129' HUP
+trap 'exit 131' QUIT
 
 open_pane() {  # <name> <dir> <command...>: start one harness in a fresh pane
   local name=$1 dir=$2
@@ -139,6 +141,7 @@ PROJ="$CASE/project"
 WT="$CASE/wt"
 PI_WT="$CASE/pi-wt"
 fm_git_worktree "$PROJ" "$WT" "wt-live"
+printf '{}\n' > "$TMP_ROOT/treehouse-state.json"
 # pi gates a directory on .pi resources or an ancestor .agents/skills; a firstmate
 # worktree has both, so the fixture carries the same shape.
 mkdir -p "$PI_WT/.pi/extensions" "$PI_WT/.agents/skills"
