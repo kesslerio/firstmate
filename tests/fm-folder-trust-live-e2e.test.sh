@@ -9,14 +9,15 @@
 # confirm the assumption written into it, so this replays the REAL launch flags
 # firstmate builds (captured from a spawn driven through a fake pane, the
 # tests/fm-codex-hook-layer-live-e2e.test.sh shape) against the installed
-# binaries in a throwaway config root, inside a fresh linked worktree, and reads
-# the rendered pane.
+# binaries in a throwaway config root and fresh directories, and reads the
+# rendered pane.
 #
-# Four facts are pinned, two per runtime, and each is only meaningful beside its
-# control:
+# Five facts are pinned, three for Codex and two for Pi, with controls:
 #   codex  an unregistered fresh worktree renders the dialog (the fixture really
 #          is trust-gated, so the pass below cannot go vacuous)
 #   codex  bin/fm-codex-trust.sh, run first, removes it
+#   codex  trusting an ancestor above the repository root leaves the dialog
+#          standing
 #   pi     an untrusted fresh directory renders the prompt with the launch flags
 #          minus pi's own trust flag
 #   pi     the same flags as firstmate actually launches them, which carry

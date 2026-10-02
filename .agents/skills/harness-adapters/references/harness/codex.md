@@ -20,6 +20,7 @@ A directory trust dialog appears on the first run for a repository root: "Folder
 Saved folder approval covers the canonical repository root and its worktrees; `../../../bin/fm-codex-trust.sh` owns the store format and registration safeguards.
 For a qualifying linked pool worktree, `../../../bin/fm-spawn.sh` requires successful registration through `../../../bin/fm-codex-trust.sh` before launching Codex, so registration failure stops the launch and successful registration removes the folder prompt.
 Secondmate seed markers do not grant folder trust: both registration modes require a linked pool worktree, while standalone and other attended checkouts keep manual folder approval.
+For an attended checkout, accept the selected "Trust and continue" option with Enter and verify the instructions begin processing.
 Bounded read-to-replace race: an independent writer can still add a distinct project's trusted entry after the final read and before replacement; losing that entry causes a recoverable folder re-prompt, without losing project data or granting trust to another project.
 The [maintainer verification record](../../../../../docs/verification/runtime-backends.md#folder-and-project-trust-on-a-fresh-worktree) owns versioned vendor observations and the live refresh command.
 
