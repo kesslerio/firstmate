@@ -23,7 +23,7 @@
 # disposition through the same decoder every remote seat path uses
 # (bin/fm-fleet-seats.sh reconcile-remote). Only a confirmed start republishes
 # this home's harness, model, effort, and seat generation, read back from the
-# endpoint's own route report; a refused relaunch leaves this parent's record
+# endpoint's own route report; a verified prelaunch refusal leaves the record
 # untouched and releases only its own candidate, and an unknown outcome keeps
 # the candidate counted for reconciliation. Nothing is ever cancelled by task
 # id alone.

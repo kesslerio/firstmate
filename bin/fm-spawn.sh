@@ -57,8 +57,8 @@
 #   ordinary relaunch. It refuses unless the recorded endpoint is positively
 #   agent-free on a backend with a recovery-grade agent-state classifier (tmux
 #   or herdr), and clears the previous harness's per-task wiring before arming
-#   the new incarnation. Two verdicts are agent-free: a `dead` endpoint is
-#   ADOPTED as-is, while an endpoint PROVEN gone is RE-CREATED in the recorded
+#   the new incarnation. Subject to bin/fm-fleet-seats.sh's predecessor proof,
+#   a `dead` endpoint is ADOPTED; one PROVEN gone is RE-CREATED in the recorded
 #   worktree and the republished record rebinds the task to it. That proof is
 #   its own step, because a backend's `missing` also covers an endpoint that is
 #   merely unreachable from here - and it is only available on HERDR, which must

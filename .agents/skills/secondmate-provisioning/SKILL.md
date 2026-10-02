@@ -215,7 +215,7 @@ Do not hand off `local-only` items.
 
 ## Recovery
 
-For local `kind=secondmate` meta with no window, treat the secondmate as a dead persistent direct report and respawn it with:
+For local `kind=secondmate` meta with no window, attempt recovery through the [generation-bound launch owner](../../../bin/fm-spawn.sh) with:
 
 ```sh
 bin/fm-spawn.sh <id> --secondmate
