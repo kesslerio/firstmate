@@ -138,6 +138,29 @@ assert_meta_profile() {
   assert_grep "effort=$effort" "$meta" "meta missing effort=$effort"
 }
 
+assert_pi_launch_args() {
+  python3 - "$@" <<'PY' || fail "Pi launch did not preserve its executable and option values"
+import shlex
+import sys
+launch, harness, executable, extension, tui, *profile = sys.argv[1:]
+words = shlex.split(launch)
+index = words.index(executable)
+assert "FM_PI_HARNESS=" + harness in words[:index]
+argv = words[index + 1:]
+assert argv.count("--approve") == 1, argv
+expected = {"-e": extension}
+if tui:
+    expected["--tui-mode"] = tui
+else:
+    assert "--tui-mode" not in argv, argv
+if profile:
+    expected.update({"--model": profile[0], "--thinking": profile[1]})
+for flag, value in expected.items():
+    assert argv.count(flag) == 1, argv
+    assert argv[argv.index(flag) + 1] == value, argv
+PY
+}
+
 test_no_profile_keeps_claude_profile_defaults() {
   local rec id out status expected launch
   id=profile-off-z1
@@ -920,8 +943,8 @@ test_pi_threads_model_and_max_effort() {
   expect_code 0 "$status" "pi spawn with max effort should succeed"
   assert_meta_profile "$HOME_DIR/state/$id.meta" pi openai-codex/gpt-5.6-sol max
   launch=$(cat "$LAUNCH_LOG")
-  assert_contains "$launch" "FM_PI_HARNESS=pi '$FAKEBIN_DIR/pi' --tui-mode regular --approve --model 'openai-codex/gpt-5.6-sol' --thinking 'max' -e" \
-    "pi launch did not force the regular TUI while threading the requested model and max thinking level"
+  assert_pi_launch_args "$launch" pi "$FAKEBIN_DIR/pi" "$HOME_DIR/state/$id.pi-ext.ts" \
+    regular openai-codex/gpt-5.6-sol max
   assert_not_contains "$launch" "FM_FIRSTMATE_PI_LAUNCH_BRIEF=" \
     "pi launch still exports the removed Calm input-reroute binding"
   assert_contains "$launch" "fm-operational-input.sh' encode launch-brief" \
@@ -942,8 +965,8 @@ test_pi_signed_threads_shared_pi_profile_and_preserves_identity() {
   assert_contains "$out" "spawned $id harness=pi-signed" "pi-signed spawn did not preserve its visible identity"
   assert_meta_profile "$HOME_DIR/state/$id.meta" pi-signed openai-codex/gpt-5.6-sol max
   launch=$(cat "$LAUNCH_LOG")
-  assert_contains "$launch" "FM_PI_HARNESS=pi-signed '$FAKEBIN_DIR/pi-signed' --tui-mode regular --approve --model 'openai-codex/gpt-5.6-sol' --thinking 'max' -e" \
-    "pi-signed launch did not force the regular TUI with Pi's model, thinking, and extension semantics"
+  assert_pi_launch_args "$launch" pi-signed "$FAKEBIN_DIR/pi-signed" "$HOME_DIR/state/$id.pi-ext.ts" \
+    regular openai-codex/gpt-5.6-sol max
   assert_contains "$launch" "fm-operational-input.sh' encode launch-brief" \
     "pi-signed launch lost the canonical typed launch-brief envelope"
   assert_present "$HOME_DIR/state/$id.pi-ext.ts" "pi-signed launch did not install Pi's turn-end extension"
@@ -954,7 +977,7 @@ test_pi_signed_threads_shared_pi_profile_and_preserves_identity() {
 }
 
 test_pi_tui_mode_probe_is_safe_for_old_and_new_pi() {
-  local harness version rec id out status launch
+  local harness version rec id out status launch tui
   for harness in pi pi-signed; do
     for version in 0.82.0 0.84.0; do
       id="profile-${harness}-tui-${version//./}-z8d"
@@ -967,17 +990,12 @@ test_pi_tui_mode_probe_is_safe_for_old_and_new_pi() {
       status=$?
       expect_code 0 "$status" "$harness $version spawn should succeed"
       launch=$(cat "$LAUNCH_LOG")
-      assert_contains "$launch" "'$FAKEBIN_DIR/$harness'" \
-        "$harness $version launch must use the executable selected for probing"
-      assert_not_contains "$launch" "FM_PI_HARNESS=$harness $harness" \
-        "$harness $version launch must not re-resolve a bare executable in the worker"
+      tui=regular
       if [ "$version" = 0.82.0 ]; then
-        assert_not_contains "$launch" "--tui-mode" \
-          "$harness $version launch must omit unsupported --tui-mode"
-      else
-        assert_contains "$launch" "'$FAKEBIN_DIR/$harness' --tui-mode regular" \
-          "$harness $version launch must preserve the regular TUI"
+        tui=
       fi
+      assert_pi_launch_args "$launch" "$harness" "$FAKEBIN_DIR/$harness" \
+        "$HOME_DIR/state/$id.pi-ext.ts" "$tui"
     done
   done
   pass "Pi launch probing omits --tui-mode on older Pi and preserves it on supporting Pi"
