@@ -35,29 +35,27 @@ fm_live_gate default-on FM_FOLDER_TRUST_LIVE codex pi tmux
 CODEX_VERSION=$(codex --version 2>&1 | head -1)
 PI_VERSION=$(pi --version 2>&1 | head -1)
 TMP_ROOT=$(fm_test_tmproot fm-folder-trust-live)
-SESSIONS=''
+TMUX_SOCKET="$TMP_ROOT/tmux.sock"
 
 cleanup() {
-  local s
-  for s in $SESSIONS; do
-    tmux kill-session -t "$s" 2>/dev/null || true
-  done
+  tmux -S "$TMUX_SOCKET" kill-server 2>/dev/null || true
+  fm_test_cleanup
 }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 open_pane() {  # <name> <dir> <command...>: start one harness in a fresh pane
   local name=$1 dir=$2
   shift 2
   local sess="fmft-$name"
-  tmux kill-session -t "$sess" 2>/dev/null || true
-  tmux new-session -d -s "$sess" -x 160 -y 45 \
-    "sh -c 'cd \"$dir\" && exec $*'"
-  SESSIONS="$SESSIONS $sess"
+  tmux -S "$TMUX_SOCKET" new-session -d -s "$sess" -x 160 -y 45 \
+    "sh -c 'cd \"$dir\" && exec $*'" || fail "could not open the test-owned pane $sess"
   printf '%s\n' "$sess"
 }
 
 pane_text() {  # <session>: the visible viewport, whitespace-collapsed
-  tmux capture-pane -pt "$1" -S -60 2>/dev/null | tr -s ' \n' '  ' || true
+  tmux -S "$TMUX_SOCKET" capture-pane -pt "$1" -S -60 2>/dev/null | tr -s ' \n' '  ' || true
 }
 
 # read_pane <session>: the viewport with any vendor update nag dismissed. Both
@@ -71,7 +69,7 @@ read_pane() {
     text=$(pane_text "$sess")
     case $text in
       *'Update available'* | *'Update Available'* | *'Release notes'*)
-        tmux send-keys -t "$sess" Escape 2>/dev/null || true
+        tmux -S "$TMUX_SOCKET" send-keys -t "$sess" Escape 2>/dev/null || true
         sleep 1
         continue
         ;;
@@ -105,11 +103,14 @@ see_codex_dialog() {
   return 1
 }
 
-see_codex_running() { # codex's own affirmative is gone and its composer is up
+see_codex_running() {
   case $1 in
     *'Trust this folder?'*) return 1 ;;
   esac
-  return 0
+  case $1 in
+    *'Ask Codex to do anything'* | *'? for shortcuts'*) return 0 ;;
+  esac
+  return 1
 }
 
 see_pi_prompt() {
@@ -228,9 +229,8 @@ test_codex_root_entry_is_the_narrow_key() {
   printf 'check_for_update_on_startup = false\n\n[projects."%s"]\ntrust_level = "trusted"\n' "$above" \
     > "$above_home/config.toml"
   ln -s "$HOME/.codex/auth.json" "$above_home/auth.json"
-  rm -rf "$CASE/other"
-  fm_git_worktree "$CASE/other-project" "$CASE/other" other-wt
-  sess=$(open_pane codex-above "$CASE/other" \
+  fm_git_worktree "$above/project" "$above/wt" other-wt
+  sess=$(open_pane codex-above "$above/wt" \
     "env CODEX_HOME=$above_home codex $CODEX_FLAGS")
   text=$(wait_for_pane "$sess" see_codex_dialog 30)
   see_codex_dialog "$text" ||

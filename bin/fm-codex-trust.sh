@@ -105,10 +105,7 @@ refuse() { echo "error: refusing to pre-register Codex folder trust: $1" >&2; ex
 
 real_dir() { (cd -P -- "$1" 2>/dev/null && pwd -P); }
 
-# The fully resolved path of an existing file, or empty. Resolution runs in node
-# because it must follow a symlink chain to its final target, and node is already
-# this script's store writer.
-real_file() { node -e 'process.stdout.write(require("node:fs").realpathSync(process.argv[1]))' "$1" 2>/dev/null; }
+real_file() { python3 -c 'import pathlib, sys; print(pathlib.Path(sys.argv[1]).resolve(strict=True))' "$1" 2>/dev/null; }
 
 # The resolved common dir of a git directory, or empty. --git-common-dir can be
 # relative, so it is resolved from inside the directory rather than joined here.
@@ -141,10 +138,6 @@ if [ "$MODE" = worktree ]; then
   [ -n "$PROJ_REAL" ] || refuse "project '$PROJ_ARG' is not an accessible directory"
 fi
 
-# Codex reads its config from ${CODEX_HOME:-$HOME/.codex}, and fm-spawn.sh
-# forwards CODEX_HOME onto the launch by inheriting it rather than resolving it,
-# so a relative value would name one store here and another in the pane. Refuse
-# rather than guess at the worker's cwd.
 CODEX_DIR=${CODEX_HOME:-}
 if [ -z "$CODEX_DIR" ]; then
   [ -n "${HOME:-}" ] || refuse "neither CODEX_HOME nor HOME is set, so the store cannot be located"
@@ -236,7 +229,7 @@ else
     || refuse "'$TARGET_REAL' has no verifiable repository root to register (its common dir is '$HOME_COMMON')"
 fi
 
-command -v node >/dev/null 2>&1 || refuse "node is required to record folder trust and was not found on PATH"
+command -v python3 >/dev/null 2>&1 || refuse "python3 with tomllib (Python 3.11+) is required to record folder trust and was not found on PATH"
 
 STORE="$CODEX_DIR_REAL/config.toml"
 # A dotfile manager or a synced folder legitimately symlinks this store, so the
@@ -248,6 +241,14 @@ if [ -L "$STORE" ]; then
   [ -n "$STORE_REAL" ] || refuse "'$STORE' is a symlink whose target cannot be resolved"
   STORE=$STORE_REAL
 fi
+TRUST_LIB_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+FM_STATE_OVERRIDE=$(dirname -- "$STORE") . "$TRUST_LIB_DIR/fm-wake-lib.sh"
+TRUST_LOCK="$STORE.fm-trust.lock"
+trap 'fm_lock_release "$TRUST_LOCK"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+fm_lock_acquire_wait_max "$TRUST_LOCK" 15 || refuse "could not acquire the folder-trust store lock '$TRUST_LOCK'"
+
 if [ -e "$STORE" ]; then
   [ -f "$STORE" ] || refuse "'$STORE' is not a regular file"
   [ -O "$STORE" ] || refuse "'$STORE' is not owned by this user"
@@ -262,129 +263,97 @@ fi
 # repository root is appended, or its existing `trust_level` line is checked -
 # so every unrelated line, hook entry, and profile in the operator's own config
 # survives byte for byte.
-if ! node - "$STORE" "$TRUST_ROOT" <<'NODE'
-const fs = require("node:fs");
-const path = require("node:path");
-const crypto = require("node:crypto");
-const [store, root] = process.argv.slice(2);
-if (/[\0\r\n]/.test(root)) throw new Error(`cannot register a path containing a line break: ${JSON.stringify(root)}`);
-// TOML basic-key escaping, which is the form Codex itself writes.
-const key = root.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-const header = `[projects."${key}"]`;
-// The declared path inside any `[projects."<path>"]` table header, tolerant of
-// the whitespace a hand-edited file adds, so an existing entry is recognised in
-// the form it was written rather than only in the form this script would write.
-const declaredKey = (line) => {
-  const match = /^\s*\[projects\."((?:[^"\\]|\\.)*)"\]\s*$/.exec(line);
-  return match ? match[1] : null;
-};
-const readStore = () => {
-  try {
-    return fs.readFileSync(store);
-  } catch (err) {
-    if (err.code === "ENOENT") return null;
-    throw err;
-  }
-};
-const fingerprint = (buf) => (buf === null ? "absent" : crypto.createHash("sha256").update(buf).digest("hex"));
-// Where this repository's entry already lives, and what it says: the header
-// line, the first line after its stanza, and the recorded trust_level text
-// (null when the stanza declares none). Null when the file has no entry here.
-const findEntry = (lines) => {
-  let found = null;
-  for (let i = 0; i < lines.length; i += 1) {
-    if (declaredKey(lines[i]) !== key) continue;
-    if (found !== null) throw new Error(`${store} declares an entry for ${root} more than once`);
-    found = { line: i, end: lines.length, value: null };
-    for (let j = i + 1; j < lines.length; j += 1) {
-      if (/^\s*\[/.test(lines[j])) {
-        found.end = j;
-        break;
-      }
-      const body = lines[j].replace(/^\s+/, "");
-      if (body === "" || body.startsWith("#")) continue;
-      if (!/^trust_level\s*=/.test(body)) {
-        throw new Error(`${store} holds an unexpected key under the entry for ${root}: ${lines[j].trim()}`);
-      }
-      found.value = body.replace(/^trust_level\s*=\s*/, "").replace(/\s+#.*$/, "").replace(/\s+$/, "");
-    }
-  }
-  return found;
-};
-// Null when nothing is recorded, the entry when something is, and a refusal when
-// a human already recorded a decision this write is not entitled to flip: a
-// value that is not "trusted" is most often a hand-written policy, and silently
-// granting every future interactive session of that repository what the operator
-// declined is the failure mode this whole control must not become.
-const recordedEntry = (text) => {
-  const entry = findEntry(text.split("\n"));
-  if (entry === null) return null;
-  if (entry.value !== null && entry.value !== '"trusted"') {
-    throw new Error(`${store} already records trust_level = ${entry.value} for ${root}; refusing to overwrite that decision`);
-  }
-  return entry;
-};
-const attempt = () => {
-  const original = readStore();
-  const before = fingerprint(original);
-  const text = original === null ? "" : original.toString("utf8");
-  const lines = text.split("\n");
-  const firstHeader = lines.findIndex((line) => /^\s*\[/.test(line));
-  const topLevel = firstHeader === -1 ? lines.length : firstHeader;
-  // A top-level inline table or dotted-key form for `projects` is a form this
-  // does not own; editing it correctly needs a TOML writer, so refuse loudly
-  // rather than append a table Codex may read as a conflict.
-  for (let i = 0; i < topLevel; i += 1) {
-    if (/^\s*projects\s*=/.test(lines[i])) {
-      throw new Error(`${store} sets "projects" inline rather than as [projects."<path>"] tables; refusing to guess at that form`);
-    }
-    if (new RegExp(`^\\s*projects\\."${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"\\.trust_level\\s*=`).test(lines[i])) {
-      throw new Error(`${store} sets trust for ${root} as a dotted key; refusing to guess at that form`);
-    }
-  }
-  const entry = recordedEntry(text);
-  let updated;
-  if (entry !== null && entry.value !== null) return "recorded";
-  if (entry !== null) {
-    // The header exists but says nothing: record the decision inside the existing
-    // stanza rather than declaring the same table a second time.
-    lines.splice(entry.line + 1, 0, 'trust_level = "trusted"');
-    updated = lines.join("\n");
-  } else {
-    const stanza = `${header}\ntrust_level = "trusted"\n`;
-    const separator = text === "" ? "" : text.endsWith("\n") ? "\n" : "\n\n";
-    updated = `${text}${separator}${stanza}`;
-  }
-  const unique = `${process.pid}.${crypto.randomBytes(8).toString("hex")}`;
-  const tmp = path.join(path.dirname(store), `.config.toml.fm-trust.${unique}`);
-  fs.writeFileSync(tmp, updated, { mode: 0o600, flag: "wx" });
-  let renamed = false;
-  try {
-    if (fingerprint(readStore()) !== before) return "moved";
-    fs.renameSync(tmp, store);
-    renamed = true;
-  } finally {
-    if (!renamed) fs.rmSync(tmp, { force: true });
-  }
-  const after = recordedEntry(fs.readFileSync(store, "utf8"));
-  return after !== null && after.value === '"trusted"' ? "recorded" : "dropped";
-};
-try {
-  for (let i = 0; i < 3; i += 1) {
-    const result = attempt();
-    if (result === "recorded") process.exit(0);
-    if (result === "moved" && i >= 1) {
-      console.error(`error: ${store} was modified while folder trust was being recorded; refusing to overwrite it`);
-      process.exit(1);
-    }
-  }
-} catch (err) {
-  console.error(`error: ${err.message}`);
-  process.exit(1);
-}
-console.error(`error: ${store} did not retain folder trust for ${root} after 3 attempts`);
-process.exit(1);
-NODE
+if ! python3 - "$STORE" "$TRUST_ROOT" <<'PY'
+import json
+import os
+import pathlib
+import sys
+import tempfile
+try:
+    import tomllib
+except ModuleNotFoundError:
+    print("error: Python 3.11+ with tomllib is required to record folder trust", file=sys.stderr)
+    sys.exit(1)
+
+store = pathlib.Path(sys.argv[1])
+root = sys.argv[2]
+header = f"[projects.{json.dumps(root, ensure_ascii=False)}]"
+
+def read_store():
+    try:
+        return store.read_bytes()
+    except FileNotFoundError:
+        return None
+
+def entry_in(text):
+    config = tomllib.loads(text)
+    projects = config.get("projects", {})
+    if not isinstance(projects, dict):
+        raise ValueError(f'{store} does not declare projects as a table')
+    entry = projects.get(root)
+    if entry is None:
+        return None, None
+    if not isinstance(entry, dict) or set(entry) - {"trust_level"}:
+        raise ValueError(f'{store} holds unexpected keys under the entry for {root}')
+    indices = []
+    for i, line in enumerate(text.splitlines(keepends=True)):
+        if not line.lstrip().startswith("["):
+            continue
+        try:
+            table = tomllib.loads(line)
+        except tomllib.TOMLDecodeError:
+            continue
+        if table == {"projects": {root: {}}}:
+            indices.append(i)
+    if len(indices) != 1:
+        raise ValueError(f'{store} sets trust for {root} inline or as a dotted key; refusing to guess at that form')
+    if "trust_level" in entry and entry["trust_level"] != "trusted":
+        raise ValueError(f'{store} already records trust_level = {entry["trust_level"]!r} for {root}; refusing to overwrite that decision')
+    return entry, indices[0]
+
+def attempt():
+    original = read_store()
+    text = "" if original is None else original.decode("utf-8")
+    entry, index = entry_in(text)
+    if entry is not None and entry.get("trust_level") == "trusted":
+        return "recorded"
+    if entry is not None:
+        lines = text.splitlines(keepends=True)
+        if not lines[index].endswith("\n"):
+            lines[index] += "\n"
+        lines.insert(index + 1, 'trust_level = "trusted"\n')
+        updated = "".join(lines)
+    else:
+        separator = "" if not text else "\n" if text.endswith("\n") else "\n\n"
+        updated = f'{text}{separator}{header}\ntrust_level = "trusted"\n'
+    after, _ = entry_in(updated)
+    if after is None or after.get("trust_level") != "trusted":
+        raise ValueError(f'{store} would not retain folder trust for {root}')
+    fd, tmp = tempfile.mkstemp(prefix=".config.toml.fm-trust.", dir=store.parent)
+    try:
+        with os.fdopen(fd, "wb") as staged:
+            staged.write(updated.encode("utf-8"))
+        if read_store() != original:
+            return "moved"
+        os.replace(tmp, store)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+    after, _ = entry_in(store.read_text(encoding="utf-8"))
+    return "recorded" if after is not None and after.get("trust_level") == "trusted" else "dropped"
+
+try:
+    for i in range(3):
+        result = attempt()
+        if result == "recorded":
+            sys.exit(0)
+        if result == "moved" and i >= 1:
+            raise ValueError(f'{store} was modified while folder trust was being recorded; refusing to overwrite it')
+    raise ValueError(f'{store} did not retain folder trust for {root} after 3 attempts')
+except (OSError, ValueError) as err:
+    print(f'error: {err}', file=sys.stderr)
+    sys.exit(1)
+PY
 then
   refuse "could not record folder trust for '$TRUST_ROOT' in '$STORE'"
 fi

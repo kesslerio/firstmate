@@ -2508,5 +2508,6 @@ ok - live: pi 0.99.2 gates an untrusted fresh directory on the project-trust pro
 ok - live: pi 0.99.2 launches with --approve, shows no prompt, and persists nothing
 ```
 
-The portable suite reports `total=24 failed=0`, covering the store write, its preservation of every unrelated line of the operator's config, idempotence, and each structural refusal.
+The portable suite covers the store write, preservation of unrelated configuration, TOML key equivalence and operator decisions, concurrent writers, launch-store selection, fixture isolation, and structural refusals.
+Registration uses Python 3.11 or newer with `tomllib` to validate the existing and proposed configuration, serializes Firstmate writers by resolved config file, and sends the selected `CODEX_HOME` on the worker command even when launch-environment filtering is enabled.
 Hook trust is a separate and deliberately untouched decision: the crewmate launch still disables Codex's hook layer outright instead of pre-accepting that modal, and the live guard for that posture is `tests/fm-codex-hook-layer-live-e2e.test.sh`.
