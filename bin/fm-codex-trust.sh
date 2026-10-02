@@ -1,39 +1,27 @@
 #!/usr/bin/env bash
 # Pre-register Codex's folder trust for the repository a codex spawn is about to
-# launch into - the isolated task worktree of a ship or scout crewmate, or the
-# seeded home of a secondmate - so the worker reaches its brief instead of
-# parking on the "Trust this folder?" dialog until a person presses Enter.
+# launch into - a qualifying linked pool worktree of a ship or scout crewmate,
+# or a seeded secondmate home in that pool - so the worker reaches its brief
+# instead of parking on "Trust this folder?" until a person presses Enter.
 #
 # Usage: fm-codex-trust.sh <worktree> <project>
 #        fm-codex-trust.sh --secondmate-home <home> <id>
 #   <worktree>  the isolated task worktree this spawn launches into
-#   <project>   the primary checkout that worktree belongs to
-#   <home>      the seeded secondmate home this spawn launches into
+#   <project>   the recorded checkout sharing that worktree's repository
+#   <home>      the seeded linked pool worktree this secondmate launches into
 #   <id>        the secondmate id that home must already be marked for
 # Prints one line naming what it registered; refuses loudly on anything else.
 #
-# WHY THIS EXISTS. Codex gates a directory it has never seen behind
-# "Folder access … Trust this folder?", and no launch flag suppresses it:
-# `-c projects."<path>".trust_level="trusted"` is accepted and ignored for this
-# decision (verified on codex-cli 0.159.2, docs/verification/runtime-backends.md),
-# and every fresh pool slot is a directory nobody has answered for. The pane
-# therefore sat idle on a keystroke a human had to supply, per project, per
-# machine, on every otherwise unattended spawn.
+# WHY THIS EXISTS. A repository with no saved folder approval parks Codex on
+# "Folder access … Trust this folder?" before the worker reads its brief.
+# docs/verification/runtime-backends.md owns the vendor evidence for using the
+# persisted store rather than a command-line override.
 #
 # WHAT GETS WRITTEN, AND WHERE. Codex persists folder trust as
 # `[projects."<path>"] trust_level = "trusted"` in `${CODEX_HOME:-$HOME/.codex}/config.toml`,
-# and this script writes exactly one such stanza: the entry Codex's own
-# Enter-key answer would have written for that launch. Verified on
-# codex-cli 0.159.2 against the installed binary in a throwaway CODEX_HOME:
-# answering the dialog inside a LINKED WORKTREE persists the entry for the
-# REPOSITORY ROOT, not the worktree, and an entry registered for that root -
-# written ahead of launch, by this script - removes the dialog for that
-# worktree, while an entry for a directory merely ABOVE the repository root
-# does not. So the key is the canonical repository root, one write per project
-# covers every current and future worktree of it, and pool slots add nothing to
-# the store after the first spawn of that project. This is the opposite of
-# Pi's scope, which is a per-directory store with an unbounded parent walk
-# (bin/fm-spawn.sh's pi launch comment owns that half).
+# and this script registers the canonical repository root, never a pool slot
+# or an ancestor above the repository. One entry covers the project's current
+# and future worktrees; repeated registration is idempotent.
 #
 # Folder trust is not hook trust. The hook-trust modal stays unautomated and
 # the crewmate launch disables Codex's hook layer outright, because
@@ -43,21 +31,27 @@
 # firstmate-created worktree of a project firstmate was told to work on, and an
 # entry this script leaves behind is the entry that key would have written.
 #
-# THE SCOPE TEST IS THE SAFETY PROPERTY and mirrors bin/fm-claude-trust.sh.
+# THE SCOPE TEST IS THE SAFETY PROPERTY.
+# Both modes require a linked pool worktree that passes fm_treehouse_pool_slot
+# in bin/fm-wake-lib.sh; a linked worktree outside that pool is not sufficient.
 # Worktree mode: <worktree> must be a LINKED git worktree - its own git dir,
 # sharing <project>'s common dir - whose top level is exactly the resolved
 # argument, so a primary checkout, a worktree of an unrelated repo, a
 # subdirectory, a plain directory, and a home directory are each refused.
-# Secondmate-home mode: the directory must carry the seed evidence
+# Secondmate-home mode additionally requires the seed evidence
 # bin/fm-home-seed.sh writes and bin/fm-spawn.sh re-checks before launch.
+# A standalone secondmate checkout keeps attended folder approval.
 # Refusal is always a non-zero exit naming the reason, never a warning and
 # never a silent skip.
 #
 # Only the launching user's own store is written. It must be a regular file this
-# uid owns (or absent, in which case it is created), every unrelated line and
-# project entry is preserved verbatim, an existing entry is never rewritten
-# unless it already says `trusted`, the replacement is atomic, and the entry is
-# read back after the rename.
+# uid owns (or absent, in which case it is created). Existing non-trusted
+# decisions are refused rather than overwritten, and unrelated configuration
+# is preserved. Firstmate writers share a resolved-store lock; observed
+# concurrent trust edits for distinct projects are merged, and other edits
+# refuse the write. Replacement is atomic and the complete write is read back.
+# The Codex harness reference owns the bounded read-to-replace race limitation;
+# tests/fm-codex-trust.test.sh covers preservation, merging, and refusals.
 set -u
 # Path resolution here must answer from the filesystem, never from the caller's
 # environment, because the refusals below are the safety property. See

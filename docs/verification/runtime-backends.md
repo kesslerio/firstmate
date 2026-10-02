@@ -2443,10 +2443,7 @@ A throwaway scout was spawned through `bin/fm-spawn.sh --scout --harness omp --m
 
 ## Folder and project trust on a fresh worktree
 
-Every fresh pool slot is a directory neither runtime has seen, so both used to stop there and wait for a person to press Enter.
-The two runtimes persist that decision at two different scopes, and the spawn now answers each with the mechanism that runtime documents rather than with a keystroke.
-Automatic folder trust applies to qualifying linked pool worktrees, including pooled secondmate homes; standalone secondmate checkouts retain attended approval.
-Codex registration failure stops an eligible launch before the worker starts.
+The current launch and trust boundaries are owned by the [Codex](../../.agents/skills/harness-adapters/references/harness/codex.md) and [Pi](../../.agents/skills/harness-adapters/references/harness/pi.md) adapter references.
 
 Verified 2026-10-02 on Linux with codex-cli 0.159.2 and Pi 0.99.2, both against a throwaway config root (`CODEX_HOME`, `PI_CODING_AGENT_DIR`) so the operator's own stores were untouched:
 
@@ -2454,9 +2451,9 @@ Verified 2026-10-02 on Linux with codex-cli 0.159.2 and Pi 0.99.2, both against 
 | --- | --- |
 | Codex store | `[projects."<path>"] trust_level = "trusted"` in `${CODEX_HOME:-~/.codex}/config.toml`, the table Codex itself writes |
 | Codex scope | answering "Trust this folder?" inside a LINKED WORKTREE persists the entry for the REPOSITORY ROOT, and a root entry written ahead of launch removes the dialog for that worktree |
-| Codex scope, negative | an entry for a directory above the repository root does not remove it, so one entry per project is the whole grant and each project still asks once |
+| Codex scope, negative | an entry for a directory above the repository root leaves the dialog standing |
 | Codex, command line | `-c 'projects."<path>".trust_level="trusted"'` is accepted and ignored for this decision, so the persisted store is the only non-interactive path |
-| Codex, decline path | Escape records nothing, so a registered entry never overwrites a decision a human gave |
+| Codex, decline path | Escape records no trust entry |
 | Pi store | `<$PI_CODING_AGENT_DIR or ~/.pi/agent>/trust.json`, keyed per canonical directory with the closest parent entry winning |
 | Pi, per-run flag | `--approve` is consulted before the saved decisions, suppresses "Trust project folder?", still loads that directory's `.pi` resources and project extensions, and writes no store entry |
 
@@ -2478,5 +2475,5 @@ ok - live: pi 0.99.2 launches with --approve, shows no prompt, and persists noth
 ```
 
 The portable suite covers the store write, preservation of unrelated configuration, TOML key equivalence and operator decisions, concurrent writers, launch-store selection, fixture isolation, and structural refusals.
-Registration uses Python 3.11 or newer with `tomllib` to validate the existing and proposed configuration, serializes Firstmate writers by resolved config file, and sends the selected `CODEX_HOME` on the worker command even when launch-environment filtering is enabled.
-Hook trust is a separate and deliberately untouched decision: the crewmate launch still disables Codex's hook layer outright instead of pre-accepting that modal, and the live guard for that posture is `tests/fm-codex-hook-layer-live-e2e.test.sh`.
+The helper's [header](../../bin/fm-codex-trust.sh) owns registration safeguards; the [spawn header](../../bin/fm-spawn.sh) owns launch-store selection, including raw commands and environment filtering.
+The separate [hook-trust boundary](../../.agents/skills/harness-adapters/references/harness/codex.md#hook-trust) is refreshed by `tests/fm-codex-hook-layer-live-e2e.test.sh`.

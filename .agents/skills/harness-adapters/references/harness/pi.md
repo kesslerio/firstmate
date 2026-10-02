@@ -34,7 +34,8 @@ A project trust dialog can appear on the first Pi run in any not-yet-trusted dir
 Saved decisions are keyed per canonical directory with a walk up through the parents, the closest one winning, in `<$PI_CODING_AGENT_DIR or ~/.pi/agent>/trust.json`.
 For a qualifying linked pool worktree, the launch carries Pi's own `--approve`, a per-run decision consulted before saved decisions that persists nothing.
 Secondmate seed markers do not grant folder trust: both Pi identities require a linked pool worktree for `--approve`, while standalone and other attended checkouts keep manual folder approval.
-Verified on Pi 0.99.2, where the flag suppresses the prompt and still loads that directory's `.pi` resources and project extensions - the state answering the prompt by hand already produced - while the unflagged launch of the same directory still renders the prompt.
+Approval loads the directory's `.pi` resources and project extensions for that run.
+The [maintainer verification record](../../../../../docs/verification/runtime-backends.md#folder-and-project-trust-on-a-fresh-worktree) owns versioned vendor observations and the live refresh command.
 The store's per-directory scope is why a launch flag is the right shape here rather than a pre-registered entry: a pooled worktree path would otherwise add one store entry per slot, and a worker account pin relocates that store, so a writer would have to resolve the pin first.
 
 ## Worker turn-end extension
