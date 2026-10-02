@@ -1,0 +1,77 @@
+
+SCENARIO launch fresh candidate refuses without releasing pending predecessor
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"candidate.launch","requested_generation":"candidate.launch","actual_generation":null,"previous_generation":"previous.launch","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: unverified remote secondmate harness: notaharness
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state","task":"ios","revision":5,"incarnations":[{"generation":"previous.launch","previous_generation":null,"kind":"secondmate","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"reserved","launch_phase":"dispatching","owner_pid":148147,"owner_pid_identity":"linux-starttime=5460984 cmdline-hex=707974686f6e33002f686f6d652f6172742f2e6e6f2d6d697374616b65732f65766964656e63652f30314d33584e444837563939354a3936484138365445575834442f6c6976652d636c692d626f756e64732e707900","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"previous.launch"},"startup_confirmed":false,"disposition":null},{"generation":"candidate.launch","previous_generation":"previous.launch","kind":"secondmate","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"released","launch_phase":"dispatching","owner_pid":148147,"owner_pid_identity":"linux-starttime=5460984 cmdline-hex=707974686f6e33002f686f6d652f6172742f2e6e6f2d6d697374616b65732f65766964656e63652f30314d33584e444837563939354a3936484138365445575834442f6c6976652d636c692d626f756e64732e707900","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"candidate.launch"},"startup_confirmed":false,"disposition":{"reason":"prelaunch","source":"reconcile-remote","generation":"candidate.launch","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"candidate.launch"},"operation":"candidate.launch"}}]}
+
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch fresh candidate refuses without releasing pending predecessor
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"candidate.relaunch","requested_generation":"candidate.relaunch","actual_generation":null,"previous_generation":"previous.relaunch","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: unverified remote secondmate harness: notaharness
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state","task":"ios","revision":5,"incarnations":[{"generation":"previous.relaunch","previous_generation":null,"kind":"secondmate","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"reserved","launch_phase":"dispatching","owner_pid":148147,"owner_pid_identity":"linux-starttime=5460984 cmdline-hex=707974686f6e33002f686f6d652f6172742f2e6e6f2d6d697374616b65732f65766964656e63652f30314d33584e444837563939354a3936484138365445575834442f6c6976652d636c692d626f756e64732e707900","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"previous.relaunch"},"startup_confirmed":false,"disposition":null},{"generation":"candidate.relaunch","previous_generation":"previous.relaunch","kind":"secondmate","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"released","launch_phase":"dispatching","owner_pid":148147,"owner_pid_identity":"linux-starttime=5460984 cmdline-hex=707974686f6e33002f686f6d652f6172742f2e6e6f2d6d697374616b65732f65766964656e63652f30314d33584e444837563939354a3936484138365445575834442f6c6976652d636c692d626f756e64732e707900","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"candidate.relaunch"},"startup_confirmed":false,"disposition":{"reason":"prelaunch","source":"reconcile-remote","generation":"candidate.relaunch","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"candidate.relaunch"},"operation":"candidate.relaunch"}}]}
+
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch home system-call trace
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"trace.launch.home","requested_generation":"trace.launch.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+Actual execve trace shows no endpoint provider, control or spawn invocation; parent remains reserved. Evidence: exec-launch-home.log
+
+SCENARIO launch directories system-call trace
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"trace.launch.directories","requested_generation":"trace.launch.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+Actual execve trace shows no endpoint provider, control or spawn invocation; parent remains reserved. Evidence: exec-launch-directories.log
+
+SCENARIO relaunch home system-call trace
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"trace.relaunch.home","requested_generation":"trace.relaunch.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+Actual execve trace shows no endpoint provider, control or spawn invocation; parent remains reserved. Evidence: exec-relaunch-home.log
+
+SCENARIO relaunch directories system-call trace
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"trace.relaunch.directories","requested_generation":"trace.relaunch.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+Actual execve trace shows no endpoint provider, control or spawn invocation; parent remains reserved. Evidence: exec-relaunch-directories.log
+
+SCENARIO pre-fix launch reproduces unsafe downgrade and parent release
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"before.launch","requested_generation":"before.launch","actual_generation":null,"previous_generation":null,"disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+schema=fm-remote-seat-receipt.v1
+operation=before.launch
+verb=launch
+requested_generation=before.launch
+previous_generation=-
+route_backend=herdr
+route_target=fm-lab-custody:w1:p1
+phase=prelaunch
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state","task":"ios","revision":3,"incarnations":[{"generation":"before.launch","previous_generation":null,"kind":"secondmate","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"released","launch_phase":"dispatching","owner_pid":148147,"owner_pid_identity":"linux-starttime=5460984 cmdline-hex=707974686f6e33002f686f6d652f6172742f2e6e6f2d6d697374616b65732f65766964656e63652f30314d33584e444837563939354a3936484138365445575834442f6c6976652d636c692d626f756e64732e707900","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"before.launch"},"startup_confirmed":false,"disposition":{"reason":"prelaunch","source":"reconcile-remote","generation":"before.launch","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"before.launch"},"operation":"before.launch"}}]}
+
+
+SCENARIO pre-fix relaunch reproduces unsafe downgrade and parent release
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"before.relaunch","requested_generation":"before.relaunch","actual_generation":null,"previous_generation":null,"disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+schema=fm-remote-seat-receipt.v1
+operation=before.relaunch
+verb=relaunch
+requested_generation=before.relaunch
+previous_generation=-
+route_backend=herdr
+route_target=fm-lab-custody:w1:p1
+phase=prelaunch
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state","task":"ios","revision":3,"incarnations":[{"generation":"before.relaunch","previous_generation":null,"kind":"secondmate","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"released","launch_phase":"dispatching","owner_pid":148147,"owner_pid_identity":"linux-starttime=5460984 cmdline-hex=707974686f6e33002f686f6d652f6172742f2e6e6f2d6d697374616b65732f65766964656e63652f30314d33584e444837563939354a3936484138365445575834442f6c6976652d636c692d626f756e64732e707900","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"before.relaunch"},"startup_confirmed":false,"disposition":{"reason":"prelaunch","source":"reconcile-remote","generation":"before.relaunch","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"before.relaunch"},"operation":"before.relaunch"}}]}
+
+Additional CLI boundaries and original-head reproductions completed.

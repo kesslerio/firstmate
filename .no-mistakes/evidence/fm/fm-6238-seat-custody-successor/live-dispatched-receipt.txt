@@ -1,0 +1,8 @@
+schema=fm-remote-seat-receipt.v1
+operation=live.barrier
+verb=launch
+requested_generation=live.barrier
+previous_generation=-
+phase=dispatched
+route_backend=herdr
+route_target=fm-lab-custody:w1:p1

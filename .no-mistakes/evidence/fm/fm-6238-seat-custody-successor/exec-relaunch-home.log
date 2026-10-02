@@ -1,0 +1,114 @@
+155507 execve("/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/bin/fm-remote-secondmate-control.sh", ["/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffdb5474dc0 /* 92 vars */) = 0
+155507 execve("/home/art/.npm-packages/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/home/art/.local/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/home/art/.npm-packages/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/run/wrappers/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/home/art/.local/share/flatpak/exports/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/var/lib/flatpak/exports/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/home/art/.nix-profile/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/nix/profile/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/home/art/.local/state/nix/profile/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/etc/profiles/per-user/art/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/nix/var/nix/profiles/default/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = -1 ENOENT (No such file or directory)
+155507 execve("/run/current-system/sw/bin/bash", ["bash", "/home/art/.no-mistakes/worktrees"..., "relaunch", "ios", "notaharness", "pool-model-a", "medium", "--operation", "trace.relaunch.home"], 0x7ffd1f333a30 /* 92 vars */) = 0
+155510 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/worktrees"...], 0x556a86892570 /* 92 vars */) = 0
+155510 +++ exited with 0 +++
+155508 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155510, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155508 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155508, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155512 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155512, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155516 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/worktrees"...], 0x556a86893a20 /* 92 vars */) = 0
+155516 +++ exited with 0 +++
+155514 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155516, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155514 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155514, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155522 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155522, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155525 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/worktrees"...], 0x556a86893a20 /* 92 vars */) = 0
+155525 +++ exited with 0 +++
+155524 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155525, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155524 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155524, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155530 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/worktrees"...], 0x556a86897270 /* 92 vars */) = 0
+155530 +++ exited with 0 +++
+155528 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155530, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155528 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155528, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155536 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/worktrees"...], 0x556a86897270 /* 92 vars */) = 0
+155536 +++ exited with 0 +++
+155535 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155536, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155535 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155535, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155542 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/worktrees"...], 0x556a86897270 /* 92 vars */) = 0
+155542 +++ exited with 0 +++
+155540 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155542, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155540 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155540, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155544 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155544, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155548 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155548, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155550 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155550, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155556 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155556, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155562 execve("/run/current-system/sw/bin/uname", ["uname", "-s"], 0x556a86897270 /* 92 vars */) = 0
+155562 +++ exited with 0 +++
+155558 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155562, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155558 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155558, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155588 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/worktrees"...], 0x556a868959b0 /* 92 vars */) = 0
+155588 +++ exited with 0 +++
+155586 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155588, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155586 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155586, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155592 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155592, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155594 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155594, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155597 execve("/run/current-system/sw/bin/uname", ["uname"], 0x556a86895950 /* 92 vars */) = 0
+155597 +++ exited with 0 +++
+155595 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155597, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155595 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155595, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155601 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/worktrees"...], 0x556a86895950 /* 92 vars */) = 0
+155601 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155601, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155613 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/worktrees"...], 0x556a86b4a670 /* 92 vars */) = 0
+155613 +++ exited with 0 +++
+155612 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155613, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155612 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155612, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155615 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155615, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155623 execve("/run/current-system/sw/bin/dirname", ["dirname", "--", "/home/art/.no-mistakes/worktrees"...], 0x556a8692b0c0 /* 92 vars */) = 0
+155623 +++ exited with 0 +++
+155622 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155623, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155622 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155622, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155626 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/worktrees"...], 0x556a8692b0c0 /* 92 vars */) = 0
+155626 +++ exited with 0 +++
+155625 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155626, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155625 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155625, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155633 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155633, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155642 execve("/run/current-system/sw/bin/cat", ["cat", "/home/art/.no-mistakes/worktrees"...], 0x556a86ca7200 /* 92 vars */) = 0
+155642 +++ exited with 0 +++
+155641 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155642, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155641 +++ exited with 1 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155641, si_uid=1000, si_status=1, si_utime=0, si_stime=0} ---
+155644 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155644, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155646 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155646, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155650 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155650, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155653 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155653, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155654 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155654, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155655 +++ exited with 0 +++
+155507 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=155655, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+155507 +++ exited with 1 +++

@@ -1,0 +1,29 @@
+
+SCENARIO launch invalid same-token retry at six-seat capacity
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"six.launch","requested_generation":"six.launch","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+original dispatched receipt byte-for-byte unchanged; parent pending generation still reserved
+fleet-seats: pool shared is full (6 of 6 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer0
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer1
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer2
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer3
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer4
+
+SCENARIO relaunch invalid same-token retry at six-seat capacity
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"six.relaunch","requested_generation":"six.relaunch","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+original dispatched receipt byte-for-byte unchanged; parent pending generation still reserved
+fleet-seats: pool shared is full (6 of 6 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer0
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer1
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer2
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer3
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state peer4
+Six-seat capacity remains enforced after both early refusal paths.

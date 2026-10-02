@@ -1,0 +1,334 @@
+
+SCENARIO launch retained received, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.received.home","requested_generation":"live.launch.received.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=84cfb67d8a6f341934c6987ced4458fd204c413df9ff22e213ee432e5b11402f; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained received, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.received.directories","requested_generation":"live.launch.received.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=aac393ae4817147e560b21a8191baeeb54ac222edab31142c40a23346be9cbf6; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained dispatched, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.dispatched.home","requested_generation":"live.launch.dispatched.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=670aa24ca2bef678a5eaf9d3dddd9690773832259f2b015f041f67d0251e587b; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained dispatched, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.dispatched.directories","requested_generation":"live.launch.dispatched.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=1109119af3adbf403f74d8e1fa591268c25d24e55d555033a60ef52187c0572e; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained started, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.started.home","requested_generation":"live.launch.started.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=49ea327fe04be131b14ef14cf6919480736bf774de45238b4297384290fe2f72; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained started, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.started.directories","requested_generation":"live.launch.started.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=88c248cf506c67396b818daf3905fdaf7c1cf91ffb2a96bed3655ccc4c731ddf; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained prelaunch, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.prelaunch.home","requested_generation":"live.launch.prelaunch.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=57c1df74502206725486eb4d066cd1be48bd434cf462842ed37192fc2b9d0510; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained prelaunch, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.prelaunch.directories","requested_generation":"live.launch.prelaunch.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=4be1c3537cba9ee1df50646441452b3a1d9a2cb7a8a2fad2ec1c0b49348a44e1; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained dead-after-start, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.dead.after.start.home","requested_generation":"live.launch.dead.after.start.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=6a99d0a2cd1405c9cfe765c4702b6edeb04d07206e3d3ca33f048496e767cbe3; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained dead-after-start, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.dead.after.start.directories","requested_generation":"live.launch.dead.after.start.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=0dba398468f95849cf7ea23a7f79ed53bfa67f256da2dc8964ca13f430ac3167; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained cancelled, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.cancelled.home","requested_generation":"live.launch.cancelled.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=6263dfa33381e0b8ab83f86356a75a1772ebc6ee417a441cedf783b8fd9288ac; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch retained cancelled, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.launch.cancelled.directories","requested_generation":"live.launch.cancelled.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=751db92c57d0656d84b7375933885d20aedca4aea8cd130f61fb03780adf481c; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch genuinely fresh refusal
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"fresh.launch","requested_generation":"fresh.launch","actual_generation":null,"previous_generation":null,"disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: unverified remote secondmate harness: notaharness
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state","task":"ios","revision":3,"incarnations":[{"generation":"fresh.launch","previous_generation":null,"kind":"secondmate","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"released","launch_phase":"dispatching","owner_pid":17830,"owner_pid_identity":"linux-starttime=5439866 cmdline-hex=707974686f6e33002f686f6d652f6172742f2e6e6f2d6d697374616b65732f65766964656e63652f30314d33584e444837563939354a3936484138365445575834442f6c6976652d637573746f64792e707900","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"fresh.launch"},"startup_confirmed":false,"disposition":{"reason":"prelaunch","source":"reconcile-remote","generation":"fresh.launch","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"fresh.launch"},"operation":"fresh.launch"}}]}
+
+
+SCENARIO launch same-token settled replay
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"fresh.launch","requested_generation":"fresh.launch","actual_generation":null,"previous_generation":null,"disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation fresh.launch was already handled on this host (prelaunch)
+receipt and immutable reservation byte-for-byte unchanged
+
+SCENARIO launch missing evidence
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"damaged.launch.missing","requested_generation":"damaged.launch.missing","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation damaged.launch.missing was already handled on this host (unknown)
+parent remains reserved; receipt never reopened or rewritten; immutable reservation unchanged
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch foreign evidence
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"damaged.launch.foreign","requested_generation":"damaged.launch.foreign","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation damaged.launch.foreign was already handled on this host (unknown)
+parent remains reserved; receipt never reopened or rewritten; immutable reservation unchanged
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch malformed evidence
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"damaged.launch.malformed","requested_generation":"damaged.launch.malformed","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation damaged.launch.malformed was already handled on this host (unknown)
+parent remains reserved; receipt never reopened or rewritten; immutable reservation unchanged
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained received, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.received.home","requested_generation":"live.relaunch.received.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=8f553f229970a17c831d669c388f5ac27edea7d87bdb8cdea5e9626ff67d2778; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained received, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.received.directories","requested_generation":"live.relaunch.received.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=54de10c1afd67edfb80be1a1a25e821604ae39172fe359405e67e9ea38e22529; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained dispatched, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.dispatched.home","requested_generation":"live.relaunch.dispatched.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=86a53cb19e7c9d491e026ef57cb731b11c0e0cf50ee739db47f42b70e100b8a0; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained dispatched, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.dispatched.directories","requested_generation":"live.relaunch.dispatched.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=eddc9dfd0eba086a566e605b93ba2c5792c045f7180cb15d3c7ec801cc11239e; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained started, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.started.home","requested_generation":"live.relaunch.started.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=66f6b0f7054cc52ab941a9cb01fc3a79d5dba34083c72766c95302adfd6b19fb; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained started, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.started.directories","requested_generation":"live.relaunch.started.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=915d0ef5a941095eae93b2037a663756ecbeb6d43069c0df3e6f004faad2d7eb; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained prelaunch, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.prelaunch.home","requested_generation":"live.relaunch.prelaunch.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=8444519e49f96e8937366103a2cf3344df2c61abcf76372d6de883f5f4e806ae; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained prelaunch, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.prelaunch.directories","requested_generation":"live.relaunch.prelaunch.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=386f094a04f429e835a35472490e2ed381324d66f13fa47b0ce16c55c1b6f3b2; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained dead-after-start, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.dead.after.start.home","requested_generation":"live.relaunch.dead.after.start.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=ab1e139882f5bf4f2f74a73b0ba39dd5941fb23378bcb35c55afc5a45f628d13; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained dead-after-start, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.dead.after.start.directories","requested_generation":"live.relaunch.dead.after.start.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=0db12803caa602b66e083b34628fbf5ecbf95334c17112bb7ec28e1bf7e82540; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained cancelled, refused home
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.cancelled.home","requested_generation":"live.relaunch.cancelled.home","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt sha256 unchanged=55ba8f7b7653b32b7004adfed78838444ef965ec476414174906b79145673668; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch retained cancelled, refused directories
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.relaunch.cancelled.directories","requested_generation":"live.relaunch.cancelled.directories","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote endpoint directories could not be created
+receipt sha256 unchanged=78862aaa652efcede3e3de04350358c3b169dbb778fa35108f7dd3f6c192406d; metadata and journal unchanged; parent=reserved
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch genuinely fresh refusal
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"fresh.relaunch","requested_generation":"fresh.relaunch","actual_generation":null,"previous_generation":null,"disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: unverified remote secondmate harness: notaharness
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state","task":"ios","revision":3,"incarnations":[{"generation":"fresh.relaunch","previous_generation":null,"kind":"secondmate","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"released","launch_phase":"dispatching","owner_pid":17830,"owner_pid_identity":"linux-starttime=5439866 cmdline-hex=707974686f6e33002f686f6d652f6172742f2e6e6f2d6d697374616b65732f65766964656e63652f30314d33584e444837563939354a3936484138365445575834442f6c6976652d637573746f64792e707900","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"fresh.relaunch"},"startup_confirmed":false,"disposition":{"reason":"prelaunch","source":"reconcile-remote","generation":"fresh.relaunch","route":{"placement":"remote","backend":"herdr","target":null,"home":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/host","host":"disposable-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D","operation":"fresh.relaunch"},"operation":"fresh.relaunch"}}]}
+
+
+SCENARIO relaunch same-token settled replay
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"fresh.relaunch","requested_generation":"fresh.relaunch","actual_generation":null,"previous_generation":null,"disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation fresh.relaunch was already handled on this host (prelaunch)
+receipt and immutable reservation byte-for-byte unchanged
+
+SCENARIO relaunch missing evidence
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"damaged.relaunch.missing","requested_generation":"damaged.relaunch.missing","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation damaged.relaunch.missing was already handled on this host (unknown)
+parent remains reserved; receipt never reopened or rewritten; immutable reservation unchanged
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch foreign evidence
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"damaged.relaunch.foreign","requested_generation":"damaged.relaunch.foreign","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation damaged.relaunch.foreign was already handled on this host (unknown)
+parent remains reserved; receipt never reopened or rewritten; immutable reservation unchanged
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch malformed evidence
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"damaged.relaunch.malformed","requested_generation":"damaged.relaunch.malformed","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation damaged.relaunch.malformed was already handled on this host (unknown)
+parent remains reserved; receipt never reopened or rewritten; immutable reservation unchanged
+fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO launch early retry during owner snapshot barrier
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.barrier","requested_generation":"live.barrier","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt unchanged; parent reserved; fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch early retry during owner snapshot barrier
+error: remote home belongs to foreign, not ios
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.barrier","requested_generation":"live.barrier","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: remote secondmate home validation failed
+receipt unchanged; parent reserved; fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO reject missing, unrelated, or stale writer carrier
+error: seat receipt update requires the verified lifecycle episode for ios
+receipt byte-for-byte unchanged
+
+SCENARIO reject missing, unrelated, or stale writer carrier
+error: seat receipt update requires the verified lifecycle episode for ios
+receipt byte-for-byte unchanged
+
+SCENARIO reject missing, unrelated, or stale writer carrier
+error: seat receipt update requires the verified lifecycle episode for ios
+receipt byte-for-byte unchanged
+
+SCENARIO launch busy lifecycle mutex
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.barrier","requested_generation":"live.barrier","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: another lifecycle episode for remote secondmate ios is running on this host
+parent remains reserved; fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+SCENARIO relaunch busy lifecycle mutex
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"live.barrier","requested_generation":"live.barrier","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: another lifecycle episode for remote secondmate ios is running on this host
+parent remains reserved; fleet-seats: pool shared is full (1 of 1 seats held); probe gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XNDH7V995J96HA86TEWX4D/.nm-live/parent/state ios
+
+OWNER RECEIPT AFTER BARRIER
+schema=fm-remote-seat-receipt.v1
+operation=live.barrier
+verb=launch
+requested_generation=live.barrier
+previous_generation=-
+phase=dispatched
+route_backend=herdr
+route_target=fm-lab-custody:w1:p1
+
+
+VERIFIED DESCENDANT UPDATE
+schema=fm-remote-seat-receipt.v1
+operation=live.barrier
+verb=launch
+requested_generation=live.barrier
+previous_generation=-
+route_backend=herdr
+route_target=fm-lab-custody:w1:p1
+phase=started
+actual_generation=live.barrier
+
+All direct product custody scenarios passed.
