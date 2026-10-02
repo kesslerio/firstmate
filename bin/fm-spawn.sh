@@ -172,7 +172,14 @@
 #   /updatefirstmate, restart). A bare adapter name (claude|codex|opencode|pi|pi-signed|grok|kimi|cursor|gemini|muse|rovo|omp|agy|devin)
 #   overrides it for this spawn (either kind). A non-flag string containing
 #   whitespace is treated as a RAW launch command - the escape hatch for verifying
-#   new adapters. For pi and pi-signed, fm-spawn resolves the selected executable
+#   new adapters. For Codex, registration and launch use the same absolute store:
+#   a raw command's leading CODEX_HOME assignment selects it, otherwise this
+#   process's CODEX_HOME is used. An empty or unset value falls back to .codex
+#   under the effective HOME, including a raw HOME prefix. Store-selection
+#   prefixes must be literal paths,
+#   with shell expansion refused. The raw CODEX_HOME prefixes are replaced by one
+#   resolved assignment, retained even under launch-environment filtering.
+#   For pi and pi-signed, fm-spawn resolves the selected executable
 #   name from PATH once, probes that concrete path with --help, and launches the
 #   same path. It adds --tui-mode regular only when that help advertises the flag;
 #   a failed or inconclusive probe omits it so older Pi versions remain launchable.
@@ -407,14 +414,8 @@
 # busy turn - answering the dialog first if it renders anyway - before
 # reporting success (the rovo/kimi launch-then-confirm shape). Its busy state
 # is a screen-scrape fallback like grok and rovo, and it is crewmate/scout only.
-# codex and pi gate a fresh directory the same way, and both are answered without
-# a human and without a keystroke: the codex launch pre-registers the repository
-# root in the operator's own Codex config through bin/fm-codex-trust.sh (the
-# claude shape, non-fatal, because codex's dialog preselects "Trust and
-# continue"), and the pi launch passes pi's own per-run trust flag, which is pi's
-# documented answer for an automated run and writes nothing. Both helpers' and
-# both templates' comments own the verified scope each runtime keys on - codex
-# the repository root, pi the launch directory.
+# Codex and Pi folder-trust policy is owned by their harness-adapter references;
+# bin/fm-codex-trust.sh owns Codex registration and its structural refusals.
 # cursor installs no per-task hook either: it writes state/<id>.cursor-session to
 # bind the pane to cursor's own conversation transcript (projects root, the exact
 # workspace path cursor records in .workspace-trusted, and the conversations that
@@ -422,7 +423,7 @@
 # resolver because `cursor` is not the CLI name. A cursor SECONDMATE instead runs
 # the tracked project-scope .cursor/hooks.json in its own home, whose stop-hook
 # park owns that home's supervision (docs/supervision-protocols/cursor.md).
-# claude is the one harness whose pre-launch setup can REFUSE the spawn: before
+# Claude also refuses a failed pre-launch trust registration: before
 # any per-task state exists, and before its worktree .claude/settings.local.json
 # hooks are written, every claude launch pre-registers the directory the pane
 # starts in - the task worktree, or the secondmate home for a --secondmate spawn -
@@ -2042,9 +2043,9 @@ launch_template() {
   # PRIMARY-session infrastructure that already stands down in a child worktree.
   # This is the opposite of --dangerously-bypass-hook-trust, which RUNS untrusted
   # hooks; disabling the feature runs none of them and leaves the operator's
-  # ~/.codex untouched. An unknown feature name is a hard codex error, so a future
-  # release that drops this flag fails the launch loudly instead of silently
-  # restoring the modal.
+  # hook-trust decisions untouched. An unknown feature name is a hard codex
+  # error, so a future release that drops this flag fails the launch loudly
+  # instead of silently restoring the modal.
   # A secondmate is a firstmate PRIMARY in its own home, and its turn-end guard,
   # session-start digest, and cd/arm seatbelts are exactly those project hooks
   # (docs/turnend-guard.md, docs/sessionstart-nudge.md, docs/cd-guard.md), so the
@@ -2057,18 +2058,10 @@ launch_template() {
     fi
     ;;
   opencode) printf '%s' 'OPENCODE_CONFIG_CONTENT='\''{"permission":{"*":"allow"}__EFFORTFLAG__}'\'' opencode __MODELFLAG__--prompt "$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
-  # Pi has no permission system, so the only launch dialog is project trust: a
-  # directory holding .pi resources or an ancestor .agents/skills parks on
-  # "Trust project folder?" until someone answers it. --approve is pi's own
-  # documented per-run decision for an automated run (docs/security.md
-  # "Project trust without an interactive prompt"), it is consulted before pi's
-  # saved decisions, and it persists nothing, so the trust.json store keeps
-  # holding only the decisions a human actually made. What it does change is
-  # what loads: the project's .pi resources and project extensions load for this
-  # run, which is exactly what answering the prompt by hand already did for every
-  # pooled worktree a human ever trusted. Pi's store is keyed per directory with
-  # a parent walk, so a per-run flag is also the only shape that does not grow a
-  # new store entry per pool slot.
+  # __PITRUST__ becomes --approve only after the linked-pool scope check below.
+  # The Pi harness reference owns the policy; docs/verification/runtime-backends.md
+  # owns the vendor evidence that approval loads project resources without
+  # persisting a decision or accumulating entries for pool slots.
   pi | pi-signed)
     printf '%s' '__PIBIN____PITUIMODE____PIRESUME____PITRUST__'
     if [ "$kind" = secondmate ]; then
