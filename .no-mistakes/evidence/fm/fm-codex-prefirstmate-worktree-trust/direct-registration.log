@@ -1,0 +1,3 @@
+trusted: /home/art/.no-mistakes/evidence/01M3YYK7P4G7RPC6D0H6B5QFQS/capture-lab/repo
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/evidence/01M3YYK7P4G7RPC6D0H6B5QFQS/capture-lab/repo' is a primary checkout, not an isolated worktree; approve its folder trust during attended provisioning
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/evidence/01M3YYK7P4G7RPC6D0H6B5QFQS/capture-lab/case/wt/sub' is not a worktree root (its root is '/home/art/.no-mistakes/evidence/01M3YYK7P4G7RPC6D0H6B5QFQS/capture-lab/case/wt')

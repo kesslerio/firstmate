@@ -1,0 +1,5 @@
+ok - live: codex codex-cli 0.159.2 gates an unregistered fresh worktree on the folder-trust dialog
+ok - live: codex codex-cli 0.159.2 launches into a pre-registered fresh worktree with no dialog
+ok - live: codex codex-cli 0.159.2 keys folder trust on the repository root, not an ancestor
+ok - live: pi 1.0.0 gates an untrusted fresh directory on the project-trust prompt
+ok - live: pi 1.0.0 launches with --approve, shows no prompt, and persists nothing

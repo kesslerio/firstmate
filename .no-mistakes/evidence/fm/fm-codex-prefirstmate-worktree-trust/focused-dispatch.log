@@ -1,0 +1,8 @@
+ok - a codex crewmate launches with no hook layer and keeps its turn-end signal
+ok - a codex secondmate keeps the project hook layer its primary session runs on
+ok - pi receives --model and --thinking max profile flags
+ok - pi-signed shares Pi launch semantics while preserving its configured and recorded identity
+ok - Pi launch probing omits --tui-mode on older Pi and preserves it on supporting Pi
+ok - pi-signed refuses safely and actionably when the selected executable is unavailable
+ok - pi-signed is a distinct persistent secondmate runtime with shared Pi supervision semantics
+ok - standalone Pi/pi-signed secondmate launches keep manual project trust
