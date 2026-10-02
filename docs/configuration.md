@@ -1275,6 +1275,7 @@ The pool names, capacities, and models are the operator's own choice; nothing is
 - A live legacy ship, scout, or secondmate record with a default, empty, or missing model occupies a seat in every declared pool until its model is resolved or the record is retired.
   A record with a resolved unpooled model occupies none.
 - A remote secondmate shares the same capacity through the existing primary-to-remote transport: while a declaration exists or needs clearing, the primary's watcher delivers the current pool declaration to each remote about every 30 seconds outside the fleet lock, with certificate publication fenced by the pending epoch, and a pooled remote launch files a seat request in that host's remote root home and waits for that answer.
+  The watcher bounds the entire sequential serving pass (see [`bin/fm-watch.sh`](../bin/fm-watch.sh) for the deadline) and logs failed remotes in `state/.watch-triage.log`; an interrupted pass retains pending uncertainty until a later complete certificate reconciles it.
 - Each remote home and its local descendants share one host ledger, delivery path, and certificate, including pooled descendants that predate the declaration.
 - Unpooled remote approvals are recorded as holders before certificate publication, so a later policy change counts them immediately.
 - A remote secondmate's own seat belongs to the primary: an initial launch or relaunch reserves its generation at the primary before the host's launch or relaunch operation, and the host reports one outcome bound to that generation.

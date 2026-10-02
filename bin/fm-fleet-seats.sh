@@ -1768,8 +1768,22 @@ if [ "$CMD" = serve-remotes ]; then
     unlock
     served=0
     rpc_rc=0
-    fm_run_timed "$REMOTE_CALL_TIMEOUT" "$SCRIPT_DIR/fm-on.sh" --stdin "$id" fm-fleet-seats.sh serve \
-        --digest "$DIGEST" --epoch "$EPOCH" "$@" < "$POOLS" > "$TMPD/served" 2>"$TMPD/served.err" || rpc_rc=$?
+    # Wait explicitly so pass cancellation can stop and reap the separate RPC
+    # group before this process exits and its enclosing watchdog reaps us.
+    rpc_pid=
+    trap 'trap "" HUP INT TERM
+      if [ -n "$rpc_pid" ]; then
+        kill -TERM "$rpc_pid" 2>/dev/null || true
+        wait "$rpc_pid" 2>/dev/null || true
+      fi
+      echo "unreachable $id (serve interrupted)"
+      exit 143' HUP INT TERM
+    ( fm_exec_timed "$REMOTE_CALL_TIMEOUT" 1 "$SCRIPT_DIR/fm-on.sh" --stdin "$id" fm-fleet-seats.sh serve \
+        --digest "$DIGEST" --epoch "$EPOCH" "$@" < "$POOLS" > "$TMPD/served" 2>"$TMPD/served.err" ) &
+    rpc_pid=$!
+    wait "$rpc_pid" || rpc_rc=$?
+    rpc_pid=
+    trap - HUP INT TERM
     lock_or_refuse "$LOCK"
     if [ "$rpc_rc" -eq 0 ]; then
       grep '^{' "$TMPD/served" | tail -1 > "$TMPD/cert"

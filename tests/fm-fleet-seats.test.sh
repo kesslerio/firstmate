@@ -15,6 +15,7 @@ TMP_ROOT=$(fm_test_tmproot fm-fleet-seats)
 SEATS="$ROOT/bin/fm-fleet-seats.sh"
 HOLDER_PIDS=
 REMOTE_JOBS="$TMP_ROOT/remote-jobs"
+SERVE_PIDS_FILE=
 
 stop_remote_worker() {
   if [ -f "$REMOTE_JOBS/worker.pid" ]; then
@@ -25,6 +26,11 @@ stop_remote_worker() {
 
 cleanup_holders() {
   local pid
+  if [ -f "$SERVE_PIDS_FILE" ]; then
+    while IFS= read -r pid; do
+      kill -KILL "$pid" 2>/dev/null || true
+    done < "$SERVE_PIDS_FILE"
+  fi
   for pid in $HOLDER_PIDS; do
     kill "$pid" 2>/dev/null || true
   done
@@ -886,6 +892,117 @@ test_primary_watcher_serves_remote_requests() {
   pass "the primary watcher's poll grants a waiting remote request"
 }
 
+test_watcher_bounds_the_whole_serve_pass_and_keeps_failure_evidence() {
+  local base="$TMP_ROOT/watch-serve-bound" home code fakebin id out rc elapsed pid state n
+  home="$base/primary"
+  code="$base/code"
+  SERVE_PIDS_FILE="$base/pids"
+  make_home "$home"
+  pools "$home" 2
+  mkdir -p "$code"
+  cp -R "$ROOT/bin" "$code/bin"
+  fakebin=$(fm_fakebin "$base/fake")
+  fm_fake_exit0 "$fakebin" tmux
+  for id in alpha beta gamma; do
+    make_remote_secondmate "$base/$id" "$id"
+    printf -- '- %s - Test remote. (host: test-host; root: %s; home: %s; scope: tests; projects: ; added 2026-09-28)\n' \
+      "$id" "$code" "$base/$id" >> "$home/data/secondmates.md"
+  done
+  # Fake the remote entrypoint, retaining real policy/certificate application.
+  # beta and gamma each exceed the per-call timeout, so a per-call-only bound
+  # cannot satisfy the whole-pass assertion. No remote worker or live backend.
+  cat > "$code/bin/fm-on.sh" <<'SH'
+#!/usr/bin/env bash
+id=$2
+shift 3
+printf '%s\n' "$id" >> "$FM_TEST_SERVE_BASE/calls"
+if [ -f "$FM_TEST_SERVE_BASE/slow" ]; then
+  if [ "$id" = alpha ]; then exit 255; fi
+  date +%s > "$FM_TEST_SERVE_BASE/started-$id"
+  printf 'done: supervision after remote serving\n' > "$FM_HOME/state/supervision.status"
+  printf '%s\n' "$$" >> "$FM_TEST_SERVE_BASE/pids"
+  trap '' TERM
+  sleep 600 &
+  printf '%s\n' "$!" >> "$FM_TEST_SERVE_BASE/pids"
+  wait
+  exit 255
+fi
+exec env -u FM_STATE_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_DATA_OVERRIDE \
+  FM_HOME="$FM_TEST_SERVE_BASE/$id" "$FM_TEST_SERVE_BASE/code/bin/fm-fleet-seats.sh" "$@"
+SH
+  chmod +x "$code/bin/fm-on.sh"
+  FM_TEST_SERVE_BASE="$base" FM_HOME="$home" "$code/bin/fm-fleet-seats.sh" serve-remotes \
+    > "$base/initial.out" 2>&1 || fail "initial fake-entrypoint serve: $(cat "$base/initial.out")"
+  for id in alpha beta gamma; do
+    cp "$home/state/fleet-seats/remote-$id.cert" "$base/$id.before.cert"
+  done
+  new_holder
+  reserve "$home" retained pool-model-a >/dev/null || fail "initial root reservation"
+  seats "$home" show retained > "$base/holder.before.json"
+  : > "$base/calls"
+  : > "$base/slow"
+  fm_test_track_watcher_state "$home/state"
+  rc=0
+  out=$(env -u FM_STATE_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_DATA_OVERRIDE -u FM_ROOT_OVERRIDE -u FM_TRACE_CONTEXT \
+    FM_TEST_SERVE_BASE="$base" FM_FLEET_SEATS_TEST_BACKOFF=0 FM_HOME="$home" \
+    FM_BACKEND=tmux TMUX="fake,1,0" PATH="$fakebin:$PATH" \
+    FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+    "$code/bin/fm-watch-checkpoint.sh" --seconds 50 2>&1) || rc=$?
+  expect_code 0 "$rc" "the watcher did not resume supervision: $out"
+  [ -f "$base/started-beta" ] || fail "the watcher did not enter a slow serve"
+  elapsed=$(( $(date +%s) - $(cat "$base/started-beta") ))
+  [ "$elapsed" -le 25 ] || fail "sequential serving delayed supervision ${elapsed}s beyond the whole-pass budget"
+  assert_contains "$out" 'signal:' "the queued supervision event was lost"
+  assert_equals $'alpha\nbeta' "$(cat "$base/calls")" "the partial pass started a remote after exhausting its budget"
+  assert_contains "$(cat "$home/state/.watch-triage.log")" 'fleet seat serving: unreachable alpha' "failed-host output never reached the watcher log"
+  assert_contains "$(cat "$home/state/.watch-triage.log")" 'fleet seat serving: unreachable beta (serve interrupted)' "the interrupted remote was not named in the watcher log"
+  assert_contains "$(cat "$home/state/.watch-triage.log")" 'fleet seat serving unavailable (rc=124)' "the pass deadline was not diagnosed"
+  for id in alpha beta; do
+    [ -s "$home/state/fleet-seats/remote-$id.pending" ] || fail "$id lost its pending uncertainty"
+    cmp -s "$home/state/fleet-seats/remote-$id.cert" "$base/$id.before.cert" || fail "incomplete transport replaced $id's certificate"
+  done
+  cmp -s "$home/state/fleet-seats/remote-gamma.cert" "$base/gamma.before.cert" || fail "the skipped remote's certificate changed"
+  seats "$home" show retained > "$base/holder.after.json"
+  cmp -s "$base/holder.before.json" "$base/holder.after.json" || fail "a partial pass mutated the reserved generation"
+  out=$(reserve "$home" blocked pool-model-a 2>&1); rc=$?
+  expect_code 5 "$rc" "pending transport allowed pooled admission: $out"
+  # The inner transport owns a separate group. It and its TERM-resistant child
+  # must stop too, rather than surviving the enclosing pass's cancellation.
+  while IFS= read -r pid; do
+    for n in $(seq 1 50); do
+      state=$(ps -p "$pid" -o stat= 2>/dev/null || true)
+      case "$state" in ''|*Z*) break ;; esac
+      sleep 0.1
+    done
+    case "$state" in ''|*Z*) ;; *) kill -KILL "$pid"; fail "serve descendant $pid survived cancellation" ;; esac
+  done < "$base/pids"
+  SERVE_PIDS_FILE=
+  rm -f "$base/slow" "$home/state/.fleet-seats-served"
+  FM_HOME="$home" FM_ROOT_OVERRIDE="$code" "$code/bin/fm-wake-drain.sh" \
+    > "$base/drain.out" 2> "$base/drain.err" || fail "could not drain the first supervision wake"
+  FM_HOME="$home" FM_ROOT_OVERRIDE="$code" bash -c \
+    '. "$1/tests/wake-helpers.sh"; ack_drain_err "$2" "$3"' \
+    _ "$ROOT" "$home/state" "$base/drain.err" >/dev/null || fail "could not acknowledge the first supervision wake"
+  # A later watcher pass must reconcile the retained pending epochs normally.
+  printf 'done: later successful serving\n' > "$home/state/recovery.status"
+  rc=0
+  out=$(env -u FM_STATE_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_DATA_OVERRIDE -u FM_ROOT_OVERRIDE -u FM_TRACE_CONTEXT \
+    FM_TEST_SERVE_BASE="$base" FM_FLEET_SEATS_TEST_BACKOFF=0 FM_HOME="$home" \
+    FM_BACKEND=tmux TMUX="fake,1,0" PATH="$fakebin:$PATH" \
+    FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+    "$code/bin/fm-watch-checkpoint.sh" --seconds 15 2>&1) || rc=$?
+  expect_code 0 "$rc" "later watcher serve failed: $out"
+  for id in alpha beta gamma; do
+    assert_absent "$home/state/fleet-seats/remote-$id.pending" "successful reconciliation retained $id's pending marker"
+    assert_equals true "$(jq '.complete' "$home/state/fleet-seats/remote-$id.cert")" "later serve did not publish a complete certificate"
+  done
+  assert_equals reserved "$(lifecycle_of "$home" retained g-retained)" "later reconciliation freed the existing holder"
+  reserve "$home" recovered pool-model-a >/dev/null || fail "complete certificates did not restore available admission"
+  out=$(reserve "$home" excess pool-model-a 2>&1); rc=$?
+  expect_code 4 "$rc" "successful reconciliation exceeded capacity: $out"
+  pass "watcher serving resumes supervision within ${elapsed}s, logs failure, retains pending custody, and later reconciles"
+}
+
 # --- spawn and cleanup ------------------------------------------------------
 
 make_spawn_fakebin() {  # <dir>
@@ -1657,6 +1774,7 @@ project=$home"
   pass "validated legacy routes confirm and recover, while invalid endpoint evidence stays counted"
 }
 
+test_watcher_bounds_the_whole_serve_pass_and_keeps_failure_evidence
 test_no_pool_configured_is_off
 test_pool_names_do_not_escape_the_seat_directory
 test_legacy_unresolved_models_count_in_every_pool
