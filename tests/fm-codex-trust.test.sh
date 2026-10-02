@@ -659,6 +659,129 @@ test_concurrent_store_writers_keep_both_projects() {
   pass "fm-codex-trust.sh: concurrent writers sharing a resolved store retain both projects"
 }
 
+test_concurrent_operator_edits_merge_or_refuse() {
+  local rec mode change home store selected fakebin out status expected real_python
+  real_python=$(command -v python3)
+  for mode in worktree secondmate; do
+    rec=$(make_case "operator-$mode")
+    read_case "$rec"
+    home="$CASE_DIR/secondmate"
+    [ "$mode" != secondmate ] || seed_secondmate_home "$home" operator worktree
+    store=$(store_of "$CODEX_HOME")
+    selected=$CODEX_HOME
+    if [ "$mode" = secondmate ]; then
+      selected="$CASE_DIR/store-alias"
+      mkdir -p "$selected"
+      ln -s "$store" "$selected/config.toml"
+    fi
+    mkdir -p "$CASE_DIR/inject"
+    fakebin=$(fm_fakebin "$CASE_DIR")
+    cat > "$fakebin/python3" <<'SH'
+#!/usr/bin/env bash
+export PYTHONPATH="$FM_OPERATOR_INJECT"
+exec "$FM_REAL_PYTHON" "$@"
+SH
+    chmod +x "$fakebin/python3"
+    cat > "$CASE_DIR/inject/sitecustomize.py" <<'PY'
+import os
+import pathlib
+import tempfile
+store = pathlib.Path(os.environ["FM_OPERATOR_STORE"])
+payload = pathlib.Path(os.environ["FM_OPERATOR_PAYLOAD"])
+phase = os.environ["FM_OPERATOR_PHASE"]
+mkstemp = tempfile.mkstemp
+replace = os.replace
+write_bytes = pathlib.Path.write_bytes
+injected = False
+def operator_write(source):
+    pending = store.with_name("operator-pending.toml")
+    write_bytes(pending, source.read_bytes())
+    replace(pending, store)
+def stage(*args, **kwargs):
+    global injected
+    result = mkstemp(*args, **kwargs)
+    if not injected and phase != "readback":
+        injected = True
+        operator_write(payload)
+    return result
+def install(source, destination, *args, **kwargs):
+    replace(source, destination, *args, **kwargs)
+    if pathlib.Path(destination) == store and phase == "readback":
+        operator_write(payload)
+def restage(path, content):
+    result = write_bytes(path, content)
+    if phase == "restage" and path.parent == store.parent and path != store:
+        operator_write(payload.with_name("operator-second.toml"))
+    return result
+tempfile.mkstemp = stage
+os.replace = install
+pathlib.Path.write_bytes = restage
+PY
+    for change in add deny update same delete settings hooks malformed comments extra restage readback; do
+      expected=1
+      case "$change" in add|deny|update) expected=0 ;; esac
+      python3 - "$store" "$PROJ" "$home.src" "$mode" "$change" "$CASE_DIR/operator.toml" <<'PY'
+import json
+import pathlib
+import sys
+store, project, secondmate, mode, change, payload = sys.argv[1:]
+root = secondmate if mode == "secondmate" else project
+key = json.dumps(root)
+base = 'model = "base"\n\n[projects."/operator/existing"]\ntrust_level = "trusted"\n'
+if mode == "secondmate":
+    base += f'\n[projects.{key}]\n'
+base += '\n[hooks]\noperator_setting = "preserved"\n'
+pathlib.Path(store).write_text(base)
+edits = {
+    "add": base + '\n[projects."/operator/new"]\ntrust_level = "trusted"\n',
+    "deny": base + "\n[projects.'/operator/new'] # human decision\ntrust_level = 'untrusted'\n",
+    "update": base.replace('trust_level = "trusted"', 'trust_level = "untrusted"'),
+    "same": (base.replace(f'[projects.{key}]\n', f'[projects.{key}]\ntrust_level = "untrusted"\n')
+             if mode == "secondmate" else base + f'\n[projects.{key}]\ntrust_level = "untrusted"\n'),
+    "delete": base.replace('[projects."/operator/existing"]\ntrust_level = "trusted"\n', ''),
+    "settings": base.replace('model = "base"', 'model = "operator"'),
+    "hooks": base.replace('operator_setting = "preserved"', 'operator_setting = "changed"'),
+    "malformed": 'model = "unterminated\n',
+    "comments": base + '# operator note\n',
+    "extra": base + '\n[projects."/operator/new"]\ntrust_level = "trusted"\nextra = true\n',
+    "restage": base + '\n[projects."/operator/new"]\ntrust_level = "trusted"\n',
+    "readback": f'model = "base"\n\n[projects.{key}]\ntrust_level = "trusted"\n\n[hooks]\noperator_setting = "preserved"\n',
+}
+pathlib.Path(payload).write_text(edits[change])
+pathlib.Path(payload).with_name("operator-second.toml").write_text(edits["restage"].replace('model = "base"', 'model = "operator"'))
+PY
+      if [ "$mode" = secondmate ]; then
+        out=$(FM_OPERATOR_INJECT="$CASE_DIR/inject" FM_REAL_PYTHON="$real_python" \
+          FM_OPERATOR_STORE="$store" FM_OPERATOR_PAYLOAD="$CASE_DIR/operator.toml" \
+          FM_OPERATOR_PHASE="$change" PATH="$fakebin:$PATH" run_home_trust "$selected" "$home" operator)
+      else
+        out=$(FM_OPERATOR_INJECT="$CASE_DIR/inject" FM_REAL_PYTHON="$real_python" \
+          FM_OPERATOR_STORE="$store" FM_OPERATOR_PAYLOAD="$CASE_DIR/operator.toml" \
+          FM_OPERATOR_PHASE="$change" PATH="$fakebin:$PATH" run_trust "$selected" "$WT" "$PROJ")
+      fi
+      status=$?
+      expect_code "$expected" "$status" "$mode $change concurrent edit violated merge-or-refuse: $out"
+      python3 - "$store" "$CASE_DIR/operator.toml" "$expected" "$change" "$PROJ" "$home.src" "$mode" <<'PY' || fail "concurrent operator state was lost or misreported"
+import pathlib
+import sys
+import tomllib
+store, payload, expected, change, project, secondmate, mode = sys.argv[1:]
+actual = pathlib.Path(store).read_bytes()
+operator = pathlib.Path(payload)
+if expected == "0":
+    config = tomllib.loads(operator.read_text())
+    config["projects"][secondmate if mode == "secondmate" else project] = {"trust_level": "trusted"}
+    assert tomllib.loads(actual.decode()) == config
+else:
+    if change == "restage":
+        operator = operator.with_name("operator-second.toml")
+    assert actual == operator.read_bytes()
+PY
+    done
+  done
+  pass "fm-codex-trust.sh: distinct operator decisions merge and other concurrent edits refuse"
+}
+
 test_codex_launch_reads_the_registered_store() {
   local kind case_dir fakebin worker_home expected_root launch selected override out
   for kind in ship scout secondmate; do
@@ -994,6 +1117,7 @@ test_direct_registration_refuses_linked_homes_outside_the_pool
 test_equivalent_toml_entries_preserve_operator_decisions
 test_unsupported_and_malformed_toml_is_unchanged
 test_concurrent_store_writers_keep_both_projects
+test_concurrent_operator_edits_merge_or_refuse
 test_codex_launch_reads_the_registered_store
 test_spawn_fixture_isolates_an_exported_codex_home
 test_fresh_worktree_registers_the_repository_root
