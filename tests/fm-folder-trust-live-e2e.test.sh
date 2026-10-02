@@ -27,6 +27,8 @@
 # are installed.
 set -u
 
+CODEX_AUTH_FILE="${CODEX_HOME:-$HOME/.codex}/auth.json"
+
 # shellcheck source=tests/fixtures.sh
 . "$(dirname "${BASH_SOURCE[0]}")/fixtures.sh"
 
@@ -163,10 +165,10 @@ CODEX_HOME_DIR="$CASE/codex-home"
 mkdir -p "$CODEX_HOME_DIR"
 # Codex needs a login to reach its composer at all, and an auth-less start would
 # make the "no dialog" assertion pass for the wrong reason.
-if [ -f "$HOME/.codex/auth.json" ]; then
-  ln -s "$HOME/.codex/auth.json" "$CODEX_HOME_DIR/auth.json"
+if [ -f "$CODEX_AUTH_FILE" ]; then
+  ln -s "$CODEX_AUTH_FILE" "$CODEX_HOME_DIR/auth.json"
 else
-  printf 'not ok - codex folder trust cannot be verified with no %s login present\n' "$HOME/.codex/auth.json" >&2
+  printf 'not ok - codex folder trust cannot be verified with no %s login present\n' "$CODEX_AUTH_FILE" >&2
   exit 1
 fi
 # The update nag is a second first-launch modal; silence it so the only modal this
@@ -271,7 +273,7 @@ test_codex_root_entry_is_the_narrow_key() {
   mkdir -p "$above" "$above_home"
   printf 'check_for_update_on_startup = false\n\n[projects."%s"]\ntrust_level = "trusted"\n' "$above" \
     > "$above_home/config.toml"
-  ln -s "$HOME/.codex/auth.json" "$above_home/auth.json"
+  ln -s "$CODEX_AUTH_FILE" "$above_home/auth.json"
   fm_git_worktree "$above/repository" "$above/worktrees/fresh" other-wt
   open_pane codex-above "$above/worktrees/fresh" \
     "env CODEX_HOME=$above_home codex $CODEX_FLAGS"
