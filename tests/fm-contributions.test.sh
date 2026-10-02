@@ -4,13 +4,14 @@ set -u
 # shellcheck source=tests/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 TMP_ROOT=$(fm_test_tmproot fm-contributions)
+export FM_TEST_REAL_DATE="$(command -v date)"
 NOW=2026-09-16T08:00:00Z
 HEAD_A=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 HEAD_B=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 
 new_home() {
   local home="$TMP_ROOT/$1"
-  mkdir -p "$home/data" "$home/state" "$home/config" "$home/projects" "$home/fakebin"
+  mkdir -p "$home/data" "$home/state" "$home/config" "$home/projects" "$home/fakebin" "$home/root"
   printf '# Backlog\n\n## Queued\n' > "$home/data/backlog.md"
   printf '#!/bin/sh\nexit 1\n' > "$home/fakebin/tmux"
   printf '#!/bin/sh\nexit 0\n' > "$home/fakebin/no-mistakes"
@@ -19,7 +20,7 @@ new_home() {
 }
 
 bearings() {
-  PATH="$1/fakebin:$PATH" FM_HOME="$1" FM_ROOT_OVERRIDE="$ROOT" \
+  PATH="$1/fakebin:$PATH" FM_HOME="$1" FM_ROOT_OVERRIDE="$1/root" \
     FM_STATE_OVERRIDE="$1/state" FM_DATA_OVERRIDE="$1/data" FM_CONFIG_OVERRIDE="$1/config" \
     FM_BEARINGS_NOW="$NOW" "$ROOT/bin/fm-bearings-snapshot.sh" --json
 }
@@ -349,13 +350,13 @@ test_page_assembly_timeout_preserves_record() {
   forge_home "$home"
   pin_clock "$home"
   # Hold the budget open: the read must be attempted however long setup takes.
-  /bin/date +%s > "$home/forge/clock"
+  "$FM_TEST_REAL_DATE" +%s > "$home/forge/clock"
   cp "$home/data/delivery/contributions.json" "$home/prior.json"
   real_jq=$(command -v jq)
   cat > "$home/fakebin/jq" <<'SH'
 #!/usr/bin/env bash
 if [ "${1:-}" = -s ] && [ "${2:-}" = . ] && [[ "${3:-}" == */pages.* ]]; then
-  /bin/date +%s > "$FORGE/assembly-start"
+  "$FM_TEST_REAL_DATE" +%s > "$FORGE/assembly-start"
   sleep 12 &
   printf '%s\n' "$!" >> "$FORGE/assembly-pids"
   wait
@@ -366,7 +367,7 @@ SH
   out=$(with_home "$home" env REAL_JQ="$real_jq" FM_CONTRIBUTIONS_BUDGET=5 "$ROOT/bin/fm-contributions.sh" poll) || fail 'slow assembly poll failed'
   [ -s "$home/forge/assembly-pids" ] || fail 'slow page assembly was not exercised'
   started=$(cat "$home/forge/assembly-start")
-  elapsed=$(( $(/bin/date +%s) - started ))
+  elapsed=$(( $("$FM_TEST_REAL_DATE" +%s) - started ))
   [ "$elapsed" -lt 10 ] || fail "page assembly exceeded the read budget: $elapsed seconds"
   [ -z "$out" ] || fail 'page assembly timeout reported forge unavailability'
   cmp -s "$home/prior.json" "$home/data/delivery/contributions.json" || fail 'page assembly timeout rewrote prior observation'
@@ -780,7 +781,7 @@ pin_clock() { # home: route date +%s through $FORGE/clock
   local home=$1
   cat > "$home/fakebin/date" <<'SH'
 #!/bin/sh
-if [ "$*" = +%s ] && [ -f "$FORGE/clock" ]; then cat "$FORGE/clock"; else exec /bin/date "$@"; fi
+if [ "$*" = +%s ] && [ -f "$FORGE/clock" ]; then cat "$FORGE/clock"; else exec "$FM_TEST_REAL_DATE" "$@"; fi
 SH
   chmod +x "$home/fakebin/date"
 }
@@ -833,7 +834,7 @@ test_budget_exhaustion_keeps_prior_record() { # exhaust|hang
   cp "$home/data/delivery/contributions.json" "$home/prior.json"
   # Both modes freeze the clock: an unfrozen one can tick past a one-second
   # budget before the first forge call, so nothing is ever observed.
-  /bin/date +%s > "$home/forge/clock"
+  "$FM_TEST_REAL_DATE" +%s > "$home/forge/clock"
   printf '%s\n' "$mode" > "$home/forge/fault"
   out=$(with_home "$home" env FM_CONTRIBUTIONS_BUDGET=1 "$ROOT/bin/fm-contributions.sh" poll) \
     || fail "poll failed when its budget ran out ($mode)"
@@ -855,7 +856,7 @@ test_genuine_failure_near_deadline_is_unavailable() {
   forge_home "$home"
   wrap_forge "$home"
   mutate_record "$home" delivery '.records[0].checked_at="2026-09-15T08:00:00Z"'
-  /bin/date +%s > "$home/forge/clock"
+  "$FM_TEST_REAL_DATE" +%s > "$home/forge/clock"
   printf 'fail-late\n' > "$home/forge/fault"
   out=$(with_home "$home" "$ROOT/bin/fm-contributions.sh" poll) || fail 'poll failed on a genuine forge failure'
   [ "$out" = 'contributions: observation unavailable for https://github.com/o/r/pull/8' ] \
@@ -1022,7 +1023,7 @@ test_reservation_defers_later_url_when_fifteen_seconds_do_not_remain() {
   wrap_forge "$home"
   printf -- '- [ ] filed - Measured defect https://github.com/o/r/issues/9 (repo: sample) (kind: ship)\n' >> "$home/data/backlog.md"
   mutate_record "$home" delivery '.records[0].checked_at="2026-09-15T08:00:00Z"'
-  /bin/date +%s > "$home/forge/clock"
+  "$FM_TEST_REAL_DATE" +%s > "$home/forge/clock"
   printf 'reserve\n' > "$home/forge/fault"
   out=$(with_home "$home" env FM_CONTRIBUTIONS_BUDGET=20 "$ROOT/bin/fm-contributions.sh" poll) \
     || fail 'reservation poll failed'
@@ -1060,7 +1061,7 @@ test_slow_read_deadline_kill_is_budget_refusal() {
   wrap_forge "$home"
   mutate_record "$home" delivery '.records[0].checked_at="2026-09-15T08:00:00Z"'
   cp "$home/data/delivery/contributions.json" "$home/prior.json"
-  /bin/date +%s > "$home/forge/clock"
+  "$FM_TEST_REAL_DATE" +%s > "$home/forge/clock"
   printf 'latency\n' > "$home/forge/fault"
   out=$(with_home "$home" env FM_CONTRIBUTIONS_BUDGET=20 FORGE_LATENCY=6 "$ROOT/bin/fm-contributions.sh" poll) \
     || fail 'poll failed on a deadline-killed slow read'
@@ -1083,10 +1084,10 @@ test_unmeasured_url_does_not_starve_the_tail() {
   printf 'slow-wave\n' > "$home/forge/fault"
   for cycle in 0 1 2; do
     at=$(jq -nr --arg now "$NOW" --argjson cycle "$cycle" '(($now | fromdateiso8601) + ($cycle + 1) * 300) | todateiso8601')
-    started=$(/bin/date +%s)
+    started=$("$FM_TEST_REAL_DATE" +%s)
     out=$(with_home "$home" env FM_CONTRIBUTIONS_NOW="$at" FM_CONTRIBUTIONS_BUDGET=20 "$ROOT/bin/fm-contributions.sh" poll) \
       || fail 'poll failed after an unmeasured first URL'
-    elapsed=$(( $(/bin/date +%s) - started ))
+    elapsed=$(( $("$FM_TEST_REAL_DATE" +%s) - started ))
     [ -z "$out" ] || fail "a poll after an unmeasured URL printed a wake: $out"
     [ "$elapsed" -le 23 ] || fail "poll exceeded its elapsed budget: $elapsed seconds"
     if [ "$cycle" -eq 0 ]; then
@@ -1122,10 +1123,10 @@ test_unmeasured_url_does_not_starve_the_tail() {
   printf 'latency\n' > "$home/forge/fault"
   for cycle in 0 1 2 3 4 5; do
     at=$(jq -nr --arg now "$NOW" --argjson cycle "$cycle" '(($now | fromdateiso8601) + $cycle * 300) | todateiso8601')
-    started=$(/bin/date +%s)
+    started=$("$FM_TEST_REAL_DATE" +%s)
     out=$(with_home "$home" env FM_CONTRIBUTIONS_NOW="$at" FM_CONTRIBUTIONS_BUDGET=20 FORGE_LATENCY=3 "$ROOT/bin/fm-contributions.sh" poll) \
       || fail 'sustained slow-read poll failed'
-    elapsed=$(( $(/bin/date +%s) - started ))
+    elapsed=$(( $("$FM_TEST_REAL_DATE" +%s) - started ))
     [ "$elapsed" -ge 9 ] && [ "$elapsed" -le 23 ] \
       || fail "slow successful poll did not respect its elapsed budget: $elapsed seconds"
     [ -z "$out" ] || fail "slow successful reads printed a wake: $out"
@@ -1159,7 +1160,7 @@ test_budget_is_cut_down_to_the_watcher_check_bound() {
   wrap_forge "$home"
   mutate_record "$home" delivery '.records[0].checked_at="2026-09-15T08:00:00Z"'
   cp "$home/data/delivery/contributions.json" "$home/prior.json"
-  /bin/date +%s > "$home/forge/clock"
+  "$FM_TEST_REAL_DATE" +%s > "$home/forge/clock"
   printf 'hang\n' > "$home/forge/fault"
   out=$(with_home "$home" env FM_CHECK_TIMEOUT=6 "$ROOT/bin/fm-contributions.sh" poll) \
     || fail 'poll failed under a small watcher check bound'
@@ -1177,7 +1178,7 @@ test_arm_plumbs_a_configured_budget_into_the_check_shim() {
     forge_home "$home"
     wrap_forge "$home"
     # Reach the intended read even when setup crosses a wall-clock second.
-    /bin/date +%s > "$home/forge/clock"
+    "$FM_TEST_REAL_DATE" +%s > "$home/forge/clock"
     mutate_record "$home" delivery '.records[0].checked_at="2026-09-15T08:00:00Z"'
     cp "$home/data/delivery/contributions.json" "$home/prior.json"
     printf 'hang\n' > "$home/forge/fault"
