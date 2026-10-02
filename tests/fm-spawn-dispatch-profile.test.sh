@@ -1002,18 +1002,19 @@ test_pi_tui_mode_probe_is_safe_for_old_and_new_pi() {
 }
 
 test_pi_signed_missing_binary_refuses_before_endpoint_or_metadata() {
-  local rec id out status
+  local rec id out status missing_path
   id=profile-pi-signed-missing-z8c
   rec=$(make_spawn_case profile-pi-signed-missing pi-signed "$id")
   read_case_record "$rec"
   rm -f "$FAKEBIN_DIR/pi-signed"
   : > "$LAUNCH_LOG"
+  missing_path=$(fm_test_base_path_sans "$PATH" pi-signed)
 
   out=$(FM_ROOT_OVERRIDE='' FM_HOME="$HOME_DIR" \
     FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
     FM_PROJECTS_OVERRIDE="$HOME_DIR/projects" FM_CONFIG_OVERRIDE="$HOME_DIR/config" \
     FM_SPAWN_NO_GUARD=1 FM_FAKE_PANE_PATH="$WT_DIR" TMUX="fake,1,0" \
-    FM_FAKE_LAUNCH_LOG="$LAUNCH_LOG" PATH="$FAKEBIN_DIR:/usr/bin:/bin:/usr/sbin:/sbin" \
+    FM_FAKE_LAUNCH_LOG="$LAUNCH_LOG" PATH="$FAKEBIN_DIR:$missing_path" \
     "$SPAWN" "$id" "$PROJ_DIR" --mode no-mistakes --yolo off 2>&1)
   status=$?
   expect_code 1 "$status" "a missing pi-signed executable should refuse the spawn"
