@@ -565,6 +565,92 @@ SH
   pass "fm-spawn.sh: the pi trust flag survives the pane shell into pi's own argv"
 }
 
+test_pi_approval_covers_canonical_and_raw_launches() {
+  local harness kind style scope case_dir fakebin id home wt launch out selected
+  for harness in pi pi-signed; do
+    for kind in ship scout secondmate; do
+      for style in canonical raw prefixed; do
+        for scope in pool attended; do
+          id="pi-approval-$harness-$kind-$style-$scope"
+          case_dir="$TMP_ROOT/$id"
+          fakebin=$(make_launch_home "$case_dir" "$harness" "$harness")
+          wt="$case_dir/wt"
+          home="$case_dir/project"
+          if [ "$scope" = attended ]; then
+            wt="$case_dir/attended/wt"
+            git -C "$home" worktree add --quiet -b "attended-$id" "$wt" || fail "could not seed an attended worktree"
+          fi
+          if [ "$kind" = secondmate ]; then
+            home="$case_dir/secondmate"
+            [ "$scope" != attended ] || home="$case_dir/attended/secondmate"
+            seed_secondmate_home "$home" "$id" worktree
+            wt=$home
+          fi
+          cat > "$fakebin/$harness" <<'SH'
+#!/usr/bin/env bash
+case "${1:-}" in
+  --help) printf '%s\n' '--tui-mode <mode>'; exit 0 ;;
+  --version) printf '0.99.2\n'; exit 0 ;;
+esac
+python3 - "$FM_PI_RESULT" "${FM_PI_RAW_MARKER:-}" "$FM_PI_HARNESS" "$PWD" "$@" <<'PY'
+import json
+import pathlib
+import sys
+result, marker, harness, cwd, *argv = sys.argv[1:]
+pathlib.Path(result).write_text(json.dumps(dict(marker=marker, harness=harness, cwd=cwd, argv=argv)))
+PY
+SH
+          chmod +x "$fakebin/$harness"
+          selected=$harness
+          case "$style" in
+            raw) selected="$harness --tui-mode regular 'retained value'" ;;
+            prefixed)
+              mkdir -p "$case_dir/quoted executable"
+              cp "$fakebin/$harness" "$case_dir/quoted executable/$harness"
+              selected="FM_PI_RAW_MARKER='retained value' '$case_dir/quoted executable/$harness' --tui-mode regular 'retained value'"
+              ;;
+          esac
+          case "$kind" in
+            secondmate)
+              out=$(spawn_secondmate_with_fakebin "$case_dir" "$home" "$id" "$fakebin" "$selected")
+              ;;
+            scout)
+              fm_test_spawn_brief "$case_dir/home" "$id"
+              : > "$case_dir/launch.log"
+              out=$(FM_FAKE_LAUNCH_LOG="$case_dir/launch.log" \
+                fm_test_run_spawn "$case_dir/home" "$wt" "$fakebin" "$id" "$home" "$selected" --scout)
+              ;;
+            ship)
+              out=$(spawn_with_fakebin "$case_dir" "$case_dir/home" "$id" "$home" "$wt" "$fakebin" "$selected")
+              ;;
+          esac
+          expect_code 0 $? "$harness $kind $style $scope launch failed: $out"
+          launch=$(cat "$case_dir/launch.log")
+          (cd "$wt" && env -i HOME="$case_dir/destination-home" PATH="$fakebin:$PATH" TERM=xterm \
+            FM_PI_RESULT="$case_dir/result.json" bash -c "$launch") || fail "Pi launch did not reach its executable"
+          python3 - "$case_dir/result.json" "$harness" "$style" "$scope" "$kind" "$wt" <<'PY' || fail "Pi invocation changed its approval scope or arguments"
+import json
+import pathlib
+import sys
+result, harness, style, scope, kind, cwd = sys.argv[1:]
+observed = json.loads(pathlib.Path(result).read_text())
+argv = observed["argv"]
+assert observed["harness"] == harness
+assert pathlib.Path(observed["cwd"]) == pathlib.Path(cwd).resolve()
+assert argv.count("--approve") == (1 if scope == "pool" else 0), argv
+assert observed["marker"] == ("retained value" if style == "prefixed" else "")
+if style != "canonical":
+    assert [arg for arg in argv if arg != "--approve"] == ["--tui-mode", "regular", "retained value"], argv
+else:
+    assert argv.count("-e") == (2 if kind == "secondmate" else 1), argv
+PY
+        done
+      done
+    done
+  done
+  pass "fm-spawn.sh: both Pi identities scope approval at canonical and raw invocations for every local launch kind"
+}
+
 test_equivalent_toml_entries_preserve_operator_decisions() {
   local rec store style decision out status before
   rec=$(make_case semantic-entries)
@@ -1243,3 +1329,4 @@ test_codex_spawn_stops_when_registration_is_refused
 test_pi_spawn_launches_with_the_trust_flag
 test_pi_secondmate_launch_carries_the_trust_flag
 test_pi_launch_flag_reaches_the_pi_process
+test_pi_approval_covers_canonical_and_raw_launches

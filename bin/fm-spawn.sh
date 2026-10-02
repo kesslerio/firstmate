@@ -2058,12 +2058,8 @@ launch_template() {
     fi
     ;;
   opencode) printf '%s' 'OPENCODE_CONFIG_CONTENT='\''{"permission":{"*":"allow"}__EFFORTFLAG__}'\'' opencode __MODELFLAG__--prompt "$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
-  # __PITRUST__ becomes --approve only after the linked-pool scope check below.
-  # The Pi harness reference owns the policy; docs/verification/runtime-backends.md
-  # owns the vendor evidence that approval loads project resources without
-  # persisting a decision or accumulating entries for pool slots.
   pi | pi-signed)
-    printf '%s' '__PIBIN____PITUIMODE____PIRESUME____PITRUST__'
+    printf '%s' '__PIBIN____PITUIMODE____PIRESUME__'
     if [ "$kind" = secondmate ]; then
       printf '%s' ' __MODELFLAG____EFFORTFLAG__-e __PITURNEND__ -e __PIWATCH__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
     else
@@ -4399,11 +4395,6 @@ codex | pi | pi-signed)
   fi
   ;;
 esac
-PI_TRUST_FLAG=
-if [ "$SPAWN_FOLDER_TRUST_ALLOWED" = 1 ]; then
-  PI_TRUST_FLAG=' --approve'
-fi
-LAUNCH=${LAUNCH//__PITRUST__/$PI_TRUST_FLAG}
 
 # Pre-register Claude's workspace trust for the directory this launch starts in,
 # at the first point that directory is known and before any per-task state is
@@ -5169,7 +5160,32 @@ LAUNCH=${LAUNCH//__OMPEXT__/$sq_ompext}
 LAUNCH=${LAUNCH//__OMPWORKERCFG__/$sq_ompcfg}
 LAUNCH=${LAUNCH//__OPINPUT__/$sq_opinput}
 case "$HARNESS" in
-pi | pi-signed) LAUNCH=${LAUNCH//__PIBIN__/"$(shell_quote "$PI_BIN")"} ;;
+pi | pi-signed)
+  LAUNCH=${LAUNCH//__PIBIN__/"$(shell_quote "$PI_BIN")"}
+  if [ "$SPAWN_FOLDER_TRUST_ALLOWED" = 1 ]; then
+    LAUNCH=$(python3 - "$LAUNCH" <<'PY'
+import re
+import shlex
+import sys
+launch = sys.argv[1]
+lexer = shlex.shlex(launch, posix=True)
+lexer.whitespace_split = True
+lexer.commenters = ""
+try:
+    while True:
+        word = lexer.get_token()
+        if word is None:
+            raise ValueError("launch has no executable")
+        if not re.match(r"[A-Za-z_][A-Za-z_0-9]*=", word):
+            break
+    end = lexer.instream.tell()
+    print(launch[:end] + " --approve " + launch[end:], end="")
+except ValueError as err:
+    sys.exit(f"error: cannot apply Pi project approval to launch: {err}")
+PY
+    ) || exit 1
+  fi
+  ;;
 cursor) LAUNCH=${LAUNCH//__CURSORBIN__/"$(shell_quote "$CURSOR_BIN")"} ;;
 gemini) LAUNCH=${LAUNCH//__GEMINISETTINGS__/"$(shell_quote "$STATE_REAL/$ID.gemini-settings.json")"} ;;
 omp) LAUNCH=${LAUNCH//__OMPBIN__/"$(shell_quote "$OMP_BIN")"} ;;
