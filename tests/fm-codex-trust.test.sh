@@ -1115,9 +1115,8 @@ test_direct_registration_refuses_linked_homes_outside_the_pool() {
 }
 
 test_live_guard_requires_editor_and_owns_cleanup() {
-  local case_dir="$TMP_ROOT/live-guard" fakebin tool scenario screen signal expected ancestor_trust out status socket root
-  mkdir -p "$case_dir/home/.codex"
-  printf '{}\n' > "$case_dir/home/.codex/auth.json"
+  local case_dir="$TMP_ROOT/live-guard" fakebin tool scenario screen signal expected ancestor_trust out status socket root runtimes codex_store pi_store live_mode
+  mkdir -p "$case_dir/home/.codex" "$case_dir/home/.pi/agent"
   fakebin=$(fm_fakebin "$case_dir")
   fm_fake_exit0 "$fakebin" sleep
   for tool in codex pi; do
@@ -1222,10 +1221,28 @@ PY
 esac
 SH
   chmod +x "$fakebin/tmux"
-  for scenario in empty crashed banner dialog editor shortcuts ancestor int term hup quit; do
+  for scenario in no-login codex-only pi-only custom-stores empty crashed banner dialog editor shortcuts ancestor int term hup quit; do
     signal=''
     ancestor_trust=0
+    runtimes=codex,pi
+    codex_store="$case_dir/home/.codex"
+    pi_store="$case_dir/home/.pi/agent"
+    live_mode=1
+    printf '{}\n' > "$case_dir/home/.codex/auth.json"
+    printf '{}\n' > "$case_dir/home/.pi/agent/auth.json"
     case "$scenario" in
+      no-login) screen=''; expected=0; runtimes=none; live_mode=''
+        rm "$case_dir/home/.codex/auth.json" "$case_dir/home/.pi/agent/auth.json" ;;
+      codex-only) screen='› Ask Codex to do anything'; expected=0; runtimes=codex; live_mode=''
+        rm "$case_dir/home/.pi/agent/auth.json" ;;
+      pi-only) screen=''; expected=0; runtimes=pi; live_mode=''
+        rm "$case_dir/home/.codex/auth.json" ;;
+      custom-stores) screen='› Ask Codex to do anything'; expected=0
+        codex_store="$case_dir/custom-codex"
+        pi_store="$case_dir/custom-pi"
+        mkdir -p "$codex_store" "$pi_store"
+        mv "$case_dir/home/.codex/auth.json" "$codex_store/auth.json"
+        mv "$case_dir/home/.pi/agent/auth.json" "$pi_store/auth.json" ;;
       empty) screen=''; expected=1 ;;
       crashed) screen='sh: codex: command not found'; expected=1 ;;
       banner) screen='Ask Codex to do anything'; expected=1 ;;
@@ -1241,8 +1258,9 @@ SH
     : > "$case_dir/tmux.log"
     : > "$case_dir/cli.log"
     rm -f "$case_dir/stopped"
-    out=$(HOME="$case_dir/home" CODEX_HOME="$case_dir/home/.codex" \
-      FM_FOLDER_TRUST_LIVE=1 FM_LIVE_TMUX_LOG="$case_dir/tmux.log" \
+    out=$(HOME="$case_dir/home" CODEX_HOME="$codex_store" \
+      PI_CODING_AGENT_DIR="$pi_store" \
+      FM_FOLDER_TRUST_LIVE="$live_mode" FM_LIVE='' FM_LIVE_TMUX_LOG="$case_dir/tmux.log" \
       FM_LIVE_TMUX_STOPPED="$case_dir/stopped" FM_LIVE_TEST_SIGNAL="$signal" \
       FM_LIVE_TEST_PID_FILE="$case_dir/live.pid" \
       FM_LIVE_ANCESTOR_TRUST="$ancestor_trust" FM_LIVE_CLI_LOG="$case_dir/cli.log" \
@@ -1264,9 +1282,19 @@ PY
     expect_code "$expected" "$status" "live guard failed the $scenario exit contract: $out"
     socket=$(head -1 "$case_dir/tmux.log" | cut -f1)
     root=${socket%/*}
-    assert_equals "$socket" "$(cat "$case_dir/stopped")" "live guard removed its socket before stopping tmux"
+    if [ "$runtimes" = none ]; then
+      assert_absent "$case_dir/stopped" "live guard opened a server without credentials"
+    else
+      assert_equals "$socket" "$(cat "$case_dir/stopped")" "live guard removed its socket before stopping tmux"
+    fi
     assert_absent "$root" "live guard leaked its registered fixture root"
-    python3 - "$case_dir/tmux.log" "$socket" "$case_dir/cli.log" "$expected" <<'PY' || fail "live guard violated its pane ownership or prompt-free replay contract"
+    case "$runtimes" in
+      none | pi) assert_contains "$out" "skip: live: codex folder trust: no readable login at $codex_store/auth.json" "missing Codex login was not reported: $out" ;;
+    esac
+    case "$runtimes" in
+      none | codex) assert_contains "$out" "skip: live: pi project trust: no readable login at $pi_store/auth.json" "missing Pi login was not reported: $out" ;;
+    esac
+    python3 - "$case_dir/tmux.log" "$socket" "$case_dir/cli.log" "$expected" "$runtimes" <<'PY' || fail "live guard violated its pane ownership or prompt-free replay contract"
 import json
 import pathlib
 import shlex
@@ -1285,12 +1313,19 @@ assert len(created) == len(set(created))
 assert len(closed) == len(set(closed))
 assert set(closed) <= set(created)
 replays = [json.loads(line) for line in pathlib.Path(sys.argv[3]).read_text().splitlines()]
-assert replays and all(row["argv"][0].startswith("-") for row in replays)
+assert all(row["argv"][0].startswith("-") for row in replays)
 if sys.argv[4] == "0":
-    assert created == closed and len(created) == 5
+    runtimes = sys.argv[5].split(",")
+    expected_counts = {"codex": 3, "pi": 2}
+    assert created == closed
+    assert len(created) == sum(expected_counts.get(runtime, 0) for runtime in runtimes)
+    for runtime, count in expected_counts.items():
+        assert sum(row["harness"] == runtime for row in replays) == (count if runtime in runtimes else 0)
     pi = [row["argv"] for row in replays if row["harness"] == "pi"]
-    assert len(pi) == 2
-    assert "--approve" not in pi[0] and "--approve" in pi[1]
+    if "pi" in runtimes:
+        assert "--approve" not in pi[0] and "--approve" in pi[1]
+else:
+    assert replays
 PY
   done
   pass "live guard: prompt-free replay, editor evidence, ancestor scope and owned cleanup"

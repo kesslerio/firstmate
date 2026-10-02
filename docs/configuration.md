@@ -1237,12 +1237,15 @@ Every home requires:
 - chrome-devtools-axi.
 - Compatible tasks-axi, as specified in "Backlog backend" above.
 - Compatible quota-axi.
+- `python3` for the home's backlog tooling and raw launch-command parsing, including raw Pi and Claude launches.
 
 [`bin/fm-bootstrap.sh`](../bin/fm-bootstrap.sh) owns the axi-family floor policy and the gh-axi and lavish-axi floors, while [`bin/fm-tasks-axi-lib.sh`](../bin/fm-tasks-axi-lib.sh) and [`bin/fm-quota-axi-lib.sh`](../bin/fm-quota-axi-lib.sh) hold their own tools' floor constants.
 This section is the single owner of that universal toolchain list; backend guides' prerequisites point here and add only their backend-specific tools.
 
 In that list, no-mistakes runs the validation pipeline, gh-axi and chrome-devtools-axi cover GitHub and browser operations, and tasks-axi plus quota-axi back backlog mutations and quota-aware array dispatch.
 Lavish is a presentation-only dependency for visual decisions and reports; nonvisual work can proceed with plain text when it is unavailable.
+The home's own backlog tooling already requires the interpreter, so raw launch plumbing makes that requirement explicit rather than implicit.
+Reimplementing launch-line parsing in shell would be more fragile in the code path that decides whether a worker stops at a human trust prompt.
 
 **Backend requirements**
 
