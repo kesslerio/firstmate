@@ -63,19 +63,15 @@ trusted_roots() {
   local store
   store=$(store_of "${1:-}")
   [ -f "$store" ] || return 0
-  awk '
-    /^\[/ {
-      current = ""
-      if ($0 ~ /^\[projects\."/) {
-        line = $0
-        sub(/^\[projects\."/, "", line)
-        sub(/"\][[:space:]]*$/, "", line)
-        current = line
-      }
-      next
-    }
-    current != "" && /^[[:space:]]*trust_level[[:space:]]*=[[:space:]]*"trusted"/ { print current }
-  ' "$store"
+  python3 - "$store" <<'PY'
+import sys
+import tomllib
+with open(sys.argv[1], "rb") as stream:
+    config = tomllib.load(stream)
+for root, entry in config.get("projects", {}).items():
+    if entry.get("trust_level") == "trusted":
+        print(root)
+PY
 }
 
 assert_trusted_root() {  # <codex-home> <path> <msg>
@@ -398,20 +394,20 @@ test_project_argument_that_is_itself_a_worktree_registers_the_primary_checkout()
   pass "fm-codex-trust.sh: a project that is itself a worktree resolves to the primary checkout"
 }
 
-test_missing_node_is_refused() {
+test_missing_python_is_refused() {
   local rec dir out tool
-  rec=$(make_case no-node)
+  rec=$(make_case no-python)
   read_case "$rec"
-  dir="$CASE_DIR/nonode-bin"
+  dir="$CASE_DIR/nopython-bin"
   mkdir -p "$dir"
-  for tool in bash env git mkdir cat; do
+  for tool in bash env git mkdir cat dirname; do
     ln -sf "$(command -v "$tool")" "$dir/$tool"
   done
   out=$(env -i PATH="$dir" CODEX_HOME="$CODEX_HOME" HOME="$CODEX_HOME" \
     "$TRUST" "$WT" "$PROJ" 2>&1)
-  expect_code 1 $? "a missing node must refuse rather than launch a worker into the dialog: $out"
-  assert_contains "$out" "node" "the refusal did not name the missing tool"
-  pass "fm-codex-trust.sh: a missing node interpreter refuses the registration"
+  expect_code 1 $? "a missing Python must refuse rather than launch a worker into the dialog: $out"
+  assert_contains "$out" "python3" "the refusal did not name the missing tool"
+  pass "fm-codex-trust.sh: a missing Python interpreter refuses the registration"
 }
 
 # --- secondmate homes -------------------------------------------------------
@@ -488,7 +484,7 @@ test_codex_spawn_launches_when_registration_is_refused() {
   local case_dir=$TMP_ROOT/spawn-codex-refused fakebin out
   mkdir -p "$case_dir"
   fakebin=$(make_launch_home "$case_dir" codex codex)
-  out=$(CODEX_HOME=relative-codex-home \
+  out=$(FM_TEST_CODEX_HOME=relative-codex-home \
     spawn_with_fakebin "$case_dir" "$case_dir/home" spawn-codex-2 "$case_dir/project" \
     "$case_dir/wt" "$fakebin")
   expect_code 0 $? "a codex spawn whose trust registration was refused must still launch: $out"
@@ -548,6 +544,244 @@ SH
   pass "fm-spawn.sh: the pi trust flag survives the pane shell into pi's own argv"
 }
 
+test_equivalent_toml_entries_preserve_operator_decisions() {
+  local rec store style decision out status before
+  rec=$(make_case semantic-entries)
+  read_case "$rec"
+  store=$(store_of "$CODEX_HOME")
+  for style in commented literal escaped quoted; do
+    for decision in empty trusted untrusted; do
+      python3 - "$store" "$PROJ" "$style" "$decision" <<'PY'
+import json
+import pathlib
+import sys
+store, root, style, decision = sys.argv[1:]
+key = json.dumps(root)
+if style == "literal":
+    header = f"[projects.'{root}']"
+elif style == "escaped":
+    header = '[projects.' + key.replace("/", "\\u002f") + ']'
+elif style == "quoted":
+    header = f'["projects" . {key}]'
+else:
+    header = f"[projects.{key}] # operator decision"
+body = "" if decision == "empty" else f"'trust_level' = '{decision}' # operator decision\n"
+pathlib.Path(store).write_text(header + "\n" + body + '\n[tui]\ntheme = "dark"\n')
+PY
+      before=$(cat "$store")
+      out=$(run_trust "$CODEX_HOME" "$WT" "$PROJ")
+      status=$?
+      if [ "$decision" = untrusted ]; then
+        expect_code 1 "$status" "equivalent TOML denial must be preserved: $out"
+        assert_equals "$before" "$(cat "$store")" "denied entry was changed"
+      else
+        expect_code 0 "$status" "equivalent TOML entry must be recognised: $out"
+        assert_trusted_root "$CODEX_HOME" "$PROJ" "the semantic entry was not trusted"
+        if [ "$decision" = trusted ]; then
+          assert_equals "$before" "$(cat "$store")" "trusted entry was unnecessarily rewritten"
+        fi
+      fi
+    done
+  done
+  pass "fm-codex-trust.sh: equivalent TOML keys and trust values preserve decisions"
+}
+
+test_unsupported_and_malformed_toml_is_unchanged() {
+  local rec store form out before
+  rec=$(make_case semantic-refusals)
+  read_case "$rec"
+  store=$(store_of "$CODEX_HOME")
+  for form in inline dotted nested duplicate malformed; do
+    python3 - "$store" "$PROJ" "$form" <<'PY'
+import json
+import pathlib
+import sys
+store, root, form = sys.argv[1:]
+key = json.dumps(root).replace("/", "\\u002f")
+configs = {
+    "inline": f'"projects" = {{ {key} = {{ trust_level = "untrusted" }} }}\n',
+    "dotted": f'"projects".{key}."trust_level" = "untrusted"\n',
+    "nested": f'[projects]\n{key} = {{ trust_level = "untrusted" }}\n',
+    "duplicate": f'[projects.{key}]\ntrust_level = "trusted"\n[projects.{key}]\n',
+    "malformed": 'model = "unterminated\n',
+}
+pathlib.Path(store).write_text(configs[form])
+PY
+    before=$(cat "$store")
+    out=$(run_trust "$CODEX_HOME" "$WT" "$PROJ")
+    expect_code 1 $? "unsupported or malformed TOML must refuse: $out"
+    assert_equals "$before" "$(cat "$store")" "refused TOML changed"
+  done
+  pass "fm-codex-trust.sh: unsupported and malformed TOML is refused without writes"
+}
+
+test_concurrent_store_writers_keep_both_projects() {
+  local rec first_proj first_wt shared second_proj second_wt p1 p2 status1 status2
+  rec=$(make_case concurrent-first)
+  read_case "$rec"
+  first_proj=$PROJ first_wt=$WT shared=$CODEX_HOME
+  rec=$(make_case concurrent-second)
+  read_case "$rec"
+  second_proj=$PROJ second_wt=$WT
+  printf 'model = "test-model"\n' > "$shared/config.toml"
+  mkdir -p "$CASE_DIR/store-alias"
+  ln -s "$shared/config.toml" "$CASE_DIR/store-alias/config.toml"
+  run_trust "$shared" "$first_wt" "$first_proj" >"$TMP_ROOT/first-writer.log" &
+  p1=$!
+  run_trust "$CASE_DIR/store-alias" "$second_wt" "$second_proj" >"$TMP_ROOT/second-writer.log" &
+  p2=$!
+  wait "$p1"; status1=$?
+  wait "$p2"; status2=$?
+  expect_code 0 "$status1" "first concurrent writer failed"
+  expect_code 0 "$status2" "second concurrent writer failed"
+  assert_trusted_root "$shared" "$first_proj" "first project was lost"
+  assert_trusted_root "$shared" "$second_proj" "second project was lost"
+  pass "fm-codex-trust.sh: concurrent writers sharing a resolved store retain both projects"
+}
+
+test_codex_launch_reads_the_registered_store() {
+  local kind case_dir fakebin worker_home launch selected override out
+  for kind in ship scout secondmate; do
+    case_dir="$TMP_ROOT/store-launch-$kind"
+    mkdir -p "$case_dir"
+    fakebin=$(make_launch_home "$case_dir" codex codex)
+    selected="$case_dir/selected store"
+    override=$selected
+    if [ "$kind" = ship ]; then
+      selected="$case_dir/home/user-home/.codex"
+      override=''
+    fi
+    cat > "$fakebin/codex" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$CODEX_HOME" > "$FM_CODEX_STORE_RESULT"
+python3 - "$CODEX_HOME/config.toml" "$FM_CODEX_EXPECT_ROOT" <<'PY'
+import sys
+import tomllib
+with open(sys.argv[1], "rb") as stream:
+    config = tomllib.load(stream)
+assert config["projects"][sys.argv[2]]["trust_level"] == "trusted"
+PY
+SH
+    chmod +x "$fakebin/codex"
+    printf 'FM_CODEX_STORE_RESULT\nFM_CODEX_EXPECT_ROOT\n' > "$case_dir/home/config/launch-env-allowlist"
+    if [ "$kind" = secondmate ]; then
+      worker_home="$case_dir/secondmate"
+      seed_secondmate_home "$worker_home" store-launch-secondmate
+      out=$(FM_TEST_CODEX_HOME="$override" spawn_secondmate_with_fakebin "$case_dir" "$worker_home" store-launch-secondmate "$fakebin")
+    else
+      worker_home="$case_dir/project"
+      if [ "$kind" = scout ]; then
+        fm_test_spawn_brief "$case_dir/home" "store-launch-$kind"
+        : > "$case_dir/launch.log"
+        out=$(FM_TEST_CODEX_HOME="$override" FM_FAKE_LAUNCH_LOG="$case_dir/launch.log" \
+          fm_test_run_spawn "$case_dir/home" "$case_dir/wt" "$fakebin" "store-launch-$kind" "$worker_home" --scout)
+      else
+        out=$(FM_TEST_CODEX_HOME="$override" spawn_with_fakebin "$case_dir" "$case_dir/home" "store-launch-$kind" "$worker_home" "$case_dir/wt" "$fakebin")
+      fi
+    fi
+    expect_code 0 $? "store-pinned $kind spawn failed: $out"
+    launch=$(cat "$case_dir/launch.log")
+    env -i HOME="$case_dir/destination-home" CODEX_HOME="$case_dir/wrong-store" \
+      FM_CODEX_STORE_RESULT="$case_dir/worker-store" FM_CODEX_EXPECT_ROOT="$worker_home" \
+      PATH="$fakebin:$PATH" TERM=xterm bash -c "$launch" || fail "worker did not consume the registered store"
+    assert_equals "$selected" "$(cat "$case_dir/worker-store")" "worker selected a different Codex store"
+    assert_absent "$case_dir/wrong-store/config.toml" "registration wrote a second store"
+  done
+  pass "fm-spawn.sh: all Codex launch kinds read the single registered store"
+}
+
+test_spawn_fixture_isolates_an_exported_codex_home() {
+  local case_dir="$TMP_ROOT/store-isolation" fakebin out
+  mkdir -p "$case_dir/operator-store"
+  printf 'model = "operator-model"\n' > "$case_dir/operator-store/config.toml"
+  fakebin=$(make_launch_home "$case_dir" codex codex)
+  out=$(CODEX_HOME="$case_dir/operator-store" spawn_with_fakebin "$case_dir" "$case_dir/home" store-isolation "$case_dir/project" "$case_dir/wt" "$fakebin")
+  expect_code 0 $? "isolated fixture spawn failed: $out"
+  assert_equals 'model = "operator-model"' "$(cat "$case_dir/operator-store/config.toml")" "fixture changed the inherited operator store"
+  assert_trusted_root "$case_dir/home/user-home/.codex" "$case_dir/project" "fixture did not use its own store"
+  pass "spawn fixture: exported Codex profiles remain untouched"
+}
+
+test_live_guard_requires_editor_and_owns_cleanup() {
+  local case_dir="$TMP_ROOT/live-guard" fakebin screen out status socket root
+  mkdir -p "$case_dir/home/.codex"
+  printf '{}\n' > "$case_dir/home/.codex/auth.json"
+  fakebin=$(fm_fakebin "$case_dir")
+  fm_fake_exit0 "$fakebin" sleep
+  fm_fake_version_tool "$fakebin" codex FM_FAKE_CODEX_VERSION "codex-test"
+  fm_fake_version_tool "$fakebin" pi FM_FAKE_PI_VERSION "pi-test"
+  cat > "$fakebin/tmux" <<'SH'
+#!/usr/bin/env bash
+set -eu
+[ "$1" = -S ] || exit 2
+socket=$2
+shift 2
+printf '%s\t%s\n' "$socket" "$*" >> "$FM_LIVE_TMUX_LOG"
+case "$1" in
+  new-session)
+    mkdir -p "$(dirname "$socket")"
+    : > "$socket"
+    if [ "$4" = fmft-codex-above ]; then
+      python3 - "${@: -1}" <<'PY'
+import re
+import sys
+from pathlib import Path
+command = sys.argv[1]
+worktree = Path(re.search(r'cd "([^"]+)"', command)[1])
+codex_home = Path(re.search(r'CODEX_HOME=([^ ]+)', command)[1])
+import tomllib
+with open(codex_home / "config.toml", "rb") as stream:
+    ancestor = Path(next(iter(tomllib.load(stream)["projects"])))
+assert ancestor in worktree.parents
+assert ancestor in (worktree.parent / "project").parents
+PY
+    fi
+    ;;
+  capture-pane)
+    case "$3" in
+      fmft-codex-control|fmft-codex-above) printf 'Trust this folder?\n' ;;
+      fmft-codex-registered) printf '%s\n' "$FM_LIVE_REGISTERED_SCREEN" ;;
+      fmft-pi-control) printf 'Trust project folder?\n' ;;
+      fmft-pi-approved) printf 'ctrl+o\n' ;;
+      *) exit 2 ;;
+    esac
+    ;;
+  kill-server) [ -e "$socket" ] && rm "$socket" ;;
+  *) exit 2 ;;
+esac
+SH
+  chmod +x "$fakebin/tmux"
+  for screen in '' 'sh: codex: command not found' 'Ask Codex to do anything'; do
+    : > "$case_dir/tmux.log"
+    out=$(HOME="$case_dir/home" FM_FOLDER_TRUST_LIVE=1 FM_LIVE_TMUX_LOG="$case_dir/tmux.log" \
+      FM_LIVE_REGISTERED_SCREEN="$screen" PATH="$fakebin:$PATH" \
+      bash "$ROOT/tests/fm-folder-trust-live-e2e.test.sh" 2>&1)
+    status=$?
+    if [ "$screen" = 'Ask Codex to do anything' ]; then
+      expect_code 0 "$status" "live guard rejected the synthetic editor: $out"
+    else
+      expect_code 1 "$status" "live guard accepted an empty or failed pane: $out"
+    fi
+    socket=$(head -1 "$case_dir/tmux.log" | cut -f1)
+    root=${socket%/*}
+    assert_absent "$root" "live guard leaked its registered fixture root"
+    python3 - "$case_dir/tmux.log" "$socket" <<'PY' || fail "live guard did not clean up exactly its own socket"
+import pathlib
+import sys
+rows = [line.split("\t", 1) for line in pathlib.Path(sys.argv[1]).read_text().splitlines()]
+assert all(socket == sys.argv[2] for socket, command in rows)
+assert rows[-1][1] == "kill-server"
+PY
+  done
+  pass "live guard: editor evidence, ancestor scope, private pane ownership and cleanup"
+}
+
+test_live_guard_requires_editor_and_owns_cleanup
+test_equivalent_toml_entries_preserve_operator_decisions
+test_unsupported_and_malformed_toml_is_unchanged
+test_concurrent_store_writers_keep_both_projects
+test_codex_launch_reads_the_registered_store
+test_spawn_fixture_isolates_an_exported_codex_home
 test_fresh_worktree_registers_the_repository_root
 test_registration_keys_on_the_root_not_the_worktree
 test_unrelated_config_content_is_preserved
@@ -563,7 +797,7 @@ test_relative_codex_home_is_refused
 test_non_git_and_missing_directories_are_refused
 test_foreign_worktree_and_subdirectory_are_refused
 test_project_argument_that_is_itself_a_worktree_registers_the_primary_checkout
-test_missing_node_is_refused
+test_missing_python_is_refused
 test_secondmate_standalone_clone_home_is_trusted
 test_secondmate_leased_worktree_home_is_trusted
 test_secondmate_home_refuses_everything_unseeded

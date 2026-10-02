@@ -4419,12 +4419,19 @@ claude*)
   fi
   ;;
 codex)
+  CODEX_LAUNCH_HOME=${CODEX_HOME:-}
+  if [ -z "$CODEX_LAUNCH_HOME" ] && [ -n "${HOME:-}" ]; then
+    CODEX_LAUNCH_HOME="$HOME/.codex"
+  fi
+  if [ -n "$CODEX_LAUNCH_HOME" ]; then
+    LAUNCH="CODEX_HOME=$(shell_quote "$CODEX_LAUNCH_HOME") $LAUNCH"
+  fi
   if [ "$KIND" = secondmate ]; then
     spawn_trust_args=(--secondmate-home "$PROJ_ABS" "$ID")
   else
     spawn_trust_args=("$WT" "$PROJ_ABS")
   fi
-  if ! "$FM_ROOT/bin/fm-codex-trust.sh" "${spawn_trust_args[@]}" >/dev/null; then
+  if ! CODEX_HOME="$CODEX_LAUNCH_HOME" "$FM_ROOT/bin/fm-codex-trust.sh" "${spawn_trust_args[@]}" >/dev/null; then
     echo "warning: could not pre-register codex folder trust for $WT; the launch may park on the folder-trust dialog in window $T" >&2
   fi
   ;;

@@ -1268,6 +1268,7 @@ A herdr, zellij, or cmux home is therefore never told `tmux` is missing, and the
 
 **Feature-specific requirements**
 
+- Codex folder-trust registration requires Python 3.11 or newer with its standard `tomllib` module.
 - When `config/crew-dispatch.json` exists, bootstrap also requires `jq` for dispatch profile validation.
 - When Relay is opted in, bootstrap also requires `curl` and `jq` before arming the relay poll shim.
 
