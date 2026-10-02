@@ -602,6 +602,7 @@ host_journal op2 failed:stopping
 assert_equals "unknown false" "$(host_disposition op2)" "an interrupted stop was not left unknown"
 cat > "$FAKEBIN/herdr" <<'SH'
 #!/usr/bin/env bash
+printf '%s\n' "$*" >> "$FM_HOME/endpoint-effects.log"
 case "${1:-} ${2:-}" in
   'status --json') printf '{"client":{"version":"0.9.0","protocol":22},"server":{"running":true}}\n' ;;
   'pane get') printf '{"result":{"pane":{"pane_id":"%s","foreground_cwd":"%s"}}}\n' "$3" "$FM_HOME" ;;
@@ -674,7 +675,7 @@ printf 'other\n' > "$HOST_HOME/.fm-secondmate-home"
 OUT=$(host_control relaunch ios claude pool-model-a medium --operation op9 --previous op3); RC=$?
 [ "$RC" -ne 0 ] || fail "a relaunch into a foreign home succeeded"
 DISP=$(printf '%s\n' "$OUT" | sed -n 's/^seat_disposition=//p' | tail -1)
-assert_equals "op9 prelaunch" "$(printf '%s\n' "$DISP" | jq -r '.operation + " " + .disposition')" \
+assert_equals "op9 unknown" "$(printf '%s\n' "$DISP" | jq -r '.operation + " " + .disposition')" \
   "a home validation refusal was not bound to its operation"
 printf 'ios\n' > "$HOST_HOME/.fm-secondmate-home"
 pass "a pooled host refuses unaccounted relaunches and binds its refusals to the operation"
@@ -883,5 +884,238 @@ for VERB in launch relaunch disposition; do
   ' || fail "host $VERB did not adopt and preserve its verified owner's episode"
 done
 pass "unpooled host launch, relaunch, and disposition serialize and adopt without releasing their owner's episode"
+
+# An invalid retry has no custody of the prior invocation's receipt, even
+# when it carries exactly the same operation token. Exercise both entrypoints
+# and feed their real replies to the parent seat owner.
+pending_host_operation() {  # <operation> [previous]
+  local op=$1 prev=${2:--}
+  seats reserve ios --generation "$op" --previous-generation "$prev" --kind secondmate \
+    --harness pi --model pool-model-a --holder-pid "$$" >/dev/null || fail "reserve $op"
+  (umask 077; jq -cn --arg g "$op" '{placement:"remote", backend:"herdr", target:null,
+    home:"/srv/fm-home", host:"remote-mac", remote_root:"/srv/fm", operation:$g}' \
+    > "$TMP/custody-route")
+  seats dispatch ios --generation "$op" --route-file "$TMP/custody-route" >/dev/null || fail "dispatch $op"
+}
+
+host_reply_to_parent() {  # <operation> <output>
+  local op=$1 output=$2
+  printf '%s\n' "$output" | sed -n 's/^seat_disposition=//p' > "$TMP/custody-response"
+  chmod 0600 "$TMP/custody-response"
+  assert_equals "$op" "$(jq -r .operation "$TMP/custody-response")" "reply lost its operation"
+  seats reconcile-remote ios --generation "$op" --response-file "$TMP/custody-response" >/dev/null 2>&1
+}
+
+for VERB in launch relaunch; do
+  HOST_ARGS=("$VERB" ios notaharness pool-model-a medium)
+  [ "$VERB" != launch ] || HOST_ARGS+=(herdr)
+  for PHASE in received dispatched started dead-after-start cancelled; do
+    for REFUSAL in home directories; do
+      OP="custody.$VERB.${PHASE//-/.}.$REFUSAL"
+      reset_meta
+      seed_pool
+      pending_host_operation "$OP"
+      host_receipt "$OP" "$VERB" "$PHASE"
+      RECEIPT="$HOST_HOME/state/parent-route/ios.seat-operation.$OP"
+      printf 'route_backend=herdr\nroute_target=fm-remote:w1:p1\n' >> "$RECEIPT"
+      cp "$RECEIPT" "$TMP/custody-before"
+      cp "$HOST_HOME/state/parent-route/ios.meta" "$TMP/custody-meta"
+      cp "$HOST_HOME/state/parent-route/ios.control-relaunch" "$TMP/custody-journal"
+      : > "$HOST_HOME/endpoint-effects.log"
+      if [ "$REFUSAL" = home ]; then
+        printf 'foreign\n' > "$HOST_HOME/.fm-secondmate-home"
+      else
+        # Fail preparation after valid-home checks, before episode entry.
+        mv "$HOST_HOME/data/.parent-route" "$HOST_HOME/data/.parent-route.saved"
+        : > "$HOST_HOME/data/.parent-route"
+      fi
+      OUT=$(host_control "${HOST_ARGS[@]}" --operation "$OP" < /dev/null); RC=$?
+      [ "$RC" -ne 0 ] || fail "invalid $VERB retry succeeded"
+      cmp -s "$TMP/custody-before" "$RECEIPT" || fail "$VERB $REFUSAL refusal rewrote $PHASE receipt"
+      cmp -s "$TMP/custody-meta" "$HOST_HOME/state/parent-route/ios.meta" || fail "refusal changed endpoint metadata"
+      cmp -s "$TMP/custody-journal" "$HOST_HOME/state/parent-route/ios.control-relaunch" || fail "refusal entered control"
+      [ ! -s "$HOST_HOME/endpoint-effects.log" ] || fail "refusal touched the endpoint"
+      DISP=$(printf '%s\n' "$OUT" | sed -n 's/^seat_disposition=//p')
+      assert_equals unknown "$(printf '%s\n' "$DISP" | jq -r .disposition)" "$VERB $PHASE $REFUSAL early refusal claimed dispatch never happened: $OUT"
+      host_reply_to_parent "$OP" "$OUT"
+      assert_equals reserved "$(ios_lifecycle "$OP")" "early refusal released the parent generation"
+      PROBE=$(probe_pool 2>&1); RC=$?
+      expect_code 4 "$RC" "the pending generation must still occupy capacity: $PROBE"
+      if [ "$REFUSAL" = home ]; then
+        printf 'ios\n' > "$HOST_HOME/.fm-secondmate-home"
+      else
+        rm "$HOST_HOME/data/.parent-route"
+        mv "$HOST_HOME/data/.parent-route.saved" "$HOST_HOME/data/.parent-route"
+      fi
+    done
+  done
+done
+pass "early launch and relaunch refusals preserve every retained receipt and pending parent seat"
+
+# A fresh refusal owns its unsubmitted receipt and releases only that candidate.
+for VERB in launch relaunch; do
+  reset_meta
+  seed_pool
+  OUT=$(run_relaunch ios claude pool-model-a medium); RC=$?
+  expect_code 0 "$RC" "start the predecessor: $OUT"
+  OLD=$(ios_generation)
+  OP="fresh.$VERB"
+  pending_host_operation "$OP" "$OLD"
+  HOST_ARGS=("$VERB" ios notaharness pool-model-a medium)
+  [ "$VERB" != launch ] || HOST_ARGS+=(herdr)
+  OUT=$(host_control "${HOST_ARGS[@]}" --operation "$OP" --previous "$OLD" \
+    <<< "$(host_parent_record "$OP" "$OLD")"); RC=$?
+  expect_code 1 "$RC" "fresh prelaunch refusal: $OUT"
+  host_reply_to_parent "$OP" "$OUT" || fail "fresh refusal was not accepted by parent"
+  assert_equals released "$(ios_lifecycle "$OP")" "fresh refusal did not release its candidate"
+  assert_equals confirmed "$(ios_lifecycle "$OLD")" "fresh refusal released the predecessor"
+  RECEIPT="$HOST_HOME/state/parent-route/ios.seat-operation.$OP"
+  RESERVATION="$HOST_HOME/state/parent-route/ios.seat-reservation.$OP"
+  cp "$RECEIPT" "$TMP/fresh-receipt"
+  cp "$RESERVATION" "$TMP/fresh-reservation"
+  OUT=$(host_control "${HOST_ARGS[@]}" --operation "$OP" --previous "$OLD" < /dev/null); RC=$?
+  expect_code 1 "$RC" "same-token refusal replay: $OUT"
+  assert_contains "$OUT" 'already handled' "same-token replay opened another episode"
+  assert_equals prelaunch "$(printf '%s\n' "$OUT" | sed -n 's/^seat_disposition=//p' | jq -r .disposition)" "refusal replay changed its disposition"
+  cmp -s "$TMP/fresh-receipt" "$RECEIPT" || fail "replay rewrote the receipt"
+  cmp -s "$TMP/fresh-reservation" "$RESERVATION" || fail "replay rewrote the immutable reservation"
+
+  # A started same-token replay uses its locked disposition, even when the
+  # invocation's requested harness would fail validation for a fresh operation.
+  OP="replay.$VERB"
+  host_receipt "$OP" "$VERB" started
+  printf 'actual_generation=%s\nroute_backend=herdr\nroute_target=fm-remote:w1:p1\nactual_model=pool-model-a\n' "$OP" \
+    >> "$HOST_HOME/state/parent-route/ios.seat-operation.$OP"
+  perl -pi -e "s/^spawn_gen=.*/spawn_gen=$OP/" "$HOST_HOME/state/parent-route/ios.meta"
+  OUT=$(host_control "${HOST_ARGS[@]}" --operation "$OP" < /dev/null); RC=$?
+  expect_code 0 "$RC" "started same-token $VERB replay: $OUT"
+  assert_equals started "$(printf '%s\n' "$OUT" | sed -n 's/^seat_disposition=//p' | jq -r .disposition)" "replay lost startup evidence"
+
+  for DAMAGE in missing foreign malformed; do
+    OP="unknown.$VERB.$DAMAGE"
+    reset_meta
+    seed_pool
+    pending_host_operation "$OP"
+    host_receipt "$OP" "$VERB" received
+    RECEIPT="$HOST_HOME/state/parent-route/ios.seat-operation.$OP"
+    # The immutable reservation prevents a missing receipt from becoming fresh.
+    host_parent_record "$OP" > "$HOST_HOME/state/parent-route/ios.seat-reservation.$OP"
+    case "$DAMAGE" in
+      missing) rm "$RECEIPT" ;;
+      foreign) printf 'operation=foreign\n' >> "$RECEIPT" ;;
+      malformed) printf 'phase=started\n' >> "$RECEIPT" ;;
+    esac
+    [ "$DAMAGE" = missing ] || cp "$RECEIPT" "$TMP/damaged-receipt"
+    : > "$HOST_HOME/endpoint-effects.log"
+    OUT=$(host_control "${HOST_ARGS[@]}" --operation "$OP" < /dev/null); RC=$?
+    expect_code 1 "$RC" "$DAMAGE $VERB replay: $OUT"
+    assert_equals unknown "$(printf '%s\n' "$OUT" | sed -n 's/^seat_disposition=//p' | jq -r .disposition)" "damaged evidence settled the operation"
+    host_reply_to_parent "$OP" "$OUT"
+    assert_equals reserved "$(ios_lifecycle "$OP")" "damaged evidence released the generation"
+    [ ! -s "$HOST_HOME/endpoint-effects.log" ] || fail "damaged replay touched the endpoint"
+    if [ "$DAMAGE" = missing ]; then
+      assert_absent "$RECEIPT" "missing receipt was reopened"
+    else
+      cmp -s "$TMP/damaged-receipt" "$RECEIPT" || fail "damaged receipt was rewritten"
+    fi
+  done
+done
+pass "fresh refusals release only their candidates, normal retries replay, and damaged evidence stays unknown"
+
+# Hold the real owner's writer after its snapshot, then attempt the unsafe
+# early retry and out-of-episode writes. The barrier pins the lost-update race.
+OP=custody.barrier
+reset_meta
+seed_pool
+pending_host_operation "$OP"
+host_receipt "$OP" launch received
+RECEIPT="$HOST_HOME/state/parent-route/ios.seat-operation.$OP"
+cp "$RECEIPT" "$TMP/barrier-before"
+REAL_CP=$(command -v cp)
+cat > "$FAKEBIN/cp" <<SH
+#!/usr/bin/env bash
+"$REAL_CP" "\$@" || exit \$?
+if [ "\${FM_CUSTODY_BARRIER:-}" != "" ] && [ "\$1" = "$RECEIPT" ]; then
+  : > "$TMP/copy-ready"
+  while [ ! -e "$TMP/copy-release" ]; do sleep 0.05; done
+fi
+SH
+chmod +x "$FAKEBIN/cp"
+# shellcheck disable=SC2016 # Variables expand in the child shell and its exit trap.
+env ROOT="$ROOT" HOST_HOME="$HOST_HOME" RECEIPT="$RECEIPT" OP="$OP" TMP="$TMP" \
+  PATH="$FAKEBIN:$PATH" FM_CUSTODY_BARRIER=1 bash -c '
+    . "$ROOT/bin/fm-secondmate-liveness-lib.sh"
+    fm_supervisor_lifecycle_acquire "$HOST_HOME/state/parent-route" ios 0 || exit 1
+    trap '\''fm_supervisor_lifecycle_release "$HOST_HOME/state/parent-route" ios'\'' EXIT
+    printf "%s\n" "$FM_SUPERVISOR_LIFECYCLE_CARRIER" > "$TMP/writer-carrier"
+    fm_remote_seat_receipt_update "$RECEIPT" "$OP" "$OP" phase=dispatched \
+      route_backend=herdr route_target=fm-remote:w1:p1
+  ' > "$TMP/writer.out" 2>&1 &
+WRITER=$!
+trap 'touch "$TMP/copy-release"; kill "$WRITER" 2>/dev/null || true; wait "$WRITER" 2>/dev/null || true' EXIT
+for _ in $(seq 1 100); do [ -f "$TMP/copy-ready" ] && break; sleep 0.05; done
+assert_present "$TMP/copy-ready" "owner did not reach the writer barrier"
+CARRIER=$(cat "$TMP/writer-carrier")
+for VERB in launch relaunch; do
+  printf 'foreign\n' > "$HOST_HOME/.fm-secondmate-home"
+  HOST_ARGS=("$VERB" ios notaharness pool-model-a medium)
+  [ "$VERB" != launch ] || HOST_ARGS+=(herdr)
+  OUT=$(host_control "${HOST_ARGS[@]}" --operation "$OP" < /dev/null); RC=$?
+  expect_code 1 "$RC" "early retry during the writer barrier: $OUT"
+  cmp -s "$TMP/barrier-before" "$RECEIPT" || fail "early retry participated in the owner's update"
+  host_reply_to_parent "$OP" "$OUT"
+  assert_equals reserved "$(ios_lifecycle "$OP")" "early concurrent retry released the seat"
+done
+printf 'ios\n' > "$HOST_HOME/.fm-secondmate-home"
+for BAD_CARRIER in '' "$CARRIER" "${CARRIER%|*}|stale"; do
+  # shellcheck disable=SC2016 # Variables expand in the child shell.
+  OUT=$(env ROOT="$ROOT" RECEIPT="$RECEIPT" OP="$OP" FM_SUPERVISOR_LIFECYCLE_CARRIER="$BAD_CARRIER" bash -c '
+    . "$ROOT/bin/fm-secondmate-liveness-lib.sh"
+    fm_remote_seat_receipt_update "$RECEIPT" "$OP" "$OP" phase=prelaunch
+  ' 2>&1); RC=$?
+  [ "$RC" -ne 0 ] || fail "out-of-episode shared writer was accepted"
+  cmp -s "$TMP/barrier-before" "$RECEIPT" || fail "unauthorized writer changed the receipt"
+done
+
+# Both entrypoints must refuse a busy episode without releasing the seat.
+BUSY_CALLERS=()
+for VERB in launch relaunch; do
+  ( HOST_ARGS=("$VERB" ios notaharness pool-model-a medium)
+    [ "$VERB" != launch ] || HOST_ARGS+=(herdr)
+    host_control "${HOST_ARGS[@]}" --operation "$OP" < /dev/null > "$TMP/busy-$VERB.out"
+    echo "$?" > "$TMP/busy-$VERB.rc"
+  ) &
+  BUSY_CALLERS+=("$!")
+done
+for CALLER in "${BUSY_CALLERS[@]}"; do wait "$CALLER" || fail "busy entrypoint fixture failed"; done
+for VERB in launch relaunch; do
+  expect_code 1 "$(cat "$TMP/busy-$VERB.rc")" "busy $VERB refusal"
+  OUT=$(cat "$TMP/busy-$VERB.out")
+  assert_contains "$OUT" 'another lifecycle episode' "busy refusal was not proved"
+  assert_equals unknown "$(printf '%s\n' "$OUT" | sed -n 's/^seat_disposition=//p' | jq -r .disposition)" "busy refusal was settled"
+  host_reply_to_parent "$OP" "$OUT"
+  assert_equals reserved "$(ios_lifecycle "$OP")" "busy refusal released the pending generation"
+done
+touch "$TMP/copy-release"
+wait "$WRITER" || fail "verified owner writer failed: $(cat "$TMP/writer.out")"
+trap - EXIT
+assert_grep 'phase=dispatched' "$RECEIPT" "the original owner lost dispatch evidence"
+assert_grep 'route_target=fm-remote:w1:p1' "$RECEIPT" "the original owner lost its route"
+rm "$FAKEBIN/cp"
+# shellcheck disable=SC2016 # Variables expand in the owner, its exit trap, and child.
+env ROOT="$ROOT" HOST_HOME="$HOST_HOME" RECEIPT="$RECEIPT" OP="$OP" bash -c '
+  . "$ROOT/bin/fm-secondmate-liveness-lib.sh"
+  fm_supervisor_lifecycle_acquire "$HOST_HOME/state/parent-route" ios 0 || exit 1
+  trap '\''fm_supervisor_lifecycle_release "$HOST_HOME/state/parent-route" ios'\'' EXIT
+  cp "$RECEIPT" "$HOST_HOME/state/parent-route/other.seat-operation.$OP"
+  if fm_remote_seat_receipt_update "$HOST_HOME/state/parent-route/other.seat-operation.$OP" "$OP" "$OP" phase=prelaunch; then exit 1; fi
+  if fm_remote_seat_receipt_update "$RECEIPT" "$OP" "$OP" phase=prelaunch; then exit 1; fi
+  bash -c '\''
+    . "$ROOT/bin/fm-secondmate-liveness-lib.sh"
+    fm_remote_seat_receipt_update "$RECEIPT" "$OP" "$OP" phase=started actual_generation="$OP"
+  '\'' || exit 1
+' > "$TMP/adopted-writer.out" 2>&1 || fail "shared writer did not enforce task custody or allow verified child: $(cat "$TMP/adopted-writer.out")"
+assert_grep 'phase=started' "$RECEIPT" "verified adopted writer could not confirm startup"
+pass "verified writer custody excludes unauthorized lost updates and busy refusals retain the parent seat"
 
 echo "ALL TESTS PASSED"

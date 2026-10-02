@@ -254,20 +254,49 @@ fm_remote_seat_receipts_for_generation() {
   done
 }
 
+# fm_remote_seat_receipt_validate <receipt> <operation> <generation>
+# Malformed or foreign evidence cannot authorize a settled disposition or write.
+fm_remote_seat_receipt_validate() {
+  [ -f "$1" ] && [ ! -L "$1" ] || return 1
+  awk -F= -v op="$2" -v gen="$3" '
+    { count[$1]++; value[$1] = substr($0, length($1) + 2) }
+    END {
+      for (key in count) if (count[key] != 1) exit 1
+      if (value["schema"] != "fm-remote-seat-receipt.v1" ||
+          value["operation"] != op || value["requested_generation"] != gen ||
+          (value["verb"] != "launch" && value["verb"] != "relaunch") ||
+          value["previous_generation"] == "" ||
+          value["phase"] !~ /^(received|prelaunch|existing|dispatched|started|dead-after-start|cancelled)$/) exit 1
+    }
+  ' "$1"
+}
+
 # fm_remote_seat_receipt_update <receipt> <operation> <generation> <key=value>...
 #
 # The host operation receipt (<host-state>/parent-route/<id>.seat-operation.<gen>) is
 # opened by bin/fm-remote-secondmate-control.sh, which owns its schema, before
 # any endpoint effect; a host-local launch inside that same episode records its
 # delivery and startup through this one writer. Refuses unless the receipt is
-# a regular file naming exactly <operation> and <generation>; values never
-# carry newlines.
+# a valid receipt naming exactly <operation> and <generation> and the inherited
+# lifecycle carrier verifies for the receipt's state directory and task.
+# Prelaunch updates also require an unsubmitted phase; values never carry newlines.
 fm_remote_seat_receipt_update() {
-  local receipt=$1 op=$2 gen=$3 tmp kv key
+  local receipt=$1 op=$2 gen=$3 tmp kv key name id phase
   shift 3
-  [ -f "$receipt" ] && [ ! -L "$receipt" ] || return 1
-  [ "$(sed -n 's/^operation=//p' "$receipt" | head -1)" = "$op" ] || return 1
-  [ "$(sed -n 's/^requested_generation=//p' "$receipt" | head -1)" = "$gen" ] || return 1
+  name=${receipt##*/}
+  id=${name%".seat-operation.$op"}
+  [ "$name" = "$id.seat-operation.$op" ] || return 1
+  if ! fm_supervisor_lifecycle_adopt "${receipt%/*}" "$id"; then
+    printf 'error: seat receipt update requires the verified lifecycle episode for %s\n' "$id" >&2
+    return 1
+  fi
+  fm_remote_seat_receipt_validate "$receipt" "$op" "$gen" || return 1
+  phase=$(sed -n 's/^phase=//p' "$receipt")
+  for kv in "$@"; do
+    if [ "$kv" = phase=prelaunch ]; then
+      case "$phase" in received|prelaunch) ;; *) return 1 ;; esac
+    fi
+  done
   tmp="$receipt.tmp.$$"
   (umask 077 && cp "$receipt" "$tmp") || return 1
   for kv in "$@"; do

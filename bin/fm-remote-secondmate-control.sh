@@ -70,6 +70,9 @@
 # operation keeps its own receipt and an immutable .seat-reservation.<gen> holder record
 # received from fm-on's ledger-verified input. Losing its mutable receipt is
 # unknown and never permits opening another episode for that token.
+# An invocation's early error is not an operation disposition: only verified
+# episode ownership plus custody of a fresh, unsubmitted receipt can establish
+# a prelaunch refusal. Earlier validation or preparation failures return unknown.
 # An `existing` receipt binds its request token to the actual generation it observed, so
 # disposition and predecessor readiness resolve evidence through that binding,
 # not just a receipt filename equal to the generation. Replacement preserves
@@ -114,11 +117,17 @@ SEAT_OP=
 SEAT_PREV=-
 EXPECT_GENERATION=
 SEAT_LIFECYCLE_ID=
-prelaunch_die() {
-  if [ -n "$SEAT_OP" ]; then
-    seat_receipt_set phase=prelaunch 2>/dev/null || true
+SEAT_FRESH_RECEIPT=0
+seat_prelaunch_refusal() {
+  [ -n "$SEAT_OP" ] || return 0
+  if [ "$SEAT_FRESH_RECEIPT" = 1 ] && seat_receipt_set phase=prelaunch; then
     seat_emit prelaunch false false
+  else
+    seat_emit unknown false false
   fi
+}
+prelaunch_die() {
+  seat_prelaunch_refusal
   printf 'relaunch_failure=prelaunch\n' >&2
   die "$1"
 }
@@ -186,17 +195,19 @@ seat_parse_operation() {
 # seat_receipt_open <id> <verb>: persist the token-scoped receipt before any
 # endpoint effect. Must run inside the host lifecycle episode.
 seat_receipt_open() {
-  local id=$1 receipt tmp
+  local id=$1 receipt
+  fm_supervisor_lifecycle_adopt "$CONTROL_STATE" "$id" || return 1
   receipt=$(receipt_path "$id")
-  tmp="$receipt.tmp.$$"
-  (umask 077 && {
+  # Noclobber preserves prior operation evidence even if an unexpected file
+  # already exists. A partial write is retained as unknown, without custody.
+  (umask 077; set -C; {
     echo "schema=fm-remote-seat-receipt.v1"
     echo "operation=$SEAT_OP"
     echo "verb=$2"
     echo "requested_generation=$SEAT_OP"
     echo "previous_generation=$SEAT_PREV"
     echo "phase=received"
-  } > "$tmp") && mv -f "$tmp" "$receipt"
+  } > "$receipt")
 }
 
 seat_receipt_set() {  # <key=value>...
@@ -244,10 +255,7 @@ seat_decide() {
   meta=$(meta_path "$id")
   SEAT_DECIDED=unknown
   SEAT_OLD_DESTROYED=false
-  if [ ! -f "$receipt" ] || [ -L "$receipt" ] \
-    || [ "$(receipt_field "$receipt" schema)" != fm-remote-seat-receipt.v1 ] \
-    || [ "$(receipt_field "$receipt" operation)" != "$SEAT_OP" ] \
-    || [ "$(receipt_field "$receipt" requested_generation)" != "$SEAT_OP" ]; then
+  if ! fm_remote_seat_receipt_validate "$receipt" "$SEAT_OP" "$SEAT_OP"; then
     seat_emit unknown false false
     return 0
   fi
@@ -394,6 +402,7 @@ seat_enter() {
   (umask 077; set -C; printf '%s\n' "$record" > "$reservation") \
     || { seat_emit unknown false false; die "the seat operation was already claimed or could not be retained"; }
   seat_receipt_open "$id" "$verb" || prelaunch_die "the seat operation receipt could not be written"
+  SEAT_FRESH_RECEIPT=1
   return 0
 }
 
@@ -613,8 +622,7 @@ cmd_relaunch() {
   fi
   if [ -n "$EXPECT_GENERATION" ] && [ "$(fm_meta_get "$(meta_path "$id")" spawn_gen)" != "$EXPECT_GENERATION" ]; then
     if [ -n "$SEAT_OP" ]; then
-      seat_receipt_set phase=prelaunch || die "could not record the generation mismatch"
-      seat_emit prelaunch false false
+      seat_prelaunch_refusal
     fi
     echo "error: generation-mismatch: the host incarnation is not $EXPECT_GENERATION; nothing was changed" >&2
     exit 6

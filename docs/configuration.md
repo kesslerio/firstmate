@@ -1278,7 +1278,7 @@ The pool names, capacities, and models are the operator's own choice; nothing is
 - Each remote home and its local descendants share one host ledger, delivery path, and certificate, including pooled descendants that predate the declaration.
 - Unpooled remote approvals are recorded as holders before certificate publication, so a later policy change counts them immediately.
 - A remote secondmate's own seat belongs to the primary: an initial launch or relaunch reserves its generation at the primary before the host's launch or relaunch operation, and the host reports one outcome bound to that generation.
-- A host refusal before launch releases only the new candidate and leaves the old agent's seat alone.
+- A verified host refusal for a fresh, unsubmitted operation releases only the new candidate and leaves the old agent's seat alone; an invocation that fails before acquiring receipt custody reports unknown and keeps its reservation counted.
 - A confirmed start counts the model the host actually runs, reports any mismatch with the requested model, and survives a failed update of the primary's own record.
 - A lost reply or an unknown outcome keeps the candidate counted until the primary's watcher reads the host's outcome for that generation; a missing or mismatched receipt stays unknown and never permits the token to repeat lifecycle effects.
 - While seat pools are configured, a host refuses a supervisor launch or relaunch that did not come through the primary's accounting.

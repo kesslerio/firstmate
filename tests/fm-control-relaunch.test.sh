@@ -2551,7 +2551,7 @@ test_host_relaunch_records_terminal_predecessor() {
   dir=$(new_case host-receipt sm62)
   sm_case "$dir" sm62
   for gen in g-sm-old s.test.new; do
-    printf 'schema=fm-remote-seat-receipt.v1\noperation=%s\nrequested_generation=%s\nphase=started\n' "$gen" "$gen" > "$dir/home/state/sm62.seat-operation.$gen"
+    printf 'schema=fm-remote-seat-receipt.v1\noperation=%s\nrequested_generation=%s\nverb=relaunch\nprevious_generation=-\nphase=started\n' "$gen" "$gen" > "$dir/home/state/sm62.seat-operation.$gen"
   done
   out=$(FM_REMOTE_SEAT_OPERATION=s.test.new FM_SPAWN_SEAT_GENERATION=s.test.new run_control "$dir" sm62 relaunch --model pool-model-a); rc=$?
   expect_code 0 "$rc" "host relaunch with retained predecessor receipt: $out"
@@ -2841,9 +2841,9 @@ test_control_terminalizes_all_observing_predecessor_receipts() {
   dir=$(new_case host-alias-stop sm68)
   sm_case "$dir" sm68
   for op in observing.one observing.two; do
-    printf 'schema=fm-remote-seat-receipt.v1\noperation=%s\nrequested_generation=%s\nactual_generation=g-sm-old\nphase=existing\n' "$op" "$op" > "$dir/home/state/sm68.seat-operation.$op"
+    printf 'schema=fm-remote-seat-receipt.v1\noperation=%s\nrequested_generation=%s\nverb=launch\nprevious_generation=-\nactual_generation=g-sm-old\nphase=existing\n' "$op" "$op" > "$dir/home/state/sm68.seat-operation.$op"
   done
-  printf 'schema=fm-remote-seat-receipt.v1\noperation=replacement.new\nrequested_generation=replacement.new\nphase=received\n' > "$dir/home/state/sm68.seat-operation.replacement.new"
+  printf 'schema=fm-remote-seat-receipt.v1\noperation=replacement.new\nrequested_generation=replacement.new\nverb=relaunch\nprevious_generation=-\nphase=received\n' > "$dir/home/state/sm68.seat-operation.replacement.new"
   printf 'schema=fm-remote-seat-receipt.v1\noperation=foreign\nrequested_generation=foreign\nactual_generation=other-generation\nphase=existing\n' > "$dir/home/state/sm68.seat-operation.foreign"
   out=$(FM_REMOTE_SEAT_OPERATION=replacement.new FM_SPAWN_SEAT_GENERATION=replacement.new run_control "$dir" sm68 relaunch --model pool-model-a); rc=$?
   expect_code 0 "$rc" "control stopping a live imported predecessor: $out"
