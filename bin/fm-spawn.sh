@@ -2070,11 +2070,11 @@ launch_template() {
   # a parent walk, so a per-run flag is also the only shape that does not grow a
   # new store entry per pool slot.
   pi | pi-signed)
-    printf '%s' '__PIBIN____PITUIMODE____PIAPPROVE____PIRESUME__'
+    printf '%s' '__PIBIN____PITUIMODE____PIRESUME____PITRUST__'
     if [ "$kind" = secondmate ]; then
-      printf '%s' ' --approve __MODELFLAG____EFFORTFLAG__-e __PITURNEND__ -e __PIWATCH__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
+      printf '%s' ' __MODELFLAG____EFFORTFLAG__-e __PITURNEND__ -e __PIWATCH__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
     else
-      printf '%s' ' --approve __MODELFLAG____EFFORTFLAG__-e __PIEXT__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
+      printf '%s' ' __MODELFLAG____EFFORTFLAG__-e __PIEXT__ "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
     fi
     ;;
   # omp (Oh My Pi), a Pi fork. Same one-positional-brief, --model, --thinking,
@@ -4361,6 +4361,20 @@ fi
 spawn_enter_recorded_worktree
 spawn_assert_agent_worktree
 
+SPAWN_FOLDER_TRUST_ALLOWED=0
+case "$HARNESS" in
+codex | pi | pi-signed)
+  if fm_treehouse_pool_slot "$PROJ_ABS" "$WT"; then
+    SPAWN_FOLDER_TRUST_ALLOWED=1
+  fi
+  ;;
+esac
+PI_TRUST_FLAG=
+if [ "$SPAWN_FOLDER_TRUST_ALLOWED" = 1 ]; then
+  PI_TRUST_FLAG=' --approve'
+fi
+LAUNCH=${LAUNCH//__PITRUST__/$PI_TRUST_FLAG}
+
 # Pre-register Claude's workspace trust for the directory this launch starts in,
 # at the first point that directory is known and before any per-task state is
 # created below. The dialog gates the pane before the brief is ever read, and it
@@ -4385,27 +4399,7 @@ spawn_assert_agent_worktree
 # path that was not pre-registered, refuses to count a busy turn as ready until
 # it has done so. agy is crewmate/scout only (refused above for secondmate), so
 # only the worktree shape applies.
-# codex gates a fresh directory on "Trust this folder?" and honours the entry its
-# own Enter key writes, so the same pre-registration removes it: one
-# `[projects."<repository root>"]` entry per project, registered by
-# bin/fm-codex-trust.sh, covers every worktree of that repository, including
-# every pool slot that project has not used yet. Folder trust only - the hook
-# trust modal stays unautomated and the crewmate template above keeps disabling
-# codex's hook layer. Like agy and unlike claude, codex's dialog preselects the
-# affirmative, so a failed registration warns and launches: the pane is left
-# exactly as it was before this control existed, answerable by hand, rather than
-# the spawn failing over a config the operator may be editing.
 AGY_TRUST_PREREGISTERED=0
-# codex gates a fresh directory on "Trust this folder?" and honours the entry its
-# own Enter key writes, so the same pre-registration removes it: one
-# `[projects."<repository root>"]` entry per project, registered by
-# bin/fm-codex-trust.sh, covers every worktree of that repository, including
-# every pool slot that project has not used yet. Folder trust only - the hook
-# trust modal stays unautomated and the crewmate template above keeps disabling
-# codex's hook layer. Like agy and unlike claude, codex's dialog preselects the
-# affirmative, so a failed registration warns and launches: the pane is left
-# exactly as it was before this control existed, answerable by hand, rather than
-# the spawn failing over a config the operator may be editing.
 case "$HARNESS" in
 claude*)
   if [ "$KIND" = secondmate ]; then
@@ -4426,13 +4420,16 @@ codex)
   if [ -n "$CODEX_LAUNCH_HOME" ]; then
     LAUNCH="CODEX_HOME=$(shell_quote "$CODEX_LAUNCH_HOME") $LAUNCH"
   fi
-  if [ "$KIND" = secondmate ]; then
-    spawn_trust_args=(--secondmate-home "$PROJ_ABS" "$ID")
-  else
-    spawn_trust_args=("$WT" "$PROJ_ABS")
-  fi
-  if ! CODEX_HOME="$CODEX_LAUNCH_HOME" "$FM_ROOT/bin/fm-codex-trust.sh" "${spawn_trust_args[@]}" >/dev/null; then
-    echo "warning: could not pre-register codex folder trust for $WT; the launch may park on the folder-trust dialog in window $T" >&2
+  if [ "$SPAWN_FOLDER_TRUST_ALLOWED" = 1 ]; then
+    if [ "$KIND" = secondmate ]; then
+      spawn_trust_args=(--secondmate-home "$PROJ_ABS" "$ID")
+    else
+      spawn_trust_args=("$WT" "$PROJ_ABS")
+    fi
+    if ! CODEX_HOME="$CODEX_LAUNCH_HOME" "$FM_ROOT/bin/fm-codex-trust.sh" "${spawn_trust_args[@]}" >/dev/null; then
+      echo "error: could not pre-register codex folder trust for $WT; refusing to launch the worker; inspect window $T and the registration error above" >&2
+      exit 1
+    fi
   fi
   ;;
 agy)

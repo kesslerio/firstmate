@@ -32,7 +32,8 @@ Multiple positional arguments become separate queued messages; the spawn templat
 
 A project trust dialog can appear on the first Pi run in any not-yet-trusted directory, including a clean worktree: "Trust project folder?", offering Trust, Trust parent folder, Trust (this session only), Do not trust, and Do not trust (this session only), with the cursor on Trust.
 Saved decisions are keyed per canonical directory with a walk up through the parents, the closest one winning, in `<$PI_CODING_AGENT_DIR or ~/.pi/agent>/trust.json`.
-A crewmate launch never waits on it: Pi's own `--approve` is a per-run decision consulted before the saved decisions, and it persists nothing, so the store keeps holding only decisions a person actually made at that prompt.
+For a qualifying linked pool worktree, the launch carries Pi's own `--approve`, a per-run decision consulted before saved decisions that persists nothing.
+Standalone secondmate checkouts keep folder approval as an attended provisioning step.
 Verified on Pi 0.99.2, where the flag suppresses the prompt and still loads that directory's `.pi` resources and project extensions - the state answering the prompt by hand already produced - while the unflagged launch of the same directory still renders the prompt.
 The store's per-directory scope is why a launch flag is the right shape here rather than a pre-registered entry: a pooled worktree path would otherwise add one store entry per slot, and a worker account pin relocates that store, so a writer would have to resolve the pin first.
 

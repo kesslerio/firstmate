@@ -218,10 +218,6 @@ else
     esac
   done
 
-  # A secondmate home is a whole firstmate instance, and Codex keys the launch on
-  # its repository root: the home itself when bin/fm-home-seed.sh produced a
-  # standalone clone, the parent checkout when it leased a linked worktree. Either
-  # way that is the entry the operator's own Enter press would have written.
   HOME_COMMON=$(common_dir_of "$TARGET_REAL") || true
   [ -n "$HOME_COMMON" ] || refuse "'$TARGET_REAL' is not inside a git repository, so it has no repository root to register"
   TRUST_ROOT=$(repo_root_of "$HOME_COMMON") || true
@@ -243,6 +239,8 @@ if [ -L "$STORE" ]; then
 fi
 TRUST_LIB_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 FM_STATE_OVERRIDE=$(dirname -- "$STORE") . "$TRUST_LIB_DIR/fm-wake-lib.sh"
+fm_treehouse_pool_slot "$TRUST_ROOT" "$TARGET_REAL" \
+  || refuse "'$TARGET_REAL' is not a qualifying linked pool worktree; approve its folder trust during attended provisioning"
 TRUST_LOCK="$STORE.fm-trust.lock"
 trap 'fm_lock_release "$TRUST_LOCK"' EXIT
 trap 'exit 130' INT
