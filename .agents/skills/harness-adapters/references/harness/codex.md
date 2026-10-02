@@ -19,7 +19,7 @@ Verified on 2026-06-11 with codex-cli 0.139.0 unless a fact gives a newer versio
 A directory trust dialog appears on the first run for a repository root: "Folder access … Trust this folder?", with "Trust and continue" already selected and "Quit" second.
 The decision persists per REPOSITORY ROOT in `[projects."<root>"] trust_level = "trusted"` inside `${CODEX_HOME:-~/.codex}/config.toml`, so answering it once covers every later worktree of that repository; verified on codex-cli 0.159.2, where answering inside a linked worktree wrote the entry for the primary checkout, and an entry for a directory merely above the repository root left the dialog standing.
 For a qualifying linked pool worktree, `../../../bin/fm-spawn.sh` requires successful registration through `../../../bin/fm-codex-trust.sh` before launching Codex, so registration failure stops the launch and successful registration removes the folder prompt.
-Standalone secondmate checkouts keep folder approval as an attended provisioning step.
+Secondmate seed markers do not grant folder trust: both registration modes require a linked pool worktree, while standalone and other attended checkouts keep manual folder approval.
 The live guard `../../../tests/fm-folder-trust-live-e2e.test.sh` refreshes the store contract against the installed binary.
 Two vendor details that shaped that choice, both verified on codex-cli 0.159.2: a `-c 'projects."<path>".trust_level="trusted"'` command-line override is accepted and ignored for this decision, so only the persisted store works, and declining the prompt with Escape records nothing, so a registered entry is never overwriting an answer a human gave.
 
