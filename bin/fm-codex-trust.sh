@@ -167,28 +167,7 @@ if [ -n "${HOME:-}" ]; then
   [ "$TARGET_REAL" != "${HOME_REAL:-}" ] || refuse "'$TARGET_REAL' is the home directory, not a $SCOPE_NOUN"
 fi
 
-if [ "$MODE" = worktree ]; then
-  WT_TOP=$(git -C "$TARGET_REAL" rev-parse --show-toplevel 2>/dev/null) || true
-  [ -n "$WT_TOP" ] || refuse "'$TARGET_REAL' is not inside a git repository"
-  WT_TOP_REAL=$(real_dir "$WT_TOP") || true
-  [ "$WT_TOP_REAL" = "$TARGET_REAL" ] || refuse "'$TARGET_REAL' is not a worktree root (its root is '${WT_TOP_REAL:-unresolvable}')"
-
-  WT_GIT_DIR=$(git -C "$TARGET_REAL" rev-parse --absolute-git-dir 2>/dev/null) || true
-  [ -n "$WT_GIT_DIR" ] || refuse "'$TARGET_REAL' has no resolvable git directory"
-  WT_GIT_DIR=$(real_dir "$WT_GIT_DIR") || true
-  [ -n "$WT_GIT_DIR" ] || refuse "'$TARGET_REAL' has an unresolvable git directory"
-  WT_COMMON=$(common_dir_of "$TARGET_REAL") || true
-  [ -n "$WT_COMMON" ] || refuse "'$TARGET_REAL' has no resolvable git common directory"
-  [ "$WT_GIT_DIR" != "$WT_COMMON" ] || refuse "'$TARGET_REAL' is a primary checkout, not an isolated worktree"
-
-  PROJ_COMMON=$(common_dir_of "$PROJ_REAL") || true
-  [ -n "$PROJ_COMMON" ] || refuse "project '$PROJ_REAL' is not inside a git repository"
-  [ "$WT_COMMON" = "$PROJ_COMMON" ] || refuse "'$TARGET_REAL' is not a worktree of project '$PROJ_REAL'"
-
-  TRUST_ROOT=$(repo_root_of "$WT_COMMON") || true
-  [ -n "$TRUST_ROOT" ] \
-    || refuse "'$TARGET_REAL' has no verifiable repository root to register (its common dir is '$WT_COMMON')"
-else
+if [ "$MODE" = secondmate-home ]; then
   # The seed evidence, in the order that names the most useful reason first: the
   # marker decides whether this is a secondmate home at all, the id decides whose,
   # and the instance files and operational directories decide whether it is the
@@ -217,13 +196,28 @@ else
       *) refuse "'$sub_dir' resolves to '$sub_dir_real', outside the home, so '$TARGET_REAL' is not a safe secondmate home" ;;
     esac
   done
-
-  HOME_COMMON=$(common_dir_of "$TARGET_REAL") || true
-  [ -n "$HOME_COMMON" ] || refuse "'$TARGET_REAL' is not inside a git repository, so it has no repository root to register"
-  TRUST_ROOT=$(repo_root_of "$HOME_COMMON") || true
-  [ -n "$TRUST_ROOT" ] \
-    || refuse "'$TARGET_REAL' has no verifiable repository root to register (its common dir is '$HOME_COMMON')"
 fi
+
+WT_TOP=$(git -C "$TARGET_REAL" rev-parse --show-toplevel 2>/dev/null) || true
+[ -n "$WT_TOP" ] || refuse "'$TARGET_REAL' is not inside a git repository"
+WT_TOP_REAL=$(real_dir "$WT_TOP") || true
+[ "$WT_TOP_REAL" = "$TARGET_REAL" ] || refuse "'$TARGET_REAL' is not a worktree root (its root is '${WT_TOP_REAL:-unresolvable}')"
+WT_GIT_DIR=$(git -C "$TARGET_REAL" rev-parse --absolute-git-dir 2>/dev/null) || true
+[ -n "$WT_GIT_DIR" ] || refuse "'$TARGET_REAL' has no resolvable git directory"
+WT_GIT_DIR=$(real_dir "$WT_GIT_DIR") || true
+[ -n "$WT_GIT_DIR" ] || refuse "'$TARGET_REAL' has an unresolvable git directory"
+WT_COMMON=$(common_dir_of "$TARGET_REAL") || true
+[ -n "$WT_COMMON" ] || refuse "'$TARGET_REAL' has no resolvable git common directory"
+[ "$WT_GIT_DIR" != "$WT_COMMON" ] \
+  || refuse "'$TARGET_REAL' is a primary checkout, not an isolated worktree; approve its folder trust during attended provisioning"
+if [ "$MODE" = worktree ]; then
+  PROJ_COMMON=$(common_dir_of "$PROJ_REAL") || true
+  [ -n "$PROJ_COMMON" ] || refuse "project '$PROJ_REAL' is not inside a git repository"
+  [ "$WT_COMMON" = "$PROJ_COMMON" ] || refuse "'$TARGET_REAL' is not a worktree of project '$PROJ_REAL'"
+fi
+TRUST_ROOT=$(repo_root_of "$WT_COMMON") || true
+[ -n "$TRUST_ROOT" ] \
+  || refuse "'$TARGET_REAL' has no verifiable repository root to register (its common dir is '$WT_COMMON')"
 
 command -v python3 >/dev/null 2>&1 || refuse "python3 with tomllib (Python 3.11+) is required to record folder trust and was not found on PATH"
 

@@ -414,15 +414,20 @@ test_missing_python_is_refused() {
 # --- secondmate homes -------------------------------------------------------
 
 test_secondmate_standalone_clone_home_requires_attended_trust() {
-  local rec home out
+  local rec home shape out
   rec=$(make_case sm-clone)
   read_case "$rec"
-  home="$CASE_DIR/home"
-  seed_secondmate_home "$home" "android"
-  out=$(run_home_trust "$CODEX_HOME" "$home" android)
-  expect_code 1 $? "a standalone-clone secondmate home must not be pre-trusted: $out"
-  assert_contains "$out" "attended provisioning" "the refusal did not name the attended approval step"
-  assert_absent "$(store_of "$CODEX_HOME")" "the standalone home gained automatic trust"
+  for shape in standalone separate; do
+    home="$CASE_DIR/$shape"
+    seed_secondmate_home "$home" "android"
+    if [ "$shape" = separate ]; then
+      git -C "$home" init --separate-git-dir "$CASE_DIR/primary-git" >/dev/null 2>&1 || fail "could not seed separate git metadata"
+    fi
+    out=$(run_home_trust "$CODEX_HOME" "$home" android)
+    expect_code 1 $? "a $shape secondmate home must not be pre-trusted: $out"
+    assert_contains "$out" "attended provisioning" "the refusal did not name the attended approval step"
+    assert_absent "$(store_of "$CODEX_HOME")" "the primary home gained automatic trust"
+  done
   pass "fm-codex-trust.sh: standalone secondmate homes keep attended folder trust"
 }
 
@@ -708,27 +713,43 @@ SH
 }
 
 test_spawn_fixture_isolates_an_exported_codex_home() {
-  local case_dir="$TMP_ROOT/store-isolation" fakebin out
-  mkdir -p "$case_dir/operator-store"
-  printf 'model = "operator-model"\n' > "$case_dir/operator-store/config.toml"
-  fakebin=$(make_launch_home "$case_dir" codex codex)
-  out=$(CODEX_HOME="$case_dir/operator-store" spawn_with_fakebin "$case_dir" "$case_dir/home" store-isolation "$case_dir/project" "$case_dir/wt" "$fakebin")
-  expect_code 0 $? "isolated fixture spawn failed: $out"
-  assert_equals 'model = "operator-model"' "$(cat "$case_dir/operator-store/config.toml")" "fixture changed the inherited operator store"
-  assert_trusted_root "$case_dir/home/user-home/.codex" "$case_dir/project" "fixture did not use its own store"
+  local mode case_dir fakebin selected
+  for mode in default empty explicit; do
+    case_dir="$TMP_ROOT/store-isolation-$mode"
+    mkdir -p "$case_dir/operator-store"
+    printf 'model = "operator-model"\n' > "$case_dir/operator-store/config.toml"
+    fakebin=$(make_launch_home "$case_dir" codex codex)
+    selected="$case_dir/home/user-home/.codex"
+    (
+      export CODEX_HOME="$case_dir/operator-store"
+      unset FM_TEST_CODEX_HOME
+      case "$mode" in
+        empty) export FM_TEST_CODEX_HOME='' ;;
+        explicit) export FM_TEST_CODEX_HOME="$case_dir/selected-store" ;;
+      esac
+      spawn_with_fakebin "$case_dir" "$case_dir/home" "store-isolation-$mode" "$case_dir/project" "$case_dir/wt" "$fakebin" >/dev/null || exit 1
+      [ "$CODEX_HOME" = "$case_dir/operator-store" ]
+    ) || fail "isolated fixture spawn changed its caller environment or failed"
+    [ "$mode" != explicit ] || selected="$case_dir/selected-store"
+    assert_equals 'model = "operator-model"' "$(cat "$case_dir/operator-store/config.toml")" "fixture changed the inherited operator store"
+    assert_trusted_root "$selected" "$case_dir/project" "fixture did not use its selected throwaway store"
+  done
   pass "spawn fixture: exported Codex profiles remain untouched"
 }
 
 test_secondmate_automatic_trust_is_limited_to_linked_pool_homes() {
   local harness shape case_dir fakebin home out launch status argv store
   for harness in codex pi pi-signed; do
-    for shape in standalone nonpool pool; do
+    for shape in standalone separate nonpool pool; do
       case_dir="$TMP_ROOT/scope-$harness-$shape"
       mkdir -p "$case_dir"
       fakebin=$(make_launch_home "$case_dir" "$harness" "$harness")
       home="$case_dir/secondmate"
-      if [ "$shape" = standalone ]; then
+      if [ "$shape" = standalone ] || [ "$shape" = separate ]; then
         seed_secondmate_home "$home" "scope-$harness-$shape"
+        if [ "$shape" = separate ]; then
+          git -C "$home" init --separate-git-dir "$case_dir/primary-git" >/dev/null 2>&1 || fail "could not seed a primary checkout with separate git metadata"
+        fi
       else
         if [ "$shape" = nonpool ]; then
           home="$case_dir/attended/secondmate"
@@ -787,13 +808,43 @@ test_direct_registration_refuses_linked_homes_outside_the_pool() {
 }
 
 test_live_guard_requires_editor_and_owns_cleanup() {
-  local case_dir="$TMP_ROOT/live-guard" fakebin scenario screen signal expected out status socket root
+  local case_dir="$TMP_ROOT/live-guard" fakebin tool scenario screen signal expected ancestor_trust out status socket root
   mkdir -p "$case_dir/home/.codex"
   printf '{}\n' > "$case_dir/home/.codex/auth.json"
   fakebin=$(fm_fakebin "$case_dir")
   fm_fake_exit0 "$fakebin" sleep
-  fm_fake_version_tool "$fakebin" codex FM_FAKE_CODEX_VERSION "codex-test"
-  fm_fake_version_tool "$fakebin" pi FM_FAKE_PI_VERSION "pi-test"
+  for tool in codex pi; do
+    cat > "$fakebin/$tool" <<'SH'
+#!/usr/bin/env bash
+exec python3 - "${0##*/}" "$@" <<'PY'
+import argparse
+import json
+import os
+import sys
+harness, *argv = sys.argv[1:]
+if argv == ["--version"]:
+    print(harness + "-test")
+    sys.exit(0)
+parser = argparse.ArgumentParser()
+if harness == "codex":
+    parser.add_argument("--dangerously-bypass-approvals-and-sandbox", action="store_true")
+    parser.add_argument("--disable", action="append")
+    parser.add_argument("-c", action="append")
+    parser.add_argument("--model")
+else:
+    parser.add_argument("--tui-mode")
+    parser.add_argument("--approve", action="store_true")
+    parser.add_argument("--model")
+    parser.add_argument("--thinking")
+    parser.add_argument("-e", action="append")
+parser.parse_args(argv)
+assert argv and argv[0].startswith("-")
+with open(os.environ["FM_LIVE_CLI_LOG"], "a") as stream:
+    stream.write(json.dumps({"harness": harness, "argv": argv}) + "\n")
+PY
+SH
+    chmod +x "$fakebin/$tool"
+  done
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
 set -eu
@@ -805,33 +856,55 @@ case "$1" in
   new-session)
     mkdir -p "$(dirname "$socket")"
     : > "$socket"
+    dir=''
+    for ((i=1; i<=$#; i++)); do
+      if [ "${!i}" = -c ]; then
+        i=$((i + 1))
+        dir=${!i}
+        break
+      fi
+    done
+    [ -n "$dir" ]
+    (cd "$dir" && bash -c "${@: -1}")
     if [ -n "${FM_LIVE_TEST_SIGNAL:-}" ]; then
       kill -s "$FM_LIVE_TEST_SIGNAL" "$(cat "$FM_LIVE_TEST_PID_FILE")"
     fi
     if [ "$4" = fmft-codex-above ]; then
-      python3 - "${@: -1}" <<'PY'
-import re
+      python3 - "$dir" "${@: -1}" <<'PY'
+import shlex
+import subprocess
 import sys
 from pathlib import Path
-command = sys.argv[1]
-worktree = Path(re.search(r'cd "([^"]+)"', command)[1])
-codex_home = Path(re.search(r'CODEX_HOME=([^ ]+)', command)[1])
+worktree = Path(sys.argv[1])
+words = shlex.split(sys.argv[2])
+codex_home = Path(next(word.split("=", 1)[1] for word in words if word.startswith("CODEX_HOME=")))
 import tomllib
 with open(codex_home / "config.toml", "rb") as stream:
     ancestor = Path(next(iter(tomllib.load(stream)["projects"])))
+common = subprocess.check_output(["git", "-C", str(worktree), "rev-parse", "--path-format=absolute", "--git-common-dir"], text=True).strip()
 assert ancestor in worktree.parents
-assert ancestor in (worktree.parent / "project").parents
+assert ancestor in Path(common).parent.parents
 PY
     fi
     ;;
   capture-pane)
     case "$3" in
-      fmft-codex-control|fmft-codex-above) printf 'Trust this folder?\n' ;;
+      fmft-codex-control) printf 'Trust this folder?\n' ;;
+      fmft-codex-above)
+        if [ "$FM_LIVE_ANCESTOR_TRUST" = 1 ]; then
+          printf '› Ask Codex to do anything\n'
+        else
+          printf 'Trust this folder?\n'
+        fi
+        ;;
       fmft-codex-registered) printf '%s\n' "$FM_LIVE_REGISTERED_SCREEN" ;;
       fmft-pi-control) printf 'Trust project folder?\n' ;;
       fmft-pi-approved) printf 'ctrl+o\n' ;;
       *) exit 2 ;;
     esac
+    ;;
+  kill-session)
+    [ -e "$socket" ]
     ;;
   kill-server)
     [ -e "$socket" ]
@@ -842,20 +915,29 @@ PY
 esac
 SH
   chmod +x "$fakebin/tmux"
-  for scenario in empty crashed editor hup quit; do
+  for scenario in empty crashed banner dialog editor shortcuts ancestor int term hup quit; do
     signal=''
+    ancestor_trust=0
     case "$scenario" in
       empty) screen=''; expected=1 ;;
       crashed) screen='sh: codex: command not found'; expected=1 ;;
-      editor) screen='Ask Codex to do anything'; expected=0 ;;
+      banner) screen='Ask Codex to do anything'; expected=1 ;;
+      dialog) screen='Trust this folder? › Ask Codex to do anything'; expected=1 ;;
+      editor) screen='› Ask Codex to do anything'; expected=0 ;;
+      shortcuts) screen='›  ? for shortcuts'; expected=0 ;;
+      ancestor) screen='› Ask Codex to do anything'; ancestor_trust=1; expected=1 ;;
+      int) screen=''; signal=INT; expected=130 ;;
+      term) screen=''; signal=TERM; expected=143 ;;
       hup) screen=''; signal=HUP; expected=129 ;;
       quit) screen=''; signal=QUIT; expected=131 ;;
     esac
     : > "$case_dir/tmux.log"
+    : > "$case_dir/cli.log"
     rm -f "$case_dir/stopped"
     out=$(HOME="$case_dir/home" FM_FOLDER_TRUST_LIVE=1 FM_LIVE_TMUX_LOG="$case_dir/tmux.log" \
       FM_LIVE_TMUX_STOPPED="$case_dir/stopped" FM_LIVE_TEST_SIGNAL="$signal" \
       FM_LIVE_TEST_PID_FILE="$case_dir/live.pid" \
+      FM_LIVE_ANCESTOR_TRUST="$ancestor_trust" FM_LIVE_CLI_LOG="$case_dir/cli.log" \
       FM_LIVE_REGISTERED_SCREEN="$screen" PATH="$fakebin:$PATH" \
       python3 - "$ROOT/tests/fm-folder-trust-live-e2e.test.sh" "$case_dir/live.pid" 2>&1 <<'PY'
 import os
@@ -865,6 +947,8 @@ import sys
 pathlib.Path(sys.argv[2]).write_text(str(os.getpid()))
 signal.signal(signal.SIGHUP, signal.SIG_DFL)
 signal.signal(signal.SIGQUIT, signal.SIG_DFL)
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+signal.signal(signal.SIGTERM, signal.SIG_DFL)
 os.execvp("bash", ["bash", sys.argv[1]])
 PY
 )
@@ -874,15 +958,34 @@ PY
     root=${socket%/*}
     assert_equals "$socket" "$(cat "$case_dir/stopped")" "live guard removed its socket before stopping tmux"
     assert_absent "$root" "live guard leaked its registered fixture root"
-    python3 - "$case_dir/tmux.log" "$socket" <<'PY' || fail "live guard did not clean up exactly its own socket"
+    python3 - "$case_dir/tmux.log" "$socket" "$case_dir/cli.log" "$expected" <<'PY' || fail "live guard violated its pane ownership or prompt-free replay contract"
+import json
 import pathlib
+import shlex
 import sys
 rows = [line.split("\t", 1) for line in pathlib.Path(sys.argv[1]).read_text().splitlines()]
 assert all(socket == sys.argv[2] for socket, command in rows)
 assert rows[-1][1] == "kill-server"
+created, closed = [], []
+for _, command in rows:
+    words = shlex.split(command)
+    if words[0] == "new-session":
+        created.append(words[words.index("-s") + 1])
+    elif words[0] == "kill-session":
+        closed.append(words[words.index("-t") + 1])
+assert len(created) == len(set(created))
+assert len(closed) == len(set(closed))
+assert set(closed) <= set(created)
+replays = [json.loads(line) for line in pathlib.Path(sys.argv[3]).read_text().splitlines()]
+assert replays and all(row["argv"][0].startswith("-") for row in replays)
+if sys.argv[4] == "0":
+    assert created == closed and len(created) == 5
+    pi = [row["argv"] for row in replays if row["harness"] == "pi"]
+    assert len(pi) == 2
+    assert "--approve" not in pi[0] and "--approve" in pi[1]
 PY
   done
-  pass "live guard: editor evidence, ancestor scope, private pane ownership and cleanup"
+  pass "live guard: prompt-free replay, editor evidence, ancestor scope and owned cleanup"
 }
 
 test_live_guard_requires_editor_and_owns_cleanup

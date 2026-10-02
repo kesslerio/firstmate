@@ -36,8 +36,13 @@ CODEX_VERSION=$(codex --version 2>&1 | head -1)
 PI_VERSION=$(pi --version 2>&1 | head -1)
 TMP_ROOT=$(fm_test_tmproot fm-folder-trust-live)
 TMUX_SOCKET="$TMP_ROOT/tmux.sock"
+SESSIONS=()
 
 cleanup() {
+  local sess
+  for sess in "${SESSIONS[@]}"; do
+    tmux -S "$TMUX_SOCKET" kill-session -t "$sess" 2>/dev/null || true
+  done
   tmux -S "$TMUX_SOCKET" kill-server 2>/dev/null || true
   fm_test_cleanup
 }
@@ -51,9 +56,10 @@ open_pane() {  # <name> <dir> <command...>: start one harness in a fresh pane
   local name=$1 dir=$2
   shift 2
   local sess="fmft-$name"
-  tmux -S "$TMUX_SOCKET" new-session -d -s "$sess" -x 160 -y 45 \
-    "sh -c 'cd \"$dir\" && exec $*'" || fail "could not open the test-owned pane $sess"
-  printf '%s\n' "$sess"
+  tmux -S "$TMUX_SOCKET" new-session -d -s "$sess" -x 160 -y 45 -c "$dir" \
+    "$*" || fail "could not open the test-owned pane $sess"
+  SESSIONS+=("$sess")
+  OPENED_SESSION=$sess
 }
 
 pane_text() {  # <session>: the visible viewport, whitespace-collapsed
@@ -108,6 +114,10 @@ see_codex_dialog() {
 see_codex_running() {
   case $1 in
     *'Trust this folder?'*) return 1 ;;
+  esac
+  case $1 in
+    *'› '*) ;;
+    *) return 1 ;;
   esac
   case $1 in
     *'Ask Codex to do anything'* | *'? for shortcuts'*) return 0 ;;
@@ -171,6 +181,7 @@ capture_launch() {
   fm_test_spawn_home "$case_dir/home" "$harness"
   fm_test_spawn_brief "$case_dir/home" "$name"
   : > "$case_dir/launch.log"
+  printf '%s\n' "$fakebin/$harness" > "$case_dir/executable"
   FM_FAKE_LAUNCH_LOG="$case_dir/launch.log" \
     fm_test_run_spawn "$case_dir/home" "$WT" "$fakebin" "$name" "$PROJ" \
     --mode no-mistakes --yolo off >/dev/null 2>&1 ||
@@ -182,18 +193,45 @@ capture_launch() {
 # before the positional brief, so the guard can replay the configuration without
 # spending a model turn.
 global_flags() {
-  local launcher=$1 launch=$2 flags brief_marker=$'"$('
-  flags=${launch#*"$launcher" }
-  flags=${flags%%"$brief_marker"*}
-  printf '%s' "$flags"
+  python3 - "$1" "$2" <<'PY'
+import shlex
+import sys
+launcher, launch = sys.argv[1:]
+prefix, marker, _ = launch.partition('"$(')
+if not marker:
+    sys.exit("the captured launch has no positional brief boundary")
+words = shlex.split(prefix)
+if words.count(launcher) != 1:
+    sys.exit("the captured launch does not name the expected executable exactly once")
+flags = words[words.index(launcher) + 1:]
+arity = {
+    "--dangerously-bypass-approvals-and-sandbox": 0,
+    "--disable": 1,
+    "-c": 1,
+    "--model": 1,
+    "--tui-mode": 1,
+    "--approve": 0,
+    "--thinking": 1,
+    "-e": 1,
+}
+i = 0
+while i < len(flags):
+    count = arity.get(flags[i])
+    if count is None or i + count >= len(flags):
+        sys.exit("refusing replay arguments containing an unknown option or positional prompt")
+    i += count + 1
+if not flags or not flags[0].startswith("-"):
+    sys.exit("replayed arguments must begin with a flag, never an executable path")
+print(shlex.join(flags))
+PY
 }
 
 CODEX_LAUNCH=$(capture_launch codex-live codex)
-CODEX_FLAGS=$(global_flags codex "$CODEX_LAUNCH")
+CODEX_FLAGS=$(global_flags codex "$CODEX_LAUNCH") || fail "refusing unsafe Codex replay flags"
 PI_LAUNCH=$(capture_launch pi-live pi)
-PI_FLAGS=$(global_flags pi "$PI_LAUNCH")
+PI_FLAGS=$(global_flags "$(cat "$CASE/spawn-pi-live/executable")" "$PI_LAUNCH") || fail "refusing unsafe Pi replay flags"
 case $PI_FLAGS in
-  *--approve*) ;;
+  -*--approve* | --approve*) ;;
   *) fail "the captured pi launch lost its trust flag, so the guard would prove nothing: $PI_LAUNCH" ;;
 esac
 
@@ -201,7 +239,8 @@ esac
 
 test_codex_dialog_gates_an_unregistered_worktree() {
   local sess text
-  sess=$(open_pane codex-control "$WT" "env CODEX_HOME=$CODEX_HOME_DIR codex $CODEX_FLAGS")
+  open_pane codex-control "$WT" "env CODEX_HOME=$CODEX_HOME_DIR codex $CODEX_FLAGS"
+  sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_codex_dialog 30)
   see_codex_dialog "$text" ||
     fail "codex $CODEX_VERSION showed no folder-trust dialog in an unregistered fresh worktree, so this fixture proves nothing: $text"
@@ -215,7 +254,8 @@ test_codex_trust_script_removes_the_dialog() {
   assert_contains "$out" "$PROJ" "the registration did not report the repository root: $out"
   assert_contains "$(cat "$CODEX_HOME_DIR/config.toml")" "[projects.\"$PROJ\"]" \
     "codex did not read the entry this guard wrote, and the pane below says so"
-  sess=$(open_pane codex-registered "$WT" "env CODEX_HOME=$CODEX_HOME_DIR codex $CODEX_FLAGS")
+  open_pane codex-registered "$WT" "env CODEX_HOME=$CODEX_HOME_DIR codex $CODEX_FLAGS"
+  sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_codex_running 30)
   see_codex_running "$text" ||
     fail "codex $CODEX_VERSION still shows the folder-trust dialog after bin/fm-codex-trust.sh registered $PROJ: $text"
@@ -227,14 +267,15 @@ test_codex_trust_script_removes_the_dialog() {
 # NOT suppress the dialog. If a release starts walking ancestors, this fails and
 # the "one entry per project" claim has to be revisited.
 test_codex_root_entry_is_the_narrow_key() {
-  local above="$CASE/above" above_home="$CASE/codex-home-above" sess text
+  local above="$CASE/ancestor" above_home="$CASE/codex-home-above" sess text
   mkdir -p "$above" "$above_home"
   printf 'check_for_update_on_startup = false\n\n[projects."%s"]\ntrust_level = "trusted"\n' "$above" \
     > "$above_home/config.toml"
   ln -s "$HOME/.codex/auth.json" "$above_home/auth.json"
-  fm_git_worktree "$above/project" "$above/wt" other-wt
-  sess=$(open_pane codex-above "$above/wt" \
-    "env CODEX_HOME=$above_home codex $CODEX_FLAGS")
+  fm_git_worktree "$above/repository" "$above/worktrees/fresh" other-wt
+  open_pane codex-above "$above/worktrees/fresh" \
+    "env CODEX_HOME=$above_home codex $CODEX_FLAGS"
+  sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_codex_dialog 30)
   see_codex_dialog "$text" ||
     fail "codex $CODEX_VERSION stopped asking for a directory whose only registered ancestor is above the repository root; the one-entry-per-project scope claim needs re-reviewing: $text"
@@ -253,7 +294,8 @@ mkdir -p "$PI_ROOT"
 
 test_pi_prompt_gates_an_untrusted_directory() {
   local sess text
-  sess=$(open_pane pi-control "$PI_WT" "env PI_CODING_AGENT_DIR=$PI_ROOT pi ${PI_FLAGS/--approve/}")
+  open_pane pi-control "$PI_WT" "env PI_CODING_AGENT_DIR=$PI_ROOT pi ${PI_FLAGS/--approve/}"
+  sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_pi_prompt 30)
   see_pi_prompt "$text" ||
     fail "pi $PI_VERSION showed no project-trust prompt in an untrusted fresh directory, so this fixture proves nothing: $text"
@@ -263,7 +305,8 @@ test_pi_prompt_gates_an_untrusted_directory() {
 test_pi_launch_flag_reaches_the_editor_with_no_prompt() {
   local sess text
   [ -f "$PI_ROOT/trust.json" ] && fail "pi wrote a trust store unprompted, so --approve is persisting: $(cat "$PI_ROOT/trust.json")"
-  sess=$(open_pane pi-approved "$PI_WT" "env PI_CODING_AGENT_DIR=$PI_ROOT pi $PI_FLAGS")
+  open_pane pi-approved "$PI_WT" "env PI_CODING_AGENT_DIR=$PI_ROOT pi $PI_FLAGS"
+  sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_pi_started 30)
   see_pi_started "$text" ||
     fail "pi $PI_VERSION with firstmate's own launch flags showed no editor and no prompt, so the verdict is unknown: $text"
