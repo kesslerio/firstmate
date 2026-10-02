@@ -1,0 +1,8 @@
+cursor_row=27
+tmux_adapter=empty
+backend_dispatch=empty
+cursorless_styled_profile=empty
+cursorless_plain_profile=empty
+injection_guard=permit
+baseline_tmux_adapter=empty
+baseline_cursorless_styled=empty

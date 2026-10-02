@@ -1,0 +1,8 @@
+cursor_row=27
+tmux_adapter=pending
+backend_dispatch=pending
+cursorless_styled_profile=pending
+cursorless_plain_profile=pending
+injection_guard=defer
+baseline_tmux_adapter=pending-unproven
+baseline_cursorless_styled=pending-unproven
