@@ -1,0 +1,57 @@
+{
+  "url": "https://github.com/lab/contributions/issues/9",
+  "kind": "issue",
+  "checked_at": "2026-10-02T09:46:14Z",
+  "observation": {
+    "state": "open",
+    "head": null,
+    "ready": true,
+    "checks": [],
+    "reviews": [],
+    "events": [
+      {
+        "token": "comment:12:2026-10-02T08:00:00Z",
+        "type": "comment",
+        "source": "https://github.com/lab/contributions/pull/8#comment-12",
+        "head": null,
+        "author": "maintainer",
+        "body": "Please prove the contract"
+      },
+      {
+        "token": "ready-for-pr:41",
+        "type": "ready-for-pr",
+        "source": "https://github.com/lab/contributions/issues/9",
+        "head": null,
+        "body": "filed issue reached ready-for-pr"
+      }
+    ],
+    "absent_checks": []
+  },
+  "verdict": null,
+  "seen": [
+    "comment:12:2026-10-02T08:00:00Z",
+    "ready-for-pr:41"
+  ],
+  "pending": [
+    {
+      "token": "comment:12:2026-10-02T08:00:00Z",
+      "type": "comment",
+      "source": "https://github.com/lab/contributions/pull/8#comment-12",
+      "head": null,
+      "author": "maintainer",
+      "body": "Please prove the contract"
+    },
+    {
+      "token": "ready-for-pr:41",
+      "type": "ready-for-pr",
+      "source": "https://github.com/lab/contributions/issues/9",
+      "head": null,
+      "body": "filed issue reached ready-for-pr"
+    }
+  ],
+  "notified": [
+    "comment:12:2026-10-02T08:00:00Z",
+    "ready-for-pr:41"
+  ],
+  "error": null
+}

@@ -1,0 +1,31 @@
+{
+  "families": [
+    {
+      "count": 1,
+      "duration_ms": 47904,
+      "failed": 1,
+      "name": "secondmate"
+    }
+  ],
+  "finished_at": "2026-10-02T09:44:12Z",
+  "run_id": "fm-test-run-1790934204479-455182",
+  "scripts": [
+    {
+      "duration_ms": 47904,
+      "exit": 1,
+      "expected_gate_skip": "none",
+      "family": "secondmate",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-remote-secondmate-trace-context.test.sh"
+    }
+  ],
+  "selection": "scripts;jobs=1",
+  "started_at": "2026-10-02T09:43:24Z",
+  "summary": {
+    "duration_ms": 47950,
+    "failed": 1,
+    "skipped_gate": 0,
+    "total": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "fm-contributions.v1",
+  "task": "delivery",
+  "records": [
+    {
+      "url": "https://github.com/kunchenguid/firstmate/pull/5645",
+      "kind": "pr",
+      "checked_at": "2026-10-02T09:48:27Z",
+      "observation": null,
+      "verdict": null,
+      "seen": [],
+      "pending": [],
+      "notified": [],
+      "error": "forge observation unavailable or changed during read"
+    }
+  ]
+}

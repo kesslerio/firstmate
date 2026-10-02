@@ -1,0 +1,589 @@
++ set -eu
++++ dirname /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh
+++ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin
+++ pwd
++ SCRIPT_DIR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin
++ FM_ROOT=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/root
++ FM_HOME=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old
++ STATE=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
++ DATA=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data
++ export FM_HOME FM_STATE_OVERRIDE=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
++ FM_STATE_OVERRIDE=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-pr-lib.sh
+++ FM_PR_PROVIDER=
+++ FM_PR_URL=
+++ FM_PR_HOST=
+++ FM_PR_PATH=
+++ FM_PR_OWNER=
+++ FM_PR_REPO=
+++ FM_PR_NUMBER=
+++ FM_PR_DATA_PROVIDER=
+++ FM_PR_DATA_URL=
+++ FM_PR_DATA_HOST=
+++ FM_PR_DATA_PATH=
+++ FM_PR_DATA_NUMBER=
+++ FM_PR_META_PROVIDER=
+++ FM_PR_META_URL=
+++ FM_PR_META_HOST=
+++ FM_PR_META_PATH=
+++ FM_PR_META_NUMBER=
+++ FM_PR_REG_ID=
+++ FM_PR_REG_PROVIDER=
+++ FM_PR_REG_URL=
+++ FM_PR_REG_HOST=
+++ FM_PR_REG_PATH=
+++ FM_PR_REG_NUMBER=
+++ FM_PR_REG_DATA_HASH=
+++ FM_PR_REG_TEMPLATE_HASH=
+++ FM_PR_REG_DATA_IDENTITY=
+++ FM_PR_REG_CHECK_IDENTITY=
+++ FM_PR_POLL_DATA_TMP=
+++ FM_PR_POLL_CHECK_TMP=
+++ FM_PR_POLL_REG_TMP=
+++ FM_PR_POLL_DATA_DEST=
+++ FM_PR_POLL_CHECK_DEST=
+++ FM_PR_POLL_REG_DEST=
+++ FM_PR_POLL_EXPECT_ID=
+++ FM_PR_POLL_EXPECT_PROVIDER=
+++ FM_PR_POLL_EXPECT_URL=
+++ FM_PR_POLL_EXPECT_HOST=
+++ FM_PR_POLL_EXPECT_PATH=
+++ FM_PR_POLL_EXPECT_NUMBER=
+++ FM_PR_POLL_EXPECT_DATA_HASH=
+++ FM_PR_POLL_EXPECT_TEMPLATE_HASH=
+++ FM_PR_POLL_EXPECT_DATA_IDENTITY=
+++ FM_PR_POLL_EXPECT_CHECK_IDENTITY=
+++ FM_PR_POLL_TEMPLATE=
+++ FM_PR_POLL_STATE_DEVICE=
+++ FM_PR_POLL_SNAPSHOT_ID=
+++ FM_PR_POLL_SNAPSHOT_PROVIDER=
+++ FM_PR_POLL_SNAPSHOT_URL=
+++ FM_PR_POLL_SNAPSHOT_HOST=
+++ FM_PR_POLL_SNAPSHOT_PATH=
+++ FM_PR_POLL_SNAPSHOT_NUMBER=
+++ FM_PR_POLL_SNAPSHOT_DATA_HASH=
+++ FM_PR_POLL_SNAPSHOT_TEMPLATE_HASH=
+++ FM_PR_POLL_SNAPSHOT_DATA_IDENTITY=
+++ FM_PR_POLL_SNAPSHOT_CHECK_IDENTITY=
+++ FM_PR_POLL_SNAPSHOT_REG_HASH=
+++ FM_PR_POLL_SNAPSHOT_REG_IDENTITY=
+++ FM_PR_POLL_REARM_DATA_IDENTITY=
+++ FM_PR_POLL_REARM_CHECK_IDENTITY=
+++ FM_PR_RETIRE_ID=
+++ FM_PR_RETIRE_PROVIDER=
+++ FM_PR_RETIRE_URL=
+++ FM_PR_RETIRE_HOST=
+++ FM_PR_RETIRE_PATH=
+++ FM_PR_RETIRE_NUMBER=
+++ FM_PR_RETIRE_DATA_HASH=
+++ FM_PR_RETIRE_TEMPLATE_HASH=
+++ FM_PR_RETIRE_DATA_IDENTITY=
+++ FM_PR_RETIRE_CHECK_IDENTITY=
+++ FM_PR_RETIRE_REG_HASH=
+++ FM_PR_RETIRE_REG_IDENTITY=
+++ FM_PR_RETIRE_RECEIPT_HASH=
+++ FM_PR_RETIRE_RECEIPT_IDENTITY=
+++ FM_PR_RECORD_STATE=
+++ FM_PR_RECORD_MERGED=
+++ FM_PR_POLL_RETIREMENT_REJECTED=
++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-timeout-lib.sh
+++ set -u
++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-path-lib.sh
++ case "${1:-}" in
++ command -v jq
+++ date -u +%Y-%m-%dT%H:%M:%SZ
++ NOW=2026-10-02T09:45:23Z
+++ jq -nr --arg now 2026-10-02T09:45:23Z '$now | fromdateiso8601'
++ EPOCH=1790934323
++ MAX_AGE=900
++ BUDGET=20
++ case "$MAX_AGE" in
++ case "$BUDGET" in
++ '[' 20 -ge 1 ']'
++ '[' 20 -le 25 ']'
++ CHECK_TIMEOUT=30
++ case "$CHECK_TIMEOUT" in
++ BUDGET_CAP=27
++ '[' 27 -ge 1 ']'
++ '[' 20 -le 27 ']'
+++ mktemp -d /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.XXXXXX
++ TMP=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy
++ LOCK_HELD=0
++ trap cleanup EXIT
++ trap 'exit 1' HUP INT TERM
++ case "${1:-}" in
++ poll
++ local task url old kind error observed
++ local -a row
++ acquire
++ '[' -d /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state ']'
++ '[' '!' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state ']'
++ '[' -d /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data ']'
++ '[' '!' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data ']'
++ FM_WAKE_QUEUE=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.wake-queue
++ FM_WAKE_QUEUE_LOCK=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.wake-queue.lock
++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-wake-lib.sh
++++ d=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin
++++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin '!=' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-wake-lib.sh ']'
++++ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin
++++ pwd
+++ FM_WAKE_LIB_DIR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin
++++ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/..
++++ pwd
+++ FM_WAKE_DEFAULT_ROOT=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ
+++ FM_ROOT=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/root
+++ FM_HOME=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old
+++ STATE=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
+++ FM_WAKE_QUEUE=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.wake-queue
+++ FM_WAKE_QUEUE_LOCK=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.wake-queue.lock
+++ FM_LOCK_STALE_AFTER=2
+++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-path-lib.sh
++++ uname
+++ _FM_UNAME=Linux
+++ mkdir -p /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
+++ '[' 5 -gt 4 ']'
+++ FM_WATCHER_MATCHED_IDENTITY=
+++ FM_WATCHER_HEALTHY_PID=
+++ FM_WATCHER_HEALTHY_IDENTITY=
+++ FM_WATCHER_VERDICT_OK=false
+++ FM_WATCHER_VERDICT_REASON=stale-beacon
+++ FM_RECOVERY_MARKER_TOKEN=
+++ FM_RECOVERY_MARKER_ACTION=none
+++ FM_RECOVERY_MARKER_WRITTEN_TOKEN=
+++ FM_WAKE_APPEND_RECOVERY_PREVIOUS_TOKEN=
+++ FM_WAKE_APPEND_RECOVERY_PUBLISHED_TOKEN=
+++ FM_RECOVERY_HANDOVER_TOKEN=
+++ FM_RECOVERY_HANDOVER_SEQ=
+++ FM_WAKE_STATUS_KEY=
+++ FM_WAKE_STATUS_HISTORICAL=false
+++ FM_WAKE_EVENT_LINE=
+++ FM_WAKE_UNREAD_LINES=
++ fm_lock_acquire_wait /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ fm_lock_try_acquire /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
+++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock lock_abs
++++ fm_lock_abs_path /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++++ local path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock dir base
++++ fm_dirname_to dir /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++++ local fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
++++ fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
++++ '[' -n /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state ']'
++++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state '!=' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state ']'
++++ printf -v dir %s /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
++++ fm_basename_to base /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++++ local fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++++ fm_path=.contributions.lock
++++ '[' .contributions.lock '!=' .contributions.lock ']'
++++ printf -v base %s .contributions.lock
+++++ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
+++++ pwd -P
++++ dir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state
++++ printf '%s/%s\n' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state .contributions.lock
+++ lock_abs=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
+++ mktemp -d /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.XXXXXX
++ ownerdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ '[' -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock ']'
++ '[' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock ']'
++ fm_lock_prepare_owner /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ local ownerdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=558665
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 558665
++ printf '%s\n' 558665
+++ cat /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI/pid
++ back=558665
++ '[' 558665 = 558665 ']'
++ ln -s /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ fm_lock_points_to_owner /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock ownerdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI actual
+++ readlink /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ actual=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI = /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI ']'
++ fm_lock_claim /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI ''
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock ownerdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=558665
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 558665
+++ cat /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI/pid
++ back=558665
++ '[' 558665 '!=' 558665 ']'
++ fm_lock_points_to_owner /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock ownerdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI actual
+++ readlink /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ actual=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI = /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI ']'
++ fm_lock_claim_blocked_by_steal /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock ''
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock allowed_steal_owner= steal
++ steal=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.steal
++ '[' -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.steal ']'
++ '[' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ return 0
++ return 0
++ LOCK_HELD=1
++ get_input
++ /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-fleet-snapshot.sh --contribution-input
++ read_saved
++ local file dir task
++ :
++ ERRORS=0
++ '[' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data ']'
++ for file in "$DATA"/*/contributions.json
++ '[' -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
++ fm_dirname_to dir /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ local fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ case "$fm_path" in
++ fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ case "$fm_path" in
++ fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++ fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++ '[' -n /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery ']'
++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery '!=' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery ']'
++ printf -v dir %s /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++ fm_basename_to task /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++ local fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++ case "$fm_path" in
++ fm_path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++ fm_path=delivery
++ '[' delivery '!=' delivery ']'
++ printf -v task %s delivery
++ '[' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
++ '[' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery ']'
++ '[' '!' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
+++ wc -c
++ '[' 397 -gt 1048576 ']'
++ jq_lib -ne --slurpfile record /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json '($record | length) == 1 and ($record[0] | valid_record)'
++ jq -e --arg task delivery '.task == $task' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ jq -c . /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ jq -s . /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/saved.jsonl
++ '[' 0 -eq 0 ']'
++ jq_lib -nr --slurpfile input /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/input.json --slurpfile saved /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/saved.json $'\n    known($input[0];$saved[0])\n    | group_by(.url) | map({url:.[0].url,tasks:(map(.task) | unique)})\n    | .[] | [.url] + .tasks | @tsv'
++ local $'program=\n    known($input[0];$saved[0])\n    | group_by(.url) | map({url:.[0].url,tasks:(map(.task) | unique)})\n    | .[] | [.url] + .tasks | @tsv'
++ set -- -nr --slurpfile input /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/input.json --slurpfile saved /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/saved.json
++ jq -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin -nr --slurpfile input /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/input.json --slurpfile saved /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/saved.json $'include "fm-contributions"; \n    known($input[0];$saved[0])\n    | group_by(.url) | map({url:.[0].url,tasks:(map(.task) | unique)})\n    | .[] | [.url] + .tasks | @tsv'
++ :
++ IFS=$'\t'
++ read -r -a row
++ '[' 2 -ge 2 ']'
++ url=https://github.com/lab/contributions/pull/8
++ jq -ne --slurpfile saved /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/saved.json --arg url https://github.com/lab/contributions/pull/8 --args $'any($ARGS.positional[] as $task | [$saved[0][] | select(.task == $task) | .records[] | select(.url == $url)] | first;\n        . != null and (.observation.state | IN("merged","closed")))' delivery
++ IFS=$'\t'
++ printf '%s\n' $'https://github.com/lab/contributions/pull/8\tdelivery'
++ IFS=$'\t'
++ read -r -a row
++ jq -Rnr --argjson bucket 5969781 $'\n    [inputs] | if length == 0 then . else ($bucket % length) as $offset | .[$offset:] + .[:$offset] end\n    | .[]'
+++ date +%s
++ DEADLINE=1790934343
++ OBSERVATION_RESERVE=15
++ IFS=$'\t'
++ read -r -a row
+++ date +%s
++ '[' 20 -ge 15 ']'
++ url=https://github.com/lab/contributions/pull/8
++ observed=0
++ observe https://github.com/lab/contributions/pull/8
++ local url=https://github.com/lab/contributions/pull/8 part number kind endpoint head after label
++ case "$url" in
++ part=lab/contributions/pull/8
++ number=8
++ part=lab/contributions/pull
++ kind=pull
++ part=lab/contributions
++ case "$kind" in
++ endpoint=repos/lab/contributions/pulls/8
++ rm -f -- /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/budget-exhausted /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/forge-unavailable
++ BUDGET_EXHAUSTED=0
++ forge api repos/lab/contributions/pulls/8
++ forge_read env GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api repos/lab/contributions/pulls/8
++ local remaining rc=0 forge_err=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/forge.err
+++ date +%s
++ remaining=20
++ '[' 20 -gt 0 ']'
++ '[' 20 -le 5 ']'
++ remaining=5
++ fm_run_timed 5 env GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api repos/lab/contributions/pulls/8
++ '[' 0 -eq 124 ']'
++ '[' 0 -ne 0 ']'
++ return 0
++ jq -e '(.state == "open" or .state == "closed") and (.user.login | type == "string")' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/core.json
++ '[' pull = pull ']'
+++ jq -er '.head.sha | select(test("^[a-fA-F0-9]{40}$"))' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/core.json
++ head=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
++ local comments_pid=558841
++ FORGE_ERR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/comments.err
++ forge_pages 'repos/lab/contributions/issues/8/comments?per_page=100'
++ local reviews_pid=558842
++ FORGE_ERR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/reviews.err
++ forge_pages 'repos/lab/contributions/pulls/8/reviews?per_page=100'
++ local 'endpoint=repos/lab/contributions/issues/8/comments?per_page=100' raw rc=0
++ local inline_pid=558843
++ FORGE_ERR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/inline.err
++ forge_pages 'repos/lab/contributions/pulls/8/comments?per_page=100'
++ local 'endpoint=repos/lab/contributions/pulls/8/reviews?per_page=100' raw rc=0
++ local checks_pid=558845
++ FORGE_ERR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/checks.err
++ forge_pages 'repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100'
+++ mktemp /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.XXXXXX
++ local 'endpoint=repos/lab/contributions/pulls/8/comments?per_page=100' raw rc=0
+++ mktemp /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.XXXXXX
++ local statuses_pid=558847
++ local 'endpoint=repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100' raw rc=0
++ FORGE_ERR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/statuses.err
++ forge_pages 'repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100'
++ local repo_pid=558849
++ FORGE_ERR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/repo.err
++ forge api repos/lab/contributions
++ wait_forges 558841 558842 558843 558845 558847 558849
++ local pid rc=0
++ for pid in "$@"
++ wait 558841
++ local 'endpoint=repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100' raw rc=0
+++ mktemp /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.XXXXXX
++ forge_read env GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api repos/lab/contributions
++ local remaining rc=0 forge_err=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/repo.err
+++ mktemp /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.XXXXXX
+++ date +%s
+++ mktemp /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.XXXXXX
++ raw=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.ZjFwFY
++ forge_read bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/pulls/8/reviews?per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.ZjFwFY
++ local remaining rc=0 forge_err=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/reviews.err
++ raw=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.vuTE7l
++ forge_read bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.vuTE7l
++ raw=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.kryTvf
++ local remaining rc=0 forge_err=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/checks.err
++ forge_read bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/issues/8/comments?per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.kryTvf
++ local remaining rc=0 forge_err=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/comments.err
+++ date +%s
+++ date +%s
++ raw=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.EBParO
+++ date +%s
++ forge_read bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.EBParO
++ local remaining rc=0 forge_err=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/statuses.err
++ remaining=20
++ '[' 20 -gt 0 ']'
++ '[' 20 -le 5 ']'
++ remaining=5
++ fm_run_timed 5 env GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api repos/lab/contributions
+++ date +%s
++ raw=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.U742ky
++ forge_read bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/pulls/8/comments?per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.U742ky
++ local remaining rc=0 forge_err=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/inline.err
++ remaining=20
++ '[' 20 -gt 0 ']'
++ '[' 20 -le 5 ']'
++ remaining=5
++ fm_run_timed 5 bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/pulls/8/reviews?per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.ZjFwFY
+++ date +%s
++ remaining=20
++ '[' 20 -gt 0 ']'
++ '[' 20 -le 5 ']'
++ remaining=5
++ fm_run_timed 5 bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.vuTE7l
++ remaining=20
++ '[' 20 -gt 0 ']'
++ '[' 20 -le 5 ']'
++ remaining=5
++ fm_run_timed 5 bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/issues/8/comments?per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.kryTvf
++ remaining=20
++ '[' 20 -gt 0 ']'
++ '[' 20 -le 5 ']'
++ remaining=5
++ fm_run_timed 5 bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.EBParO
++ remaining=20
++ '[' 20 -gt 0 ']'
++ '[' 20 -le 5 ']'
++ remaining=5
++ fm_run_timed 5 bash -c $'\n    GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1 gh api "$1" --paginate > "$2" && jq -s . "$2"\n  ' _ 'repos/lab/contributions/pulls/8/comments?per_page=100' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.U742ky
++ rc=5
++ '[' 5 -eq 124 ']'
++ '[' 5 -ne 0 ']'
++ :
++ return 5
++ rc=5
++ rm -f -- /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.ZjFwFY
++ return 5
++ '[' 0 -eq 124 ']'
++ '[' 0 -ne 0 ']'
++ return 0
++ rm -f -- /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.vuTE7l
++ return 0
++ '[' 0 -eq 124 ']'
++ '[' 0 -ne 0 ']'
++ return 0
++ '[' 0 -eq 124 ']'
++ '[' 0 -ne 0 ']'
++ return 0
++ rm -f -- /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.U742ky
++ return 0
++ rc=5
++ '[' 5 -eq 124 ']'
++ '[' 5 -ne 0 ']'
++ :
++ return 5
++ rc=5
++ rm -f -- /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.EBParO
++ '[' 0 -eq 124 ']'
++ '[' 0 -ne 0 ']'
++ return 0
++ rm -f -- /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/pages.kryTvf
++ return 5
++ return 0
++ for pid in "$@"
++ wait 558842
++ rc=1
++ for pid in "$@"
++ wait 558843
++ for pid in "$@"
++ wait 558845
++ for pid in "$@"
++ wait 558847
++ rc=1
++ for pid in "$@"
++ wait 558849
++ '[' '!' -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/forge-unavailable ']'
++ return 1
++ return 1
++ observed=1
++ '[' 0 -eq 0 ']'
++ '[' 1 -ne 0 ']'
++ jq -ne --slurpfile saved /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/saved.json --arg url https://github.com/lab/contributions/pull/8 --args $'all($ARGS.positional[] as $task | [$saved[0][] | select(.task == $task) | .records[] | select(.url == $url)] | first;\n        .error == null)' delivery
++ case "$url" in
++ kind=pr
++ for task in "${row[@]:1}"
++ fm_pr_task_id_valid delivery
++ local id=delivery
++ fm_task_id_path_safe delivery
++ local id=delivery
++ local LC_ALL=C
++ case "$id" in
++ old=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/old.json
++ jq -n --slurpfile saved /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/saved.json --arg task delivery --arg url https://github.com/lab/contributions/pull/8 --arg kind pr $'\n        ([$saved[0][] | select(.task == $task) | .records[] | select(.url == $url)] | first)\n        // {url:$url,kind:$kind,checked_at:null,observation:null,verdict:null,seen:[],pending:[],notified:[]}'
++ '[' 1 -eq 0 ']'
++ error='forge observation unavailable or changed during read'
++ jq --arg now 2026-10-02T09:45:23Z --arg error 'forge observation unavailable or changed during read' '.checked_at=$now | .error=$error' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/old.json
++ write_record delivery /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/row.json
++ local task=delivery file dir device staged
++ fm_pr_task_id_valid delivery
++ local id=delivery
++ fm_task_id_path_safe delivery
++ local id=delivery
++ local LC_ALL=C
++ case "$id" in
++ dir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++ '[' '!' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery ']'
++ mkdir -p /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++ file=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
+++ fm_pr_file_device /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++++ uname
+++ '[' Linux = Darwin ']'
+++ stat -c %d /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery
++ device=66306
++ fm_pr_regular_destination_on_device_or_absent /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json 66306
++ local path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json device=66306
++ fm_pr_regular_destination_or_absent /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ local path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ '[' '!' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
++ '[' -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
+++ fm_pr_file_link_count /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++++ uname
+++ '[' Linux = Darwin ']'
+++ stat -c %h /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ '[' 1 = 1 ']'
++ '[' '!' -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
+++ fm_pr_file_device /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++++ uname
+++ '[' Linux = Darwin ']'
+++ stat -c %d /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ '[' 66306 = 66306 ']'
+++ umask 077
+++ mktemp /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/.contributions.XXXXXX
++ staged=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/.contributions.yJXmD3
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
++ jq_lib -ne --arg task delivery --slurpfile record /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json '$record[0] | valid_record and .task == $task'
++ local 'program=$record[0] | valid_record and .task == $task'
++ set -- -ne --arg task delivery --slurpfile record /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ jq -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin -ne --arg task delivery --slurpfile record /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json 'include "fm-contributions"; $record[0] | valid_record and .task == $task'
++ jq --slurpfile row /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/row.json '.records = ([.records[] | select(.url != $row[0].url)] + $row)' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ chmod 600 /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/.contributions.yJXmD3
++ fm_pr_regular_destination_on_device_or_absent /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json 66306
++ local path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json device=66306
++ fm_pr_regular_destination_or_absent /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ local path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ '[' '!' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
++ '[' -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
+++ fm_pr_file_link_count /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++++ uname
+++ '[' Linux = Darwin ']'
+++ stat -c %h /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ '[' 1 = 1 ']'
++ '[' '!' -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json ']'
+++ fm_pr_file_device /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++++ uname
+++ '[' Linux = Darwin ']'
+++ stat -c %d /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ '[' 66306 = 66306 ']'
++ mv -f -- /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/.contributions.yJXmD3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/data/delivery/contributions.json
++ publish_pending delivery https://github.com/lab/contributions/pull/8 /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/row.json
++ local task=delivery url=https://github.com/lab/contributions/pull/8 record=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/row.json token key count emitted status
+++ jq '.pending | length' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy/row.json
++ count=0
++ '[' 0 -gt 0 ']'
++ return 0
++ IFS=$'\t'
++ read -r -a row
++ cleanup
++ '[' 1 = 0 ']'
++ fm_lock_release /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=558665
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 558665
++ '[' -L /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock ']'
+++ fm_lock_link_owner /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ ownerdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ '[' -n /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI ']'
+++ cat /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI/pid
++ pid=558665
++ '[' 558665 = 558665 ']'
++ fm_lock_points_to_owner /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock ownerdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI actual
+++ readlink /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ actual=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI = /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI ']'
++ rm -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock
++ fm_lock_discard_owner /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ local ownerdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ '[' -n /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI ']'
++ fm_lock_clean_known_files /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ local lockdir=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ rm -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI/pid /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI/fm-home /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI/pid-identity /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI/role /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI/watcher-path
++ rmdir /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/api-pr-old/state/.contributions.lock.owner.UKMaPI
++ return 0
++ rm -rf -- /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-contributions.YQkRoy

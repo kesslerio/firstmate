@@ -1,4 +1,4 @@
-FM_TEST_BEGIN 2026-09-30T00:54:25Z tests/fm-contributions.test.sh family=snapshot-bearings expected_gate_skip=optional-binary
+FM_TEST_BEGIN 2026-10-02T09:39:00Z tests/fm-contributions.test.sh family=snapshot-bearings expected_gate_skip=optional-binary
 ok - only required-captain contributions are rows; other actors are counted
 ok - replaced-head verdict is stale and cannot create a captain requirement
 ok - unchecked ownership is disclosed and cannot prove silence
@@ -7,6 +7,8 @@ ok - new maintainer comment wakes once and stays pending until acknowledged
 ok - new maintainer review wakes once and stays pending until acknowledged
 ok - new maintainer inline wakes once and stays pending until acknowledged
 ok - a gh without --slurp still reports maintainer comments and reviews from every page
+ok - old-gh issue pagination filters comments and deduplicates and acknowledges later-page signals
+ok - page assembly is bounded and preserves prior observations without leaving children
 ok - ready-for-pr on a filed issue becomes a planning wake
 ok - a fresh open issue remains measured maintainer triage
 ok - an absent check lane remains missing across repeated observations
@@ -14,6 +16,7 @@ ok - mixed freshness retains measured captain work and discloses the gap
 ok - malformed durable evidence cannot prove silence
 ok - a transient ready-for-pr label wakes and its exact acknowledgement survives replay
 ok - recorded judgment keeps its exact head and is stale immediately on a published replacement
+ok - verdict help and refusal name exactly the actors the command accepts
 ok - a current forge observation refreshes a verdict after a replacement
 ok - an unavailable current head leaves verdict freshness unknown
 ok - away yolo delivery is fleet work without granting merge authority
@@ -46,83 +49,82 @@ ok - the effective budget is cut down to the watcher per-check bound with margin
 ok - generated checks enforce configured and inherited budgets at runtime
 ok - a genuinely unavailable forge records an error and wakes once per failure episode
 ok - a late owner does not restart a shared forge failure episode
-FM_TEST_END 2026-09-30T00:58:15Z tests/fm-contributions.test.sh exit=0 duration_ms=230000 gate_skip=false
-FM_TEST_BEGIN 2026-09-30T00:58:15Z tests/fm-pr-check-security.test.sh family=pr-forge expected_gate_skip=none
+FM_TEST_END 2026-10-02T09:41:23Z tests/fm-contributions.test.sh exit=0 duration_ms=143398 gate_skip=false
+FM_TEST_BEGIN 2026-10-02T09:41:24Z tests/fm-pi-branch-extension.test.sh family=standalone expected_gate_skip=none
+ok - fm_branch_outcomes and fm_branch_processed call headers match stock on Pi before and from 0.99
+ok - fm_branch_outcomes hides through ToolExecutionComponent while Calm-off and HTML export stay stock
+ok - the installed Pi still bounds the picker's list and ranks its search
+ok - branch owns accepted wakes with a stable prefix and deterministic verdict-driven delivery
+ok - a captain outcome reaches main's model as one typed, sequence-keyed processing request while routine notes stay plain
+ok - requested and unsolicited healthy outcomes keep distinct delivery and event ownership
+ok - captain outcomes are exact and exactly once across crash, reload, busy main, compaction, and an unrelated assistant response
+ok - a captain outcome opens one sequence-keyed processing turn, survives empty and unrelated answers, is re-presented at run end and session start, and closes only on its acknowledgement
+ok - Pi: an abbreviated processing request points to the full outcome and instructs main to read it first
+ok - Pi: a marker-less >1 MiB backlog is presented oldest first in bounded requests and continues after batch acknowledgement
+ok - an unprocessed captain row the store lists without its age is reported to main, never formatted undated, and stays unprocessed until the store is healthy
+ok - scopeForUnreadWake excludes every main-only class without vetoing eligible task-local rows, and writes the eligible snapshot
+ok - second-mate signal rows route by their new span while crewmate and stale routing stay unchanged
+ok - branch prompt_cache_key is stable per home across sessions and distinct between homes
+ok - branch default-on eligibility (task-scoped, heartbeat, legacy flag ignored) binds and a broken branch rejects to watcher fallback
+ok - under the away-posture record the wake carries the verbatim read-back tail, claims every row, opens no processing turn, cancels a pending request, and presents the accumulated rows after archive
+ok - Pi branch: an unchanged held outcome reaches the captain once across cadences, and a later red check on the task still does
+ok - an accepted away-only wake rejects after archive, while a drained task-local wake stays a quiet no-op
+ok - a claimed heartbeat row on a non-heartbeat away wake lifts task scoping for the fleet report
+ok - a heartbeat review survives a check row arriving before its drain
+ok - fm_branch_report refuses a task the wake did not name, fleet included, while a heartbeat is unscoped
+ok - pre-drain eligibility re-check excludes a newly main-owned row without deferring eligible work
+ok - a co-present needs-decision row neither vetoes nor falsely settles routine branch delivery
+ok - a settled branch turn without a durable outcome falls back and releases its grant for main replay
+ok - provider-error latches cool down, re-probe once with backoff, and recover through a durable report
+ok - selection changes preserve in-flight transcript ownership and reset provider-error streaks
+ok - a stale main claim returns the durable wake to watcher delivery
+ok - pre-drain eligibility re-check no-ops an already-drained wake
+ok - dialog mirror filters tool and operational traffic, lands before wakes, and keeps a durable cursor
+ok - the dialog mirror re-anchors for each session's new branch conversation and stays incremental within it
+ok - every main session start begins a new branch conversation while one session keeps its own
+ok - the current pin state binds every branch build, and clearing it returns the branch to main's model
+ok - unpinned branches follow main model changes live while pinned branches stay fixed
+ok - supervision-model command persists the captain's pick and rebinds the live branch
+ok - supervision-model opens a bounded searchable list, follow main first, and pins the branch alone
+ok - branch model picker keeps follow main first and filters the eligible catalog
+ok - the effort pin binds every branch build, and clearing it returns the branch to main's effort
+ok - unpinned branches follow main effort changes live while pinned branches stay fixed
+ok - an extension-registered provider resolves in the isolated branch runtime
+ok - supervision-model runs an effort picker after the model picker and persists both independently
+ok - an unusable model pin rejects to watcher fallback and an unparseable one is treated as no pin
+ok - replacement activation cleans old branch leases and retries failed cleanup
+ok - branch activates on a cold start once the lock is acquired, never before
+ok - queued wakes and mirrors stop mutating branch state after lock ownership is lost
+ok - stale reports, shells, mirrors, cursors, leases, and prompts perform no side effects
+ok - a Pi session that does not own the lock accepts nothing and mutates no branch state
+ok - an extension rebind re-mirrors undelivered dialog instead of dropping it
+ok - outcome delivery keeps the event loop running and interleaved reports stay ordered and exactly once
+ok - a session replaced mid-delivery cancels cleanly and the stored outcome still arrives exactly once
+ok - a failing store script surfaces to the branch and its outcome is neither lost nor delivered twice
+ok - a failed cursor write re-delivers a routine note exactly once more while a captain outcome stays deduplicated
+FM_TEST_END 2026-10-02T09:42:31Z tests/fm-pi-branch-extension.test.sh exit=0 duration_ms=67649 gate_skip=false
+FM_TEST_BEGIN 2026-10-02T09:42:31Z tests/fm-pr-check-security.test.sh family=pr-forge expected_gate_skip=none
 ok - raw-byte parser accepts canonical URLs and rejects the complete adversarial matrix
-ok - GitLab merge requests are followed on any instance and never wake falsely
-ok - the Gerrit watch wakes only on an explicit merged status and never on submittability
-ok - Gerrit arming records no patch set revision and the merge path refuses to submit
-ok - Gerrit arming accepts a published HEAD only by the change's current patch set tree
-ok - a no-mistakes Gerrit ready report requires the pipeline's fixes recovered into the published copy
-ok - validated merged polls notify once and retire before the next watcher cycle
-ok - a repeat identical merged poll for an already-notified task is absorbed, never queued as a main-blocking row
-ok - a failed upward merge report keeps its poll armed for repair and retry
-ok - staged self-merge and poll interleavings are never silent
-ok - queued merges retain their away authority after captain return
-ok - poll distinguishes attended authorization from external landing
-ok - accepted merge authority refuses rebound task metadata
-ok - accepted merge authority persists under the lifecycle lock
-ok - teardown cannot race merged-poll authority consumption
-ok - poll retirement preserves a replacement authority record
-ok - a merge detected by the poll is reported upward from a secondmate home exactly once
-ok - a different merged PR for the same task gets its own first notification
-ok - a merged poll on a persistent secondmate retires silently: no outcome, marker, or wake, and every lifecycle artifact preserved
-ok - queue, receipt, and every fixed-path removal crash point recover without loss or repeated execution
-ok - open/red, closed-unmerged, malformed, and forge errors remain armed until an exact merged transition
-ok - replacement, nonterminal, tampered, and custom results receive no deletion authority
-ok - queue failure and untrusted receipts preserve canonical poll evidence
-ok - GitHub and GitLab exact merged results share one retirement path
-ok - PR and teardown entrypoints reject invalid arguments before every side effect
-ok - arming refuses a draft pull request, naming it, and arms a ready or unreadable one
-ok - fm-pr-check refuses to record a PR or arm a merge watch on a secondmate record
-ok - fm-pr-check refuses to register a PR whose named head is only in the worker copy
-ok - fm-pr-check refuses a direct-PR registration while a later commit is only in the copy
-not ok - tests/fm-pr-check-security.test.sh exceeded the per-script bound of 480s and was terminated
-FM_TEST_END 2026-09-30T01:06:16Z tests/fm-pr-check-security.test.sh exit=124 duration_ms=480243 gate_skip=false
-FM_TEST_BEGIN 2026-09-30T01:06:16Z tests/fm-remote-secondmate-trace-context.test.sh family=secondmate expected_gate_skip=none
-ok - disabled: a remote-routed second mate records and receives no carrier and stays enabled-off end to end
-ok - enabled: a remote-routed second mate receives one carrier in its pane, identical to the parent's recorded identity, before launch
-ok - relaunch: a remote-routed second mate keeps one stable identity across restarts
-ok - boundary: each remote-routed second mate roots its own trace and never adopts the spawning environment's carrier
-ok - allowlist: the remote receiver accepts exactly the declared inherited-material set, including the enablement flag
-ok - delivery: a parent-supplied carrier is accepted only for a secondmate launch and only as a strict W3C value
-ALL TESTS PASSED
-FM_TEST_END 2026-09-30T01:09:37Z tests/fm-remote-secondmate-trace-context.test.sh exit=0 duration_ms=201393 gate_skip=false
-FM_TEST_BEGIN 2026-09-30T01:09:37Z tests/fm-remote-secondmate-lifecycle-e2e.test.sh family=secondmate expected_gate_skip=none
-ok - overlapping remote home provisioning serializes through publication and rollback
-ok - competing cleanup of the public home cannot reach a live provisioning clone
-ok - a home that appears mid-provision makes the provision die without touching it
-ok - remote seed rollback preserves serialized competing routes
-ok - unknown readiness preserves its route and brief for reconciliation
-ok - remote seeding checks, repairs, and re-checks readiness, then stops on a remaining gap
-ok - remote seeding proceeds once the repair closes every gap
-ok - remote seeding provisions a supplied origin without touching the primary project tree
-ok - remote provisioning re-validates a supplied origin at the receiving host
-ok - seeding carries bitbucket, self-hosted, and scp-like origins through to the remote clone
-ok - remote seed registers the route and provisions the whole home and project clone on that host
-ok - remote inheritance rejects incomplete and superseded payload generations
-ok - mixed local and remote routes validate without migration
-ok - remote spawn launches on the remote-local backend and records a host-qualified route
-ok - legacy and mismatched remote endpoints fail closed before backend access
-ok - non-herdr remote endpoints are refused without changing either route
-ok - remote spawn serializes inheritance through launch publication
-ok - marked send and routed reply complete through the existing parent correlation owner
-ok - partial remote inheritance retains reread intent through bootstrap convergence
-ok - config push and bootstrap serialize remote inheritance convergence
-WARNING: watcher still down (same stale episode; last beat: 111s ago, grace 300s) - full banner already printed this episode.
-ok - remote inherited config retains and retries a failed live reread nudge
-ok - fleet snapshot projects mixed local and remote structured state
-ok - remote update imports and fast-forwards the persistent home on its configured host
-ok - the remote restart verb delegates to the host-local control plane and refuses before stopping anything
-ok - startup repairs remote readiness before probing without relaunching
-not ok - tests/fm-remote-secondmate-lifecycle-e2e.test.sh exceeded the per-script bound of 480s and was terminated
-FM_TEST_END 2026-09-30T01:17:37Z tests/fm-remote-secondmate-lifecycle-e2e.test.sh exit=124 duration_ms=480189 gate_skip=false
-FM_TEST_SUMMARY total=4 failed=2 skipped_gate=0 duration_ms=1392397
-FM_TEST_SUMMARY_FAMILY family=pr-forge count=1 duration_ms=480243 failed=1
-FM_TEST_SUMMARY_FAMILY family=secondmate count=2 duration_ms=681582 failed=1
-FM_TEST_SUMMARY_FAMILY family=snapshot-bearings count=1 duration_ms=230000 failed=0
-FM_TEST_SLOWEST rank=1 script=tests/fm-pr-check-security.test.sh duration_ms=480243
-FM_TEST_SLOWEST rank=2 script=tests/fm-remote-secondmate-lifecycle-e2e.test.sh duration_ms=480189
-FM_TEST_SLOWEST rank=3 script=tests/fm-contributions.test.sh duration_ms=230000
-FM_TEST_SLOWEST rank=4 script=tests/fm-remote-secondmate-trace-context.test.sh duration_ms=201393
-fm-test-run: wrote timing artifact: /Users/kesslerio/.no-mistakes/evidence/01M3QWKSRJRB00RM226TH7K477/targeted-tests.json
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: sed: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: head: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: sed: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: head: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: sed: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: head: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: sed: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: head: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: sed: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: head: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: head: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: sed: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: sed: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: head: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: sed: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/tmp/fm-pr-check-security.tITWyn/gitlab-merge-watch/home/state/task-a.check.sh: line 108: head: command not found
+not ok - GitLab poll did not emit exactly one merged line
+FM_TEST_END 2026-10-02T09:42:32Z tests/fm-pr-check-security.test.sh exit=1 duration_ms=528 gate_skip=false
+FM_TEST_BEGIN 2026-10-02T09:42:32Z tests/fm-remote-secondmate-trace-context.test.sh family=secondmate expected_gate_skip=none
+tar: ./.test-scratch/tmp/fm-remote-trace-context.ztcy26/remote-root/.pi/extensions/lib/fm-calm-preservation.ts: Cannot open: Permission denied
+tar: ./.test-scratch/tmp/fm-remote-trace-context.ztcy26/remote-root/.pi/extensions/lib/fm-calm-working-ship-sprite.ts: Cannot open: Permission denied
+tar: ./.test-scratch/tmp/fm-remote-trace-context.ztcy26/remote-root/.agents/skills/firstmate-calm: Cannot open: Permission denied
+tar: ./.test-scratch/tmp/fm-remote-trace-context.ztcy26/remote-root/.claude/skills: Cannot open: Permission denied

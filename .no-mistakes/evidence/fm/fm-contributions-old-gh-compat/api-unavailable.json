@@ -1,0 +1,136 @@
+{
+  "url": "https://github.com/lab/contributions/pull/8",
+  "kind": "pr",
+  "checked_at": "2026-10-02T09:46:23Z",
+  "observation": {
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "state": "open",
+    "draft": false,
+    "mergeable": "mergeable",
+    "can_merge": false,
+    "review_decision": "CHANGES_REQUESTED",
+    "reviews": [
+      {
+        "id": 20,
+        "user": {
+          "login": "stranger"
+        },
+        "author_association": "NONE",
+        "body": "Please prove the contract",
+        "html_url": "https://github.com/lab/contributions/pull/8#review-20",
+        "updated_at": "2026-10-02T08:00:00Z",
+        "submitted_at": "2026-10-02T08:00:00Z",
+        "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "CHANGES_REQUESTED"
+      },
+      {
+        "id": 21,
+        "user": {
+          "login": "maintainer"
+        },
+        "author_association": "OWNER",
+        "body": "Please prove the contract",
+        "html_url": "https://github.com/lab/contributions/pull/8#review-21",
+        "updated_at": "2026-10-02T08:00:00Z",
+        "submitted_at": "2026-10-02T08:00:00Z",
+        "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "CHANGES_REQUESTED"
+      }
+    ],
+    "checks": [
+      {
+        "name": "test-first",
+        "id": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-02T08:00:00Z"
+      },
+      {
+        "name": "test-later",
+        "id": 2,
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-02T08:00:00Z"
+      },
+      {
+        "name": "legacy-first",
+        "id": 4,
+        "started_at": "2026-10-02T08:00:00Z",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "legacy-status",
+        "id": 3,
+        "started_at": "2026-10-02T08:00:00Z",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "events": [
+      {
+        "token": "comment:12:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+        "type": "comment",
+        "source": "https://github.com/lab/contributions/pull/8#comment-12",
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": "maintainer",
+        "body": "Please prove the contract"
+      },
+      {
+        "token": "review:21:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+        "type": "review",
+        "source": "https://github.com/lab/contributions/pull/8#review-21",
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": "maintainer",
+        "body": "Please prove the contract"
+      },
+      {
+        "token": "review-comment:31:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+        "type": "review-comment",
+        "source": "https://github.com/lab/contributions/pull/8#comment-31",
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": "maintainer",
+        "body": "Please prove the contract"
+      }
+    ],
+    "absent_checks": []
+  },
+  "verdict": null,
+  "seen": [
+    "comment:12:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+    "review:21:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+    "review-comment:31:2026-10-02T08:00:00Z:CHANGES_REQUESTED"
+  ],
+  "pending": [
+    {
+      "token": "comment:12:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+      "type": "comment",
+      "source": "https://github.com/lab/contributions/pull/8#comment-12",
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "author": "maintainer",
+      "body": "Please prove the contract"
+    },
+    {
+      "token": "review-comment:31:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+      "type": "review-comment",
+      "source": "https://github.com/lab/contributions/pull/8#comment-31",
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "author": "maintainer",
+      "body": "Please prove the contract"
+    },
+    {
+      "token": "review:21:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+      "type": "review",
+      "source": "https://github.com/lab/contributions/pull/8#review-21",
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "author": "maintainer",
+      "body": "Please prove the contract"
+    }
+  ],
+  "notified": [
+    "comment:12:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+    "review-comment:31:2026-10-02T08:00:00Z:CHANGES_REQUESTED",
+    "review:21:2026-10-02T08:00:00Z:CHANGES_REQUESTED"
+  ],
+  "error": "forge observation unavailable or changed during read"
+}

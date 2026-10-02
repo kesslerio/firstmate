@@ -1,0 +1,1122 @@
+{
+  "steps": [
+    {
+      "probe": [
+        "pr",
+        "view",
+        "https://github.com/lab/contributions/pull/8",
+        "--json",
+        "headRefOid,reviewDecision"
+      ],
+      "stdout": "{\"headRefOid\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"reviewDecision\":\"CHANGES_REQUESTED\"}\n",
+      "stderr": "",
+      "exit": 0
+    },
+    {
+      "probe": [
+        "api",
+        "repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+        "--paginate"
+      ],
+      "stdout": "{\"check_runs\": [{\"name\": \"test-first\", \"id\": 1, \"status\": \"completed\", \"conclusion\": \"success\", \"started_at\": \"2026-10-02T08:00:00Z\"}]}{\"check_runs\": [{\"name\": \"test-later\", \"id\": 2, \"status\": \"completed\", \"conclusion\": \"success\", \"started_at\": \"2026-10-02T08:00:00Z\"}]}",
+      "stderr": "",
+      "exit": 0
+    },
+    {
+      "jq_probe": true,
+      "stdout": "[\n  {\n    \"check_runs\": [\n      {\n        \"name\": \"test-first\",\n        \"id\": 1,\n        \"status\": \"completed\",\n        \"conclusion\": \"success\",\n        \"started_at\": \"2026-10-02T08:00:00Z\"\n      }\n    ]\n  },\n  {\n    \"check_runs\": [\n      {\n        \"name\": \"test-later\",\n        \"id\": 2,\n        \"status\": \"completed\",\n        \"conclusion\": \"success\",\n        \"started_at\": \"2026-10-02T08:00:00Z\"\n      }\n    ]\n  }\n]\n",
+      "stderr": "",
+      "exit": 0
+    },
+    {
+      "probe": [
+        "api",
+        "repos/lab/contributions/issues/8/comments?per_page=100",
+        "--paginate"
+      ],
+      "stdout": "[{\"id\": 11, \"user\": {\"login\": \"stranger\"}, \"author_association\": \"NONE\", \"body\": \"Please prove the contract\", \"html_url\": \"https://github.com/lab/contributions/pull/8#comment-11\", \"updated_at\": \"2026-10-02T08:00:00Z\", \"submitted_at\": \"2026-10-02T08:00:00Z\", \"commit_id\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"state\": \"CHANGES_REQUESTED\"},{\"id\": 12, \"user\": {\"login\": \"maintainer\"}, \"author_association\": \"OWNER\", \"body\": \"Please prove the contract\", \"html_url\": \"https://github.com/lab/contributions/pull/8#comment-12\", \"updated_at\": \"2026-10-02T08:00:00Z\", \"submitted_at\": \"2026-10-02T08:00:00Z\", \"commit_id\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"state\": \"CHANGES_REQUESTED\"}]",
+      "stderr": "",
+      "exit": 0
+    },
+    {
+      "jq_probe": true,
+      "stdout": "[\n  [\n    {\n      \"id\": 11,\n      \"user\": {\n        \"login\": \"stranger\"\n      },\n      \"author_association\": \"NONE\",\n      \"body\": \"Please prove the contract\",\n      \"html_url\": \"https://github.com/lab/contributions/pull/8#comment-11\",\n      \"updated_at\": \"2026-10-02T08:00:00Z\",\n      \"submitted_at\": \"2026-10-02T08:00:00Z\",\n      \"commit_id\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n      \"state\": \"CHANGES_REQUESTED\"\n    },\n    {\n      \"id\": 12,\n      \"user\": {\n        \"login\": \"maintainer\"\n      },\n      \"author_association\": \"OWNER\",\n      \"body\": \"Please prove the contract\",\n      \"html_url\": \"https://github.com/lab/contributions/pull/8#comment-12\",\n      \"updated_at\": \"2026-10-02T08:00:00Z\",\n      \"submitted_at\": \"2026-10-02T08:00:00Z\",\n      \"commit_id\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n      \"state\": \"CHANGES_REQUESTED\"\n    }\n  ]\n]\n",
+      "stderr": "",
+      "exit": 0
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "contribution-wake: check: contributions delivery c4be9832e705de3f4a07e0aea1bb54261848747f0ee839da84b4d97d5cdcc9cf\ncontribution-wake: check: contributions delivery cb7b667f6d62b4b0ffde465718550fe6f8946563695b8998402952203aa4095f\ncontribution-wake: check: contributions delivery b9d5e640ca35e72b2ddc7f1b79c716c83e6c0c0564518535e0b922237fc3207d\n",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.9
+    },
+    {
+      "scenario": "old gh collects all PR pages",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.77
+    },
+    {
+      "scenario": "old gh replay does not duplicate wakes",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "ack",
+        "delivery",
+        "https://github.com/lab/contributions/pull/8",
+        "comment:12:2026-10-02T08:00:00Z:CHANGES_REQUESTED"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.19
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "ack",
+        "delivery",
+        "https://github.com/lab/contributions/pull/8",
+        "review-comment:31:2026-10-02T08:00:00Z:CHANGES_REQUESTED"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.2
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "ack",
+        "delivery",
+        "https://github.com/lab/contributions/pull/8",
+        "review:21:2026-10-02T08:00:00Z:CHANGES_REQUESTED"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.18
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.53
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "pending"
+      ],
+      "stdout": "[]\n",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.03
+    },
+    {
+      "scenario": "old gh acknowledged events do not replay",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "contribution-wake: check: contributions delivery c4be9832e705de3f4a07e0aea1bb54261848747f0ee839da84b4d97d5cdcc9cf\ncontribution-wake: check: contributions delivery cb7b667f6d62b4b0ffde465718550fe6f8946563695b8998402952203aa4095f\ncontribution-wake: check: contributions delivery b9d5e640ca35e72b2ddc7f1b79c716c83e6c0c0564518535e0b922237fc3207d\n",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 1.2
+    },
+    {
+      "scenario": "current gh collects all PR pages",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.64
+    },
+    {
+      "scenario": "current gh replay does not duplicate wakes",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "ack",
+        "delivery",
+        "https://github.com/lab/contributions/pull/8",
+        "comment:12:2026-10-02T08:00:00Z:CHANGES_REQUESTED"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.17
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "ack",
+        "delivery",
+        "https://github.com/lab/contributions/pull/8",
+        "review-comment:31:2026-10-02T08:00:00Z:CHANGES_REQUESTED"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.16
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "ack",
+        "delivery",
+        "https://github.com/lab/contributions/pull/8",
+        "review:21:2026-10-02T08:00:00Z:CHANGES_REQUESTED"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.12
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.55
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "pending"
+      ],
+      "stdout": "[]\n",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.03
+    },
+    {
+      "scenario": "current gh acknowledged events do not replay",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "contribution-wake: check: contributions delivery 2eb216f2565184d8058160cc779dc14371e9979751c3adf23890aefe194859f6\ncontribution-wake: check: contributions delivery e8ada8b926eac6d035676d2fc56abde45c2d1981a777013062973a551299b8d3\n",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.72
+    },
+    {
+      "scenario": "old gh collects later-page issue comment and ready label",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.57
+    },
+    {
+      "scenario": "issue replay does not wake again",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "contribution-wake: check: contributions delivery c4be9832e705de3f4a07e0aea1bb54261848747f0ee839da84b4d97d5cdcc9cf\ncontribution-wake: check: contributions delivery cb7b667f6d62b4b0ffde465718550fe6f8946563695b8998402952203aa4095f\ncontribution-wake: check: contributions delivery b9d5e640ca35e72b2ddc7f1b79c716c83e6c0c0564518535e0b922237fc3207d\n",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.95
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 5.26
+    },
+    {
+      "scenario": "slow API read preserves prior record and wake queue",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "contributions: observation unavailable for https://github.com/lab/contributions/pull/8\n",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.81
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.46
+    },
+    {
+      "scenario": "genuine outage records error once per episode",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.52
+    },
+    {
+      "scenario": "successful read clears failure episode",
+      "result": "pass"
+    },
+    {
+      "command": [
+        "bin/fm-contributions.sh",
+        "poll"
+      ],
+      "stdout": "contributions: observation unavailable for https://github.com/lab/contributions/pull/8\n",
+      "stderr": "",
+      "exit": 0,
+      "elapsed": 0.56
+    },
+    {
+      "scenario": "malformed JSON is an assembly failure not success",
+      "result": "pass"
+    }
+  ],
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/graphql"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "POST",
+      "path": "/graphql"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "POST",
+      "path": "/graphql"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "POST",
+      "path": "/graphql"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "POST",
+      "path": "/graphql"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "POST",
+      "path": "/graphql"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "POST",
+      "path": "/graphql"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9/events?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9/events?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9/events?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/9/events?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "POST",
+      "path": "/graphql"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "timeout"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "failure"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "ok"
+    },
+    {
+      "method": "POST",
+      "path": "/graphql"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8",
+      "mode": "malformed"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100",
+      "mode": "malformed"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100",
+      "mode": "malformed"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100",
+      "mode": "malformed"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/comments?per_page=100",
+      "mode": "malformed"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100&page=2",
+      "mode": "malformed"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/pulls/8/reviews?per_page=100&page=2",
+      "mode": "malformed"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100&page=2",
+      "mode": "malformed"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions",
+      "mode": "malformed"
+    },
+    {
+      "method": "GET",
+      "path": "/repos/lab/contributions/issues/8/comments?per_page=100",
+      "mode": "malformed"
+    }
+  ]
+}

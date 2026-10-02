@@ -1,0 +1,1 @@
+Registered fixture root and read-only child were removed successfully
