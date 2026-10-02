@@ -1012,18 +1012,19 @@ SH
 }
 
 test_direct_registration_refuses_linked_homes_outside_the_pool() {
-  local rec home out
+  local rec home out codex_home
   rec=$(make_case sm-nonpool)
   read_case "$rec"
+  codex_home="$CASE_DIR/codex-home"
   home="$CASE_DIR/attended/home"
   seed_secondmate_home "$home" nonpool worktree
-  out=$(run_home_trust "$CODEX_HOME" "$home" nonpool)
+  out=$(run_home_trust "$codex_home" "$home" nonpool)
   expect_code 1 $? "direct registration trusted a linked home outside the pool: $out"
   assert_contains "$out" "qualifying linked pool" "the refusal did not identify the scope"
-  assert_absent "$(store_of "$CODEX_HOME")" "nonpool secondmate trust was persisted"
-  out=$(run_trust "$CODEX_HOME" "$home" "$home.src")
+  assert_absent "$(store_of "$codex_home")" "nonpool secondmate trust was persisted"
+  out=$(run_trust "$codex_home" "$home" "$home.src")
   expect_code 1 $? "worktree mode trusted a linked home outside the pool: $out"
-  assert_absent "$(store_of "$CODEX_HOME")" "worktree mode persisted nonpool trust"
+  assert_absent "$(store_of "$codex_home")" "worktree mode persisted nonpool trust"
   pass "fm-codex-trust.sh: both registration modes refuse linked paths outside the pool"
 }
 
