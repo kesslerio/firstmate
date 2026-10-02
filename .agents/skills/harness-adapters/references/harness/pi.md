@@ -32,7 +32,7 @@ Multiple positional arguments become separate queued messages; the spawn templat
 
 A project trust dialog can appear on the first Pi run in any not-yet-trusted directory, including a clean worktree: "Trust project folder?", offering Trust, Trust parent folder, Trust (this session only), Do not trust, and Do not trust (this session only), with the cursor on Trust.
 Saved decisions are keyed per canonical directory with a walk up through the parents, the closest one winning, in `<$PI_CODING_AGENT_DIR or ~/.pi/agent>/trust.json`.
-For a qualifying linked pool worktree, the launch carries Pi's own `--approve`, a per-run decision consulted before saved decisions that persists nothing.
+For a qualifying linked pool worktree, both canonical and raw launch commands for ships, scouts, and local secondmates carry Pi's own `--approve`, a per-run decision consulted before saved decisions that persists nothing.
 Secondmate seed markers do not grant folder trust: both Pi identities require a linked pool worktree for `--approve`, while standalone and other attended checkouts keep manual folder approval.
 Approval loads the directory's `.pi` resources and project extensions for that run.
 The [maintainer verification record](../../../../../docs/verification/runtime-backends.md#folder-and-project-trust-on-a-fresh-worktree) owns versioned vendor observations and the live refresh command.

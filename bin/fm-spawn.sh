@@ -191,6 +191,9 @@
 #   operator's trust.json. Ordinary Pi worker launches never receive --approve.
 #   A missing selected executable refuses before endpoint creation, and pi-signed
 #   never falls back to pi.
+#   Scoped Pi approval is inserted after the executable in the final launch
+#   command, after template substitution; the Pi harness reference owns the
+#   qualifying-worktree policy.
 #   Devin is worker-only: --permission-mode dangerous and
 #   --respect-workspace-trust false allow unattended tools in a fresh worktree.
 #   --config points at a private per-task snapshot of the user config with
