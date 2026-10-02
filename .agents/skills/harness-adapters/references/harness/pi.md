@@ -30,10 +30,11 @@ The router's Detection section owns how launch markers and ancestry select betwe
 Keep the instructions as one positional argument.
 Multiple positional arguments become separate queued messages; the spawn template already preserves the one-argument shape.
 
-A project trust dialog can appear on the first Pi run in any not-yet-trusted directory that holds a trust-requiring resource such as `.pi/extensions/`, including a clean worktree and a freshly seeded secondmate home.
-Accept it with Enter and verify the instructions begin processing.
-The decision persists per path in `~/.pi/agent/trust.json`, or in the pinned root's `trust.json` under a worker account pin, so later spawns in the same pooled slot under that root skip it.
-For unattended seeded-secondmate launches, `../../../bin/fm-spawn.sh --help` owns the capability-gated project-trust approval mechanics; [runtime verification](../../../../../docs/verification/runtime-backends.md#pi-seeded-secondmate-project-trust) owns the regression evidence.
+A project trust dialog can appear on the first Pi run in any not-yet-trusted directory, including a clean worktree: "Trust project folder?", offering Trust, Trust parent folder, Trust (this session only), Do not trust, and Do not trust (this session only), with the cursor on Trust.
+Saved decisions are keyed per canonical directory with a walk up through the parents, the closest one winning, in `<$PI_CODING_AGENT_DIR or ~/.pi/agent>/trust.json`.
+A crewmate launch never waits on it: Pi's own `--approve` is a per-run decision consulted before the saved decisions, and it persists nothing, so the store keeps holding only decisions a person actually made at that prompt.
+Verified on Pi 0.99.2, where the flag suppresses the prompt and still loads that directory's `.pi` resources and project extensions - the state answering the prompt by hand already produced - while the unflagged launch of the same directory still renders the prompt.
+The store's per-directory scope is why a launch flag is the right shape here rather than a pre-registered entry: a pooled worktree path would otherwise add one store entry per slot, and a worker account pin relocates that store, so a writer would have to resolve the pin first.
 
 ## Worker turn-end extension
 
