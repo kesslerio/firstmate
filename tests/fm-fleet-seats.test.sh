@@ -18,8 +18,8 @@ REMOTE_JOBS="$TMP_ROOT/remote-jobs"
 
 stop_remote_worker() {
   if [ -f "$REMOTE_JOBS/worker.pid" ]; then
-    # shellcheck source=bin/fm-remote-job-lib.sh
-    ( . "$ROOT/bin/fm-remote-job-lib.sh" && fm_remote_job_stop_worker_tree "$(cat "$REMOTE_JOBS/worker.pid")" ) || true
+    bash -c '. "$1/bin/fm-remote-job-lib.sh" && fm_remote_job_stop_worker_tree "$2"' \
+      _ "$ROOT" "$(cat "$REMOTE_JOBS/worker.pid")" || true
   fi
 }
 
