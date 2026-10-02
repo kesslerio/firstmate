@@ -986,7 +986,10 @@ for VERB in launch relaunch; do
   host_receipt "$OP" "$VERB" started
   printf 'actual_generation=%s\nroute_backend=herdr\nroute_target=fm-remote:w1:p1\nactual_model=pool-model-a\n' "$OP" \
     >> "$HOST_HOME/state/parent-route/ios.seat-operation.$OP"
-  perl -pi -e "s/^spawn_gen=.*/spawn_gen=$OP/" "$HOST_HOME/state/parent-route/ios.meta"
+  fm_write_meta "$HOST_HOME/state/parent-route/ios.meta" \
+    kind=secondmate harness=claude backend=herdr window=fm-remote:w1:p1 endpoint_task_id=ios \
+    herdr_session=fm-remote herdr_workspace_id=w1 herdr_tab_id=w1:t1 herdr_pane_id=w1:p1 \
+    "worktree=$HOST_HOME" "project=$ROOT" "home=$HOST_HOME" "spawn_gen=$OP" model=pool-model-a
   OUT=$(host_control "${HOST_ARGS[@]}" --operation "$OP" < /dev/null); RC=$?
   expect_code 0 "$RC" "started same-token $VERB replay: $OUT"
   assert_equals started "$(printf '%s\n' "$OUT" | sed -n 's/^seat_disposition=//p' | jq -r .disposition)" "replay lost startup evidence"
