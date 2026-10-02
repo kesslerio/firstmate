@@ -1,0 +1,40 @@
+terminal input unknown-mode: state=unknown injection=deferred expected=unknown/deferred
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰───────────────────────────────────────── Grok 4.7 (high) · auto-approve ─╯
+terminal input trailing-text: state=unknown injection=deferred expected=unknown/deferred
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰─────────────────────────────────── Grok 4.7 (high) · always-approve now ─╯
+terminal input other-brand: state=unknown injection=deferred expected=unknown/deferred
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰────────────────────────────────────── Other 4.7 (high) · always-approve ─╯
+terminal input unlisted-effort: state=unknown injection=deferred expected=unknown/deferred
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰────────────────────────────────────── Grok 4.7 (turbo) · always-approve ─╯
+terminal input second-dot: state=unknown injection=deferred expected=unknown/deferred
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰─────────────────────────────── Grok 4.7 (high) · always-approve · extra ─╯
+terminal input dot-before-suffix: state=unknown injection=deferred expected=unknown/deferred
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰───────────────────────────────────── Grok 4.7 · (high) · always-approve ─╯
+terminal input approval-overhang: state=unknown injection=deferred expected=unknown/deferred
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰────────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+terminal input approval-too-short: state=unknown injection=deferred expected=unknown/deferred
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+terminal input legacy-overhang: state=empty injection=permitted expected=empty/permitted
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  ╰────────────────────────────────────────────────────────── Grok 4.6 (xhigh) ─╯
+terminal input mixed-family: state=unknown injection=deferred expected=unknown/deferred
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                        │
+  └─────────────────────────────────────── Grok 4.7 (high) · always-approve ─┘

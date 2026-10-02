@@ -1,0 +1,12 @@
+Normal shell-owned worker, before exit: agent=alive composer=empty
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XTW30QBX3MFPFVCEH64HM7/.fm-test-lab.m77DOL
+stopped exitprobe harness=grok backend=tmux endpoint=primary:fm-exitprobe worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M3XTW30QBX3MFPFVCEH64HM7
+Normal shell-owned worker, after exit: agent=dead endpoint-present=%11
+
+
+
+
+
+
+
+

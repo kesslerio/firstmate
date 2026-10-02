@@ -1,20 +1,20 @@
 
-  [2m detached[0m [2mworktree [0m/h/a/.n/w/9f75ec418609/01M3XTW30QBX3MFPFVCEH64HM7
+   detached worktree /h/a/.n/w/9f75ec418609/01M3XTW30QBX3MFPFVCEH64HM7
 
 
 
 
    ╭────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
    │                                                                                                                │
-   │  ⠀⠀⠀⠀⠀⠀⣀⣀⡀⠀⠀⠀⢀⠄   [1mGrok Build  [0m1.0.46                                                                           │
+   │  ⠀⠀⠀⠀⠀⠀⣀⣀⡀⠀⠀⠀⢀⠄   Grok Build  1.0.46                                                                           │
    │  ⠀⠀⠀⣠⣾⠿⠛⠛⠛⠛⢀⡴⠁⠀                                                                                                │
-   │  ⠀⠀⣼⡟⠁⠀⠀⠀⢀⡴⠻⣿⡀⠀   [1mGrok 4.7 is here![0m                                                                            │
-   │  ⠀⠀⣿⡇⠀⠀⠀⠔⠁⠀⠀⣿⡇⠀   Select 'Grok 4.7' under /model.                                                              │
+   │  ⠀⠀⣼⡟⠁⠀⠀⠀⢀⡴⠻⣿⡀⠀   New /learn skill!                                                                            │
+   │  ⠀⠀⣿⡇⠀⠀⠀⠔⠁⠀⠀⣿⡇⠀   Ask Grok to /learn from your past traces and tune Grok Build to how you work.                │
    │  ⠀⠀⢹⣷⠀⠀⠀⠀⠀⢀⣴⡿⠀⠀                                                                                                │
-   │  ⠀⢀⠞⠁⠠⢶⣶⣶⣶⠿⠋⠀⠀⠀   [1mNew worktree[0m                                                                         ctrl+w  │
-   │  ⠐⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   [1mResume session[0m                                                                       ctrl+r  │
-   │                   [1mChangelog[0m                                                                                    │
-   │                   [1mQuit[0m                                                                                 ctrl+q  │
+   │  ⠀⢀⠞⠁⠠⢶⣶⣶⣶⠿⠋⠀⠀⠀   New worktree                                                                         ctrl+w  │
+   │  ⠐⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   Resume session                                                                       ctrl+r  │
+   │                   Changelog                                                                                    │
+   │                   Quit                                                                                 ctrl+q  │
    │                                                                                                                │
    ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 
@@ -30,11 +30,11 @@
   Help improve Grok                                                                                 [Opt out] [Opt in]
   Off by default. Opt-in to allow SpaceXAI to retain coding data, e.g., prompts, traces, & metrics,
   for training and debugging purposes. Change anytime via settings.
-  Read [4mTerms[0m and [4mPrivacy Policy[0m.
+  Read Terms and Privacy Policy.
 
   ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
   │ ❯                                                                                                                │
-  ╰─────────────────────────────────────────────────────────────────────────────── [2mGrok 4.7 (high)[0m · [2malways-approve[0m ─╯
+  ╰────────────────────────────────────────────────────────────────────────────────── Grok 4.7 (high) · auto-review ─╯
 
                                                                                                               [stable]
 

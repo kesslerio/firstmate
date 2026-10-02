@@ -1,0 +1,12 @@
+Independent live UI QA — disposable Grok 1.0.46 tmux lab
+
+Sequence: cleared the existing unsubmitted draft with C-a C-k; entered the literal draft `independent-qa-never-submit-draft` using tmux send-keys -l; cleared it with C-a C-k. Never pressed Enter, submitted a turn, or exited the lab.
+
+Observed classifier states:
+- independent-empty: tmux=empty, backend=empty, injection=permitted; cursorless-styled=empty, cursorless-plain=empty.
+- independent-typed-draft: tmux=pending, backend=pending, injection=deferred; cursorless-styled=pending, cursorless-plain=pending.
+- independent-final-idle: tmux=empty, backend=empty, injection=permitted; cursorless-styled=empty, cursorless-plain=empty.
+
+Screenshot inspection: grok-idle.png and grok-draft.png are Chromium-rendered HTML views of real 120x40 tmux captures, not native GUI screenshots. The idle image shows `Grok 4.7 (high) · always-approve` intact along the aligned right side of the composer bottom border, with the border continuing to its corner. The draft image shows `draft-never-submit-approval-title` inside the composer and the send/newline shortcuts below. Both captures are readable. The live pane was left empty and idle.
+
+Result: no actionable UI or classifier failure observed for idle recognition or draft protection.

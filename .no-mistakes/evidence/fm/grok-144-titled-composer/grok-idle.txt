@@ -1,32 +1,40 @@
 
-   detached worktree ~/.n/w/9f75ec418609/01M3XN5CBG24FBWV9X5M3XAQVB
-
-   ╭────────────────────────────────────────────────────────────────────────────────────────────╮
-   │                                                                                            │
-   │  ⠀⠀⠀⠀⠀⠀⣀⣀⡀⠀⠀⠀⢀⠄   Grok Build  1.0.46                                                       │
-   │  ⠀⠀⠀⣠⣾⠿⠛⠛⠛⠛⢀⡴⠁⠀                                                                            │
-   │  ⠀⠀⣼⡟⠁⠀⠀⠀⢀⡴⠻⣿⡀⠀   New /learn skill!                                                        │
-   │  ⠀⠀⣿⡇⠀⠀⠀⠔⠁⠀⠀⣿⡇⠀   Ask Grok to /learn from your past traces and tune Grok Build to how you  │
-   │  ⠀⠀⢹⣷⠀⠀⠀⠀⠀⢀⣴⡿⠀⠀   work.                                                                    │
-   │  ⠀⢀⠞⠁⠠⢶⣶⣶⣶⠿⠋⠀⠀⠀                                                                            │
-   │  ⠐⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   New worktree                                                     ctrl+w  │
-   │                   Resume session                                                   ctrl+r  │
-   │                   Changelog                                                                │
-   │                   Quit                                                             ctrl+q  │
-   │                                                                                            │
-   ╰────────────────────────────────────────────────────────────────────────────────────────────╯
+   detached worktree /h/a/.n/w/9f75ec418609/01M3XTW30QBX3MFPFVCEH64HM7
 
 
 
-  Help improve Grok                                                             [Opt out] [Opt in]
-  Off by default. Opt-in to allow SpaceXAI to retain coding data, e.g.,
-  prompts, traces, & metrics, for training and debugging purposes. Change
-  anytime via settings.
+
+   ╭────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+   │                                                                                                                │
+   │  ⠀⠀⠀⠀⠀⠀⣀⣀⡀⠀⠀⠀⢀⠄   Grok Build  1.0.46                                                                           │
+   │  ⠀⠀⠀⣠⣾⠿⠛⠛⠛⠛⢀⡴⠁⠀                                                                                                │
+   │  ⠀⠀⣼⡟⠁⠀⠀⠀⢀⡴⠻⣿⡀⠀   Grok 4.7 is here!                                                                            │
+   │  ⠀⠀⣿⡇⠀⠀⠀⠔⠁⠀⠀⣿⡇⠀   Select 'Grok 4.7' under /model.                                                              │
+   │  ⠀⠀⢹⣷⠀⠀⠀⠀⠀⢀⣴⡿⠀⠀                                                                                                │
+   │  ⠀⢀⠞⠁⠠⢶⣶⣶⣶⠿⠋⠀⠀⠀   New worktree                                                                         ctrl+w  │
+   │  ⠐⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   Resume session                                                                       ctrl+r  │
+   │                   Changelog                                                                                    │
+   │                   Quit                                                                                 ctrl+q  │
+   │                                                                                                                │
+   ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+
+
+
+
+
+
+
+
+  Help improve Grok                                                                                 [Opt out] [Opt in]
+  Off by default. Opt-in to allow SpaceXAI to retain coding data, e.g., prompts, traces, & metrics,
+  for training and debugging purposes. Change anytime via settings.
   Read Terms and Privacy Policy.
 
-  ╭──────────────────────────────────────────────────────────────────────────────────────────────╮
-  │ ❯                                                                                            │
-  ╰─────────────────────────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+  ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+  │ ❯                                                                                                                │
+  ╰─────────────────────────────────────────────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
 
-                                                                                          [stable]
+                                                                                                              [stable]
 

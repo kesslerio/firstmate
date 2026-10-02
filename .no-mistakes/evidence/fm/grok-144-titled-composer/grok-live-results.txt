@@ -1,0 +1,25 @@
+idle: tmux=empty backend=empty cursor_row=35
+injection=permitted
+cursorless-styled=empty
+cursorless-plain=empty
+draft: tmux=pending backend=pending cursor_row=35
+injection=deferred
+cursorless-styled=pending
+cursorless-plain=pending
+pre-change classifier on the same live idle capture: tmux=unknown cursorless-styled=unknown
+narrow-idle: tmux=empty backend=empty cursor_row=35
+injection=permitted
+cursorless-styled=empty
+cursorless-plain=empty
+narrow-wrapped-draft: tmux=pending backend=pending cursor_row=35
+injection=deferred
+cursorless-styled=pending
+cursorless-plain=pending
+narrow-cleared: tmux=empty backend=empty cursor_row=35
+injection=permitted
+cursorless-styled=empty
+cursorless-plain=empty
+wide-idle: tmux=empty backend=empty cursor_row=45
+injection=permitted
+cursorless-styled=empty
+cursorless-plain=empty

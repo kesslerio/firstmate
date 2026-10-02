@@ -1,0 +1,21 @@
+Scope: Firstmate approval-titled Grok composer classification and its public verification record.
+
+Focused baseline command: timeout -k 5s 90s bash tests/fm-composer-lib.test.sh. Passed. No full suite, lint, static analysis, pipeline control, push, PR, or CI command ran in this test phase.
+
+Live setup: marked disposable FM_HOME under the gate worktree via bin/fm-lab-home.sh create; private socket directory via bin/fm-lab-home.sh tmux-dir; tmux -L fm-lab with explicit 120x40 dimensions and /dev/null tmux config. Grok 1.0.46 used a disposable Grok home and copied existing login artifact, with no operator credential/configuration mutations. No model turn was submitted.
+
+Live commands: grok --always-approve --reasoning-effort high --leader-socket <owned socket dir>/grok.sock; tmux send-keys -l for literal drafts; C-a C-k to clear; resize-window to 80x40 and 220x50. Reads used fm_tmux_composer_state, fm_backend_composer_state tmux, fm_pane_input_pending, and shared classifier cursorless capability profiles on the actual capture. Cursorless profiles do not establish a live Herdr, cmux, or Orca backend run.
+
+Idle was empty and permitted injection at all tested widths. Normal and wrapped drafts were pending and deferred injection. bin/fm-control.sh probe exit refused a real pending draft and left it unchanged. A separate normal shell-owned worker ran bin/fm-control.sh exitprobe exit: before=alive/empty; result=stopped; after=dead with endpoint retained.
+
+Real adversarial mode: grok --permission-mode auto --reasoning-effort high rendered `Grok 4.7 (high) · auto-review`, classified unknown and deferred injection.
+
+Supplemental adversarial input: actual tmux terminal panes containing generated malformed titles/widths were consumed by the real Firstmate adapter and guard. These are synthetic inputs, not evidence that a Grok release renders those shapes. Unknown mode, trailing text, other brand, unlisted effort, extra mid-dots, oversized/undersized approval borders, and mixed border family all deferred; the older suffix-free three-column-overhang input remained empty. The portable suite separately covered all four efforts and documented profile coverage.
+
+Regression reproduction: the pre-change classifier, evaluated on this run's same real idle capture, returned unknown; the target classifier returned empty. This baseline replay is supplemental evidence rather than a second live vendor run.
+
+Visual evidence: PNGs are Chromium-rendered captured terminal output, not native GUI screenshots. Idle and draft ANSI captures preserve the real UI styling; auto-mode HTML renders the plain real terminal capture. Independent QA interacted with the real pane, inspected idle and draft PNGs, and left it idle.
+
+Resolved setup issues: initial screenshot startup attempted unavailable KDE KWallet DBus access; retried successfully using a disposable browser profile, --password-store=basic, and disabled DBus/display process environment. Initial exit fixture used remain-on-exit, retaining stale tmux current-command information after Grok exited with status 0; corrected to the normal shell-owned worker endpoint and re-driven successfully. The first fixture's unconfirmed-exit output is retained in grok-idle-exit.txt for transparency; grok-shell-owned-exit.txt is the successful final check.
+
+Both private tmux servers, their Grok processes, owned socket directories, lab homes, browser profiles, and transient test drivers were removed. Final git status --short was empty. Verification-document inspection confirmed it separates aligned approval-title evidence from capture-only 1.0.5 overhang evidence and accurately limits its portable matrix claims.

@@ -1,0 +1,3 @@
+idle: composer top=116 columns, bottom=116 columns; aligned
+narrow-idle: composer top=76 columns, bottom=76 columns; aligned
+wide-idle: composer top=216 columns, bottom=216 columns; aligned
