@@ -57,8 +57,7 @@
 # uid owns (or absent, in which case it is created), every unrelated line and
 # project entry is preserved verbatim, an existing entry is never rewritten
 # unless it already says `trusted`, the replacement is atomic, and the entry is
-# read back after the rename. A store that an interactive Codex moved while this
-# ran is retried once and then refused rather than clobbered.
+# read back after the rename.
 set -u
 # Path resolution here must answer from the filesystem, never from the caller's
 # environment, because the refusals below are the safety property. See
@@ -247,11 +246,7 @@ if [ -e "$STORE" ]; then
   [ -w "$STORE" ] || refuse "'$STORE' is not writable"
 fi
 
-# Read-modify-write with a fingerprint check before the rename and a readback
-# after it, the bin/fm-agy-trust.sh shape: an interactive Codex rewrites this
-# same file when a human answers a dialog or a setting changes, so a store that
-# moved under us is retried once and then refused rather than clobbered. The
-# edit is stanza-scoped - the one `[projects."<root>"]` table for the resolved
+# The edit is stanza-scoped - the one `[projects."<root>"]` table for the resolved
 # repository root is appended, or its existing `trust_level` line is checked -
 # so every unrelated line, hook entry, and profile in the operator's own config
 # survives byte for byte.
@@ -303,12 +298,10 @@ def entry_in(text):
         raise ValueError(f'{store} already records trust_level = {entry["trust_level"]!r} for {root}; refusing to overwrite that decision')
     return entry, indices[0]
 
-def attempt():
-    original = read_store()
-    text = "" if original is None else original.decode("utf-8")
+def trusted_text(text):
     entry, index = entry_in(text)
     if entry is not None and entry.get("trust_level") == "trusted":
-        return "recorded"
+        return text
     if entry is not None:
         lines = text.splitlines(keepends=True)
         if not lines[index].endswith("\n"):
@@ -321,27 +314,53 @@ def attempt():
     after, _ = entry_in(updated)
     if after is None or after.get("trust_level") != "trusted":
         raise ValueError(f'{store} would not retain folder trust for {root}')
+    return updated
+
+def merge_operator_entries(original, current):
+    before = tomllib.loads((original or b"").decode("utf-8"))
+    after = tomllib.loads((current or b"").decode("utf-8"))
+    previous = before.pop("projects", {})
+    projects = after.pop("projects", {})
+    if not isinstance(projects, dict) or before != after:
+        raise ValueError(f'{store} changed outside project trust entries; refusing to overwrite the concurrent edit')
+    changed = [key for key in previous.keys() | projects.keys() if previous.get(key) != projects.get(key)]
+    if not changed:
+        raise ValueError(f'{store} changed without a distinct project trust decision to merge; refusing to overwrite it')
+    for key in changed:
+        old = previous.get(key, {})
+        new = projects.get(key)
+        if (key == root or not isinstance(old, dict) or not isinstance(new, dict)
+                or new.get("trust_level") not in ("trusted", "untrusted")
+                or {k: v for k, v in old.items() if k != "trust_level"}
+                != {k: v for k, v in new.items() if k != "trust_level"}):
+            raise ValueError(f'{store} has a nonmergeable concurrent edit for {key}; refusing to overwrite it')
+    return trusted_text(current.decode("utf-8"))
+
+def record_trust():
+    original = read_store()
+    text = (original or b"").decode("utf-8")
+    updated = trusted_text(text)
+    if updated == text:
+        return
     fd, tmp = tempfile.mkstemp(prefix=".config.toml.fm-trust.", dir=store.parent)
     try:
         with os.fdopen(fd, "wb") as staged:
             staged.write(updated.encode("utf-8"))
-        if read_store() != original:
-            return "moved"
+        current = read_store()
+        if current != original:
+            updated = merge_operator_entries(original, current)
+            pathlib.Path(tmp).write_bytes(updated.encode("utf-8"))
+            if read_store() != current:
+                raise ValueError(f'{store} changed again before replacement; refusing to overwrite the concurrent edit')
         os.replace(tmp, store)
     finally:
         if os.path.exists(tmp):
             os.unlink(tmp)
-    after, _ = entry_in(store.read_text(encoding="utf-8"))
-    return "recorded" if after is not None and after.get("trust_level") == "trusted" else "dropped"
+    if read_store() != updated.encode("utf-8"):
+        raise ValueError(f'{store} changed after replacement; cannot confirm the complete folder trust write')
 
 try:
-    for i in range(3):
-        result = attempt()
-        if result == "recorded":
-            sys.exit(0)
-        if result == "moved" and i >= 1:
-            raise ValueError(f'{store} was modified while folder trust was being recorded; refusing to overwrite it')
-    raise ValueError(f'{store} did not retain folder trust for {root} after 3 attempts')
+    record_trust()
 except (OSError, ValueError) as err:
     print(f'error: {err}', file=sys.stderr)
     sys.exit(1)
