@@ -1,0 +1,17 @@
+[
+  {
+    "fixture": "/tmp/fm-folder-trust-live.idPe3s",
+    "fixture_removed": true,
+    "private_tmux_server_absent": true
+  },
+  {
+    "fixture": "/tmp/fm-raw-codex-live.4oMF0x",
+    "fixture_removed": true,
+    "private_tmux_server_absent": true
+  },
+  {
+    "fixture": "/tmp/fm-raw-pi-live.2MVCM2",
+    "fixture_removed": true,
+    "private_tmux_server_absent": true
+  }
+]

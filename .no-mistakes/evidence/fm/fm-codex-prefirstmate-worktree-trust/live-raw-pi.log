@@ -1,0 +1,6 @@
+warning: /tmp/fm-raw-pi-live.2MVCM2/case/home/data/raw-pi/launch-brief.md records no ship branch; defaulting to legacy branch fm/raw-pi
+warning: /tmp/fm-raw-pi-live.2MVCM2/case/home/data/raw-pi/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+spawned raw-pi harness=pi kind=ship mode=no-mistakes yolo=off window=firstmate:fm-raw-pi worktree=/tmp/fm-raw-pi-live.2MVCM2/case/wt
+Exact emitted raw Pi argv: ['--approve', '--tui-mode', 'regular']
+export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='/tmp/fm-raw-pi-live.2MVCM2/case/home/state/raw-pi.inbox'; export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0='/tmp/fm-raw-pi-live.2MVCM2/case/home/state/raw-pi.git-hooks'; env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI FM_PI_HARNESS=pi pi  --approve --tui-mode regular
+Raw Pi launch reached the real editor with no trust prompt and no persisted approval.

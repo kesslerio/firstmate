@@ -1,0 +1,32 @@
+
+=== Register a linked pool worktree ===
+trusted: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/project
+Saved repository trust; preserved operator project and effort; no hook-trust state.
+trusted: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/project
+Repeat registration leaves the configuration byte-identical.
+
+=== Refuse /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/project ===
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/project' is a primary checkout, not an isolated worktree; approve its folder trust during attended provisioning
+Refused with existing trust configuration byte-identical.
+
+=== Refuse /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/outside ===
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/outside' is not a qualifying linked pool worktree; approve its folder trust during attended provisioning
+Refused with existing trust configuration byte-identical.
+
+=== Refuse /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/pool/slot/repo/subdirectory ===
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/pool/slot/repo/subdirectory' is not a worktree root (its root is '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/pool/slot/repo')
+Refused with existing trust configuration byte-identical.
+
+=== Refuse /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/plain ===
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/plain' is not a worktree root (its root is '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P')
+Refused with existing trust configuration byte-identical.
+
+=== Refuse an existing operator denial ===
+error: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/denied-store/config.toml already records trust_level = 'untrusted' for /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/project; refusing to overwrite that decision
+error: refusing to pre-register Codex folder trust: could not record folder trust for '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/project' in '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/denied-store/config.toml'
+Operator denial preserved byte-identically.
+
+=== Refuse malformed configuration ===
+error: Invalid value (at line 1, column 9)
+error: refusing to pre-register Codex folder trust: could not record folder trust for '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/project' in '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/manual/malformed-store/config.toml'
+Malformed configuration preserved byte-identically.

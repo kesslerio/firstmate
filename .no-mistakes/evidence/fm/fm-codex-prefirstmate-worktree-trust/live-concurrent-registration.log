@@ -1,0 +1,9 @@
+=== Concurrent operator distinct-project ===
+An independent writer atomically installed its edit while registration staged its configuration.
+trusted: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/concurrent/project
+Both the operator denial for another project and Firstmate repository trust survived.
+=== Concurrent operator settings-change ===
+An independent writer atomically installed its edit while registration staged its configuration.
+error: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/concurrent/settings-change/config.toml changed outside project trust entries; refusing to overwrite the concurrent edit
+error: refusing to pre-register Codex folder trust: could not record folder trust for '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/concurrent/project' in '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-phase/concurrent/settings-change/config.toml'
+Nonmergeable concurrent setting edit caused refusal and survived byte-for-byte.

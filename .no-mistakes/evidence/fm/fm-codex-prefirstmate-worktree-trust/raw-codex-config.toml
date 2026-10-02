@@ -1,0 +1,4 @@
+check_for_update_on_startup = false
+
+[projects."/tmp/fm-raw-codex-live.4oMF0x/case/project"]
+trust_level = "trusted"

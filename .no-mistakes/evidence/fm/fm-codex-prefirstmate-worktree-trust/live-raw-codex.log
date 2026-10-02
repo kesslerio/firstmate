@@ -1,0 +1,6 @@
+warning: /tmp/fm-raw-codex-live.4oMF0x/case/home/data/raw-codex/launch-brief.md records no ship branch; defaulting to legacy branch fm/raw-codex
+warning: /tmp/fm-raw-codex-live.4oMF0x/case/home/data/raw-codex/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+spawned raw-codex harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-raw-codex worktree=/tmp/fm-raw-codex-live.4oMF0x/case/wt
+Exactly one launch-store assignment; matching repository trust saved in custom store; supervisor store untouched; replay has no positional prompt.
+export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='/tmp/fm-raw-codex-live.4oMF0x/case/home/state/raw-codex.inbox'; export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0='/tmp/fm-raw-codex-live.4oMF0x/case/home/state/raw-codex.git-hooks'; env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI CODEX_HOME='/tmp/fm-raw-codex-live.4oMF0x/case/custom codex store' codex --disable hooks
+Raw Codex launch read the custom store and reached the real editor without folder trust.
