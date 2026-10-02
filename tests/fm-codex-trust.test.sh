@@ -136,9 +136,10 @@ spawn_with_fakebin() {
 # no delivery contract.
 spawn_secondmate_with_fakebin() {
   local case_dir=$1 home=$2 id=$3 fakebin=$4
+  shift 4
   : > "$case_dir/launch.log"
   FM_FAKE_LAUNCH_LOG="$case_dir/launch.log" \
-    fm_test_run_spawn "$case_dir/home" "$home" "$fakebin" "$id" "$home" --secondmate
+    fm_test_run_spawn "$case_dir/home" "$home" "$fakebin" "$id" "$home" "$@" --secondmate
 }
 
 # make_launch_home <case-dir> <harness> <fakebin-tools...>: a spawn home whose
@@ -788,7 +789,7 @@ test_codex_launch_reads_the_registered_store() {
     case_dir="$TMP_ROOT/store-launch-$kind"
     mkdir -p "$case_dir"
     fakebin=$(make_launch_home "$case_dir" codex codex)
-    selected="$case_dir/selected store"
+    selected="$case_dir/selected __MODELFLAG__ store"
     override=$selected
     if [ "$kind" = ship ]; then
       selected="$case_dir/home/user-home/.codex"
@@ -833,6 +834,102 @@ SH
     assert_absent "$case_dir/wrong-store/config.toml" "registration wrote a second store"
   done
   pass "fm-spawn.sh: all Codex launch kinds read the single registered store"
+}
+
+test_raw_codex_launch_reads_its_selected_store() {
+  local kind style case_dir fakebin worker_home expected_root selected supervisor raw out status launch
+  for kind in ship scout secondmate; do
+    for style in explicit quoted repeated empty inherited invalid; do
+      case_dir="$TMP_ROOT/raw-store-$kind-$style"
+      fakebin=$(make_launch_home "$case_dir" codex codex)
+      selected="$case_dir/account-store"
+      supervisor="$case_dir/supervisor-store"
+      case "$style" in
+        explicit) raw="DEBUG=retained CODEX_HOME=$selected codex --disable hooks" ;;
+        quoted)
+          selected="$case_dir/account __MODELFLAG__ __BRIEFDOORBELL__ store"
+          raw="DEBUG='retained value' CODEX_HOME='$selected' codex --disable hooks"
+          ;;
+        repeated) raw="CODEX_HOME=$case_dir/ignored-store CODEX_HOME='$selected' codex --disable hooks" ;;
+        empty)
+          selected="$case_dir/account-home/.codex"
+          raw="HOME='$case_dir/account-home' CODEX_HOME='' codex --disable hooks"
+          ;;
+        inherited) selected=$supervisor; raw='codex --disable hooks' ;;
+        invalid) raw="CODEX_HOME=\"\$(touch '$case_dir/executed')\" codex --disable hooks" ;;
+      esac
+      cat > "$fakebin/codex" <<'SH'
+#!/usr/bin/env bash
+python3 - "$CODEX_HOME" "$FM_RAW_EXPECT_ROOT" "$FM_RAW_RESULT" "${DEBUG:-}" "$@" <<'PY'
+import json
+import pathlib
+import sys
+import tomllib
+store, root, result, marker, *argv = sys.argv[1:]
+with open(pathlib.Path(store) / "config.toml", "rb") as stream:
+    config = tomllib.load(stream)
+assert config["projects"][root]["trust_level"] == "trusted"
+assert argv == ["--disable", "hooks"]
+pathlib.Path(result).write_text(json.dumps({"store": store, "marker": marker}))
+PY
+SH
+      chmod +x "$fakebin/codex"
+      printf 'FM_RAW_EXPECT_ROOT\nFM_RAW_RESULT\n' > "$case_dir/home/config/launch-env-allowlist"
+      worker_home="$case_dir/project"
+      expected_root=$worker_home
+      if [ "$kind" = secondmate ]; then
+        worker_home="$case_dir/secondmate"
+        seed_secondmate_home "$worker_home" raw-account worktree
+        expected_root="$worker_home.src"
+        out=$(FM_TEST_CODEX_HOME="$supervisor" spawn_secondmate_with_fakebin "$case_dir" "$worker_home" raw-account "$fakebin" "$raw")
+      elif [ "$kind" = scout ]; then
+        fm_test_spawn_brief "$case_dir/home" raw-account
+        : > "$case_dir/launch.log"
+        out=$(FM_TEST_CODEX_HOME="$supervisor" FM_FAKE_LAUNCH_LOG="$case_dir/launch.log" \
+          fm_test_run_spawn "$case_dir/home" "$case_dir/wt" "$fakebin" raw-account "$worker_home" "$raw" --scout)
+      else
+        out=$(FM_TEST_CODEX_HOME="$supervisor" spawn_with_fakebin "$case_dir" "$case_dir/home" raw-account "$worker_home" "$case_dir/wt" "$fakebin" "$raw")
+      fi
+      status=$?
+      if [ "$style" = invalid ]; then
+        expect_code 1 "$status" "dynamic raw store selection was not refused: $out"
+        assert_absent "$case_dir/executed" "resolving the raw store executed a command substitution"
+        assert_absent "$supervisor/config.toml" "invalid raw store registration wrote the supervisor store"
+        [ ! -s "$case_dir/launch.log" ] || fail "invalid raw store selection launched a worker"
+        continue
+      fi
+      expect_code 0 "$status" "raw $kind $style store launch failed: $out"
+      launch=$(cat "$case_dir/launch.log")
+      env -i HOME="$case_dir/destination-home" CODEX_HOME="$case_dir/destination-store" \
+        PATH="$fakebin:$PATH" TERM=xterm FM_RAW_EXPECT_ROOT="$expected_root" \
+        FM_RAW_RESULT="$case_dir/result.json" bash -c "$launch" || fail "raw worker did not read the registered store"
+      python3 - "$case_dir/result.json" "$selected" "$style" "$launch" <<'PY' || fail "raw launch did not preserve one effective store and its arguments"
+import json
+import pathlib
+import shlex
+import sys
+result = json.loads(pathlib.Path(sys.argv[1]).read_text())
+assert result["store"] == sys.argv[2]
+if sys.argv[3] == "explicit":
+    assert result["marker"] == "retained"
+if sys.argv[3] == "quoted":
+    assert result["marker"] == "retained value"
+words = shlex.split(sys.argv[4])
+if "/bin/sh" in words:
+    shell = words.index("/bin/sh")
+    assert words[shell + 1] == "-c"
+    words = shlex.split(words[shell + 2])
+assignments = [word for word in words if word.startswith("CODEX_HOME=")]
+assert assignments == ["CODEX_HOME=" + sys.argv[2]], assignments
+PY
+      if [ "$style" != inherited ]; then
+        assert_absent "$supervisor/config.toml" "raw launch wrote a second supervisor store"
+      fi
+      assert_absent "$case_dir/ignored-store/config.toml" "raw launch registered an overridden assignment"
+      assert_absent "$case_dir/destination-store/config.toml" "raw worker registered a second destination store"
+    done
+  done
+  pass "fm-spawn.sh: all raw Codex launch kinds read only their selected store"
 }
 
 test_spawn_fixture_isolates_an_exported_codex_home() {
@@ -1119,6 +1216,7 @@ test_unsupported_and_malformed_toml_is_unchanged
 test_concurrent_store_writers_keep_both_projects
 test_concurrent_operator_edits_merge_or_refuse
 test_codex_launch_reads_the_registered_store
+test_raw_codex_launch_reads_its_selected_store
 test_spawn_fixture_isolates_an_exported_codex_home
 test_fresh_worktree_registers_the_repository_root
 test_registration_keys_on_the_root_not_the_worktree

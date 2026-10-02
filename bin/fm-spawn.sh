@@ -2247,15 +2247,52 @@ launch_template() {
 case "$ARG3" in
 *' '*) # raw launch command (unverified-adapter escape hatch)
   RAW_LAUNCH=1
-  LAUNCH=$ARG3
-  HARNESS=""
-  for word in $LAUNCH; do
-    case "$word" in [A-Za-z_]*=*) continue ;; *)
-      HARNESS=$(basename "$word")
-      break
-      ;;
-    esac
-  done
+  RAW_LAUNCH_DETAILS=$(python3 - "$ARG3" <<'PY'
+import os
+import re
+import shlex
+import sys
+raw = sys.argv[1]
+lexer = shlex.shlex(raw, posix=True)
+lexer.whitespace_split = True
+lexer.commenters = ""
+prefix = []
+start = 0
+try:
+    while True:
+        word = lexer.get_token()
+        end = lexer.instream.tell()
+        assignment = re.fullmatch(r"([A-Za-z_][A-Za-z_0-9]*)=(.*)", word or "", re.DOTALL)
+        if assignment is None:
+            break
+        prefix.append((assignment[1], assignment[2], raw[start:end]))
+        start = end
+    harness = os.path.basename(word or "")
+    store = ""
+    launch = raw
+    if harness == "codex":
+        values = dict((name, value) for name, value, _ in prefix)
+        for name, value, _ in prefix:
+            if name in ("CODEX_HOME", "HOME") and any(char in value for char in "$`\n\r\t"):
+                raise ValueError(f"raw Codex {name} must be a literal path; use an explicit absolute store")
+        store = values.get("CODEX_HOME", os.environ.get("CODEX_HOME", ""))
+        home = values.get("HOME", os.environ.get("HOME", ""))
+        if not store and home:
+            store = home + "/.codex"
+        if not store or not os.path.isabs(store) or any(char in store for char in "\n\r"):
+            raise ValueError("raw Codex launch requires an absolute CODEX_HOME or HOME to select its trust store")
+        launch = "".join(part for name, _, part in prefix if name != "CODEX_HOME") + raw[start:]
+    print(harness)
+    print(store)
+    print(launch, end="")
+except ValueError as err:
+    sys.exit(f"error: cannot resolve raw launch store: {err}")
+PY
+  ) || exit 1
+  HARNESS=${RAW_LAUNCH_DETAILS%%$'\n'*}
+  RAW_LAUNCH_DETAILS=${RAW_LAUNCH_DETAILS#*$'\n'}
+  RAW_CODEX_HOME=${RAW_LAUNCH_DETAILS%%$'\n'*}
+  LAUNCH=${RAW_LAUNCH_DETAILS#*$'\n'}
   ;;
 '')
   # No explicit harness: resolve from config. A secondmate AGENT launches on the
@@ -4413,12 +4450,13 @@ claude*)
   fi
   ;;
 codex)
-  CODEX_LAUNCH_HOME=${CODEX_HOME:-}
-  if [ -z "$CODEX_LAUNCH_HOME" ] && [ -n "${HOME:-}" ]; then
-    CODEX_LAUNCH_HOME="$HOME/.codex"
-  fi
-  if [ -n "$CODEX_LAUNCH_HOME" ]; then
-    LAUNCH="CODEX_HOME=$(shell_quote "$CODEX_LAUNCH_HOME") $LAUNCH"
+  if [ "$RAW_LAUNCH" = 1 ]; then
+    CODEX_LAUNCH_HOME=$RAW_CODEX_HOME
+  else
+    CODEX_LAUNCH_HOME=${CODEX_HOME:-}
+    if [ -z "$CODEX_LAUNCH_HOME" ] && [ -n "${HOME:-}" ]; then
+      CODEX_LAUNCH_HOME="$HOME/.codex"
+    fi
   fi
   if [ "$SPAWN_FOLDER_TRUST_ALLOWED" = 1 ]; then
     if [ "$KIND" = secondmate ]; then
@@ -5173,6 +5211,9 @@ case "$LAUNCH" in
   LAUNCH=${LAUNCH//__CLAUDEADDDIRS__/$CLAUDE_ADD_DIRS}
   ;;
 esac
+if [ "$HARNESS" = codex ] && [ -n "$CODEX_LAUNCH_HOME" ]; then
+  LAUNCH="CODEX_HOME=$(shell_quote "$CODEX_LAUNCH_HOME") $LAUNCH"
+fi
 case "$HARNESS" in
 claude | codex | opencode | pi | pi-signed | grok | kimi | gemini | muse | rovo | agy | devin)
   LAUNCH="env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI $LAUNCH"
