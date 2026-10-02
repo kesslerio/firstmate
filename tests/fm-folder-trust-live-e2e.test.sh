@@ -220,7 +220,7 @@ PY
 
 test_codex_dialog_gates_an_unregistered_worktree() {
   local sess text
-  open_pane codex-control "$WT" "env CODEX_HOME=$CODEX_HOME_DIR codex $CODEX_FLAGS"
+  open_pane codex-control "$WT" "env CODEX_HOME=$(printf '%q' "$CODEX_HOME_DIR") codex $CODEX_FLAGS"
   sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_codex_dialog 30)
   see_codex_dialog "$text" ||
@@ -235,7 +235,7 @@ test_codex_trust_script_removes_the_dialog() {
   assert_contains "$out" "$PROJ" "the registration did not report the repository root: $out"
   assert_contains "$(cat "$CODEX_HOME_DIR/config.toml")" "[projects.\"$PROJ\"]" \
     "codex did not read the entry this guard wrote, and the pane below says so"
-  open_pane codex-registered "$WT" "env CODEX_HOME=$CODEX_HOME_DIR codex $CODEX_FLAGS"
+  open_pane codex-registered "$WT" "env CODEX_HOME=$(printf '%q' "$CODEX_HOME_DIR") codex $CODEX_FLAGS"
   sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_codex_running 30)
   see_codex_running "$text" ||
@@ -255,7 +255,7 @@ test_codex_root_entry_is_the_narrow_key() {
   ln -s "$CODEX_AUTH_FILE" "$above_home/auth.json"
   fm_git_worktree "$above/repository" "$above/worktrees/fresh" other-wt
   open_pane codex-above "$above/worktrees/fresh" \
-    "env CODEX_HOME=$above_home codex $CODEX_FLAGS"
+    "env CODEX_HOME=$(printf '%q' "$above_home") codex $CODEX_FLAGS"
   sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_codex_dialog 30)
   see_codex_dialog "$text" ||
@@ -272,7 +272,7 @@ PI_ROOT="$CASE/pi-root"
 
 test_pi_prompt_gates_an_untrusted_directory() {
   local sess text
-  open_pane pi-control "$PI_WT" "env PI_CODING_AGENT_DIR=$PI_ROOT pi ${PI_FLAGS/--approve/}"
+  open_pane pi-control "$PI_WT" "env PI_CODING_AGENT_DIR=$(printf '%q' "$PI_ROOT") pi ${PI_FLAGS/--approve/}"
   sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_pi_prompt 30)
   see_pi_prompt "$text" ||
@@ -283,7 +283,7 @@ test_pi_prompt_gates_an_untrusted_directory() {
 test_pi_launch_flag_reaches_the_editor_with_no_prompt() {
   local sess text
   [ -f "$PI_ROOT/trust.json" ] && fail "pi wrote a trust store unprompted, so --approve is persisting: $(cat "$PI_ROOT/trust.json")"
-  open_pane pi-approved "$PI_WT" "env PI_CODING_AGENT_DIR=$PI_ROOT pi $PI_FLAGS"
+  open_pane pi-approved "$PI_WT" "env PI_CODING_AGENT_DIR=$(printf '%q' "$PI_ROOT") pi $PI_FLAGS"
   sess=$OPENED_SESSION
   text=$(wait_for_pane "$sess" see_pi_started 30)
   see_pi_started "$text" ||
