@@ -24,10 +24,12 @@
 #
 # It spends no model tokens: every harness is started with no positional prompt,
 # so nothing reaches a model, and it runs by default wherever codex, pi, and tmux
-# are installed.
+# are installed. Each runtime's cases self-skip with a recorded reason when its
+# selected credential store has no readable login; the other runtime still runs.
 set -u
 
 CODEX_AUTH_FILE="${CODEX_HOME:-$HOME/.codex}/auth.json"
+PI_AUTH_DIR="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}"
 
 # shellcheck source=tests/fixtures.sh
 . "$(dirname "${BASH_SOURCE[0]}")/fixtures.sh"
@@ -159,21 +161,7 @@ printf '{}\n' > "$TMP_ROOT/treehouse-state.json"
 mkdir -p "$PI_WT/.pi/extensions" "$PI_WT/.agents/skills"
 printf '{}\n' > "$PROJ/.pi-settings-marker"
 
-# --- codex: the throwaway config root the pane will read --------------------
-
 CODEX_HOME_DIR="$CASE/codex-home"
-mkdir -p "$CODEX_HOME_DIR"
-# Codex needs a login to reach its composer at all, and an auth-less start would
-# make the "no dialog" assertion pass for the wrong reason.
-if [ -f "$CODEX_AUTH_FILE" ]; then
-  ln -s "$CODEX_AUTH_FILE" "$CODEX_HOME_DIR/auth.json"
-else
-  printf 'not ok - codex folder trust cannot be verified with no %s login present\n' "$CODEX_AUTH_FILE" >&2
-  exit 1
-fi
-# The update nag is a second first-launch modal; silence it so the only modal this
-# guard can see is the one under test.
-printf 'check_for_update_on_startup = false\n' > "$CODEX_HOME_DIR/config.toml"
 
 # capture_launch <name> <harness> -> the literal command firstmate sent the pane
 capture_launch() {
@@ -228,15 +216,6 @@ print(shlex.join(flags))
 PY
 }
 
-CODEX_LAUNCH=$(capture_launch codex-live codex)
-CODEX_FLAGS=$(global_flags codex "$CODEX_LAUNCH") || fail "refusing unsafe Codex replay flags"
-PI_LAUNCH=$(capture_launch pi-live pi)
-PI_FLAGS=$(global_flags "$(cat "$CASE/spawn-pi-live/executable")" "$PI_LAUNCH") || fail "refusing unsafe Pi replay flags"
-case $PI_FLAGS in
-  -*--approve* | --approve*) ;;
-  *) fail "the captured pi launch lost its trust flag, so the guard would prove nothing: $PI_LAUNCH" ;;
-esac
-
 # --- codex ------------------------------------------------------------------
 
 test_codex_dialog_gates_an_unregistered_worktree() {
@@ -290,9 +269,6 @@ test_codex_root_entry_is_the_narrow_key() {
 # catalog so pi reaches its editor instead of failing on a provider, and starting
 # with no trust.json at all so the trust decision is genuinely undecided.
 PI_ROOT="$CASE/pi-root"
-mkdir -p "$PI_ROOT"
-[ ! -f "$HOME/.pi/agent/auth.json" ] || ln -s "$HOME/.pi/agent/auth.json" "$PI_ROOT/auth.json"
-[ ! -f "$HOME/.pi/agent/models.json" ] || ln -s "$HOME/.pi/agent/models.json" "$PI_ROOT/models.json"
 
 test_pi_prompt_gates_an_untrusted_directory() {
   local sess text
@@ -317,8 +293,34 @@ test_pi_launch_flag_reaches_the_editor_with_no_prompt() {
   pass "live: pi $PI_VERSION launches with --approve, shows no prompt, and persists nothing"
 }
 
-test_codex_dialog_gates_an_unregistered_worktree
-test_codex_trust_script_removes_the_dialog
-test_codex_root_entry_is_the_narrow_key
-test_pi_prompt_gates_an_untrusted_directory
-test_pi_launch_flag_reaches_the_editor_with_no_prompt
+if [ -r "$CODEX_AUTH_FILE" ]; then
+  # Codex needs a login to reach its composer; an auth-less start cannot prove
+  # that folder trust was accepted. All replay writes stay in this test store.
+  mkdir -p "$CODEX_HOME_DIR"
+  ln -s "$CODEX_AUTH_FILE" "$CODEX_HOME_DIR/auth.json"
+  # Silence the update nag so the only modal is the one under test.
+  printf 'check_for_update_on_startup = false\n' > "$CODEX_HOME_DIR/config.toml"
+  CODEX_LAUNCH=$(capture_launch codex-live codex)
+  CODEX_FLAGS=$(global_flags codex "$CODEX_LAUNCH") || fail "refusing unsafe Codex replay flags"
+  test_codex_dialog_gates_an_unregistered_worktree
+  test_codex_trust_script_removes_the_dialog
+  test_codex_root_entry_is_the_narrow_key
+else
+  printf 'skip: live: codex folder trust: no readable login at %s\n' "$CODEX_AUTH_FILE"
+fi
+
+if [ -r "$PI_AUTH_DIR/auth.json" ]; then
+  mkdir -p "$PI_ROOT"
+  ln -s "$PI_AUTH_DIR/auth.json" "$PI_ROOT/auth.json"
+  [ ! -f "$PI_AUTH_DIR/models.json" ] || ln -s "$PI_AUTH_DIR/models.json" "$PI_ROOT/models.json"
+  PI_LAUNCH=$(capture_launch pi-live pi)
+  PI_FLAGS=$(global_flags "$(cat "$CASE/spawn-pi-live/executable")" "$PI_LAUNCH") || fail "refusing unsafe Pi replay flags"
+  case $PI_FLAGS in
+    -*--approve* | --approve*) ;;
+    *) fail "the captured pi launch lost its trust flag, so the guard would prove nothing: $PI_LAUNCH" ;;
+  esac
+  test_pi_prompt_gates_an_untrusted_directory
+  test_pi_launch_flag_reaches_the_editor_with_no_prompt
+else
+  printf 'skip: live: pi project trust: no readable login at %s/auth.json\n' "$PI_AUTH_DIR"
+fi
