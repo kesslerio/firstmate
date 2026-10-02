@@ -1,0 +1,4 @@
+command -v pi-signed: unavailable on PATH
+Repository bin/: no pi-signed executable or signed-wrapper distribution.
+References describe an installed distinct wrapper, not a locally buildable substitute.
+Live rerun requires the genuine pi-signed wrapper on PATH; a renamed Pi executable would falsify this check.

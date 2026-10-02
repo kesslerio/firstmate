@@ -1,9 +1,9 @@
 
   >_ OpenAI Codex (v0.159.2)
-     /tmp/fm-folder-trust-live.idPe3s/case/wt
+     ~/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/t e/fm-folder-trust-live.OToC35/case/wt
   permissions: YOLO mode
 
-  Nice place you’ve got here. Very monospace.
+  Bring a question. Bonus points if it’s a weird one.
 
 
 
@@ -41,5 +41,5 @@
 
 › Ask Codex to do anything
 
-  GPT-6.1-Sol default · /tmp/fm-folder-trust-live.idPe3s/case/wt
-  ? for shortcuts                                                                                                                      ⚠ 1 warning · f2 to view
+
+  ? for shortcuts

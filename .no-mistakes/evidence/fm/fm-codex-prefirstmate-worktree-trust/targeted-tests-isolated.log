@@ -1,0 +1,55 @@
+FM_TEST_BEGIN 2026-10-02T17:35:13Z tests/fm-codex-trust.test.sh family=backend-dispatch expected_gate_skip=none
+ok - live guard: prompt-free replay, editor evidence, ancestor scope and owned cleanup
+ok - fm-spawn.sh: Codex and both Pi identities automate only linked pool secondmate homes
+ok - fm-codex-trust.sh: both registration modes refuse linked paths outside the pool
+ok - fm-codex-trust.sh: equivalent TOML keys and trust values preserve decisions
+ok - fm-codex-trust.sh: unsupported and malformed TOML is refused without writes
+ok - fm-codex-trust.sh: concurrent writers sharing a resolved store retain both projects
+ok - fm-codex-trust.sh: distinct operator decisions merge and other concurrent edits refuse
+ok - fm-spawn.sh: all Codex launch kinds read the single registered store
+ok - fm-spawn.sh: all raw Codex launch kinds read only their selected store
+ok - spawn fixture: exported Codex profiles remain untouched
+ok - fm-codex-trust.sh: a fresh task worktree registers its repository root
+ok - fm-codex-trust.sh: the entry is the repository root, not the per-worktree path
+ok - fm-codex-trust.sh: preserves every unrelated line of the operator's config
+ok - fm-codex-trust.sh: registering the same repository twice changes nothing
+ok - fm-codex-trust.sh: creates the Codex directory and store when absent
+ok - fm-codex-trust.sh: fills in an existing empty entry instead of redeclaring it
+ok - fm-codex-trust.sh: refuses to overwrite an operator's recorded non-trusted decision
+ok - fm-codex-trust.sh: refuses a projects table written in a form it does not own
+ok - fm-codex-trust.sh: refuses a trust entry written as a dotted key
+ok - fm-codex-trust.sh: a primary checkout is refused
+ok - fm-codex-trust.sh: a home directory is refused
+ok - fm-codex-trust.sh: a relative CODEX_HOME is refused rather than guessed at
+ok - fm-codex-trust.sh: a plain directory and a missing directory are refused
+ok - fm-codex-trust.sh: a foreign worktree and a worktree subdirectory are refused
+ok - fm-codex-trust.sh: a project that is itself a worktree resolves to the primary checkout
+ok - fm-codex-trust.sh: a missing Python interpreter refuses the registration
+ok - fm-codex-trust.sh: standalone secondmate homes keep attended folder trust
+ok - fm-codex-trust.sh: a seeded secondmate home that is a leased worktree is trusted
+ok - fm-codex-trust.sh: secondmate-home mode refuses an unseeded or foreign home
+ok - fm-spawn.sh: a codex crewmate pre-registers folder trust and launches
+ok - fm-spawn.sh: a refused codex trust registration stops before worker launch
+ok - fm-spawn.sh: a pi crewmate launch carries pi's per-run project-trust flag
+ok - fm-spawn.sh: a pi secondmate launch carries pi's per-run project-trust flag
+ok - fm-spawn.sh: the pi trust flag survives the pane shell into pi's own argv
+ok - fm-spawn.sh: both Pi identities scope approval at canonical and raw invocations for every local launch kind
+FM_TEST_END 2026-10-02T17:38:18Z tests/fm-codex-trust.test.sh exit=0 duration_ms=185188 gate_skip=false
+FM_TEST_BEGIN 2026-10-02T17:38:18Z tests/fm-spawn-dispatch-profile.test.sh family=backend-dispatch expected_gate_skip=none
+ok - allowlist=absent preserves the operational floor and filters only when opted in
+ok - allowlist=missing-config preserves the operational floor and filters only when opted in
+ok - allowlist=enabled preserves the operational floor and filters only when opted in
+ok - allowlist=empty preserves the operational floor and filters only when opted in
+ok - invalid allowlist names refuse before launch or task publication
+ok - inaccessible config with present allowlist refuses before launch or task publication
+ok - inaccessible config with absent allowlist refuses before launch or task publication
+ok - inaccessible ancestor with present allowlist refuses before launch or task publication
+ok - inaccessible ancestor with absent allowlist refuses before launch or task publication
+ok - secondmate launch inherits the allowlist for subsequent worker launches
+ok - local inheritance preserves the allowlist on source errors and mirrors proven absence
+not ok - remote allowlist inheritance should succeed: error: remote command is not tracked by this Firstmate checkout: fm-remote-inherit.sh: expected exit 0, got 1
+FM_TEST_END 2026-10-02T17:38:29Z tests/fm-spawn-dispatch-profile.test.sh exit=1 duration_ms=11060 gate_skip=false
+FM_TEST_SUMMARY total=2 failed=1 skipped_gate=0 duration_ms=196308
+FM_TEST_SUMMARY_FAMILY family=backend-dispatch count=2 duration_ms=196248 failed=1
+FM_TEST_SLOWEST rank=1 script=tests/fm-codex-trust.test.sh duration_ms=185188
+FM_TEST_SLOWEST rank=2 script=tests/fm-spawn-dispatch-profile.test.sh duration_ms=11060

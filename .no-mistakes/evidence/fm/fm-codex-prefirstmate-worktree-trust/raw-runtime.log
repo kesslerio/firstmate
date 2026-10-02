@@ -1,0 +1,9 @@
+warning: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/tmp/raw-runtime.AqZYCu/case/home-codex/data/raw-codex/launch-brief.md records no ship branch; defaulting to legacy branch fm/raw-codex
+warning: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/tmp/raw-runtime.AqZYCu/case/home-codex/data/raw-codex/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+spawned raw-codex harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-raw-codex worktree=/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/tmp/raw-runtime.AqZYCu/case/wt
+ok - raw codex launch reached the actual editor without folder-trust prompt
+warning: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/tmp/raw-runtime.AqZYCu/case/home-pi/data/raw-pi/launch-brief.md records no ship branch; defaulting to legacy branch fm/raw-pi
+warning: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/tmp/raw-runtime.AqZYCu/case/home-pi/data/raw-pi/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+spawned raw-pi harness=pi kind=ship mode=no-mistakes yolo=off window=firstmate:fm-raw-pi worktree=/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/tmp/raw-runtime.AqZYCu/case/wt
+ok - raw pi launch reached the actual editor without folder-trust prompt
+ok - raw Pi approval persisted no trust store

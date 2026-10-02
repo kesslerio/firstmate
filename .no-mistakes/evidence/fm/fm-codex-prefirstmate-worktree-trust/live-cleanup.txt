@@ -1,0 +1,2 @@
+test-owned socket: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/t e/fm-folder-trust-live.OToC35/tmux.sock
+kill-server exit: 1

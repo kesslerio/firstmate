@@ -1,0 +1,38 @@
+Reject primary checkout
+exit=1
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/repository' is a primary checkout, not an isolated worktree; approve its folder trust during attended provisioning
+
+Reject ordinary linked worktree outside pool
+exit=1
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/ordinary/worktree' is not a qualifying linked pool worktree; approve its folder trust during attended provisioning
+
+Reject subdirectory of a qualifying worktree
+exit=1
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/pool/slots/fresh/subdir' is not a worktree root (its root is '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/pool/slots/fresh')
+
+Approve qualifying linked pool worktree
+exit=0
+trusted: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/repository
+
+Repeat approval is idempotent
+exit=0
+trusted: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/repository
+
+Refuse to overwrite operator denial
+exit=1
+error: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/custom store/config.toml already records trust_level = 'untrusted' for /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/repository; refusing to overwrite that decision
+error: refusing to pre-register Codex folder trust: could not record folder trust for '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/repository' in '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/custom store/config.toml'
+
+Reject secondmate identity mismatch
+exit=1
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/pool/slots/secondmate' is marked for secondmate 'lab-secondmate', not 'wrong-id'
+
+Approve seeded linked pool secondmate
+exit=0
+trusted: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/repository
+
+Reject standalone seeded secondmate
+exit=1
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/standalone' is a primary checkout, not an isolated worktree; approve its folder trust during attended provisioning
+
+Readback: qualifying repository trusted; unrelated operator denial preserved; only config.toml created; no hook trust artifacts.

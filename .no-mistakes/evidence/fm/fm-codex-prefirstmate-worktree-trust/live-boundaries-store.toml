@@ -1,0 +1,8 @@
+# operator setting
+model = "gpt-6.1-sol"
+
+[projects."/unrelated/operator-project"]
+trust_level = "untrusted"
+
+[projects."/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/manual/repository"]
+trust_level = "trusted"

@@ -1,4 +1,4 @@
-<!doctype html><meta charset="utf-8"><title>fmft-pi-approved</title><style>body{background:#17191c;color:#ededed}pre{font:14px/1.35 monospace;white-space:pre}</style><pre>
+
  ▀▀█  v1.0.0
  █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
  Press ctrl+o to show full startup help and loaded resources.
@@ -7,16 +7,10 @@
 
 
 [Context]
-  ~/AGENTS.md, ~/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/AGENTS.md
-
-[Skills]
-  afk, agent-skill-trigger-index, ahoy, ask-user-authority, away-quiet-supervision, bearings, bootstrap-diagnostics, captain-hold-lifecycle,
-decision-hold-lifecycle, diagnostic-reasoning, firstmate-codexapp, firstmate-coding-guidelines, firstmate-orca, fmx-respond, harness-adapters, impeccable, kb,
-no-mistakes, operational-home-layout, process-event-sources, project-management, quiet, quota-array-dispatch, scout-completion, secondmate-provisioning,
-session-start-recovery, ship-landing, stow, stuck-crewmate-recovery, updatefirstmate, validation-supervision
+  /home/art/AGENTS.md, /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/AGENTS.md
 
 [Extensions]
-  pi-live.pi-ext.ts
+  test.ts
 
 
  Warning: Anthropic subscription auth is active. Third-party harness usage draws from extra usage and is billed per token, not your Claude plan limits. Manage
@@ -24,23 +18,8 @@ session-start-recovery, ship-landing, stow, stuck-crewmate-recovery, updatefirst
 
  Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to ~/.tmux.conf and restart tmux.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-~/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/t e/fm-folder-trust-live.OToC35/case/pi-wt (detached)
+/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/tmp/raw-runtime.AqZYCu/case/wt (fresh)
 $0.000 (sub) 0.0%/1.0M (auto)                                                                                               (anthropic) claude-opus-4-8 • medium
-</pre>

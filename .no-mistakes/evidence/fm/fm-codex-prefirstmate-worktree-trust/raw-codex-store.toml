@@ -1,0 +1,7 @@
+check_for_update_on_startup = false
+
+[projects."/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/tmp/raw-runtime.AqZYCu/case/project"]
+trust_level = "trusted"
+
+[tui]
+screen_reader_detection_done = true

@@ -1,5 +1,10 @@
+FM_TEST_BEGIN 2026-10-02T17:34:38Z tests/fm-folder-trust-live-e2e.test.sh family=live-harness-optin expected_gate_skip=live-capability
 ok - live: codex codex-cli 0.159.2 gates an unregistered fresh worktree on the folder-trust dialog
 ok - live: codex codex-cli 0.159.2 launches into a pre-registered fresh worktree with no dialog
 ok - live: codex codex-cli 0.159.2 keys folder trust on the repository root, not an ancestor
-ok - live: pi 0.99.2 gates an untrusted fresh directory on the project-trust prompt
-ok - live: pi 0.99.2 launches with --approve, shows no prompt, and persists nothing
+ok - live: pi 1.0.0 gates an untrusted fresh directory on the project-trust prompt
+ok - live: pi 1.0.0 launches with --approve, shows no prompt, and persists nothing
+FM_TEST_END 2026-10-02T17:34:51Z tests/fm-folder-trust-live-e2e.test.sh exit=0 duration_ms=13521 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=13566
+FM_TEST_SUMMARY_FAMILY family=live-harness-optin count=1 duration_ms=13521 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-folder-trust-live-e2e.test.sh duration_ms=13521

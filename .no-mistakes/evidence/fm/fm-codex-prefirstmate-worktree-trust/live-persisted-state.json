@@ -1,0 +1,5 @@
+{
+  "codex-home/config.toml": "check_for_update_on_startup = false\n\n[tui]\nscreen_reader_detection_done = true\n\n[tui.model_availability_nux]\n\"gpt-6.1-sol\" = 1\n\n[projects.\"/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/t e/fm-folder-trust-live.OToC35/case/project\"]\ntrust_level = \"trusted\"\n",
+  "codex-home-above/config.toml": "check_for_update_on_startup = false\n\n[projects.\"/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/t e/fm-folder-trust-live.OToC35/case/ancestor\"]\ntrust_level = \"trusted\"\n\n[tui]\nscreen_reader_detection_done = true\n",
+  "pi_trust_store_exists": false
+}
