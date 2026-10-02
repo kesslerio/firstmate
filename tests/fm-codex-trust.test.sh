@@ -1241,7 +1241,8 @@ SH
     : > "$case_dir/tmux.log"
     : > "$case_dir/cli.log"
     rm -f "$case_dir/stopped"
-    out=$(HOME="$case_dir/home" FM_FOLDER_TRUST_LIVE=1 FM_LIVE_TMUX_LOG="$case_dir/tmux.log" \
+    out=$(HOME="$case_dir/home" CODEX_HOME="$case_dir/home/.codex" \
+      FM_FOLDER_TRUST_LIVE=1 FM_LIVE_TMUX_LOG="$case_dir/tmux.log" \
       FM_LIVE_TMUX_STOPPED="$case_dir/stopped" FM_LIVE_TEST_SIGNAL="$signal" \
       FM_LIVE_TEST_PID_FILE="$case_dir/live.pid" \
       FM_LIVE_ANCESTOR_TRUST="$ancestor_trust" FM_LIVE_CLI_LOG="$case_dir/cli.log" \
