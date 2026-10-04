@@ -1,0 +1,25 @@
+
+$ fm-codex-trust.sh /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/wt /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project
+trusted: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project
+exit=0
+
+$ fm-codex-trust.sh /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/wt /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project
+trusted: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project
+exit=0
+
+$ fm-codex-trust.sh /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project' is a primary checkout, not an isolated worktree; approve its folder trust during attended provisioning
+exit=1
+
+$ fm-codex-trust.sh /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/wt /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project
+error: refusing to pre-register Codex folder trust: '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/wt' is not a qualifying linked pool worktree; approve its folder trust during attended provisioning
+exit=1
+
+$ fm-codex-trust.sh /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/wt /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project
+error: /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/store/config.toml already records trust_level = 'untrusted' for /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project; refusing to overwrite that decision
+error: refusing to pre-register Codex folder trust: could not record folder trust for '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project' in '/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/store/config.toml'
+exit=1
+
+Persisted operator denial preserved:
+[projects."/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3YYK7P4G7RPC6D0H6B5QFQS/.trust-manual/pool/case/project"]
+trust_level = "untrusted"

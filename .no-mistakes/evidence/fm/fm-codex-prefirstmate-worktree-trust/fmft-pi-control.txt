@@ -1,12 +1,12 @@
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
  Trust project folder?
- /home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/t e/fm-folder-trust-live.OToC35/case/pi-wt
+ /tmp/fm spaces.43zbhfju/fm-folder-trust-live.g2QmqC/case/pi-wt
 
  This allows pi to load .pi settings and resources, install missing project packages, and execute project extensions.
 
  → Trust
-   Trust parent folder (/home/art/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/t e/fm-folder-trust-live.OToC35/case)
+   Trust parent folder (/tmp/fm spaces.43zbhfju/fm-folder-trust-live.g2QmqC/case)
    Trust (this session only)
    Do not trust
    Do not trust (this session only)

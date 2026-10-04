@@ -1,19 +1,12 @@
 
- ▀▀█  v1.0.0
+ ▀▀█  v1.0.2
  █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
  Press ctrl+o to show full startup help and loaded resources.
 
  Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
 
-
-[Context]
-  ~/AGENTS.md, ~/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/AGENTS.md
-
 [Skills]
-  afk, agent-skill-trigger-index, ahoy, ask-user-authority, away-quiet-supervision, bearings, bootstrap-diagnostics, captain-hold-lifecycle,
-decision-hold-lifecycle, diagnostic-reasoning, firstmate-codexapp, firstmate-coding-guidelines, firstmate-orca, fmx-respond, harness-adapters, impeccable, kb,
-no-mistakes, operational-home-layout, process-event-sources, project-management, quiet, quota-array-dispatch, scout-completion, secondmate-provisioning,
-session-start-recovery, ship-landing, stow, stuck-crewmate-recovery, updatefirstmate, validation-supervision
+  impeccable, kb, no-mistakes
 
 [Extensions]
   pi-live.pi-ext.ts
@@ -38,8 +31,15 @@ session-start-recovery, ship-landing, stow, stuck-crewmate-recovery, updatefirst
 
 
 
+
+
+
+
+
+
+
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-~/.no-mistakes/worktrees/0d0ef57a8e94/01M3Y7D8T0561B932DK0JS6M3P/.test-validation/t e/fm-folder-trust-live.OToC35/case/pi-wt (detached)
+/tmp/fm spaces.43zbhfju/fm-folder-trust-live.g2QmqC/case/pi-wt
 $0.000 (sub) 0.0%/1.0M (auto)                                                                                               (anthropic) claude-opus-4-8 • medium
