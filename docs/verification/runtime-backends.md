@@ -2492,6 +2492,8 @@ Verified 2026-10-02 on Linux with codex-cli 0.159.2 and Pi 0.99.2, both against 
 
 Refresh the vendor half with the live guard, which replays the real launch flags Firstmate builds and reads the rendered pane, and the mechanics with the portable regression:
 
+The [live guard header](../../tests/fm-folder-trust-live-e2e.test.sh) owns credential-based skip behavior; a runtime's recorded skip leaves its vendor observations unrefreshed.
+
 ```sh
 bin/fm-test-run.sh tests/fm-folder-trust-live-e2e.test.sh
 bin/fm-test-run.sh tests/fm-codex-trust.test.sh
