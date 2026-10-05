@@ -43,12 +43,14 @@ shift
 target=''
 jq=''
 field=''
+body=''
 while [ $# -gt 0 ]; do
   case "$1" in
     --method) shift 2 ;;
     --jq) jq=$2; shift 2 ;;
     -i | --include) shift ;;
-    -F | --field | -H | --header) shift 2 ;;
+    -F | --field) case "$2" in text=@*) body=${2#text=@} ;; esac; shift 2 ;;
+    -f | -H | --header) shift 2 ;;
     --json) field=$2; shift 2 ;;
     -q) shift 2 ;;
     *) target=$1; shift ;;
@@ -57,6 +59,24 @@ done
 printf '%s\n' "$sub $target" >>"$asked"
 case "$sub" in
   api)
+    if [ "$target" = markdown ]; then
+      [ "${FM_FAKE_GH_RENDER_FAIL:-0}" = 0 ] || exit 1
+      if [ -f "${FM_FAKE_GH_RENDERED:-}" ]; then
+        cat "$FM_FAKE_GH_RENDERED"
+      else
+        python3 - "$body" <<'RENDER'
+import html
+import re
+import sys
+text = open(sys.argv[1]).read()
+text = re.sub(r'!\[([^]]*)\]\(([^)]+)\)', lambda m: '<img alt="' + html.escape(m[1], quote=True) + '" src="' + html.escape(m[2], quote=True) + '">', text)
+text = re.sub(r'(?<!!)\[([^]]*)\]\(([^)]+)\)', lambda m: '<a href="' + html.escape(m[2], quote=True) + '">' + m[1] + '</a>', text)
+text = re.sub(r'(?<!["\w])https?://[^\s<>"\']+', lambda m: '<a href="' + m[0].rstrip('.') + '">' + m[0] + '</a>', text)
+print(text)
+RENDER
+      fi
+      exit 0
+    fi
     if [ -n "$jq" ]; then
       answer=$(awk -v want="$target" '$1 == "PRIVATE" && $2 == want { print $3 }' "$table" | head -n 1)
       [ -n "$answer" ] || answer=unknown
@@ -109,7 +129,9 @@ run_case() {
       FM_FAKE_GH_TABLE="$dir/table" \
       FM_FAKE_GH_ASKED="$dir/asked" \
       FM_FAKE_GH_PRVIEW_FAIL="${FM_FAKE_GH_PRVIEW_FAIL:-}" \
-      "$CMD" --repo "$REPO" "$@" 2>"$dir/err"
+      FM_FAKE_GH_META="$(printf 'https://github.com/tester/widgets/pull/7\t%s\twidgets\ttester' "${FIXTURE_HEAD:-$SHA}")" \
+      FM_FAKE_GH_RENDERED="$dir/rendered.html" \
+      "$CMD" --repo "$REPO" 7 "$@" 2>"$dir/err"
   )
   CODE=$?
   ERR=$(cat "$dir/err")
@@ -137,7 +159,7 @@ test_pinned_raw_address_at_the_published_head_passes() {
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" '![First screen](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a pinned address that exists at the published head must pass"
   assert_contains "$OUT" "[ok] https://github.com/tester/widgets/raw/$SHA/docs/media/a.png" \
     "the receipt must carry a verdict for the address"
@@ -154,7 +176,7 @@ test_raw_githubusercontent_address_fails_on_a_private_repository() {
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" '![First screen](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "a raw.githubusercontent address on a private repository must fail"
   assert_contains "$OUT" "404 to a logged-in browser" \
     "the refusal must name the browser, not just a code"
@@ -171,7 +193,7 @@ test_abbreviated_commit_is_refused_and_rewritten_to_the_published_head() {
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=0123456" 200
   body_case "$dir" '![First screen](https://github.com/tester/widgets/raw/0123456/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "a 7-character commit prefix must be refused, not resolved"
   assert_contains "$OUT" 'abbreviated commit id "0123456"' "the refusal must name the prefix"
   assert_contains "$OUT" "use: https://github.com/tester/widgets/raw/$SHA/docs/media/a.png" \
@@ -185,7 +207,7 @@ test_address_pointing_at_a_path_the_head_does_not_cite_fails_the_run() {
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/missing.png?ref=$SHA" 404
   body_case "$dir" '![First screen](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/missing.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "an address whose path is not in the published head must fail"
   assert_contains "$OUT" "contents=404" "the receipt must print the 404"
   assert_contains "$OUT" "absent from $SHA" "the refusal must name the head it checked"
@@ -198,7 +220,7 @@ test_relative_path_is_unverifiable_and_shows_the_pinned_form() {
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" '![First screen](docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "a relative path resolves against the default branch, so it must not pass"
   assert_contains "$OUT" "resolves against the repository default branch" \
     "the refusal must say why a relative path proves nothing"
@@ -214,7 +236,7 @@ test_attachment_address_is_fetched_with_the_credential() {
   pass_dir=$dir
   status_row "$pass_dir" "https://github.com/user-attachments/assets/aaaabbbb-0000-1111-2222-333344445555" 200
   body_case "$pass_dir" '![First screen](https://github.com/user-attachments/assets/aaaabbbb-0000-1111-2222-333344445555)'
-  run_case "$pass_dir" --body-file "$pass_dir/body.md" --head "$SHA"
+  run_case "$pass_dir" --body-file "$pass_dir/body.md"
   expect_code 0 "$CODE" "an uploaded attachment that the credential can read must pass"
   assert_contains "$OUT" "fetch=200" "the receipt must print the attachment code"
 
@@ -222,7 +244,7 @@ test_attachment_address_is_fetched_with_the_credential() {
   private_row "$fail_dir" yes
   status_row "$fail_dir" "https://github.com/user-attachments/assets/eeeeeeee-0000-1111-2222-333344445555" 404
   body_case "$fail_dir" '![First screen](https://github.com/user-attachments/assets/eeeeeeee-0000-1111-2222-333344445555)'
-  run_case "$fail_dir" --body-file "$fail_dir/body.md" --head "$SHA"
+  run_case "$fail_dir" --body-file "$fail_dir/body.md"
   expect_code 1 "$CODE" "an attachment the credential cannot read must fail"
   assert_contains "$OUT" "fetch=404" "the receipt must print the failed attachment code"
   pass "an attachment address is verified with the credential that uploaded it"
@@ -233,11 +255,11 @@ test_body_naming_evidence_without_addressing_it_fails() {
   dir=$(new_case named-only)
   private_row "$dir" yes
   body_case "$dir" 'Proof: screenshots in data/screens/login-passed.png and data/screens/login-blocked.png'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "naming evidence without an address is the failure this gate exists for"
   assert_contains "$OUT" "data/screens/login-passed.png" "the report must name the file it found"
   assert_contains "$OUT" "not evidence a reviewer can open" "the report must say what is wrong"
-  assert_contains "$OUT" "RESULT: 0 address(es), 0 passed, 1 failed, 0 unchecked, 1 body-level failure(s)" \
+  assert_contains "$OUT" "RESULT: 0 address(es), 0 passed, 1 failed, 1 body-level failure(s)" \
     "the count must show the failure came from the body, not from a checked address"
   pass "a body that names media but addresses none of it fails"
 }
@@ -247,58 +269,15 @@ test_body_without_media_passes_and_fails_only_when_embeds_are_required() {
   dir=$(new_case no-media)
   private_row "$dir" yes
   body_case "$dir" 'Documentation-only change; see [the guide](docs/guide.md#section).'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a body with no media has nothing to fail"
   assert_contains "$OUT" "RESULT: 0 address(es), 0 passed, 0 failed" \
     "the receipt must still report what it counted"
 
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA" --require-embeds
+  run_case "$dir" --body-file "$dir/body.md" --require-embeds
   expect_code 1 "$CODE" "--require-embeds must fail a body carrying no media address"
   assert_contains "$OUT" "REQUIRE-EMBEDS" "the failure must name the requirement it enforced"
   pass "an empty media body passes by default and fails under --require-embeds"
-}
-
-test_shape_only_reports_unchecked_and_still_refuses_an_unpinned_address() {
-  local dir
-  dir=$(new_case shape-only)
-  body_case "$dir" '![First screen](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA" --shape-only
-  expect_code 0 "$CODE" "offline mode must not invent a resolvability verdict"
-  assert_contains "$OUT" "mode: --shape-only" "the receipt must say the run was offline"
-  assert_contains "$OUT" "[unchecked]" "offline mode must classify what it could not judge"
-  assert_not_contains "$OUT" "contents=200" "offline mode must not report a code it never read"
-
-  body_case "$dir" '![First screen](https://github.com/user-attachments/assets/aaaabbbb-0000-1111-2222-333344445555)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA" --shape-only
-  expect_code 0 "$CODE" "an attachment address needs no verdict to be shape-valid"
-  assert_contains "$OUT" "fetch not-checked" "offline mode must print that it fetched nothing"
-  assert_contains "$OUT" "SHAPE-ONLY" "a shape pass must say it is not a green receipt"
-  grep -q "repos/$REPO/contents" "$dir/asked" \
-    && fail "--shape-only still asked the forge for a contents check: $(cat "$dir/asked")"
-
-  body_case "$dir" '![First screen](docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA" --shape-only
-  expect_code 1 "$CODE" "a relative path fails on shape alone, with no network involved"
-  pass "--shape-only skips the network without pretending to have passed it"
-}
-
-test_upload_refusal_is_reported_with_the_fallback() {
-  local dir out err code
-  dir=$(new_case attach)
-  private_row "$dir" yes
-  printf 'not a real png\n' >"$dir/shot.png"
-  : >"$dir/asked"
-  out=$(
-    PATH="$dir/fakebin:$PATH" \
-      FM_FAKE_GH_TABLE="$dir/table" \
-      FM_FAKE_GH_ASKED="$dir/asked" \
-      "$CMD" --repo "$REPO" --body-file "$dir/body.md" --head "$SHA" --attach "$dir/shot.png" 2>&1
-  )
-  code=$?
-  expect_code 1 "$code" "an upload the forge refused cannot be reported as a pass"
-  assert_contains "$out" "refused the upload of shot.png" "the refusal must name the file"
-  assert_contains "$out" "raw/<full-sha>/<path>" "the refusal must point at the committed-media fallback"
-  pass "a refused upload stops with the fallback named instead of a silent pass"
 }
 
 test_unreadable_inputs_refuse_with_exit_two() {
@@ -307,12 +286,17 @@ test_unreadable_inputs_refuse_with_exit_two() {
   private_row "$dir" yes
   body_case "$dir" '![First screen](docs/media/a.png)'
 
+  FIXTURE_HEAD=''
+  FM_FAKE_GH_PRVIEW_FAIL=url,headRefOid,headRepository,headRepositoryOwner
   run_case "$dir" --body-file "$dir/body.md"
-  expect_code 2 "$CODE" "a body without a head is not a published body and must refuse"
-  assert_contains "$ERR" "--body-file needs --head" "the refusal must name the missing input"
+  unset FM_FAKE_GH_PRVIEW_FAIL
+  expect_code 2 "$CODE" "a forge head read that fails must refuse"
+  assert_contains "$ERR" "could not read PR" "the refusal must name the failed read"
 
-  run_case "$dir" --body-file "$dir/body.md" --head 0123456
-  expect_code 2 "$CODE" "a 7-character head cannot be the published head"
+  FIXTURE_HEAD=0123456
+  run_case "$dir" --body-file "$dir/body.md"
+  unset FIXTURE_HEAD
+  expect_code 2 "$CODE" "a 7-character forge head cannot be the published head"
   assert_contains "$ERR" "full 40-character commit id" "the refusal must say what a head must be"
   pass "unreadable inputs refuse loudly rather than reporting a verdict"
 }
@@ -323,7 +307,7 @@ test_pinned_raw_address_is_never_judged_by_a_published_web_fetch() {
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" '![First screen](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "the address is good on the contents check"
   if grep -q "https://github.com/tester/widgets/raw/" "$dir/asked"; then
     fail "the command must verify a pinned address through the contents API, not by fetching the session-bound published URL that answers 404 to a token: $(cat "$dir/asked")"
@@ -337,7 +321,7 @@ test_pinned_raw_githubusercontent_address_passes_on_a_public_repository() {
   private_row "$dir" no
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" '![First screen](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "on a public repository the raw host resolves for a browser too"
   assert_contains "$OUT" "shape: raw-direct   ref=$SHA" "the receipt must still name the shape it read"
   pass "the private-repository refusal is not applied to a public one"
@@ -349,7 +333,7 @@ test_pinned_raw_githubusercontent_address_reports_both_reasons_once() {
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=0123456" 200
   body_case "$dir" '![First screen](https://raw.githubusercontent.com/tester/widgets/0123456/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "a prefix on the raw host must fail"
   assert_contains "$OUT" 'abbreviated commit id "0123456"' "the prefix must be named"
   assert_contains "$OUT" 'raw.githubusercontent.com answers the API token' \
@@ -362,7 +346,7 @@ test_pinned_raw_githubusercontent_address_on_an_unknown_repository_is_not_a_pass
   dir=$(new_case raw-direct-unknown-private)
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" '![First screen](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 2 "$CODE" "not knowing whether the repository is private must stop the run, not pass it"
   assert_contains "$ERR" "could not read whether $REPO is private" \
     "the refusal must name the fact it could not establish"
@@ -375,7 +359,7 @@ test_pinned_raw_githubusercontent_address_rejects_a_moving_ref() {
   private_row "$dir" no
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=main" 200
   body_case "$dir" '![First screen](https://raw.githubusercontent.com/tester/widgets/main/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "an address at a branch is evidence that can vanish after the review"
   assert_contains "$OUT" 'moving ref "main"' "the refusal must name the ref"
   pass "an address at a moving ref is refused with the pinned correction"
@@ -387,7 +371,7 @@ test_pinned_raw_githubusercontent_address_reports_an_unexpected_code_as_unproven
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 500
   body_case "$dir" '![First screen](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "a server error is not proof that a path lives in that commit"
   assert_contains "$OUT" "contents=500" "the receipt must print the code it read"
   assert_contains "$OUT" "does not prove the path is in that commit" \
@@ -401,7 +385,7 @@ test_pinned_raw_githubusercontent_address_survices_an_unanswerable_contents_chec
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" NONE
   body_case "$dir" '![First screen](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "an address the forge would not answer cannot be reported as good"
   assert_contains "$OUT" "contents=ERR" "the receipt must print that the check could not be answered"
   assert_contains "$OUT" "unverified rather than good" "an unreadable check is never a pass"
@@ -414,7 +398,7 @@ test_pinned_raw_githubusercontent_address_with_a_fragment_is_checked_on_its_path
   private_row "$dir" no
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" '![First screen](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/media/a.png#frame=2)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a fragment is navigation, not part of the path in a commit"
   pass "a fragment on a media address does not break its check"
 }
@@ -424,7 +408,7 @@ test_pinned_raw_githubusercontent_address_ignores_a_documentation_link() {
   dir=$(new_case docs-link-only)
   private_row "$dir" yes
   body_case "$dir" 'See [the guide](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/guide.md) for details.'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a documentation link is not media and must not be checked as media"
   assert_contains "$OUT" "RESULT: 0 address(es)" "only media addresses may be counted"
   pass "an ordinary documentation link is not mistaken for media evidence"
@@ -435,10 +419,10 @@ test_pinned_raw_githubusercontent_address_covers_a_recording_and_a_blob_link() {
   dir=$(new_case mixed-shapes)
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/clip.mp4?ref=$SHA" 200
-  body_case "$dir" '![Recording](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/clip.mp4)
+  body_case "$dir" '[Recording](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/clip.mp4)
 
 Watch it here: https://github.com/tester/widgets/blob/'"$SHA"'/docs/media/clip.mp4'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "both published-web forms resolve, so the run is green"
   assert_contains "$OUT" "shape: web-raw" "the embed must be read as the raw form"
   assert_contains "$OUT" "shape: web-blob" "the bare link must be read as the blob form"
@@ -455,7 +439,7 @@ test_pinned_raw_githubusercontent_address_reports_every_address_it_found() {
   body_case "$dir" '![One](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/a.png)
 
 ![Two](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/media/b.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "one broken address fails the whole body"
   assert_contains "$OUT" "RESULT: 2 address(es), 1 passed, 1 failed" \
     "the receipt must count both, so a green line cannot hide a broken one"
@@ -516,7 +500,7 @@ test_pinned_raw_githubusercontent_address_rejects_a_body_file_that_is_not_readab
   local dir
   dir=$(new_case body-file-missing)
   private_row "$dir" yes
-  run_case "$dir" --body-file "$dir/nope.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/nope.md"
   expect_code 2 "$CODE" "a body file that cannot be read is not an empty body"
   assert_contains "$ERR" "no readable file" "the refusal must name the missing file"
   pass "a missing body file refuses rather than passing vacuously"
@@ -526,7 +510,7 @@ test_pinned_raw_githubusercontent_address_rejects_an_unnamed_flag() {
   local dir
   dir=$(new_case bad-flag)
   private_row "$dir" yes
-  run_case "$dir" --nope --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --nope --body-file "$dir/body.md"
   expect_code 2 "$CODE" "an unknown flag must refuse, not be ignored"
   pass "an unknown flag refuses"
 }
@@ -537,7 +521,7 @@ test_pinned_raw_githubusercontent_address_reports_a_blob_url_as_a_page_not_an_im
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/clip.mp4?ref=$SHA" 200
   body_case "$dir" 'Watch it here: https://github.com/tester/widgets/blob/'"$SHA"'/docs/media/clip.mp4'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a blob link resolves, so the run is green"
   assert_contains "$OUT" "a blob URL is a page" "the receipt must say a blob link is not an inline image"
   pass "a blob link is verified and labelled for what a reviewer gets"
@@ -551,7 +535,7 @@ test_pinned_raw_githubusercontent_address_deduplicates_one_address_written_twice
   body_case "$dir" '![One](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/a.png)
 
 Again, the same screen: https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/a.png'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "the same address written twice is one address"
   assert_contains "$OUT" "RESULT: 1 address(es), 1 passed, 0 failed" \
     "one address written twice must be counted and checked once"
@@ -564,7 +548,7 @@ test_pinned_raw_githubusercontent_address_keeps_trailing_sentence_punctuation_ou
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" 'Recording: https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/a.png.'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a sentence-ending period is not part of an address"
   assert_contains "$OUT" "contents=200" "the address was checked at the path the body named"
   pass "a bare address keeps a sentence's punctuation out of the check"
@@ -578,7 +562,7 @@ test_pinned_raw_githubusercontent_address_still_counts_evidence_names_when_embed
   body_case "$dir" 'Stills are kept under docs/media as a.png; the reviewer copy is below.
 
 ![One](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a body that does address its media passes on the address it wrote"
   assert_contains "$OUT" "RESULT: 1 address(es), 1 passed, 0 failed" \
     "a bare filename next to a real address must not become a second verdict"
@@ -590,7 +574,7 @@ test_pinned_raw_githubusercontent_address_requires_embeds_even_when_names_exist(
   dir=$(new_case require-embeds-with-names)
   private_row "$dir" yes
   body_case "$dir" 'Proof: screenshots in data/screens/login-passed.png'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA" --require-embeds
+  run_case "$dir" --body-file "$dir/body.md" --require-embeds
   expect_code 1 "$CODE" "--require-embeds must fail a body with no address even when it names files"
   assert_contains "$OUT" "REQUIRE-EMBEDS" "the requirement it enforced must be named"
   assert_contains "$OUT" "login-passed.png" "the names it found must still be reported"
@@ -602,7 +586,7 @@ test_pinned_raw_githubusercontent_address_ignores_a_relative_link_with_a_fragmen
   dir=$(new_case fragment-no-double)
   private_row "$dir" yes
   body_case "$dir" 'Compare [the sheet](docs/media/sheet.png#two).'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "a relative media path fails on shape even when nothing was fetched"
   assert_contains "$OUT" "use: https://github.com/tester/widgets/raw/$SHA/docs/media/sheet.png" \
     "the correction must carry the path without its fragment"
@@ -618,7 +602,7 @@ test_pinned_raw_githubusercontent_address_prints_every_verdict_when_all_are_bad(
 ![Two](https://raw.githubusercontent.com/tester/widgets/'"$SHA"'/docs/media/b.png)
 
 ![Three](https://github.com/tester/widgets/raw/0123456/docs/media/c.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "three unverifiable addresses must not collapse into one line"
   assert_contains "$OUT" "RESULT: 3 address(es), 0 passed, 3 failed" \
     "the receipt must report one verdict per address"
@@ -630,7 +614,7 @@ test_pinned_raw_githubusercontent_address_refuses_when_forge_access_is_unknown_e
   dir=$(new_case public-unknown)
   body_case "$dir" '![One](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/a.png)'
   status_row "$dir" "repos/$REPO/contents/docs/media/a.png?ref=$SHA" 200
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a pinned address needs no knowledge of repository access to be proven"
   assert_contains "$OUT" "shape: web-raw" "the pinned form must still be identified"
   pass "a pinned address is proven without needing the repository's visibility"
@@ -642,7 +626,7 @@ test_pinned_raw_githubusercontent_address_reads_public_state_only_for_the_head_r
   private_row "$dir" yes
   status_row "$dir" "repos/other/widgets/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" '![One](https://github.com/other/widgets/raw/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a pinned address in another repository is proven on its own contents"
   assert_contains "$OUT" "contents=200" "the check must be answered against the repository named"
   pass "an address in another repository is checked where it points"
@@ -655,7 +639,7 @@ test_pinned_raw_githubusercontent_address_refuses_a_foreign_private_raw_address(
   printf 'PRIVATE repos/other/widgets true\n' >>"$dir/table"
   status_row "$dir" "repos/other/widgets/contents/docs/media/a.png?ref=$SHA" 200
   body_case "$dir" '![One](https://raw.githubusercontent.com/other/widgets/'"$SHA"'/docs/media/a.png)'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   expect_code 1 "$CODE" "the raw host on someone else's private repository still cannot render"
   assert_contains "$OUT" "404 to a logged-in browser" "the refusal must name the browser"
   pass "repository access is read for the repository the address names"
@@ -666,7 +650,7 @@ test_pinned_raw_githubusercontent_address_reports_the_receipt_header() {
   dir=$(new_case receipt-header)
   private_row "$dir" yes
   body_case "$dir" 'No media here.'
-  run_case "$dir" --body-file "$dir/body.md" --head "$SHA"
+  run_case "$dir" --body-file "$dir/body.md"
   assert_contains "$OUT" "fm-pr-media receipt: $REPO" "the receipt must name what it checked"
   assert_contains "$OUT" "published head: $SHA" "the receipt must name the head it checked"
   assert_contains "$OUT" "media addresses found: 0" "the receipt must state its count"
@@ -699,6 +683,161 @@ test_pull_request_head_published_from_a_fork_is_verified_in_the_fork() {
 }
 
 
+test_image_context_survives_deduplication() {
+  local dir shape
+  for shape in blob raw; do
+    dir=$(new_case "image-context-$shape")
+    status_row "$dir" "repos/$REPO/contents/screen.png?ref=$SHA" 200
+    status_row "$dir" "repos/$REPO/contents/clip.mp4?ref=$SHA" 200
+    if [ "$shape" = blob ]; then
+      body_case "$dir" "[Screen](https://github.com/$REPO/blob/$SHA/screen.png) ![Screen](https://github.com/$REPO/blob/$SHA/screen.png)"
+    else
+      body_case "$dir" "![Clip](https://github.com/$REPO/raw/$SHA/clip.mp4)"
+    fi
+    run_case "$dir" --body-file "$dir/body.md" --require-embeds
+    expect_code 1 "$CODE" "an image target must render an image despite a successful contents check"
+    assert_contains "$OUT" "image position" "the receipt must identify the rendering failure"
+    assert_contains "$OUT" "1 address(es), 0 passed, 1 failed" "deduplication must retain the image obligation"
+  done
+  pass "blob pages and recordings fail in image positions"
+}
+
+test_rendered_targets_exclude_code_and_preserve_references() {
+  local dir
+  dir=$(new_case rendered-targets)
+  body_case "$dir" '```
+![receipt](https://github.com/tester/widgets/raw/head/screen.png)
+```
+<!-- ![hidden](hidden.png) -->'
+  printf '<pre><code>![receipt](https://github.com/%s/raw/%s/screen.png)</code></pre><!-- <img src="hidden.png"> -->' "$REPO" "$SHA" >"$dir/rendered.html"
+  run_case "$dir" --body-file "$dir/body.md" --require-embeds
+  expect_code 1 "$CODE" "code and comments cannot satisfy a visual evidence obligation"
+  assert_contains "$OUT" 'media addresses found: 0' "non-rendered targets must be excluded"
+
+  body_case "$dir" '![valid](valid) ![broken][proof]
+[proof]: missing.png'
+  printf '<img src="https://github.com/%s/raw/%s/screen.png"><img src="missing.png">' "$REPO" "$SHA" >"$dir/rendered.html"
+  status_row "$dir" "repos/$REPO/contents/screen.png?ref=$SHA" 200
+  run_case "$dir" --body-file "$dir/body.md" --require-embeds
+  expect_code 1 "$CODE" "a rendered broken reference must fail alongside valid evidence"
+  assert_contains "$OUT" '2 address(es), 1 passed, 1 failed' "both inline and resolved reference targets must be checked"
+  grep -q 'api markdown' "$dir/asked" || fail "the forge must render the body"
+  pass "only rendered targets count, including resolved references"
+}
+
+test_explicit_target_punctuation_and_canonical_image_source() {
+  local dir
+  dir=$(new_case exact-target)
+  body_case "$dir" "![screen](https://github.com/$REPO/raw/$SHA/screen.png.)"
+  status_row "$dir" "repos/$REPO/contents/screen.png?ref=$SHA" 200
+  status_row "$dir" "repos/$REPO/contents/screen.png.?ref=$SHA" 404
+  run_case "$dir" --body-file "$dir/body.md"
+  expect_code 1 "$CODE" "explicit punctuation must remain part of the target"
+  assert_contains "$OUT" "screen.png." "the receipt must keep the explicit target"
+
+  body_case "$dir" "![screen](https://raw.githubusercontent.com/$REPO/$SHA/screen.png)"
+  printf '<img src="https://camo.githubusercontent.com/proxy" data-canonical-src="https://raw.githubusercontent.com/%s/%s/screen.png">' "$REPO" "$SHA" >"$dir/rendered.html"
+  private_row "$dir" yes
+  run_case "$dir" --body-file "$dir/body.md"
+  expect_code 1 "$CODE" "a rendered proxy must not hide a private raw target"
+  assert_contains "$OUT" 'shape: raw-direct' "the original image target must be verified"
+  pass "explicit targets stay exact and image proxies preserve their origin"
+}
+
+test_external_fetch_is_unauthenticated_and_redacted() {
+  local dir address
+  dir=$(new_case external-fetch)
+  cat >"$dir/fakebin/curl" <<'CURL'
+#!/usr/bin/env bash
+printf '%s\n' "$@" >"$FM_FAKE_CURL_ASKED"
+for arg in "$@"; do
+  case "$arg" in *Authorization* | --user | -u | --header | -H) exit 9 ;; esac
+done
+printf '%s' "${FM_FAKE_CURL_STATUS:-200}"
+CURL
+  chmod +x "$dir/fakebin/curl"
+  export FM_FAKE_CURL_ASKED="$dir/curl-asked"
+  for address in 'https://collector.example/proof.png?secret=private' 'https://collector.example/user-attachments/proof.png' 'https://github.com.evil.example/proof.png'; do
+    body_case "$dir" "![proof]($address)"
+    run_case "$dir" --body-file "$dir/body.md"
+    expect_code 0 "$CODE" "a resolving external target may pass without credentials"
+    assert_contains "$OUT" '[redacted]' "external targets must be redacted"
+    assert_not_contains "$OUT" "$address" "external URLs must not appear in receipts"
+    grep -Fxq -- "$address" "$dir/curl-asked" || fail "curl must receive the exact external target"
+    grep -Fxq -- '--disable' "$dir/curl-asked" || fail "curl config must not add credentials"
+    grep -Fq "$address" "$dir/asked" && fail "an external target reached authenticated gh"
+  done
+  FM_FAKE_CURL_STATUS=404
+  export FM_FAKE_CURL_STATUS
+  run_case "$dir" --body-file "$dir/body.md"
+  expect_code 1 "$CODE" "an external fetch that does not resolve must fail"
+  unset FM_FAKE_CURL_STATUS FM_FAKE_CURL_ASKED
+  body_case "$dir" '![proof](https://user:password@collector.example/proof.png)'
+  run_case "$dir" --body-file "$dir/body.md"
+  expect_code 2 "$CODE" "a target must not supply credentials to an external fetch"
+  pass "external fetches exclude credentials and redact their receipts"
+}
+
+test_foreign_corrections_never_use_the_pr_head() {
+  local dir ref
+  for ref in main 0123456; do
+    dir=$(new_case "foreign-$ref")
+    body_case "$dir" "![proof](https://github.com/media/assets/raw/$ref/screen.png)"
+    status_row "$dir" "repos/media/assets/contents/screen.png?ref=$ref" 200
+    run_case "$dir" --body-file "$dir/body.md"
+    expect_code 1 "$CODE" "foreign moving or abbreviated refs must fail"
+    assert_not_contains "$OUT" "use: https://github.com/media/assets/raw/$SHA" "the PR head must not be substituted into another repository"
+    assert_contains "$OUT" "address's own repository" "the correction must identify the correct owner"
+  done
+  pass "foreign corrections stay in the repository that owns the media"
+}
+
+test_removed_modes_are_rejected() {
+  local dir flag
+  dir=$(new_case removed-modes)
+  body_case "$dir" 'No media.'
+  for flag in --head --shape-only --attach; do
+    run_case "$dir" --body-file "$dir/body.md" "$flag"
+    expect_code 2 "$CODE" "removed modes must refuse"
+    [ ! -s "$dir/asked" ] || fail "removed flags must not reach the forge"
+  done
+  pass "removed modes cannot bypass published verification"
+}
+
+test_visual_task_instruction_requires_embeds() {
+  local prompt mode
+  . "$ROOT/bin/fm-dod-lib.sh"
+  for mode in direct-PR no-mistakes; do
+  prompt=$(fm_dod_block "$mode" media-review fm/media-review none)
+  assert_contains "$prompt" 'If your task owes' "the generated instruction must trigger on the task obligation"
+  assert_contains "$prompt" '--require-embeds' "the generated public command must require evidence"
+  assert_contains "$prompt" 'even if the body contains no media addresses' "empty bodies must still run the verifier"
+  done
+  pass "both generated PR instructions require evidence for visual tasks"
+}
+
+test_unreadable_render_is_not_a_clean_receipt() {
+  local dir
+  dir=$(new_case render-failure)
+  body_case "$dir" 'No media.'
+  export FM_FAKE_GH_RENDER_FAIL=1
+  run_case "$dir" --body-file "$dir/body.md"
+  unset FM_FAKE_GH_RENDER_FAIL
+  expect_code 2 "$CODE" "an unreadable render must refuse instead of passing vacuously"
+  assert_contains "$ERR" 'could not render' "the refusal must identify rendering"
+  pass "an unreadable render is never a clean receipt"
+}
+
+test_unreadable_render_is_not_a_clean_receipt
+
+test_image_context_survives_deduplication
+test_rendered_targets_exclude_code_and_preserve_references
+test_explicit_target_punctuation_and_canonical_image_source
+test_external_fetch_is_unauthenticated_and_redacted
+test_foreign_corrections_never_use_the_pr_head
+test_removed_modes_are_rejected
+test_visual_task_instruction_requires_embeds
+
 test_pinned_raw_address_at_the_published_head_passes
 test_raw_githubusercontent_address_fails_on_a_private_repository
 test_abbreviated_commit_is_refused_and_rewritten_to_the_published_head
@@ -707,8 +846,6 @@ test_relative_path_is_unverifiable_and_shows_the_pinned_form
 test_attachment_address_is_fetched_with_the_credential
 test_body_naming_evidence_without_addressing_it_fails
 test_body_without_media_passes_and_fails_only_when_embeds_are_required
-test_shape_only_reports_unchecked_and_still_refuses_an_unpinned_address
-test_upload_refusal_is_reported_with_the_fallback
 test_unreadable_inputs_refuse_with_exit_two
 test_pinned_raw_address_is_never_judged_by_a_published_web_fetch
 test_pinned_raw_githubusercontent_address_passes_on_a_public_repository

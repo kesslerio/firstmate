@@ -402,7 +402,7 @@ EOF
 
 fm_pr_media_step() {
   cat <<'EOF'
-If your pull-request body carries a screenshot, a recording, or any other evidence embed, load `pr-media-embed` and run `bin/fm-pr-media.sh <pr-number> --repo <owner>/<repo>` against the published body before your ready report, then put the receipt it prints in the PR's Evidence section.
+If your task owes screenshots, recordings, or other visual evidence, load `pr-media-embed` and run `bin/fm-pr-media.sh <pr-number> --repo <owner>/<repo> --require-embeds` against the published body before your ready report, even if the body contains no media addresses, then put the receipt it prints in the PR's Evidence section.
 Its non-zero exit means a reviewer would be reading evidence that does not resolve, so the ready report is not yet true; apply the correction its failing line prints and run it again.
 EOF
 }
