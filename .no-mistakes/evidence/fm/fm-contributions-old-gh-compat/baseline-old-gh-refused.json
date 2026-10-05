@@ -1,0 +1,14 @@
+{
+  "record": {
+    "url": "https://github.com/o/r/pull/8",
+    "kind": "pr",
+    "checked_at": "2026-10-05T23:00:00Z",
+    "observation": null,
+    "verdict": null,
+    "seen": [],
+    "pending": [],
+    "notified": [],
+    "error": "forge observation unavailable or changed during read"
+  },
+  "wake_queue": ""
+}

@@ -1,0 +1,60 @@
+{
+  "record": {
+    "url": "https://github.com/o/r/issues/9",
+    "kind": "issue",
+    "checked_at": "2026-10-05T23:00:00Z",
+    "observation": {
+      "state": "open",
+      "head": null,
+      "ready": false,
+      "checks": [],
+      "reviews": [],
+      "events": [
+        {
+          "token": "comment:41:2026-10-05T23:00:00Z",
+          "type": "comment",
+          "source": "https://github.com/o/r/pull/8#signal-41",
+          "head": null,
+          "author": "maintainer",
+          "body": "Please clarify the compatibility contract"
+        },
+        {
+          "token": "ready-for-pr:88",
+          "type": "ready-for-pr",
+          "source": "https://github.com/o/r/issues/9",
+          "head": null,
+          "body": "filed issue reached ready-for-pr"
+        }
+      ],
+      "absent_checks": []
+    },
+    "verdict": null,
+    "seen": [
+      "comment:41:2026-10-05T23:00:00Z",
+      "ready-for-pr:88"
+    ],
+    "pending": [
+      {
+        "token": "comment:41:2026-10-05T23:00:00Z",
+        "type": "comment",
+        "source": "https://github.com/o/r/pull/8#signal-41",
+        "head": null,
+        "author": "maintainer",
+        "body": "Please clarify the compatibility contract"
+      },
+      {
+        "token": "ready-for-pr:88",
+        "type": "ready-for-pr",
+        "source": "https://github.com/o/r/issues/9",
+        "head": null,
+        "body": "filed issue reached ready-for-pr"
+      }
+    ],
+    "notified": [
+      "comment:41:2026-10-05T23:00:00Z",
+      "ready-for-pr:88"
+    ],
+    "error": null
+  },
+  "wake_queue": "1791242451\t1\tcheck\tcontribution-bca0a2b4a0b995197070015ca7e96872baade9b6485528a2edc877197fc80c93\tcheck: contributions delivery bca0a2b4a0b995197070015ca7e96872baade9b6485528a2edc877197fc80c93\n1791242451\t2\tcheck\tcontribution-4ef4cb953fa1ad82875f3198b922a6cef4bf34379a797cd72ee29ba1fa9332a2\tcheck: contributions delivery 4ef4cb953fa1ad82875f3198b922a6cef4bf34379a797cd72ee29ba1fa9332a2\n"
+}

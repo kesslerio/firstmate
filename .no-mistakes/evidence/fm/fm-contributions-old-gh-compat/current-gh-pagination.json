@@ -1,0 +1,139 @@
+{
+  "record": {
+    "url": "https://github.com/o/r/pull/8",
+    "kind": "pr",
+    "checked_at": "2026-10-05T23:00:00Z",
+    "observation": {
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "state": "open",
+      "draft": false,
+      "mergeable": "mergeable",
+      "can_merge": false,
+      "review_decision": "CHANGES_REQUESTED",
+      "reviews": [
+        {
+          "id": 20,
+          "user": {
+            "login": "passerby"
+          },
+          "author_association": "NONE",
+          "body": "Please clarify the compatibility contract",
+          "html_url": "https://github.com/o/r/pull/8#signal-20",
+          "updated_at": "2026-10-05T23:00:00Z",
+          "submitted_at": "2026-10-05T23:00:00Z",
+          "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "state": "CHANGES_REQUESTED"
+        },
+        {
+          "id": 21,
+          "user": {
+            "login": "maintainer"
+          },
+          "author_association": "MEMBER",
+          "body": "Please clarify the compatibility contract",
+          "html_url": "https://github.com/o/r/pull/8#signal-21",
+          "updated_at": "2026-10-05T23:00:00Z",
+          "submitted_at": "2026-10-05T23:00:00Z",
+          "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "state": "CHANGES_REQUESTED"
+        }
+      ],
+      "checks": [
+        {
+          "name": "portable-serial-1",
+          "id": 1,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:00:00Z"
+        },
+        {
+          "name": "portable-serial-2",
+          "id": 2,
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:00:00Z"
+        },
+        {
+          "name": "legacy-status-1",
+          "id": 3,
+          "started_at": "2026-10-05T23:00:00Z",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "legacy-status-2",
+          "id": 4,
+          "started_at": "2026-10-05T23:00:00Z",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "events": [
+        {
+          "token": "comment:12:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+          "type": "comment",
+          "source": "https://github.com/o/r/pull/8#signal-12",
+          "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "author": "maintainer",
+          "body": "Please clarify the compatibility contract"
+        },
+        {
+          "token": "review:21:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+          "type": "review",
+          "source": "https://github.com/o/r/pull/8#signal-21",
+          "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "author": "maintainer",
+          "body": "Please clarify the compatibility contract"
+        },
+        {
+          "token": "review-comment:31:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+          "type": "review-comment",
+          "source": "https://github.com/o/r/pull/8#signal-31",
+          "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "author": "maintainer",
+          "body": "Please clarify the compatibility contract"
+        }
+      ],
+      "absent_checks": []
+    },
+    "verdict": null,
+    "seen": [
+      "comment:12:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+      "review:21:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+      "review-comment:31:2026-10-05T23:00:00Z:CHANGES_REQUESTED"
+    ],
+    "pending": [
+      {
+        "token": "comment:12:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+        "type": "comment",
+        "source": "https://github.com/o/r/pull/8#signal-12",
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": "maintainer",
+        "body": "Please clarify the compatibility contract"
+      },
+      {
+        "token": "review-comment:31:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+        "type": "review-comment",
+        "source": "https://github.com/o/r/pull/8#signal-31",
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": "maintainer",
+        "body": "Please clarify the compatibility contract"
+      },
+      {
+        "token": "review:21:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+        "type": "review",
+        "source": "https://github.com/o/r/pull/8#signal-21",
+        "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "author": "maintainer",
+        "body": "Please clarify the compatibility contract"
+      }
+    ],
+    "notified": [
+      "comment:12:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+      "review-comment:31:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+      "review:21:2026-10-05T23:00:00Z:CHANGES_REQUESTED"
+    ],
+    "error": null
+  },
+  "wake_queue": "1791242459\t1\tcheck\tcontribution-4fb3b0af846c48566371b32fb7e6a341a2222a85a07a4a3ed933a044807a34b2\tcheck: contributions delivery 4fb3b0af846c48566371b32fb7e6a341a2222a85a07a4a3ed933a044807a34b2\n1791242459\t2\tcheck\tcontribution-24d76df17a25431f3a6b51617522bcf76259d3fbb58a81262698683d1fef64b2\tcheck: contributions delivery 24d76df17a25431f3a6b51617522bcf76259d3fbb58a81262698683d1fef64b2\n1791242459\t3\tcheck\tcontribution-646cf67029c316768ee1e9b145456d7daff04a8a13d9dd9656ef4e313d57eea5\tcheck: contributions delivery 646cf67029c316768ee1e9b145456d7daff04a8a13d9dd9656ef4e313d57eea5\n"
+}

@@ -1,0 +1,114 @@
+$ gh --version
+exit=0; elapsed=0.037s
+gh version 2.45.0 (2024-03-04)
+https://github.com/cli/cli/releases/tag/v2.45.0
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/.test-scratch/baseline-bin/fm-contributions.sh poll
+exit=0; elapsed=0.453s
+contributions: observation unavailable for https://github.com/o/r/pull/8
+
+$ gh pr view https://github.com/o/r/pull/8 --json headRefOid,reviewDecision
+exit=0; elapsed=0.055s
+{"headRefOid":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","reviewDecision":"CHANGES_REQUESTED"}
+
+$ gh api repos/o/r/issues/8/comments?per_page=100 --paginate
+exit=0; elapsed=0.080s
+[{"id": 11, "user": {"login": "passerby"}, "author_association": "NONE", "body": "Please clarify the compatibility contract", "html_url": "https://github.com/o/r/pull/8#signal-11", "updated_at": "2026-10-05T23:00:00Z", "submitted_at": "2026-10-05T23:00:00Z", "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "state": "CHANGES_REQUESTED"}, {"id": 10, "user": {"login": "author"}, "author_association": "OWNER", "body": "Please clarify the compatibility contract", "html_url": "https://github.com/o/r/pull/8#signal-10", "updated_at": "2026-10-05T23:00:00Z", "submitted_at": "2026-10-05T23:00:00Z", "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "state": "CHANGES_REQUESTED"},{"id": 12, "user": {"login": "maintainer"}, "author_association": "OWNER", "body": "Please clarify the compatibility contract", "html_url": "https://github.com/o/r/pull/8#signal-12", "updated_at": "2026-10-05T23:00:00Z", "submitted_at": "2026-10-05T23:00:00Z", "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "state": "CHANGES_REQUESTED"}]
+$ gh api repos/o/r/pulls/8/reviews?per_page=100 --paginate
+exit=0; elapsed=0.064s
+[{"id": 20, "user": {"login": "passerby"}, "author_association": "NONE", "body": "Please clarify the compatibility contract", "html_url": "https://github.com/o/r/pull/8#signal-20", "updated_at": "2026-10-05T23:00:00Z", "submitted_at": "2026-10-05T23:00:00Z", "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "state": "CHANGES_REQUESTED"},{"id": 21, "user": {"login": "maintainer"}, "author_association": "MEMBER", "body": "Please clarify the compatibility contract", "html_url": "https://github.com/o/r/pull/8#signal-21", "updated_at": "2026-10-05T23:00:00Z", "submitted_at": "2026-10-05T23:00:00Z", "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "state": "CHANGES_REQUESTED"}]
+$ gh api repos/o/r/pulls/8/comments?per_page=100 --paginate
+exit=0; elapsed=0.057s
+[{"id": 30, "user": {"login": "passerby"}, "author_association": "NONE", "body": "Please clarify the compatibility contract", "html_url": "https://github.com/o/r/pull/8#signal-30", "updated_at": "2026-10-05T23:00:00Z", "submitted_at": "2026-10-05T23:00:00Z", "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "state": "CHANGES_REQUESTED"},{"id": 31, "user": {"login": "maintainer"}, "author_association": "COLLABORATOR", "body": "Please clarify the compatibility contract", "html_url": "https://github.com/o/r/pull/8#signal-31", "updated_at": "2026-10-05T23:00:00Z", "submitted_at": "2026-10-05T23:00:00Z", "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "state": "CHANGES_REQUESTED"}]
+$ gh api repos/o/r/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/check-runs?filter=all&per_page=100 --paginate
+exit=0; elapsed=0.071s
+{"total_count": 2, "check_runs": [{"id": 1, "name": "portable-serial-1", "status": "completed", "conclusion": "success", "started_at": "2026-10-05T23:00:00Z"}]}{"total_count": 2, "check_runs": [{"id": 2, "name": "portable-serial-2", "status": "completed", "conclusion": "success", "started_at": "2026-10-05T23:00:00Z"}]}
+$ gh api repos/o/r/commits/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/statuses?per_page=100 --paginate
+exit=0; elapsed=0.050s
+[{"id": 3, "context": "legacy-status-1", "state": "success", "created_at": "2026-10-05T23:00:00Z"},{"id": 4, "context": "legacy-status-2", "state": "success", "created_at": "2026-10-05T23:00:00Z"}]
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=1.202s
+contribution-wake: check: contributions delivery 4fb3b0af846c48566371b32fb7e6a341a2222a85a07a4a3ed933a044807a34b2
+contribution-wake: check: contributions delivery 24d76df17a25431f3a6b51617522bcf76259d3fbb58a81262698683d1fef64b2
+contribution-wake: check: contributions delivery 646cf67029c316768ee1e9b145456d7daff04a8a13d9dd9656ef4e313d57eea5
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=0.545s
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh pending
+exit=0; elapsed=0.034s
+[
+  {
+    "token": "comment:12:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+    "type": "comment",
+    "source": "https://github.com/o/r/pull/8#signal-12",
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "author": "maintainer",
+    "body": "Please clarify the compatibility contract",
+    "task": "delivery",
+    "url": "https://github.com/o/r/pull/8"
+  },
+  {
+    "token": "review-comment:31:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+    "type": "review-comment",
+    "source": "https://github.com/o/r/pull/8#signal-31",
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "author": "maintainer",
+    "body": "Please clarify the compatibility contract",
+    "task": "delivery",
+    "url": "https://github.com/o/r/pull/8"
+  },
+  {
+    "token": "review:21:2026-10-05T23:00:00Z:CHANGES_REQUESTED",
+    "type": "review",
+    "source": "https://github.com/o/r/pull/8#signal-21",
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "author": "maintainer",
+    "body": "Please clarify the compatibility contract",
+    "task": "delivery",
+    "url": "https://github.com/o/r/pull/8"
+  }
+]
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh ack delivery https://github.com/o/r/pull/8 comment:12:2026-10-05T23:00:00Z:CHANGES_REQUESTED
+exit=0; elapsed=0.240s
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=0.590s
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=0.853s
+contribution-wake: check: contributions delivery bca0a2b4a0b995197070015ca7e96872baade9b6485528a2edc877197fc80c93
+contribution-wake: check: contributions delivery 4ef4cb953fa1ad82875f3198b922a6cef4bf34379a797cd72ee29ba1fa9332a2
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=4.367s
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=0.550s
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=0.499s
+contributions: observation unavailable for https://github.com/o/r/pull/8
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=0.393s
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=0.581s
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=0.530s
+contributions: observation unavailable for https://github.com/o/r/pull/8
+
+$ gh --version
+exit=0; elapsed=0.052s
+gh version 2.102.0 (2026-09-30)
+https://github.com/cli/cli/releases/tag/v2.102.0
+
+$ bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M3XZEBZYK15EMYAQS3FAYYSQ/bin/fm-contributions.sh poll
+exit=0; elapsed=1.074s
+contribution-wake: check: contributions delivery 4fb3b0af846c48566371b32fb7e6a341a2222a85a07a4a3ed933a044807a34b2
+contribution-wake: check: contributions delivery 24d76df17a25431f3a6b51617522bcf76259d3fbb58a81262698683d1fef64b2
+contribution-wake: check: contributions delivery 646cf67029c316768ee1e9b145456d7daff04a8a13d9dd9656ef4e313d57eea5
+

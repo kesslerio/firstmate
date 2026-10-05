@@ -1,153 +1,300 @@
-import os, json, ssl, threading, subprocess, pathlib, time, urllib.parse, shutil
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+#!/usr/bin/env python3
+"""Drive real Firstmate and real gh 2.45 against a disposable HTTPS API.
 
-ROOT = pathlib.Path.cwd()
-EVID = pathlib.Path('/home/art/.no-mistakes/evidence/01M3XZEBZYK15EMYAQS3FAYYSQ')
-TOOLS = ROOT / '.test-scratch/live-tools'
-SHA = 'a' * 40
-mode = 'ok'
-calls = []
+The fixture replaces the remote forge only. Firstmate, gh pagination, jq
+assembly, deadlines, persistence, wake publication and acknowledgment are real.
+No operator credentials, config, fleet, or remote mutation are used.
+"""
+import http.server
+import json
+import os
+from pathlib import Path
+import shutil
+import ssl
+import subprocess
+import threading
+import time
+import urllib.parse
+
+ROOT = Path.cwd()
+SCRATCH = ROOT / '.test-scratch'
+EVIDENCE = Path(__file__).parent
+HEAD = 'a' * 40
+OTHER_HEAD = 'b' * 40
+NOW = '2026-10-05T23:00:00Z'
+requests = []
+mode = 'normal'
+lock = threading.Lock()
 results = []
-tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-tls.load_cert_chain(TOOLS / 'server.crt', TOOLS / 'server.key')
+transcript = []
+old_cli = True
+product = ROOT/'bin/fm-contributions.sh'
 
-def signal(i, association='OWNER', typ='comment'):
-    return dict(id=i, user={'login':'maintainer' if association != 'NONE' else 'stranger'},
-                author_association=association, body='Please prove the contract',
-                html_url=f'https://github.com/lab/contributions/pull/8#{typ}-{i}',
-                updated_at='2026-10-02T08:00:00Z', submitted_at='2026-10-02T08:00:00Z',
-                commit_id=SHA, state='CHANGES_REQUESTED')
+def event(id, kind='comment', association='OWNER', author='maintainer'):
+    return dict(id=id, user=dict(login=author), author_association=association,
+                body='Please clarify the compatibility contract',
+                html_url=f'https://github.com/o/r/pull/8#signal-{id}',
+                updated_at=NOW, submitted_at=NOW, commit_id=HEAD,
+                state='CHANGES_REQUESTED')
 
-class API(BaseHTTPRequestHandler):
-    protocol_version = 'HTTP/1.1'
-    def log_message(self, *args): pass
-    def do_POST(self):
-        query = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-        calls.append({'method':'POST', 'path':self.path})
-        self.emit({'data':{'repository':{'pullRequest':{'headRefOid':SHA,'reviewDecision':'CHANGES_REQUESTED'}}}})
-    def emit(self, body, code=200, next_page=False):
-        raw = json.dumps(body).encode()
-        self.send_response(code)
-        self.send_header('Content-Type','application/json')
-        self.send_header('Content-Length',str(len(raw)))
-        if next_page:
-            self.send_header('Link',f'<https://api.github.com{self.path}&page=2>; rel="next"')
+def check(id, name):
+    return dict(id=id, name=name, status='completed', conclusion='success', started_at=NOW)
+
+class API(http.server.BaseHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
+
+    def respond(self, value, link=None, raw=False):
+        data = value.encode() if raw else json.dumps(value).encode()
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Length', str(len(data)))
+        if link:
+            self.send_header('Link', f'<https://api.github.com{link}>; rel="next"')
         self.end_headers()
-        self.wfile.write(raw)
+        try:
+            self.wfile.write(data)
+        except (BrokenPipeError, ssl.SSLError, ConnectionResetError):
+            pass
+
     def do_GET(self):
-        calls.append({'method':'GET', 'path':self.path, 'mode':mode})
-        parsed=urllib.parse.urlsplit(self.path)
-        path=parsed.path
-        page=urllib.parse.parse_qs(parsed.query).get('page',['1'])[0]
-        later=page=='2'
-        if '/comments' in path and mode=='timeout':
-            time.sleep(7)
-        if '/comments' in path and mode=='failure':
-            self.emit({'message':'Disposable API outage'},503); return
-        if '/comments' in path and mode=='malformed':
-            self.send_response(200); self.send_header('Content-Length','8'); self.end_headers(); self.wfile.write(b'not-json'); return
-        if path.endswith('/pulls/8'):
-            self.emit({'state':'open','user':{'login':'author'},'head':{'sha':SHA},'draft':False,'mergeable':True,'merged_at':None}); return
-        if path.endswith('/issues/9'):
-            self.emit({'state':'open','user':{'login':'author'},'labels':[{'name':'READY-FOR-PR'}], 'html_url':'https://github.com/lab/contributions/issues/9'}); return
-        if path.endswith('/reviews'):
-            self.emit([signal(21,typ='review')] if later else [signal(20,'NONE',typ='review')], next_page=not later); return
-        if path.endswith('/comments'):
-            self.emit([signal(31 if '/pulls/' in path else 12)] if later else [signal(11,'NONE')], next_page=not later); return
-        if path.endswith('/events'):
-            self.emit([{'id':41,'event':'labeled','label':{'name':'READY-FOR-PR'}}] if later else [{'id':40,'event':'renamed'}],next_page=not later); return
-        if path.endswith('/check-runs'):
-            self.emit({'check_runs':[{'name':'test-later' if later else 'test-first','id':2 if later else 1,'status':'completed','conclusion':'success','started_at':'2026-10-02T08:00:00Z'}]},next_page=not later); return
-        if path.endswith('/statuses'):
-            self.emit([{'context':'legacy-status' if later else 'legacy-first','id':3 if later else 4,'created_at':'2026-10-02T08:00:00Z','state':'success'}],next_page=not later); return
-        if path.endswith('/contributions'):
-            self.emit({'permissions':{'push':False}}); return
-        self.emit({'message':'Not Found'},404)
+        parsed = urllib.parse.urlsplit(self.path)
+        page = int(urllib.parse.parse_qs(parsed.query).get('page', ['1'])[0])
+        path = parsed.path
+        with lock:
+            requests.append(dict(method='GET', path=self.path, mode=mode))
+        if path == '/repos/o/r/pulls/8':
+            return self.respond(dict(state='open', user=dict(login='author'),
+                                     head=dict(sha=HEAD), draft=False, mergeable=True, merged_at=None))
+        if path == '/repos/o/r/issues/9':
+            return self.respond(dict(state='open', user=dict(login='author'), labels=[],
+                                     html_url='https://github.com/o/r/issues/9'))
+        if path == '/repos/o/r':
+            return self.respond(dict(permissions=dict(push=False)))
+        is_comments = path.endswith('/issues/8/comments')
+        if is_comments and page == 2 and mode == 'malformed':
+            return self.respond('{broken JSON', raw=True)
+        if is_comments and page == 2 and mode == 'slow':
+            time.sleep(8)
+        if path.endswith('/issues/8/comments'):
+            pages = [[event(11, association='NONE', author='passerby'), event(10, author='author')], [event(12)]]
+        elif path.endswith('/pulls/8/reviews'):
+            pages = [[event(20, association='NONE', author='passerby')], [event(21, association='MEMBER')]]
+        elif path.endswith('/pulls/8/comments'):
+            pages = [[event(30, association='NONE', author='passerby')], [event(31, association='COLLABORATOR')]]
+        elif path.endswith('/check-runs'):
+            pages = [dict(total_count=2, check_runs=[check(1, 'portable-serial-1')]),
+                     dict(total_count=2, check_runs=[check(2, 'portable-serial-2')])]
+        elif path.endswith('/statuses'):
+            pages = [[dict(id=3, context='legacy-status-1', state='success', created_at=NOW)],
+                     [dict(id=4, context='legacy-status-2', state='success', created_at=NOW)]]
+        elif path.endswith('/issues/9/comments'):
+            pages = [[event(40, association='NONE', author='passerby')], [event(41)]]
+        elif path.endswith('/issues/9/events'):
+            pages = [[dict(id=87, event='unlabeled', label=dict(name='other-label'))], [dict(id=88, event='labeled', label=dict(name='ready-for-pr'))]]
+        else:
+            self.send_error(404, f'Unexpected fixture path: {path}')
+            return
+        next_link = self.path + '&page=2' if page == 1 else None
+        self.respond(pages[page-1], next_link)
 
-class Proxy(BaseHTTPRequestHandler):
-    def log_message(self,*args): pass
+    def do_POST(self):
+        body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+        assert self.path == '/graphql', self.path
+        assert 'mutation' not in body['query'].lower(), body
+        with lock:
+            requests.append(dict(method='POST', path=self.path, query=body['query'], mode=mode))
+        self.respond(dict(data=dict(repository=dict(pullRequest=dict(
+            headRefOid=OTHER_HEAD if mode == 'changed-head' else HEAD,
+            reviewDecision='CHANGES_REQUESTED')))))
+
+tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+tls.load_cert_chain(SCRATCH/'cert.pem', SCRATCH/'key.pem')
+
+class Proxy(http.server.BaseHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
+
     def do_CONNECT(self):
-        assert self.path in ('api.github.com:443','github.com:443'), self.path
-        self.send_response(200); self.end_headers()
-        wrapped=tls.wrap_socket(self.connection,server_side=True)
-        try: API(wrapped,self.client_address,self.server)
-        except (BrokenPipeError,ConnectionResetError): pass
-        finally: wrapped.close()
+        assert self.path in ('api.github.com:443', 'github.com:443'), self.path
+        self.send_response(200, 'Connection established')
+        self.end_headers()
+        try:
+            conn = tls.wrap_socket(self.connection, server_side=True)
+            API(conn, self.client_address, self.server)
+            conn.close()
+        except (ssl.SSLError, ConnectionResetError):
+            pass
+        self.close_connection = True
 
-server=ThreadingHTTPServer(('127.0.0.1',0),Proxy)
-threading.Thread(target=server.serve_forever,daemon=True).start()
-baseenv=os.environ.copy()
-for key in list(baseenv):
-    if key.startswith(('FM_', 'GH_', 'GITHUB_')) or key in ('TASKS_AXI_FILE','TASKS_AXI_BACKEND','NO_PROXY','no_proxy'):
-        baseenv.pop(key,None)
-baseenv.update(HTTPS_PROXY=f'http://127.0.0.1:{server.server_port}',https_proxy=f'http://127.0.0.1:{server.server_port}',
-               SSL_CERT_FILE=str(TOOLS/'server.crt'),GH_TOKEN='disposable-lab-token',GH_CONFIG_DIR=str(TOOLS/'gh-config'),
-               TMPDIR=str(ROOT/'.test-scratch/tmp'))
+server = http.server.ThreadingHTTPServer(('127.0.0.1', 0), Proxy)
+thread = threading.Thread(target=server.serve_forever, daemon=True)
+thread.start()
 
-def home(name, kind='pull', number=8, binary='old'):
-    h=ROOT/'.test-scratch'/name
-    if h.exists(): shutil.rmtree(h)
-    for d in ('data','state','config','projects','root'): (h/d).mkdir(parents=True,exist_ok=True)
-    url=f'https://github.com/lab/contributions/{kind}/{number}'
-    (h/'data/backlog.md').write_text(f'# Backlog\n\n## Queued\n- [ ] delivery - Disposable contribution {url} (repo: sample) (kind: ship)\n')
-    env=baseenv.copy()
-    env.update(FM_HOME=str(h),FM_ROOT_OVERRIDE=str(h/'root'),FM_STATE_OVERRIDE=str(h/'state'),FM_DATA_OVERRIDE=str(h/'data'),FM_CONFIG_OVERRIDE=str(h/'config'),FM_PROJECTS_OVERRIDE=str(h/'projects'))
-    if binary=='old': env['PATH']=str(TOOLS/'gh_2.45.0_linux_amd64/bin')+':'+env['PATH']
-    return h,env,url
+def environment(home):
+    cli_prefix = f'{SCRATCH}/gh_2.45.0_linux_amd64/bin:' if old_cli else ''
+    return dict(PATH=cli_prefix + os.environ['PATH'],
+                HOME=str(home), LANG='C.UTF-8', TMPDIR=str(SCRATCH/'tmp'),
+                GH_CONFIG_DIR=str(home/'gh-config'), GH_TOKEN='disposable-test-token',
+                GH_PROMPT_DISABLED='1', GH_NO_UPDATE_NOTIFIER='1',
+                HTTPS_PROXY=f'http://127.0.0.1:{server.server_port}',
+                HTTP_PROXY=f'http://127.0.0.1:{server.server_port}', NO_PROXY='',
+                SSL_CERT_FILE=str(SCRATCH/'cert.pem'),
+                GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL='/dev/null',
+                FM_HOME=str(home), FM_ROOT_OVERRIDE=str(home/'root'),
+                FM_STATE_OVERRIDE=str(home/'state'), FM_DATA_OVERRIDE=str(home/'data'),
+                FM_CONFIG_OVERRIDE=str(home/'config'), FM_PROJECTS_OVERRIDE=str(home/'projects'),
+                FM_CONTRIBUTIONS_NOW=NOW, FM_CONTRIBUTIONS_BUDGET='20')
 
-def run(env,*args):
-    start=time.monotonic()
-    p=subprocess.run([str(ROOT/'bin/fm-contributions.sh'),*args],env=env,capture_output=True,text=True,timeout=40)
-    results.append({'command':['bin/fm-contributions.sh',*args],'stdout':p.stdout,'stderr':p.stderr,'exit':p.returncode,'elapsed':round(time.monotonic()-start,2)})
-    assert p.returncode==0, results[-1]
-    return p.stdout
+def home(name, kind='pr'):
+    h = SCRATCH/name
+    for directory in ('data', 'state', 'config', 'projects', 'root', 'gh-config'):
+        (h/directory).mkdir(parents=True, exist_ok=True)
+    url = 'https://github.com/o/r/pull/8' if kind == 'pr' else 'https://github.com/o/r/issues/9'
+    (h/'data/backlog.md').write_text(f'# Backlog\n\n## Queued\n- [ ] delivery - Compatibility {url} (repo: sample) (kind: ship)\n')
+    return h, url
 
-def record(h): return json.loads((h/'data/delivery/contributions.json').read_text())['records'][0]
-def save(label,h): (EVID/(label+'.json')).write_text(json.dumps(record(h),indent=2)+'\n')
-def check(name, condition):
-    assert condition,name
-    results.append({'scenario':name,'result':'pass'})
+def run(h, *args, gh=False, budget=None):
+    env = environment(h)
+    if budget:
+        env['FM_CONTRIBUTIONS_BUDGET'] = str(budget)
+    cmd = ['gh'] + list(args) if gh else ['bash', str(product)] + list(args)
+    start = time.monotonic()
+    p = subprocess.run(cmd, env=env, cwd=ROOT, capture_output=True, text=True, timeout=45)
+    elapsed = time.monotonic()-start
+    transcript.append(f'$ {" ".join(cmd)}\nexit={p.returncode}; elapsed={elapsed:.3f}s\n{p.stdout}{p.stderr}')
+    assert p.returncode == 0, transcript[-1]
+    return p.stdout, elapsed
+
+def record(h):
+    return json.loads((h/'data/delivery/contributions.json').read_text())['records'][0]
+
+def capture(h, name):
+    data = dict(record=record(h), wake_queue=(h/'state/.wake-queue').read_text() if (h/'state/.wake-queue').exists() else '')
+    (EVIDENCE/f'{name}.json').write_text(json.dumps(data, indent=2)+'\n')
+
+def success(name, evidence):
+    results.append(dict(name=name, result='pass', live=True, evidence=evidence, reason=''))
 
 try:
-    for binary in ('old','current'):
-        h,env,url=home('api-pr-'+binary,binary=binary)
-        if binary=='old':
-            for args in (['pr','view',url,'--json','headRefOid,reviewDecision'], ['api',f'repos/lab/contributions/commits/{SHA}/check-runs?filter=all&per_page=100','--paginate'], ['api','repos/lab/contributions/issues/8/comments?per_page=100','--paginate']):
-                p=subprocess.run(['gh',*args],env=env,capture_output=True,text=True,timeout=15)
-                results.append({'probe':args,'stdout':p.stdout,'stderr':p.stderr,'exit':p.returncode})
-                if args[0]=='api':
-                    parsed=subprocess.run(['jq','-s','.'],input=p.stdout,env=env,capture_output=True,text=True)
-                    results.append({'jq_probe':True,'stdout':parsed.stdout,'stderr':parsed.stderr,'exit':parsed.returncode})
-        first=run(env,'poll'); r=record(h)
-        if r['error'] is not None:
-            debug=subprocess.run(['bash','-x',str(ROOT/'bin/fm-contributions.sh'),'poll'],env=env,capture_output=True,text=True,timeout=40)
-            (EVID/'debug-poll.txt').write_text(debug.stderr)
-        check(binary+' gh collects all PR pages',r['error'] is None and len(r['observation']['checks'])==4 and len(r['pending'])==3 and all(e['author']=='maintainer' for e in r['pending']))
-        save('api-pr-'+binary,h)
-        original=(h/'state/.wake-queue').read_text()
-        check(binary+' gh replay does not duplicate wakes',run(env,'poll')=='' and (h/'state/.wake-queue').read_text()==original)
-        for event in r['pending']: run(env,'ack','delivery',url,event['token'])
-        run(env,'poll')
-        check(binary+' gh acknowledged events do not replay',json.loads(run(env,'pending'))==[])
-    h,env,url=home('api-issue','issues',9)
-    run(env,'poll'); r=record(h)
-    check('old gh collects later-page issue comment and ready label',r['error'] is None and {e['type'] for e in r['pending']}=={'comment','ready-for-pr'})
-    save('api-issue',h)
-    check('issue replay does not wake again',run(env,'poll')=='')
-    h,env,url=home('api-faults')
-    run(env,'poll')
-    prior=(h/'data/delivery/contributions.json').read_bytes()
-    prior_wake=(h/'state/.wake-queue').read_bytes()
-    mode='timeout'; run(env,'poll')
-    check('slow API read preserves prior record and wake queue',(h/'data/delivery/contributions.json').read_bytes()==prior and (h/'state/.wake-queue').read_bytes()==prior_wake)
-    mode='failure'; first=run(env,'poll'); second=run(env,'poll')
-    check('genuine outage records error once per episode','observation unavailable' in first and second=='' and record(h)['error'] is not None)
-    save('api-unavailable',h)
-    mode='ok'; run(env,'poll')
-    check('successful read clears failure episode',record(h)['error'] is None)
-    mode='malformed'; first=run(env,'poll')
-    check('malformed JSON is an assembly failure not success','observation unavailable' in first and record(h)['error'] is not None)
-    save('api-malformed',h)
+    h, url = home('live-pr')
+    version, _ = run(h, '--version', gh=True)
+    assert '2.45.0' in version
+    baseline_dir = SCRATCH/'baseline-bin'
+    baseline_dir.mkdir(exist_ok=True)
+    for source in (ROOT/'bin').iterdir():
+        if source.name != 'fm-contributions.sh':
+            link = baseline_dir/source.name
+            if not link.exists():
+                link.symlink_to(source)
+    baseline_script = baseline_dir/'fm-contributions.sh'
+    baseline_script.write_bytes(subprocess.check_output(['git', 'show', '70f2ed3d0ce66d481a105a9b79877c861ec9552e:bin/fm-contributions.sh'], cwd=ROOT))
+    baseline, _ = home('live-baseline')
+    product = baseline_script
+    output, _ = run(baseline, 'poll')
+    assert 'observation unavailable' in output
+    assert record(baseline)['error'] is not None
+    assert record(baseline)['observation'] is None
+    capture(baseline, 'baseline-old-gh-refused')
+    product = ROOT/'bin/fm-contributions.sh'
+    run(h, 'pr', 'view', url, '--json', 'headRefOid,reviewDecision', gh=True)
+    run(h, 'api', 'repos/o/r/issues/8/comments?per_page=100', '--paginate', gh=True)
+    for endpoint in ('repos/o/r/pulls/8/reviews?per_page=100', 'repos/o/r/pulls/8/comments?per_page=100', f'repos/o/r/commits/{HEAD}/check-runs?filter=all&per_page=100', f'repos/o/r/commits/{HEAD}/statuses?per_page=100'):
+        run(h, 'api', endpoint, '--paginate', gh=True)
+    output, _ = run(h, 'poll')
+    r = record(h)
+    assert r['error'] is None
+    assert r['observation']['head'] == HEAD
+    assert r['observation']['can_merge'] is False
+    assert len(r['observation']['checks']) == 4
+    assert len(r['pending']) == 3
+    assert {x['type'] for x in r['pending']} == {'comment', 'review', 'review-comment'}
+    assert all(x['author'] == 'maintainer' for x in r['pending'])
+    assert output.count('contribution-wake:') == 3
+    capture(h, 'pr-pagination')
+    success('Poll an owned PR with gh 2.45: later-page comments, reviews, inline feedback, checks and statuses are measured', 'pr-pagination.json; api-requests.json; live-transcript.log')
+
+    prior_queue = (h/'state/.wake-queue').read_bytes()
+    output, _ = run(h, 'poll')
+    assert not output.strip()
+    assert (h/'state/.wake-queue').read_bytes() == prior_queue
+    pending, _ = run(h, 'pending')
+    token = json.loads(pending)[0]['token']
+    run(h, 'ack', 'delivery', url, token)
+    assert len(record(h)['pending']) == 2
+    output, _ = run(h, 'poll')
+    assert not output.strip()
+    assert len(record(h)['pending']) == 2
+    assert (h/'state/.wake-queue').read_bytes() == prior_queue
+    capture(h, 'ack-and-repoll')
+    success('Re-poll and acknowledge one captured signal: no duplicate wakes and only that token is removed', 'ack-and-repoll.json; live-transcript.log')
+
+    issue, issue_url = home('live-issue', 'issue')
+    output, _ = run(issue, 'poll')
+    ir = record(issue)
+    assert ir['error'] is None
+    assert {x['type'] for x in ir['pending']} == {'comment', 'ready-for-pr'}
+    assert len(ir['pending']) == 2
+    assert output.count('contribution-wake:') == 2
+    capture(issue, 'issue-pagination')
+    success('Poll a filed issue with gh 2.45: later-page maintainer feedback and a ready-label timeline event survive filtering', 'issue-pagination.json; api-requests.json; live-transcript.log')
+
+    mode = 'slow'
+    prior = (h/'data/delivery/contributions.json').read_bytes()
+    prior_queue = (h/'state/.wake-queue').read_bytes()
+    output, elapsed = run(h, 'poll', budget=5)
+    assert elapsed < 10, elapsed
+    assert not output.strip(), output
+    assert (h/'data/delivery/contributions.json').read_bytes() == prior
+    assert (h/'state/.wake-queue').read_bytes() == prior_queue
+    capture(h, 'slow-read-preserved')
+    mode = 'normal'
+    run(h, 'poll')
+    assert record(h)['error'] is None
+    success('A slow later page reaches the read deadline: prior evidence and wakes stay unchanged and a later normal poll recovers', 'slow-read-preserved.json; live-transcript.log')
+
+    mode = 'malformed'
+    prior_observation = record(h)['observation']
+    output, _ = run(h, 'poll')
+    assert 'observation unavailable' in output, output
+    assert record(h)['error'] is not None
+    assert record(h)['observation'] == prior_observation
+    output, _ = run(h, 'poll')
+    assert 'observation unavailable' not in output
+    capture(h, 'malformed-page')
+    mode = 'normal'
+    run(h, 'poll')
+    assert record(h)['error'] is None
+    capture(h, 'recovered-page')
+    success('A malformed later page records one unavailable episode, preserves the last observation, and clears the error after recovery', 'malformed-page.json; recovered-page.json; live-transcript.log')
+
+    mode = 'changed-head'
+    before = record(h)['observation']
+    output, _ = run(h, 'poll')
+    assert 'observation unavailable' in output
+    assert record(h)['error'] is not None
+    assert record(h)['observation'] == before
+    capture(h, 'changed-head-refused')
+    success('A PR head changes between opening and closing reads: mixed-head evidence is refused', 'changed-head-refused.json; live-transcript.log')
+
+    mode = 'normal'
+    old_cli = False
+    current, _ = home('live-current')
+    run(current, '--version', gh=True)
+    output, _ = run(current, 'poll')
+    assert record(current)['error'] is None
+    assert len(record(current)['observation']['checks']) == 4
+    assert len(record(current)['pending']) == 3
+    assert output.count('contribution-wake:') == 3
+    capture(current, 'current-gh-pagination')
+    success('Poll the same paginated PR with the installed current gh CLI: compatibility and complete measurement are retained', 'current-gh-pagination.json; live-transcript.log')
 finally:
-    (EVID/'live-api-transcript.json').write_text(json.dumps({'steps':results,'requests':calls},indent=2)+'\n')
-    server.shutdown();server.server_close()
+    server.shutdown()
+    server.server_close()
+    thread.join(timeout=5)
+    (EVIDENCE/'api-requests.json').write_text(json.dumps(requests, indent=2)+'\n')
+    (EVIDENCE/'live-transcript.log').write_text('\n'.join(transcript)+'\n')
+    (EVIDENCE/'live-results.json').write_text(json.dumps(results, indent=2)+'\n')
+    for name in ('live-pr', 'live-issue', 'live-baseline', 'live-current'):
+        shutil.rmtree(SCRATCH/name, ignore_errors=True)
+print(json.dumps(results, indent=2))

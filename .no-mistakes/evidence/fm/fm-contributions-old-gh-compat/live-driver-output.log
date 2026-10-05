@@ -1,3 +1,26 @@
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 33480)
+Traceback (most recent call last):
+  File "/nix/store/cdaifv92znxy5ai4sawricjl0p5b9sgf-python3-3.13.11/lib/python3.13/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/cdaifv92znxy5ai4sawricjl0p5b9sgf-python3-3.13.11/lib/python3.13/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/cdaifv92znxy5ai4sawricjl0p5b9sgf-python3-3.13.11/lib/python3.13/socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "/nix/store/cdaifv92znxy5ai4sawricjl0p5b9sgf-python3-3.13.11/lib/python3.13/http/server.py", line 447, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/nix/store/cdaifv92znxy5ai4sawricjl0p5b9sgf-python3-3.13.11/lib/python3.13/http/server.py", line 435, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "/home/art/.no-mistakes/evidence/01M3XZEBZYK15EMYAQS3FAYYSQ/live-drive.py", line 119, in do_CONNECT
+    assert self.path in ('api.github.com:443', 'github.com:443'), self.path
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: cafe.github.com:443
+----------------------------------------
 [
   {
     "name": "Poll an owned PR with gh 2.45: later-page comments, reviews, inline feedback, checks and statuses are measured",
