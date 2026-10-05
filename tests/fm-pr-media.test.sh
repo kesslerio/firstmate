@@ -44,13 +44,15 @@ target=''
 jq=''
 field=''
 body=''
+raw=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --method) shift 2 ;;
     --jq) jq=$2; shift 2 ;;
     -i | --include) shift ;;
     -F | --field) case "$2" in text=@*) body=${2#text=@} ;; esac; shift 2 ;;
-    -f | -H | --header) shift 2 ;;
+    -H | --header) [ "$2" != 'Accept: application/vnd.github.raw+json' ] || raw=1; shift 2 ;;
+    -f) shift 2 ;;
     --json) field=$2; shift 2 ;;
     -q) shift 2 ;;
     *) target=$1; shift ;;
@@ -90,7 +92,17 @@ RENDER
     if [ "$code" = NONE ]; then
       exit 1
     fi
-    printf 'HTTP/2.0 %s Fake\r\nX-Fake: yes\r\n\r\nfake-body\r\n' "$code"
+    printf 'HTTP/2.0 %s Fake\r\nX-Fake: yes\r\n\r\n' "$code"
+    if [[ "$target" = repos/*/contents/* ]] && [ "$raw" = 0 ]; then
+      printf '{"type":"file","encoding":"base64","content":"fixture"}'
+      exit 0
+    fi
+    kind=$(awk -v want="$target" '$1 == "MEDIA" && $2 == want { print $3 }' "$table" | head -n 1)
+    case "${kind:-image}" in
+      image) python3 -c 'import base64, sys; sys.stdout.buffer.write(base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2J3gAAAAASUVORK5CYII="))' ;;
+      video) printf '\000\000\000\030ftypmp42fixture-video' ;;
+      *) printf 'unknown-media' ;;
+    esac
     case "$code" in
       2??) exit 0 ;;
       *) exit 1 ;;
@@ -753,6 +765,12 @@ printf '%s\n' "$@" >"$FM_FAKE_CURL_ASKED"
 for arg in "$@"; do
   case "$arg" in *Authorization* | --user | -u | --header | -H) exit 9 ;; esac
 done
+args=("$@")
+for ((i=0; i < ${#args[@]}; i++)); do
+  if [ "${args[$i]}" = --output ]; then
+    python3 -c 'import base64, sys; sys.stdout.buffer.write(base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2J3gAAAAASUVORK5CYII="))' >"${args[$((i+1))]}"
+  fi
+done
 printf '%s' "${FM_FAKE_CURL_STATUS:-200}"
 CURL
   chmod +x "$dir/fakebin/curl"
@@ -827,6 +845,112 @@ test_unreadable_render_is_not_a_clean_receipt() {
   assert_contains "$ERR" 'could not render' "the refusal must identify rendering"
   pass "an unreadable render is never a clean receipt"
 }
+
+test_extensionless_media_must_match_image_context() {
+  local dir target kind shape context
+  for shape in asset repository; do
+    for kind in image video unknown; do
+      for context in image link; do
+        dir=$(new_case "extensionless-$shape-$kind-$context")
+        if [ "$shape" = asset ]; then
+          target="https://github.com/user-attachments/assets/extensionless-$kind"
+          body_case "$dir" "[$kind]($target)"
+          if [ "$context" = image ]; then body_case "$dir" "![$kind]($target)"; fi
+          status_row "$dir" "$target" 200
+          printf 'MEDIA %s %s\n' "$target" "$kind" >>"$dir/table"
+        else
+          target="https://github.com/$REPO/raw/$SHA/extensionless"
+          body_case "$dir" "![$kind]($target)"
+          [ "$context" = image ] || continue
+          status_row "$dir" "repos/$REPO/contents/extensionless?ref=$SHA" 200
+          printf 'MEDIA repos/%s/contents/extensionless?ref=%s %s\n' "$REPO" "$SHA" "$kind" >>"$dir/table"
+        fi
+        run_case "$dir" --body-file "$dir/body.md" --require-embeds
+        if [ "$context" = link ] || [ "$kind" = image ]; then
+          expect_code 0 "$CODE" "a resolving image or attachment link must pass without an extension"
+        else
+          expect_code 1 "$CODE" "an extensionless non-image cannot pass in an image position"
+          assert_contains "$OUT" 'not an image' "the receipt must identify the media mismatch"
+        fi
+        assert_contains "$OUT" '1 address(es)' "embed context or attachment shape must select extensionless media"
+      done
+    done
+  done
+  pass "extensionless attachments and repository media respect image positions"
+}
+
+test_generated_command_runs_from_another_project() {
+  local dir mode prompt command skill command_q expected_q out code
+  dir=$(new_case other-project)
+  mkdir -p "$dir/project"
+  . "$ROOT/bin/fm-dod-lib.sh"
+  for mode in direct-PR no-mistakes; do
+    prompt=$(cd "$dir/project" && fm_dod_block "$mode" media-review fm/media-review none)
+    command=$(printf '%s\n' "$prompt" | sed -n "s/.*and run \`\\([^\`]*\\)\`.*/\\1/p")
+    skill=$(printf '%s\n' "$prompt" | sed -n "s/.*if unavailable by name, read \`\\([^\`]*\\)\`).*/\\1/p")
+    printf -v expected_q '%q' "$ROOT/.agents/skills/pr-media-embed/SKILL.md"
+    [ "$skill" = "$expected_q" ] || fail "the emitted skill fallback must identify Firstmate's skill"
+    printf -v command_q '%q' "$ROOT/bin/fm-pr-media.sh"
+    assert_contains "$command" "$command_q" "the generated command must resolve the helper absolutely"
+    command=${command//<pr-number>/7}
+    command=${command//<owner>\/<repo>/tester\/widgets}
+    body_case "$dir" 'No visual evidence.'
+    printf -v command '%s --body-file %q' "$command" "$dir/body.md"
+    out=$(cd "$dir/project" && PATH="$dir/fakebin:$PATH" \
+      FM_FAKE_GH_TABLE="$dir/table" FM_FAKE_GH_ASKED="$dir/asked" \
+      FM_FAKE_GH_META="$(printf 'https://github.com/tester/widgets/pull/7\t%s\twidgets\ttester' "$SHA")" \
+      bash -c "$command" 2>&1)
+    code=$?
+    expect_code 1 "$code" "the actual generated command must execute and enforce missing evidence in another project"
+    assert_contains "$out" 'REQUIRE-EMBEDS' "the executed command must reach the verifier"
+  done
+  pass "both generated helper commands run in another project's directory"
+}
+
+test_external_redirects_require_successful_terminal_status() {
+  local dir result
+  dir=$(new_case redirect-chain)
+  cat >"$dir/fakebin/curl" <<'CURL'
+#!/usr/bin/env bash
+location=0
+bound=0
+https=0
+for ((i=1; i <= $#; i++)); do
+  arg=${!i}
+  next=$((i+1))
+  case "$arg" in
+    --location) location=1 ;;
+    --max-redirs) [ "${!next}" = 5 ] && bound=1 ;;
+    --proto-redir) [ "${!next}" = '=https' ] && https=1 ;;
+    --output) python3 -c 'import base64, sys; sys.stdout.buffer.write(base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2J3gAAAAASUVORK5CYII="))' >"${!next}" ;;
+    *Authorization* | --user | -u | --header | -H | --location-trusted) exit 9 ;;
+  esac
+done
+if [ "$location" = 0 ]; then printf 302; exit 0; fi
+[ "$bound" = 1 ] && [ "$https" = 1 ] || exit 9
+case "$FM_FAKE_REDIRECT_RESULT" in
+  loop | downgrade) printf 302; exit 47 ;;
+  *) printf '%s' "$FM_FAKE_REDIRECT_RESULT" ;;
+esac
+CURL
+  chmod +x "$dir/fakebin/curl"
+  body_case "$dir" '![proof](https://collector.example/start)'
+  for result in 200 404 302 loop downgrade; do
+    export FM_FAKE_REDIRECT_RESULT="$result"
+    run_case "$dir" --body-file "$dir/body.md"
+    if [ "$result" = 200 ]; then
+      expect_code 0 "$CODE" "a successful HTTPS redirect destination must pass"
+    else
+      expect_code 1 "$CODE" "missing, unfinished, looping, and downgraded redirects must fail"
+    fi
+  done
+  unset FM_FAKE_REDIRECT_RESULT
+  pass "external redirects are bounded to HTTPS and require terminal success"
+}
+
+test_extensionless_media_must_match_image_context
+test_generated_command_runs_from_another_project
+test_external_redirects_require_successful_terminal_status
 
 test_unreadable_render_is_not_a_clean_receipt
 

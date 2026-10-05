@@ -106,6 +106,8 @@
 # It takes the same optional trailing forge argument, because the rule that keeps
 # a worker off a remote is exactly the rule that changes when the forge does.
 
+FM_DOD_CODE_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd) || return 1
+
 # shellcheck source=bin/fm-pr-lib.sh
 . "$(d=${BASH_SOURCE[0]%/*}; [ "$d" != "${BASH_SOURCE[0]}" ] || d=.; cd "${d:-/}" && pwd)/fm-pr-lib.sh"
 # shellcheck source=bin/fm-classify-lib.sh
@@ -401,8 +403,11 @@ EOF
 }
 
 fm_pr_media_step() {
-  cat <<'EOF'
-If your task owes screenshots, recordings, or other visual evidence, load `pr-media-embed` and run `bin/fm-pr-media.sh <pr-number> --repo <owner>/<repo> --require-embeds` against the published body before your ready report, even if the body contains no media addresses, then put the receipt it prints in the PR's Evidence section.
+  local helper_q skill_q
+  printf -v helper_q '%q' "$FM_DOD_CODE_ROOT/bin/fm-pr-media.sh"
+  printf -v skill_q '%q' "$FM_DOD_CODE_ROOT/.agents/skills/pr-media-embed/SKILL.md"
+  cat <<EOF
+If your task owes screenshots, recordings, or other visual evidence, load \`pr-media-embed\` (if unavailable by name, read \`$skill_q\`) and run \`$helper_q <pr-number> --repo <owner>/<repo> --require-embeds\` against the published body before your ready report, even if the body contains no media addresses, then put the receipt it prints in the PR's Evidence section.
 Its non-zero exit means a reviewer would be reading evidence that does not resolve, so the ready report is not yet true; apply the correction its failing line prints and run it again.
 EOF
 }

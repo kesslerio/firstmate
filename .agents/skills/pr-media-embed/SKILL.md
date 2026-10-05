@@ -16,7 +16,8 @@ The lane obligation, in order:
 1. Put the media where the address can point. Commit it to the branch, or use an existing forge attachment.
    A file that exists only on a lane's disk has no address, so it cannot be verified at all.
 2. Write screenshots as images and recordings as links in the body, at the published head, and never as a bare filename or a path relative to the repository: `bin/fm-pr-media.sh` refuses both, because neither resolves for a reviewer reading the pull request rather than this checkout.
-3. Run `bin/fm-pr-media.sh <pr-number> --repo <owner>/<repo> --require-embeds` after the body exists on the forge, against the published body at the published head, never against a local draft of either.
+3. Run the absolute helper command supplied in the generated delivery instructions with `<pr-number> --repo <owner>/<repo> --require-embeds`.
+   If reading this skill directly, resolve the Firstmate code root three directories above this skill directory and run its `bin/fm-pr-media.sh` by a quoted absolute path after the body exists on the forge, against the published body at the published head, never against a local draft of either.
    Run it even when the body has no media addresses, so missing evidence fails.
 4. Act on the exit code, not on the prose around it: `0` means every address was proven, `1` means at least one was not, and `2` means something could not be read, which is never a pass.
    A failure is not a formatting nuisance: the done line is not yet true, because the reviewer would be reading broken evidence.

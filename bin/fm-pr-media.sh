@@ -35,7 +35,9 @@
 #   an asset that renders for every reviewer holding repository access, so a
 #   token-less probe proves nothing in either direction and is not run.
 #   Other absolute addresses are fetched without credentials and must answer
-#   2xx or 3xx. Their addresses are redacted in the receipt.
+#   a final 2xx after at most five HTTPS redirects. Their addresses are redacted
+#   in the receipt. Image positions require image media, including extensionless
+#   attachments, checked from fetched bytes rather than the filename.
 #
 # A direct fetch of the `github.com/.../raw/...` form is deliberately NOT a check:
 # that endpoint hands a browser a session-bound redirect, so it answers 404 to an
@@ -259,26 +261,57 @@ authenticated_target() {
   esac
 }
 
-api_status() {  # <endpoint-or-absolute-url> -> 3-digit code, or ERR
-  local target=$1 first code
+api_status() {  # <endpoint-or-absolute-url> [image] -> 3-digit code, or ERR
+  local target=$1 context=${2:-link} code
+  : >"$TMP_DIR/media-body"
   if ! authenticated_target "$target"; then
-    code=$(curl --disable --silent --output /dev/null --write-out '%{http_code}' \
-      --max-time 30 --proto '=https' -- "$target") || code=ERR
+    code=$(curl --disable --silent --output "$TMP_DIR/media-body" --write-out '%{http_code}' \
+      --location --max-redirs 5 --max-time 30 --proto '=https' --proto-redir '=https' \
+      -- "$target") || code=ERR
     printf '%s\n' "$code"
     return 0
   fi
-  first=$(gh api -i "$target" 2>/dev/null | head -c 200) || true
-  code=$(printf '%s\n' "$first" | head -n 1 | awk '{ print $2 }')
-  case "$code" in
-    [1-5][0-9][0-9]) printf '%s\n' "$code" ;;
-    *) printf 'ERR\n' ;;
-  esac
+  if [ "$context" = image ] && [[ "$target" = repos/*/contents/* ]]; then
+    gh api -i -H 'Accept: application/vnd.github.raw+json' "$target" >"$TMP_DIR/response" 2>/dev/null || true
+  else
+    gh api -i "$target" >"$TMP_DIR/response" 2>/dev/null || true
+  fi
+  python3 - "$TMP_DIR/response" "$TMP_DIR/media-body" <<'PYTHON'
+import re
+import sys
+from pathlib import Path
+response = Path(sys.argv[1]).read_bytes()
+parts = re.split(rb'\r?\n\r?\n', response, maxsplit=1)
+header = parts[0]
+body = parts[1] if len(parts) == 2 else b''
+match = re.match(rb'HTTP/\S+ ([1-5][0-9][0-9])', header)
+Path(sys.argv[2]).write_bytes(body)
+print(match[1].decode() if match and len(parts) == 2 else 'ERR')
+PYTHON
 }
 
-contents_status() {  # <owner/repo> <ref> <path>
-  local repo=$1 ref=$2 path=$3 enc
+is_image_media() {
+  python3 - "$TMP_DIR/media-body" <<'PYTHON'
+import sys
+import xml.etree.ElementTree as ET
+from pathlib import Path
+body = Path(sys.argv[1]).read_bytes()
+image = body.startswith((b'\x89PNG\r\n\x1a\n', b'\xff\xd8\xff', b'GIF87a', b'GIF89a', b'BM', b'II*\x00', b'MM\x00*', b'\x00\x00\x01\x00'))
+image |= body[:4] == b'RIFF' and body[8:12] == b'WEBP'
+image |= body[4:8] == b'ftyp' and body[8:12] in (b'avif', b'avis', b'heic', b'heix', b'hevc', b'hevx', b'mif1', b'msf1')
+if not image:
+    try:
+        image = ET.fromstring(body).tag in ('svg', '{http://www.w3.org/2000/svg}svg')
+    except ET.ParseError:
+        pass
+sys.exit(0 if image else 1)
+PYTHON
+}
+
+contents_status() {  # <owner/repo> <ref> <path> [image]
+  local repo=$1 ref=$2 path=$3 context=${4:-link} enc
   enc=$(printf '%s' "$path" | LC_ALL=C sed -e 's/ /%20/g' -e 's/#/%23/g' -e 's/?/%3F/g')
-  api_status "repos/$repo/contents/$enc?ref=$ref"
+  api_status "repos/$repo/contents/$enc?ref=$ref" "$context"
 }
 
 # Whether the repository holding an address is private decides the raw-address
@@ -342,7 +375,7 @@ pin_at_head() {  # <owner/repo> <path>
 }
 
 check_address() {  # <address>
-  local addr=$1 context=$2 host rest shape='' owner repo ref path tail codes verdict access fix
+  local addr=$1 context=$2 host rest shape='' owner repo ref path tail codes verdict access fix image_mismatch=0
 
   case "$addr" in
     *://*) ;;
@@ -397,7 +430,7 @@ check_address() {  # <address>
 
   case "$shape" in
     asset | remote | web-other)
-      codes=$(api_status "$addr")
+      codes=$(api_status "$addr" "$context")
       if [ "$context" = image ]; then
         case "$addr" in
           https://github.com/*/*/blob/*)
@@ -411,7 +444,11 @@ check_address() {  # <address>
         return 0
       fi
       case "$codes" in
-        2?? | 3??)
+        2??)
+          if [ "$context" = image ] && ! is_image_media; then
+            record fail "$addr" "shape: $shape   fetch=$codes" "the fetched media is not an image; use a recording link for video media"
+            return 0
+          fi
           record ok "$addr" "shape: $shape   fetch=$codes"
           ;;
         *)
@@ -435,7 +472,7 @@ check_address() {  # <address>
   path=${path%%\#*}
   path=${path%%\?*}
 
-  codes="contents=$(contents_status "$owner/$repo" "$ref" "$path")   direct=session-bound"
+  codes="contents=$(contents_status "$owner/$repo" "$ref" "$path" "$context")   direct=session-bound"
 
   verdict=ok
   REASON=''
@@ -488,12 +525,18 @@ check_address() {  # <address>
   esac
 
   if [ "$context" = image ]; then
+    if [ "$verdict" = ok ] && ! is_image_media; then
+      verdict=fail
+      image_mismatch=1
+      add_reason "the fetched repository media is not an image; use a recording link for video media"
+    fi
     if [ "$shape" = web-blob ]; then
       verdict=fail
       add_reason "a blob URL is an HTML page and cannot render in an image position"
     fi
     if printf '%s\n' "$path" | LC_ALL=C grep -qiE '\.(mp4|mov|webm|m4v|avi|mkv)$'; then
       verdict=fail
+      image_mismatch=1
       add_reason "a recording cannot render in an image position; use a recording link"
     fi
   fi
@@ -509,7 +552,7 @@ check_address() {  # <address>
   [ -n "$REASON" ] || REASON='the check above failed'
   if [ -z "$fix" ]; then
     record fail "$addr" "shape: $shape   ref=$ref   $codes" "why: $REASON" "use a valid full commit and path from the address's own repository"
-  elif [ "$context" = image ] && printf '%s\n' "$path" | LC_ALL=C grep -qiE '\.(mp4|mov|webm|m4v|avi|mkv)$'; then
+  elif [ "$image_mismatch" -eq 1 ]; then
     record fail "$addr" "shape: $shape   ref=$ref   $codes" "why: $REASON" "use a recording link instead of an image embed"
   elif [ "$fix" = "$addr" ]; then
     record fail "$addr" "shape: $shape   ref=$ref   $codes" "why: $REASON" "keep the address and re-check it once the head carries the file"
