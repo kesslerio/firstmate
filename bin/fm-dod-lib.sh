@@ -400,6 +400,13 @@ There is no pull request, no \`gh-axi\` call, and no forge CI result to report: 
 EOF
 }
 
+fm_pr_media_step() {
+  cat <<'EOF'
+If your pull-request body carries a screenshot, a recording, or any other evidence embed, load `pr-media-embed` and run `bin/fm-pr-media.sh <pr-number> --repo <owner>/<repo>` against the published body before your ready report, then put the receipt it prints in the PR's Evidence section.
+Its non-zero exit means a reviewer would be reading evidence that does not resolve, so the ready report is not yet true; apply the correction its failing line prints and run it again.
+EOF
+}
+
 fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>]
   local mode=$1 id=$2 forge=${4:-none} base=${5:-}
   local branch=${3:-fm/$id} pr_base='' nm_base='' base_q
@@ -469,6 +476,7 @@ The task is complete only when committed on your branch.
 When it is implemented and committed, push your branch and open a PR with \`gh-axi\` that is ready for review, not a draft$pr_base.
 Before you report done, read the PR back from the forge and confirm it is not a draft (\`gh-axi pr view <number>\` must print \`draft: no\`, where <number> is the PR number from your PR URL); if it is a draft, mark it ready with \`gh-axi pr ready <number>\`.
 A draft cannot be merged, so a done report on one leaves the merge unasked.
+$(fm_pr_media_step)
 Then append \`done [at=<epoch>]: PR {url}\` to the status file and stop.
 That \`done:\` is accepted only when this copy's HEAD - your latest commit - is pushed to your PR branch; the check tests that commit, not merely that a branch moved.
 If you deliberately keep the PR a draft, append \`paused [at=<epoch>]: {why the draft is held}\` instead of done.
@@ -504,6 +512,7 @@ EOF
 
 After /no-mistakes reports CI green (the CI-ready return point - do not wait for it to keep monitoring in the background until merge), read the PR back from the forge and confirm it is not a draft (\`gh-axi pr view <number>\` must print \`draft: no\`, where <number> is the PR number from your PR URL); if it is a draft, mark it ready with \`gh-axi pr ready <number>\`.
 A draft cannot be merged, so a done report on one leaves the merge unasked.
+$(fm_pr_media_step)
 Then append \`done [at=<epoch>]: PR {url} checks green\` and stop. You are finished.
 That CI-ready \`done:\` is accepted only when this copy's HEAD - your latest commit - is one the /no-mistakes run pushed, so commit nothing after the run; the check tests that commit, not merely that a branch moved.
 If you deliberately keep the PR a draft, append \`paused [at=<epoch>]: {why the draft is held}\` instead of done.
