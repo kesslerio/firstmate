@@ -1368,6 +1368,54 @@ CASES
   pass "recording structure and declared containers hold across every fetch path"
 }
 
+test_recording_walk_stops_at_structure_budget() {
+  local dir shape format state address target expected
+  dir=$(new_case recording-budget)
+  python3 - "$dir" <<'FIXTURES'
+import sys
+from pathlib import Path
+root = Path(sys.argv[1])
+ftyp = bytes.fromhex('00000018667479706d703432000000006d70343269736f6d')
+mdat = (1024).to_bytes(4, 'big') + b'mdat' + bytes(1016)
+free = (8).to_bytes(4, 'big') + b'free'
+avi_list = b'LIST' + (1016).to_bytes(4, 'little') + b'movi' + bytes(1012)
+junk = b'JUNK' + bytes(4)
+continuation = b'RIFF' + (4).to_bytes(4, 'little') + b'AVIX'
+for state, count in [('within', 100), ('beyond', 100000)]:
+    # The malformed final box/chunk is reached only inside the inspection budget.
+    (root / ('mp4-' + state)).write_bytes(ftyp + mdat + free * count + b'bad-size')
+    chunks = avi_list + junk * count + b'LIST' + (99999).to_bytes(4, 'little')
+    (root / ('avi-' + state)).write_bytes(b'RIFF' + (len(chunks) + 4).to_bytes(4, 'little') + b'AVI ' + chunks)
+    avi = b'RIFF' + (len(avi_list) + 4).to_bytes(4, 'little') + b'AVI ' + avi_list
+    (root / ('continuation-' + state)).write_bytes(avi + continuation * count + b'RIFF' + (99999).to_bytes(4, 'little') + b'AVIX')
+# A late marker must not grant a pass when it lies beyond the inspection budget.
+(root / 'mp4-unseen').write_bytes(ftyp + free * 100000 + mdat)
+chunks = junk * 100000 + avi_list
+(root / 'avi-unseen').write_bytes(b'RIFF' + (len(chunks) + 4).to_bytes(4, 'little') + b'AVI ' + chunks)
+FIXTURES
+  for shape in repository attachment external; do
+    for format in mp4 avi continuation; do
+      for state in within beyond unseen; do
+        [ "$format-$state" != continuation-unseen ] || continue
+        case "$shape" in
+          repository) address="https://github.com/$REPO/raw/$SHA/budget.${format/continuation/avi}"; target="repos/$REPO/contents/budget.${format/continuation/avi}?ref=$SHA" ;;
+          attachment) address="https://github.com/user-attachments/assets/budget.${format/continuation/avi}"; target=$address ;;
+          external) address="https://collector.example/budget.${format/continuation/avi}"; target=$address ;;
+        esac
+        : >"$dir/table"
+        status_row "$dir" "$target" 200
+        printf 'PAYLOAD %s %s\n' "$target" "$dir/$format-$state" >>"$dir/table"
+        body_case "$dir" "[recording]($address)"
+        run_case "$dir" --body-file "$dir/body.md"
+        expected=1
+        [ "$state" != beyond ] || expected=0
+        expect_code "$expected" "$CODE" "$shape $format $state must use only the bounded structural walk"
+      done
+    done
+  done
+  pass "ISO boxes, AVI chunks, and continuation containers stop at a shared inspection budget"
+}
+
 test_every_rendered_srcset_candidate_is_verified() {
   local dir
   dir=$(new_case srcset)
@@ -1390,6 +1438,7 @@ test_every_rendered_srcset_candidate_is_verified() {
 }
 
 test_container_bytes_and_declared_length
+test_recording_walk_stops_at_structure_budget
 test_recording_structure_and_declared_container
 test_every_rendered_srcset_candidate_is_verified
 

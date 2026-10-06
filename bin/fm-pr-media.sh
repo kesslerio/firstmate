@@ -51,7 +51,11 @@
 #   or complete RIFF/AVI containers with an AVI LIST chunk for avi.
 #   ISO boxes and RIFF chunks are walked by declared size, including padding;
 #   ISO brands are unrestricted, and AVI may have OpenDML continuation containers.
-#   Every ISO box and RIFF continuation container must fit the received stream.
+#   Inspected ISO boxes and RIFF continuation containers must fit the received
+#   stream. The walk reads at most 256 KiB of structure and 4096 box, chunk, or
+#   container headers, sharing both limits across continuations. Payload bytes
+#   are skipped by declared size. At either limit, the verdict uses the structure
+#   already seen; the uninspected remainder is not a container-integrity proof.
 #   The verifier proves address resolution at the published head, the claimed
 #   media kind, transfer completeness, and container structure; it does not
 #   decode frames or prove codec decoding.
@@ -390,18 +394,34 @@ elif sys.argv[3] == 'image':
 else:
     # Seek between declared boundaries instead of searching inside payload bytes.
     ftyp = iso = avi = False
+    structure_bytes = structure_count = 0
+    budget_exhausted = False
     with path.open('rb') as source:
+        def read_structure(length, header=False):
+            global structure_bytes, structure_count, budget_exhausted
+            if structure_bytes + length > 256 * 1024 or (header and structure_count >= 4096):
+                budget_exhausted = True
+                return None
+            structure_bytes += length
+            structure_count += int(header)
+            return source.read(length)
+
         offset = 0
         while offset + 8 <= size:
             source.seek(offset)
-            header = source.read(8)
+            header = read_structure(8, header=True)
+            if header is None:
+                break
             box_size = int.from_bytes(header[:4], 'big')
             kind = header[4:8]
             header_size = 8
             if box_size == 1:
                 if offset + 16 > size:
                     break
-                box_size = int.from_bytes(source.read(8), 'big')
+                extended_size = read_structure(8)
+                if extended_size is None:
+                    break
+                box_size = int.from_bytes(extended_size, 'big')
                 header_size = 16
             elif box_size == 0:
                 box_size = size - offset
@@ -416,14 +436,16 @@ else:
             elif kind in (b'moov', b'mdat'):
                 iso = True
             offset += box_size
-        iso = iso and offset == size
+        iso = iso and (offset == size or budget_exhausted)
 
         if start[:4] == b'RIFF' and start[8:12] == b'AVI ':
             container_offset = 0
             # Walk every OpenDML continuation, even after finding an AVI list.
             while container_offset + 12 <= size:
                 source.seek(container_offset)
-                header = source.read(12)
+                header = read_structure(12, header=True)
+                if header is None:
+                    break
                 riff_end = container_offset + 8 + int.from_bytes(header[4:8], 'little')
                 form = b'AVI ' if container_offset == 0 else b'AVIX'
                 if header[:4] != b'RIFF' or header[8:12] != form or not container_offset + 12 <= riff_end <= size:
@@ -431,19 +453,25 @@ else:
                 offset = container_offset + 12
                 while offset + 8 <= riff_end:
                     source.seek(offset)
-                    header = source.read(8)
+                    header = read_structure(8, header=True)
+                    if header is None:
+                        break
                     chunk_size = int.from_bytes(header[4:8], 'little')
                     chunk_end = offset + 8 + chunk_size
                     next_offset = chunk_end + chunk_size % 2
                     if next_offset > riff_end:
                         break
-                    if header[:4] == b'LIST' and chunk_size >= 4 and source.read(4) in (b'hdrl', b'movi'):
-                        avi = True
+                    if header[:4] == b'LIST' and chunk_size >= 4:
+                        list_type = read_structure(4)
+                        if list_type is None:
+                            break
+                        if list_type in (b'hdrl', b'movi'):
+                            avi = True
                     offset = next_offset
                 if offset != riff_end:
                     break
                 container_offset = riff_end + (riff_end - container_offset) % 2
-            avi = avi and container_offset == size
+            avi = avi and (container_offset == size or budget_exhausted)
     ebml = start.startswith(b'\x1a\x45\xdf\xa3')
     ext = Path(urlsplit(sys.argv[4]).path).suffix.lower()
     recording = iso if ext in ('.mp4', '.mov', '.m4v') else ebml if ext in ('.webm', '.mkv') else avi if ext == '.avi' else iso or ebml or avi

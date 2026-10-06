@@ -25,7 +25,8 @@ The lane obligation, in order:
 5. Paste the receipt block into the PR's Evidence section, or into the report firstmate reads when the body is owned by the pipeline.
    The receipt is what makes the done claim checkable by someone who is not looking at this machine, and it is where a later reader learns which codes were actually observed.
 
-The helper checks every rendered image variant and fetched media container according to its header, including large ISO boxes, RIFF padding chunks, and all AVI continuation containers.
+The helper checks every rendered image variant and fetched media container according to its header, including large ISO boxes, RIFF padding chunks, and AVI continuation containers within a shared budget of 256 KiB of structure and 4096 box, chunk, or container headers.
+At either limit it reaches a verdict from the structure already inspected; the remaining container structure is unverified.
 It proves address resolution at the published head, the claimed media kind, transfer completeness, and container structure; it does not decode frames.
 Its receipt does not replace visual inspection or recording playback.
 Apply the correction in each failing line and re-run.
