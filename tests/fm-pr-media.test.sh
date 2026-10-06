@@ -1381,13 +1381,16 @@ free = (8).to_bytes(4, 'big') + b'free'
 avi_list = b'LIST' + (1016).to_bytes(4, 'little') + b'movi' + bytes(1012)
 junk = b'JUNK' + bytes(4)
 continuation = b'RIFF' + (4).to_bytes(4, 'little') + b'AVIX'
-for state, count in [('within', 100), ('beyond', 100000)]:
+for state, count in [('within', 100), ('beyond', 100000), ('complete', 4093)]:
     # The malformed final box/chunk is reached only inside the inspection budget.
-    (root / ('mp4-' + state)).write_bytes(ftyp + mdat + free * count + b'bad-size')
-    chunks = avi_list + junk * count + b'LIST' + (99999).to_bytes(4, 'little')
+    tail = b'' if state == 'complete' else b'bad-size'
+    (root / ('mp4-' + state)).write_bytes(ftyp + mdat + free * (count + int(state == 'complete')) + tail)
+    tail = b'' if state == 'complete' else b'LIST' + (99999).to_bytes(4, 'little')
+    chunks = avi_list + junk * count + tail
     (root / ('avi-' + state)).write_bytes(b'RIFF' + (len(chunks) + 4).to_bytes(4, 'little') + b'AVI ' + chunks)
     avi = b'RIFF' + (len(avi_list) + 4).to_bytes(4, 'little') + b'AVI ' + avi_list
-    (root / ('continuation-' + state)).write_bytes(avi + continuation * count + b'RIFF' + (99999).to_bytes(4, 'little') + b'AVIX')
+    tail = b'' if state == 'complete' else b'RIFF' + (99999).to_bytes(4, 'little') + b'AVIX'
+    (root / ('continuation-' + state)).write_bytes(avi + continuation * count + tail)
 # A late marker must not grant a pass when it lies beyond the inspection budget.
 (root / 'mp4-unseen').write_bytes(ftyp + free * 100000 + mdat)
 chunks = junk * 100000 + avi_list
@@ -1395,7 +1398,7 @@ chunks = junk * 100000 + avi_list
 FIXTURES
   for shape in repository attachment external; do
     for format in mp4 avi continuation; do
-      for state in within beyond unseen; do
+      for state in within beyond unseen complete; do
         [ "$format-$state" != continuation-unseen ] || continue
         case "$shape" in
           repository) address="https://github.com/$REPO/raw/$SHA/budget.${format/continuation/avi}"; target="repos/$REPO/contents/budget.${format/continuation/avi}?ref=$SHA" ;;
@@ -1408,8 +1411,17 @@ FIXTURES
         body_case "$dir" "[recording]($address)"
         run_case "$dir" --body-file "$dir/body.md"
         expected=1
-        [ "$state" != beyond ] || expected=0
+        [ "$state" != complete ] || expected=0
         expect_code "$expected" "$CODE" "$shape $format $state must use only the bounded structural walk"
+        if [ "$state" = beyond ] || [ "$state" = unseen ]; then
+          assert_contains "$OUT" 'inspection budget exhausted' "exhaustion must explain the failed verification"
+        fi
+        if [ "$state" = unseen ]; then
+          case "$format" in
+            mp4) assert_contains "$OUT" 'moov or mdat box' "exhaustion must name the unseen ISO structure" ;;
+            avi) assert_contains "$OUT" 'AVI LIST chunk' "exhaustion must name the unseen AVI structure" ;;
+          esac
+        fi
       done
     done
   done

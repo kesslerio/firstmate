@@ -26,7 +26,7 @@ The lane obligation, in order:
    The receipt is what makes the done claim checkable by someone who is not looking at this machine, and it is where a later reader learns which codes were actually observed.
 
 The helper checks every rendered image variant and fetched media container according to its header, including large ISO boxes, RIFF padding chunks, and AVI continuation containers within a shared budget of 256 KiB of structure and 4096 box, chunk, or container headers.
-At either limit it reaches a verdict from the structure already inspected; the remaining container structure is unverified.
+Exhausting either limit fails verification and names the required marker or complete container structure that was never established.
 It proves address resolution at the published head, the claimed media kind, transfer completeness, and container structure; it does not decode frames.
 Its receipt does not replace visual inspection or recording playback.
 Apply the correction in each failing line and re-run.

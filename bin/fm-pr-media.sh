@@ -54,8 +54,8 @@
 #   Inspected ISO boxes and RIFF continuation containers must fit the received
 #   stream. The walk reads at most 256 KiB of structure and 4096 box, chunk, or
 #   container headers, sharing both limits across continuations. Payload bytes
-#   are skipped by declared size. At either limit, the verdict uses the structure
-#   already seen; the uninspected remainder is not a container-integrity proof.
+#   are skipped by declared size. Exhausting either limit fails verification,
+#   naming the required marker or complete container structure never established.
 #   The verifier proves address resolution at the published head, the claimed
 #   media kind, transfer completeness, and container structure; it does not
 #   decode frames or prove codec decoding.
@@ -436,7 +436,11 @@ else:
             elif kind in (b'moov', b'mdat'):
                 iso = True
             offset += box_size
-        iso = iso and (offset == size or budget_exhausted)
+        if budget_exhausted:
+            missing = 'moov or mdat box' if not iso else 'complete ISO box structure'
+            print('the fetched recording media lacks the required ' + missing + ': inspection budget exhausted')
+            sys.exit(0)
+        iso = iso and offset == size
 
         if start[:4] == b'RIFF' and start[8:12] == b'AVI ':
             container_offset = 0
@@ -471,7 +475,11 @@ else:
                 if offset != riff_end:
                     break
                 container_offset = riff_end + (riff_end - container_offset) % 2
-            avi = avi and (container_offset == size or budget_exhausted)
+            if budget_exhausted:
+                missing = 'AVI LIST chunk' if not avi else 'complete RIFF/AVI chunk and continuation structure'
+                print('the fetched recording media lacks the required ' + missing + ': inspection budget exhausted')
+                sys.exit(0)
+            avi = avi and container_offset == size
     ebml = start.startswith(b'\x1a\x45\xdf\xa3')
     ext = Path(urlsplit(sys.argv[4]).path).suffix.lower()
     recording = iso if ext in ('.mp4', '.mov', '.m4v') else ebml if ext in ('.webm', '.mkv') else avi if ext == '.avi' else iso or ebml or avi
