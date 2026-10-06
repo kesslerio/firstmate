@@ -179,7 +179,8 @@ else
 fi
 if [ -n "$header_output" ]; then
   length=$(awk -v want="$target" '$1 == "LENGTH" && $2 == want { print $3 }' "$FM_FAKE_GH_TABLE" | head -n 1)
-  printf 'HTTP/2 %s\r\nContent-Length: %s\r\n\r\n' "$code" "${length:-$(wc -c <"$output")}" >"$header_output"
+  content_type=$(awk -v want="$target" '$1 == "TYPE" && $2 == want { print $3 }' "$FM_FAKE_GH_TABLE" | head -n 1)
+  printf 'HTTP/2 %s\r\nContent-Length: %s\r\nContent-Type: %s\r\n\r\n' "$code" "${length:-$(wc -c <"$output")}" "${content_type:-application/octet-stream}" >"$header_output"
 fi
 printf '%s' "$code"
 if awk -v want="$target" '$1 == "TRANSFER" && $2 == want { found=1 } END { exit !found }' "$FM_FAKE_GH_TABLE"; then exit 18; fi
@@ -1167,10 +1168,10 @@ ftyp = bytes.fromhex('00000018667479706d703432000000006d70343269736f6d')
 mdat = bytes.fromhex('000004006d646174') + bytes(1016)
 avi = b'RIFF' + (1028).to_bytes(4, 'little') + b'AVI LIST' + (1016).to_bytes(4, 'little') + b'movi' + bytes(1012)
 videos = {'mp4': ftyp + mdat,
-          'mov': bytes.fromhex('0000000866726565000000186674797071742020000000007174202069736f6d') + mdat,
+          'mov': bytes.fromhex('000000186674797071742020000000007174202069736f6d') + mdat,
           'avi': avi,
           'large-mp4': ftyp + (8192).to_bytes(4, 'big') + b'mdat' + bytes(8184),
-          'leading-mp4': (8192).to_bytes(4, 'big') + b'mdat' + ftyp + bytes(8160),
+          'leading-mp4': ftyp + (8192).to_bytes(4, 'big') + b'free' + bytes(8184) + mdat,
           'webm': bytes.fromhex('1a45dfa3') + bytes(1024)}
 for ext, body in (images | videos).items():
     (root / (ext + '-valid')).write_bytes(body)
@@ -1225,7 +1226,7 @@ FIXTURES
 }
 
 test_recording_structure_and_declared_container() {
-  local dir shape fixture extension expected reason address target
+  local dir shape fixture extension content_type expected reason address target
   dir=$(new_case recording-structure)
   python3 - "$dir" <<'FIXTURES'
 import sys
@@ -1239,7 +1240,20 @@ for name, body in {
     'moov': ftyp + (8192).to_bytes(4, 'big') + b'moov' + bytes(8184),
     'avi': avi,
     'ebml': bytes.fromhex('1a45dfa3') + bytes(1024),
-    'no-brand': b'\x00\x00\x00\x18ftypnope' + bytes(12) + mdat,
+    'new-brand': b'\x00\x00\x00\x18ftypav01' + bytes(4) + b'av01zzzz' + mdat,
+    'extended-iso': ftyp + (1).to_bytes(4, 'big') + b'free' + (8192).to_bytes(8, 'big') + bytes(8176) + mdat,
+    'to-end-iso': ftyp + bytes(4) + b'mdat' + bytes(8192),
+    'short-extended': ftyp + (1).to_bytes(4, 'big') + b'mdat' + bytes(3),
+    'zero-padding': ftyp + bytes(4) + b'free' + mdat,
+    'padded-iso': ftyp + (8192).to_bytes(4, 'big') + b'free' + bytes(8184) + mdat,
+    'padded-avi': b'RIFF' + (9228).to_bytes(4, 'little') + b'AVI JUNK' + (8191).to_bytes(4, 'little') + bytes(8192) + avi[12:],
+    'continued-avi': avi + b'RIFF' + (4).to_bytes(4, 'little') + b'AVIX',
+    'embedded-iso': (8192).to_bytes(4, 'big') + b'mdat' + ftyp + bytes(8160),
+    'unrelated-iso': ftyp + b'junk' + mdat,
+    'embedded-avi': b'RIFF' + (8204).to_bytes(4, 'little') + b'AVI JUNK' + (8192).to_bytes(4, 'little') + avi[12:] + bytes(7168),
+    'bad-ftyp': (23).to_bytes(4, 'big') + b'ftyp' + bytes(15) + mdat,
+    'oversized-box': ftyp + (99999).to_bytes(4, 'big') + b'mdat' + bytes(8192),
+    'oversized-chunk': avi[:12] + b'LIST' + (99999).to_bytes(4, 'little') + b'movi' + bytes(1024),
     'no-ftyp': mdat,
     'no-payload': ftyp + bytes(8192),
     'no-list': avi[:12] + bytes(1024),
@@ -1249,7 +1263,7 @@ for name, body in {
     (root / name).write_bytes(body)
 FIXTURES
   for shape in repository attachment external; do
-    while read -r fixture extension expected reason; do
+    while read -r fixture extension content_type expected reason; do
       case "$shape" in
         repository) address="https://github.com/$REPO/raw/$SHA/demo.$extension"; target="repos/$REPO/contents/demo.$extension?ref=$SHA" ;;
         attachment) address="https://github.com/user-attachments/assets/demo.$extension"; target=$address ;;
@@ -1262,6 +1276,7 @@ FIXTURES
       : >"$dir/table"
       status_row "$dir" "$target" 200
       printf 'PAYLOAD %s %s\n' "$target" "$dir/$fixture" >>"$dir/table"
+      [ "$content_type" = - ] || printf 'TYPE %s %s\n' "$target" "$content_type" >>"$dir/table"
       if [ "$extension" = none ]; then
         body_case "$dir" "<video src=\"$address\"></video>"
       else
@@ -1284,25 +1299,50 @@ FIXTURES
         expect_code 1 "$CODE" "$shape recordings must fail in image positions"
       fi
     done <<'CASES'
-iso mp4 0
-iso mov 0
-iso m4v 0
-iso none 0
-moov mp4 0
-avi avi 0
-avi none 0
-ebml mkv 0
-avi mp4 1 ISO file type brand
-iso avi 1 RIFF/AVI
-iso webm 1 EBML
-iso mkv 1 EBML
-ebml avi 1 RIFF/AVI
-no-brand mp4 1 ISO file type brand
-no-ftyp mp4 1 ISO file type brand
-no-payload mp4 1 moov or mdat box
-no-list avi 1 AVI LIST chunk
-wrong-riff avi 1 RIFF/AVI
-short-riff avi 1 complete RIFF/AVI
+iso mp4 - 0
+iso mov - 0
+iso m4v - 0
+iso none - 0
+moov mp4 - 0
+avi avi - 0
+avi none - 0
+ebml mkv - 0
+avi mp4 - 1 ISO file type box
+iso avi - 1 RIFF/AVI
+iso webm - 1 EBML
+iso mkv - 1 EBML
+ebml avi - 1 RIFF/AVI
+new-brand mp4 - 0
+new-brand none - 0
+extended-iso mp4 - 0
+to-end-iso mp4 - 0
+short-extended mp4 - 1 moov or mdat box
+zero-padding mp4 - 1 moov or mdat box
+padded-iso mp4 - 0
+padded-iso mov - 0
+padded-iso m4v - 0
+padded-iso none - 0
+padded-avi avi - 0
+padded-avi none - 0
+continued-avi avi - 0
+embedded-iso mp4 - 1 ISO file type
+unrelated-iso mp4 - 1 moov or mdat box
+embedded-avi avi - 1 AVI LIST chunk
+bad-ftyp mp4 - 1 ISO file type
+oversized-box mp4 - 1 moov or mdat box
+oversized-chunk avi - 1 AVI LIST chunk
+no-ftyp mp4 - 1 ISO file type box
+no-payload mp4 - 1 moov or mdat box
+no-list avi - 1 AVI LIST chunk
+wrong-riff avi - 1 RIFF/AVI
+short-riff avi - 1 complete RIFF/AVI
+iso none video/mp4 0
+avi none video/x-msvideo 0
+ebml none video/webm 0
+avi mp4 video/mp4 1 Content-Type
+iso none video/x-msvideo 1 Content-Type
+iso none video/webm 1 Content-Type
+avi none video/mp4 1 Content-Type
 CASES
   done
   pass "recording structure and declared containers hold across every fetch path"

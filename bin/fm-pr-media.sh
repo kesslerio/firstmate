@@ -44,11 +44,14 @@
 #   All rendered img and picture source srcset candidates are checked as images.
 #   Fetched bodies must meet Content-Length when declared. PNG, JPEG, and GIF
 #   require their closing IEND, end-of-image, and trailer markers respectively.
-#   Recordings require at least 1024 bytes and a recognised ISO file type brand
-#   plus a moov or mdat box in the first 4096 bytes for mp4/mov, a leading EBML
-#   marker for webm/mkv, or complete RIFF/AVI bytes with an AVI LIST chunk for avi.
-#   ISO box order and boxes larger than the scanned prefix are accepted.
-#   These bounded container checks reject truncation and disguised text;
+#   Recording bytes must match the container claimed by the address and response
+#   Content-Type when it identifies a supported recording container.
+#   Recordings require at least 1024 bytes and a leading ISO file type box
+#   followed by a moov or mdat box for mp4/mov, a leading EBML marker for webm/mkv,
+#   or a complete first RIFF/AVI container with an AVI LIST chunk for avi.
+#   ISO boxes and RIFF chunks are walked by declared size, including padding;
+#   ISO brands are unrestricted, and AVI may have OpenDML continuation containers.
+#   These container checks reject truncation and disguised text;
 #   they do not prove codec decoding.
 #
 # A direct fetch of the `github.com/.../raw/...` form is deliberately NOT a check:
@@ -347,11 +350,15 @@ with path.open('rb') as source:
     end = source.read(12)
 # Reset at every response, so redirect lengths cannot describe the final body.
 length = None
+content_type = ''
 for line in Path(sys.argv[2]).read_text(encoding='latin1').splitlines():
     if line.startswith('HTTP/'):
         length = None
+        content_type = ''
     elif line.lower().startswith('content-length:'):
         length = int(line.split(':', 1)[1].strip())
+    elif line.lower().startswith('content-type:'):
+        content_type = line.split(':', 1)[1].split(';', 1)[0].strip().lower()
 if length is not None and size < length:
     print('the fetched media body is shorter than its declared Content-Length')
     sys.exit(0)
@@ -379,39 +386,72 @@ elif sys.argv[3] == 'image':
     if not image:
         print('the fetched media is not an image; use a recording link for video media')
 else:
-    # Inspect structural headers throughout the prefix: a large leading box
-    # must not hide another marker, and its payload need not fit in the prefix.
-    ftyp = payload = avi_list = False
-    brands = {b'isom', b'mp41', b'mp42', b'avc1', b'dash', b'M4V ', b'MSNV', b'qt  '}
-    brands.update(b'iso' + bytes([digit]) for digit in range(ord('2'), ord('9') + 1))
-    for offset in range(len(start) - 7):
-        box_size = int.from_bytes(start[offset:offset + 4], 'big')
-        kind = start[offset + 4:offset + 8]
-        if 8 <= box_size <= size - offset:
-            if kind == b'ftyp' and box_size >= 16 and offset + box_size <= len(start):
-                declared_brands = [start[offset + 8:offset + 12]]
-                declared_brands += [start[i:i + 4] for i in range(offset + 16, offset + box_size, 4)]
-                ftyp |= any(brand in brands for brand in declared_brands)
-            payload |= kind in (b'moov', b'mdat')
-        if start[offset:offset + 4] == b'LIST':
-            chunk_size = int.from_bytes(start[offset + 4:offset + 8], 'little')
-            avi_list |= 4 <= chunk_size <= size - offset - 8 and start[offset + 8:offset + 12] in (b'hdrl', b'movi')
-    iso = ftyp and payload
+    # Seek between declared boundaries instead of searching inside payload bytes.
+    ftyp = iso = avi = False
+    with path.open('rb') as source:
+        offset = 0
+        while offset + 8 <= size:
+            source.seek(offset)
+            header = source.read(8)
+            box_size = int.from_bytes(header[:4], 'big')
+            kind = header[4:8]
+            header_size = 8
+            if box_size == 1:
+                if offset + 16 > size:
+                    break
+                box_size = int.from_bytes(source.read(8), 'big')
+                header_size = 16
+            elif box_size == 0:
+                box_size = size - offset
+            if box_size < header_size or box_size > size - offset:
+                break
+            if offset == 0:
+                # Major brand, minor version, then any four-byte compatible brands.
+                brand_size = box_size - header_size
+                ftyp = kind == b'ftyp' and brand_size >= 8 and brand_size % 4 == 0
+                if not ftyp:
+                    break
+            elif kind in (b'moov', b'mdat'):
+                iso = True
+                break
+            offset += box_size
+
+        if start[:4] == b'RIFF' and start[8:12] == b'AVI ':
+            riff_end = int.from_bytes(start[4:8], 'little') + 8
+            offset = 12
+            # The first RIFF may be followed by OpenDML continuation containers.
+            while 12 <= riff_end <= size and offset + 8 <= riff_end:
+                source.seek(offset)
+                header = source.read(8)
+                chunk_size = int.from_bytes(header[4:8], 'little')
+                chunk_end = offset + 8 + chunk_size
+                next_offset = chunk_end + chunk_size % 2
+                if next_offset > riff_end:
+                    break
+                if header[:4] == b'LIST' and chunk_size >= 4 and source.read(4) in (b'hdrl', b'movi'):
+                    avi = True
+                    break
+                offset = next_offset
     ebml = start.startswith(b'\x1a\x45\xdf\xa3')
-    avi = (start[:4] == b'RIFF' and start[8:12] == b'AVI ' and avi_list
-           and int.from_bytes(start[4:8], 'little') + 8 == size)
     ext = Path(urlsplit(sys.argv[4]).path).suffix.lower()
     recording = iso if ext in ('.mp4', '.mov', '.m4v') else ebml if ext in ('.webm', '.mkv') else avi if ext == '.avi' else iso or ebml or avi
-    if ext in ('.mp4', '.mov', '.webm', '.m4v', '.avi', '.mkv') or not image:
-        if not recording:
+    claimed_container = {
+        'video/mp4': iso, 'video/quicktime': iso, 'video/x-m4v': iso,
+        'video/webm': ebml, 'video/x-matroska': ebml,
+        'video/avi': avi, 'video/x-msvideo': avi,
+    }.get(content_type)
+    if ext in ('.mp4', '.mov', '.webm', '.m4v', '.avi', '.mkv') or not image or claimed_container is not None:
+        if claimed_container is False:
+            print('the fetched recording media does not match its declared Content-Type: ' + content_type)
+        elif not recording:
             if ext in ('.mp4', '.mov', '.m4v'):
-                missing = 'recognised ISO file type brand' if not ftyp else 'moov or mdat box'
+                missing = 'leading ISO file type box' if not ftyp else 'moov or mdat box'
             elif ext == '.avi':
                 missing = 'complete RIFF/AVI container with an AVI LIST chunk'
             elif ext in ('.webm', '.mkv'):
                 missing = 'EBML container marker'
             else:
-                missing = 'ISO file type brand and moov/mdat box, EBML, or RIFF/AVI container marker'
+                missing = 'ISO file type box and moov/mdat box, EBML, or RIFF/AVI container marker'
             print('the fetched recording media lacks the required ' + missing)
         elif size < 1024:
             print('the fetched recording media is too small: at least 1024 bytes are required')
