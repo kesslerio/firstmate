@@ -101,7 +101,7 @@ RENDER
     kind=$(awk -v want="$target" '$1 == "MEDIA" && $2 == want { print $3 }' "$table" | head -n 1)
     case "${kind:-image}" in
       image) python3 -c 'import base64, sys; sys.stdout.buffer.write(base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2J3gAAAAASUVORK5CYII="))' ;;
-      video) printf '\000\000\000\030ftypmp42fixture-video' ;;
+      video) python3 -c 'import sys; sys.stdout.buffer.write(bytes.fromhex("00000018667479706d703432000000006d70343269736f6d") + bytes.fromhex("000004006d646174") + bytes(1016))' ;;
       *) printf 'unknown-media' ;;
     esac
     if awk -v want="$target" '$1 == "TRANSFER" && $2 == want { found=1 } END { exit !found }' "$table"; then exit 1; fi
@@ -132,11 +132,13 @@ SH
 set -u
 target=''
 output=''
+header_output=''
 raw=0
 auth=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --output) output=$2; shift 2 ;;
+    --dump-header) header_output=$2; shift 2 ;;
     --header)
       case "$2" in
         @-) header=$(cat); [ "$header" = 'Authorization: Bearer fixture-token' ] || exit 9; auth=1 ;;
@@ -155,19 +157,29 @@ case "$target" in
   https://api.github.com/repos/*) target=${target#https://api.github.com/} ;;
 esac
 printf 'curl %s\n' "$target" >>"$FM_FAKE_GH_ASKED"
-[ "$auth" = 1 ] || exit 9
+case "$target" in
+  repos/*|https://github.com/*) [ "$auth" = 1 ] || exit 9 ;;
+  *) [ "$auth" = 0 ] || exit 9 ;;
+esac
 code=$(awk -v want="$target" '$1 == "STATUS" && $2 == want { print $3 }' "$FM_FAKE_GH_TABLE" | head -n 1)
 [ -n "$code" ] || code=599
 [ "$code" != NONE ] || exit 18
 kind=$(awk -v want="$target" '$1 == "MEDIA" && $2 == want { print $3 }' "$FM_FAKE_GH_TABLE" | head -n 1)
-if [[ "$target" = repos/*/contents/* ]] && [ "$raw" = 0 ]; then
+payload=$(awk -v want="$target" '$1 == "PAYLOAD" && $2 == want { print $3 }' "$FM_FAKE_GH_TABLE" | head -n 1)
+if [ -n "$payload" ]; then
+  cat "$payload" >"$output"
+elif [[ "$target" = repos/*/contents/* ]] && [ "$raw" = 0 ]; then
   printf '{"type":"file","encoding":"base64","content":"fixture"}' >"$output"
 else
   case "${kind:-image}" in
     image) python3 -c 'import base64, sys; sys.stdout.buffer.write(base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2J3gAAAAASUVORK5CYII="))' >"$output" ;;
-    video) printf '\000\000\000\030ftypmp42fixture-video' >"$output" ;;
+    video) python3 -c 'import sys; sys.stdout.buffer.write(bytes.fromhex("00000018667479706d703432000000006d70343269736f6d") + bytes.fromhex("000004006d646174") + bytes(1016))' >"$output" ;;
     *) printf 'unknown-media' >"$output" ;;
   esac
+fi
+if [ -n "$header_output" ]; then
+  length=$(awk -v want="$target" '$1 == "LENGTH" && $2 == want { print $3 }' "$FM_FAKE_GH_TABLE" | head -n 1)
+  printf 'HTTP/2 %s\r\nContent-Length: %s\r\n\r\n' "$code" "${length:-$(wc -c <"$output")}" >"$header_output"
 fi
 printf '%s' "$code"
 if awk -v want="$target" '$1 == "TRANSFER" && $2 == want { found=1 } END { exit !found }' "$FM_FAKE_GH_TABLE"; then exit 18; fi
@@ -479,6 +491,7 @@ test_pinned_raw_githubusercontent_address_covers_a_recording_and_a_blob_link() {
   dir=$(new_case mixed-shapes)
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/clip.mp4?ref=$SHA" 200
+  printf 'MEDIA repos/%s/contents/docs/media/clip.mp4?ref=%s video\n' "$REPO" "$SHA" >>"$dir/table"
   body_case "$dir" '[Recording](https://github.com/tester/widgets/raw/'"$SHA"'/docs/media/clip.mp4)
 
 Watch it here: https://github.com/tester/widgets/blob/'"$SHA"'/docs/media/clip.mp4'
@@ -580,6 +593,7 @@ test_pinned_raw_githubusercontent_address_reports_a_blob_url_as_a_page_not_an_im
   dir=$(new_case blob-note-once)
   private_row "$dir" yes
   status_row "$dir" "repos/$REPO/contents/docs/media/clip.mp4?ref=$SHA" 200
+  printf 'MEDIA repos/%s/contents/docs/media/clip.mp4?ref=%s video\n' "$REPO" "$SHA" >>"$dir/table"
   body_case "$dir" 'Watch it here: https://github.com/tester/widgets/blob/'"$SHA"'/docs/media/clip.mp4'
   run_case "$dir" --body-file "$dir/body.md"
   expect_code 0 "$CODE" "a blob link resolves, so the run is green"
@@ -902,11 +916,15 @@ test_extensionless_media_must_match_image_context() {
           printf 'MEDIA repos/%s/contents/extensionless?ref=%s %s\n' "$REPO" "$SHA" "$kind" >>"$dir/table"
         fi
         run_case "$dir" --body-file "$dir/body.md" --require-embeds
-        if [ "$context" = link ] || [ "$kind" = image ]; then
+        if [ "$kind" = image ] || { [ "$context" = link ] && [ "$kind" = video ]; }; then
           expect_code 0 "$CODE" "a resolving image or attachment link must pass without an extension"
         else
           expect_code 1 "$CODE" "an extensionless non-image cannot pass in an image position"
-          assert_contains "$OUT" 'not an image' "the receipt must identify the media mismatch"
+          if [ "$context" = image ]; then
+            assert_contains "$OUT" 'not an image' "the receipt must identify the media mismatch"
+          else
+            assert_contains "$OUT" 'container marker' "unknown attachment bytes must fail as recording media"
+          fi
         fi
         assert_contains "$OUT" '1 address(es)' "embed context or attachment shape must select extensionless media"
       done
@@ -1132,6 +1150,88 @@ assert any(r['path'] == '/final/interrupted' for r in external)
 ASSERT
   pass "live HTTPS redirects strip Authorization and refuse incomplete bodies"
 }
+
+test_container_bytes_and_declared_length() {
+  local dir format state shape target address payload
+  dir=$(new_case container-bytes)
+  python3 - "$dir" <<'FIXTURES'
+import base64
+import sys
+from pathlib import Path
+root = Path(sys.argv[1])
+png = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2J3gAAAAASUVORK5CYII=')
+# Byte-contract fixtures cover signatures and terminators, not codec decoding.
+images = {'png': png, 'jpg': b'\xff\xd8\xff' + bytes(64) + b'\xff\xd9',
+          'gif': b'GIF89a' + bytes(64) + b';'}
+videos = {'mp4': bytes.fromhex('00000018667479706d703432000000006d70343269736f6d') + bytes(1024),
+          'mov': bytes.fromhex('0000000866726565000000186674797071742020000000007174202069736f6d') + bytes(1024),
+          'webm': bytes.fromhex('1a45dfa3') + bytes(1024)}
+for ext, body in (images | videos).items():
+    (root / (ext + '-valid')).write_bytes(body)
+    (root / (ext + '-bad')).write_bytes(body[:-12] if ext in images else b'text posing as a recording' * 100)
+    (root / (ext + '-tiny')).write_bytes(body[:24] if ext in images else body[:40])
+FIXTURES
+  for shape in repository attachment external; do
+    for format in png jpg gif mp4 mov webm; do
+      for state in valid bad tiny short; do
+        case "$shape" in
+          repository) address="https://github.com/$REPO/raw/$SHA/demo.$format"; target="repos/$REPO/contents/demo.$format?ref=$SHA" ;;
+          attachment) address="https://github.com/user-attachments/assets/demo.$format"; target=$address ;;
+          external) address="https://collector.example/demo.$format"; target=$address ;;
+        esac
+        : >"$dir/table"
+        status_row "$dir" "$target" 200
+        payload="$dir/$format-$state"
+        [ "$state" != short ] || payload="$dir/$format-valid"
+        printf 'PAYLOAD %s %s\n' "$target" "$payload" >>"$dir/table"
+        [ "$state" != short ] || printf 'LENGTH %s 99999\n' "$target" >>"$dir/table"
+        case "$format" in
+          png|jpg|gif) body_case "$dir" "![proof]($address)" ;;
+          *) body_case "$dir" "[recording]($address)" ;;
+        esac
+        run_case "$dir" --body-file "$dir/body.md"
+        if [ "$state" = valid ]; then
+          expect_code 0 "$CODE" "$shape $format valid bytes must pass"
+        else
+          expect_code 1 "$CODE" "$shape $format $state bytes must fail"
+          assert_not_contains "$OUT" '[ok]' "invalid media must never receive an ok receipt"
+          if [ "$state" = short ]; then
+            assert_contains "$OUT" 'Content-Length' "the receipt must explain the short response"
+          elif [ "$state" = tiny ] && [[ "$format" = mp4 || "$format" = mov || "$format" = webm ]]; then
+            assert_contains "$OUT" 'too small' "the receipt must explain the recording size rejection"
+          else
+            assert_contains "$OUT" 'marker' "the receipt must explain the missing container marker"
+          fi
+        fi
+      done
+    done
+  done
+  pass "container checks and declared lengths hold across all fetch paths"
+}
+
+test_every_rendered_srcset_candidate_is_verified() {
+  local dir
+  dir=$(new_case srcset)
+  status_row "$dir" "repos/$REPO/contents/good.png?ref=$SHA" 200
+  printf '<picture><source srcset="https://github.com/%s/raw/%s/good.png 1x, https://github.com/%s/raw/%s/dark.png 2x"><img src="https://github.com/%s/raw/%s/good.png" srcset="https://github.com/%s/raw/%s/wide.png 800w, https://github.com/%s/raw/%s/good.png 1600w"></picture>' "$REPO" "$SHA" "$REPO" "$SHA" "$REPO" "$SHA" "$REPO" "$SHA" "$REPO" "$SHA" >"$dir/rendered.html"
+  body_case "$dir" ''
+  run_case "$dir" --body-file "$dir/body.md"
+  expect_code 1 "$CODE" "broken dark and responsive candidates must fail despite a working fallback"
+  assert_contains "$OUT" 'RESULT: 3 address(es), 1 passed, 2 failed' "every distinct candidate must be checked"
+  status_row "$dir" "repos/$REPO/contents/dark.png?ref=$SHA" 200
+  status_row "$dir" "repos/$REPO/contents/wide.png?ref=$SHA" 200
+  printf 'MEDIA repos/%s/contents/dark.png?ref=%s video\n' "$REPO" "$SHA" >>"$dir/table"
+  run_case "$dir" --body-file "$dir/body.md"
+  expect_code 1 "$CODE" "picture srcset must require image bytes"
+  : >"$dir/table"
+  for name in good dark wide; do status_row "$dir" "repos/$REPO/contents/$name.png?ref=$SHA" 200; done
+  run_case "$dir" --body-file "$dir/body.md"
+  expect_code 0 "$CODE" "all valid candidates must pass"
+  pass "img and picture source srcsets verify every candidate in image context"
+}
+
+test_container_bytes_and_declared_length
+test_every_rendered_srcset_candidate_is_verified
 
 test_failed_downloads_override_partial_success
 test_failed_fixture_read_refuses_before_verification

@@ -41,6 +41,12 @@
 #   a final 2xx after at most five HTTPS redirects. Their addresses are redacted
 #   in the receipt. Image positions require image media, including extensionless
 #   attachments, checked from fetched bytes rather than the filename.
+#   All rendered img and picture source srcset candidates are checked as images.
+#   Fetched bodies must meet Content-Length when declared. PNG, JPEG, and GIF
+#   require their closing IEND, end-of-image, and trailer markers respectively.
+#   Recordings require at least 1024 bytes and an ISO file type box near the start
+#   for mp4/mov, or a leading EBML marker for webm. These bounded container checks
+#   reject truncation and disguised text; they do not prove codec decoding.
 #
 # A direct fetch of the `github.com/.../raw/...` form is deliberately NOT a check:
 # that endpoint hands a browser a session-bound redirect, so it answers 404 to an
@@ -223,8 +229,29 @@ class Evidence(HTMLParser):
         attrs = dict(attrs)
         context = 'image' if tag == 'img' else 'link'
         target = (attrs.get('data-canonical-src') or attrs.get('src')) if tag in ('img', 'video', 'source') else attrs.get('href') if tag == 'a' else None
-        if not target:
-            return
+        if target:
+            self.add_target(target, context, tag)
+        if tag in ('img', 'source'):
+            # HTML srcset collects a non-space URL, then descriptors until the
+            # next comma. Commas within a URL (e.g. a data URL) stay in the URL.
+            remaining = attrs.get('srcset', '')
+            while remaining:
+                remaining = remaining.lstrip(' \t\r\n\f,')
+                candidate = re.match(r'[^ \t\r\n\f]+', remaining)
+                if not candidate:
+                    break
+                url = candidate[0]
+                remaining = remaining[len(url):]
+                if url.endswith(','):
+                    url = url.rstrip(',')
+                else:
+                    _, separator, remaining = remaining.partition(',')
+                    if not separator:
+                        remaining = ''
+                if url:
+                    self.add_target(url, 'image', tag)
+
+    def add_target(self, target, context, tag):
         parts = urlsplit(target)
         if parts.username is not None or parts.password is not None:
             raise ValueError('media target contains URL credentials')
@@ -265,10 +292,11 @@ authenticated_target() {
   esac
 }
 
-api_status() {  # <endpoint-or-absolute-url> [image] -> 3-digit code, or ERR
-  local target=$1 context=${2:-link} code host token=''
+api_status() {  # <endpoint-or-absolute-url> -> 3-digit code, or ERR
+  local target=$1 code host token=''
   local -a headers=()
   : >"$TMP_DIR/media-body"
+  : >"$TMP_DIR/media-headers"
   if authenticated_target "$target"; then
     case "$target" in
       repos/*)
@@ -291,38 +319,91 @@ api_status() {  # <endpoint-or-absolute-url> [image] -> 3-digit code, or ERR
     [ -n "$token" ] || { printf 'ERR\n'; return 0; }
     headers=(--header @-)
   fi
-  if [ "$context" = image ] && [[ "$target" = */repos/*/contents/* ]]; then
+  if [[ "$target" = */repos/*/contents/* ]]; then
     headers+=(--header 'Accept: application/vnd.github.raw+json')
   fi
   code=$( { [ -z "$token" ] || printf 'Authorization: Bearer %s\n' "$token"; } | \
-    curl --disable --silent --output "$TMP_DIR/media-body" --write-out '%{http_code}' \
+    curl --disable --silent --output "$TMP_DIR/media-body" --dump-header "$TMP_DIR/media-headers" --write-out '%{http_code}' \
       --location --max-redirs 5 --max-time 30 --proto '=https' --proto-redir '=https' \
       "${headers[@]}" -- "$target") || code=ERR
   printf '%s\n' "$code"
 }
 
-is_image_media() {
-  python3 - "$TMP_DIR/media-body" <<'PYTHON'
+media_error() {  # <image|link> <address> -> empty on success, otherwise reason
+  python3 - "$TMP_DIR/media-body" "$TMP_DIR/media-headers" "$1" "$2" <<'PYTHON'
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
-body = Path(sys.argv[1]).read_bytes()
-image = body.startswith((b'\x89PNG\r\n\x1a\n', b'\xff\xd8\xff', b'GIF87a', b'GIF89a', b'BM', b'II*\x00', b'MM\x00*', b'\x00\x00\x01\x00'))
-image |= body[:4] == b'RIFF' and body[8:12] == b'WEBP'
-image |= body[4:8] == b'ftyp' and body[8:12] in (b'avif', b'avis', b'heic', b'heix', b'hevc', b'hevx', b'mif1', b'msf1')
-if not image:
-    try:
-        image = ET.fromstring(body).tag in ('svg', '{http://www.w3.org/2000/svg}svg')
-    except ET.ParseError:
-        pass
-sys.exit(0 if image else 1)
+from urllib.parse import urlsplit
+
+path = Path(sys.argv[1])
+size = path.stat().st_size
+with path.open('rb') as source:
+    start = source.read(4096)
+    source.seek(max(0, size - 12))
+    end = source.read(12)
+# Reset at every response, so redirect lengths cannot describe the final body.
+length = None
+for line in Path(sys.argv[2]).read_text(encoding='latin1').splitlines():
+    if line.startswith('HTTP/'):
+        length = None
+    elif line.lower().startswith('content-length:'):
+        length = int(line.split(':', 1)[1].strip())
+if length is not None and size < length:
+    print('the fetched media body is shorter than its declared Content-Length')
+    sys.exit(0)
+
+image = False
+closing = None
+if start.startswith(b'\x89PNG\r\n\x1a\n'):
+    image, closing = True, b'\x00\x00\x00\x00IEND\xaeB`\x82'
+elif start.startswith(b'\xff\xd8\xff'):
+    image, closing = True, b'\xff\xd9'
+elif start.startswith((b'GIF87a', b'GIF89a')):
+    image, closing = True, b';'
+else:
+    image = start.startswith((b'BM', b'II*\x00', b'MM\x00*', b'\x00\x00\x01\x00'))
+    image |= start[:4] == b'RIFF' and start[8:12] == b'WEBP'
+    image |= start[4:8] == b'ftyp' and start[8:12] in (b'avif', b'avis', b'heic', b'heix', b'hevc', b'hevx', b'mif1', b'msf1')
+    if not image:
+        try:
+            image = ET.parse(path).getroot().tag in ('svg', '{http://www.w3.org/2000/svg}svg')
+        except ET.ParseError:
+            pass
+if closing is not None and not end.endswith(closing):
+    print('the fetched image media is truncated or corrupt: container closing marker is absent')
+elif sys.argv[3] == 'image':
+    if not image:
+        print('the fetched media is not an image; use a recording link for video media')
+else:
+    # Walk complete leading ISO boxes within the bounded prefix, allowing a
+    # leading free/wide box without mistaking a random "ftyp" string for a box.
+    iso = False
+    offset = 0
+    while offset + 16 <= len(start):
+        box_size = int.from_bytes(start[offset:offset + 4], 'big')
+        kind = start[offset + 4:offset + 8]
+        if box_size < 8 or offset + box_size > len(start):
+            break
+        if kind == b'ftyp' and box_size >= 16:
+            iso = True
+            break
+        offset += box_size
+    ebml = start.startswith(b'\x1a\x45\xdf\xa3')
+    ext = Path(urlsplit(sys.argv[4]).path).suffix.lower()
+    recording = iso if ext in ('.mp4', '.mov', '.m4v') else ebml if ext == '.webm' else iso or ebml
+    if ext in ('.mp4', '.mov', '.webm', '.m4v', '.avi', '.mkv') or not image:
+        if not recording:
+            print('the fetched recording media lacks the required ISO file type box or EBML container marker')
+        elif size < 1024:
+            print('the fetched recording media is too small: at least 1024 bytes are required')
 PYTHON
 }
 
-contents_status() {  # <owner/repo> <ref> <path> [image]
-  local repo=$1 ref=$2 path=$3 context=${4:-link} enc
+contents_status() {  # <owner/repo> <ref> <path>
+  local repo=$1 ref=$2 path=$3 enc
   enc=$(printf '%s' "$path" | LC_ALL=C sed -e 's/ /%20/g' -e 's/#/%23/g' -e 's/?/%3F/g')
-  api_status "repos/$repo/contents/$enc?ref=$ref" "$context"
+  api_status "repos/$repo/contents/$enc?ref=$ref"
 }
 
 # Whether the repository holding an address is private decides the raw-address
@@ -386,7 +467,7 @@ pin_at_head() {  # <owner/repo> <path>
 }
 
 check_address() {  # <address>
-  local addr=$1 context=$2 host rest shape='' owner repo ref path tail codes verdict access fix image_mismatch=0
+  local addr=$1 context=$2 host rest shape='' owner repo ref path tail codes verdict access fix error image_mismatch=0
 
   case "$addr" in
     *://*) ;;
@@ -441,7 +522,7 @@ check_address() {  # <address>
 
   case "$shape" in
     asset | remote | web-other)
-      codes=$(api_status "$addr" "$context")
+      codes=$(api_status "$addr")
       if [ "$context" = image ]; then
         case "$addr" in
           https://github.com/*/*/blob/*)
@@ -456,8 +537,9 @@ check_address() {  # <address>
       fi
       case "$codes" in
         2??)
-          if [ "$context" = image ] && ! is_image_media; then
-            record fail "$addr" "shape: $shape   fetch=$codes" "the fetched media is not an image; use a recording link for video media"
+          error=$(media_error "$context" "$addr") || error='the fetched media could not be checked'
+          if [ -n "$error" ]; then
+            record fail "$addr" "shape: $shape   fetch=$codes" "$error"
             return 0
           fi
           record ok "$addr" "shape: $shape   fetch=$codes"
@@ -483,7 +565,7 @@ check_address() {  # <address>
   path=${path%%\#*}
   path=${path%%\?*}
 
-  codes="contents=$(contents_status "$owner/$repo" "$ref" "$path" "$context")   direct=session-bound"
+  codes="contents=$(contents_status "$owner/$repo" "$ref" "$path")   direct=session-bound"
 
   verdict=ok
   REASON=''
@@ -535,12 +617,14 @@ check_address() {  # <address>
         ;;
   esac
 
-  if [ "$context" = image ]; then
-    if [ "$verdict" = ok ] && ! is_image_media; then
+  if [ "$verdict" = ok ]; then
+    error=$(media_error "$context" "$addr") || error='the fetched media could not be checked'
+    if [ -n "$error" ]; then
       verdict=fail
-      image_mismatch=1
-      add_reason "the fetched repository media is not an image; use a recording link for video media"
+      add_reason "$error"
     fi
+  fi
+  if [ "$context" = image ]; then
     if [ "$shape" = web-blob ]; then
       verdict=fail
       add_reason "a blob URL is an HTML page and cannot render in an image position"
