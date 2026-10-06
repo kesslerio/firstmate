@@ -48,11 +48,13 @@
 #   Content-Type when it identifies a supported recording container.
 #   Recordings require at least 1024 bytes and a leading ISO file type box
 #   followed by a moov or mdat box for mp4/mov, a leading EBML marker for webm/mkv,
-#   or a complete first RIFF/AVI container with an AVI LIST chunk for avi.
+#   or complete RIFF/AVI containers with an AVI LIST chunk for avi.
 #   ISO boxes and RIFF chunks are walked by declared size, including padding;
 #   ISO brands are unrestricted, and AVI may have OpenDML continuation containers.
-#   These container checks reject truncation and disguised text;
-#   they do not prove codec decoding.
+#   Every ISO box and RIFF continuation container must fit the received stream.
+#   The verifier proves address resolution at the published head, the claimed
+#   media kind, transfer completeness, and container structure; it does not
+#   decode frames or prove codec decoding.
 #
 # A direct fetch of the `github.com/.../raw/...` form is deliberately NOT a check:
 # that endpoint hands a browser a session-bound redirect, so it answers 404 to an
@@ -413,25 +415,35 @@ else:
                     break
             elif kind in (b'moov', b'mdat'):
                 iso = True
-                break
             offset += box_size
+        iso = iso and offset == size
 
         if start[:4] == b'RIFF' and start[8:12] == b'AVI ':
-            riff_end = int.from_bytes(start[4:8], 'little') + 8
-            offset = 12
-            # The first RIFF may be followed by OpenDML continuation containers.
-            while 12 <= riff_end <= size and offset + 8 <= riff_end:
-                source.seek(offset)
-                header = source.read(8)
-                chunk_size = int.from_bytes(header[4:8], 'little')
-                chunk_end = offset + 8 + chunk_size
-                next_offset = chunk_end + chunk_size % 2
-                if next_offset > riff_end:
+            container_offset = 0
+            # Walk every OpenDML continuation, even after finding an AVI list.
+            while container_offset + 12 <= size:
+                source.seek(container_offset)
+                header = source.read(12)
+                riff_end = container_offset + 8 + int.from_bytes(header[4:8], 'little')
+                form = b'AVI ' if container_offset == 0 else b'AVIX'
+                if header[:4] != b'RIFF' or header[8:12] != form or not container_offset + 12 <= riff_end <= size:
                     break
-                if header[:4] == b'LIST' and chunk_size >= 4 and source.read(4) in (b'hdrl', b'movi'):
-                    avi = True
+                offset = container_offset + 12
+                while offset + 8 <= riff_end:
+                    source.seek(offset)
+                    header = source.read(8)
+                    chunk_size = int.from_bytes(header[4:8], 'little')
+                    chunk_end = offset + 8 + chunk_size
+                    next_offset = chunk_end + chunk_size % 2
+                    if next_offset > riff_end:
+                        break
+                    if header[:4] == b'LIST' and chunk_size >= 4 and source.read(4) in (b'hdrl', b'movi'):
+                        avi = True
+                    offset = next_offset
+                if offset != riff_end:
                     break
-                offset = next_offset
+                container_offset = riff_end + (riff_end - container_offset) % 2
+            avi = avi and container_offset == size
     ebml = start.startswith(b'\x1a\x45\xdf\xa3')
     ext = Path(urlsplit(sys.argv[4]).path).suffix.lower()
     recording = iso if ext in ('.mp4', '.mov', '.m4v') else ebml if ext in ('.webm', '.mkv') else avi if ext == '.avi' else iso or ebml or avi

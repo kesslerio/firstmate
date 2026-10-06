@@ -1248,6 +1248,14 @@ for name, body in {
     'padded-iso': ftyp + (8192).to_bytes(4, 'big') + b'free' + bytes(8184) + mdat,
     'padded-avi': b'RIFF' + (9228).to_bytes(4, 'little') + b'AVI JUNK' + (8191).to_bytes(4, 'little') + bytes(8192) + avi[12:],
     'continued-avi': avi + b'RIFF' + (4).to_bytes(4, 'little') + b'AVIX',
+    'continued-avi-media': avi + b'RIFF' + (1028).to_bytes(4, 'little') + b'AVIX' + avi[12:],
+    'truncated-continuation': avi + b'RIFF' + (1028).to_bytes(4, 'little') + b'AVIX' + avi[12:-1],
+    'truncated-third-container': avi + b'RIFF' + (4).to_bytes(4, 'little') + b'AVIX' + b'RIFF' + (1028).to_bytes(4, 'little') + b'AVIX',
+    'short-continuation-header': avi + b'RIFF' + (4).to_bytes(4, 'little'),
+    'oversized-continuation-chunk': avi + b'RIFF' + (16).to_bytes(4, 'little') + b'AVIXLIST' + (99999).to_bytes(4, 'little') + b'movi',
+    'continued-iso': ftyp + mdat + (8).to_bytes(4, 'big') + b'free',
+    'truncated-iso-continuation': ftyp + mdat + (8192).to_bytes(4, 'big') + b'mdat' + bytes(8183),
+    'short-iso-continuation-header': ftyp + mdat + bytes(4),
     'embedded-iso': (8192).to_bytes(4, 'big') + b'mdat' + ftyp + bytes(8160),
     'unrelated-iso': ftyp + b'junk' + mdat,
     'embedded-avi': b'RIFF' + (8204).to_bytes(4, 'little') + b'AVI JUNK' + (8192).to_bytes(4, 'little') + avi[12:] + bytes(7168),
@@ -1325,6 +1333,18 @@ padded-iso none - 0
 padded-avi avi - 0
 padded-avi none - 0
 continued-avi avi - 0
+continued-avi-media avi - 0
+continued-avi-media none video/x-msvideo 0
+truncated-continuation avi - 1 complete RIFF/AVI
+truncated-continuation none - 1 RIFF/AVI
+truncated-continuation none video/x-msvideo 1 Content-Type
+truncated-third-container avi - 1 complete RIFF/AVI
+short-continuation-header avi - 1 complete RIFF/AVI
+oversized-continuation-chunk avi - 1 complete RIFF/AVI
+continued-iso mp4 - 0
+truncated-iso-continuation mp4 - 1 moov or mdat box
+truncated-iso-continuation none video/mp4 1 Content-Type
+short-iso-continuation-header mp4 - 1 moov or mdat box
 embedded-iso mp4 - 1 ISO file type
 unrelated-iso mp4 - 1 moov or mdat box
 embedded-avi avi - 1 AVI LIST chunk
