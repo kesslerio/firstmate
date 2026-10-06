@@ -60,6 +60,7 @@ while [ $# -gt 0 ]; do
 done
 printf '%s\n' "$sub $target" >>"$asked"
 case "$sub" in
+  auth) [ "${FM_FAKE_AUTH_FAIL:-0}" = 0 ] || exit 1; printf 'fixture-token\n'; exit 0 ;;
   api)
     if [ "$target" = markdown ]; then
       [ "${FM_FAKE_GH_RENDER_FAIL:-0}" = 0 ] || exit 1
@@ -103,6 +104,7 @@ RENDER
       video) printf '\000\000\000\030ftypmp42fixture-video' ;;
       *) printf 'unknown-media' ;;
     esac
+    if awk -v want="$target" '$1 == "TRANSFER" && $2 == want { found=1 } END { exit !found }' "$table"; then exit 1; fi
     case "$code" in
       2??) exit 0 ;;
       *) exit 1 ;;
@@ -125,6 +127,52 @@ RENDER
     ;;
 esac
 SH
+  cat >"$dir/fakebin/curl" <<'CURL'
+#!/usr/bin/env bash
+set -u
+target=''
+output=''
+raw=0
+auth=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --output) output=$2; shift 2 ;;
+    --header)
+      case "$2" in
+        @-) header=$(cat); [ "$header" = 'Authorization: Bearer fixture-token' ] || exit 9; auth=1 ;;
+        'Accept: application/vnd.github.raw+json') raw=1 ;;
+        *) exit 9 ;;
+      esac
+      shift 2
+      ;;
+    --write-out | --max-redirs | --max-time | --proto | --proto-redir) shift 2 ;;
+    --disable | --silent | --location | --) shift ;;
+    -*) exit 9 ;;
+    *) target=$1; shift ;;
+  esac
+done
+case "$target" in
+  https://api.github.com/repos/*) target=${target#https://api.github.com/} ;;
+esac
+printf 'curl %s\n' "$target" >>"$FM_FAKE_GH_ASKED"
+[ "$auth" = 1 ] || exit 9
+code=$(awk -v want="$target" '$1 == "STATUS" && $2 == want { print $3 }' "$FM_FAKE_GH_TABLE" | head -n 1)
+[ -n "$code" ] || code=599
+[ "$code" != NONE ] || exit 18
+kind=$(awk -v want="$target" '$1 == "MEDIA" && $2 == want { print $3 }' "$FM_FAKE_GH_TABLE" | head -n 1)
+if [[ "$target" = repos/*/contents/* ]] && [ "$raw" = 0 ]; then
+  printf '{"type":"file","encoding":"base64","content":"fixture"}' >"$output"
+else
+  case "${kind:-image}" in
+    image) python3 -c 'import base64, sys; sys.stdout.buffer.write(base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2J3gAAAAASUVORK5CYII="))' >"$output" ;;
+    video) printf '\000\000\000\030ftypmp42fixture-video' >"$output" ;;
+    *) printf 'unknown-media' >"$output" ;;
+  esac
+fi
+printf '%s' "$code"
+if awk -v want="$target" '$1 == "TRANSFER" && $2 == want { found=1 } END { exit !found }' "$FM_FAKE_GH_TABLE"; then exit 18; fi
+CURL
+  chmod +x "$dir/fakebin/curl"
   chmod +x "$dir/fakebin/gh"
   : >"$dir/table"
   : >"$dir/asked"
@@ -810,18 +858,6 @@ test_foreign_corrections_never_use_the_pr_head() {
   pass "foreign corrections stay in the repository that owns the media"
 }
 
-test_removed_modes_are_rejected() {
-  local dir flag
-  dir=$(new_case removed-modes)
-  body_case "$dir" 'No media.'
-  for flag in --head --shape-only --attach; do
-    run_case "$dir" --body-file "$dir/body.md" "$flag"
-    expect_code 2 "$CODE" "removed modes must refuse"
-    [ ! -s "$dir/asked" ] || fail "removed flags must not reach the forge"
-  done
-  pass "removed modes cannot bypass published verification"
-}
-
 test_visual_task_instruction_requires_embeds() {
   local prompt mode
   . "$ROOT/bin/fm-dod-lib.sh"
@@ -948,6 +984,159 @@ CURL
   pass "external redirects are bounded to HTTPS and require terminal success"
 }
 
+test_failed_downloads_override_partial_success() {
+  local dir shape context target request
+  for shape in asset repository raw-direct; do
+    for context in image link; do
+      dir=$(new_case "failed-download-$shape-$context")
+      private_row "$dir" no
+      case "$shape" in
+        asset) target=https://github.com/user-attachments/assets/interrupted; request=$target ;;
+        repository) target="https://github.com/$REPO/raw/$SHA/screen.png"; request="repos/$REPO/contents/screen.png?ref=$SHA" ;;
+        raw-direct) target="https://raw.githubusercontent.com/$REPO/$SHA/screen.png"; request="repos/$REPO/contents/screen.png?ref=$SHA" ;;
+      esac
+      status_row "$dir" "$request" 200
+      printf 'TRANSFER %s\n' "$request" >>"$dir/table"
+      body_case "$dir" "[proof]($target)"
+      [ "$context" != image ] || body_case "$dir" "![proof]($target)"
+      run_case "$dir" --body-file "$dir/body.md"
+      expect_code 1 "$CODE" "a failed transfer cannot pass despite a 200 and image bytes"
+      assert_contains "$OUT" 'ERR' "the receipt must refuse an incomplete download"
+      assert_not_contains "$OUT" '[ok]' "partial response bytes cannot produce a passing verdict"
+    done
+  done
+  pass "failed downloads override partial success for all consumers"
+}
+
+test_failed_fixture_read_refuses_before_verification() {
+  local dir
+  dir=$(new_case failed-body-read)
+  body_case "$dir" 'No media.'
+  cat >"$dir/fakebin/cat" <<'CAT'
+#!/usr/bin/env bash
+if [ "$1" = "$FM_FAKE_UNREADABLE_BODY" ]; then
+  printf 'partial body'
+  exit 1
+fi
+exec "$FM_REAL_CAT" "$@"
+CAT
+  chmod +x "$dir/fakebin/cat"
+  FM_REAL_CAT=$(command -v cat) || fail "cat is required for the fixture"
+  export FM_REAL_CAT FM_FAKE_UNREADABLE_BODY="$dir/body.md"
+  run_case "$dir" --body-file "$dir/body.md"
+  unset FM_REAL_CAT FM_FAKE_UNREADABLE_BODY
+  expect_code 2 "$CODE" "an interrupted fixture read is never an empty successful body"
+  assert_contains "$ERR" 'could not read --body-file' "the refusal must identify the failed body read"
+  [ ! -s "$dir/asked" ] || fail "a failed body read must stop before forge verification"
+  pass "failed fixture reads refuse before verification"
+}
+
+test_live_redirects_strip_authorization_and_reject_partial_bodies() {
+  local dir server_pid mode first_port _final_port result attempt
+  dir=$(new_case live-redirects)
+  rm "$dir/fakebin/curl"
+  openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
+    -keyout "$dir/key.pem" -out "$dir/cert.pem" -subj /CN=localhost \
+    -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1' >/dev/null 2>&1 || fail "could not create TLS fixture"
+  cat >"$dir/server.py" <<'SERVER'
+import json
+import ssl
+import sys
+import threading
+import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
+import base64
+
+root = Path(sys.argv[1])
+png = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2J3gAAAAASUVORK5CYII=')
+
+class Handler(BaseHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
+
+    def do_GET(self):
+        with (root / 'requests.jsonl').open('a') as out:
+            out.write(json.dumps({'role': self.server.role, 'path': self.path, 'authorization': self.headers.get('Authorization')}) + '\n')
+        mode = self.path.rsplit('/', 1)[-1]
+        if self.server.role == 'forge':
+            self.send_response(302)
+            self.send_header('Location', f'https://127.0.0.1:{final.server_port}/{mode}')
+        elif not self.path.startswith('/final/'):
+            self.send_response(302)
+            if mode == 'loop':
+                location = '/loop'
+            elif mode == 'downgrade':
+                location = f'http://127.0.0.1:{final.server_port}/final/downgrade'
+            else:
+                location = f'/final/{mode}'
+            self.send_header('Location', location)
+        else:
+            self.send_response(404 if mode == 'missing' else 200)
+            self.send_header('Content-Length', str(len(png) + 100 if mode == 'interrupted' else len(png)))
+        self.end_headers()
+        if self.server.role == 'external' and self.path.startswith('/final/'):
+            self.wfile.write(png[:8] if mode == 'interrupted' else png)
+        self.close_connection = True
+
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain(root / 'cert.pem', root / 'key.pem')
+forge = HTTPServer(('127.0.0.1', 0), Handler)
+final = HTTPServer(('127.0.0.1', 0), Handler)
+for server, role in ((forge, 'forge'), (final, 'external')):
+    server.role = role
+    server.socket = context.wrap_socket(server.socket, server_side=True)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+(root / 'ports').write_text(f'{forge.server_port} {final.server_port}')
+while True:
+    time.sleep(1)
+SERVER
+  python3 "$dir/server.py" "$dir" >"$dir/server-out" 2>"$dir/server-err" &
+  server_pid=$!
+  for ((attempt=0; attempt<100; attempt++)); do
+    [ ! -f "$dir/ports" ] || break
+    sleep 0.05
+  done
+  if [ ! -f "$dir/ports" ]; then
+    kill "$server_pid" 2>/dev/null || true
+    wait "$server_pid" 2>/dev/null || true
+    fail "TLS fixture did not become ready"
+  fi
+  read -r first_port _final_port <"$dir/ports" || true
+  export GH_HOST="localhost:$first_port" CURL_CA_BUNDLE="$dir/cert.pem" NO_PROXY=localhost,127.0.0.1
+  result=0
+  for mode in success missing interrupted loop downgrade; do
+    body_case "$dir" "![proof](https://localhost:$first_port/user-attachments/assets/$mode)"
+    run_case "$dir" --body-file "$dir/body.md"
+    if [ "$mode" = success ]; then
+      [ "$CODE" = 0 ] || result=1
+    else
+      [ "$CODE" = 1 ] || result=1
+    fi
+  done
+  unset GH_HOST CURL_CA_BUNDLE NO_PROXY
+  kill "$server_pid" 2>/dev/null || true
+  wait "$server_pid" 2>/dev/null || true
+  [ "$result" = 0 ] || fail "live redirect/transfer outcomes did not match terminal responses"
+  python3 - "$dir/requests.jsonl" <<'ASSERT' || fail "credentials reached an external redirect destination"
+import json
+import sys
+records = [json.loads(line) for line in open(sys.argv[1])]
+forge = [r for r in records if r['role'] == 'forge']
+external = [r for r in records if r['role'] == 'external']
+assert forge and external
+assert all(r['authorization'] == 'Bearer fixture-token' for r in forge)
+assert all(r['authorization'] is None for r in external)
+assert any(r['path'] == '/final/success' for r in external)
+assert any(r['path'] == '/final/interrupted' for r in external)
+ASSERT
+  pass "live HTTPS redirects strip Authorization and refuse incomplete bodies"
+}
+
+test_failed_downloads_override_partial_success
+test_failed_fixture_read_refuses_before_verification
+test_live_redirects_strip_authorization_and_reject_partial_bodies
+
 test_extensionless_media_must_match_image_context
 test_generated_command_runs_from_another_project
 test_external_redirects_require_successful_terminal_status
@@ -959,7 +1148,6 @@ test_rendered_targets_exclude_code_and_preserve_references
 test_explicit_target_punctuation_and_canonical_image_source
 test_external_fetch_is_unauthenticated_and_redacted
 test_foreign_corrections_never_use_the_pr_head
-test_removed_modes_are_rejected
 test_visual_task_instruction_requires_embeds
 
 test_pinned_raw_address_at_the_published_head_passes

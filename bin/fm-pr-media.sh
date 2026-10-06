@@ -34,6 +34,8 @@
 #   upload used. On a private repository an unauthenticated fetch returns 404 for
 #   an asset that renders for every reviewer holding repository access, so a
 #   token-less probe proves nothing in either direction and is not run.
+#   Redirects to another origin never receive the Authorization header.
+#   An incomplete transfer is unverified even when it started with HTTP 200.
 #   Other absolute addresses are fetched without credentials and must answer
 #   a final 2xx after at most five HTTPS redirects. Their addresses are redacted
 #   in the receipt. Image positions require image media, including extensionless
@@ -161,7 +163,7 @@ HEAD_REPO=$REPO
 [ -n "$PR" ] || usage
 if [ -n "$BODY_FILE" ]; then
   [ -f "$BODY_FILE" ] || die "--body-file names no readable file: $BODY_FILE"
-  cat "$BODY_FILE" >"$BODY"
+  cat "$BODY_FILE" >"$BODY" || die "could not read --body-file: $BODY_FILE"
 else
   gh pr view "$PR" --repo "$REPO" --json body -q .body >"$BODY" 2>"$TMP_DIR/err" \
     || die "could not read the published body of PR $PR in $REPO: $(cat "$TMP_DIR/err")"
@@ -262,32 +264,39 @@ authenticated_target() {
 }
 
 api_status() {  # <endpoint-or-absolute-url> [image] -> 3-digit code, or ERR
-  local target=$1 context=${2:-link} code
+  local target=$1 context=${2:-link} code host token=''
+  local -a headers=()
   : >"$TMP_DIR/media-body"
-  if ! authenticated_target "$target"; then
-    code=$(curl --disable --silent --output "$TMP_DIR/media-body" --write-out '%{http_code}' \
+  if authenticated_target "$target"; then
+    case "$target" in
+      repos/*)
+        if [ "$WEB_HOST" = github.com ]; then
+          target="https://api.github.com/$target"
+        else
+          target="https://$WEB_HOST/api/v3/$target"
+        fi
+        host=$WEB_HOST
+        ;;
+      https://github.com/* | https://raw.githubusercontent.com/* | https://api.github.com/*)
+        host=github.com
+        ;;
+      *) host=$WEB_HOST ;;
+    esac
+    token=$(gh auth token --hostname "$host" 2>/dev/null) || {
+      printf 'ERR\n'
+      return 0
+    }
+    [ -n "$token" ] || { printf 'ERR\n'; return 0; }
+    headers=(--header @-)
+  fi
+  if [ "$context" = image ] && [[ "$target" = */repos/*/contents/* ]]; then
+    headers+=(--header 'Accept: application/vnd.github.raw+json')
+  fi
+  code=$( { [ -z "$token" ] || printf 'Authorization: Bearer %s\n' "$token"; } | \
+    curl --disable --silent --output "$TMP_DIR/media-body" --write-out '%{http_code}' \
       --location --max-redirs 5 --max-time 30 --proto '=https' --proto-redir '=https' \
-      -- "$target") || code=ERR
-    printf '%s\n' "$code"
-    return 0
-  fi
-  if [ "$context" = image ] && [[ "$target" = repos/*/contents/* ]]; then
-    gh api -i -H 'Accept: application/vnd.github.raw+json' "$target" >"$TMP_DIR/response" 2>/dev/null || true
-  else
-    gh api -i "$target" >"$TMP_DIR/response" 2>/dev/null || true
-  fi
-  python3 - "$TMP_DIR/response" "$TMP_DIR/media-body" <<'PYTHON'
-import re
-import sys
-from pathlib import Path
-response = Path(sys.argv[1]).read_bytes()
-parts = re.split(rb'\r?\n\r?\n', response, maxsplit=1)
-header = parts[0]
-body = parts[1] if len(parts) == 2 else b''
-match = re.match(rb'HTTP/\S+ ([1-5][0-9][0-9])', header)
-Path(sys.argv[2]).write_bytes(body)
-print(match[1].decode() if match and len(parts) == 2 else 'ERR')
-PYTHON
+      "${headers[@]}" -- "$target") || code=ERR
+  printf '%s\n' "$code"
 }
 
 is_image_media() {
@@ -509,7 +518,7 @@ check_address() {  # <address>
   fi
 
   case "$codes" in
-      *contents=2??* | *contents=3??*) ;;
+      *contents=2??*) ;;
       *contents=404*)
         verdict=fail
         add_reason "the path is absent from $ref, so the address points at something the published head does not contain"
