@@ -21,18 +21,19 @@
 #   reviewer's browser needs. Existing in the working branch or the local copy
 #   proves nothing.
 #     https://github.com/<owner>/<repo>/raw/<full-sha>/<path>  renders and plays in
-#       a logged-in browser: the required shape for committed media.
+#       a logged-in browser: the required raw shape for private committed media.
 #     https://github.com/<owner>/<repo>/blob/<full-sha>/<path>  a page, not an
 #       image: acceptable for a recording a reviewer may open, never as `![..]`.
 #     https://raw.githubusercontent.com/...  rejected on a private repository,
 #       because a browser cannot resolve it whatever the token reports. The
 #       correction printed is the `github.com/.../raw/...` form.
+#       Public repositories may use a pinned raw.githubusercontent.com address.
 #     a relative path such as `docs/media/x.png`  rejected: on a pull-request body
 #       a relative path resolves against the repository default branch, not this
 #       head, so the only way to verify it at the head is to pin it.
-#   An uploaded `user-attachments` asset is fetched with the same credential the
-#   upload used. On a private repository an unauthenticated fetch returns 404 for
-#   an asset that renders for every reviewer holding repository access, so a
+#   A `user-attachments` asset on the configured forge host is fetched with the
+#   current gh credential for that host. On a private repository an unauthenticated
+#   fetch returns 404 for an asset that renders for reviewers holding repository access, so a
 #   token-less probe proves nothing in either direction and is not run.
 #   Redirects to another origin never receive the Authorization header.
 #   An incomplete transfer is unverified even when it started with HTTP 200.
@@ -50,8 +51,9 @@
 # Full commit ids only. A 7-character prefix is refused rather than resolved: it
 # names whichever commit the forge disambiguates first, it cannot be checked at the
 # address as written, and evidence quoted at a prefix cannot be re-fetched once
-# another branch introduces the same prefix. The receipt prints the published-head
-# form of the address as the drop-in correction.
+# another branch introduces the same prefix. For this PR's head repository, the
+# receipt prints the published-head form as the correction. For another repository,
+# it asks for a valid full commit and path from that repository instead.
 #
 # Exit codes are the contract, so a lane can gate on them:
 #   0  every address in the body passed its check, and --require-embeds holds
@@ -376,8 +378,8 @@ record() {  # <ok|fail> <address> <detail...>
   done
 }
 
-# An abbreviated commit id or a moving ref is corrected to the same path pinned at
-# the published head, which is the one address this run can actually verify.
+# Only this PR's head repository can use its published head as a correction;
+# another repository needs a commit from its own history.
 pin_at_head() {  # <owner/repo> <path>
   [ "$1" = "$HEAD_REPO" ] || return 0
   printf 'https://%s/%s/raw/%s/%s\n' "$WEB_HOST" "$1" "$PUBLISHED_HEAD" "$2"
