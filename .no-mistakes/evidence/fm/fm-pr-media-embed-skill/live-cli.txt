@@ -1,0 +1,145 @@
+CASE pinned-image: expected=0 observed=0
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[ok] https://github.com/kunchenguid/firstmate/raw/87893ad6ae2363565edf9589454a9f5e2c9dc1a5/assets/banner.png
+    shape: web-raw   ref=87893ad6ae2363565edf9589454a9f5e2c9dc1a5   contents=200   direct=session-bound
+
+RESULT: 1 address(es), 1 passed, 0 failed
+
+CASE missing-evidence: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 0
+
+No media address appears in the body, but 1 media file name(s) do:
+    screenshot.png
+
+Evidence named by filename is not evidence a reviewer can open: commit it and address it at the head, or upload it and embed the returned address.
+REQUIRE-EMBEDS: the body claims visual evidence but carries no media address.
+RESULT: 0 address(es), 0 passed, 2 failed, 2 body-level failure(s)
+
+CASE empty-required: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 0
+
+REQUIRE-EMBEDS: the body claims visual evidence but carries no media address.
+RESULT: 0 address(es), 0 passed, 1 failed, 1 body-level failure(s)
+
+CASE absent-path: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://github.com/kunchenguid/firstmate/raw/87893ad6ae2363565edf9589454a9f5e2c9dc1a5/assets/no-such-media-01M46.png
+    shape: web-raw   ref=87893ad6ae2363565edf9589454a9f5e2c9dc1a5   contents=404   direct=session-bound
+    why: the path is absent from 87893ad6ae2363565edf9589454a9f5e2c9dc1a5, so the address points at something the published head does not contain
+    keep the address and re-check it once the head carries the file
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE relative-path: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] assets/banner.png
+    shape: relative   ref=87893ad6ae2363565edf9589454a9f5e2c9dc1a5   contents=200   direct=session-bound
+    why: a relative path on a pull-request body resolves against the repository default branch, not this head
+    use: https://github.com/kunchenguid/firstmate/raw/87893ad6ae2363565edf9589454a9f5e2c9dc1a5/assets/banner.png
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE moving-ref: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://github.com/kunchenguid/firstmate/raw/main/assets/banner.png
+    shape: web-raw   ref=main   contents=200   direct=session-bound
+    why: it names the moving ref "main" instead of a commit, so the evidence can change or vanish after the review
+    use: https://github.com/kunchenguid/firstmate/raw/87893ad6ae2363565edf9589454a9f5e2c9dc1a5/assets/banner.png
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE abbreviated-ref: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://github.com/kunchenguid/firstmate/raw/87893ad/assets/banner.png
+    shape: web-raw   ref=87893ad   contents=200   direct=session-bound
+    why: it pins the abbreviated commit id "87893ad"; a prefix is not an address a reader can re-fetch
+    use: https://github.com/kunchenguid/firstmate/raw/87893ad6ae2363565edf9589454a9f5e2c9dc1a5/assets/banner.png
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE blob-image: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://github.com/kunchenguid/firstmate/blob/87893ad6ae2363565edf9589454a9f5e2c9dc1a5/assets/banner.png
+    shape: web-blob   ref=87893ad6ae2363565edf9589454a9f5e2c9dc1a5   contents=200   direct=session-bound
+    why: a blob URL is an HTML page and cannot render in an image position
+    use: https://github.com/kunchenguid/firstmate/raw/87893ad6ae2363565edf9589454a9f5e2c9dc1a5/assets/banner.png
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE public-raw-image: expected=0 observed=0
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[ok] https://raw.githubusercontent.com/kunchenguid/firstmate/87893ad6ae2363565edf9589454a9f5e2c9dc1a5/assets/banner.png
+    shape: raw-direct   ref=87893ad6ae2363565edf9589454a9f5e2c9dc1a5   contents=200   direct=session-bound
+
+RESULT: 1 address(es), 1 passed, 0 failed
+
+CASE non-image-bytes: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://github.com/kunchenguid/firstmate/raw/87893ad6ae2363565edf9589454a9f5e2c9dc1a5/README.md
+    shape: web-raw   ref=87893ad6ae2363565edf9589454a9f5e2c9dc1a5   contents=200   direct=session-bound
+    why: the fetched repository media is not an image; use a recording link for video media
+    use a recording link instead of an image embed
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE code-is-not-evidence: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 0
+
+REQUIRE-EMBEDS: the body claims visual evidence but carries no media address.
+RESULT: 0 address(es), 0 passed, 1 failed, 1 body-level failure(s)
+
+CASE unreadable-pr: expected=2 observed=2
+fm-pr-media: could not read PR 999999999 in kunchenguid/firstmate: GraphQL: Could not resolve to a PullRequest with the number of 999999999. (repository.pullRequest)
+
+CASE removed flag --shape-only: expected=2 observed=2
+CASE removed flag --head: expected=2 observed=2
+CASE removed flag --attach: expected=2 observed=2
+CASE real published PR141: observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 0
+
+REQUIRE-EMBEDS: the body claims visual evidence but carries no media address.
+RESULT: 0 address(es), 0 passed, 1 failed, 1 body-level failure(s)

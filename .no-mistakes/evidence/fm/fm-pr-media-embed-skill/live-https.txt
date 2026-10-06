@@ -1,0 +1,170 @@
+CASE success: expected=0 observed=0
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[ok] https://[external-host]/[redacted]
+    shape: remote   fetch=200
+
+RESULT: 1 address(es), 1 passed, 0 failed
+
+CASE missing: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://[external-host]/[redacted]
+    shape: remote   fetch=404 - the address does not resolve for a reviewer
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE interrupted: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://[external-host]/[redacted]
+    shape: remote   fetch=ERR - the address does not resolve for a reviewer
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE loop: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://[external-host]/[redacted]
+    shape: remote   fetch=ERR - the address does not resolve for a reviewer
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE downgrade: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://[external-host]/[redacted]
+    shape: remote   fetch=ERR - the address does not resolve for a reviewer
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+CASE video: expected=1 observed=1
+fm-pr-media receipt: kunchenguid/firstmate
+  pull request: https://github.com/kunchenguid/firstmate/pull/141
+  published head: 87893ad6ae2363565edf9589454a9f5e2c9dc1a5
+  media addresses found: 1
+
+[fail] https://[external-host]/[redacted]
+    shape: remote   fetch=200
+    the fetched media is not an image; use a recording link for video media
+
+RESULT: 1 address(es), 0 passed, 1 failed
+
+Requests: [
+  {
+    "path": "/start/success",
+    "host": "localhost:43709",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/success",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/final/success",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/start/missing",
+    "host": "localhost:43709",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/missing",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/final/missing",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/start/interrupted",
+    "host": "localhost:43709",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/interrupted",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/final/interrupted",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/start/loop",
+    "host": "localhost:43709",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/loop",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/loop",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/loop",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/loop",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/loop",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/start/downgrade",
+    "host": "localhost:43709",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/downgrade",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/start/video",
+    "host": "localhost:43709",
+    "authorization_present": false
+  },
+  {
+    "path": "/next/video",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  },
+  {
+    "path": "/final/video",
+    "host": "127.0.0.1:39603",
+    "authorization_present": false
+  }
+]
+Authorization absent at all external hops: True
