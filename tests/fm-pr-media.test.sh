@@ -1163,21 +1163,32 @@ png = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4
 # Byte-contract fixtures cover signatures and terminators, not codec decoding.
 images = {'png': png, 'jpg': b'\xff\xd8\xff' + bytes(64) + b'\xff\xd9',
           'gif': b'GIF89a' + bytes(64) + b';'}
-videos = {'mp4': bytes.fromhex('00000018667479706d703432000000006d70343269736f6d') + bytes(1024),
-          'mov': bytes.fromhex('0000000866726565000000186674797071742020000000007174202069736f6d') + bytes(1024),
+ftyp = bytes.fromhex('00000018667479706d703432000000006d70343269736f6d')
+mdat = bytes.fromhex('000004006d646174') + bytes(1016)
+avi = b'RIFF' + (1028).to_bytes(4, 'little') + b'AVI LIST' + (1016).to_bytes(4, 'little') + b'movi' + bytes(1012)
+videos = {'mp4': ftyp + mdat,
+          'mov': bytes.fromhex('0000000866726565000000186674797071742020000000007174202069736f6d') + mdat,
+          'avi': avi,
+          'large-mp4': ftyp + (8192).to_bytes(4, 'big') + b'mdat' + bytes(8184),
+          'leading-mp4': (8192).to_bytes(4, 'big') + b'mdat' + ftyp + bytes(8160),
           'webm': bytes.fromhex('1a45dfa3') + bytes(1024)}
 for ext, body in (images | videos).items():
     (root / (ext + '-valid')).write_bytes(body)
     (root / (ext + '-bad')).write_bytes(body[:-12] if ext in images else b'text posing as a recording' * 100)
-    (root / (ext + '-tiny')).write_bytes(body[:24] if ext in images else body[:40])
+    tiny = body[:24] if ext in images else body[:40]
+    if ext == 'avi':
+        tiny = b'RIFF' + (32).to_bytes(4, 'little') + b'AVI LIST' + (20).to_bytes(4, 'little') + b'movi' + bytes(16)
+    elif 'mp4' in ext or ext == 'mov':
+        tiny = ftyp + (16).to_bytes(4, 'big') + b'mdat' + bytes(8)
+    (root / (ext + '-tiny')).write_bytes(tiny)
 FIXTURES
   for shape in repository attachment external; do
-    for format in png jpg gif mp4 mov webm; do
+    for format in large-mp4 leading-mp4 avi png jpg gif mp4 mov webm; do
       for state in valid bad tiny short; do
         case "$shape" in
-          repository) address="https://github.com/$REPO/raw/$SHA/demo.$format"; target="repos/$REPO/contents/demo.$format?ref=$SHA" ;;
-          attachment) address="https://github.com/user-attachments/assets/demo.$format"; target=$address ;;
-          external) address="https://collector.example/demo.$format"; target=$address ;;
+          repository) address="https://github.com/$REPO/raw/$SHA/demo.${format##*-}"; target="repos/$REPO/contents/demo.${format##*-}?ref=$SHA" ;;
+          attachment) address="https://github.com/user-attachments/assets/demo.${format##*-}"; target=$address ;;
+          external) address="https://collector.example/demo.${format##*-}"; target=$address ;;
         esac
         : >"$dir/table"
         status_row "$dir" "$target" 200
@@ -1197,16 +1208,104 @@ FIXTURES
           assert_not_contains "$OUT" '[ok]' "invalid media must never receive an ok receipt"
           if [ "$state" = short ]; then
             assert_contains "$OUT" 'Content-Length' "the receipt must explain the short response"
-          elif [ "$state" = tiny ] && [[ "$format" = mp4 || "$format" = mov || "$format" = webm ]]; then
+          elif [ "$state" = tiny ] && [[ "$format" != png && "$format" != jpg && "$format" != gif ]]; then
             assert_contains "$OUT" 'too small' "the receipt must explain the recording size rejection"
           else
-            assert_contains "$OUT" 'marker' "the receipt must explain the missing container marker"
+            if [[ "$format" = png || "$format" = jpg || "$format" = gif ]]; then
+              assert_contains "$OUT" 'marker' "the receipt must explain the missing container marker"
+            else
+              assert_contains "$OUT" 'lacks the required' "the receipt must explain the missing recording structure"
+            fi
           fi
         fi
       done
     done
   done
   pass "container checks and declared lengths hold across all fetch paths"
+}
+
+test_recording_structure_and_declared_container() {
+  local dir shape fixture extension expected reason address target
+  dir=$(new_case recording-structure)
+  python3 - "$dir" <<'FIXTURES'
+import sys
+from pathlib import Path
+root = Path(sys.argv[1])
+ftyp = bytes.fromhex('00000018667479706d703432000000006d70343269736f6d')
+mdat = (8192).to_bytes(4, 'big') + b'mdat' + bytes(8184)
+avi = b'RIFF' + (1028).to_bytes(4, 'little') + b'AVI LIST' + (1016).to_bytes(4, 'little') + b'movi' + bytes(1012)
+for name, body in {
+    'iso': ftyp + mdat,
+    'moov': ftyp + (8192).to_bytes(4, 'big') + b'moov' + bytes(8184),
+    'avi': avi,
+    'ebml': bytes.fromhex('1a45dfa3') + bytes(1024),
+    'no-brand': b'\x00\x00\x00\x18ftypnope' + bytes(12) + mdat,
+    'no-ftyp': mdat,
+    'no-payload': ftyp + bytes(8192),
+    'no-list': avi[:12] + bytes(1024),
+    'wrong-riff': avi[:8] + b'WAVE' + avi[12:],
+    'short-riff': avi[:-1],
+}.items():
+    (root / name).write_bytes(body)
+FIXTURES
+  for shape in repository attachment external; do
+    while read -r fixture extension expected reason; do
+      case "$shape" in
+        repository) address="https://github.com/$REPO/raw/$SHA/demo.$extension"; target="repos/$REPO/contents/demo.$extension?ref=$SHA" ;;
+        attachment) address="https://github.com/user-attachments/assets/demo.$extension"; target=$address ;;
+        external) address="https://collector.example/demo.$extension"; target=$address ;;
+      esac
+      if [ "$extension" = none ]; then
+        address=${address%.none}
+        target=${target//demo.none/demo}
+      fi
+      : >"$dir/table"
+      status_row "$dir" "$target" 200
+      printf 'PAYLOAD %s %s\n' "$target" "$dir/$fixture" >>"$dir/table"
+      if [ "$extension" = none ]; then
+        body_case "$dir" "<video src=\"$address\"></video>"
+      else
+        body_case "$dir" "[recording]($address)"
+      fi
+      run_case "$dir" --body-file "$dir/body.md"
+      expect_code "$expected" "$CODE" "$shape $fixture declared as $extension must return $expected"
+      if [ "$expected" = 1 ]; then
+        assert_not_contains "$OUT" '[ok]' "missing or mismatched recording structure must fail"
+        assert_contains "$OUT" "$reason" "the receipt must identify the missing recording structure"
+      else
+        assert_contains "$OUT" '[ok]' "valid recording structure must get a receipt"
+        if [ "$shape" = repository ] && [ "$extension" != none ]; then
+          body_case "$dir" "[recording](${address/\/raw\//\/blob\/})"
+          run_case "$dir" --body-file "$dir/body.md"
+          expect_code 0 "$CODE" "valid recordings must also pass as blob links"
+        fi
+        body_case "$dir" "![recording]($address)"
+        run_case "$dir" --body-file "$dir/body.md"
+        expect_code 1 "$CODE" "$shape recordings must fail in image positions"
+      fi
+    done <<'CASES'
+iso mp4 0
+iso mov 0
+iso m4v 0
+iso none 0
+moov mp4 0
+avi avi 0
+avi none 0
+ebml mkv 0
+avi mp4 1 ISO file type brand
+iso avi 1 RIFF/AVI
+iso webm 1 EBML
+iso mkv 1 EBML
+ebml avi 1 RIFF/AVI
+no-brand mp4 1 ISO file type brand
+no-ftyp mp4 1 ISO file type brand
+no-payload mp4 1 moov or mdat box
+no-list avi 1 AVI LIST chunk
+wrong-riff avi 1 RIFF/AVI
+short-riff avi 1 complete RIFF/AVI
+CASES
+  done
+  pass "recording structure and declared containers hold across every fetch path"
 }
 
 test_every_rendered_srcset_candidate_is_verified() {
@@ -1231,6 +1330,7 @@ test_every_rendered_srcset_candidate_is_verified() {
 }
 
 test_container_bytes_and_declared_length
+test_recording_structure_and_declared_container
 test_every_rendered_srcset_candidate_is_verified
 
 test_failed_downloads_override_partial_success

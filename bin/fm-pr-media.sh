@@ -44,9 +44,12 @@
 #   All rendered img and picture source srcset candidates are checked as images.
 #   Fetched bodies must meet Content-Length when declared. PNG, JPEG, and GIF
 #   require their closing IEND, end-of-image, and trailer markers respectively.
-#   Recordings require at least 1024 bytes and an ISO file type box near the start
-#   for mp4/mov, or a leading EBML marker for webm. These bounded container checks
-#   reject truncation and disguised text; they do not prove codec decoding.
+#   Recordings require at least 1024 bytes and a recognised ISO file type brand
+#   plus a moov or mdat box in the first 4096 bytes for mp4/mov, a leading EBML
+#   marker for webm/mkv, or complete RIFF/AVI bytes with an AVI LIST chunk for avi.
+#   ISO box order and boxes larger than the scanned prefix are accepted.
+#   These bounded container checks reject truncation and disguised text;
+#   they do not prove codec decoding.
 #
 # A direct fetch of the `github.com/.../raw/...` form is deliberately NOT a check:
 # that endpoint hands a browser a session-bound redirect, so it answers 404 to an
@@ -376,25 +379,40 @@ elif sys.argv[3] == 'image':
     if not image:
         print('the fetched media is not an image; use a recording link for video media')
 else:
-    # Walk complete leading ISO boxes within the bounded prefix, allowing a
-    # leading free/wide box without mistaking a random "ftyp" string for a box.
-    iso = False
-    offset = 0
-    while offset + 16 <= len(start):
+    # Inspect structural headers throughout the prefix: a large leading box
+    # must not hide another marker, and its payload need not fit in the prefix.
+    ftyp = payload = avi_list = False
+    brands = {b'isom', b'mp41', b'mp42', b'avc1', b'dash', b'M4V ', b'MSNV', b'qt  '}
+    brands.update(b'iso' + bytes([digit]) for digit in range(ord('2'), ord('9') + 1))
+    for offset in range(len(start) - 7):
         box_size = int.from_bytes(start[offset:offset + 4], 'big')
         kind = start[offset + 4:offset + 8]
-        if box_size < 8 or offset + box_size > len(start):
-            break
-        if kind == b'ftyp' and box_size >= 16:
-            iso = True
-            break
-        offset += box_size
+        if 8 <= box_size <= size - offset:
+            if kind == b'ftyp' and box_size >= 16 and offset + box_size <= len(start):
+                declared_brands = [start[offset + 8:offset + 12]]
+                declared_brands += [start[i:i + 4] for i in range(offset + 16, offset + box_size, 4)]
+                ftyp |= any(brand in brands for brand in declared_brands)
+            payload |= kind in (b'moov', b'mdat')
+        if start[offset:offset + 4] == b'LIST':
+            chunk_size = int.from_bytes(start[offset + 4:offset + 8], 'little')
+            avi_list |= 4 <= chunk_size <= size - offset - 8 and start[offset + 8:offset + 12] in (b'hdrl', b'movi')
+    iso = ftyp and payload
     ebml = start.startswith(b'\x1a\x45\xdf\xa3')
+    avi = (start[:4] == b'RIFF' and start[8:12] == b'AVI ' and avi_list
+           and int.from_bytes(start[4:8], 'little') + 8 == size)
     ext = Path(urlsplit(sys.argv[4]).path).suffix.lower()
-    recording = iso if ext in ('.mp4', '.mov', '.m4v') else ebml if ext == '.webm' else iso or ebml
+    recording = iso if ext in ('.mp4', '.mov', '.m4v') else ebml if ext in ('.webm', '.mkv') else avi if ext == '.avi' else iso or ebml or avi
     if ext in ('.mp4', '.mov', '.webm', '.m4v', '.avi', '.mkv') or not image:
         if not recording:
-            print('the fetched recording media lacks the required ISO file type box or EBML container marker')
+            if ext in ('.mp4', '.mov', '.m4v'):
+                missing = 'recognised ISO file type brand' if not ftyp else 'moov or mdat box'
+            elif ext == '.avi':
+                missing = 'complete RIFF/AVI container with an AVI LIST chunk'
+            elif ext in ('.webm', '.mkv'):
+                missing = 'EBML container marker'
+            else:
+                missing = 'ISO file type brand and moov/mdat box, EBML, or RIFF/AVI container marker'
+            print('the fetched recording media lacks the required ' + missing)
         elif size < 1024:
             print('the fetched recording media is too small: at least 1024 bytes are required')
 PYTHON
