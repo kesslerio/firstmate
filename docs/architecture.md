@@ -208,6 +208,7 @@ The always-on watcher also uses that library's absorb classification on no-verb 
 The daemon's stale-routing precedence, declared-wait aging, and steering-inbox exception are owned by [Classification policy](../.agents/skills/afk/SKILL.md#classification-policy).
 In away mode, seen-status dedupe does not clear possible-wedge aging for nonterminal progress, so housekeeping still re-escalates an unchanged idle pane at the configured bound.
 Away-mode housekeeping has no worktree-write deferral of its own, so while `state/.afk` exists a quiet crew that is writing its own worktree still escalates as a possible wedge at that bound.
+Before suppressing or acknowledging any heartbeat, the daemon checks backlog readiness through the same consumer as the watcher. Ready work or unavailable readiness is durably buffered for the authorized supervisor to dispatch or resolve; empty and captain-held queues remain quiet. A failed handoff keeps the wake unacknowledged.
 The daemon batches the escalations selected by that policy into a single-line digest using the canonical `away-supervisor` kind from `bin/fm-operational-input.sh`; a Claude Code primary receives that owner's record-backed doorbell instead of the stripped invisible marker, so firstmate can distinguish the escalation from ordinary captain messages.
 Captain-held transfers remain silent until return while the away record exists.
 Its supervisor injection path supports tmux and herdr panes, with `FM_SUPERVISOR_BACKEND` and `FM_SUPERVISOR_TARGET` resolved independently from the task-spawn backend.
