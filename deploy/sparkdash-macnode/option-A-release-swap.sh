@@ -31,9 +31,11 @@ if [[ "$APPLY" != "1" ]]; then
   echo "would: cp -a $BASE_RELEASE -> $RELEASE, git checkout --detach $FROM_REF inside it"
   echo "would: keep the untracked docker-compose.live.yml (container_name sparkDash-opencode-e2e,"
   echo "       ports 100.120.26.16:5556:5556, ~/.ssh bind) so sparkdash-boot's expectations hold"
+  echo "would: docker compose -f $RELEASE/docker-compose.live.yml build  (build BEFORE touching the unit;"
+  echo "       the compose file has no image: key, so the tag is project-scoped by directory name)"
   if [[ "$SWAP_UNIT" == "1" ]]; then
     echo "would: keep $UNIT.bak-<ts>, sed the single ExecStart path $BASE_RELEASE -> $RELEASE,"
-    echo "       systemctl daemon-reload && systemctl restart $UNIT"
+    echo "       docker compose down on $BASE_RELEASE (shared container_name), reset-failed, restart $UNIT"
   else
     echo "would NOT touch the systemd unit (release cut only; verify, then swap separately)"
   fi
@@ -59,13 +61,21 @@ git log --oneline -1
 git merge-base --is-ancestor aaddfe7 HEAD && echo "release contains aaddfe7"
 [ -f docker-compose.live.yml ] || { echo "release has no docker-compose.live.yml" >&2; exit 1; }
 docker compose -f docker-compose.live.yml config -q && echo "compose file valid"
+# Build before the unit is touched: if the build fails, nothing has changed and the old release
+# is still serving. The tag is project-scoped by directory name, so this is a real new build.
+docker compose -f docker-compose.live.yml build
 if [ "\$SWAP_UNIT" = "1" ]; then
   unit="/etc/systemd/system/\$UNIT"
   sudo cp -a "\$unit" "\$unit.bak-\$(date +%Y%m%d%H%M%S)"
   sudo sed -i "s|sparkDash-releases/\$BASE_RELEASE|sparkDash-releases/\$RELEASE|g" "\$unit"
   sudo systemctl daemon-reload
+  # Both release directories declare the same container_name, so --force-recreate cannot claim the
+  # name while the old project's container is still running. Release it through the old project
+  # first, then let the boot unit create the container (no raw docker up).
+  docker compose -f "\$root/\$BASE_RELEASE/docker-compose.live.yml" down || true
+  sudo systemctl reset-failed "\$UNIT" 2>/dev/null || true
   sudo systemctl restart "\$UNIT"
-  sleep 5
+  sleep 8
   systemctl is-active "\$UNIT" || true
 fi
 docker ps --format '{{.Names}}\t{{.Status}}\t{{.Ports}}' | grep -i sparkdash || true

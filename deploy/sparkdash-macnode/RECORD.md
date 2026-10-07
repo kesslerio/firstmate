@@ -44,7 +44,7 @@ LaunchAgent:
   tailnet address is `100.71.122.118` (`Tailscale ip -4`, `ifconfig` utun inet), LocalHostName
   `MK-MacBook-Pro-5`.
 
-## Stage 2 - merge fork main into `feat/llm-proxy-auth` on john: STOPPED, beyond a routine merge
+## Stage 2 - merge fork main into `feat/llm-proxy-auth` on john: SKIPPED by ruling (Option A)
 
 `/opt/sparkDash`: branch `feat/llm-proxy-auth`, HEAD `17c9560`, merge-base with `origin/main`
 (`aaddfe7`) = `b3cf0a1`, `git rev-list --left-right --count HEAD...origin/main` = `9 163`.
@@ -82,7 +82,7 @@ attempted in place without first committing or stashing the captain's uncommitte
 
 No merge was attempted; nothing on john's `/opt/sparkDash` was committed, stashed, reset, or rewritten.
 
-## Stage 3 - how the dashboard is actually launched on john: FOUND, but not where the brief expected
+## Stage 3 - how the dashboard is actually launched on john: FOUND and APPLIED via Option A
 
 - `sparkdash-boot.service` (`/etc/systemd/system/`, Type=oneshot, RemainAfterExit, waits for
   `tailscale0`) runs exactly one thing:
@@ -106,39 +106,152 @@ No merge was attempted; nothing on john's `/opt/sparkDash` was committed, stashe
   `origin/main`. On this Mac, `*:26000` is held by the Stream Deck Slack plugin, not sparkDash.
   The live dashboard is `http://100.120.26.16:5556`.
 
-## Stage 4 - register this Mac as a spark: NOT DONE, depends on stage 3
+## Stage 4 - register this Mac as a spark: DONE, verified through the running dashboard
 
-The current server predates `aaddfe7`, so it has no Mac-agent transport (`MacAgentCollector`,
-`MacAgentFields`, agent-port field, `unavailable`-aware runtime rendering are all in that merge).
-Registering the Mac now would produce exactly the wrong-looking node the captain complained about.
-Intended entry once the server is on the merged tree: Unit type **Apple Silicon Mac**, host
-`100.71.122.118` (tailnet), agent port `8790`, no SSH.
+Registered through the live dashboard's own `POST /api/sparks` as Unit type **Apple Silicon Mac**
+(`kind: "mac"`), host `100.71.122.118` (tailnet), agent port `8790`, no SSH block, so no credentials
+were stored. Full evidence, including the field-name correction, is in "Stage 4 applied" below.
 
-## Stage 5 - overview screenshot: NOT DONE, depends on stage 3/4
-
-Intended artifact: the overview route of the live dashboard (`http://100.120.26.16:5556/`) captured
-with the Mac node rendered, written to
-`/Users/kesslerio/projects/firstmate/data/sparkdash-deploy-macnode/overview-with-mac-node.png`.
-Not captured yet because the running server still predates the Mac-node merge, so the node cannot
-be registered.
-
-## Stage 4 prep - the exact entry and where it persists (read-only inspection, nothing written)
+## Stage 4 prep - the exact entry and where it persists
 
 - Create path: `POST /api/sparks` (`server/index.js:432` in the `aaddfe7` tree) -> `registry.addSpark(body)`,
   then `startMonitor(spark)`.
 - `validateSparkTarget` (`server/validate.js:154`) requires `lanIp` or `ssh.host` unless `isLocal`, so
   the Mac entry still needs its address; the agent endpoint is a separate block.
-- `normalizeMacAgent` (`server/sparks/SparkRegistry.js`, added by `aaddfe7`) accepts
-  `macAgent: { url?, host?, port? }`; a usable port keeps the agent transport, otherwise it falls back
-  to the SSH transport for a `mac` unit. Intended body:
+- The block is `agent: { url?, host?, port? }` - **not** `macAgent`. `normalizeMacAgent` keeps the agent
+  transport when a usable port is present, otherwise the `mac` unit falls back to SSH. `kind` is
+  case-sensitive and normalized by `SparkRegistry` line 606: only `"host"`, `"mac"`, `"spark"` survive;
+  `"MAC"` or `"windows"` become `spark`, so the unit-type choice must be lowercase `mac`.
+- Working body:
   `{ id: "mk-macbook-pro-5", name: "MK-MacBook-Pro-5", kind: "mac", lanIp: "100.71.122.118",
-  macAgent: { host: "100.71.122.118", port: 8790 } }` - no ssh block, so no credentials get stored.
+  agent: { host: "100.71.122.118", port: 8790 } }` - no ssh block, so no credentials get stored.
 - Persistence is release-independent: `config/sparks.json` lives on john at
   `/home/kesslerio/sparkDash-opencode-e2e/config/sparks.json`, which the compose file mounts as
   `/app/config`; the existing convention is a timestamped `sparks.json.bak-before-<change>` copy
   before any manual edit. A Mac entry therefore survives both a release swap and a container restart.
 
-## Decision that is blocking stage 3/4
+## Stage 5 - screenshots: DONE
+
+Both captured from the live dashboard on john through the browser, full page, verified on disk:
+
+- `/Users/kesslerio/projects/firstmate/data/sparkdash-deploy-macnode/overview-with-mac-node.png`
+  (1280x1116, 150402 bytes) - overview with 5/5 online and the `MK-MacBook-Pro-5` card rendered
+  `MAC / STANDALONE / ONLINE`, unified memory 94.4 / 128 GB, CPU 74%, **GPU usage unavailable**,
+  **GPU Power unavailable**, LLM unavailable, and RUNTIMES chips `mtplx-mux :8200`,
+  `tensorfold :8300 qwen3.8-27b`, `qflash :11234`.
+- `/Users/kesslerio/projects/firstmate/data/sparkdash-deploy-macnode/node-mk-macbook-pro-5.png`
+  (1280x1292, 152756 bytes) - node page `/spark/mk-macbook-pro-5`: header `Mac (Mac17,6) · Apple M5 Max`,
+  uptime 7h 58m; GPU panel usage/power `unavailable`, thermal pressure dash, throttle OK, unified memory
+  96.0 / 128.0 GB, available 32.0 GB; CPU usage 83% with temperature and CPU power `unavailable`,
+  model `Apple M5 Max · 18 cores`; RAM 96.0 / 128.0 GB at 75%; MODEL RUNTIMES listing all three as
+  serving with ports; storage `/System/Volumes/Data disk3s5` 43% (1588 / 3722 GB); network `en0`
+  192.168.4.125; LLM service `unavailable · not_observed` on :8888.
+- An earlier viewport-only capture of the same overview is kept as `overview-with-mac-node-viewport.png`.
+
+## Stage 2 applied - skipped by ruling
+
+The ruling picked Option A, so no merge was attempted or needed. `/opt/sparkDash` ended the task
+exactly as found: 23 dirty entries, HEAD `17c9560`, `stash@{0}` present. `feat/llm-proxy-auth` was
+never checked out, committed, stashed, or reset.
+
+## Stage 3 applied - the release swap, with the one wrinkle
+
+Sequence executed on john (read-only checks first, single `ExecStart` line changed):
+
+1. `cp -a ~/sparkDash-releases/mama-live-rates-20260930 ~/sparkDash-releases/mac-node-20261007`
+   (19 MB base, no `node_modules`; the untracked `docker-compose.live.yml` is preserved by the copy).
+2. Inside the new dir: `git fetch origin main` -> `6b6fec7..aaddfe7`, then
+   `git checkout --detach origin/main`; `git merge-base --is-ancestor aaddfe7 HEAD` -> YES, and
+   `git diff --stat 6b6fec7 HEAD` = **28 files changed, 2943 insertions(+), 35 deletions(-)** - the
+   Mac-node merge. `docker-compose.live.yml` still present and untracked.
+3. `docker compose -f docker-compose.live.yml build` **before** touching the unit, exit 0,
+   image `mac-node-20261007-sparkdash:latest`. (Necessary: the compose `build:` block has no `image:`
+   key, so the image tag is project-scoped by release-directory name, which is why the new release
+   gets a fresh build instead of reusing `mama-live-rates-20260930-sparkdash:latest`.)
+4. Unit swap with backup, then `daemon-reload` and `systemctl restart sparkdash-boot.service`.
+
+Unit diff as applied (`/etc/systemd/system/sparkdash-boot.service`, single line, backup
+`sparkdash-boot.service.bak-20261007162148` kept beside it - matching the host's existing
+`.bak-20260930`, `.bak-memfix-20260929`, `.bak-omlxlive-20260929` convention):
+
+```diff
+--- /etc/systemd/system/sparkdash-boot.service.bak-20261007162148
++++ /etc/systemd/system/sparkdash-boot.service
+@@ -9,7 +9,7 @@
+ # Wait up to 120s for tailscale0 to have an IPv4 address; publishing
+ # 100.120.26.16:5556 cannot bind before tailscale is up.
+ ExecStartPre=/bin/sh -c "for i in $(seq 1 120); do ip -4 addr show tailscale0 2>/dev/null | grep -q \"inet \" && exit 0; sleep 1; done; exit 1"
+-ExecStart=/usr/bin/docker compose -f /home/kesslerio/sparkDash-releases/mama-live-rates-20260930/docker-compose.live.yml up -d --force-recreate
++ExecStart=/usr/bin/docker compose -f /home/kesslerio/sparkDash-releases/mac-node-20261007/docker-compose.live.yml up -d --force-recreate
+
+ [Install]
+ WantedBy=multi-user.target
+```
+
+**Wrinkle worth knowing:** the first boot restart failed with `Conflict. The container name
+"/sparkDash-opencode-e2e" is already in use`. Both release directories declare the same
+`container_name`, so the new compose project cannot claim the name while the old project's container
+is still running; `--force-recreate` only recreates within its own project. The whole dashboard
+stayed up on the old container throughout. Recovery was to release the name through the old project
+and restart the unit:
+
+```bash
+docker compose -f /home/kesslerio/sparkDash-releases/mama-live-rates-20260930/docker-compose.live.yml down
+sudo systemctl reset-failed sparkdash-boot.service
+sudo systemctl restart sparkdash-boot.service
+```
+
+After that: `systemctl is-active` -> `active`, `docker ps` shows
+`sparkDash-opencode-e2e  Up 10 seconds  5555/tcp, 100.120.26.16:5556->5556/tcp`, and
+`docker inspect` reports `project=mac-node-20261007`, `image=mac-node-20261007-sparkdash`,
+`restart=always`. `curl http://100.120.26.16:5556/` -> 200 and
+`docker exec sparkDash-opencode-e2e ls /app/server/collectors` contains `MacAgentCollector.js`,
+which is the deployment proof that the Mac-node merge is serving.
+
+**Rollback is one command** (old release fully recoverable - dir, compose file, built image, and unit
+backup all intact; it needs the same name-release step, so it is one compound line, not two commands):
+
+```bash
+sudo cp -a /etc/systemd/system/sparkdash-boot.service.bak-20261007162148 /etc/systemd/system/sparkdash-boot.service \
+  && sudo systemctl daemon-reload \
+  && docker compose -f /home/kesslerio/sparkDash-releases/mac-node-20261007/docker-compose.live.yml down \
+  && sudo systemctl reset-failed sparkdash-boot.service \
+  && sudo systemctl restart sparkdash-boot.service
+```
+
+## Stage 4 applied - the Mac entry
+
+Backed up first per the host convention (`sparks.json.bak-before-macnode-20261007T162255`), then
+`POST /api/sparks` against the live server:
+
+```json
+{"id":"mk-macbook-pro-5","name":"MK-MacBook-Pro-5","kind":"mac",
+ "lanIp":"100.71.122.118","agent":{"host":"100.71.122.118","port":8790}}
+```
+
+- Response: `success: true`, `kind: "mac"`, `agent: {url: null, host: "100.71.122.118", port: 8790}`,
+  `lanIp: 100.71.122.118`, `ssh.host` left empty so no credentials were stored, `role: standalone`.
+- The field is `agent`, **not** `macAgent`, and `kind` is case-sensitive (`"MAC"` normalizes to
+  `spark`) - corrected in the Stage 4 prep note below.
+- `GET /api/sparks/mk-macbook-pro-5/metrics` -> `online: true`, `kind: mac`, hardware
+  `Mac (Mac17,6)` / `Apple M5 Max` / 18 cores / 128 GB, `runtimes` = 3 entries all `serving`
+  (`mtplx-mux` :8200, `tensorfold` :8300 `qwen3.8-27b`, `qflash` :11234), and
+  `metrics.gpu.unavailable` = `cpu.perCore`, `gpu.utilization`, `gpu.power`, `ane.power`.
+- Persistence confirmed: `config/sparks.json` on the host now has 5 entries including
+  `mk-macbook-pro-5` with `agent = {host: 100.71.122.118, port: 8790}`, and that file sits in the
+  host-mounted config directory, not the release directory.
+
+## Decision taken
+
+The ruling arrived through the task inbox at 2026-10-07T23:19Z: **Pick A, as recommended** - cut the
+new release from `origin/main` at `aaddfe7`, stage the unit repoint with a backup, restart through the
+boot unit rather than raw docker, confirm 5556 serves again, register the Mac (Apple Silicon Mac,
+tailnet address, agent port 8790), verify vitals + runtime inventory + honest unavailable tiles, take
+the overview screenshot with the MacBook present, leave `/opt/sparkDash` and `feat/llm-proxy-auth`
+completely untouched, and finish when the old release is recoverable within one command. All of those
+were met above; the alternatives are kept below for the record.
+
+
 
 - **A (recommended, matches how john already deploys):** cut
   `~/sparkDash-releases/mac-node-20261007` from `origin/main` = `aaddfe7`, copy the existing
