@@ -1,0 +1,12 @@
+[2026-10-07T00:35:09-0700] startup failed: target 'primary' not found (backend=tmux)
+[2026-10-07T00:35:28-0700] daemon starting (pid 3082785); target=primary; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=90s
+[2026-10-07T00:35:30-0700] wake: heartbeat
+[2026-10-07T00:35:31-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T00:35:32-0700] wake: heartbeat
+[2026-10-07T00:35:32-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T00:35:36-0700] wake: heartbeat
+[2026-10-07T00:35:36-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T00:35:44-0700] wake: heartbeat
+[2026-10-07T00:35:45-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T00:35:46-0700] inject deferred: supervisor composer not confirmed-empty (state=pending: pending input, dead-shell prompt, or unreadable pane)
+[2026-10-07T00:35:46-0700] daemon shutting down

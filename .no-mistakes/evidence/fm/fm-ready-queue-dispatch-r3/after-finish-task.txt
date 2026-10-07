@@ -1,0 +1,18 @@
+task:
+  id: after
+  title: handoff note without worker
+  state: in_flight
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: "blocked-by:dep2"
+  links: none
+  body: "Launched through guarded scout dispatch. Codex CLI verified alive through fm_backend_agent_state; startup folder-trust dialog remains unanswered, so brief processing has not begun. Existing sibling trust waits do not block this dispatch. Persistent trust remains an operator decision."

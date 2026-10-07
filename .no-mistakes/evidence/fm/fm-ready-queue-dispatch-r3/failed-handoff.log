@@ -1,0 +1,18 @@
+[2026-10-07T00:44:05-0700] daemon starting (pid 3321091); target=primary; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=90s
+[2026-10-07T00:44:06-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-escalations is not a readable file
+[2026-10-07T00:44:06-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-escalations is not a readable file
+[2026-10-07T00:44:06-0700] ERROR: away-mode escalation undelivered 999999s; last delivery failure: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-escalations is not a readable file. Buffer + wake-queue preserved; alarm marker written.
+[2026-10-07T00:44:06-0700] wedge alarm: no OS-level alert channel on Linux; durable marker /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-inject-wedged is the only signal - set config/wedge-alarm (e.g. a command: directive)
+[2026-10-07T00:44:06-0700] wake: heartbeat
+[2026-10-07T00:44:07-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T00:44:07-0700] wake classification failed; retaining durable wakes
+[2026-10-07T00:44:07-0700] durable wake handling was not acknowledged; restarting for recovery
+[2026-10-07T00:44:08-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-escalations is not a readable file
+[2026-10-07T00:44:08-0700] wake: heartbeat
+[2026-10-07T00:44:09-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T00:44:09-0700] wake classification failed; retaining durable wakes
+[2026-10-07T00:44:09-0700] durable wake handling was not acknowledged; restarting for recovery
+[2026-10-07T00:44:10-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-escalations is not a readable file
+[2026-10-07T00:44:11-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-escalations is not a readable file
+[2026-10-07T00:44:11-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-escalations is not a readable file
+[2026-10-07T00:44:11-0700] daemon shutting down

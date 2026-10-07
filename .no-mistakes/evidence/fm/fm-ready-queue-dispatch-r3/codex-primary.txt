@@ -1,0 +1,40 @@
+╭─────────────────────────────────────────────────╮
+│ ✨ Update available! 0.159.2 -> 0.160.1         │
+│ Run npm install -g @openai/codex to update.     │
+│                                                 │
+│ See full release notes:                         │
+│ https://github.com/openai/codex/releases/latest │
+╰─────────────────────────────────────────────────╯
+
+
+  >_ OpenAI Codex (v0.159.2)
+     ~/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S
+
+  Nice place you’ve got here. Very monospace.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+› This is an isolated live validation. Do not run session-start or change any files or configuration. Reply
+  LAB_PRIMARY_READY only.
+
+
+  GPT-6.1-Sol medium · ~/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S
+                                                                                               ⚠ 1 warning · f2 to view

@@ -1,0 +1,6 @@
+[2026-10-07T00:44:59-0700] daemon starting (pid 3337956); target=primary; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=90s
+[2026-10-07T00:45:01-0700] wake: heartbeat
+[2026-10-07T00:45:01-0700] wake force-self (FM_INJECT_SKIP): heartbeat
+[2026-10-07T00:45:03-0700] wake: heartbeat
+[2026-10-07T00:45:03-0700] wake force-self (FM_INJECT_SKIP): heartbeat
+[2026-10-07T00:45:05-0700] daemon shutting down

@@ -1,0 +1,40 @@
+
+  Folder access
+  /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/projects/fixture/.treehouse/fixture-aa
+  56b3/3/fixture
+
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the repository root:
+  /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/projects/fixture
+
+  Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings
+  can run code automatically, even without a model request. Continue only if you trust these files. Your trust
+  decision will be saved.
+
+› 1. Trust and continue
+  2. Quit
+
+  enter continue · esc quit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

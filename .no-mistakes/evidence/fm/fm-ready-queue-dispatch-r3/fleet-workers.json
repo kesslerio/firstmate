@@ -1,0 +1,480 @@
+{
+  "schema": "fm-fleet-snapshot.v1",
+  "generated": "2026-10-07T07:40:33Z",
+  "fm_home": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab",
+  "roots": {
+    "fm_root": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S",
+    "state": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/state",
+    "data": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/data",
+    "config": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/config",
+    "projects": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/projects"
+  },
+  "backlog": {
+    "present": true,
+    "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/data/backlog.md",
+    "records": [
+      {
+        "merged": null,
+        "body_lines": [],
+        "done": null,
+        "repo": null,
+        "hold_reason": null,
+        "unresolved_blocker_ids": [],
+        "links": [],
+        "completion": {
+          "verb": null,
+          "date": null
+        },
+        "current_role": "worker",
+        "blocked_by_ids": [
+          "dep"
+        ],
+        "requires_child_metadata": true,
+        "title": "ready sibling",
+        "body_excerpt": null,
+        "kind": null,
+        "since": "2026-10-07",
+        "captain_actionable": false,
+        "reported": null,
+        "hold_age_days": 0,
+        "state": "in_flight",
+        "id": "sibling",
+        "hold_until": null,
+        "hold_set": null,
+        "raw": "- [ ] sibling - ready sibling blocked-by: dep (since 2026-10-07)",
+        "blocked_by": "dep",
+        "local_note": null,
+        "order": 1,
+        "blocked_reason": null,
+        "hold_bucket": null,
+        "checked": false,
+        "report_path": null,
+        "hold_kind": null,
+        "priority": null,
+        "structured": true,
+        "pr_url": null
+      },
+      {
+        "links": [],
+        "unresolved_blocker_ids": [],
+        "hold_reason": null,
+        "repo": null,
+        "body_lines": [
+          "Captain hold set: 2026-10-07T07:36:44Z"
+        ],
+        "done": null,
+        "merged": null,
+        "hold_age_days": 0,
+        "reported": null,
+        "captain_actionable": false,
+        "since": "2026-10-07",
+        "kind": null,
+        "body_excerpt": "Captain hold set: 2026-10-07T07:36:44Z",
+        "title": "next unit with stale stop note",
+        "requires_child_metadata": true,
+        "blocked_by_ids": [
+          "dep"
+        ],
+        "completion": {
+          "verb": null,
+          "date": null
+        },
+        "current_role": "worker",
+        "id": "next",
+        "state": "in_flight",
+        "hold_set": "2026-10-07T07:36:44Z",
+        "hold_until": null,
+        "order": 2,
+        "local_note": null,
+        "blocked_by": "dep",
+        "raw": "- [ ] next - next unit with stale stop note blocked-by: dep (since 2026-10-07)",
+        "hold_kind": null,
+        "priority": null,
+        "report_path": null,
+        "checked": false,
+        "hold_bucket": null,
+        "blocked_reason": null,
+        "pr_url": null,
+        "structured": true
+      },
+      {
+        "hold_until": null,
+        "hold_set": "2026-10-07T07:34:58Z",
+        "state": "queued",
+        "id": "held",
+        "current_role": "queued",
+        "completion": {
+          "verb": null,
+          "date": null
+        },
+        "blocked_by_ids": [],
+        "requires_child_metadata": false,
+        "title": "explicit hold",
+        "body_excerpt": "Captain hold set: 2026-10-07T07:34:58Z",
+        "kind": null,
+        "since": "2026-10-07",
+        "captain_actionable": true,
+        "reported": null,
+        "hold_age_days": 0,
+        "merged": null,
+        "done": null,
+        "body_lines": [
+          "Captain hold set: 2026-10-07T07:34:58Z"
+        ],
+        "repo": null,
+        "hold_reason": "explicit captain hold",
+        "unresolved_blocker_ids": [],
+        "links": [],
+        "structured": true,
+        "pr_url": null,
+        "blocked_reason": null,
+        "hold_bucket": "live",
+        "checked": false,
+        "report_path": null,
+        "priority": null,
+        "hold_kind": "captain",
+        "raw": "- [ ] held - explicit hold (since 2026-10-07) (hold: fm-hold-v1:ZXhwbGljaXQgY2FwdGFpbiBob2xk) (hold-kind: captain)",
+        "blocked_by": null,
+        "local_note": null,
+        "order": 3
+      },
+      {
+        "completion": {
+          "date": "2026-10-07",
+          "verb": "merged"
+        },
+        "current_role": "done",
+        "blocked_by_ids": [],
+        "requires_child_metadata": false,
+        "title": "dependency",
+        "body_excerpt": null,
+        "kind": null,
+        "since": null,
+        "captain_actionable": false,
+        "reported": null,
+        "hold_age_days": null,
+        "merged": "2026-10-07",
+        "done": null,
+        "body_lines": [],
+        "repo": null,
+        "hold_reason": null,
+        "unresolved_blocker_ids": [],
+        "links": [
+          "https://github.com/example/fixture/pull/1"
+        ],
+        "hold_until": null,
+        "hold_set": null,
+        "state": "done",
+        "id": "dep",
+        "blocked_reason": null,
+        "hold_bucket": null,
+        "checked": true,
+        "report_path": null,
+        "hold_kind": null,
+        "priority": null,
+        "raw": "- [x] dep - dependency https://github.com/example/fixture/pull/1 (merged 2026-10-07)",
+        "blocked_by": null,
+        "order": 4,
+        "local_note": null,
+        "structured": true,
+        "pr_url": "https://github.com/example/fixture/pull/1"
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": "next",
+      "kind": "scout",
+      "harness": "codex",
+      "mode": "",
+      "yolo": "",
+      "branch": null,
+      "project": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/projects/fixture",
+      "spawn_gen": "s1791358779.3211650.16416",
+      "backend": "tmux",
+      "remote": null,
+      "paths": {
+        "meta": {
+          "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/state/next.meta",
+          "present": true
+        },
+        "status_log": {
+          "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/state/next.status",
+          "present": false,
+          "kind": "event_history",
+          "last_event": {
+            "state": "",
+            "note": "",
+            "raw": "",
+            "age_seconds": null
+          }
+        },
+        "worktree": {
+          "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/projects/fixture/.treehouse/fixture-aa56b3/1/fixture",
+          "present": true
+        },
+        "home": {
+          "path": null,
+          "present": false
+        },
+        "report": {
+          "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/data/next/report.md",
+          "present": false
+        }
+      },
+      "secondmate_projects": [],
+      "current_state": {
+        "state": "unknown",
+        "source": "pane",
+        "detail": "harness state unavailable (unknown codex-unverified)",
+        "raw": "state: unknown · source: pane · harness state unavailable (unknown codex-unverified)",
+        "observed_at": "2026-10-07T07:40:33Z",
+        "freshness": "fresh"
+      },
+      "endpoint": {
+        "target": "codex-primary:fm-next",
+        "exists": true,
+        "agent_alive": "not_checked",
+        "status": "unknown",
+        "observed_at": "2026-10-07T07:40:33Z",
+        "freshness": "fresh"
+      },
+      "pr": {
+        "url": null,
+        "source": "absent",
+        "head": null
+      },
+      "hints": {
+        "pending_decision": false,
+        "blocked_event": false,
+        "open_decisions": [],
+        "scout_report_present": false,
+        "last_event_text": ""
+      },
+      "actions": {
+        "watch": "bin/fm-peek.sh fm-next",
+        "steer": "bin/fm-send.sh fm-next '<instruction>'",
+        "return_channel_note": null
+      },
+      "backlog": {
+        "links": [],
+        "unresolved_blocker_ids": [],
+        "hold_reason": null,
+        "repo": null,
+        "body_lines": [
+          "Captain hold set: 2026-10-07T07:36:44Z"
+        ],
+        "done": null,
+        "merged": null,
+        "hold_age_days": 0,
+        "reported": null,
+        "captain_actionable": false,
+        "since": "2026-10-07",
+        "kind": null,
+        "body_excerpt": "Captain hold set: 2026-10-07T07:36:44Z",
+        "title": "next unit with stale stop note",
+        "requires_child_metadata": true,
+        "blocked_by_ids": [
+          "dep"
+        ],
+        "completion": {
+          "verb": null,
+          "date": null
+        },
+        "current_role": "worker",
+        "id": "next",
+        "state": "in_flight",
+        "hold_set": "2026-10-07T07:36:44Z",
+        "hold_until": null,
+        "order": 2,
+        "local_note": null,
+        "blocked_by": "dep",
+        "raw": "- [ ] next - next unit with stale stop note blocked-by: dep (since 2026-10-07)",
+        "hold_kind": null,
+        "priority": null,
+        "report_path": null,
+        "checked": false,
+        "hold_bucket": null,
+        "blocked_reason": null,
+        "pr_url": null,
+        "structured": true
+      }
+    },
+    {
+      "id": "sibling",
+      "kind": "scout",
+      "harness": "codex",
+      "mode": "",
+      "yolo": "",
+      "branch": null,
+      "project": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/projects/fixture",
+      "spawn_gen": "s1791358798.3220841.13145",
+      "backend": "tmux",
+      "remote": null,
+      "paths": {
+        "meta": {
+          "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/state/sibling.meta",
+          "present": true
+        },
+        "status_log": {
+          "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/state/sibling.status",
+          "present": false,
+          "kind": "event_history",
+          "last_event": {
+            "state": "",
+            "note": "",
+            "raw": "",
+            "age_seconds": null
+          }
+        },
+        "worktree": {
+          "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/projects/fixture/.treehouse/fixture-aa56b3/2/fixture",
+          "present": true
+        },
+        "home": {
+          "path": null,
+          "present": false
+        },
+        "report": {
+          "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/data/sibling/report.md",
+          "present": false
+        }
+      },
+      "secondmate_projects": [],
+      "current_state": {
+        "state": "unknown",
+        "source": "pane",
+        "detail": "harness state unavailable (unknown codex-unverified)",
+        "raw": "state: unknown · source: pane · harness state unavailable (unknown codex-unverified)",
+        "observed_at": "2026-10-07T07:40:33Z",
+        "freshness": "fresh"
+      },
+      "endpoint": {
+        "target": "codex-primary:fm-sibling",
+        "exists": true,
+        "agent_alive": "not_checked",
+        "status": "unknown",
+        "observed_at": "2026-10-07T07:40:33Z",
+        "freshness": "fresh"
+      },
+      "pr": {
+        "url": null,
+        "source": "absent",
+        "head": null
+      },
+      "hints": {
+        "pending_decision": false,
+        "blocked_event": false,
+        "open_decisions": [],
+        "scout_report_present": false,
+        "last_event_text": ""
+      },
+      "actions": {
+        "watch": "bin/fm-peek.sh fm-sibling",
+        "steer": "bin/fm-send.sh fm-sibling '<instruction>'",
+        "return_channel_note": null
+      },
+      "backlog": {
+        "merged": null,
+        "body_lines": [],
+        "done": null,
+        "repo": null,
+        "hold_reason": null,
+        "unresolved_blocker_ids": [],
+        "links": [],
+        "completion": {
+          "verb": null,
+          "date": null
+        },
+        "current_role": "worker",
+        "blocked_by_ids": [
+          "dep"
+        ],
+        "requires_child_metadata": true,
+        "title": "ready sibling",
+        "body_excerpt": null,
+        "kind": null,
+        "since": "2026-10-07",
+        "captain_actionable": false,
+        "reported": null,
+        "hold_age_days": 0,
+        "state": "in_flight",
+        "id": "sibling",
+        "hold_until": null,
+        "hold_set": null,
+        "raw": "- [ ] sibling - ready sibling blocked-by: dep (since 2026-10-07)",
+        "blocked_by": "dep",
+        "local_note": null,
+        "order": 1,
+        "blocked_reason": null,
+        "hold_bucket": null,
+        "checked": false,
+        "report_path": null,
+        "hold_kind": null,
+        "priority": null,
+        "structured": true,
+        "pr_url": null
+      }
+    }
+  ],
+  "main_inventory": {
+    "valid": true,
+    "reason": null,
+    "orphan_in_flight": [],
+    "unstructured_current_count": 0
+  },
+  "contributions": {
+    "known": 1,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 1,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "unmeasured": 0,
+    "complete": false,
+    "proven_clear": false,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "unreadable_records": 0,
+    "valid_until": 900,
+    "captain": [],
+    "captain_omitted": 0
+  },
+  "scout_reports": [],
+  "secondmate_current": {
+    "registry": {
+      "present": false,
+      "available": true,
+      "complete": true,
+      "reason": null,
+      "provenance": "registered-table",
+      "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.lab/data/secondmates.md",
+      "freshness": {
+        "status": "fresh",
+        "observed_at": "2026-10-07T07:40:33Z"
+      },
+      "records": [],
+      "input_truncated": false,
+      "records_truncated": false,
+      "reasons": [],
+      "lines_in_window": 0,
+      "records_in_window": 0
+    },
+    "records": [],
+    "total_registered": 0,
+    "total": 0,
+    "shown": 0,
+    "truncated": 0
+  },
+  "secondmate_landed": {
+    "records": [],
+    "truncated": [],
+    "unreadable": [],
+    "partial": []
+  },
+  "secondmate_guidance": {
+    "note": "For kind=secondmate, bearings selects validated structured state from that registered home; parent events and bounded terminal evidence are fallback-only supplements and never current-state authority."
+  }
+}

@@ -1,0 +1,53 @@
+ok: updated queued (body)
+task:
+  id: queued
+  title: ready without status events
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: yes
+  hold_reason: "fm-hold-v1:ZXhwbGljaXQgY2FwdGFpbiBob2xk"
+  hold_kind: captain
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Earlier handoff: next worker started (no worker actually exists)"
+help[1]:
+  - Run `tasks-axi show queued --full` to see the result
+count: 0
+ready: 0 unblocked queued tasks
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi list --state queued` to see all queued work (incl. blocked)
+ok: unhold queued -> cleared
+task:
+  id: queued
+  title: ready without status events
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Earlier handoff: next worker started (no worker actually exists)"
+help[1]:
+  - Run `tasks-axi ready` to see dispatchable work
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  queued,queued,task,"-",ready without status events
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these

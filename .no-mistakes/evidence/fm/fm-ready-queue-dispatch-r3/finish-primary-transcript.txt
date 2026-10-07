@@ -1,0 +1,40 @@
+› Use the standard guarded spawn unchanged. The supplied boundary explicitly allows ephemeral temp/cache writes incide…
+    ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    spawned after harness=codex kind=scout window=finish-primary:fm-after worktree=/home/art/.no-mistakes/worktrees/9f7…
+    + 7 lines (ctrl+t to expand)
+
+✔ You approved codex to run FM_HOME="$PWD/.lab" bash -c '. bin/fm-backend.sh; target=$(fm_meta_get "$FM_H... this time
+
+• Ran FM_HOME="$PWD/.lab" bash -c '. bin/fm-backend.sh; target=$(fm_meta_get "$FM_HOME/state/after.meta" window); print…
+  └ ?? .u/
+    ?? .w/
+    ?? bin/.test-supervise-before.sh
+    + 98 lines (ctrl+t to expand)
+
+• Ran FM_HOME="$PWD/.lab" bin/fm-tasks-axi.sh edit --help; FM_HOME="$PWD/.lab" bin/fm-tasks-axi.sh show dep2; sed -n '1…
+  └   ' "$0"
+    }
+
+    + 100 lines (ctrl+t to expand)
+
+• Ran FM_HOME="$PWD/.lab" bin/fm-tasks-axi.sh update after --body 'Launched through guarded scout dispatch. Codex CLI v…
+  └   deps: none
+      links: none
+      body: "Captain hold set: 2026-10-07T07:34:58Z"
+    + 41 lines (ctrl+t to expand)
+
+• Captain, dep2 is Done with https://github.com/example/fixture/pull/2.
+
+  The same-turn ready-work check launched after as a Codex scout using tmux, default model, and a filled brief.
+  fm_backend_agent_state confirms it is alive, but its unanswered trust dialog means brief processing has not begun.
+
+  next and sibling stayed untouched; held remains queued and held. No persistent trust was accepted. I’m now idle; the
+  primary pane remains running.
+
+  Worked for 3m 15s • 00:46
+
+
+› Ask Codex to do anything
+
+  GPT-6.1-Sol medium · ~/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S · Finish dep2, launch after
+  ← for agents · ? for shortcuts                                                               ⚠ 1 warning · f2 to view

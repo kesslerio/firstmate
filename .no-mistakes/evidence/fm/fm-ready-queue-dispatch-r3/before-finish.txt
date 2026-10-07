@@ -1,0 +1,6 @@
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  dep2,queued,task,"-",finishable dependency
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these

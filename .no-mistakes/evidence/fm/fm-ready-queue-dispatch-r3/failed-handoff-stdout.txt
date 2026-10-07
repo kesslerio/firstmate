@@ -1,0 +1,3 @@
+bin/fm-supervise-daemon.sh: line 754: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-escalations: Is a directory
+bin/fm-supervise-daemon.sh: line 754: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4AKKGPB2V34X41SFK8K494S/.f/state/.subsuper-escalations: Is a directory
+Terminated                 sleep 1
