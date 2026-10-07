@@ -1,0 +1,18 @@
+task:
+  id: next
+  title: "beyond earlier capacity: next unit"
+  state: in_flight
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: demo
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: "blocked-by:dependency"
+  links: none
+  body: "Dependency landed. Previous note has no worker. Delivery: mode=local-only yolo=off harness=codex. Project is FM_HOME/projects/demo; brief is data/next/brief.md."

@@ -1,0 +1,7 @@
+Away posture (recorded):
+  entered: 2026-10-07T12:19:55Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Dispatch the queued unit next using its existing brief and local-only contract with Codex. Only next is authorized. Do not merge, push, or open a PR. At the Codex folder-trust dialog, use Enter as authorized; never pre-accept hook trust in a store.

@@ -1,0 +1,40 @@
+  The move IS the acknowledgement: without it firstmate rings again and eventually treats you as stuck. An empty or
+  absent inbox needs no action.
+
+  # Project memory
+  A project's `AGENTS.md` or `CLAUDE.md` is loaded into every agent session in that project, so edit it only to correct
+  information that is factually wrong - including information your own change made wrong - and never to add knowledge
+  because it is missing.
+  A correction edits only the wrong text: do not run `/home/art/.no-mistakes/
+  worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/bin/fm-ensure-agents-md.sh`, create either file, or add sections,
+  headings, or pointers alongside it.
+
+  # Definition of done
+  Delivery contract: mode=local-only
+  Ship branch: fm/next
+  This task ships **local-only**: no remote, no PR, no pipeline.
+  The task is complete only when committed on your branch `fm/next`. Do NOT push, do NOT open a PR, do NOT merge.
+  A `done:` is accepted when the named head is on this project's shared local branch, not only on a detached copy; the
+  check tests that head, not merely that a branch moved.
+  Keep your branch a clean fast-forward onto the current default branch - if `main` has advanced, rebase onto it so the
+  eventual merge stays a fast-forward.
+  When it is implemented and committed, append `done [at=<epoch>]: ready in branch fm/next` to the status file and
+  stop.
+  The configured merge authority approves the ready branch, then firstmate merges it into local `main` through the
+  guarded fast-forward path.
+
+
+• I’ll verify the worktree, write the product to the authorized proof directory, and complete the local branch delivery.
+
+• Ran pwd -P …
+  └ /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixture-a87c48/1…
+    /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixture-a87c48/1…
+    + 2 lines (ctrl+t to expand)
+
+◦ Working (8s • esc to interrupt)
+
+
+› Ask Codex to do anything
+
+  GPT-6.1-Sol medium · ~/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixtu…
+  ? for shortcuts                                                                              ⚠ 1 warning · f2 to view

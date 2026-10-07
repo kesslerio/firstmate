@@ -1,0 +1,7 @@
+Away posture (recorded):
+  entered: 2026-10-07T11:59:54Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Dispatch the queued unit next using its existing brief and local-only contract with Codex. Only next is authorized. Do not merge, push, open a PR, or change global configuration.

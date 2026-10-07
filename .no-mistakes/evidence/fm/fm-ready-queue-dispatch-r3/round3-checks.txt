@@ -1,0 +1,1 @@
+Verified real CLI readiness before/after landing, sibling independence and holds; heartbeat wake and daemon handoff; refused premature acknowledgement; preserved repeated older and >4500-byte handoffs; wake retention/retry on failed durable write; held-only silence; real Codex worker processing with proof 493; preserved denied-work note and retry condition.

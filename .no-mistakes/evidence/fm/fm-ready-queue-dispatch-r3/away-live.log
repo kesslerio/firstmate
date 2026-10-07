@@ -1,0 +1,114 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/away-home
+ok: added other -> Queued
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start other` to move it to in flight
+  - Run `tasks-axi block other --by <other>` to record a dependency
+ok: updated other (body)
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: Existing note to preserve.
+help[1]:
+  - Run `tasks-axi show other --full` to see the result
+ok: added held -> Queued
+task:
+  id: held
+  title: explicit captain hold
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start held` to move it to in flight
+  - Run `tasks-axi block held --by <other>` to record a dependency
+held
+Away posture recorded at 2026-10-07T11:55:20Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: 4 concurrent workers.
+Away posture (recorded):
+  entered: 2026-10-07T11:55:20Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    No dispatch is authorized. Do not merge, push, open a PR, or change global configuration.
+engine_exit=0
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Existing note to preserve. Not dispatched: away words ('No dispatch is authorized') forbid dispatch; retry waits for MAIN's return or an applicable dispatch grant."
+task:
+  id: held
+  title: explicit captain hold
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: yes
+  hold_reason: "design pick waits for captain"
+  hold_kind: captain
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Captain hold set: 2026-10-07T11:55:20Z"
+{"seq":1,"epoch":1791374137,"task":"fleet","wake":"heartbeat","verdict":"captain","summary":"Heartbeat: ready unit 'other' is queued but not dispatched because your away words say no dispatch is authorized; recorded on its note, waits for your return (unit 'held' stays on captain hold). No other fleet activity.","silent":false,"statusEndpoint":0,"statusIdent":"-"}
+wake_remaining=0

@@ -1,0 +1,18 @@
+Attended real Claude engine:
+The heartbeat found one ready unit, `next`, and I reported it to MAIN with verdict captain so MAIN can dispatch it. I can't spawn workers while the home is attended.
+
+`next` was blocked by `dependency`, which has landed (https://github.com/example/lab/pull/1). Its earlier capacity stop has cleared and no worker is live for it.
+
+The other two queued units stay put. `held` is under a captain hold, and `paused` is blocked behind `held`. No tasks were under way.
+
+The report was recorded as seq 7. The drain printed nothing after the acknowledgement, so I'm treating wake 4 as acknowledged.
+
+Away real Claude engine:
+I dispatched the queued unit `next` (demo project, codex, local-only, yolo off), and it's now in flight. I reported it as routine, and MAIN will see it at the next wake.
+
+The worker's state still reads "unknown" because the harness status isn't available yet. I haven't confirmed it's actually running.
+
+- **Other units:** `held`, `paused` and `other` stay queued. `held` is under a captain hold and `paused` depends on it. `other` is outside the dispatch your away words authorized.
+- **Scope:** I didn't merge, push, open a PR, or change global configuration.
+- **Spawn notice:** `fm-spawn.sh` warned that local-only is less rigorous than the demo project's standing no-mistakes posture. Your words named local-only, so I went ahead.
+- **Ack and leases:** The first ack seems to have gone through silently, since a second attempt found nothing to acknowledge. I tried releasing the `next` and `backlog` leases twice and neither release printed any output, so I can't confirm they were released.

@@ -1,0 +1,135 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/round3-finish-home
+ok: added other -> Queued
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start other` to move it to in flight
+  - Run `tasks-axi block other --by <other>` to record a dependency
+ok: updated other (body)
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: Existing note to preserve.
+help[1]:
+  - Run `tasks-axi show other --full` to see the result
+ok: added held -> Queued
+task:
+  id: held
+  title: explicit captain hold
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start held` to move it to in flight
+  - Run `tasks-axi block held --by <other>` to record a dependency
+held
+ok: added dependency -> Queued
+task:
+  id: dependency
+  title: finished predecessor
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start dependency` to move it to in flight
+  - Run `tasks-axi block dependency --by <other>` to record a dependency
+ok: block other -> blocked-by dependency
+help[2]:
+  - Run `tasks-axi unblock other --by <other>` to clear it
+  - Run `tasks-axi ready` to see what is still dispatchable
+ok: done dependency -> Done (pr https://github.com/example/fixture/pull/1)
+help[1]:
+  - Run `tasks-axi ready` to dispatch work unblocked by this
+engine_exit=0
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: "blocked-by:dependency"
+  links: none
+  body: Existing note to preserve.
+task:
+  id: held
+  title: explicit captain hold
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: yes
+  hold_reason: "design pick waits for captain"
+  hold_kind: captain
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Captain hold set: 2026-10-07T12:23:53Z"
+{"seq":1,"epoch":1791375843,"task":"dependency","wake":"heartbeat","verdict":"captain","summary":"Predecessor 'dependency' finished; queued unit 'other' (out of scope ready unit) is now ready with no hold or live worker. Please dispatch it. 'held' stays waiting on the captain hold.","silent":false,"statusEndpoint":0,"statusIdent":"-"}
+wake_remaining=0

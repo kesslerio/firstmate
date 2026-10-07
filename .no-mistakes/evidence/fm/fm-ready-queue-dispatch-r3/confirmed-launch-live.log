@@ -1,0 +1,167 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/confirmed-launch-home
+scaffolded: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/confirmed-launch-home/data/next/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+ok: added other -> Queued
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start other` to move it to in flight
+  - Run `tasks-axi block other --by <other>` to record a dependency
+ok: updated other (body)
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: Existing note to preserve.
+help[1]:
+  - Run `tasks-axi show other --full` to see the result
+ok: added held -> Queued
+task:
+  id: held
+  title: explicit captain hold
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start held` to move it to in flight
+  - Run `tasks-axi block held --by <other>` to record a dependency
+held
+Away posture recorded at 2026-10-07T12:17:25Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: 4 concurrent workers.
+Away posture (recorded):
+  entered: 2026-10-07T12:17:25Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Dispatch the queued unit next using its existing brief and local-only contract with Codex. Only next is authorized. Do not merge, push, or open a PR. At the Codex folder-trust dialog, use Enter as authorized; never pre-accept hook trust in a store.
+ok: added next -> Queued
+task:
+  id: next
+  title: authorized proof unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start next` to move it to in flight
+  - Run `tasks-axi block next --by <other>` to record a dependency
+ok: updated next (body)
+task:
+  id: next
+  title: authorized proof unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Project: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture. Brief is /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/confirmed-launch-home/data/next/brief.md. Dispatch via bin/fm-spawn.sh next /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture --mode local-only --yolo off --harness codex. A note is not a live worker."
+help[1]:
+  - Run `tasks-axi show next --full` to see the result
+window=primary:fm-next
+endpoint_task_id=next
+worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixture-a87c48/1/fixture
+project=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture
+harness=codex
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/next
+tasktmp=/tmp/fm-next
+model=default
+effort=default
+spawn_gen=s1791375455.9848.12863
+
+Terminated                 python3 - <<'VERIFY'
+import os, subprocess, time, pathlib
+root=pathlib.Path.cwd(); home=pathlib.Path(os.environ['FM_HOME']); evidence=pathlib.Path('/home/art/.no-mistakes/evidence/01M4B0WCFKS0F03ZZ5EPCCQ72P')
+def run(args): return subprocess.run(args, text=True, capture_output=True)
+meta=home/'state/next.meta'
+assert meta.exists(), 'supervision did not create worker metadata'
+fields=dict(line.split('=',1) for line in meta.read_text().splitlines() if '=' in line)
+print(meta.read_text(),flush=True)
+worker=pathlib.Path(fields['worktree'])
+assert worker.is_relative_to(root), 'worker escaped workspace'
+target=fields.get('window','primary:fm-next')
+trust_answered=False
+for n in range(120):
+    pane=run(['tmux','-L','fm-lab','capture-pane','-p','-t',target]).stdout
+    if ('Trust this folder?' in pane or 'Do you trust the contents' in pane) and not trust_answered:
+        (evidence/'confirmed-launch-trust.txt').write_text(pane)
+        print('Reproduced folder-trust startup gate; sending authorized Enter',flush=True)
+        sent=run(['bin/fm-send.sh','next','--key','Enter'])
+        print(sent.stdout+sent.stderr,flush=True)
+        assert sent.returncode==0
+        trust_answered=True
+    if (worker/'proof.txt').exists():
+        assert (worker/'proof.txt').read_text().strip()=='493', 'worker produced incorrect result'
+        live=run(['tmux','-L','fm-lab','list-panes','-t',target,'-F','#{pane_dead} #{pane_pid} #{pane_current_command}'])
+        assert live.returncode==0 and live.stdout.startswith('0 '), 'worker endpoint not live'
+        (evidence/'confirmed-launch-worker.txt').write_text(pane+'\nLive endpoint: '+live.stdout+'\nProof: '+(worker/'proof.txt').read_text())
+        print('PASS: live Codex worker processed launch brief and wrote 493',flush=True)
+        break
+    time.sleep(1)
+else:
+    (evidence/'confirmed-launch-worker.txt').write_text(pane)
+    raise AssertionError('worker did not process brief within 120 seconds')
+VERIFY
+

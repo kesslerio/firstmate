@@ -1,0 +1,3 @@
+pane process 3504622 exited after private tmux server shutdown
+pane process 3518221 exited after private tmux server shutdown
+All bounded engine and daemon commands completed; their production wrappers reaped descendants.

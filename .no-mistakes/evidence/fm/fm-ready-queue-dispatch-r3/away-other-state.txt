@@ -1,0 +1,18 @@
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""

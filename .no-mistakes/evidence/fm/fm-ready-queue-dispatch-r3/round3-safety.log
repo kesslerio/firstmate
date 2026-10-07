@@ -1,0 +1,41 @@
+ok: added next -> Queued
+task:
+  id: next
+  title: ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start next` to move it to in flight
+  - Run `tasks-axi block next --by <other>` to record a dependency
+
+FAILED HANDOFF MUST KEEP WAKE
+bin/fm-supervise-daemon.sh: line 756: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/safety-home/state/.subsuper-escalations: Is a directory
+1791375783	1	heartbeat	heartbeat	heartbeat
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 124873.1791375783.3dj2Ks
+
+RETRY HANDOFF
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+next
+
+ONLY HELD WORK
+count: 0
+ready: 0 unblocked queued tasks
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi list --state queued` to see all queued work (incl. blocked)
+heartbeat_streak=1
+watch_output_bytes=0
+wake_queue_bytes=0

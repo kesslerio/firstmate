@@ -1,0 +1,14 @@
+{
+  "scenario": "An authorized queued unit starts a worker that demonstrably processes its brief",
+  "result": "pass",
+  "live": true,
+  "evidence": [
+    "confirmed-launch-trust.txt",
+    "confirmed-launch-success.txt",
+    "confirmed-launch-rerun.log",
+    "confirmed-launch-worker.txt"
+  ],
+  "root_cause": "Prior test stopped at directory trust; documented Enter handling clears it. Temporary verifier corrected to the scaffold-owned proof path.",
+  "source_changes": false,
+  "cleanup": "Private server and fixture processes stopped; disposable fixtures removed."
+}

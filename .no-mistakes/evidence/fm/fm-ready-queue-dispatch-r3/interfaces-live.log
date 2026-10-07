@@ -1,0 +1,145 @@
+ok: added dependency -> Queued
+task:
+  id: dependency
+  title: landed predecessor
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start dependency` to move it to in flight
+  - Run `tasks-axi block dependency --by <other>` to record a dependency
+ok: added next -> Queued
+task:
+  id: next
+  title: queued note without worker
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start next` to move it to in flight
+  - Run `tasks-axi block next --by <other>` to record a dependency
+ok: added sibling -> Queued
+task:
+  id: sibling
+  title: independent ready sibling
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start sibling` to move it to in flight
+  - Run `tasks-axi block sibling --by <other>` to record a dependency
+ok: added held -> Queued
+task:
+  id: held
+  title: captain lane
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start held` to move it to in flight
+  - Run `tasks-axi block held --by <other>` to record a dependency
+ok: block next -> blocked-by dependency
+help[2]:
+  - Run `tasks-axi unblock next --by <other>` to clear it
+  - Run `tasks-axi ready` to see what is still dispatchable
+held
+
+BEFORE LANDING
+count: 2
+ready[2]{id,state,kind,repo,title}:
+  dependency,queued,task,"-",landed predecessor
+  sibling,queued,task,"-",independent ready sibling
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+ok: done dependency -> Done (pr https://github.com/example/fixture/pull/1)
+help[1]:
+  - Run `tasks-axi ready` to dispatch work unblocked by this
+
+AFTER LANDING
+count: 2
+ready[2]{id,state,kind,repo,title}:
+  next,queued,task,"-",queued note without worker
+  sibling,queued,task,"-",independent ready sibling
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+
+WATCHER WITHOUT NEW STATUS EVENTS
+heartbeat
+
+DAEMON DURABLE HANDOFF
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+wake_remaining=0
+
+OLDER HANDOFF AND NEWER OUTCOME
+1
+2
+error: refusing processed advancement beyond the read cursor (0)
+BRANCH OUTCOMES (captain outcomes the supervision session recorded for you, one line per outcome, oldest first; each says what was true when it was recorded, so check the task's current state first, including its still-open decisions listed above under OPEN DECISIONS, and sort them into still open and already settled, such as a decision since answered, a PR since merged, or a task since finished - process the still-open ones as firstmate: tell the captain, land or merge what is ready, answer or escalate a decision, or act on a blocker; your reply to the captain covers only those, as if the settled ones had never been listed, and a settled one needs only the acknowledgement apart from any ready-work handoff; before acknowledging any outcome, including one whose source task has settled, act on every ready-work handoff it contains: check each named unit and dispatch it in this turn, or record its not-ready reason and the condition that must change before retrying on its backlog note; an applicable recorded reason suppresses repeat handoffs):
+[seq 1, recorded 0m ago] source: ready-work handoff: dispatch next and sibling; dependencies landed
+[seq 2, recorded 0m ago] source: source finished; no new handoff
+BRANCH OUTCOMES: after processing them run bin/fm-branch-outcome.sh mark-processed --through 2; until then every drain presents them again
+BRANCH OUTCOMES (captain outcomes the supervision session recorded for you, one line per outcome, oldest first; each says what was true when it was recorded, so check the task's current state first, including its still-open decisions listed above under OPEN DECISIONS, and sort them into still open and already settled, such as a decision since answered, a PR since merged, or a task since finished - process the still-open ones as firstmate: tell the captain, land or merge what is ready, answer or escalate a decision, or act on a blocker; your reply to the captain covers only those, as if the settled ones had never been listed, and a settled one needs only the acknowledgement apart from any ready-work handoff; before acknowledging any outcome, including one whose source task has settled, act on every ready-work handoff it contains: check each named unit and dispatch it in this turn, or record its not-ready reason and the condition that must change before retrying on its backlog note; an applicable recorded reason suppresses repeat handoffs):
+[seq 1, recorded 0m ago] source: ready-work handoff: dispatch next and sibling; dependencies landed
+[seq 2, recorded 0m ago] source: source finished; no new handoff
+BRANCH OUTCOMES: after processing them run bin/fm-branch-outcome.sh mark-processed --through 2; until then every drain presents them again
+
+LONG HANDOFF
+3
+4
+BRANCH OUTCOMES (captain outcomes the supervision session recorded for you, one line per outcome, oldest first; each says what was true when it was recorded, so check the task's current state first, including its still-open decisions listed above under OPEN DECISIONS, and sort them into still open and already settled, such as a decision since answered, a PR since merged, or a task since finished - process the still-open ones as firstmate: tell the captain, land or merge what is ready, answer or escalate a decision, or act on a blocker; your reply to the captain covers only those, as if the settled ones had never been listed, and a settled one needs only the acknowledgement apart from any ready-work handoff; before acknowledging any outcome, including one whose source task has settled, act on every ready-work handoff it contains: check each named unit and dispatch it in this turn, or record its not-ready reason and the condition that must change before retrying on its backlog note; an applicable recorded reason suppresses repeat handoffs):
+[seq 3, recorded 0m ago] source: ready-work handoff: dispatch first; xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx; dispatch last
+BRANCH OUTCOMES: 1 newer captain outcome(s) are held back (byte cap); they follow on the next drain once these are acknowledged
+BRANCH OUTCOMES: after processing them run bin/fm-branch-outcome.sh mark-processed --through 3; until then every drain presents them again
+BRANCH OUTCOMES (captain outcomes the supervision session recorded for you, one line per outcome, oldest first; each says what was true when it was recorded, so check the task's current state first, including its still-open decisions listed above under OPEN DECISIONS, and sort them into still open and already settled, such as a decision since answered, a PR since merged, or a task since finished - process the still-open ones as firstmate: tell the captain, land or merge what is ready, answer or escalate a decision, or act on a blocker; your reply to the captain covers only those, as if the settled ones had never been listed, and a settled one needs only the acknowledgement apart from any ready-work handoff; before acknowledging any outcome, including one whose source task has settled, act on every ready-work handoff it contains: check each named unit and dispatch it in this turn, or record its not-ready reason and the condition that must change before retrying on its backlog note; an applicable recorded reason suppresses repeat handoffs):
+[seq 4, recorded 0m ago] source: newer source update
+BRANCH OUTCOMES: after processing them run bin/fm-branch-outcome.sh mark-processed --through 4; until then every drain presents them again

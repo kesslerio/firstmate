@@ -1,0 +1,106 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/attended-home
+ok: added other -> Queued
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start other` to move it to in flight
+  - Run `tasks-axi block other --by <other>` to record a dependency
+ok: updated other (body)
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: Existing note to preserve.
+help[1]:
+  - Run `tasks-axi show other --full` to see the result
+ok: added held -> Queued
+task:
+  id: held
+  title: explicit captain hold
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start held` to move it to in flight
+  - Run `tasks-axi block held --by <other>` to record a dependency
+held
+engine_exit=0
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: Existing note to preserve.
+task:
+  id: held
+  title: explicit captain hold
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: yes
+  hold_reason: "design pick waits for captain"
+  hold_kind: captain
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Captain hold set: 2026-10-07T11:57:34Z"
+{"seq":1,"epoch":1791374264,"task":"fleet","wake":"heartbeat","verdict":"captain","summary":"Heartbeat: fleet quiet, but queued unit 'other' (out of scope ready unit) is ready with no hold, dependency, or live worker; please dispatch it. 'held' stays waiting under its captain hold.","silent":false,"statusEndpoint":0,"statusIdent":"-"}
+wake_remaining=0

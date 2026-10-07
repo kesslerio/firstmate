@@ -1,0 +1,44 @@
+  Keep your branch a clean fast-forward onto the current default branch - if `main` has advanced, rebase onto it so the
+  eventual merge stays a fast-forward.
+  When it is implemented and committed, append `done [at=<epoch>]: ready in branch fm/next` to the status file and
+  stop.
+  The configured merge authority approves the ready branch, then firstmate merges it into local `main` through the
+  guarded fast-forward path.
+
+
+• I’ll verify the worktree isolation, create fm/next, and write the verified product to the authorized task output
+  directory.
+
+• Ran pwd -P …
+  └ /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixture-a87c48/1…
+    /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixture-a87c48/1…
+    + 2 lines (ctrl+t to expand)
+
+• Ran git checkout -b fm/next -- …
+  └ Switched to a new branch 'fm/next'
+    ls: cannot access '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/round3-confirmed…
+    + 1 line (ctrl+t to expand)
+
+• Ran ls -la …
+  └ <!-- END AI-DOTFILES MANAGED CODING STANDARDS: v1 -->
+    3c8a718 Initialize disposable fixture
+    + main
+    + 111 lines (ctrl+t to expand)
+
+• Ran set -e …
+  └ [fm/next eaceaf2] chore: record completion of 17 times 29 proof
+    Current branch fm/next is up to date.
+    1791375802
+    + Show details
+
+• Working (24s • esc to interrupt)
+
+
+› Ask Codex to do anything
+
+  GPT-6.1-Sol medium · ~/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixtu…
+  ? for shortcuts                                                                              ⚠ 1 warning · f2 to view
+
+Live endpoint: 0 116253 node
+
+Proof: 493

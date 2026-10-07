@@ -1,0 +1,44 @@
+  stop.
+  The configured merge authority approves the ready branch, then firstmate merges it into local `main` through the
+  guarded fast-forward path.
+
+
+• I’ll verify the disposable worktree, create fm/next, and write the result to the authorized proof directory.
+
+• Ran pwd -P …
+  └ /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixture-a87c48/1…
+    /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixture-a87c48/1…
+    + 2 lines (ctrl+t to expand)
+
+• Failed (exit 1) git checkout -b fm/next -- …
+  └ Switched to a new branch 'fm/next'
+    + Show details
+
+• Ran ls -la …
+  └ * fm/next
+    + main
+    b40e1d3 Create disposable worker fixture
+    + 112 lines (ctrl+t to expand)
+
+• Ran mkdir -p /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/confirmed-launch-home/da…
+  └ Verified proof.txt: 493
+    [fm/next c5b4e32] chore: record completion of multiplication proof
+    1791375631
+    + Show details
+
+• Ran echo 'done [at=1791375631]: ready in branch fm/next' >> '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFK…
+  └ (no output)
+    + Show details
+
+• Working (30s • esc to interrupt)
+  └ Tip: Use /mcp to list configured MCP tools.
+
+
+› Ask Codex to do anything
+
+  GPT-6.1-Sol medium · ~/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixtu…
+  ? for shortcuts                                                                              ⚠ 1 warning · f2 to view
+
+Live endpoint: 0 60658 node
+
+Proof: 493

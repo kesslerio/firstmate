@@ -1,0 +1,9 @@
+Real daemon, real private tmux, no status events.
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+
+Daemon log:
+[2026-10-07T04:38:13-0700] daemon starting (pid 3410197); target=primary; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=3600s
+[2026-10-07T04:38:15-0700] wake: heartbeat
+[2026-10-07T04:38:15-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+
+Wake queue:

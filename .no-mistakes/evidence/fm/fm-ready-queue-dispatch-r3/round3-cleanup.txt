@@ -1,0 +1,1 @@
+Private lab tmux server stopped by cleanup trap. Worker PID 116253 no longer exists. Disposable .phase home, fixture repository, worktrees and test scratch removed. Worktree has no tracked or untracked changes.

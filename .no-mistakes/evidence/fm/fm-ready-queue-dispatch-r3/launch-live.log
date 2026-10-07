@@ -1,0 +1,259 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/launch-home
+scaffolded: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/launch-home/data/next/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+ok: added other -> Queued
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start other` to move it to in flight
+  - Run `tasks-axi block other --by <other>` to record a dependency
+ok: updated other (body)
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: Existing note to preserve.
+help[1]:
+  - Run `tasks-axi show other --full` to see the result
+ok: added held -> Queued
+task:
+  id: held
+  title: explicit captain hold
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start held` to move it to in flight
+  - Run `tasks-axi block held --by <other>` to record a dependency
+held
+Away posture recorded at 2026-10-07T11:59:54Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: 4 concurrent workers.
+Away posture (recorded):
+  entered: 2026-10-07T11:59:54Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Dispatch the queued unit next using its existing brief and local-only contract with Codex. Only next is authorized. Do not merge, push, open a PR, or change global configuration.
+ok: added next -> Queued
+task:
+  id: next
+  title: authorized proof unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start next` to move it to in flight
+  - Run `tasks-axi block next --by <other>` to record a dependency
+ok: updated next (body)
+task:
+  id: next
+  title: authorized proof unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Project: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture. Brief is /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/launch-home/data/next/brief.md. Dispatch via bin/fm-spawn.sh next /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture --mode local-only --yolo off --harness codex. A note is not a live worker."
+help[1]:
+  - Run `tasks-axi show next --full` to see the result
+engine_exit=0
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Existing note to preserve. AWAY STOP: outside the away dispatch grant (only 'next' authorized); retry waits for MAIN's return or an applicable dispatch grant."
+task:
+  id: held
+  title: explicit captain hold
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: yes
+  hold_reason: "design pick waits for captain"
+  hold_kind: captain
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Captain hold set: 2026-10-07T11:59:53Z"
+{"seq":1,"epoch":1791374431,"task":"fleet","wake":"heartbeat","verdict":"captain","summary":"per your away instructions: 'Dispatch the queued unit next ... with Codex': spawned codex worker for unit 'next' (local-only, yolo off) at primary:fm-next. Startup is NOT confirmed (empty pane peek, crew state unknown/codex-unverified), so I reopened it to queued with the endpoint kept intact and noted it; do not launch a duplicate, confirm the worker is processing its brief. Unit 'other' is outside the grant and stays queued with that recorded; 'held' remains captain-held. No merge, push, PR, or config change.","silent":false,"statusEndpoint":0,"statusIdent":"-"}
+task:
+  id: next
+  title: authorized proof unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Project: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture. Brief is .phase/launch-home/data/next/brief.md. Dispatch via bin/fm-spawn.sh next <fixture> --mode local-only --yolo off --harness codex. A note is not a live worker. STARTUP UNCONFIRMED (away dispatch): spawned codex at primary:fm-next but pane peek was empty and crew state unknown (codex-unverified); endpoint kept intact, do not launch a duplicate. Retry/confirm on next wake or MAIN return."
+state: unknown · source: pane · harness state unavailable (unknown codex-unverified)
+node %0 0
+fm-next %1 0
+
+  Update available · 0.159.2 → 0.160.1
+  Release notes: https://github.com/openai/codex/releases/latest
+
+› 1. Update now (runs `npm install -g @openai/codex`)
+  2. Skip
+  3. Skip until next version
+
+  enter continue · esc skip
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  Folder access
+  /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture/.treehouse/fixture-a87c48/1/
+  fixture
+
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the repository root:
+  /home/art/.no-mistakes/worktrees/9f75ec418609/01M4B0WCFKS0F03ZZ5EPCCQ72P/.phase/fixture
+
+  Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings
+  can run code automatically, even without a model request. Continue only if you trust these files. Your trust
+  decision will be saved.
+
+› 1. Trust and continue
+  2. Quit
+
+  enter continue · esc quit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+wake_remaining=0
