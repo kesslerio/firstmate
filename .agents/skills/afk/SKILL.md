@@ -186,7 +186,10 @@ Classify each wake this way, applying the steering-inbox exception before status
   If the pane is still idle past `FM_STALE_ESCALATE_SECS` (default 240s), housekeeping escalates it as a possible wedge.
   This bounds wedge-detection latency to the threshold plus a tick: a delay, never a loss.
   Healthy crewmates are autonomous and do not wait on firstmate mid-task.
-- `heartbeat` -> self-handle.
+- `heartbeat` -> check backlog readiness through `bin/fm-ready-queue-lib.sh` before suppression or acknowledgement.
+  Ready work or unavailable readiness escalates through the durable buffer to the authorized supervisor for dispatch or blocker resolution, even when `FM_INJECT_SKIP` matches and no new status events exist.
+  A failed buffer write leaves the wake unacknowledged; a successful handoff follows the ordinary escalation delivery path.
+  Empty and captain-held queues self-handle.
   The daemon runs its own cheap bash fleet scan every `FM_HEARTBEAT_SCAN_SECS` (default 300s) as the catch-all for captain-relevant events still unread by the per-wake classifier.
 - An unknown wake reason escalates fail-safe.
   After that escalation is delivered, its exact distilled line is acknowledged and the same identity does not escalate again during that away session.
@@ -269,6 +272,5 @@ These properties must hold:
   a pane-gone guard, and a signal-trapped shutdown that flushes buffered
   escalations before exit.
 
-`FM_INJECT_SKIP` (default `heartbeat`) force-self-handles matching kinds,
-overriding classification.
+`FM_INJECT_SKIP` (default `heartbeat`) force-self-handles matching kinds after the heartbeat readiness check above.
 Use it sparingly.
