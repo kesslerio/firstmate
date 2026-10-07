@@ -1,0 +1,146 @@
+=== watch-ready.log ===
+SCENARIO ready
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  next,queued,task,"-",dependency-cleared next unit
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+heartbeat
+1791389381	1	heartbeat	heartbeat	heartbeat
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 4071475.1791389381.cSpC8d
+heartbeat-streak: 1
+
+=== watch-empty.log ===
+SCENARIO empty
+count: 0
+ready: 0 unblocked queued tasks
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi list --state queued` to see all queued work (incl. blocked)
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 4072802.1791389383.VCskpw
+heartbeat-streak: 1
+
+=== watch-held.log ===
+SCENARIO held
+count: 0
+ready: 0 unblocked queued tasks
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi list --state queued` to see all queued work (incl. blocked)
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 4074644.1791389386.VDY1iU
+heartbeat-streak: 1
+
+=== daemon-ready.log ===
+SCENARIO daemon-ready
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  next,queued,task,"-",dependency-cleared next unit
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+Terminated                 sleep 1
+[2026-10-07T09:10:14-0700] daemon starting (pid 4083755); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:10:15-0700] wake: heartbeat
+[2026-10-07T09:10:16-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:10:17-0700] wake: heartbeat
+[2026-10-07T09:10:18-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:10:21-0700] wake: heartbeat
+[2026-10-07T09:10:22-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:10:22-0700] inject deferred: supervisor composer not confirmed-empty (state=unknown: pending input, dead-shell prompt, or unreadable pane)
+[2026-10-07T09:10:22-0700] daemon shutting down
+DURABLE HANDOFF
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+PENDING WAKE
+
+=== daemon-held.log ===
+SCENARIO daemon-held
+count: 0
+ready: 0 unblocked queued tasks
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi list --state queued` to see all queued work (incl. blocked)
+Terminated                 sleep 1
+[2026-10-07T09:10:23-0700] daemon starting (pid 4093072); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:10:26-0700] wake: heartbeat
+[2026-10-07T09:10:26-0700] wake force-self (FM_INJECT_SKIP): heartbeat
+[2026-10-07T09:10:27-0700] wake: heartbeat
+[2026-10-07T09:10:28-0700] wake force-self (FM_INJECT_SKIP): heartbeat
+[2026-10-07T09:10:31-0700] daemon shutting down
+DURABLE HANDOFF
+PENDING WAKE
+1791389431	3	heartbeat	heartbeat	heartbeat
+
+=== daemon-empty.log ===
+SCENARIO daemon-empty
+count: 0
+ready: 0 unblocked queued tasks
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi list --state queued` to see all queued work (incl. blocked)
+[2026-10-07T09:10:32-0700] daemon starting (pid 4103775); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:10:34-0700] wake: heartbeat
+[2026-10-07T09:10:34-0700] wake force-self (FM_INJECT_SKIP): heartbeat
+[2026-10-07T09:10:35-0700] wake: heartbeat
+[2026-10-07T09:10:36-0700] wake force-self (FM_INJECT_SKIP): heartbeat
+[2026-10-07T09:10:39-0700] wake: heartbeat
+[2026-10-07T09:10:40-0700] daemon shutting down
+DURABLE HANDOFF
+PENDING WAKE
+1791389439	3	heartbeat	heartbeat	heartbeat
+
+=== daemon-unavailable.log ===
+SCENARIO daemon-unavailable
+error: "Unsupported backend \"beads\" — P1 ships the markdown backend only"
+code: UNSUPPORTED
+help[1]: "Set `backend = \"markdown\"` in .tasks.toml, or omit --backend"
+Terminated                 ( local script_dir data root backend ready count; script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd); . "$script_dir/fm-tasks-axi-lib.sh"; . "$script_dir/fm-backlog-transition-lib.sh"; . "$script_dir/fm-timeout-lib.sh"; data=$(fm_backlog_data_absolute "${FM_DATA_OVERRIDE:-$FM_HOME/data}" 2> /dev/null) || return 0; root=$(fm_backlog_root "$data" 2> /dev/null) || return 0; backend=$(fm_tasks_axi_backend "$root" 2> /dev/null) || return 0; if [ "$backend" = markdown ] && [ ! -e "$data/backlog.md" ] && [ ! -L "$data/backlog.md" ]; then
+    return 1;
+fi; ready=$(fm_run_timed 10 env FM_HOME="$FM_HOME" FM_DATA_OVERRIDE="$data" "$script_dir/fm-tasks-axi.sh" ready 2> /dev/null) || return 0; count=$(printf '%s\n' "$ready" | awk '/^count: [0-9]+$/ { print $2; exit }'); [ "$count" != 0 ] )
+[2026-10-07T09:13:11-0700] daemon starting (pid 4174319); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:13:12-0700] wake: heartbeat
+[2026-10-07T09:13:13-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:13:14-0700] wake: heartbeat
+[2026-10-07T09:13:15-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:13:18-0700] wake: heartbeat
+[2026-10-07T09:13:19-0700] inject deferred: supervisor composer not confirmed-empty (state=unknown: pending input, dead-shell prompt, or unreadable pane)
+[2026-10-07T09:13:19-0700] daemon shutting down
+DURABLE HANDOFF
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+PENDING WAKE
+1791389598	3	heartbeat	heartbeat	heartbeat
+
+=== daemon-failed.log ===
+SCENARIO daemon-failed
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  next,queued,task,"-",dependency-cleared next unit
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/bin/fm-supervise-daemon.sh: line 756: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations: Is a directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/bin/fm-supervise-daemon.sh: line 756: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations: Is a directory
+[2026-10-07T09:10:40-0700] daemon starting (pid 4115065); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:10:41-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file
+[2026-10-07T09:10:41-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file
+[2026-10-07T09:10:41-0700] ERROR: away-mode escalation undelivered 999999s; last delivery failure: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file. Buffer + wake-queue preserved; alarm marker written.
+[2026-10-07T09:10:41-0700] wedge alarm: no OS-level alert channel on Linux; durable marker /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-inject-wedged is the only signal - set config/wedge-alarm (e.g. a command: directive)
+[2026-10-07T09:10:41-0700] wake: heartbeat
+[2026-10-07T09:10:42-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:10:42-0700] wake classification failed; retaining durable wakes
+[2026-10-07T09:10:42-0700] durable wake handling was not acknowledged; restarting for recovery
+[2026-10-07T09:10:43-0700] wake: heartbeat
+[2026-10-07T09:10:44-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:10:44-0700] wake classification failed; retaining durable wakes
+[2026-10-07T09:10:44-0700] durable wake handling was not acknowledged; restarting for recovery
+[2026-10-07T09:10:48-0700] wake: heartbeat
+[2026-10-07T09:10:48-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file
+[2026-10-07T09:10:48-0700] daemon shutting down
+DURABLE HANDOFF
+PENDING WAKE
+1791389441	1	heartbeat	heartbeat	heartbeat
+1791389443	2	heartbeat	heartbeat	heartbeat
+1791389447	3	heartbeat	heartbeat	heartbeat

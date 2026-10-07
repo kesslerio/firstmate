@@ -1,0 +1,5 @@
+count: 1
+tasks[1]{id,state,kind,repo,title}:
+  waiting,queued,task,"-",explicitly held sibling
+help[1]:
+  - Run `tasks-axi show <id>` for full notes on a task

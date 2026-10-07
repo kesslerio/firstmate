@@ -1,0 +1,20 @@
+SCENARIO daemon-unavailable
+error: "Unsupported backend \"beads\" — P1 ships the markdown backend only"
+code: UNSUPPORTED
+help[1]: "Set `backend = \"markdown\"` in .tasks.toml, or omit --backend"
+Terminated                 ( local script_dir data root backend ready count; script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd); . "$script_dir/fm-tasks-axi-lib.sh"; . "$script_dir/fm-backlog-transition-lib.sh"; . "$script_dir/fm-timeout-lib.sh"; data=$(fm_backlog_data_absolute "${FM_DATA_OVERRIDE:-$FM_HOME/data}" 2> /dev/null) || return 0; root=$(fm_backlog_root "$data" 2> /dev/null) || return 0; backend=$(fm_tasks_axi_backend "$root" 2> /dev/null) || return 0; if [ "$backend" = markdown ] && [ ! -e "$data/backlog.md" ] && [ ! -L "$data/backlog.md" ]; then
+    return 1;
+fi; ready=$(fm_run_timed 10 env FM_HOME="$FM_HOME" FM_DATA_OVERRIDE="$data" "$script_dir/fm-tasks-axi.sh" ready 2> /dev/null) || return 0; count=$(printf '%s\n' "$ready" | awk '/^count: [0-9]+$/ { print $2; exit }'); [ "$count" != 0 ] )
+[2026-10-07T09:13:11-0700] daemon starting (pid 4174319); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:13:12-0700] wake: heartbeat
+[2026-10-07T09:13:13-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:13:14-0700] wake: heartbeat
+[2026-10-07T09:13:15-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:13:18-0700] wake: heartbeat
+[2026-10-07T09:13:19-0700] inject deferred: supervisor composer not confirmed-empty (state=unknown: pending input, dead-shell prompt, or unreadable pane)
+[2026-10-07T09:13:19-0700] daemon shutting down
+DURABLE HANDOFF
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+PENDING WAKE
+1791389598	3	heartbeat	heartbeat	heartbeat

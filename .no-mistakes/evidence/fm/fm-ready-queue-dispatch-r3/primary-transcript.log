@@ -1,0 +1,40 @@
+› The live-local report is now visible and proves 17*19=323. If its completion gate needs the active home, steer the w…
+
+• Ran cat .l/state/live-follow.status; bin/fm-captain-hold.sh verify live-follow; bin/fm-peek.sh live-follow 18; bin/fm…
+  └ teardown live-follow complete (window primary:fm-live-follow, worktree /home/art/.no-mistakes/worktrees/9f75ec41860…
+    Backlog: live-follow is closed in /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.l/data/…
+    Apply the ready-work check in bin/fm-branch-prompt.sh (AGENTS.md section 10 for MAIN); if you cannot spawn, report …
+    + 54 lines (ctrl+t to expand)
+
+• Ran bin/fm-tasks-axi.sh ready; bin/fm-tasks-axi.sh show waiting; test -f .l/data/live-local/report.md && test -f .l/d…
+  └   Previously marked dispatched by note only. Prior spend restriction is cleared; authorized scout brief prepared.
+      Real scout processed its launch brief, wrote READY_QUEUE_WORKER_PROCESSED and 17 * 19 = 323, and reported done. L…
+    - [x] landed - landed dependency https://github.com/example/lab/pull/1 (merged 2026-10-07)
+    + 36 lines (ctrl+t to expand)
+
+• Edited .l/data/fleet-check-result.txt (+16 -4)
+     1 -Observed result: live-local ready-queue dispatch and brief-processing validation PASSED. Old live-next shutdown
+        remains BLOCKED by the public control interface.
+     1 +Observed result: live-local completion, guarded teardown, dependency-cleared live-follow dispatch, report proces
+    + Show details
+
+• Ran bin/fm-tasks-axi.sh update live-local --body 'Previously marked dispatched by note only. Authorized scout process…
+  └   body: Previously marked dispatched by note only. Authorized scout processed its launch brief and wrote READY_QUEU…
+    help[1]:
+      - Run `tasks-axi show live-local --full` to see the result
+    + 19 lines (ctrl+t to expand)
+
+• Captain, both scouts completed and passed guarded teardown. Reports remain preserved: live-local proves 323; live-
+  follow proves 899.
+
+  The ready queue is empty. waiting remains held; external live-next was untouched. No watcher was armed.
+
+  Saved result (.l/data/fleet-check-result.txt)
+
+  Worked for 5m 9s • 09:18
+
+
+› Ask Codex to do anything
+
+  GPT-6.1-Sol medium · ~/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK · Validate live-next queue
+  ? for shortcuts                                                                              ⚠ 1 warning · f2 to view

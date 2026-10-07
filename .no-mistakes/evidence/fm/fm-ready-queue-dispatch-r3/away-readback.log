@@ -1,0 +1,7 @@
+Away posture (recorded):
+  entered: 2026-10-07T16:13:50Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    No dispatch is authorized. Do not merge, push, open a PR, change credentials or global configuration. Intentional writes stay in this FM_HOME.

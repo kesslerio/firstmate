@@ -1,0 +1,31 @@
+[2026-10-07T09:10:40-0700] daemon starting (pid 4115065); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:10:41-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file
+[2026-10-07T09:10:41-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file
+[2026-10-07T09:10:41-0700] ERROR: away-mode escalation undelivered 999999s; last delivery failure: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file. Buffer + wake-queue preserved; alarm marker written.
+[2026-10-07T09:10:41-0700] wedge alarm: no OS-level alert channel on Linux; durable marker /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-inject-wedged is the only signal - set config/wedge-alarm (e.g. a command: directive)
+[2026-10-07T09:10:41-0700] wake: heartbeat
+[2026-10-07T09:10:42-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:10:42-0700] wake classification failed; retaining durable wakes
+[2026-10-07T09:10:42-0700] durable wake handling was not acknowledged; restarting for recovery
+[2026-10-07T09:10:43-0700] wake: heartbeat
+[2026-10-07T09:10:44-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:10:44-0700] wake classification failed; retaining durable wakes
+[2026-10-07T09:10:44-0700] durable wake handling was not acknowledged; restarting for recovery
+[2026-10-07T09:10:48-0700] wake: heartbeat
+[2026-10-07T09:10:48-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file
+[2026-10-07T09:10:48-0700] daemon shutting down
+[2026-10-07T09:17:12-0700] daemon starting (pid 76336); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:17:22-0700] daemon shutting down
+[2026-10-07T09:19:46-0700] daemon starting (pid 143066); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:19:47-0700] wake: check: rearm-resurface
+[2026-10-07T09:19:49-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:19:50-0700] wake: heartbeat
+[2026-10-07T09:19:51-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:19:52-0700] wake: heartbeat
+[2026-10-07T09:19:54-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:19:57-0700] inject deferred: supervisor composer not confirmed-empty (state=unknown: pending input, dead-shell prompt, or unreadable pane)
+[2026-10-07T09:19:57-0700] daemon shutting down
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+Readback: original retained heartbeat sequences 1–3 are absent from the pending queue after readiness was rechecked and a durable escalation was written. A new heartbeat (seq 6) arrived at the bounded shutdown and remains pending; no claim is made that shutdown acknowledges unhandled new work.

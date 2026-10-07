@@ -1,0 +1,11 @@
+SCENARIO ready
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  next,queued,task,"-",dependency-cleared next unit
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+heartbeat
+1791389381	1	heartbeat	heartbeat	heartbeat
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 4071475.1791389381.cSpC8d
+heartbeat-streak: 1

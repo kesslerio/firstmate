@@ -1,0 +1,16 @@
+SCENARIO daemon-empty
+count: 0
+ready: 0 unblocked queued tasks
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi list --state queued` to see all queued work (incl. blocked)
+[2026-10-07T09:10:32-0700] daemon starting (pid 4103775); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:10:34-0700] wake: heartbeat
+[2026-10-07T09:10:34-0700] wake force-self (FM_INJECT_SKIP): heartbeat
+[2026-10-07T09:10:35-0700] wake: heartbeat
+[2026-10-07T09:10:36-0700] wake force-self (FM_INJECT_SKIP): heartbeat
+[2026-10-07T09:10:39-0700] wake: heartbeat
+[2026-10-07T09:10:40-0700] daemon shutting down
+DURABLE HANDOFF
+PENDING WAKE
+1791389439	3	heartbeat	heartbeat	heartbeat

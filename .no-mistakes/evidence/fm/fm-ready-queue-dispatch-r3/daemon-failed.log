@@ -1,0 +1,30 @@
+SCENARIO daemon-failed
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  next,queued,task,"-",dependency-cleared next unit
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/bin/fm-supervise-daemon.sh: line 756: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations: Is a directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/bin/fm-supervise-daemon.sh: line 756: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations: Is a directory
+[2026-10-07T09:10:40-0700] daemon starting (pid 4115065); target=primary:0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=9999s
+[2026-10-07T09:10:41-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file
+[2026-10-07T09:10:41-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file
+[2026-10-07T09:10:41-0700] ERROR: away-mode escalation undelivered 999999s; last delivery failure: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file. Buffer + wake-queue preserved; alarm marker written.
+[2026-10-07T09:10:41-0700] wedge alarm: no OS-level alert channel on Linux; durable marker /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-inject-wedged is the only signal - set config/wedge-alarm (e.g. a command: directive)
+[2026-10-07T09:10:41-0700] wake: heartbeat
+[2026-10-07T09:10:42-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:10:42-0700] wake classification failed; retaining durable wakes
+[2026-10-07T09:10:42-0700] durable wake handling was not acknowledged; restarting for recovery
+[2026-10-07T09:10:43-0700] wake: heartbeat
+[2026-10-07T09:10:44-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-07T09:10:44-0700] wake classification failed; retaining durable wakes
+[2026-10-07T09:10:44-0700] durable wake handling was not acknowledged; restarting for recovery
+[2026-10-07T09:10:48-0700] wake: heartbeat
+[2026-10-07T09:10:48-0700] inject skipped: escalation buffer /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/manual/daemon-failed/state/.subsuper-escalations is not a readable file
+[2026-10-07T09:10:48-0700] daemon shutting down
+DURABLE HANDOFF
+PENDING WAKE
+1791389441	1	heartbeat	heartbeat	heartbeat
+1791389443	2	heartbeat	heartbeat	heartbeat
+1791389447	3	heartbeat	heartbeat	heartbeat

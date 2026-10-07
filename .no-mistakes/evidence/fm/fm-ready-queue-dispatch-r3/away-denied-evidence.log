@@ -1,0 +1,19 @@
+task:
+  id: other
+  title: out of scope ready unit
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-07
+  closed: "-"
+  deps: none
+  links: none
+  body: "Not dispatched: away words say 'No dispatch is authorized.' Retry waits for MAIN's return or an applicable dispatch grant."
+{"seq":1,"epoch":1791389646,"task":"fleet","wake":"heartbeat","verdict":"routine","summary":"Heartbeat: no live workers. One queued unit ('other') is ready but the away words say no dispatch is authorized, so I left it queued and recorded that stop on its backlog note. Retry waits for the captain's return or a dispatch grant.","silent":false,"statusEndpoint":0,"statusIdent":"-"}

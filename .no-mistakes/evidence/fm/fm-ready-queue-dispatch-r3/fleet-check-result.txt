@@ -1,0 +1,39 @@
+Observed result: live-local completion, guarded teardown, dependency-cleared live-follow dispatch, report processing, and guarded teardown PASSED. Old live-next shutdown remains BLOCKED by the public control interface; its external checkout was not touched during this continuation.
+
+Scope: marked .l lab home and its isolated tmux socket only. No watcher or checkpoint armed. No pipeline, install, credential change, network command, or external source edit performed. Only completed local scouts were torn down through the public interface.
+
+live-next:
+- Attempted bin/fm-control.sh live-next exit on the lab socket.
+- Exit refused: task live-next's composer state is 'unknown', not proven empty; refusing to type the /quit exit command because it could concatenate onto existing text. Clear the composer, then retry 'exit'.
+- Preserved exact endpoint primary:fm-live-next and external copy /home/art/.treehouse/project-087a52/1/project. Did not answer its trust prompt or alter its trust.
+- Setup blocker and retry condition recorded through bin/fm-captain-hold.sh hold live-next. Hold verified active. Retry control-plane exit only when composer emptiness can be proven without changing external trust; resume work only with a validated local allocation.
+
+live-local:
+- Public ready query identified this task as the sole ready queued item. Dependency landed was Done; prior dispatch prose did not count as a worker.
+- Dispatched with bin/fm-spawn.sh live-local <absolute gate path>/.v/project --scout --harness codex --backend tmux.
+- Exact recorded endpoint: primary:fm-live-local.
+- Recorded and canonical worktree verified inside the gate before trust answer: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4BGQYGGV94BM61ERP44DRTK/.v/treehouse/.treehouse/project-087a52/1/project.
+- Observed directory-trust dialog; answered with bin/fm-send.sh live-local --key Enter. No direct trust-store edits.
+- Observed live worker read its launch brief, acknowledge inbox message, compute 323, write report, and append done status.
+- Report: .l/data/live-local/report.md contains READY_QUEUE_WORKER_PROCESSED and 17 * 19 = 323.
+- Status: done [at=1791389689]: READY_QUEUE_WORKER_PROCESSED; 17 * 19 = 323; report written and completion gate passed.
+- Worker initially recorded completion inventory under the wrong home; supervisor reviewed report and ran complete live-local --none and verify live-local in the actual .l lab home successfully.
+- Subsequently steered the worker to run the completion gate with FM_HOME explicitly bound to the marked .l home and FM_DATA_OVERRIDE unset. Observed success and verified the inventory in that home.
+- bin/fm-teardown.sh live-local completed successfully, returned its local copy to the pool, closed its endpoint, and preserved the report and backlog completion artifact.
+
+waiting: remains Queued with its original active captain design hold; no worker dispatched.
+
+live-follow:
+- Continuation authorization cleared its earlier authorization restriction; the stale deferral note was replaced.
+- After live-local teardown, the public ready query identified live-follow with dependency live-local Done. Dispatched in this same continuation through bin/fm-spawn.sh live-follow <absolute gate path>/.v/project --scout --harness codex --backend tmux.
+- Exact recorded endpoint: primary:fm-live-follow. Recorded canonical worktree was verified inside the gate at the same local pool slot used by live-local. No directory-trust dialog appeared on this launch.
+- Steered the worker to explicitly bind FM_HOME to the marked .l home for public scripts, unset FM_DATA_OVERRIDE, and avoid external tasktmp.
+- Observed real worker read its launch brief, acknowledge its instruction inbox, write FOLLOW_WORKER_PROCESSED and 29 * 31 = 899, and pass its captain-call completion gate with explicit lab FM_HOME.
+- Report preserved at .l/data/live-follow/report.md.
+- Status observed before teardown: done [at=1791389839]: FOLLOW_WORKER_PROCESSED; 29 * 31 = 899; report complete and completion gate passed.
+- Supervisor verify succeeded. bin/fm-teardown.sh live-follow completed, closed its endpoint, returned the local copy to the pool, and recorded Done with its report artifact.
+- Both teardowns reported reaping and then force-killing their own leaked worktree process groups before returning the local slot. No force-teardown flag or guard bypass was used.
+
+Final public ready query: zero ready queued tasks. waiting remains captain-held. live-next retains its setup hold and external endpoint/copy. Both worker reports remain present for validator capture.
+
+Containment limitation: spawn metadata still records tasktmp=/tmp/fm-live-local despite the local TMPDIR. Worker was explicitly instructed not to use this external tasktmp. The public spawn interface therefore does not prove full temp-write containment. The original live-next allocation was also external; it was preserved rather than deleted. This result is not a claim that the entire setup and shutdown validation passed.

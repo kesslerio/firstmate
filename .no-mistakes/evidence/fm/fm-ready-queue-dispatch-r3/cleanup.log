@@ -1,2 +1,3 @@
-Private lab server probe: error connecting to /tmp/tmux-1000/fm-lab (No such file or directory)
-
+Owned lab PID 4091494 already exited.
+Private fm-lab tmux server stopped; no private sessions remain.
+Removed all in-worktree lab homes, fixture projects, pool, transient test selector, and driver files; restored Treehouse's incidental .gitignore addition. Initial Treehouse v2 allocation outside the worktree was left untouched under the source-file boundary; its agent was stopped by killing only the lab's private tmux server. No real fleet session was driven.

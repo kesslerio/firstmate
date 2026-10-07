@@ -1,0 +1,6 @@
+1
+2
+error: refusing processed advancement beyond the read cursor (0)
+3
+4
+Confirmed: acknowledgement rejected before presentation; older handoff repeats; 4500-byte handoff fully shown; acknowledgement bounded to presented rows; later row shown next.
