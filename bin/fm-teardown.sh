@@ -169,8 +169,10 @@
 # child cleanup. Contention refuses the complete forced teardown before child
 # mutation. Tmux children must first be torn down from their owning home and
 # server: their records lack socket identity, so parent cleanup cannot safely
-# close them even when a same-named window is visible. Local and remote
-# retirement serialize their destructive phase with
+# close them even when a same-named window is visible. Cleanup retains
+# counted seat generations and their recovery routes when an
+# endpoint close fails; --force cannot bypass that accounting refusal.
+# Local and remote retirement serialize their destructive phase with
 # that mate's backlog-handoff lock under the registry lock. Pending handoff wake
 # state is retired with the home, and local removal failure restores that state
 # before preserving the route for retry. After a successful local or remote
@@ -3252,7 +3254,7 @@ preflight_firstmate_home_herdr_children() {  # <home>
 # the step immediately after it removes the Orca worktree through the same CLI
 # whose absence is the only thing that arm ever reports, so a forced continue
 # would die there having removed nothing while this message claimed otherwise.
-# The two forced secondmate child sites refuse because that path is only ever
+# Forced secondmate child cleanup refuses because that path is only ever
 # reached under --force, so honoring force would delete the refusal rather
 # than override it, and would contradict the adjacent Herdr child gate that
 # stops forced cleanup for this same hazard.
