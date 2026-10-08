@@ -15,11 +15,8 @@
 #   fm-remote-secondmate-control.sh update <id>
 #   fm-remote-secondmate-control.sh retire <id> [--force]
 #
-# Append --herdr-session <owned-fm-lab-name> for isolated validation.
-# Omission retains fm-remote; empty or other explicit names refuse.
-#
 # Remote placement ends here, but the second-mate agent always runs on the
-# Herdr backend in the selected remote session, so launch refuses any other
+# Herdr backend in the fm-remote session, so launch refuses any other
 # selection rather than reading this home's config/backend. The interactive
 # default session remains for the user's work.
 # fm-spawn/fm-send/fm-teardown keep owning the local endpoint mechanics.
@@ -99,17 +96,6 @@ TARGET_HOME=${FM_HOME:?FM_HOME is required}
 CONTROL_STATE="$TARGET_HOME/state/parent-route"
 CONTROL_DATA="$TARGET_HOME/data/.parent-route"
 REMOTE_HERDR_SESSION=fm-remote
-if [ "$#" -ge 2 ]; then
-  session_flag_index=$(($# - 1))
-  if [ "${!session_flag_index}" = --herdr-session ]; then
-    REMOTE_HERDR_SESSION=${!#}
-    if ! [[ "$REMOTE_HERDR_SESSION" =~ ^fm-lab-[a-zA-Z0-9][a-zA-Z0-9_-]*$ ]]; then
-      printf 'error: invalid remote Herdr lab session: %s; expected an owned fm-lab-* name\n' "$REMOTE_HERDR_SESSION" >&2
-      exit 1
-    fi
-    set -- "${@:1:$#-2}"
-  fi
-fi
 
 # shellcheck source=bin/fm-backend.sh
 . "$SCRIPT_DIR/fm-backend.sh"
@@ -823,7 +809,7 @@ cmd_update() {
 }
 
 cmd_retire() {
-  local id=$1 force=${2:-} rc
+  local id=$1 force=${2:-} rc generation target
   validate_id "$id"
   validate_home "$id" yes || rc=$?
   if [ "${rc:-0}" -eq 2 ]; then
@@ -832,19 +818,25 @@ cmd_retire() {
   fi
   [ -z "$force" ] || [ "$force" = --force ] || usage
   remote_endpoint_require "$id"
+  generation=$(fm_meta_get "$(meta_path "$id")" spawn_gen)
+  target=$REMOTE_ENDPOINT_TARGET
   FM_HOME="$TARGET_HOME" FM_ROOT_OVERRIDE="$FM_ROOT" FM_STATE_OVERRIDE="$TARGET_HOME/state" \
     FM_CONFIG_OVERRIDE="$TARGET_HOME/config" "$SCRIPT_DIR/fm-guard.sh" || true
   if [ -n "$force" ]; then
     FM_HOME="$FM_ROOT" FM_ROOT_OVERRIDE="$FM_ROOT" \
       FM_STATE_OVERRIDE="$CONTROL_STATE" FM_DATA_OVERRIDE="$CONTROL_DATA" \
       FM_CONFIG_OVERRIDE="$TARGET_HOME/config" FM_TEARDOWN_GUARD_DONE=1 \
-      "$SCRIPT_DIR/fm-teardown.sh" "$id" --force
+      "$SCRIPT_DIR/fm-teardown.sh" "$id" --force || return "$?"
   else
     FM_HOME="$FM_ROOT" FM_ROOT_OVERRIDE="$FM_ROOT" \
       FM_STATE_OVERRIDE="$CONTROL_STATE" FM_DATA_OVERRIDE="$CONTROL_DATA" \
       FM_CONFIG_OVERRIDE="$TARGET_HOME/config" FM_TEARDOWN_GUARD_DONE=1 \
-      "$SCRIPT_DIR/fm-teardown.sh" "$id"
+      "$SCRIPT_DIR/fm-teardown.sh" "$id" || return "$?"
   fi
+  fm_backend_source herdr || return 1
+  fm_backend_herdr_endpoint_confirmed_gone "$target" || return 1
+  printf 'seat_retirement={"task":%s,"generation":%s,"home":%s,"backend":"herdr","target":%s,"destroyed":true}\n' \
+    "$(json_str "$id")" "$(json_str "$generation")" "$(json_str "$TARGET_HOME")" "$(json_str "$target")"
 }
 
 case "${1:-}" in
