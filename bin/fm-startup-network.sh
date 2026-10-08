@@ -107,11 +107,16 @@
 #
 # The whole stage is bounded by FM_STARTUP_NETWORK_TIMEOUT (default 120s), one
 # aggregate deadline covering both the inactive-outcome scan and network sweeps
-# plus every lock the worker waits on before them.
-# Publication and delivery are bounded the same way by FM_SESSION_START_TIMEOUT.
-# A lock that a live process still holds at either deadline ends the worker with
-# a failed record naming that holder and the rerun command, never a wait that
-# outlives the budget with its output discarded.
+# plus every lock the worker waits on before them, including the publication
+# lock taken before the report is written.
+# Publication and delivery are bounded the same way by FM_SESSION_START_TIMEOUT,
+# including the wake append. A live inline claimant is checked once a second and
+# is not waited on past that deadline.
+# A lock that a live process still holds at either deadline ends the worker
+# inside the budget. Unpublished work becomes a failed record naming that holder
+# and the rerun command. An already published report stays intact and is not
+# woken a second time, because the lock holder is the only party that can judge
+# whether this generation was already delivered.
 # Hitting the bound is reported as an actionable NETWORK_CHECKS: line, never as
 # silence. bin/fm-timeout-lib.sh remains the single owner of bounded execution.
 set -u
@@ -356,25 +361,38 @@ report_requires_wake() {  # <state>
     "$REPORT_FILE" 2>/dev/null
 }
 
-queue_result_wake() {  # <state>
-  fm_wake_append check startup-network \
-    "check: startup-network: deferred startup network checks finished ($1); read them with $FM_ROOT/bin/fm-startup-network.sh report" \
-    || true
+# fm_wake_append takes the queue lock and then the recovery-marker lock with
+# unbounded waits. Bound the whole append so a live holder of either cannot keep
+# this worker alive past its deadline. The child still goes through
+# fm_wake_append, so an outstanding generation-bound recovery acknowledgement is
+# preserved. A killed append leaves the already published report in place.
+queue_result_wake() {  # <state> <seconds>
+  local state=$1 seconds=$2
+  case "$seconds" in ''|*[!0-9]*|0) seconds=1 ;; esac
+  # shellcheck disable=SC2016  # The child receives its arguments positionally.
+  fm_run_timed "$seconds" env FM_HOME="$FM_HOME" FM_ROOT_OVERRIDE="$FM_ROOT" \
+    FM_STATE_OVERRIDE="$STATE" bash -c '
+      . "$1"
+      fm_wake_append check startup-network "$2"
+    ' _ "$SCRIPT_DIR/fm-wake-lib.sh" \
+    "check: startup-network: deferred startup network checks finished ($state); read them with $FM_ROOT/bin/fm-startup-network.sh report" \
+    >/dev/null 2>&1 || true
 }
 
 # Bounded by DELIVERY_DEADLINE, which publish() sets from the delivery budget.
 # Once the deadline passes, a still-live claimant is no longer waited for: the
 # wake decision is made as if it were gone, exactly as the old iteration cap did.
+# The check is once a second. A tenth-second poll acquired and released this lock
+# and forked a reader on every tick for as long as the claimant stayed alive.
 await_delivery() {  # <generation> <state>
   local generation=$1 state=$2 claim_record claim_generation claim_pid claim_live
   while :; do
     claim_live=0
     if ! take_lock "$PUBLISH_LOCK" "$(seconds_until "$DELIVERY_DEADLINE")"; then
-      # A live holder outlived the whole delivery budget, so the claim cannot be
-      # judged under the lock. A possible duplicate of an inline print is
-      # cheaper than an actionable result nobody is woken for.
-      ! report_requires_wake "$state" || queue_result_wake "$state"
-      return 1
+      # The report is already durable. Waking without this lock cannot tell a
+      # superseded generation or an acknowledged delivery from a result nobody
+      # has seen, so leave that decision to the holder instead of duplicating it.
+      return 0
     fi
     if [ "$(status_get generation)" != "$generation" ]; then
       fm_lock_release "$PUBLISH_LOCK"
@@ -398,12 +416,12 @@ EOF
       [ "$claim_live" -eq 1 ] || rm -f "$CLAIM_FILE" 2>/dev/null || true
     fi
     if [ "$claim_live" -eq 0 ]; then
-      ! report_requires_wake "$state" || queue_result_wake "$state"
+      ! report_requires_wake "$state" || queue_result_wake "$state" "$(seconds_until "$DELIVERY_DEADLINE")"
       fm_lock_release "$PUBLISH_LOCK"
       return 0
     fi
     fm_lock_release "$PUBLISH_LOCK"
-    sleep 0.1
+    [ "$(now)" -ge "$DELIVERY_DEADLINE" ] || sleep 1
   done
 }
 
@@ -474,7 +492,10 @@ publish_lock_held() {  # <generation> <phases> <locked> <started> <lockdir> <out
     return 1
   fi
   record_result "$generation" failed "$phases" "$locked" "$started" 124 "$out" "$timings" >/dev/null
-  queue_result_wake failed
+  # The publication lock is still held by someone else, so this wake cannot be
+  # folded into that critical section. One second is enough for an uncontended
+  # append and still ends a nested recovery-lock wait inside the budget.
+  queue_result_wake failed 1
 }
 
 cmd_run() {  # <locked> <lock-pid> <generation>
