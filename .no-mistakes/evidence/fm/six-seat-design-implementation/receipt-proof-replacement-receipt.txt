@@ -1,0 +1,10 @@
+schema=fm-remote-seat-receipt.v1
+operation=replacement.new
+verb=launch
+requested_generation=replacement.new
+previous_generation=s1791496281.2793320.3961
+route_backend=herdr
+route_target=fm-remote:w3:p2
+phase=started
+actual_generation=replacement.new
+actual_model=default

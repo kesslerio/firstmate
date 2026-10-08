@@ -1,0 +1,10 @@
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"mate","operation":"live.retry","requested_generation":"live.retry","actual_generation":"s1791496281.2793320.3961","previous_generation":null,"disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w2:p2","home":"/tmp/fm-receipt-proof.RW9aNP/remote","host":null,"remote_root":null,"spawn_gen":"s1791496281.2793320.3961"},"actual_model":"default","complete":true}
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w2:p2
+herdr_session=fm-remote
+harness=claude
+model=default
+effort=default
+spawn_gen=s1791496281.2793320.3961
+seat_operation=live.retry

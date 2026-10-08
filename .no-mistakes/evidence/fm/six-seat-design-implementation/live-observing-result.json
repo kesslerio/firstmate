@@ -1,0 +1,18 @@
+{
+  "tested_head_sha": "a606e7904aa0845eedd8f7a0df81496b1dd5805e",
+  "scenario": "Recover an existing remote generation through its observing receipt and confirm the replacement",
+  "result": "passed",
+  "live": true,
+  "runtime": "Real isolated Herdr server and foreground viewer; synthetic Claude process and lifecycle reports; actual product spawn and remote-controller interfaces",
+  "evidence": [
+    "live-observing-once.log",
+    "live-observing-before.txt",
+    "live-observing-after.txt",
+    "live-replacement-receipt.txt",
+    "live-replacement-meta.txt",
+    "live-initial-process.json",
+    "live-replacement-agent.json"
+  ],
+  "cleanup": "Runner, remote home, staged launch files, owned Herdr session and viewer removed; fleet tripwire verification passed; worktree unchanged",
+  "limitations": "Synthetic agents exercise lifecycle accounting, not LLM behavior. No UI changes or screenshot QA. No broad suite or other gate phases executed."
+}

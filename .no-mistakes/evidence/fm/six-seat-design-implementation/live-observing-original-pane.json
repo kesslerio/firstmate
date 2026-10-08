@@ -1,0 +1,15 @@
+
+[art@zeppola:/tmp/fm-observing-once.OdC29j/remote]$ export PATH=/tmp/fm-observing-once.OdC29j
+/shims:/home/art/.npm-packages/lib/node_modules/@openai/codex/node_modules/@openai/codex-linu
+x-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/art/.local/bin:/home/art/.npm-package
+s/bin:/run/wrappers/bin:/home/art/.local/share/flatpak/exports/bin:/var/lib/flatpak/exports/b
+in:/home/art/.nix-profile/bin:/nix/profile/bin:/home/art/.local/state/nix/profile/bin:/etc/pr
+ofiles/per-user/art/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin HOME=/tm
+p/fm-observing-once.OdC29j/user-home; export GOTMPDIR=/tmp/fm-mate/gotmp
+
+[art@zeppola:/tmp/fm-observing-once.OdC29j/remote]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-observing-once.OdC29j/remote]$ . '/tmp/fm-mate+045b3ff0b4821f32ce107abc1
+19fe97b54079831ff64dfe6d37329dbc45dadfc/launch.s1791496148.2680623.28045.sh'
+Claude Code synthetic fixture
+❯

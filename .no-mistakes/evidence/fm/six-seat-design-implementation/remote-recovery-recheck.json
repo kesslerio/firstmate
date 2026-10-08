@@ -1,0 +1,9 @@
+{
+  "verdict": "inconclusive",
+  "scenario": "Recover an existing remote generation through its observing receipt and confirm the replacement",
+  "live": false,
+  "focused_fixture": "pass: launch and relaunch confirm replacements, terminalize observing receipts, refuse missing or foreign evidence and damaged-receipt retries",
+  "live_blocker": "Lab helper rejects fm-remote; requires fm-lab-* sessions. Remote controller requires fm-remote. Isolated-instance exception requested; approval pending.",
+  "setup_correction": "Temporary driver uses sibling fixture FM_ROOT_OVERRIDE and worktree bin symlink to avoid nested-home refusal. No tracked source changes.",
+  "log": "observing-receipts-recheck.log"
+}

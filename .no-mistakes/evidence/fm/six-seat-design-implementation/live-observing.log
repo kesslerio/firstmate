@@ -1,0 +1,5 @@
+viewer attached to fm-lab-observing-2242941-20337 (pid 2243098)
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/receipt-run/primary
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/receipt-run/remote
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/receipt-run/primary
+error: secondmate home cannot be inside the firstmate repo: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/receipt-run/remote

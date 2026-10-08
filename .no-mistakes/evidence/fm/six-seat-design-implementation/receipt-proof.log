@@ -1,0 +1,4 @@
+viewer attached to fm-lab-observing-2773659-12292 (pid 2773781)
+/tmp/fm-receipt-proof.RW9aNP/remote
+error: /tmp/fm-receipt-proof.RW9aNP/remote is not a firstmate home (missing AGENTS.md)
+Cleanup confirmed: disposable runner removed; named Herdr session/viewer torn down; fleet tripwire unchanged.

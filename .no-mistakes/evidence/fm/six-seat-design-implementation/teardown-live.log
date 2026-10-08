@@ -1,0 +1,3 @@
+ok - forced teardown preserves wrong-socket children until owning-home cleanup
+ok - top-level cleanup requires owning-socket destruction evidence
+ok - remote cleanup requires generation-bound host destruction evidence

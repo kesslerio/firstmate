@@ -1,0 +1,10 @@
+schema=fm-remote-seat-receipt.v1
+operation=observing.old
+verb=launch
+requested_generation=observing.old
+previous_generation=-
+phase=existing
+actual_generation=s1791496281.2793320.3961
+route_backend=herdr
+route_target=fm-remote:w2:p2
+actual_model=default

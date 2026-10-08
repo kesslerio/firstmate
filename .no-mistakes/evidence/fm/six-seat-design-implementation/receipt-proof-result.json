@@ -1,0 +1,34 @@
+{
+  "scenario": "Recover an existing remote generation through its observing receipt and confirm the replacement",
+  "result": "pass",
+  "live": true,
+  "product": "Actual fm-spawn, fm-remote-secondmate-control and Herdr server; synthetic agent fixture, session mapping routed exclusively through fm-herdr-lab",
+  "actual_predecessor_generation": "s1791496281.2793320.3961",
+  "observing_request": "observing.old",
+  "predecessor_disposition": "dead-after-start",
+  "replacement": {
+    "schema": "fm-remote-seat-operation.v2",
+    "task": "mate",
+    "operation": "replacement.new",
+    "requested_generation": "replacement.new",
+    "actual_generation": "replacement.new",
+    "previous_generation": "s1791496281.2793320.3961",
+    "disposition": "started",
+    "startup_confirmed": true,
+    "old_stopped": false,
+    "old_destroyed": false,
+    "route": {
+      "placement": "remote",
+      "backend": "herdr",
+      "target": "fm-remote:w3:p2",
+      "home": "/tmp/fm-receipt-proof.RW9aNP/remote",
+      "host": null,
+      "remote_root": null,
+      "spawn_gen": "replacement.new"
+    },
+    "actual_model": "default",
+    "complete": true
+  },
+  "cleanup": "Disposable runner removed; named Herdr session and viewer torn down; helper fleet tripwire unchanged",
+  "limitations": "This proves remote lifecycle behavior with a synthetic agent; it does not test a real Claude login or model behavior."
+}

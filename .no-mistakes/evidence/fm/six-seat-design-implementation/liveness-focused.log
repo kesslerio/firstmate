@@ -1,0 +1,11 @@
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - recovery treats a shell-only submitted launch as pending startup, not death
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - recovery reclaims exactly the probed dead generation and relaunches inside its episode
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - recovery abandons a death verdict once the recorded generation changed
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - liveness recovery distinguishes proven destruction from unreadable endpoint evidence
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - a late startup confirmation never authorizes destructive recovery

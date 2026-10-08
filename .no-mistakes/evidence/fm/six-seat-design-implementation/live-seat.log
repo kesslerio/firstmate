@@ -1,0 +1,13 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/home
+fleet-seats: reserved pool=shared id=sm1 generation=g1 used=1 capacity=1
+fleet-seats: dispatched id=sm1 generation=g1
+fleet-seats: retained - the endpoint for sm1 generation g1 holds only a shell; a submitted launch may still execute there (the seat stays counted until evidence resolves it)
+Observed: shell-only dispatched launch remains reserved; reclaim refused.
+fleet-seats: confirmed id=sm1 generation=g1
+Observed: real Claude runtime confirmed on socket A.
+Recovery probe from B: status=relaunchable state=dead socket=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/a target=firstmate:fm-sm1
+Replacement launch result=1 reason= output=fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/home
+fleet-seats: no seat - harness codex launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+error: spawn refused - sm1 has no fleet seat for model default (see the fleet-seats line above)
+Decoy on B survives: pane=%0 dead=0 command=bash
+Observed: recovery reclaimed g1, closed the shell on A, and preserved the identically named unrelated window on B.

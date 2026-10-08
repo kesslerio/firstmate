@@ -1,40 +1,40 @@
+bash-5.3$ claude
 
- ▐▛███▛█   Claude Code v2.1.293
-▝▜██████▀  Opus 5.5 (1M context) with high effort · Claude Team
- ▝▝   ▝▝   ~/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                                                      ● high · /effort
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-❯ Try "how do I log an error?"
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Accessing workspace:
 
-  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents
+ /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR
+
+ Quick safety check: Is this a project you created or one you trust? (Like your own code, a well-known open source
+ project, or work from your team). If not, take a moment to review what's in this folder first.
+
+ Claude Code'll be able to read, edit, and execute files here.
+
+ Security guide
+
+ ❯ No, exit
+   Yes, I trust this folder
+
+ Enter to confirm · Esc to cancel
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

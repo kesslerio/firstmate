@@ -1,0 +1,4 @@
+ok - fm-control removes the dialog file after exit and after relaunch
+ok - fm-control exit removes the dialog file before it releases the control lock
+ok - host launch and relaunch recover imported generations and refuse damaged-receipt retries without endpoint effects
+ok - control terminalizes every matching observing receipt and leaves foreign generations alone

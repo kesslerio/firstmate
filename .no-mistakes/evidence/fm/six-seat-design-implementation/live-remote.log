@@ -1,0 +1,28 @@
+served remote policy=3130302336-69 epoch=r1791493275369860518013.1 holders=1
+true
+Observed: root serve reached remote registered only in local secondmate; certificate contains its descendant.
+fleet-seats: reserved pool=shared id=local-worker generation=glocal used=2 capacity=2
+fleet-seats: pool shared is full (2 of 2 seats held); overflow gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/remote/local/state local-worker
+  holder remote:remote:/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/remote/descendant/state existing
+Observed: local + remote descendant exhaust shared capacity; overflow refused.
+fleet-seats: recorded id=remote generation=gremote (model unpooled is in no pool)
+fleet-seats: dispatched id=remote generation=gremote
+fleet-seats: refused - no seat is reserved for remote generation gremote
+fleet-seats: released id=remote generation=gremote reason=prelaunch
+true
+Observed: root cannot reconcile descendant-owned remote; registry owner can, using root ledger.
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"remote","operation":"invalidop","requested_generation":"invalidop","actual_generation":null,"previous_generation":null,"disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: operation invalidop has no verified dispatched parent reservation; nothing was changed
+Observed: arbitrary operation token rejected before reservation or lifecycle effects.
+fleet-seats: recorded id=remote generation=guardop (model unpooled is in no pool)
+fleet-seats: dispatched id=remote generation=guardop
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"remote","operation":"guardop","requested_generation":"guardop","actual_generation":null,"previous_generation":null,"disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: unverified remote secondmate harness: unverified
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"remote","operation":"guardop","requested_generation":"guardop","actual_generation":null,"previous_generation":null,"disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation guardop was already handled on this host (prelaunch)
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"remote","operation":"guardop","requested_generation":"guardop","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation guardop was already handled on this host (unknown)
+Observed: verified reservation claimed once; prelaunch retry and missing-receipt retry refuse to repeat lifecycle effects.

@@ -1,0 +1,28 @@
+viewer attached to fm-lab-observing-2680408-8529 (pid 2680504)
+/tmp/fm-observing-once.OdC29j/remote
+spawned mate harness=claude kind=secondmate mode=secondmate yolo=off window=fm-remote:w2:p2 worktree=/tmp/fm-observing-once.OdC29j/remote
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"mate","operation":"observing.old","requested_generation":"observing.old","actual_generation":"s1791496148.2680623.28045","previous_generation":null,"disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w2:p2","home":"/tmp/fm-observing-once.OdC29j/remote","host":null,"remote_root":null,"spawn_gen":"s1791496148.2680623.28045"},"actual_model":"default","complete":true}
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w2:p2
+herdr_session=fm-remote
+harness=claude
+model=default
+effort=default
+spawn_gen=s1791496148.2680623.28045
+seat_operation=observing.old
+{"id":"cli:pane:close","result":{"type":"ok"}}
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"mate","operation":"observing.old","requested_generation":"observing.old","actual_generation":"s1791496148.2680623.28045","previous_generation":null,"disposition":"dead-after-start","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w2:p2","home":"/tmp/fm-observing-once.OdC29j/remote","host":null,"remote_root":null,"spawn_gen":"s1791496148.2680623.28045"},"actual_model":"default","complete":true}
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"mate","operation":"replacement.new","requested_generation":"replacement.new","actual_generation":"replacement.new","previous_generation":"s1791496148.2680623.28045","disposition":"started","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w3:p2","home":"/tmp/fm-observing-once.OdC29j/remote","host":null,"remote_root":null,"spawn_gen":"replacement.new"},"actual_model":"default","complete":true}
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w3:p2
+herdr_session=fm-remote
+harness=claude
+model=default
+effort=medium
+spawn_gen=replacement.new
+seat_operation=replacement.new
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"mate","operation":"observing.old","requested_generation":"observing.old","actual_generation":"s1791496148.2680623.28045","previous_generation":null,"disposition":"dead-after-start","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w2:p2","home":"/tmp/fm-observing-once.OdC29j/remote","host":null,"remote_root":null,"spawn_gen":"s1791496148.2680623.28045"},"actual_model":"default","complete":true}
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"mate","operation":"replacement.new","requested_generation":"replacement.new","actual_generation":"replacement.new","previous_generation":"s1791496148.2680623.28045","disposition":"started","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w3:p2","home":"/tmp/fm-observing-once.OdC29j/remote","host":null,"remote_root":null,"spawn_gen":"replacement.new"},"actual_model":"default","complete":true}
+Observed: observing receipt preserves its request identity, settles actual.old, and real replacement.new confirms startup.
