@@ -1165,6 +1165,170 @@ EOF
   pass "fm-startup-network: the digest discloses a refused fresh sweep without previewing findings"
 }
 
+test_pending_commit_and_reservation_share_ownership() {
+  local mode rec home root log worker starter generation waited rc wakes real_sed real_mv staged_status prepared
+  local FM_RACE_REAL_SED FM_RACE_REAL_MV
+  real_sed=$(command -v sed)
+  real_mv=$(command -v mv)
+  FM_RACE_REAL_SED=$real_sed
+  FM_RACE_REAL_MV=$real_mv
+  export FM_RACE_REAL_SED FM_RACE_REAL_MV
+  for mode in phases reservation; do
+    rec=$(new_world "reservation-ownership-$mode")
+    IFS='|' read -r home root log <<EOF
+$rec
+EOF
+    printf '%s\n' "$$" > "$home/state/.lock"
+    cat > "$root/bin/sed" <<'SH'
+#!/usr/bin/env bash
+if [ "${FM_RACE_BOUNDARY:-}" = phases ] && [ "${2:-}" = 's/^phases=//p' ] \
+  && [ "${3:-}" = "$FM_HOME/state/.startup-network.status" ] \
+  && [ "$(cat "$FM_HOME/state/.startup-network.lock/pid" 2>/dev/null)" = "$FM_RACE_START_PID" ] \
+  && [ ! -f "$FM_HOME/state/race-ready" ]; then
+  : > "$FM_HOME/state/race-ready"
+  waited=0
+  while [ ! -f "$FM_HOME/state/race-release" ] && [ "$waited" -lt 100 ]; do
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+  [ -f "$FM_HOME/state/race-release" ] || exit 1
+fi
+exec "$FM_RACE_REAL_SED" "$@"
+SH
+    cat > "$root/bin/mv" <<'SH'
+#!/usr/bin/env bash
+if [ "${FM_RACE_BOUNDARY:-}" = reservation ] && [ "${3:-}" = "$FM_HOME/state/.startup-network.status" ] \
+  && [ ! -f "$FM_HOME/state/race-ready" ]; then
+  : > "$FM_HOME/state/race-ready"
+  waited=0
+  while [ ! -f "$FM_HOME/state/race-release" ] && [ "$waited" -lt 100 ]; do
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+  [ -f "$FM_HOME/state/race-release" ] || exit 1
+fi
+exec "$FM_RACE_REAL_MV" "$@"
+SH
+    chmod +x "$root/bin/sed" "$root/bin/mv"
+    FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_SLEEP=2 FM_FAKE_BOOTSTRAP_OUT='FINDING_A' \
+      FM_SESSION_START_TIMEOUT=2 run_stage "$home" "$root" start --locked 0 --harvest-pid 999999999
+    worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+    generation=$(sed -n 's/^generation=//p' "$home/state/.startup-network.status")
+    waited=0
+    while [ ! -s "$log" ] && [ "$waited" -lt 50 ]; do
+      sleep 0.1
+      waited=$((waited + 1))
+    done
+    [ -s "$log" ] || fail "worker A never started before the reservation race"
+    PATH="$root/bin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_FAKE_HARNESS_PID="$$" \
+      FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT='FINDING_B' FM_SESSION_START_TIMEOUT=12 \
+      FM_RACE_BOUNDARY="$mode" FM_RACE_REAL_SED="$real_sed" FM_RACE_REAL_MV="$real_mv" \
+      bash -c 'export FM_RACE_START_PID=$$; exec "$FM_ROOT_OVERRIDE/bin/fm-startup-network.sh" start --locked 1 --harvest-pid 999999999' &
+    starter=$!
+    waited=0
+    while [ ! -f "$home/state/race-ready" ] && [ "$waited" -lt 50 ]; do
+      sleep 0.1
+      waited=$((waited + 1))
+    done
+    [ -f "$home/state/race-ready" ] || fail "startup B did not reach the reservation race boundary"
+    if [ "$mode" = phases ]; then
+      await_pid_exit "$worker" 80 || fail "worker A exceeded its bounded exit during reservation"
+      assert_grep 'FINDING_A' "$home/state/.startup-network.pending/report" "the allowed pending commit lost worker A's report"
+    else
+      waited=0
+      prepared=0
+      while [ "$prepared" -eq 0 ] && [ "$waited" -lt 80 ]; do
+        [ ! -d "$home/state/.startup-network.pending" ] || prepared=1
+        for staged_status in "$home/state"/.startup-network-pending.*/status; do
+          [ ! -f "$staged_status" ] || prepared=1
+        done
+        [ "$prepared" -eq 1 ] && break
+        sleep 0.1
+        waited=$((waited + 1))
+      done
+      [ "$prepared" -eq 1 ] || fail "worker A never prepared its completed report during reservation"
+    fi
+    : > "$home/state/race-release"
+    rc=0
+    wait "$starter" || rc=$?
+    if [ "$mode" = phases ]; then
+      [ "$rc" -ne 0 ] || fail "startup B superseded a report committed after its recovery check"
+      [ "$(sed -n 's/^generation=//p' "$home/state/.startup-network.status")" = "$generation" ] \
+        || fail "startup B replaced the retained generation"
+      [ "$(wc -l < "$log" | tr -d ' ')" -eq 1 ] || fail "startup B ran fresh checks over a retained report"
+      FM_FAKE_BOOTSTRAP_LOG="$log" run_stage "$home" "$root" run --locked 0 \
+        || fail "manual recovery could not settle the allowed pending commit"
+    else
+      [ "$rc" -eq 0 ] || fail "startup B could not complete its owned reservation"
+      await_pid_exit "$worker" 80 || fail "worker A exceeded its bounded exit after losing reservation ownership"
+      run_stage "$home" "$root" wait 30 >/dev/null || fail "startup B could not publish after denying worker A's commit"
+      wait_for_startup_network_wake "$home" || fail "startup B did not deliver its own findings"
+      await_pid_exit "$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")" 80 \
+        || fail "startup B did not settle its delivery"
+      assert_grep 'FINDING_B' "$home/state/.startup-network.report" "worker A blocked startup B's publication"
+      assert_no_grep 'FINDING_A' "$home/state/.startup-network.report" "the denied generation overwrote startup B's findings"
+    fi
+    assert_absent "$home/state/.startup-network.pending" "the reservation race left a blocking pending directory"
+    wakes=$(grep -Fc $'check\tstartup-network' "$home/state/.wake-queue" 2>/dev/null || true)
+    [ "$wakes" -eq 1 ] || fail "the $mode reservation race queued $wakes wakes, want 1"
+  done
+  pass "fm-startup-network: pending commit and successor reservation have one ownership boundary"
+}
+
+test_report_selects_timings_from_the_selected_result() {
+  local rec home root log holder worker waited output real_mktemp
+  rec=$(new_world selected-result-timings)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+  FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_TIMING_PHASE=old-step \
+    run_stage "$home" "$root" run --locked 0
+  output=$(run_stage "$home" "$root" report)
+  assert_contains "$output" 'old-step' "the published timing fixture was not recorded"
+  : > "$log"
+  FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_SLEEP=2 FM_FAKE_BOOTSTRAP_OUT='PENDING_RESULT' \
+    FM_FAKE_TIMING_PHASE=pending-step FM_SESSION_START_TIMEOUT=2 \
+    run_stage "$home" "$root" start --locked 0 --harvest-pid 999999999
+  worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+  waited=0
+  while [ ! -s "$log" ] && [ "$waited" -lt 50 ]; do
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+  [ -s "$log" ] || fail "the pending timing fixture never ran"
+  holder=$(hold_publish_lock "$home")
+  await_pid_exit "$worker" 80 || fail "the pending timing worker exceeded its bound"
+  output=$(run_stage "$home" "$root" report)
+  assert_contains "$output" 'PENDING_RESULT' "report omitted the selected pending findings"
+  assert_contains "$output" 'pending-step' "report omitted the selected pending timings"
+  assert_not_contains "$output" 'old-step' "report paired pending findings with published timings"
+  rm "$home/state/.startup-network.pending/timings"
+  output=$(run_stage "$home" "$root" report)
+  assert_contains "$output" 'PENDING_RESULT' "missing timings hid the selected findings"
+  assert_not_contains "$output" 'TIMINGS' "missing pending timings fell back to another run"
+  kill "$holder" 2>/dev/null || true
+  await_pid_exit "$holder" 50 || fail "could not release the selected timing fixture lock"
+  FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_SLEEP=2 \
+    run_stage "$home" "$root" start --locked 0 --harvest-pid 999999999
+  assert_absent "$home/state/.startup-network.timings" "recovery published stale timings for a result without them"
+  run_stage "$home" "$root" wait 30 >/dev/null || fail "the fresh timing fixture did not finish"
+  output=$(run_stage "$home" "$root" report)
+  assert_contains "$output" 'gh-auth' "ordinary publication stopped rendering its timings"
+  real_mktemp=$(command -v mktemp)
+  cat > "$root/bin/mktemp" <<'SH'
+#!/usr/bin/env bash
+case "$*" in *fm-startup-network-timings.*) exit 1 ;; esac
+exec "$FM_REAL_MKTEMP" "$@"
+SH
+  chmod +x "$root/bin/mktemp"
+  FM_REAL_MKTEMP="$real_mktemp" FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT='UNTIMED_RESULT' \
+    run_stage "$home" "$root" run --locked 0
+  output=$(run_stage "$home" "$root" report)
+  assert_contains "$output" 'UNTIMED_RESULT' "a missing timing artifact prevented ordinary publication"
+  assert_not_contains "$output" 'TIMINGS' "untimed publication retained another run's timings"
+  pass "fm-startup-network: report findings and timings always select the same result"
+}
+
 test_wait_fails_without_a_published_stage
 test_start_returns_without_holding_the_callers_stdout
 test_harvest_acknowledgement_suppresses_the_wake_and_no_claim_produces_it
@@ -1194,4 +1358,6 @@ test_pending_delivery_harvest_and_superseded_generations
 test_start_rechecks_pending_after_waiting_for_publication
 test_reserved_worker_retains_a_precheck_lock_timeout
 test_digest_reports_a_refused_fresh_sweep
+test_pending_commit_and_reservation_share_ownership
+test_report_selects_timings_from_the_selected_result
 echo "# fm-startup-network.test.sh: all assertions passed"
