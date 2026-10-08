@@ -1208,6 +1208,7 @@ SH
       waited=$((waited + 1))
     done
     [ -s "$log" ] || fail "worker A never started before the reservation race"
+    # shellcheck disable=SC2016 # The child bash expands its own PID and environment.
     fm_run_timed "$([ "$mode" = interrupted-reservation ] && printf 8 || printf 20)" \
       env PATH="$root/bin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_FAKE_HARNESS_PID="$$" \
       FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT='FINDING_B' FM_SESSION_START_TIMEOUT=12 \
