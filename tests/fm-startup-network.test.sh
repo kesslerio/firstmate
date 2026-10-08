@@ -19,6 +19,8 @@
 #     locked request supersedes an in-flight probe-only worker
 #   - a publish lock a live process holds past the budget ends the worker with a
 #     failed-rerun record instead of an unbounded wait
+#   - a live claimant, a live lease holder, a late publication lock, or a nested
+#     wake lock cannot keep the worker alive past its budget or duplicate a wake
 set -u
 
 # shellcheck source=tests/lib.sh
@@ -139,8 +141,14 @@ wait_for_startup_network_wake() {  # <home> [tenths]
 # holder's pid. The holder keeps the pid the lock records, so the lock's
 # stale-owner recovery never reclaims it while the test runs.
 hold_publish_lock() {  # <home>
-  local lock="$1/state/.startup-network.lock" holder waited=0
-  FM_STATE_OVERRIDE="$1/state" FM_ROOT_OVERRIDE="$ROOT" bash -c '
+  hold_named_lock "$1" "$1/state/.startup-network.lock"
+}
+
+# hold_named_lock <home> <lockdir>: same live holder, for the fleet lease and
+# the recovery-marker lock as well as publication.
+hold_named_lock() {  # <home> <lockdir>
+  local home=$1 lock=$2 holder waited=0
+  FM_STATE_OVERRIDE="$home/state" FM_ROOT_OVERRIDE="$ROOT" bash -c '
     . "$1/fm-wake-lib.sh"
     fm_lock_try_acquire "$2" || exit 1
     exec sleep 120' _ "$ROOT/bin" "$lock" >/dev/null 2>&1 </dev/null &
@@ -150,7 +158,7 @@ hold_publish_lock() {  # <home>
     waited=$((waited + 1))
   done
   [ "$(cat "$lock/pid" 2>/dev/null || true)" = "$holder" ] \
-    || fail "could not hold the publish lock from a second process"
+    || fail "could not hold $lock from a second process"
   printf '%s' "$holder"
 }
 
@@ -859,6 +867,134 @@ EOF
   pass "fm-startup-network: a held publish lock ends the worker inside its budget with a failed-rerun record"
 }
 
+# A live fleet-lease holder used to sit in an unbounded acquire before the
+# sweeps, so the stage budget never started. The worker must give up, leave a
+# failed record naming that holder, and not run the sweeps.
+test_a_live_lease_holder_cannot_extend_the_stage() {
+  local rec home root log holder began took worker report wakes
+  rec=$(new_world live-lease-holder)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+  printf '%s\n' $$ > "$home/state/.lock"
+  holder=$(hold_named_lock "$home" "$home/state/.lock.acquire")
+
+  began=$(date +%s)
+  FM_STARTUP_NETWORK_TIMEOUT=2 FM_SESSION_START_TIMEOUT=2 FM_FAKE_BOOTSTRAP_LOG="$log" \
+    run_stage "$home" "$root" start --locked 1 --harvest-pid 999999999 \
+    || fail "the contended-lease worker did not start"
+  await_worker_record "$home"
+  worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+  await_pid_exit "$worker" 80 \
+    || fail "a live lease holder kept the worker alive past a 2s stage budget"
+  took=$(( $(date +%s) - began ))
+  [ "$took" -le 8 ] || fail "the lease holder held the worker for ${took}s on a 2s budget"
+  [ ! -f "$log" ] || fail "bootstrap ran without the fleet lease"
+  report=$(run_stage "$home" "$root" report)
+  assert_contains "$report" "still held by pid $holder" \
+    "the lease timeout did not name the holder: $report"
+  assert_contains "$report" "once that lease is released" \
+    "the lease timeout did not say how to rerun"
+  wakes=$(grep -Fc $'check\tstartup-network' "$home/state/.wake-queue" 2>/dev/null || true)
+  [ "$wakes" -eq 1 ] || fail "the lease timeout queued $wakes wakes, want 1"
+  kill "$holder" 2>/dev/null || true
+  await_pid_exit "$holder" 50 || fail "could not release the lease holder"
+  pass "fm-startup-network: a live lease holder cannot extend the stage bound"
+}
+
+# The reported runaway stayed in the delivery poll while its claimant, a live
+# session, never exited. The worker must leave that poll inside the delivery
+# budget, keep the report, and queue the result once.
+test_a_live_claimant_cannot_extend_delivery() {
+  local rec home root log claimant began took worker report wakes
+  rec=$(new_world live-claimant)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+  sleep 30 &
+  claimant=$!
+  began=$(date +%s)
+  FM_SESSION_START_TIMEOUT=2 FM_FAKE_BOOTSTRAP_LOG="$log" \
+    FM_FAKE_BOOTSTRAP_OUT='MISSING: some-tool' \
+    run_stage "$home" "$root" start --locked 0 --harvest-pid "$claimant" \
+    || fail "the live-claimant worker did not start"
+  await_worker_record "$home"
+  worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+  await_pid_exit "$worker" 80 \
+    || fail "a live claimant kept the worker in delivery past a 2s budget"
+  took=$(( $(date +%s) - began ))
+  [ "$took" -le 8 ] || fail "delivery against a live claimant took ${took}s on a 2s budget"
+  kill -0 "$claimant" 2>/dev/null || fail "the claimant died before the deadline"
+  report=$(run_stage "$home" "$root" report)
+  assert_contains "$report" 'MISSING: some-tool' "the live claim lost the report: $report"
+  wakes=$(grep -Fc $'check\tstartup-network' "$home/state/.wake-queue" 2>/dev/null || true)
+  [ "$wakes" -eq 1 ] || fail "a live claimant produced $wakes deadline wakes, want 1"
+  assert_absent "$home/state/.startup-network.delivered" \
+    "an unharvested live claim was marked delivered"
+  kill "$claimant" 2>/dev/null || true
+  wait "$claimant" 2>/dev/null || true
+  pass "fm-startup-network: a live claimant cannot extend delivery or duplicate its wake"
+}
+
+# Once the report is published, a later holder of the publication lock is the
+# party that can acknowledge delivery. The worker must exit without a second
+# wake and leave that report for harvest.
+test_a_late_publication_lock_cannot_strand_delivery() {
+  local rec home root log claimant holder worker report
+  rec=$(new_world live-publication-holder)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+  sleep 30 &
+  claimant=$!
+  FM_SESSION_START_TIMEOUT=8 FM_FAKE_BOOTSTRAP_LOG="$log" \
+    FM_FAKE_BOOTSTRAP_OUT='MISSING: some-tool' \
+    run_stage "$home" "$root" start --locked 0 --harvest-pid "$claimant" \
+    || fail "the claimed worker did not start"
+  run_stage "$home" "$root" wait 8 >/dev/null || fail "the claimed worker did not publish"
+  worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+  kill -0 "$worker" 2>/dev/null \
+    || fail "the worker finished delivery before the publication lock could be taken"
+  holder=$(hold_publish_lock "$home")
+  await_pid_exit "$worker" 120 \
+    || fail "a live publication-lock holder kept the worker alive past its delivery budget"
+  report=$(run_stage "$home" "$root" report)
+  assert_contains "$report" 'MISSING: some-tool' "the published report was lost: $report"
+  assert_absent "$home/state/.wake-queue" "delivery queued a wake without the publication lock"
+  kill "$holder" 2>/dev/null || true
+  await_pid_exit "$holder" 50 || fail "could not release the publication-lock holder"
+  report=$(run_stage "$home" "$root" harvest --pid "$claimant")
+  assert_contains "$report" 'MISSING: some-tool' "harvest could not deliver the retained report"
+  assert_absent "$home/state/.wake-queue" "harvest and the expired worker queued duplicate delivery"
+  kill "$claimant" 2>/dev/null || true
+  wait "$claimant" 2>/dev/null || true
+  pass "fm-startup-network: a live publication-lock holder cannot strand delivery"
+}
+
+# The wake append takes the recovery-marker lock with no deadline of its own.
+# A live holder must not keep the worker running after the report is durable.
+test_a_nested_wake_lock_cannot_strand_delivery() {
+  local rec home root log holder began elapsed report
+  rec=$(new_world live-wake-holder)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+  holder=$(hold_named_lock "$home" "$home/state/.watcher-down.lock")
+  began=$(date +%s)
+  FM_SESSION_START_TIMEOUT=2 FM_FAKE_BOOTSTRAP_LOG="$log" \
+    FM_FAKE_BOOTSTRAP_OUT='MISSING: some-tool' \
+    run_stage "$home" "$root" run --locked 0 \
+    || fail "the wake-lock run failed before publishing"
+  elapsed=$(( $(date +%s) - began ))
+  [ "$elapsed" -le 6 ] || fail "the nested wake lock held delivery for ${elapsed}s"
+  report=$(run_stage "$home" "$root" report)
+  assert_contains "$report" 'MISSING: some-tool' "the contended wake lost the durable report: $report"
+  assert_absent "$home/state/.wake-queue" "a wake was queued through a held recovery lock"
+  kill "$holder" 2>/dev/null || true
+  await_pid_exit "$holder" 50 || fail "could not release the recovery-lock holder"
+  pass "fm-startup-network: a nested wake lock cannot strand delivery"
+}
+
 test_wait_fails_without_a_published_stage
 test_start_returns_without_holding_the_callers_stdout
 test_harvest_acknowledgement_suppresses_the_wake_and_no_claim_produces_it
@@ -880,4 +1016,8 @@ test_timings_are_published_and_only_the_on_demand_report_prints_them
 test_a_bounded_run_still_publishes_the_timings_it_managed_to_record
 test_the_timing_artifact_cannot_carry_a_command_line_or_forge_records
 test_a_held_publish_lock_cannot_keep_the_worker_alive_past_its_budget
+test_a_live_lease_holder_cannot_extend_the_stage
+test_a_live_claimant_cannot_extend_delivery
+test_a_late_publication_lock_cannot_strand_delivery
+test_a_nested_wake_lock_cannot_strand_delivery
 echo "# fm-startup-network.test.sh: all assertions passed"
