@@ -63,18 +63,22 @@ while [ "$#" -gt 0 ]; do
   shift 2
 done
 case "$query" in
-  *"comments(first: 100)"*"reviews(first: 100)"*) ;;
-  *) exit 2 ;;
+  *after:*|*endCursor*) exit 2 ;;
 esac
 case "$query" in
-  *pageInfo*|*after:*|*endCursor*) exit 2 ;;
+  *"comments(first: 100)"*"pageInfo { hasNextPage }"*"reviews(first: 100)"*"pageInfo { hasNextPage }"*) ;;
+  *) exit 2 ;;
 esac
 [ -n "$prog" ] || exit 2
-if [ "${FM_TEST_GH_UNFRAMED:-0}" = 1 ]; then
-  printf 'MERGED\n'
+if [ -n "${FM_TEST_GH_UNFRAMED:-}" ]; then
+  printf '%s\n' "$FM_TEST_GH_UNFRAMED"
   exit 0
 fi
-jq '{data:{repository:{pullRequest:{state:.state, comments:{nodes:.comments[:100]}, reviews:{nodes:.reviews[:100]}}}}}' "$FM_TEST_GH_JSON_FILE" | jq -r "$prog"
+if [ "${FM_TEST_GH_RAW_JSON:-0}" = 1 ]; then
+  jq -r "$prog" "$FM_TEST_GH_JSON_FILE"
+else
+  jq '{data:{repository:{pullRequest:{state:.state, comments:{nodes:.comments[:100],pageInfo:{hasNextPage:(.comments|length>100)}}, reviews:{nodes:.reviews[:100],pageInfo:{hasNextPage:(.reviews|length>100)}}}}}}' "$FM_TEST_GH_JSON_FILE" | jq -r "$prog"
+fi
 SH
   chmod +x "$dir/fakebin/gh"
   cp "$POLL" "$dir/home/state/task-a.check.sh"
@@ -94,7 +98,8 @@ run_direct() {
   FM_TEST_GH_JSON_FILE="$dir/pr.json" FM_TEST_GH_LOG="$dir/gh.log" \
     FM_TEST_GH_FAIL="${FM_TEST_GH_FAIL:-0}" \
     FM_TEST_GH_TRUNCATED="${FM_TEST_GH_TRUNCATED:-0}" \
-    FM_TEST_GH_UNFRAMED="${FM_TEST_GH_UNFRAMED:-0}" \
+    FM_TEST_GH_UNFRAMED="${FM_TEST_GH_UNFRAMED:-}" \
+    FM_TEST_GH_RAW_JSON="${FM_TEST_GH_RAW_JSON:-0}" \
     PATH="$dir/fakebin:$BASE_PATH" \
     bash "$dir/home/state/task-a.check.sh"
 }
@@ -105,14 +110,16 @@ run_validated() {
     FM_TEST_GH_JSON_FILE="$dir/pr.json" FM_TEST_GH_LOG="$dir/gh.log" \
       FM_TEST_GH_FAIL="${FM_TEST_GH_FAIL:-0}" \
       FM_TEST_GH_TRUNCATED="${FM_TEST_GH_TRUNCATED:-0}" \
-      FM_TEST_GH_UNFRAMED="${FM_TEST_GH_UNFRAMED:-0}" \
+      FM_TEST_GH_UNFRAMED="${FM_TEST_GH_UNFRAMED:-}" \
+      FM_TEST_GH_RAW_JSON="${FM_TEST_GH_RAW_JSON:-0}" \
       PATH="$dir/fakebin:$BASE_PATH" \
       bash "$POLL" --validated github "$URL" github.com o/r 1 "$check"
   else
     FM_TEST_GH_JSON_FILE="$dir/pr.json" FM_TEST_GH_LOG="$dir/gh.log" \
       FM_TEST_GH_FAIL="${FM_TEST_GH_FAIL:-0}" \
       FM_TEST_GH_TRUNCATED="${FM_TEST_GH_TRUNCATED:-0}" \
-      FM_TEST_GH_UNFRAMED="${FM_TEST_GH_UNFRAMED:-0}" \
+      FM_TEST_GH_UNFRAMED="${FM_TEST_GH_UNFRAMED:-}" \
+      FM_TEST_GH_RAW_JSON="${FM_TEST_GH_RAW_JSON:-0}" \
       PATH="$dir/fakebin:$BASE_PATH" \
       bash "$POLL" --validated github "$URL" github.com o/r 1
   fi
@@ -152,7 +159,7 @@ test_seed_comment_replay_and_one_wake() {
   grep -q -- '^api graphql ' "$dir/gh.log" || fail "seed did not make a GraphQL request"
   grep -qF -- 'comments(first: 100)' "$dir/gh.log" || fail "comments request was not bounded"
   grep -qF -- 'reviews(first: 100)' "$dir/gh.log" || fail "reviews request was not bounded"
-  if grep -qE -- '--paginate|pageInfo|endCursor' "$dir/gh.log"; then
+  if grep -qE -- '--paginate|endCursor' "$dir/gh.log"; then
     fail "seed requested pagination"
   fi
   : > "$dir/gh.log"
@@ -218,14 +225,14 @@ test_errors_and_merged_wording_stay_silent() {
   out=$(FM_TEST_GH_TRUNCATED=1 run_direct "$dir")
   assert_silent "$out" "truncated activity output woke"
   [ ! -e "$cursor" ] || fail "truncated output created a cursor"
-  out=$(FM_TEST_GH_UNFRAMED=1 run_direct "$dir")
-  assert_silent "$out" "an unframed merged response woke"
+  out=$(FM_TEST_GH_UNFRAMED=MERGED run_direct "$dir")
+  [ "$out" = merged ] || fail "an unframed merge was not recognized"
   [ ! -e "$cursor" ] || fail "an unframed response seeded a cursor"
   out=$(run_direct "$dir")
   assert_silent "$out" "recovery seed woke"
   before=$(cat "$cursor")
-  out=$(FM_TEST_GH_UNFRAMED=1 run_direct "$dir")
-  assert_silent "$out" "an unframed response after seed woke"
+  out=$(FM_TEST_GH_UNFRAMED=OPEN run_direct "$dir")
+  assert_silent "$out" "an unframed open response after seed woke"
   [ "$(cat "$cursor")" = "$before" ] || fail "an unframed response changed the cursor"
   [ ! -e "$cursor.pending" ] || fail "an unframed response staged a cursor"
   out=$(FM_TEST_GH_FAIL=1 run_direct "$dir")
@@ -460,6 +467,102 @@ test_bounded_activity_stays_unread() {
   pass "comments and reviews past the request bounds stay unread"
 }
 
+test_truncated_activity_marks_either_collection() {
+  local dir out paged kind count summary cursor
+  for paged in comment review; do
+    for kind in comment review; do
+      dir=$(make_case "truncated-$paged-$kind")
+      cursor="$dir/home/state/task-a.pr-activity"
+      jq -n --arg paged "$paged" \
+        '{state:"OPEN", comments:[], reviews:[]} | (if $paged == "comment" then .comments else .reviews end) = [range(0;101) | {id:("OLD"+tostring), author:{login:"a"}, createdAt:"2026-10-01T00:00:00Z", submittedAt:"2026-10-01T00:00:00Z", state:"COMMENTED", body:"old"}]' > "$dir/pr.json"
+      out=$(run_direct "$dir")
+      assert_silent "$out" "a bounded seed with unread pages woke"
+      out=$(run_validated "$dir" "$dir/home/state/task-a.check.sh")
+      assert_silent "$out" "unread pages alone woke on replay"
+      count=1
+      [ "$paged" = "$kind" ] || count=2
+      jq --arg kind "$kind" --argjson count "$count" \
+        '(if $kind == "comment" then .comments else .reviews end)[0:$count] = [range(0;$count) | {id:("NEW"+tostring), author:{login:"a"}, createdAt:"2026-10-03T00:00:00Z", submittedAt:"2026-10-03T00:00:00Z", state:"COMMENTED", body:"new note"}]' "$dir/pr.json" > "$dir/next.json"
+      mv "$dir/next.json" "$dir/pr.json"
+      : > "$dir/gh.log"
+      out=$(run_validated "$dir" "$dir/home/state/task-a.check.sh")
+      summary='new note'
+      [ "$count" -eq 1 ] || summary='2 new: new note'
+      assert_one_line "$out" "pr-activity: $URL $kind a: truncated: $summary"
+      [ "$(wc -l < "$dir/gh.log" | tr -d ' ')" = 1 ] || fail "truncation made another forge request"
+      grep -qx NEW0 "$cursor.pending" || fail "truncated activity was not staged"
+      if grep -qx NEW0 "$cursor"; then fail "truncated activity committed before queueing"; fi
+    done
+  done
+  pass "either unread collection marks single and batch activity as truncated"
+}
+
+test_malformed_pagination_metadata_stays_silent() {
+  local dir cursor before out state mutation
+  for state in OPEN MERGED; do
+    for mutation in missing-comment-page missing-review-page wrong-comment-page wrong-review-page missing-nodes short-json invalid-json; do
+      dir=$(make_case "metadata-$state-$mutation")
+      cursor="$dir/home/state/task-a.pr-activity"
+      jq -n --arg state "$state" \
+        '{data:{repository:{pullRequest:{state:$state, comments:{nodes:[{id:"NEW",author:{login:"a"},createdAt:"2026-10-03T00:00:00Z",body:"new"}],pageInfo:{hasNextPage:true}},reviews:{nodes:[],pageInfo:{hasNextPage:false}}}}}}' > "$dir/full.json"
+      case "$mutation" in
+        missing-comment-page) jq 'del(.data.repository.pullRequest.comments.pageInfo)' "$dir/full.json" > "$dir/bad.json" ;;
+        missing-review-page) jq 'del(.data.repository.pullRequest.reviews.pageInfo)' "$dir/full.json" > "$dir/bad.json" ;;
+        wrong-comment-page) jq '.data.repository.pullRequest.comments.pageInfo.hasNextPage="true"' "$dir/full.json" > "$dir/bad.json" ;;
+        wrong-review-page) jq '.data.repository.pullRequest.reviews.pageInfo.hasNextPage=null' "$dir/full.json" > "$dir/bad.json" ;;
+        missing-nodes) jq 'del(.data.repository.pullRequest.comments.nodes)' "$dir/full.json" > "$dir/bad.json" ;;
+        short-json) jq 'del(.data.repository.pullRequest.comments,.data.repository.pullRequest.reviews)' "$dir/full.json" > "$dir/bad.json" ;;
+        invalid-json) printf '{"data":' > "$dir/bad.json" ;;
+      esac
+      cp "$dir/bad.json" "$dir/pr.json"
+      out=$(FM_TEST_GH_RAW_JSON=1 run_direct "$dir")
+      assert_silent "$out" "malformed pagination metadata woke before seed"
+      if [ -e "$cursor" ] || [ -e "$cursor.pending" ]; then
+        fail "malformed metadata wrote a cursor before seed"
+      fi
+      write_json "$dir/pr.json" OPEN '[]' '[]'
+      out=$(run_direct "$dir")
+      assert_silent "$out" "metadata fixture seed woke"
+      before=$(cat "$cursor")
+      cp "$dir/bad.json" "$dir/pr.json"
+      out=$(FM_TEST_GH_RAW_JSON=1 run_validated "$dir" "$dir/home/state/task-a.check.sh")
+      assert_silent "$out" "malformed pagination metadata woke after seed"
+      [ "$(cat "$cursor")" = "$before" ] || fail "malformed metadata changed the cursor"
+      [ ! -e "$cursor.pending" ] || fail "malformed metadata staged activity"
+    done
+  done
+  pass "missing, malformed, and short JSON never become truncated activity or merges"
+}
+
+test_bare_state_compatibility() {
+  local dir cursor before state out expected
+  for state in MERGED OPEN CLOSED; do
+    dir=$(make_case "bare-$state")
+    cursor="$dir/home/state/task-a.pr-activity"
+    write_json "$dir/pr.json" OPEN '[]' '[]'
+    expected=
+    [ "$state" != MERGED ] || expected=merged
+    out=$(FM_TEST_GH_UNFRAMED="$state" run_direct "$dir")
+    [ "$out" = "$expected" ] || fail "bare $state direct response was not compatible"
+    [ ! -e "$cursor" ] || fail "bare $state seeded activity"
+    out=$(run_direct "$dir")
+    assert_silent "$out" "bare-state fixture seed woke"
+    before=$(cat "$cursor")
+    out=$(FM_TEST_GH_UNFRAMED="$state" run_validated "$dir" "$dir/home/state/task-a.check.sh")
+    [ "$out" = "$expected" ] || fail "bare $state validated response was not compatible"
+    [ "$(cat "$cursor")" = "$before" ] || fail "bare $state changed the cursor"
+    [ ! -e "$cursor.pending" ] || fail "bare $state staged activity"
+  done
+  for state in $'MERGED\nextra' $'OPEN\ntruncated=true' ' MERGED' 'state=OPEN'; do
+    dir=$(make_case "bare-invalid-$RANDOM")
+    write_json "$dir/pr.json" OPEN '[]' '[]'
+    out=$(FM_TEST_GH_UNFRAMED="$state" run_direct "$dir")
+    assert_silent "$out" "a short or malformed state response woke"
+    [ ! -e "$dir/home/state/task-a.pr-activity" ] || fail "a short or malformed state response seeded activity"
+  done
+  pass "bare MERGED, OPEN, and CLOSED remain compatible while malformed responses stay silent"
+}
+
 test_unicode_and_author_rendering() {
   local dir out kind author expected body
   for kind in comment review; do
@@ -535,3 +638,6 @@ test_failed_delivery_keeps_activity_retryable
 test_unsafe_cursor_siblings_are_refused
 test_bounded_activity_stays_unread
 test_unicode_and_author_rendering
+test_truncated_activity_marks_either_collection
+test_malformed_pagination_metadata_stays_silent
+test_bare_state_compatibility

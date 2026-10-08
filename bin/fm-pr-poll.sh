@@ -44,8 +44,8 @@ export LC_ALL
 
 # One bounded gh api graphql read, selected with gh's own query language so it does not
 # grow a jq binary dependency. Pending reviews are drafts, not submissions.
-POLL_ACTIVITY_QUERY="query(\$owner: String!, \$repo: String!, \$number: Int!) { repository(owner: \$owner, name: \$repo) { pullRequest(number: \$number) { state comments(first: 100) { nodes { id author { login } createdAt body } } reviews(first: 100) { nodes { id author { login } submittedAt state body } } } } }"
-POLL_ACTIVITY_JQ='.data.repository.pullRequest | "state=\(.state)", ((.comments.nodes // [])[] | select((.id|type)=="string" and .id != "") | ["comment", .id, (.author.login // "unknown"), (.createdAt // ""), ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200])] | join("\t")), ((.reviews.nodes // [])[] | select(.state != "PENDING" and (.state|type)=="string" and .state != "" and (.id|type)=="string" and .id != "") | ["review", .id, (.author.login // "unknown"), (.submittedAt // ""), (if ((.body // "") | gsub("[[:space:]]"; "") | length) == 0 then .state else ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200]) end)] | join("\t"))'
+POLL_ACTIVITY_QUERY="query(\$owner: String!, \$repo: String!, \$number: Int!) { repository(owner: \$owner, name: \$repo) { pullRequest(number: \$number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }"
+POLL_ACTIVITY_JQ='.data.repository.pullRequest | if ((.state|type)=="string" and (.comments.nodes|type)=="array" and (.reviews.nodes|type)=="array" and (.comments.pageInfo.hasNextPage|type)=="boolean" and (.reviews.pageInfo.hasNextPage|type)=="boolean") then "state=\(.state)", "truncated=\(.comments.pageInfo.hasNextPage or .reviews.pageInfo.hasNextPage)", (.comments.nodes[] | select((.id|type)=="string" and .id != "") | ["comment", .id, (.author.login // "unknown"), (.createdAt // ""), ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200])] | join("\t")), (.reviews.nodes[] | select(.state != "PENDING" and (.state|type)=="string" and .state != "" and (.id|type)=="string" and .id != "") | ["review", .id, (.author.login // "unknown"), (.submittedAt // ""), (if ((.body // "") | gsub("[[:space:]]"; "") | length) == 0 then .state else ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200]) end)] | join("\t")) else empty end'
 
 POLL_CHECK_PATH=
 if [ "$#" -eq 7 ] && [ "$1" = --validated ]; then
@@ -172,6 +172,10 @@ poll_state_of() {
 '*}
   case "$line" in
     state=*) state=${line#state=} ;;
+    MERGED|OPEN|CLOSED)
+      [ "$raw" = "$line" ] || return 1
+      state=$line
+      ;;
     *) return 1 ;;
   esac
   case "$state" in
@@ -310,6 +314,7 @@ poll_is_newer() {
 poll_parse_activity() {
   local raw=$1 line first=1 kind id author ts text rest
   POLL_ROWS=
+  POLL_TRUNCATED=
   POLL_READ_IDS=$'\n'
   while IFS= read -r line || [ -n "$line" ]; do
     if [ "$first" -eq 1 ]; then
@@ -318,6 +323,13 @@ poll_parse_activity() {
         state=*) continue ;;
         *) return 1 ;;
       esac
+    fi
+    if [ -z "$POLL_TRUNCATED" ]; then
+      case "$line" in
+        truncated=true|truncated=false) POLL_TRUNCATED=${line#truncated=} ;;
+        *) return 1 ;;
+      esac
+      continue
     fi
     [ -n "$line" ] || return 1
     case "$line" in
@@ -358,6 +370,7 @@ poll_parse_activity() {
     POLL_ROWS="${POLL_ROWS}${kind}"$'	'"${id}"$'	'"${author}"$'	'"${ts}"$'	'"${text}"$'
 '
   done < <(printf '%s' "$raw")
+  [ -n "$POLL_TRUNCATED" ]
 }
 
 poll_emit_github_activity() {
@@ -425,6 +438,9 @@ poll_emit_github_activity() {
   summary=$best_text
   if [ "$new_count" -gt 1 ]; then
     summary="$new_count new: $best_text"
+  fi
+  if [ "$POLL_TRUNCATED" = true ]; then
+    summary="truncated: $summary"
   fi
   printf 'pr-activity: %s %s %s: %s\n' "$url" "$best_kind" "$best_author" "$summary"
   return 0

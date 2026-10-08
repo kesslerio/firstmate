@@ -146,7 +146,7 @@ case "${1:-} ${2:-}" in
         [ "${FM_TEST_GH_FAIL:-0}" = 0 ] || exit 1
         [ -z "${FM_TEST_GH_STATE_STARTED:-}" ] || : > "$FM_TEST_GH_STATE_STARTED"
         [ "${FM_TEST_GH_SLEEP:-0}" = 0 ] || sleep "$FM_TEST_GH_SLEEP"
-        printf 'state=%s\n' "${FM_TEST_GH_STATE:-OPEN}"
+        printf 'state=%s\ntruncated=false\n' "${FM_TEST_GH_STATE:-OPEN}"
         exit 0
         ;;
     esac
@@ -3218,7 +3218,9 @@ SH
     || fail "re-recorded registration differs from the one published on the live device"
   [ "$(file_mode "$state/task-a.pr-poll-registration")" = 600 ] || fail "re-recorded registration is not private"
   fm_pr_poll_artifacts_valid "$state" task-a "$POLL" || fail "re-recorded poll is not strictly authenticated"
-  grep -F 'pr view https://github.com/o/r/pull/1 --json state' "$dir/gh.log" >/dev/null \
+  grep -F 'api graphql --hostname github.com -f query=' "$dir/gh.log" \
+    | grep -F 'comments(first: 100)' | grep -F 'reviews(first: 100)' \
+    | grep -F -- '-f owner=o -f repo=r -F number=1 --jq ' >/dev/null \
     || fail "re-recorded poll did not run its validated check in the same cycle"
   grep -F 're-recorded PR poll identity for task-a' "$state/.watch-triage.log" >/dev/null \
     || fail "re-record left no triage evidence"
