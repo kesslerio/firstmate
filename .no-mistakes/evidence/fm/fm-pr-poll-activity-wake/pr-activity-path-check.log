@@ -1,0 +1,18 @@
+
+SETUP CORRECTION: initial failure and crash retries stopped at the existing rearm-resurface handshake. Re-drive them through the real wake-drain and generation-bound acknowledgment interfaces before asserting delivery. No product changes.
+gh version 2.101.0 (2026-09-15)
+https://github.com/cli/cli/releases/tag/v2.101.0
+Actual gh and unmodified production scripts; disposable GraphQL TLS proxy on loopback; no production credentials or endpoint; watcher has no fleet backend available; jq absent from product PATH.
+
+SCENARIO: Unsafe cursor anchor paths cannot alter task state
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+refused cursor anchor: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/path-guards/state/../state/task-a.check.sh
+poll stdout=''; stderr=''; requests=1
+refused cursor anchor: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/path-guards/state/./task-a.check.sh
+poll stdout=''; stderr=''; requests=1
+refused cursor anchor: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/path-guards/state//task-a.check.sh
+poll stdout=''; stderr=''; requests=1
+refused cursor anchor: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/path-guards/linked/task-a.check.sh
+RESULT: pass
+Remaining live processes in watcher groups: []

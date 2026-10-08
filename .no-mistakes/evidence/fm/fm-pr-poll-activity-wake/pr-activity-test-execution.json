@@ -1,0 +1,19 @@
+{
+  "activity_test": {
+    "command": "TMPDIR=\"$PWD/.test-phase/tmp\" bash tests/fm-pr-poll-activity.test.sh",
+    "exit_code": 0
+  },
+  "security_test": {
+    "command": "TMPDIR=\"$PWD/.test-phase/tmp\" bash tests/fm-pr-check-security.test.sh",
+    "exit_code": 0
+  },
+  "live_commands": [
+    "python3 .test-phase/probe.py",
+    "python3 .test-phase/live.py",
+    "python3 .test-phase/live.py failed_append interrupted",
+    "python3 .test-phase/live.py paths"
+  ],
+  "setup_correction": "Initial append/crash retry assertions omitted the existing rearm-resurface recovery handshake. Real wake-drain and generation-bound acknowledgment completed it; both targeted re-drives passed. No product changes.",
+  "foreign_device_live_limit": "The worktree and permitted evidence directory both report device 16777233 via stat -f. The targeted security test covers device metadata mismatches but explicitly skips a real foreign-device file on Darwin. A disposable foreign filesystem cannot be created within the permitted boundary without host-level mount/FUSE changes, which are forbidden. Provide an already-mounted disposable filesystem accessible within the worktree to drive this guard live.",
+  "cleanup": "All disposable lab homes removed; no surviving watcher descendants; source unchanged."
+}

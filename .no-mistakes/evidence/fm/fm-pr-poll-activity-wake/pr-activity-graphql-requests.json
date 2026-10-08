@@ -1,0 +1,668 @@
+[
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  },
+  {
+    "request": "POST /graphql HTTP/1.1",
+    "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { state comments(first: 100) { nodes { id author { login } createdAt body } pageInfo { hasNextPage } } reviews(first: 100) { nodes { id author { login } submittedAt state body } pageInfo { hasNextPage } } } } }",
+    "variables": {
+      "number": 1,
+      "owner": "fixture",
+      "repo": "repo"
+    }
+  }
+]

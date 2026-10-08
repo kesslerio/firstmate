@@ -1,0 +1,28 @@
+{
+  "failed-append": {
+    "task-a.pr-activity": {
+      "mode": "0o600",
+      "content": "fm-pr-activity-v1\nhttps://github.com/fixture/repo/pull/1\nNEW\n"
+    },
+    ".wake-queue": {
+      "mode": "0o600",
+      "content": "1791487534\t1\tcheck\t/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/failed-append/state/task-a.check.sh\tcheck: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/failed-append/state/task-a.check.sh: pr-activity: https://github.com/fixture/repo/pull/1 comment a: retry note\n"
+    }
+  },
+  "interrupted": {
+    "task-a.pr-activity": {
+      "mode": "0o600",
+      "content": "fm-pr-activity-v1\nhttps://github.com/fixture/repo/pull/1\nNEW\n"
+    },
+    ".wake-queue": {
+      "mode": "0o600",
+      "content": "1791487546\t1\tcheck\t/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/interrupted/state/task-a.check.sh\tcheck: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/interrupted/state/task-a.check.sh: pr-activity: https://github.com/fixture/repo/pull/1 comment a: after crash\n"
+    }
+  },
+  "path-guards": {
+    "task-a.pr-activity": {
+      "mode": "0o600",
+      "content": "fm-pr-activity-v1\nhttps://github.com/fixture/repo/pull/1\n"
+    }
+  }
+}

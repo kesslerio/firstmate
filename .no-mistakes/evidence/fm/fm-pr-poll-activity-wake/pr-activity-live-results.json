@@ -1,0 +1,58 @@
+[
+  {
+    "name": "First sight, missing anchor, and URL reseeding are silent",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "A new comment queues once, preserves text, and suppresses replay",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Submitted reviews wake once while drafts and edits remain silent",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Bounded collections mark delivered activity truncated",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Forge and parsing failures leave the cursor unchanged",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Unsafe cursor siblings and unauthenticated checks are refused",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Merge output remains exactly merged without activity cursor writes",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Failed queue append preserves activity for retry",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Watcher crash before durable queue cannot drop staged activity",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Unsafe cursor anchor paths cannot alter task state",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "A cursor on a different filesystem device is refused",
+    "result": "untested",
+    "live": false,
+    "reason": "The worktree and permitted evidence directory both report device 16777233 via stat -f. The targeted security test covers device metadata mismatches but explicitly skips a real foreign-device file on Darwin. A disposable foreign filesystem cannot be created within the permitted boundary without host-level mount/FUSE changes, which are forbidden. Provide an already-mounted disposable filesystem accessible within the worktree to drive this guard live."
+  }
+]

@@ -1,0 +1,163 @@
+gh version 2.101.0 (2026-09-15)
+https://github.com/cli/cli/releases/tag/v2.101.0
+Actual gh and unmodified production scripts; disposable GraphQL TLS proxy on loopback; no production credentials or endpoint; watcher has no fleet backend available; jq absent from product PATH.
+
+SCENARIO: First sight, missing anchor, and URL reseeding are silent
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+first sight and URL-mismatch seed silently; missing anchor leaves no cursor; mode=0600
+RESULT: pass
+
+SCENARIO: A new comment queues once, preserves text, and suppresses replay
+poll stdout=''; stderr=''; requests=1
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 comment a: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx😀\n'; stderr=''; requests=1
+watcher exit=0; stdout='check: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/comments/state/task-a.check.sh: pr-activity: https://github.com/fixture/repo/pull/1 comment a: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx😀\n'; stderr=''
+poll stdout=''; stderr=''; requests=1
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 comment unknown: hello $(touch /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/comments/executed)\n'; stderr=''; requests=1
+valid UTF-8 200-character output; one-character login; unknown author; literal shell text; queued then committed; replay silent
+RESULT: pass
+
+SCENARIO: Submitted reviews wake once while drafts and edits remain silent
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 review b: 2 new: CHANGES_REQUESTED\n'; stderr=''; requests=1
+watcher exit=0; stdout='check: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/reviews/state/task-a.check.sh: pr-activity: https://github.com/fixture/repo/pull/1 review b: 2 new: CHANGES_REQUESTED\n'; stderr=''
+poll stdout=''; stderr=''; requests=1
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 review b: approved\n'; stderr=''; requests=1
+pending draft suppressed; submitted batch is one line; edits do not wake; later submitted approval wakes
+RESULT: pass
+
+SCENARIO: Failed queue append preserves activity for retry
+poll stdout=''; stderr=''; requests=1
+watcher exit=1; stdout=''; stderr='/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/bin/fm-wake-lib.sh: line 2168: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/failed-append/state/.wake-queue.seq: Is a directory\n'
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 comment a: retry note\n'; stderr=''; requests=1
+watcher exit=0; stdout='check: rearm-resurface\n'; stderr=''
+RESULT: fail FileNotFoundError(2, 'No such file or directory')
+
+SCENARIO: Watcher crash before durable queue cannot drop staged activity
+poll stdout=''; stderr=''; requests=1
+watcher stopped before capture handoff, poll staged NEW, process group killed; exit=-9
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 comment a: after crash\n'; stderr=''; requests=1
+watcher exit=0; stdout='check: rearm-resurface\n'; stderr=''
+RESULT: fail AssertionError()
+
+SCENARIO: Bounded collections mark delivered activity truncated
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 review b: truncated: bounded note\n'; stderr=''; requests=1
+watcher exit=0; stdout='check: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/bounded-comment/state/task-a.check.sh: pr-activity: https://github.com/fixture/repo/pull/1 review b: truncated: bounded note\n'; stderr=''
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 comment a: truncated: bounded note\n'; stderr=''; requests=1
+watcher exit=0; stdout='check: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/bounded-review/state/task-a.check.sh: pr-activity: https://github.com/fixture/repo/pull/1 comment a: truncated: bounded note\n'; stderr=''
+poll stdout=''; stderr=''; requests=1
+both collections limited to 100; unread items never recorded or wake; either hasNextPage marks delivered activity truncated; one request per sweep
+RESULT: pass
+
+SCENARIO: Forge and parsing failures leave the cursor unchanged
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+missing pageInfo: silent and unchanged
+poll stdout=''; stderr=''; requests=1
+nonboolean pageInfo: silent and unchanged
+poll stdout=''; stderr=''; requests=1
+short JSON: silent and unchanged
+poll stdout=''; stderr=''; requests=1
+invalid JSON: silent and unchanged
+poll stdout=''; stderr=''; requests=1
+GraphQL error: silent and unchanged
+poll stdout=''; stderr=''; requests=1
+HTTP error: silent and unchanged
+poll stdout=''; stderr=''; requests=1
+duplicate IDs: silent and unchanged
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 comment a: recovered\n'; stderr=''; requests=1
+RESULT: pass
+
+SCENARIO: Unsafe cursor siblings and unauthenticated checks are refused
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+symlink cursor: refused without touching sentinel
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+hardlink cursor: refused without touching sentinel
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+mode cursor: refused without touching sentinel
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+directory cursor: refused without touching sentinel
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+symlink cursor.pending: refused without touching sentinel
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+hardlink cursor.pending: refused without touching sentinel
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+mode cursor.pending: refused without touching sentinel
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+directory cursor.pending: refused without touching sentinel
+watcher exit=0; stdout='check: rejected unauthenticated state checks: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/tamper-check/state/task-a.check.sh\n'; stderr=''
+tampered registered check rejected before forge read
+RESULT: pass
+
+SCENARIO: Merge output remains exactly merged without activity cursor writes
+poll stdout=''; stderr=''; requests=1
+poll stdout='merged\n'; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+merged output exactly merged; no cursor change; closed state silent
+RESULT: pass
+Remaining live processes in watcher groups: []
+
+SETUP CORRECTION: initial failure and crash retries stopped at the existing rearm-resurface handshake. Re-drive them through the real wake-drain and generation-bound acknowledgment interfaces before asserting delivery. No product changes.
+gh version 2.101.0 (2026-09-15)
+https://github.com/cli/cli/releases/tag/v2.101.0
+Actual gh and unmodified production scripts; disposable GraphQL TLS proxy on loopback; no production credentials or endpoint; watcher has no fleet backend available; jq absent from product PATH.
+
+SCENARIO: Failed queue append preserves activity for retry
+poll stdout=''; stderr=''; requests=1
+watcher exit=1; stdout=''; stderr='/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/bin/fm-wake-lib.sh: line 2168: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/failed-append/state/.wake-queue.seq: Is a directory\n'
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 comment a: retry note\n'; stderr=''; requests=1
+watcher exit=0; stdout='check: rearm-resurface\n'; stderr=''
+recovery drain exit=0; stdout=''; stderr='WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 28585.1791487526.nkpl3m\n●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n●  WATCHER DOWN - SUPERVISION IS OFF\n●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).\n●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.\n●  This is a supervision warning only; the guarded operation WILL still run.\n●  repair missing watcher supervision with a foreground checkpoint: bin/fm-watch-checkpoint.sh --seconds 180.\n●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+recovery acknowledgment exit=0; stdout=''; stderr=''
+watcher exit=0; stdout='check: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/failed-append/state/task-a.check.sh: pr-activity: https://github.com/fixture/repo/pull/1 comment a: retry note\n'; stderr=''
+poll stdout=''; stderr=''; requests=1
+failed durable append preserves committed cursor; repaired queue delivers and commits the same activity
+RESULT: pass
+
+SCENARIO: Watcher crash before durable queue cannot drop staged activity
+poll stdout=''; stderr=''; requests=1
+watcher stopped before capture handoff, poll staged NEW, process group killed; exit=-9
+poll stdout='pr-activity: https://github.com/fixture/repo/pull/1 comment a: after crash\n'; stderr=''; requests=1
+watcher exit=0; stdout='check: rearm-resurface\n'; stderr=''
+recovery drain exit=0; stdout=''; stderr='WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 88002.1791487540.HtJ57v\n●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n●  WATCHER DOWN - SUPERVISION IS OFF\n●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).\n●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.\n●  This is a supervision warning only; the guarded operation WILL still run.\n●  repair missing watcher supervision with a foreground checkpoint: bin/fm-watch-checkpoint.sh --seconds 180.\n●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+recovery acknowledgment exit=0; stdout=''; stderr=''
+watcher exit=0; stdout='check: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/interrupted/state/task-a.check.sh: pr-activity: https://github.com/fixture/repo/pull/1 comment a: after crash\n'; stderr=''
+poll stdout=''; stderr=''; requests=1
+RESULT: pass
+Remaining live processes in watcher groups: []
+
+SETUP CORRECTION: initial failure and crash retries stopped at the existing rearm-resurface handshake. Re-drive them through the real wake-drain and generation-bound acknowledgment interfaces before asserting delivery. No product changes.
+gh version 2.101.0 (2026-09-15)
+https://github.com/cli/cli/releases/tag/v2.101.0
+Actual gh and unmodified production scripts; disposable GraphQL TLS proxy on loopback; no production credentials or endpoint; watcher has no fleet backend available; jq absent from product PATH.
+
+SCENARIO: Unsafe cursor anchor paths cannot alter task state
+poll stdout=''; stderr=''; requests=1
+poll stdout=''; stderr=''; requests=1
+refused cursor anchor: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/path-guards/state/../state/task-a.check.sh
+poll stdout=''; stderr=''; requests=1
+refused cursor anchor: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/path-guards/state/./task-a.check.sh
+poll stdout=''; stderr=''; requests=1
+refused cursor anchor: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/path-guards/state//task-a.check.sh
+poll stdout=''; stderr=''; requests=1
+refused cursor anchor: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4EB6PH5HBE0EJC90N84Y25W/.test-phase/path-guards/linked/task-a.check.sh
+RESULT: pass
+Remaining live processes in watcher groups: []
+
+LIVE LIMITATION: The worktree and permitted evidence directory both report device 16777233 via stat -f. The targeted security test covers device metadata mismatches but explicitly skips a real foreign-device file on Darwin. A disposable foreign filesystem cannot be created within the permitted boundary without host-level mount/FUSE changes, which are forbidden. Provide an already-mounted disposable filesystem accessible within the worktree to drive this guard live.
