@@ -3016,6 +3016,10 @@ test_superseded_host_leaves_the_owner_untouched() {
   pass "host: a host under a superseded auto-arm generation stands down without touching the owner"
 }
 
+# Keep each serial CI runner below its job timeout without dropping assertions.
+# The companion script sources these fixtures and executes the second group.
+case ${FM_SUPERVISION_HOST_TEST_GROUP:-early} in
+early)
 test_claude_stop_hook_restores_handoff_when_successor_closed_before_exit_to_main
 test_claude_stop_hook_restores_handoff_when_successor_closed_mid_engine_turn
 test_claude_stop_hook_notifies_when_closed_successor_downtime_restore_fails
@@ -3072,6 +3076,8 @@ test_return_during_an_engine_turn_hands_its_outcomes_to_main
 test_silent_outcomes_are_not_relayed_when_the_captain_returns
 test_large_turn_relays_an_early_visible_outcome
 test_outcome_lookup_failure_is_not_treated_as_silence
+;;
+late)
 test_outcome_after_the_return_survives_a_host_killed_at_the_turn_end
 test_next_host_clears_a_turn_its_killed_predecessor_left
 test_report_without_acknowledgement_hands_the_wake_to_main
@@ -3093,3 +3099,6 @@ test_unchanged_held_outcome_reaches_the_captain_once_until_a_new_event
 test_unverified_engine_hands_every_away_wake_to_main
 test_host_outside_the_lock_owner_stands_down
 test_superseded_host_leaves_the_owner_untouched
+;;
+*) fail "unknown supervision-host test group: $FM_SUPERVISION_HOST_TEST_GROUP" ;;
+esac
