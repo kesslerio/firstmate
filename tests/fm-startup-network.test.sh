@@ -3,24 +3,11 @@
 # the deferred startup stage a session start launches instead of running its
 # network work or inactive-outcome scan on the blocking path.
 #
-# The session-start suite proves the digest no longer waits and that the deferred
-# sweeps still land. This suite pins the stage's own contract, whose whole job is
-# to make deferral safe:
-#   - `start` returns immediately and does not hold the caller's stdout open,
-#     which is what would strand a session-open hook behind the worker
-#   - a durable acknowledgement after harvest prints a finished result suppresses
-#     the wake, while an unacknowledged result always produces one
-#   - mutating sweeps are refused when the fleet lock no longer names the session
-#     that requested them, and the refusal is reported rather than silent
-#   - the aggregate bound turns a wedged sweep into an actionable line
-#   - an abandoned `running` record is reported as needing a rerun rather than
-#     staying "in progress" forever
-#   - phase-aware single-flight: a covering worker is reused, while a later
-#     locked request supersedes an in-flight probe-only worker
-#   - a publish lock a live process holds past the budget ends the worker with a
-#     failed-rerun record instead of an unbounded wait
-#   - a live claimant, a live lease holder, a late publication lock, or a nested
-#     wake lock cannot keep the worker alive past its budget or duplicate a wake
+# bin/fm-startup-network.sh's header owns the stage's contract and delivery limits.
+# This suite covers detached stdout, inline acknowledgement, mutation leases,
+# phase-aware single-flight, abandoned runs, bounded checks and lock contention,
+# retained-report recovery, generation ownership, and matching report timings.
+# tests/fm-session-start.test.sh covers integration with the digest.
 set -u
 
 # shellcheck source=tests/lib.sh
@@ -763,17 +750,17 @@ test_a_bounded_run_still_publishes_the_timings_it_managed_to_record() {
   IFS='|' read -r home root log <<EOF
 $rec
 EOF
-  printf '%s\n' $$ > "$home/state/.lock"
-
-  FM_STARTUP_NETWORK_TIMEOUT=1 FM_SESSION_START_TIMEOUT=2 \
+  # Isolate the timed probe: a preceding inactive scan can consume the entire
+  # bound before bootstrap records anything, which would not test retention.
+  FM_STARTUP_NETWORK_TIMEOUT=2 FM_SESSION_START_TIMEOUT=2 \
     FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_SLEEP=20 \
     FM_FAKE_TIMING_PHASE=secondmate-liveness FM_FAKE_TIMING_DETAIL='mate-a@host-one' \
-    run_stage "$home" "$root" run --locked 1
+    run_stage "$home" "$root" run --locked 0
 
   [ "$(sed -n 's/^state=//p' "$home/state/.startup-network.status")" = timeout ] \
     || fail "the bounded run did not record itself as timed out"
   report_out=$(run_stage "$home" "$root" report)
-  assert_contains "$report_out" "hit the 1s bound" "the bound stopped being reported"
+  assert_contains "$report_out" "hit the 2s bound" "the bound stopped being reported"
   assert_contains "$report_out" "secondmate-liveness mate-a@host-one" \
     "a timed-out run discarded the partial timings its sweeps had already recorded"
   pass "fm-startup-network: a timed-out run still publishes the partial timings it recorded"
