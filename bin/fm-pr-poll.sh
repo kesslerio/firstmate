@@ -3,13 +3,21 @@
 # change poll sidecar.
 # It emits exactly one merged line for a merged change and stays silent on
 # every error, so a failed lookup can never be read as a merge.
-# A GitHub read of that same single gh api graphql call also reports new top-level
-# pull request comments and submitted reviews.
+# The same single GitHub gh api graphql read also reports new top-level pull
+# request comments and submitted reviews, excluding pending review drafts.
+# It requests the first 100 comments and first 100 reviews without pagination,
+# using gh's own --jq rather than requiring a jq binary.
+# Items beyond either bound remain unread and cannot trigger an activity wake.
 # One new group in a sweep is one activity line, never one line per comment:
 # pr-activity: <url> <kind> <author>: <first line>
 # kind is comment or review.
 # When the sweep has more than one new item, that first line is prefixed with
 # "<count> new:" and the kind, author, and text are the newest item's.
+# If either collection's pageInfo.hasNextPage is true, an emitted activity
+# summary is additionally prefixed with "truncated:"; unread pages alone do
+# not wake, and malformed or incomplete activity responses stay silent.
+# A single bare MERGED, OPEN, or CLOSED response remains valid for state
+# compatibility, but carries no activity data and never writes either cursor.
 # The first line is the body up to its first newline, with ASCII controls
 # removed, trimmed, and capped at 200 characters.
 # An empty review body uses the review state instead, so a changes-requested
@@ -24,13 +32,18 @@
 # and the pull request URL and does not wake, so pre-existing history is silent.
 # A later sweep wakes only for ids not in the cursor, staging them in
 # <stem>.pr-activity.pending until the watcher queues the wake and commits them.
-# Replaying the same items emits nothing.
-# Cursor file lines are fm-pr-activity-v1, the pull request URL, then one id.
+# Failed queue delivery or interruption before commit leaves activity retryable;
+# interruption after queueing can produce a duplicate wake on the next sweep.
+# After commit, replaying the same items emits nothing.
+# Cursor file lines are fm-pr-activity-v1, the pull request URL, then one item id
+# per remaining line.
 # A missing anchor, a parse miss, a forge error, a symlink cursor, a hard link,
 # or a path with an empty, dot, or dot-dot component stays silent and does not
 # wake or write through the bad path.
 # A cursor whose stored URL does not match this pull request is reseeded
 # without a wake.
+# A merged result emits only merged and leaves both cursor files untouched.
+# tests/fm-pr-poll-activity.test.sh covers activity, bounds, and delivery ordering.
 # GitLab and Gerrit stay merge-only: their one standard-CLI read does not
 # expose comments without a second call or a JSON tool the GitLab path does
 # not require.

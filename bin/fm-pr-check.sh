@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Record a PR-ready task: store one validated canonical pr=<url> and the forge's
-# exact pr_head=<sha> when available, then atomically arm a static merge poll.
+# exact pr_head=<sha> when available, then atomically arm a static PR poll.
 # Refuses when bin/fm-dod-lib.sh will not accept the named head as reachable
 # outside the worker's disposable copy; in no-mistakes mode a forge-reported
 # head is that named head and is already stored on the forge.
@@ -224,7 +224,8 @@ fi
   || FM_HOME=$FM_HOME FM_STATE_OVERRIDE=$STATE "$SCRIPT_DIR/fm-fleet-ledger.sh" pr_ready "$ID" "$URL" || true
 # The contribution observer uses the same authenticated check mechanism and
 # owns verdict freshness, required actors and external feedback separately from
-# the exact merged-state poll. Registration is local and performs no forge read.
+# the static task PR poll (bin/fm-pr-poll.sh owns its activity contract).
+# Registration is local and performs no forge read.
 if command -v jq >/dev/null 2>&1; then
   "$SCRIPT_DIR/fm-contributions.sh" arm >/dev/null \
     || printf 'contributions: observation not armed; coverage is unconfirmed\n' >&2
