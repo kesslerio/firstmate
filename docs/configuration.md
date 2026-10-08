@@ -801,12 +801,26 @@ When it is absent or contains `default`, crewmates mirror the firstmate's own ha
 ### Choose the secondmate harness
 
 `config/secondmate-harness` is a separate local, gitignored file containing the adapter the primary uses to launch secondmate agents, optionally followed by model and effort tokens on the same line.
-The first non-empty, non-comment line is parsed as `<harness> [<model>] [<effort>]`.
+The first non-empty, non-comment line is the default line, parsed as `<harness> [<model>] [<effort>]`.
+An optional additional line pins one named secondmate rather than the whole home:
+
+```text
+mate <secondmate-id>: <harness> [<model>] [<effort>]
+```
+
+A mate line replaces the default line for that exact secondmate id, so raising the default pin cannot migrate a mate the captain pinned separately.
+Precedence is the override for that mate's id, then the default line, then `config/crew-harness`, then the primary's own harness.
+An override whose harness token is `default` defers to that chain and contributes no model or effort, exactly as a `default` default line does.
+Blank lines and `#` comments stay legal anywhere, and a mate line is honored wherever it sits in the file.
+A second default line, two overrides for one id, an override with no tokens or more than three, or a `mate` keyword naming an invalid secondmate id is an actionable error: resolution exits nonzero naming the file's line number and prints no token, so malformed pin config cannot resolve to a fallback in silence.
 
 A bare `<harness>` preserves the previous behavior: harness only, with no model or effort launch flag.
 When the harness token is absent or `default`, secondmate launch falls back through `config/crew-harness` and then the primary's own harness, and no model or effort is read from that file.
 
-`fm-harness.sh secondmate-model` and `fm-harness.sh secondmate-effort` expose only the optional tokens from `config/secondmate-harness`; `config/crew-harness` remains a bare adapter-name file.
+`fm-harness.sh secondmate`, `fm-harness.sh secondmate-model`, and `fm-harness.sh secondmate-effort` each accept the secondmate id as an optional second argument and read the same file for it.
+Without that argument they resolve the default line only, exactly as before, and empty output still means no token.
+Every resolution site that knows which mate it is launching passes that id, so spawn, control-plane relaunch, and secondmate restart all land on one decision.
+`config/crew-harness` remains a bare adapter-name file and is never parsed for a model.
 Changing this pin affects the next secondmate spawn or control-plane relaunch; the relaunch profile rules are owned by [`docs/agent-control.md`](agent-control.md#transactional-relaunch).
 
 ### Per-launch overrides and inherited defaults
