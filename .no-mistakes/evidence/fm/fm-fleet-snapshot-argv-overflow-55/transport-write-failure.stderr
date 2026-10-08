@@ -1,0 +1,3 @@
+bin/fm-fleet-snapshot.sh: line 2002: printf: File too large
+bin/fm-fleet-snapshot.sh: line 2002: printf: write error: File too large
+fm-fleet-snapshot: contribution backlog write failed

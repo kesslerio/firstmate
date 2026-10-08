@@ -1,0 +1,60 @@
+{
+  "backlog": {
+    "present": true,
+    "records": [
+      {
+        "blocked_by": null,
+        "hold_kind": null,
+        "priority": null,
+        "current_role": "queued",
+        "captain_actionable": false,
+        "state": "queued",
+        "checked": false,
+        "hold_bucket": null,
+        "title": "Unicode café \"quoted\" \\ text",
+        "unresolved_blocker_ids": [],
+        "since": null,
+        "id": "sample",
+        "hold_set": null,
+        "merged": null,
+        "hold_until": null,
+        "links": [
+          "https://github.com/example/repo/pull/1"
+        ],
+        "raw": "- [ ] sample - Unicode café \"quoted\" \\ text https://github.com/example/repo/pull/1 (repo: sample) (kind: ship)",
+        "requires_child_metadata": false,
+        "repo": "sample",
+        "local_note": null,
+        "report_path": null,
+        "reported": null,
+        "kind": "ship",
+        "body_excerpt": null,
+        "blocked_by_ids": [],
+        "pr_url": "https://github.com/example/repo/pull/1",
+        "structured": true,
+        "hold_age_days": null,
+        "body_lines": [],
+        "completion": {
+          "verb": null,
+          "date": null
+        },
+        "order": 1,
+        "blocked_reason": null,
+        "hold_reason": null,
+        "done": null
+      }
+    ],
+    "path": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4CK3M44RTV3MR0ZCWQ01TRK/.contribution-live-jc987gsl/data/backlog.md"
+  },
+  "tasks": [
+    {
+      "id": "sample",
+      "kind": "ship",
+      "pr": {
+        "url": "https://github.com/example/repo/pull/1",
+        "head": "abc123"
+      },
+      "merge_authority": "attended"
+    }
+  ]
+}

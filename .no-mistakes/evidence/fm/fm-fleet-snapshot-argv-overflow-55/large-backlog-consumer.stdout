@@ -1,0 +1,19 @@
+{
+  "known": 400,
+  "checked": 0,
+  "counts": {
+    "captain": 0,
+    "fleet": 400,
+    "maintainer": 0,
+    "nobody": 0
+  },
+  "unmeasured": 0,
+  "complete": false,
+  "proven_clear": false,
+  "stale_verdicts": 0,
+  "missing_verdicts": 0,
+  "unreadable_records": 0,
+  "valid_until": 900,
+  "captain": [],
+  "captain_omitted": 0
+}

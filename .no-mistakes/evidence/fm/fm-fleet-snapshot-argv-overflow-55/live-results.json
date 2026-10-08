@@ -1,0 +1,155 @@
+[
+  {
+    "command": [
+      "bash",
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4CK3M44RTV3MR0ZCWQ01TRK/bin/.contribution-baseline.sh",
+      "--contribution-input"
+    ],
+    "label": "small-before",
+    "exit": 0,
+    "stdout_bytes": 1658,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-fleet-snapshot.sh",
+      "--contribution-input"
+    ],
+    "label": "small-after",
+    "exit": 0,
+    "stdout_bytes": 1658,
+    "stderr": ""
+  },
+  {
+    "scenario": "small ownership pair preserves exact JSON semantics and cleans transport",
+    "result": "pass"
+  },
+  {
+    "command": [
+      "bash",
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4CK3M44RTV3MR0ZCWQ01TRK/bin/.contribution-baseline.sh",
+      "--contribution-input"
+    ],
+    "label": "large-backlog-before",
+    "exit": 0,
+    "stdout_bytes": 0,
+    "stderr": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4CK3M44RTV3MR0ZCWQ01TRK/bin/.contribution-baseline.sh: line 1997: /run/current-system/sw/bin/jq: Argument list too long\n"
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-fleet-snapshot.sh",
+      "--contribution-input"
+    ],
+    "label": "large-backlog-after",
+    "exit": 0,
+    "stdout_bytes": 495361,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-contributions.sh",
+      "snapshot",
+      "/home/art/.no-mistakes/evidence/01M4CK3M44RTV3MR0ZCWQ01TRK/large-backlog-after.stdout"
+    ],
+    "label": "large-backlog-consumer",
+    "exit": 0,
+    "stdout_bytes": 330,
+    "stderr": ""
+  },
+  {
+    "scenario": "400-row backlog exceeds 128 KiB and reaches real contribution consumer",
+    "result": "pass",
+    "backlog_json_bytes": 363906,
+    "known": 400
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-bearings-snapshot.sh",
+      "--json"
+    ],
+    "label": "large-backlog-bearings",
+    "exit": 0,
+    "stdout_bytes": 5065,
+    "stderr": ""
+  },
+  {
+    "scenario": "Bearings shows contributions for a large backlog",
+    "result": "pass"
+  },
+  {
+    "command": [
+      "bash",
+      "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4CK3M44RTV3MR0ZCWQ01TRK/bin/.contribution-baseline.sh",
+      "--contribution-input"
+    ],
+    "label": "large-tasks-before",
+    "exit": 0,
+    "stdout_bytes": 0,
+    "stderr": "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4CK3M44RTV3MR0ZCWQ01TRK/bin/.contribution-baseline.sh: line 1997: /run/current-system/sw/bin/jq: Argument list too long\n"
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-fleet-snapshot.sh",
+      "--contribution-input"
+    ],
+    "label": "large-tasks-after",
+    "exit": 0,
+    "stdout_bytes": 150988,
+    "stderr": ""
+  },
+  {
+    "scenario": "task document exceeds 128 KiB and preserves every metadata value",
+    "result": "pass",
+    "tasks_json_bytes": 150545
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-fleet-snapshot.sh",
+      "--contribution-input"
+    ],
+    "label": "missing-backlog",
+    "exit": 0,
+    "stdout_bytes": 210,
+    "stderr": ""
+  },
+  {
+    "scenario": "absent backlog and empty fleet remain valid empty ownership JSON",
+    "result": "pass"
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-fleet-snapshot.sh",
+      "--contribution-input"
+    ],
+    "label": "transport-write-failure",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr": "bin/fm-fleet-snapshot.sh: line 2002: printf: File too large\nbin/fm-fleet-snapshot.sh: line 2002: printf: write error: File too large\nfm-fleet-snapshot: contribution backlog write failed\n"
+  },
+  {
+    "scenario": "failed transport write reports failure, emits no JSON, and removes temporary files",
+    "result": "pass"
+  },
+  {
+    "command": [
+      "bash",
+      "bin/fm-fleet-snapshot.sh",
+      "--contribution-input"
+    ],
+    "label": "transport-creation-failure",
+    "exit": 1,
+    "stdout_bytes": 0,
+    "stderr": "mktemp: failed to create directory via template \u2018/home/art/.no-mistakes/worktrees/9f75ec418609/01M4CK3M44RTV3MR0ZCWQ01TRK/.contribution-live-jc987gsl/does-not-exist/fm-fleet-snapshot.contrib.XXXXXX\u2019: No such file or directory\nfm-fleet-snapshot: contribution temp dir failed\n"
+  },
+  {
+    "scenario": "unavailable temporary directory reports failure without a misleading empty result",
+    "result": "pass"
+  }
+]
