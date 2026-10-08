@@ -1,0 +1,37 @@
+{
+  "id": "b2a7afd0-16e1-4623-840a-b0fc20ccac66",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "    Globbing 2 globs",
+        "    Globbing \"**/own-live.inbox/**/*\" in .",
+        "    Globbing \"**/*.msg\" in .",
+        "  For this delivery check, write the integers from 1 to 600, separated by commas. Do not use tools.",
+        " ┌─ follow-ups ─────────────────────────────────────────────────────────────────────────────────────────────────────┐",
+        " │ ○ : Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg in your 'busy-live.inbox' steering inbox, read    │",
+        " │   and act on each in numeric order, then mv each into its handled/.: Firstmate instruction waiting: list…        │",
+        " │ +2 more lines · ↑ to edit                                                                                        │",
+        " └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘",
+        "  → For this delivery check, write the integers from 1 to 600, separated by commas. Do not use",
+        "    tools.HEALTHY_BYTES_64A",
+        "  Ask (shift+tab to cycle)",
+        "  Auto · 12.3%",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  · fm-transport-live"
+      ],
+      "truncated": true,
+      "limited": false,
+      "oldestCursor": "1622",
+      "nextCursor": "3622",
+      "latestCursor": "3622",
+      "returnedLineCount": 15,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "owned_app_pid": 75729,
+  "recorded_descendants_stopped": true,
+  "lab_terminals_closed": true,
+  "lab_worktrees_removed": true,
+  "unrelated_runtime_failure_refused_retarget": true,
+  "actual_commands": [
+    [
+      "terminal",
+      "send",
+      "--terminal",
+      "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "--text",
+      "NEVER_DELIVER_AFTER_SHUTDOWN",
+      "--json"
+    ]
+  ]
+}

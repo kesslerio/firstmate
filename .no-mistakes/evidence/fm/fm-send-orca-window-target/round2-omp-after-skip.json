@@ -1,0 +1,40 @@
+{
+  "id": "d6b8ccfe-1d40-4fb9-b6e6-60c26dc1cc29",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_0c62ebe0-3338-48cd-abb6-721e4adcccf2",
+      "status": "running",
+      "tail": [
+        "                                                      \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588",
+        "                                                         \u2588\u2588  \u2588\u2588",
+        "                                                         \u2588\u2588  \u2588\u2588",
+        "                                                         \u2592\u2592  \u2588\u2588",
+        "                                                             \u2588\u2588",
+        "                                                          omp",
+        "                                                   Setup step 1 of 5",
+        "    Sign in to your providers",
+        "    Sign in to one or more providers. Press \u238b when you're done.",
+        "    Signing in to openai-codex",
+        "    Browser login: Open login URL (clipboard copy attempted; \u2325C retries)",
+        "    Paste the authorization code (or full redirect URL):",
+        "    >",
+        "    .connectors.invoke&code_challenge=MUaTH_ESQGXvm9k09J0uANQcYc_MZ-f25xSTlzf47v4&code_challenge_method=S256&state=1",
+        "    A browser window should open. Complete login to finish.",
+        "    Paste the returned code or redirect URL when prompted.",
+        "    Waiting for browser authentication...",
+        "                                    \u2191/\u2193 select \u00b7 \u23ce confirm \u00b7 \u238b skip \u00b7 \u2303C exit setup"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "40",
+      "latestCursor": "40",
+      "returnedLineCount": 23,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "50c1a69a-ddd6-4f17-b289-fff0ade2e5ed"
+  }
+}

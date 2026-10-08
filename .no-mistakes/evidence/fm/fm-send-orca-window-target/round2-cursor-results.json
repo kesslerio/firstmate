@@ -1,0 +1,25 @@
+{
+  "results": [
+    {
+      "scenario": "human draft untouched",
+      "pass": true,
+      "stderr": "fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l\nWARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.\nfm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/round2-live.inbox/002.msg and the watcher will re-ring\n",
+      "durable_record": "002.msg"
+    },
+    {
+      "scenario": "own doorbell not duplicated or submitted while composer unknown",
+      "pass": true,
+      "ring_return": 1
+    },
+    {
+      "scenario": "stale typed steer, Enter and C-c reach replacement",
+      "pass": true,
+      "original_error": "terminal_handle_stale"
+    }
+  ],
+  "metadata_before": "0a1410b10af70ac4a73f23b2b0949fe36792b09676e1a05e952835552c93cc8e",
+  "metadata_after": "0a1410b10af70ac4a73f23b2b0949fe36792b09676e1a05e952835552c93cc8e",
+  "live_handle": "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4",
+  "recorded_handle": "term_cc38ac43-c623-4736-ba37-73c5a7fb6ed6",
+  "busy_marker_observed": false
+}

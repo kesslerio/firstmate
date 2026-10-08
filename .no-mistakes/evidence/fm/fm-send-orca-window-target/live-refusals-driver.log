@@ -1,0 +1,11 @@
+['orca', 'terminal', 'create'] 0
+['bin/fm-send.sh', 'term_d4ca534c-5a26-4771-9b22-9c5e6ba82cfc', "printf 'MISDELIVERY_MISSING_4D7\\n'"] 1
+['bin/fm-send.sh', 'missing-live', '--key'] 1
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'term_78d67ea8-c735-4f56-b808-8e2913c7ea6f', "printf 'MISDELIVERY_AMBIGUOUS_4D7\\n'"] 1
+['bin/fm-send.sh', 'transport-live', '--key'] 1
+['orca', 'terminal', 'read'] 0
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'transport-live', '--key'] 1
+['orca', 'terminal', 'close'] 0
+REFUSALS_COMPLETE

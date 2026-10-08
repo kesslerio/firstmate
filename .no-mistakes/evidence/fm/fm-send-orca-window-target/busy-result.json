@@ -1,0 +1,8 @@
+{
+  "real_TUI_busy_before_ring": true,
+  "backend_busy_verdict": "unknown",
+  "ring_exit": 0,
+  "busy_doorbell_occurrences_after": 1,
+  "input_deferred": false,
+  "metadata_unchanged": true
+}

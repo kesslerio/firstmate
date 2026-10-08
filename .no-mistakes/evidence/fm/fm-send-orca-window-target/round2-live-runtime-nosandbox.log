@@ -1,0 +1,62 @@
+[daemon] Preserving daemon that could not be inspected: reason=identity_probe_failed
+[daemon] DEGRADED MODE: adopting a daemon that could not be confirmed stopped. Existing sessions keep working; fresh terminals run on the local provider WITHOUT daemon persistence until you restart the daemon (Manage Sessions → Restart).
+[daemon] STARTUP FAILED — falling back to local PTYs; terminals will not persist across quit. Reason: Daemon replacement aborted: the existing daemon could not be confirmed stopped
+[serve] orca CLI install: installed (/opt/homebrew/bin/orca)
+{"type":"orca_server_ready","schemaVersion":1,"runtimeId":"772dd3ee-d8da-489b-bd92-7d29614610c3","endpoint":"ws://0.0.0.0:17689","boundEndpoint":"ws://0.0.0.0:17689","advertisedEndpoint":"ws://127.0.0.1:17689","managedWslCliReconciliation":"settled","pairing":{"available":false,"reason":"disabled_by_operator","guidance":"Restart without --no-pairing to create a client pairing offer."}}
+[81646:1008/133131.049055:ERROR:net/cert/internal/trust_store_mac.cc:807] Error parsing certificate:
+ERROR: Failed parsing extensions
+
+[agent-state-rules] download failed: HTTP 404
+[app-icon] failed to clear macOS dock icon: Error: Command failed: /usr/bin/osascript -e use framework "AppKit" -e use scripting additions -e set appPath to system attribute "ORCA_APP_BUNDLE_PATH" -e set ok to current application's NSWorkspace's sharedWorkspace()'s setIcon:(missing value) forFile:appPath options:0 -e if ok is false then error "Orca app icon could not be cleared"
+244:280: execution error: Orca app icon could not be cleared (-2700)
+
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at Socket.<anonymous> (node:internal/child_process:498:11)
+    at Socket.emit (node:events:514:28)
+    at Pipe.<anonymous> (node:net:362:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: `/usr/bin/osascript -e use framework "AppKit" -e use scripting additions -e set appPath to system attribute "ORCA_APP_BUNDLE_PATH" -e set ok to current application's NSWorkspace's sharedWorkspace()'s setIcon:(missing value) forFile:appPath options:0 -e if ok is false then error "Orca app icon could not be cleared"`
+}
+[app-icon] failed to clear macOS dock icon metadata com.apple.ResourceFork: Error: Command failed: /usr/bin/xattr -d com.apple.ResourceFork /Applications/Orca.app
+xattr: [Errno 1] Operation not permitted: '/Applications/Orca.app'
+
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at Socket.<anonymous> (node:internal/child_process:498:11)
+    at Socket.emit (node:events:514:28)
+    at Pipe.<anonymous> (node:net:362:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: '/usr/bin/xattr -d com.apple.ResourceFork /Applications/Orca.app'
+}
+[app-icon] failed to clear macOS dock icon metadata com.apple.FinderInfo: Error: Command failed: /usr/bin/xattr -d com.apple.FinderInfo /Applications/Orca.app
+xattr: [Errno 1] Operation not permitted: '/Applications/Orca.app'
+
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at Socket.<anonymous> (node:internal/child_process:498:11)
+    at Socket.emit (node:events:514:28)
+    at Pipe.<anonymous> (node:net:362:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: '/usr/bin/xattr -d com.apple.FinderInfo /Applications/Orca.app'
+}
+[pty:history] worktreeId=afa50224-707e-465e-93fc-f1343f4c51ea::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9cdbf3912914a233/zsh_history fishSession=none
+[pty] macOS login(1) preflight failed; spawning shells directly
+[worktree-create] Failed to create the initial terminal for /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/runtime-home/orca/workspaces/project/fm-round2-live: Failed to spawn shell "/bin/zsh": node-pty: posix_openpt failed: errno (errno 1, Operation not permitted) (shell: /bin/zsh, cwd: /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/runtime-home/orca/workspaces/project/fm-round2-live, arch: arm64, platform: darwin 26.7.1, orca: 1.4.222). If this persists, please file an issue.
+[81646:1008/133354.112765:ERROR:content/browser/gpu/gpu_process_host.cc:1108] GPU process exited unexpectedly: exit_code=15
+[81646:1008/133354.165927:ERROR:content/browser/network_service_instance_impl.cc:721] Network service crashed or was terminated, restarting service.

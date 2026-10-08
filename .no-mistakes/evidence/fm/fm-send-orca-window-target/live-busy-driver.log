@@ -1,0 +1,15 @@
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'transport-live', '--key'] 0
+['bash', '-c', '. bin/fm-task-inbox-lib.sh; fm_task_inbox_write "$1" busy-live "Fixture: no action required." fire-and-forget'] 0
+['bash', '-c', '. bin/fm-task-inbox-lib.sh; fm_task_inbox_doorbell_line "$1"'] 0
+['orca', 'terminal', 'send'] 0
+['orca', 'terminal', 'read'] 0
+['orca', 'terminal', 'read'] 0
+['orca', 'terminal', 'read'] 0
+['orca', 'terminal', 'send'] 0
+['orca', 'terminal', 'read'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_busy_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-task-inbox-lib.sh; fm_task_inbox_ring orca "$1" "$2"'] 0
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'busy-live', '--key'] 0
+BUSY_COMPLETE

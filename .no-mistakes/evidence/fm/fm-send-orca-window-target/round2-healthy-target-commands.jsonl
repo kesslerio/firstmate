@@ -1,0 +1,5 @@
+["terminal", "send", "--terminal", "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4", "--text", "HEALTHY_CHANNEL_R2: Reply ACK_HEALTHY_R2; do not use tools.", "--json"]
+["terminal", "send", "--terminal", "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4", "--text", "", "--enter", "--json"]
+["terminal", "read", "--terminal", "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4", "--limit", "20", "--json"]
+["terminal", "send", "--terminal", "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4", "--interrupt", "--json"]
+["terminal", "send", "--terminal", "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4", "--text", "", "--enter", "--json"]

@@ -1,0 +1,32 @@
+{
+  "id": "2187cf9a-e45a-42ef-9707-52c225665f57",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_aa119bd2-c8bb-4954-9795-46cf204db482",
+      "status": "running",
+      "tail": [
+        "  \u2503",
+        "  \u2503  STALE_NOT_WRITABLE_R2: Reply ACK_R2. Do not use tools.",
+        "  \u2503",
+        "     \u25a3  Build \u00b7 Big Pickle",
+        "  \u2503",
+        "  \u2503",
+        "  \u2503",
+        "  \u2503  Build \u00b7 Big Pickle OpenCode Zen",
+        "  \u2579\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580\u2580",
+        "   \u2b1d\u2b1d\u2b1d\u2b1d\u2b1d\u2b1d\u2b1d\u2b1d  esc interrupt                                                                 tab agents  ctrl+p commands"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "1",
+      "latestCursor": "1",
+      "returnedLineCount": 10,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4c43b876-3b13-4292-8b64-b8ebbe28324f"
+  }
+}

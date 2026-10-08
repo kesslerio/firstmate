@@ -1,0 +1,26 @@
+{
+  "id": "323586c9-10b1-4f50-bfad-1f1e9304b919",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_d8350c37-fd42-4a8e-9e72-79acfe305901",
+      "status": "running",
+      "tail": [
+        "kesslerio@MK-MacBook-Pro-5 fm-round2-live % env HOME=/Users/kesslerio CURSOR_DATA_DIR=/Users/kesslerio/.no-mistakes/work",
+        "trees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/cursor-data CURSOR_CONFIG_DIR=/Users/kesslerio/.no-mistakes/w",
+        "orktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/cursor-config NODE_COMPILE_CACHE=/Users/kesslerio/.no-mist",
+        "akes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/cursor-cache cursor-agent --mode ask --trust"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "1",
+      "latestCursor": "1",
+      "returnedLineCount": 4,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4c43b876-3b13-4292-8b64-b8ebbe28324f"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "pass": true,
+  "actual_restart_error": "terminal_not_writable",
+  "recorded_handle": "term_f19bd447-88fb-4658-8b21-494b62b94117",
+  "live_handle": "term_aa119bd2-c8bb-4954-9795-46cf204db482",
+  "metadata_before": "5ee10249d7b75b354fce716b7fda53d22cda5b9b9836fb4f8bce56a0b1d3d992",
+  "metadata_after": "5ee10249d7b75b354fce716b7fda53d22cda5b9b9836fb4f8bce56a0b1d3d992"
+}

@@ -1,0 +1,7 @@
+['orca', 'terminal', 'send'] 1
+['bin/fm-send.sh', 'stale-code-live', '--key'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_source orca; fm_backend_orca_send_literal "$1" "HANDLE_STALE_LIVE_62D"'] 0
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'stale-code-live', '--key'] 0
+['orca', 'terminal', 'read'] 0
+STALE_CODE_COMPLETE

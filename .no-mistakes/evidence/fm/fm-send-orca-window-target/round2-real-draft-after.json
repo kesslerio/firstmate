@@ -1,0 +1,58 @@
+{
+  "id": "9bc3d06f-7f66-40ad-a897-f039c9bdc469",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4",
+      "status": "running",
+      "tail": [
+        "",
+        "",
+        "  \u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502  \u26a0 Workspace Trust Required                                                                                      \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502  Cursor Agent can execute code and access files in this directory.                                               \u2502",
+        "  \u2502                                                                         \u2502",
+        "  \u2502  Do you trust the contents of this directory?                                                                    \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502    /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/runtime-home/or  \u2502",
+        "  \u2502    ca/workspaces/project/fm-round2-live                                                                          \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502    [a] Trust this workspace                                                                                      \u2502",
+        "  \u2502    [q] Quit                                                                                                      \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502  \u23f3 Trusting workspace...                                                                                        \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f",
+        "",
+        "",
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use subagents to parallelize work and preserve context.",
+        "",
+        "",
+        "",
+        "",
+        "  \u2192 HUMAN_DRAFT_R2_DO_NOT_SUBMIT",
+        "",
+        "",
+        "  Ask (shift+tab to cycle)",
+        "  Auto",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/runtime-home/orca/workspaces/project/fm",
+        "  -round2-live \u00b7 fm-round2-live"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "49",
+      "latestCursor": "49",
+      "returnedLineCount": 36,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4c43b876-3b13-4292-8b64-b8ebbe28324f"
+  }
+}

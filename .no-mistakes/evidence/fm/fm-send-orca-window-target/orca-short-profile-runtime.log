@@ -1,0 +1,79 @@
+[secrets] The OS keychain is unavailable, so secrets are stored unencrypted.
+[75729:1008/123101.099868:ERROR:net/cert/internal/trust_store_mac.cc:807] Error parsing certificate:
+ERROR: Failed parsing extensions
+
+[daemon] STARTUP FAILED — falling back to local PTYs; terminals will not persist across quit. Reason: connect EINVAL /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/daemon/daemon-v40.sock - Local (undefined:undefined)
+[agent-state-rules] download failed: HTTP 404
+[serve] orca CLI install: installed (/opt/homebrew/bin/orca)
+{"type":"orca_server_ready","schemaVersion":1,"runtimeId":"58c151fa-ac0b-4c25-abef-85a904e6f10a","endpoint":"ws://0.0.0.0:17688","boundEndpoint":"ws://0.0.0.0:17688","advertisedEndpoint":"ws://127.0.0.1:17688","managedWslCliReconciliation":"settled","pairing":{"available":false,"reason":"disabled_by_operator","guidance":"Restart without --no-pairing to create a client pairing offer."}}
+[codex-trust-grant] granted 9 managed hook entries via codex app-server (host=native, wrote=true, 439ms)
+[codex-trust-grant] granted 9 managed hook entries via codex app-server (host=native, wrote=true, 251ms)
+[app-icon] failed to clear macOS dock icon: Error: Command failed: /usr/bin/osascript -e use framework "AppKit" -e use scripting additions -e set appPath to system attribute "ORCA_APP_BUNDLE_PATH" -e set ok to current application's NSWorkspace's sharedWorkspace()'s setIcon:(missing value) forFile:appPath options:0 -e if ok is false then error "Orca app icon could not be cleared"
+244:280: execution error: Orca app icon could not be cleared (-2700)
+
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at Socket.<anonymous> (node:internal/child_process:498:11)
+    at Socket.emit (node:events:514:28)
+    at Pipe.<anonymous> (node:net:362:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: `/usr/bin/osascript -e use framework "AppKit" -e use scripting additions -e set appPath to system attribute "ORCA_APP_BUNDLE_PATH" -e set ok to current application's NSWorkspace's sharedWorkspace()'s setIcon:(missing value) forFile:appPath options:0 -e if ok is false then error "Orca app icon could not be cleared"`
+}
+[app-icon] failed to clear macOS dock icon metadata com.apple.FinderInfo: Error: Command failed: /usr/bin/xattr -d com.apple.FinderInfo /Applications/Orca.app
+xattr: [Errno 1] Operation not permitted: '/Applications/Orca.app'
+
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at Socket.<anonymous> (node:internal/child_process:498:11)
+    at Socket.emit (node:events:514:28)
+    at Pipe.<anonymous> (node:net:362:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: '/usr/bin/xattr -d com.apple.FinderInfo /Applications/Orca.app'
+}
+[app-icon] failed to clear macOS dock icon metadata com.apple.ResourceFork: Error: Command failed: /usr/bin/xattr -d com.apple.ResourceFork /Applications/Orca.app
+xattr: [Errno 1] Operation not permitted: '/Applications/Orca.app'
+
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at Socket.<anonymous> (node:internal/child_process:498:11)
+    at Socket.emit (node:events:514:28)
+    at Pipe.<anonymous> (node:net:362:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: '/usr/bin/xattr -d com.apple.ResourceFork /Applications/Orca.app'
+}
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty] Failed to stop PTY 6: kill EPERM
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty] Failed to stop PTY 11: kill EPERM
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9aa932971ac2973c/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9aa932971ac2973c/zsh_history fishSession=none
+[pty:history] worktreeId=373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/23b333fb16dec599/zsh_history fishSession=none
+[pty:history] Scheduled history delete for worktree 373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live
+[pty:history] Scheduled history delete for worktree 373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-blocked-live

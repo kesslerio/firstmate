@@ -1,0 +1,16 @@
+['orca', 'worktree', 'create'] 0
+['orca', 'terminal', 'list'] 0
+['orca', 'terminal', 'close'] 0
+['orca', 'terminal', 'create'] 0
+['orca', 'terminal', 'read'] 0
+['orca', 'terminal', 'read'] 0
+['orca', 'terminal', 'read'] 0
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'term_f497b3a6-2780-49fd-b700-93c2b324aced', 'BLOCKED_TEXT_SHOULD_NOT_ARRIVE'] 1
+['bin/fm-send.sh', 'blocked-live', '--key'] 0
+['orca', 'terminal', 'read'] 0
+Traceback (most recent call last):
+  File "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/live-dialog.py", line 27, in <module>
+    assert text.returncode!=0 and key.returncode!=0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

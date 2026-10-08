@@ -1,0 +1,25 @@
+{
+  "id": "f4e3f3a2-a04c-4862-b940-d15255467a41",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_5fa43d09-4dca-4932-93be-01dc978d1050",
+      "status": "running",
+      "tail": [
+        "",
+        "Error: EPERM: operation not permitted, mkdir '/Users/kesslerio/.cursor/projects/Users-kesslerio-no-mistakes-worktrees-8036f35f7c08-43fc814'",
+        "kesslerio@MK-MacBook-Pro-5 fm-round2-live %"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "2",
+      "latestCursor": "2",
+      "returnedLineCount": 3,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "50c1a69a-ddd6-4f17-b289-fff0ade2e5ed"
+  }
+}

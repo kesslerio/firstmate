@@ -1,0 +1,8 @@
+{
+  "real_harness": "Cursor Agent",
+  "observed": "Working",
+  "ring_return_code": 1,
+  "replacement_input_deferred": true,
+  "before": "round2-real-busy-before.json",
+  "after": "round2-real-busy-after.json"
+}

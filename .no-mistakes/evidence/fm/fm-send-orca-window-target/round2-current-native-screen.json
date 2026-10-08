@@ -1,0 +1,46 @@
+{
+  "id": "799a2915-f613-4833-bccd-48b283915b13",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4",
+      "status": "running",
+      "tail": [
+        "  \u2502    [q] Quit                                                                                                      \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502  \u23f3 Trusting workspace...                                                                                        \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f",
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use subagents to parallelize work and preserve context.",
+        "  TYPED_STEER_RESTART_R2: Reply ACK_R2; do not use tools.",
+        "  ACK_R2ACK_R2",
+        "  ACK_R2ACK_R2",
+        "  ACK_R2ACK_R2",
+        " \u250c\u2500 follow-ups \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+        " \u2502 \u25cb Write a 120-line poem about clouds, one numbered line per stanza. Do not use tools.                            \u2502",
+        " \u2502 \u2191 to edit                                                                                                        \u2502",
+        " \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+        "  \u2192 TYPED_STEER_RESTART_R2: Reply ACK_R2; do not use tools.",
+        "  Ask (shift+tab to cycle)",
+        "  Auto",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/runtime-home/orca/workspaces/project/fm",
+        "  -round2-live \u00b7 fm-round2-live",
+        "  Error: Something went wrong. Please try again.",
+        "  [internal] EPERM: operation not permitted, mkdir",
+        "  '/Users/kesslerio/.cursor/chats/8b7f1d8b3e64b0b8f805e9effceba395/db3b3ba2-603c-49ef-ab05-8d6973c53b31'"
+      ],
+      "truncated": true,
+      "limited": false,
+      "oldestCursor": "2177",
+      "nextCursor": "4177",
+      "latestCursor": "4177",
+      "returnedLineCount": 24,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4c43b876-3b13-4292-8b64-b8ebbe28324f"
+  }
+}

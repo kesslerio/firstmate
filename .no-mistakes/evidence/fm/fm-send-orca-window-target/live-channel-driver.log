@@ -1,0 +1,15 @@
+['orca', 'terminal', 'send'] 1
+['bin/fm-send.sh', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', 'Reply exactly ACK_HEALTHY_7B9. Do not use tools.'] 1
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'transport-live', 'Channel arrival check 7B9: reply ACK_INBOX_7B9 without using tools.'] 0
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'term_78d67ea8-c735-4f56-b808-8e2913c7ea6f', 'Reply exactly ACK_STALE_7B9. Do not use tools.'] 1
+['orca', 'terminal', 'read'] 0
+['orca', 'terminal', 'send'] 0
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'transport-live', '--key'] 0
+['orca', 'terminal', 'read'] 0
+['orca', 'terminal', 'send'] 0
+['bin/fm-send.sh', 'transport-live', '--key'] 0
+['orca', 'terminal', 'read'] 0
+CHANNEL_CORE_COMPLETE

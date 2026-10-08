@@ -1,0 +1,70 @@
+$ ['orca', 'terminal', 'close', '--worktree', 'name:fm-transport-live', '--all', '--json']
+{
+  "id": "9dea1eea-4636-4e90-9f94-70e5a5655104",
+  "ok": true,
+  "result": {
+    "closed": 1,
+    "stopped": 1,
+    "retiredSurfaces": true
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'close', '--worktree', 'name:fm-blocked-live', '--all', '--json']
+{
+  "id": "b16a3c70-110d-4c2e-9e87-a7331103c9df",
+  "ok": true,
+  "result": {
+    "closed": 1,
+    "stopped": 1,
+    "retiredSurfaces": true
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'worktree', 'rm', '--worktree', 'id:373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live', '--force', '--json']
+{
+  "id": "612d3aba-086e-4ab1-b475-708406cd6cb6",
+  "ok": true,
+  "result": {
+    "removed": true,
+    "removing": true,
+    "catalogVersion": {
+      "epoch": "19a00070-e889-4e8a-a4b1-9f150c1b2660",
+      "sequence": 8
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'worktree', 'rm', '--worktree', 'id:373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-blocked-live', '--force', '--json']
+{
+  "id": "9dc34eb5-2681-463b-99f0-9340ea57c917",
+  "ok": true,
+  "result": {
+    "removed": true,
+    "removing": true,
+    "catalogVersion": {
+      "epoch": "19a00070-e889-4e8a-a4b1-9f150c1b2660",
+      "sequence": 11
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+Owned isolated Orca PID 75729; descendant PIDs [4961, 80045, 80109]
+$ ['bash', '-c', '. bin/fm-backend.sh; fm_backend_source orca; fm_backend_orca_send_literal "$1" NEVER_DELIVER_AFTER_SHUTDOWN', '_', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a']
+
+exit=1

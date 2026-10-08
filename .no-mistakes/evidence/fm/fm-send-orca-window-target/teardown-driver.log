@@ -1,0 +1,6 @@
+['orca', 'terminal', 'close'] 0
+['orca', 'terminal', 'close'] 0
+['orca', 'worktree', 'rm'] 0
+['orca', 'worktree', 'rm'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_source orca; fm_backend_orca_send_literal "$1" NEVER_DELIVER_AFTER_SHUTDOWN'] 1
+TEARDOWN_COMPLETE

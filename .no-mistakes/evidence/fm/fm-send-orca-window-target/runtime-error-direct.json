@@ -1,0 +1,11 @@
+{
+  "id": "local",
+  "ok": false,
+  "error": {
+    "code": "runtime_unavailable",
+    "message": "Could not read Orca runtime metadata at /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/orca-runtime.json. Start the Orca app first."
+  },
+  "_meta": {
+    "runtimeId": null
+  }
+}

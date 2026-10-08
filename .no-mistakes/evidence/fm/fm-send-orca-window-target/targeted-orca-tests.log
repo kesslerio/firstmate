@@ -1,0 +1,18 @@
+ok - fm_backend_orca_send_text_submit: stale terminal re-resolves window= to the live handle with zero meta writes
+ok - fm_backend_orca_send_key: Enter and C-c both re-resolve a stale terminal through window=
+ok - fm_backend_orca_send_key/submit: a healthy terminal keeps today's exact command sequence and failure bytes
+ok - fm_backend_orca_send_key: an unresolvable window falls back to the recorded-handle failure unchanged
+ok - fm-send.sh: a stale terminal's doorbell, steer record, and --key Enter all reach the live window with zero meta edits
+ok - fm-send.sh: an unresolvable window keeps the exact durable doorbell refusal and the re-ring contract
+ok - fm_backend_orca_send_text_submit: a healthy terminal id is byte-identical and does not list windows
+ok - fm_backend_orca_send_text_submit: a stale terminal id delivers through the recorded window name
+ok - fm_backend_orca_send_text_submit: a missing named window never scans other homes
+ok - fm_backend_orca_send_key: Enter and C-c resolve a stale terminal through the same window
+ok - Orca send: a stale terminal whose window is also missing keeps today's refusal
+ok - fm_backend_orca_send_text_submit: a non-stale failure is not retargeted
+ok - fm_backend_orca_send_text_submit: an ambiguous named window is not guessed
+ok - fm-send: a stale Orca window receives the doorbell, and a missing window keeps the re-ring refusal
+ok - fm-send --key: Enter and C-c reach the live window without editing meta
+ok - Orca submit: nonzero restart errors resolve from stdout or stderr, unrelated errors refuse
+ok - Orca retargeting: blocking dialogs refuse text and Enter while C-c stays available
+ok - Orca inbox: replacement panes preserve drafts, busy deferrals, own-doorbell retries, and explicit input

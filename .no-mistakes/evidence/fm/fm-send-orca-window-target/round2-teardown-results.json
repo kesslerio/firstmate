@@ -1,0 +1,29 @@
+{
+  "owned_runtime_pid": 1524,
+  "owned_processes": [
+    1524,
+    3295,
+    3306,
+    83208
+  ],
+  "remaining_processes": [],
+  "closed_terminals": [
+    "term_d8350c37-fd42-4a8e-9e72-79acfe305901",
+    "term_aa119bd2-c8bb-4954-9795-46cf204db482"
+  ],
+  "lab_worktrees_removed": true,
+  "metadata_unchanged": true,
+  "nonidentity_failure_refused_retarget": true,
+  "commands_after_runtime_stop": [
+    [
+      "terminal",
+      "send",
+      "--terminal",
+      "term_cc38ac43-c623-4736-ba37-73c5a7fb6ed6",
+      "--text",
+      "MUST_NOT_DELIVER_AFTER_RUNTIME_STOP_R2",
+      "--json"
+    ]
+  ],
+  "error_after_runtime_stop": ""
+}

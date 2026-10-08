@@ -1,0 +1,29 @@
+ok - fm_backend_orca_capture: parses result.terminal.tail and calls terminal read
+ok - fm_backend_orca_capture: falls back to result text fields
+ok - fm_backend_orca_capture: fails closed on Orca read error JSON
+ok - fm_backend_orca_runtime_check: accepts reachable ready runtime
+ok - fm_backend_orca_runtime_check: fails closed when runtime is not ready
+ok - fm_backend_orca_send_text_submit: verifies empty composer after Enter with one bounded read
+ok - fm_backend_orca_send_text_submit: a borderless claude composer confirms delivery (the missing #2029 shape)
+ok - fm_backend_orca_composer_state: a stale startup banner cannot outrank the live composer row
+ok - fm_backend_orca_send_text_submit: retries Enter while composer remains pending
+ok - fm_backend_orca_composer_state: a slash-command popup's argument-hint placeholder still reads pending
+ok - fm_backend_orca_composer_state: a bare dead-shell prompt reads unknown (unsafe-for-injection), never empty
+ok - fm_backend_orca_send_text_submit: a slash-command popup's placeholder fill on Enter #1 does not short-circuit as submitted; Enter #2 is retried and lands it
+ok - fm_backend_orca_send_literal: sends text without submitting
+ok - fm_backend_orca_send_text_submit: reports send-failed when Orca send fails
+ok - Orca send helpers: fail closed on ok:false JSON
+ok - fm_backend_orca_send_key: Enter maps to empty enter, C-c maps to interrupt
+ok - fm_backend_orca_send_key: refuses unsupported keys loudly
+ok - fm_backend_orca_send_key: refuses Escape instead of mapping it to interrupt
+ok - fm_backend_orca_send_text_submit: stale terminal re-resolves window= to the live handle with zero meta writes
+ok - fm_backend_orca_send_key: Enter and C-c both re-resolve a stale terminal through window=
+ok - fm_backend_orca_send_key/submit: a healthy terminal keeps today's exact command sequence and failure bytes
+ok - fm_backend_orca_send_key: an unresolvable window falls back to the recorded-handle failure unchanged
+not ok - the doorbell did not ring through the live terminal handle (missing: 'orcaterminalsend--terminalterm-live-9--text: Firstmate instruction waiting:')
+--- output ---
+orcaterminalread--terminalterm-stale--limit20--json
+orcaterminalread--terminalterm-stale--limit20--json
+orcaterminalsend--terminalterm-stale--text: Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 'oracawinz5.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/.--json
+orcaterminallist--worktreename:fm-oracawinz5--limit200--json
+orcaterminalread--terminalterm-live-9--limit20--json

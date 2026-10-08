@@ -1,0 +1,39 @@
+{
+  "id": "62c03b10-b707-4d30-b028-656059b99ff3",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "Reply exactly ACK_HEALTHY_7B9. Do not use tools.",
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use /skills to give Cursor specialized knowledge for tasks.",
+        "  Reply exactly ACK_HEALTHY_7B9. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg",
+        "  in your 'transport-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its",
+        "  handled/.",
+        "  ACK_HEALTHY_7B9",
+        "  Reply exactly ACK_STALE_7B9. Do not use tools.",
+        "  ACK_STALE_7B9",
+        "  Reply ACK_ENTER_7B9 without using tools.",
+        "  ACK_ENTER_7B9",
+        "  \u2192 HUMAN_UNFINISHED_DRAFT_9C2. Do not use tools.",
+        "  Ask (shift+tab to cycle)",
+        "  Auto \u00b7 11.6%",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  \u00b7 fm-transport-live"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "875",
+      "latestCursor": "875",
+      "returnedLineCount": 17,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}

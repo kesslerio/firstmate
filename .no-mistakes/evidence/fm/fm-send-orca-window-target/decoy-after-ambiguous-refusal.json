@@ -1,0 +1,23 @@
+{
+  "id": "9252eefc-345e-4580-8a4e-233ef298e52a",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_c79f77e3-18f7-4078-ad08-0bc20a713b7d",
+      "status": "running",
+      "tail": [
+        "kesslerio@localhost fm-transport-live %"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "0",
+      "latestCursor": "0",
+      "returnedLineCount": 1,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}

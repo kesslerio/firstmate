@@ -1,0 +1,167 @@
+$ ['orca', 'terminal', 'create', '--worktree', 'name:fm-transport-live', '--title', 'fm-missing-live', '--json']
+{
+  "id": "30f3d289-3eba-4ed3-9289-389f0ffa6b90",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_c79f77e3-18f7-4078-ad08-0bc20a713b7d",
+      "tabId": "f2da2657-6190-477c-815a-a1389eff6976",
+      "paneKey": "f2da2657-6190-477c-815a-a1389eff6976:a19f76e5-fce0-40a1-882f-8fab25f61904",
+      "ptyId": "17",
+      "worktreeId": "373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+      "title": "fm-missing-live",
+      "executionHostId": "local",
+      "incarnationId": "ecfa6996-fbe6-49ec-94f5-c227641fc719",
+      "hostPlatform": "darwin",
+      "surface": "background",
+      "warning": "Terminal term_c79f77e3-18f7-4078-ad08-0bc20a713b7d is running, but Orca could not make it discoverable. Run `orca terminal focus --terminal term_c79f77e3-18f7-4078-ad08-0bc20a713b7d` to reveal and focus it."
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['bin/fm-send.sh', 'term_d4ca534c-5a26-4771-9b22-9c5e6ba82cfc', "printf 'MISDELIVERY_MISSING_4D7\\n'"]
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not sent to term_d4ca534c-5a26-4771-9b22-9c5e6ba82cfc (orca send failed; tried explicit target 'term_d4ca534c-5a26-4771-9b22-9c5e6ba82cfc' matched /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/missing-live.meta; backend=orca)
+
+exit=1
+$ ['bin/fm-send.sh', 'missing-live', '--key', 'Enter']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: key 'Enter' not sent to term_d4ca534c-5a26-4771-9b22-9c5e6ba82cfc (orca send failed; tried meta=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/missing-live.meta; backend=from-meta)
+
+exit=1
+$ ['orca', 'terminal', 'read', '--terminal', 'term_c79f77e3-18f7-4078-ad08-0bc20a713b7d', '--limit', '100', '--json']
+{
+  "id": "5d7f4f3e-835c-4088-bfe0-ab41d2ce4a55",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_c79f77e3-18f7-4078-ad08-0bc20a713b7d",
+      "status": "running",
+      "tail": [
+        "kesslerio@localhost fm-transport-live %"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "0",
+      "latestCursor": "0",
+      "returnedLineCount": 1,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['bin/fm-send.sh', 'term_78d67ea8-c735-4f56-b808-8e2913c7ea6f', "printf 'MISDELIVERY_AMBIGUOUS_4D7\\n'"]
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not sent to term_78d67ea8-c735-4f56-b808-8e2913c7ea6f (orca send failed; tried explicit target 'term_78d67ea8-c735-4f56-b808-8e2913c7ea6f' matched /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/transport-live.meta; backend=orca)
+
+exit=1
+$ ['bin/fm-send.sh', 'transport-live', '--key', 'C-c']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: key 'C-c' not sent to term_78d67ea8-c735-4f56-b808-8e2913c7ea6f (orca send failed; tried meta=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/transport-live.meta; backend=from-meta)
+
+exit=1
+$ ['orca', 'terminal', 'read', '--terminal', 'term_c79f77e3-18f7-4078-ad08-0bc20a713b7d', '--limit', '100', '--json']
+{
+  "id": "9252eefc-345e-4580-8a4e-233ef298e52a",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_c79f77e3-18f7-4078-ad08-0bc20a713b7d",
+      "status": "running",
+      "tail": [
+        "kesslerio@localhost fm-transport-live %"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "0",
+      "latestCursor": "0",
+      "returnedLineCount": 1,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--limit', '100', '--json']
+{
+  "id": "03f31107-4391-48d0-97cf-9692a2623a67",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "  Reply exactly ACK_HEALTHY_7B9. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg",
+        "  in your 'transport-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its",
+        "  handled/.",
+        "  ACK_HEALTHY_7B9",
+        "  Reply exactly ACK_STALE_7B9. Do not use tools.",
+        "  ACK_STALE_7B9",
+        "  Reply ACK_ENTER_7B9 without using tools.",
+        "  ACK_ENTER_7B9",
+        "  HUMAN_UNFINISHED_DRAFT_9C2. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg in",
+        "  your 'draft-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/.",
+        "  HUMAN_UNFINISHED_DRAFT_9C2",
+        "  → : Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg in your 'own-live.inbox' steering inbox, read and",
+        "    act on each in numeric order, then mv each into its handled/.",
+        "  Ask (shift+tab to cycle)",
+        "  Auto · 11.8%",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  · fm-transport-live"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "1399",
+      "latestCursor": "1399",
+      "returnedLineCount": 17,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['bin/fm-send.sh', 'transport-live', '--key', 'Escape']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: unsupported Orca key 'Escape'
+error: key 'Escape' not sent to term_78d67ea8-c735-4f56-b808-8e2913c7ea6f (orca send failed; tried meta=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/transport-live.meta; backend=from-meta)
+
+exit=1
+$ ['orca', 'terminal', 'close', '--terminal', 'term_c79f77e3-18f7-4078-ad08-0bc20a713b7d', '--json']
+{
+  "id": "a2edcc64-d81b-46ea-ab87-a7a7e8ba8f7f",
+  "ok": true,
+  "result": {
+    "close": {
+      "handle": "term_c79f77e3-18f7-4078-ad08-0bc20a713b7d",
+      "tabId": "f2da2657-6190-477c-815a-a1389eff6976",
+      "ptyKilled": true
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0

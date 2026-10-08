@@ -1,0 +1,12 @@
+{
+  "composer_classification": "unknown",
+  "base_ring_exit": 2,
+  "base_preserved_draft": true,
+  "target_send_exit": 0,
+  "target_appended_doorbell_and_submitted_draft": true,
+  "metadata_sha256_before": "9a2fd7a2efd219adb920ec5492b10b289ee878127687193f66b142c05d1e9d5d",
+  "metadata_sha256_after": "9a2fd7a2efd219adb920ec5492b10b289ee878127687193f66b142c05d1e9d5d",
+  "recorded_terminal": "term_0e194e26-0bd6-479e-83d4-f7bb748281b4",
+  "live_terminal": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+  "window": "fm-transport-live"
+}

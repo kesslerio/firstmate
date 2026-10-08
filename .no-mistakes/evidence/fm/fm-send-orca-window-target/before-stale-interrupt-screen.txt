@@ -1,0 +1,15 @@
+Reply exactly ACK_HEALTHY_7B9. Do not use tools.
+  Cursor Agent
+  v2026.10.01-e373342
+  Tip: Use /skills to give Cursor specialized knowledge for tasks.
+  Reply exactly ACK_HEALTHY_7B9. Do not use tools.: Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg
+  in your 'transport-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its
+  handled/.
+  ACK_HEALTHY_7B9
+  Reply exactly ACK_STALE_7B9. Do not use tools.
+  ACK_STALE_7B9
+  → CANCEL_DRAFT_7B9
+  Ask (shift+tab to cycle)
+  Auto · 11.5%
+  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live
+  · fm-transport-live

@@ -1,0 +1,308 @@
+$ ['orca', 'terminal', 'send', '--terminal', 'term_78d67ea8-c735-4f56-b808-8e2913c7ea6f', '--text', 'rejected probe', '--json']
+{
+  "id": "8a76952d-8cf7-4e8b-95eb-c880659c6813",
+  "ok": false,
+  "error": {
+    "code": "terminal_not_writable",
+    "message": "terminal_not_writable"
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=1
+$ ['bin/fm-send.sh', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', 'Reply exactly ACK_HEALTHY_7B9. Do not use tools.']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not submitted to term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a (delivery unconfirmed; verdict=unknown; tried explicit target 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a' matched /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/healthy-live.meta; backend=orca)
+
+exit=1
+$ ['orca', 'terminal', 'read', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--limit', '100', '--json']
+{
+  "id": "6195b3a1-1eb7-451d-9149-eb9dad35dd09",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "Reply exactly ACK_HEALTHY_7B9. Do not use tools.",
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use /skills to give Cursor specialized knowledge for tasks.",
+        "  → Reply exactly ACK_HEALTHY_7B9. Do not use tools.",
+        "  Ask (shift+tab to cycle)",
+        "  Auto",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  · fm-transport-live"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "27",
+      "latestCursor": "27",
+      "returnedLineCount": 9,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['bin/fm-send.sh', 'transport-live', 'Channel arrival check 7B9: reply ACK_INBOX_7B9 without using tools.']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--limit', '100', '--json']
+{
+  "id": "e67e378a-92da-49cb-bce1-b4a2fef84635",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "Reply exactly ACK_HEALTHY_7B9. Do not use tools.",
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use /skills to give Cursor specialized knowledge for tasks.",
+        "  Reply exactly ACK_HEALTHY_7B9. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg",
+        "  in your 'transport-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its",
+        "  handled/.",
+        " ⠘⠤ Working",
+        "    Tip: Use /mcp to connect Cursor to your tools and data sources.",
+        "  → Add a follow-up                                                                                     ctrl+c to stop",
+        "  Ask (shift+tab to cycle)",
+        "  Auto",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  · fm-transport-live"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "284",
+      "latestCursor": "284",
+      "returnedLineCount": 14,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['bin/fm-send.sh', 'term_78d67ea8-c735-4f56-b808-8e2913c7ea6f', 'Reply exactly ACK_STALE_7B9. Do not use tools.']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not submitted to term_78d67ea8-c735-4f56-b808-8e2913c7ea6f (delivery unconfirmed; verdict=unknown; tried explicit target 'term_78d67ea8-c735-4f56-b808-8e2913c7ea6f' matched /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/transport-live.meta; backend=orca)
+
+exit=1
+$ ['orca', 'terminal', 'read', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--limit', '100', '--json']
+{
+  "id": "b31034d5-6d1d-4d08-a4c6-6848cd47dadc",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "Reply exactly ACK_HEALTHY_7B9. Do not use tools.",
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use /skills to give Cursor specialized knowledge for tasks.",
+        "  Reply exactly ACK_HEALTHY_7B9. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg",
+        "  in your 'transport-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its",
+        "  handled/.",
+        "  ACK_HEALTHY_7B9",
+        "  Reply exactly ACK_STALE_7B9. Do not use tools.",
+        "  ACK_STALE_7B9",
+        "  → Add a follow-up",
+        "  Ask (shift+tab to cycle)",
+        "  Auto · 11.5%",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  · fm-transport-live"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "609",
+      "latestCursor": "609",
+      "returnedLineCount": 15,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'send', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--text', 'CANCEL_DRAFT_7B9', '--json']
+{
+  "id": "d09c98a4-0c4c-4637-be2d-f22985986cbd",
+  "ok": true,
+  "result": {
+    "send": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "accepted": true,
+      "bytesWritten": 16
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--limit', '100', '--json']
+{
+  "id": "92d57f35-50bf-4e1a-a2ea-c8ad1c1398ca",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "Reply exactly ACK_HEALTHY_7B9. Do not use tools.",
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use /skills to give Cursor specialized knowledge for tasks.",
+        "  Reply exactly ACK_HEALTHY_7B9. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg",
+        "  in your 'transport-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its",
+        "  handled/.",
+        "  ACK_HEALTHY_7B9",
+        "  Reply exactly ACK_STALE_7B9. Do not use tools.",
+        "  ACK_STALE_7B9",
+        "  → CANCEL_DRAFT_7B9",
+        "  Ask (shift+tab to cycle)",
+        "  Auto · 11.5%",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  · fm-transport-live"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "616",
+      "latestCursor": "616",
+      "returnedLineCount": 15,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['bin/fm-send.sh', 'transport-live', '--key', 'C-c']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--limit', '100', '--json']
+{
+  "id": "0bdc592d-776b-49fd-b179-78d66925f64d",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "Reply exactly ACK_HEALTHY_7B9. Do not use tools.",
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use /skills to give Cursor specialized knowledge for tasks.",
+        "  Reply exactly ACK_HEALTHY_7B9. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg",
+        "  in your 'transport-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its",
+        "  handled/.",
+        "  ACK_HEALTHY_7B9",
+        "  Reply exactly ACK_STALE_7B9. Do not use tools.",
+        "  ACK_STALE_7B9",
+        "  → Add a follow-up",
+        "  Press Ctrl+C again to exit"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "621",
+      "latestCursor": "621",
+      "returnedLineCount": 12,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'send', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--text', 'Reply ACK_ENTER_7B9 without using tools.', '--json']
+{
+  "id": "c59d6034-69a1-4572-b990-b8c9af9d1b29",
+  "ok": true,
+  "result": {
+    "send": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "accepted": true,
+      "bytesWritten": 40
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['bin/fm-send.sh', 'transport-live', '--key', 'Enter']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--limit', '100', '--json']
+{
+  "id": "acc50631-1fa8-4503-a3be-cd9e0f8e7ab4",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "Reply exactly ACK_HEALTHY_7B9. Do not use tools.",
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use /skills to give Cursor specialized knowledge for tasks.",
+        "  Reply exactly ACK_HEALTHY_7B9. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg",
+        "  in your 'transport-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its",
+        "  handled/.",
+        "  ACK_HEALTHY_7B9",
+        "  Reply exactly ACK_STALE_7B9. Do not use tools.",
+        "  ACK_STALE_7B9",
+        "  Reply ACK_ENTER_7B9 without using tools.",
+        " ⠘⠣ Working",
+        "    Tip: Use /debug to instrument and debug complex problems.",
+        "  → Add a follow-up                                                                                     ctrl+c to stop",
+        "  Ask (shift+tab to cycle)",
+        "  Auto · 11.5%",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  · fm-transport-live"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "809",
+      "latestCursor": "809",
+      "returnedLineCount": 18,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0

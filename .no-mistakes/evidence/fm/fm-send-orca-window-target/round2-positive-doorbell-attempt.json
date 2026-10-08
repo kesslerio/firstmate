@@ -1,0 +1,30 @@
+{
+  "id": "c568e2c3-b82c-4f53-af7d-724c53f7e9a2",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_aa119bd2-c8bb-4954-9795-46cf204db482",
+      "status": "running",
+      "tail": [
+        "kesslerio@MK-MacBook-Pro-5 fm-round2-positive % opencode",
+        "                                   \u2584",
+        "  \u2588\u2580\u2580\u2588 \u2588\u2580\u2580\u2588 \u2588\u2580\u2580\u2588 \u2588\u2580\u2580\u2584 \u2588\u2580\u2580\u2580 \u2588\u2580\u2580\u2588 \u2588\u2580\u2580\u2588 \u2588\u2580\u2580\u2588",
+        "  \u2588  \u2588 \u2588  \u2588 \u2588\u2580\u2580\u2580 \u2588  \u2588 \u2588    \u2588  \u2588 \u2588  \u2588 \u2588\u2580\u2580\u2580",
+        "  \u2580\u2580\u2580\u2580 \u2588\u2580\u2580\u2580 \u2580\u2580\u2580\u2580 \u2580\u2580\u2580\u2580 \u2580\u2580\u2580\u2580 \u2580\u2580\u2580\u2580 \u2580\u2580\u2580\u2580 \u2580\u2580\u2580\u2580",
+        "  Session   New session - 2026-10-08T20:47:08.557Z",
+        "  Continue  opencode -s ses_ee2baecf2ffeTAaeX8tbJkRWpq",
+        "kesslerio@MK-MacBook-Pro-5 fm-round2-positive %"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "9",
+      "latestCursor": "9",
+      "returnedLineCount": 8,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4c43b876-3b13-4292-8b64-b8ebbe28324f"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "524cdbc8-8c54-4369-8f1d-881bfe5173f8",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd",
+      "status": "running",
+      "tail": [
+        "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+        " Accessing workspace:",
+        " /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-b",
+        " locked-live",
+        " Quick safety check: Is this a project you created or one you trust? (Like your own code, a well-known open source",
+        " project, or work from your team). If not, take a moment to review what's in this folder first.",
+        " Claude Code'll be able to read, edit, and execute files here.",
+        " Security guide",
+        " \u276f No, exit",
+        "   Yes, I trust this folder",
+        " Enter to confirm \u00b7 Esc to cancel"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "20",
+      "latestCursor": "20",
+      "returnedLineCount": 11,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}

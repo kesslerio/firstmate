@@ -1,0 +1,10 @@
+['orca', 'terminal', 'read'] 0
+['bash', '-c', '. bin/fm-task-inbox-lib.sh; fm_task_inbox_write "$1" draft-live "Fixture steer: no action required." fire-and-forget'] 0
+['orca', 'terminal', 'send'] 0
+['orca', 'terminal', 'read'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-task-inbox-lib.sh; fm_backend_source orca; . .test-orca-lab/base/backends/orca.sh; fm_task_inbox_ring orca "$1" "$2"'] 2
+['orca', 'terminal', 'read'] 0
+['bin/fm-send.sh', 'draft-live', 'Fixture steer: no action required.'] 0
+['orca', 'terminal', 'read'] 0
+{"composer_classification": "unknown", "base_ring_exit": 2, "base_preserved_draft": true, "target_send_exit": 0, "target_appended_doorbell_and_submitted_draft": true, "metadata_sha256_before": "9a2fd7a2efd219adb920ec5492b10b289ee878127687193f66b142c05d1e9d5d", "metadata_sha256_after": "9a2fd7a2efd219adb920ec5492b10b289ee878127687193f66b142c05d1e9d5d", "recorded_terminal": "term_0e194e26-0bd6-479e-83d4-f7bb748281b4", "live_terminal": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a", "window": "fm-transport-live"}

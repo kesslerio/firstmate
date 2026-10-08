@@ -1,0 +1,42 @@
+{
+  "id": "23f73395-1a52-435d-a0ed-c8659f58fae9",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4",
+      "status": "running",
+      "tail": [
+        "",
+        "",
+        "  \u256d\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256e",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502  \u26a0 Workspace Trust Required                                                                                      \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502  Cursor Agent can execute code and access files in this directory.                                               \u2502",
+        "  \u2502                                                                         \u2502",
+        "  \u2502  Do you trust the contents of this directory?                                                                    \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502    /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/runtime-home/or  \u2502",
+        "  \u2502    ca/workspaces/project/fm-round2-live                                                                          \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502  \u25b6[a] Trust this workspace                                                                                      \u2502",
+        "  \u2502    [q] Quit                                                                                                      \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2502  Use arrow keys to navigate, Enter to select, or press the key shown                                             \u2502",
+        "  \u2502                                                                                                                  \u2502",
+        "  \u2570\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u256f"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "20",
+      "latestCursor": "20",
+      "returnedLineCount": 20,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4c43b876-3b13-4292-8b64-b8ebbe28324f"
+  }
+}

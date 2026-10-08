@@ -1,0 +1,38 @@
+{
+  "id": "845a3102-2111-43a1-9b7c-69b8b5792f9a",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_9fccfad1-5d98-4946-bcd3-81e6ec03a895",
+      "status": "running",
+      "tail": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        " Claude Code'll be able to read, edit, and execute files here.",
+        "",
+        " Security guide",
+        "",
+        " \u276f No, exit"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "19",
+      "latestCursor": "19",
+      "returnedLineCount": 16,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "50c1a69a-ddd6-4f17-b289-fff0ade2e5ed"
+  }
+}

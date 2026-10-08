@@ -1,0 +1,60 @@
+[secrets] The OS keychain is unavailable, so secrets are stored unencrypted.
+[32210:1008/123025.093761:ERROR:net/cert/internal/trust_store_mac.cc:807] Error parsing certificate:
+ERROR: Failed parsing extensions
+
+[daemon] startup failed; captured stderr tail:
+[daemon] Fatal: Error: listen EINVAL: invalid argument /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/profile/daemon/.p092d395e7d
+    at Server.setupListenHandle [as _listen2] (node:net:2306:21)
+    at listenInCluster (node:net:2437:12)
+    at Server.listen (node:net:2579:5)
+    at /Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:1:18587
+    at new Promise (<anonymous>)
+    at e.start (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:1:18282)
+    at e.start (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:2:13352)
+    at wn (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:2:15286)
+    at zn (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:18:3602)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'EINVAL',
+  errno: -22,
+  syscall: 'listen',
+  address: '/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/profile/daemon/.p092d395e7d',
+  port: -1
+}
+[daemon] STARTUP FAILED — falling back to local PTYs; terminals will not persist across quit. Reason: Daemon exited during startup with code 1
+Daemon stderr (tail):
+[daemon] Fatal: Error: listen EINVAL: invalid argument /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/profile/daemon/.p092d395e7d
+    at Server.setupListenHandle [as _listen2] (node:net:2306:21)
+    at listenInCluster (node:net:2437:12)
+    at Server.listen (node:net:2579:5)
+    at /Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:1:18587
+    at new Promise (<anonymous>)
+    at e.start (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:1:18282)
+    at e.start (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:2:13352)
+    at wn (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:2:15286)
+    at zn (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:18:3602)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  code: 'EINVAL',
+  errno: -22,
+  syscall: 'listen',
+  address: '/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/profile/daemon/.p092d395e7d',
+  port: -1
+}
+[runtime] Failed to start headless RPC transport: Error: listen EINVAL: invalid argument /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/profile/o-32210-65ef.sock
+    at Server.setupListenHandle [as _listen2] (node:net:2306:21)
+    at listenInCluster (node:net:2437:12)
+    at Server.listen (node:net:2579:5)
+    at /Applications/Orca.app/Contents/Resources/app.asar/out/main/index.js:8884:65435
+    at new Promise (<anonymous>)
+    at qPo.start (/Applications/Orca.app/Contents/Resources/app.asar/out/main/index.js:8884:65395)
+    at GIo.start (/Applications/Orca.app/Contents/Resources/app.asar/out/main/index.js:8888:46474)
+    at IVo (/Applications/Orca.app/Contents/Resources/app.asar/out/main/index.js:8949:18454)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async RVo (/Applications/Orca.app/Contents/Resources/app.asar/out/main/index.js:8949:21230) {
+  code: 'EINVAL',
+  errno: -22,
+  syscall: 'listen',
+  address: '/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/profile/o-32210-65ef.sock',
+  port: -1
+}
+[agent-state-rules] download failed: HTTP 404
+[profile-state] Orca could not finish starting: listen EINVAL: invalid argument /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/profile/o-32210-65ef.sock

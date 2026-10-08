@@ -1,0 +1,85 @@
+[3597:1008/133423.265262:ERROR:net/cert/internal/trust_store_mac.cc:807] Error parsing certificate:
+ERROR: Failed parsing extensions
+
+[agent-state-rules] download failed: HTTP 404
+[daemon] startup failed; captured stderr tail:
+[pty] macOS login(1) preflight failed; spawning shells directly
+[daemon] Endpoint unavailable at startup: reason=inconclusive
+[daemon] Fatal: Wy [DaemonEndpointUnavailableError]: Daemon endpoint unavailable: inconclusive
+    at e.publish (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:1:8197)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  reason: 'inconclusive'
+}
+[daemon] STARTUP FAILED — falling back to local PTYs; terminals will not persist across quit. Reason: Daemon exited during startup with code 1
+Daemon stderr (tail):
+[pty] macOS login(1) preflight failed; spawning shells directly
+[daemon] Endpoint unavailable at startup: reason=inconclusive
+[daemon] Fatal: Wy [DaemonEndpointUnavailableError]: Daemon endpoint unavailable: inconclusive
+    at e.publish (/Applications/Orca.app/Contents/Resources/app.asar.unpacked/out/main/daemon-entry.js:1:8197)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  reason: 'inconclusive'
+}
+[serve] orca CLI install: installed (/opt/homebrew/bin/orca)
+{"type":"orca_server_ready","schemaVersion":1,"runtimeId":"50c1a69a-ddd6-4f17-b289-fff0ade2e5ed","endpoint":"ws://0.0.0.0:17689","boundEndpoint":"ws://0.0.0.0:17689","advertisedEndpoint":"ws://127.0.0.1:17689","managedWslCliReconciliation":"settled","pairing":{"available":false,"reason":"disabled_by_operator","guidance":"Restart without --no-pairing to create a client pairing offer."}}
+[app-icon] failed to clear macOS dock icon: Error: Command failed: /usr/bin/osascript -e use framework "AppKit" -e use scripting additions -e set appPath to system attribute "ORCA_APP_BUNDLE_PATH" -e set ok to current application's NSWorkspace's sharedWorkspace()'s setIcon:(missing value) forFile:appPath options:0 -e if ok is false then error "Orca app icon could not be cleared"
+244:280: execution error: Orca app icon could not be cleared (-2700)
+
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at Socket.<anonymous> (node:internal/child_process:498:11)
+    at Socket.emit (node:events:514:28)
+    at Pipe.<anonymous> (node:net:362:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: `/usr/bin/osascript -e use framework "AppKit" -e use scripting additions -e set appPath to system attribute "ORCA_APP_BUNDLE_PATH" -e set ok to current application's NSWorkspace's sharedWorkspace()'s setIcon:(missing value) forFile:appPath options:0 -e if ok is false then error "Orca app icon could not be cleared"`
+}
+[app-icon] failed to clear macOS dock icon metadata com.apple.FinderInfo: Error: Command failed: /usr/bin/xattr -d com.apple.FinderInfo /Applications/Orca.app
+xattr: [Errno 1] Operation not permitted: '/Applications/Orca.app'
+
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at Socket.<anonymous> (node:internal/child_process:498:11)
+    at Socket.emit (node:events:514:28)
+    at Pipe.<anonymous> (node:net:362:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: '/usr/bin/xattr -d com.apple.FinderInfo /Applications/Orca.app'
+}
+[app-icon] failed to clear macOS dock icon metadata com.apple.ResourceFork: Error: Command failed: /usr/bin/xattr -d com.apple.ResourceFork /Applications/Orca.app
+xattr: [Errno 1] Operation not permitted: '/Applications/Orca.app'
+
+    at genericNodeError (node:internal/errors:986:15)
+    at wrappedFn (node:internal/errors:540:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1141:16)
+    at Socket.<anonymous> (node:internal/child_process:498:11)
+    at Socket.emit (node:events:514:28)
+    at Pipe.<anonymous> (node:net:362:12) {
+  code: 1,
+  killed: false,
+  signal: null,
+  cmd: '/usr/bin/xattr -d com.apple.ResourceFork /Applications/Orca.app'
+}
+[pty:history] worktreeId=afa50224-707e-465e-93fc-f1343f4c51ea::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9cdbf3912914a233/zsh_history fishSession=none
+[pty] macOS login(1) preflight failed; spawning shells directly
+[pty:history] worktreeId=afa50224-707e-465e-93fc-f1343f4c51ea::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9cdbf3912914a233/zsh_history fishSession=none
+[pty] macOS login(1) preflight failed; spawning shells directly
+[pty:history] worktreeId=afa50224-707e-465e-93fc-f1343f4c51ea::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9cdbf3912914a233/zsh_history fishSession=none
+[pty] macOS login(1) preflight failed; spawning shells directly
+[pty:history] worktreeId=afa50224-707e-465e-93fc-f1343f4c51ea::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9cdbf3912914a233/zsh_history fishSession=none
+[pty] macOS login(1) preflight failed; spawning shells directly
+[pty:history] worktreeId=afa50224-707e-465e-93fc-f1343f4c51ea::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9cdbf3912914a233/zsh_history fishSession=none
+[pty] macOS login(1) preflight failed; spawning shells directly
+[pty:history] worktreeId=afa50224-707e-465e-93fc-f1343f4c51ea::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9cdbf3912914a233/zsh_history fishSession=none
+[pty:history] worktreeId=afa50224-707e-465e-93fc-f1343f4c51ea::/Users/kesslerio/.no-m... shell=zsh histFile=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.o/terminal-history/9cdbf3912914a233/zsh_history fishSession=none
+[3597:1008/134017.339055:ERROR:content/browser/gpu/gpu_process_host.cc:1108] GPU process exited unexpectedly: exit_code=15
+[3597:1008/134017.341774:ERROR:content/browser/network_service_instance_impl.cc:721] Network service crashed or was terminated, restarting service.

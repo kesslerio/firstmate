@@ -1,0 +1,9 @@
+Reply exactly ACK_HEALTHY_7B9. Do not use tools.
+  Cursor Agent
+  v2026.10.01-e373342
+  Tip: Use /skills to give Cursor specialized knowledge for tasks.
+  → Reply exactly ACK_HEALTHY_7B9. Do not use tools.
+  Ask (shift+tab to cycle)
+  Auto
+  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live
+  · fm-transport-live

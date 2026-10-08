@@ -1,0 +1,23 @@
+{
+  "id": "62e065e9-ba0a-4d69-9721-1840f9cba164",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_a74a9649-0bde-4a3c-ae33-6d6b1db66d0f",
+      "status": "running",
+      "tail": [
+        "kesslerio@MK-MacBook-Pro-5 fm-round2-live %"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "0",
+      "latestCursor": "0",
+      "returnedLineCount": 1,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4c43b876-3b13-4292-8b64-b8ebbe28324f"
+  }
+}

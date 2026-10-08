@@ -1,0 +1,39 @@
+{
+  "id": "03f31107-4391-48d0-97cf-9692a2623a67",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "  Reply exactly ACK_HEALTHY_7B9. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg",
+        "  in your 'transport-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its",
+        "  handled/.",
+        "  ACK_HEALTHY_7B9",
+        "  Reply exactly ACK_STALE_7B9. Do not use tools.",
+        "  ACK_STALE_7B9",
+        "  Reply ACK_ENTER_7B9 without using tools.",
+        "  ACK_ENTER_7B9",
+        "  HUMAN_UNFINISHED_DRAFT_9C2. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg in",
+        "  your 'draft-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/.",
+        "  HUMAN_UNFINISHED_DRAFT_9C2",
+        "  \u2192 : Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg in your 'own-live.inbox' steering inbox, read and",
+        "    act on each in numeric order, then mv each into its handled/.",
+        "  Ask (shift+tab to cycle)",
+        "  Auto \u00b7 11.8%",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  \u00b7 fm-transport-live"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "1399",
+      "latestCursor": "1399",
+      "returnedLineCount": 17,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}

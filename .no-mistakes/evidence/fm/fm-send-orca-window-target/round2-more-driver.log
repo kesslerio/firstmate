@@ -1,0 +1,6 @@
+busy pass
+Traceback (most recent call last):
+  File "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/drive-more.py", line 15, in <module>
+    r=fm('round2-live','--key','C-c'); b=cap(t,'round2-ambiguous-original-after'); db=cap(decoy,'round2-ambiguous-decoy-after'); assert r.returncode!=0 and 'terminal_handle_stale' in r.stderr and 'terminal send' not in r.stdout
+                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

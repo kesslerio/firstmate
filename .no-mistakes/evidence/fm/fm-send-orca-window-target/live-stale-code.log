@@ -1,0 +1,118 @@
+$ ['orca', 'terminal', 'send', '--terminal', 'term_00000000-0000-4000-8000-000000000062', '--text', 'rejected probe', '--json']
+{
+  "id": "8fcdbd4b-dab5-4e7e-8137-3f9159d0ea29",
+  "ok": false,
+  "error": {
+    "code": "terminal_handle_stale",
+    "message": "terminal_handle_stale"
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=1
+$ ['bin/fm-send.sh', 'stale-code-live', '--key', 'C-c']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+
+exit=0
+$ ['bash', '-c', '. bin/fm-backend.sh; fm_backend_source orca; fm_backend_orca_send_literal "$1" "HANDLE_STALE_LIVE_62D"', '_', 'term_00000000-0000-4000-8000-000000000062']
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--limit', '100', '--json']
+{
+  "id": "ad793a31-cef6-48aa-8536-926d19ab4716",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "  HUMAN_UNFINISHED_DRAFT_9C2. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg in",
+        "  your 'draft-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/.",
+        "  HUMAN_UNFINISHED_DRAFT_9C2",
+        "  : Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg in your 'own-live.inbox' steering inbox, read and",
+        "  act on each in numeric order, then mv each into its handled/.: Firstmate instruction waiting: list",
+        "  \"$FM_TASK_INBOX\"/*.msg in your 'own-live.inbox' steering inbox, read and act on each in numeric order, then mv",
+        "  each into its handled/.",
+        "  Ask mode blocks moving files; I'll list and read the steering inbox messages (readonly) and report what they",
+        "  require.",
+        "    Explored available MCP tools cursor · TodoWrite",
+        "  $ echo \"FM_TASK_INBOX=${FM_TASK_INBOX:-}\"; ls -la \"${FM_TASK_INBOX:-/nonexistent}\" 2>&1; ls -la",
+        "    \"${FM_TASK_INBOX}\"/*.msg 2>&1; find . -type d -name 'own-live.inbox' 2>/dev/null; find",
+        "    /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW -type d -name '*own-live*'",
+        "    2>/dev/null | head -50 Cancelled",
+        "    Globbing 2 globs",
+        "    Globbing \"**/own-live.inbox/**/*\" in .",
+        "    Globbing \"**/*.msg\" in .",
+        "  → HANDLE_STALE_LIVE_62D",
+        "  Ask (shift+tab to cycle)",
+        "  Auto · 12.3%",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live",
+        "  · fm-transport-live"
+      ],
+      "truncated": true,
+      "limited": false,
+      "oldestCursor": "666",
+      "nextCursor": "2666",
+      "latestCursor": "2666",
+      "returnedLineCount": 22,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['bin/fm-send.sh', 'stale-code-live', '--key', 'C-c']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a', '--limit', '100', '--json']
+{
+  "id": "c55506fe-4f10-4ef1-a96d-5cf9874df91d",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "status": "running",
+      "tail": [
+        "  HUMAN_UNFINISHED_DRAFT_9C2. Do not use tools.: Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg in",
+        "  your 'draft-live.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/.",
+        "  HUMAN_UNFINISHED_DRAFT_9C2",
+        "  : Firstmate instruction waiting: list \"$FM_TASK_INBOX\"/*.msg in your 'own-live.inbox' steering inbox, read and",
+        "  act on each in numeric order, then mv each into its handled/.: Firstmate instruction waiting: list",
+        "  \"$FM_TASK_INBOX\"/*.msg in your 'own-live.inbox' steering inbox, read and act on each in numeric order, then mv",
+        "  each into its handled/.",
+        "  Ask mode blocks moving files; I'll list and read the steering inbox messages (readonly) and report what they",
+        "  require.",
+        "    Explored available MCP tools cursor · TodoWrite",
+        "  $ echo \"FM_TASK_INBOX=${FM_TASK_INBOX:-}\"; ls -la \"${FM_TASK_INBOX:-/nonexistent}\" 2>&1; ls -la",
+        "    \"${FM_TASK_INBOX}\"/*.msg 2>&1; find . -type d -name 'own-live.inbox' 2>/dev/null; find",
+        "    /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW -type d -name '*own-live*'",
+        "    2>/dev/null | head -50 Cancelled",
+        "    Globbing 2 globs",
+        "    Globbing \"**/own-live.inbox/**/*\" in .",
+        "    Globbing \"**/*.msg\" in .",
+        "  → Add a follow-up",
+        "  Press Ctrl+C again to exit"
+      ],
+      "truncated": true,
+      "limited": false,
+      "oldestCursor": "671",
+      "nextCursor": "2671",
+      "latestCursor": "2671",
+      "returnedLineCount": 19,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0

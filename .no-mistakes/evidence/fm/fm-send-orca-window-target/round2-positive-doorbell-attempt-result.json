@@ -1,0 +1,8 @@
+{
+  "fm_send_exit": 0,
+  "stderr": "fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l\nWARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.\nfm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/round2-positive.inbox/001.msg and the watcher will re-ring\n",
+  "composer_state": "unknown",
+  "doorbell_visible": false,
+  "real_harness": "opencode",
+  "metadata_stale_error": "terminal_not_writable"
+}

@@ -1,0 +1,8 @@
+{
+  "real_runtime_error": "terminal_handle_stale",
+  "fixture_stale_handle": "term_00000000-0000-4000-8000-000000000062",
+  "literal_arrived_in_named_live_pane": true,
+  "explicit_C_c_accepted_by_live_pane": true,
+  "metadata_sha256_before": "4eb3c03a8a04aef4bcd9bd003366b6875cc0296efea0f40ebbb63a9ffd61a840",
+  "metadata_sha256_after": "4eb3c03a8a04aef4bcd9bd003366b6875cc0296efea0f40ebbb63a9ffd61a840"
+}

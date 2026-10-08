@@ -1,0 +1,40 @@
+{
+  "id": "22b960d8-c2e2-4057-a239-6b105cae1e03",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_ff3c4f5d-23a4-4c2d-aeb0-809a835608f4",
+      "status": "running",
+      "tail": [
+        "  Cursor Agent",
+        "  v2026.10.01-e373342",
+        "  Tip: Use subagents to parallelize work and preserve context.",
+        "  TYPED_STEER_RESTART_R2: Reply ACK_R2; do not use tools.",
+        "  ACK_R2ACK_R2",
+        "  ACK_R2ACK_R2",
+        "  ACK_R2ACK_R2",
+        "  HEALTHY_CHANNEL_R2: Reply ACK_HEALTHY_R2; do not use tools.",
+        " \u250c\u2500 follow-ups \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+        " \u2502 \u25cb Write a 120-line poem about clouds, one numbered line per stanza. Do not use tools.                            \u2502",
+        " \u2502 enter steer \u00b7 \u2191 select/edit \u00b7 esc cancel                                                                         \u2502",
+        " \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+        " \u2818\u2823 Working",
+        "  \u2192 Plan, search, build anything",
+        "  Ask (shift+tab to cycle)",
+        "  Auto",
+        "  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-round2/runtime-home/orca/workspaces/project/fm",
+        "  -round2-live \u00b7 fm-round2-live"
+      ],
+      "truncated": true,
+      "limited": false,
+      "oldestCursor": "2443",
+      "nextCursor": "4443",
+      "latestCursor": "4443",
+      "returnedLineCount": 18,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4c43b876-3b13-4292-8b64-b8ebbe28324f"
+  }
+}

@@ -1,0 +1,322 @@
+$ ['orca', 'worktree', 'create', '--repo', 'id:373d4f7c-ecdc-4efe-b013-79f808aa641a', '--name', 'fm-blocked-live', '--no-parent', '--setup', 'skip', '--json']
+{
+  "id": "aac664bb-dc6e-4f79-8add-491682b675c6",
+  "ok": true,
+  "result": {
+    "worktree": {
+      "id": "373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-blocked-live",
+      "identity": {
+        "key": "wt2:local:d10f522a-d4ef-4177-a8b8-d3a8bb82d9ae",
+        "executionHostId": "local",
+        "instanceId": "d10f522a-d4ef-4177-a8b8-d3a8bb82d9ae"
+      },
+      "instanceId": "d10f522a-d4ef-4177-a8b8-d3a8bb82d9ae",
+      "repoId": "373d4f7c-ecdc-4efe-b013-79f808aa641a",
+      "projectId": "repo:373d4f7c-ecdc-4efe-b013-79f808aa641a",
+      "hostId": "local",
+      "projectHostSetupId": "373d4f7c-ecdc-4efe-b013-79f808aa641a",
+      "creatorProvenance": {
+        "kind": "host"
+      },
+      "path": "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-blocked-live",
+      "head": "2f8f9acbb00a0a1af5fb45257145aedc9c1631ab",
+      "branch": "refs/heads/fm-blocked-live",
+      "isBare": false,
+      "isMainWorktree": false,
+      "displayName": "fm-blocked-live",
+      "displayNameMode": "fixed",
+      "comment": "",
+      "linkedIssue": null,
+      "linkedPR": null,
+      "linkedLinearIssue": null,
+      "linkedLinearIssueWorkspaceId": null,
+      "linkedLinearIssueOrganizationUrlKey": null,
+      "linkedGitLabMR": null,
+      "linkedGitLabIssue": null,
+      "linkedBitbucketPR": null,
+      "linkedAzureDevOpsPR": null,
+      "linkedGiteaPR": null,
+      "linkedWorkItem": null,
+      "linkedTaskSourceContext": null,
+      "isArchived": false,
+      "isUnread": false,
+      "isPinned": false,
+      "sortOrder": 1791489297162,
+      "lastActivityAt": 1791489297162,
+      "createdAt": 1791489297162,
+      "cliProvenance": {
+        "kind": "created-by-cli",
+        "createdAt": 1791489296704
+      },
+      "baseRef": "main",
+      "workspaceStatus": "in-progress",
+      "parentWorktreeId": null,
+      "childWorktreeIds": [],
+      "lineage": null,
+      "workspaceLineage": null,
+      "git": {
+        "path": "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-blocked-live",
+        "head": "2f8f9acbb00a0a1af5fb45257145aedc9c1631ab",
+        "branch": "refs/heads/fm-blocked-live",
+        "isBare": false,
+        "isMainWorktree": false
+      }
+    },
+    "lineage": null,
+    "workspaceLineage": null,
+    "warnings": [],
+    "catalogVersion": {
+      "epoch": "19a00070-e889-4e8a-a4b1-9f150c1b2660",
+      "sequence": 7
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'list', '--worktree', 'name:fm-blocked-live', '--json']
+{
+  "id": "61894ba4-6d53-4be9-817b-db4e3bd50118",
+  "ok": true,
+  "result": {
+    "terminals": [
+      {
+        "handle": "term_f497b3a6-2780-49fd-b700-93c2b324aced",
+        "ptyId": "15",
+        "incarnationId": "a04a6c8b-f203-474f-8d11-0988777e896b",
+        "orphaned": false,
+        "worktreeId": "373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-blocked-live",
+        "worktreePath": "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-blocked-live",
+        "branch": "refs/heads/fm-blocked-live",
+        "tabId": "1ecfe366-711d-45aa-a83c-e747f1c8f9e5",
+        "leafId": "15d06d40-16c9-4dfa-b87c-de334d3afb23",
+        "title": null,
+        "connected": true,
+        "writable": true,
+        "lastOutputAt": null,
+        "preview": "",
+        "executionHostId": "local"
+      }
+    ],
+    "hostScope": {
+      "hostIds": [
+        "local"
+      ],
+      "omittedHostIds": []
+    },
+    "topologyRevisions": {
+      "373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-blocked-live": 39
+    },
+    "totalCount": 1,
+    "truncated": false
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'close', '--terminal', 'term_f497b3a6-2780-49fd-b700-93c2b324aced', '--json']
+{
+  "id": "b4876c8b-ad2a-4c49-8eaa-5f92e1e6e8b9",
+  "ok": true,
+  "result": {
+    "close": {
+      "handle": "term_f497b3a6-2780-49fd-b700-93c2b324aced",
+      "tabId": "1ecfe366-711d-45aa-a83c-e747f1c8f9e5",
+      "ptyKilled": true
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'create', '--worktree', 'name:fm-blocked-live', '--title', 'fm-blocked-live', '--command', "printf '\\033[?1049h'; env HOME=/Users/kesslerio claude --safe-mode --permission-mode auto --tools ''", '--json']
+{
+  "id": "11f83414-80e6-4fc5-aba6-3fbd5c323c64",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd",
+      "tabId": "249c73b9-fa03-45a3-89d7-0e515206d652",
+      "paneKey": "249c73b9-fa03-45a3-89d7-0e515206d652:0eee04a4-2eee-406d-838a-8a430b15c920",
+      "ptyId": "16",
+      "worktreeId": "373d4f7c-ecdc-4efe-b013-79f808aa641a::/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-blocked-live",
+      "title": "fm-blocked-live",
+      "executionHostId": "local",
+      "incarnationId": "b1d1b2fe-95e0-4e05-b38a-2bd33d274402",
+      "hostPlatform": "darwin",
+      "surface": "background",
+      "warning": "Terminal term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd is running, but Orca could not make it discoverable. Run `orca terminal focus --terminal term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd` to reveal and focus it."
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd', '--limit', '100', '--json']
+{
+  "id": "fb6f00d7-264d-4d8b-a47b-8d65e86e4453",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd",
+      "status": "running",
+      "tail": [],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "0",
+      "latestCursor": "0",
+      "returnedLineCount": 0,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd', '--limit', '100', '--json']
+{
+  "id": "83a0bd2a-eb48-4a2c-b4d3-b23141506c56",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd",
+      "status": "running",
+      "tail": [],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "0",
+      "latestCursor": "0",
+      "returnedLineCount": 0,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd', '--limit', '100', '--json']
+{
+  "id": "fd61cf5b-c040-4ad0-bc1c-0eeb9ca2df95",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd",
+      "status": "running",
+      "tail": [
+        "printf '\\033[?1049h'; env HOME=/Users/kesslerio claude --safe-mode --permission-mode auto --tools ''",
+        ""
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "2",
+      "latestCursor": "2",
+      "returnedLineCount": 2,
+      "source": "stream"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd', '--limit', '100', '--json']
+{
+  "id": "524cdbc8-8c54-4369-8f1d-881bfe5173f8",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd",
+      "status": "running",
+      "tail": [
+        "────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────",
+        " Accessing workspace:",
+        " /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-b",
+        " locked-live",
+        " Quick safety check: Is this a project you created or one you trust? (Like your own code, a well-known open source",
+        " project, or work from your team). If not, take a moment to review what's in this folder first.",
+        " Claude Code'll be able to read, edit, and execute files here.",
+        " Security guide",
+        " ❯ No, exit",
+        "   Yes, I trust this folder",
+        " Enter to confirm · Esc to cancel"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "20",
+      "latestCursor": "20",
+      "returnedLineCount": 11,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0
+$ ['bin/fm-send.sh', 'term_f497b3a6-2780-49fd-b700-93c2b324aced', 'BLOCKED_TEXT_SHOULD_NOT_ARRIVE']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not submitted to term_f497b3a6-2780-49fd-b700-93c2b324aced (delivery unconfirmed; verdict=unknown; tried explicit target 'term_f497b3a6-2780-49fd-b700-93c2b324aced' matched /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/blocked-live.meta; backend=orca)
+
+exit=1
+$ ['bin/fm-send.sh', 'blocked-live', '--key', 'Enter']
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+
+exit=0
+$ ['orca', 'terminal', 'read', '--terminal', 'term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd', '--limit', '100', '--json']
+{
+  "id": "b9817ef9-360e-4ad3-901e-53fb2363bc56",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_2cfce4b0-13fa-46e0-b436-9c06e64e1efd",
+      "status": "running",
+      "tail": [
+        "────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────",
+        " Accessing workspace:",
+        " /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-b",
+        " locked-live",
+        " Quick safety check: Is this a project you created or one you trust? (Like your own code, a well-known open source",
+        " project, or work from your team). If not, take a moment to review what's in this folder first.",
+        " Claude Code'll be able to read, edit, and execute files here.",
+        " Security guide",
+        " ❯ No, exit",
+        "   Yes, I trust this folder",
+        " Enter to confirm · Esc to cancel",
+        "kesslerio@localhost fm-blocked-live %",
+        "kesslerio@localhost fm-blocked-live %"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "21",
+      "latestCursor": "21",
+      "returnedLineCount": 13,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "58c151fa-ac0b-4c25-abef-85a904e6f10a"
+  }
+}
+
+exit=0

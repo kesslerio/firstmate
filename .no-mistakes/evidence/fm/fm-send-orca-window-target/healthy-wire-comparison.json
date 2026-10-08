@@ -1,0 +1,24 @@
+{
+  "real_cli_passthrough": "/opt/homebrew/bin/orca",
+  "commands_identical": true,
+  "commands": [
+    [
+      "terminal",
+      "send",
+      "--terminal",
+      "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "--text",
+      "HEALTHY_BYTES_64A",
+      "--json"
+    ],
+    [
+      "terminal",
+      "send",
+      "--terminal",
+      "term_6d584bdd-8e44-44e7-9c75-b6b41f326b8a",
+      "--interrupt",
+      "--json"
+    ]
+  ],
+  "both_inputs_visible_in_real_harness": true
+}

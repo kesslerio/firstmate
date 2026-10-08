@@ -1,0 +1,37 @@
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['bash', '-c', '. bin/fm-backend.sh; fm_backend_composer_state orca "$1"'] 0
+['orca', 'terminal', 'read'] 0
+Traceback (most recent call last):
+  File "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/live-drive.py", line 38, in <module>
+    ready(t)
+    ~~~~~^^^
+  File "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/live-drive.py", line 29, in ready
+    raise RuntimeError('Real harness did not reach an empty recognized composer: '+cap(t))
+RuntimeError: Real harness did not reach an empty recognized composer:   Cursor Agent
+  v2026.10.01-e373342
+  Tip: Hit shift+tab to enable Plan Mode for large or complex changes.
+  → Plan, search, build anything
+  Ask (shift+tab to cycle)
+  Grok 4.6 High
+  ~/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.test-orca-lab/workspaces/project/fm-transport-live
+  · fm-transport-live

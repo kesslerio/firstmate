@@ -1,0 +1,2 @@
+[75130:1008/133015.913986:ERROR:chrome/browser/process_singleton_posix.cc:1192] Failed to create socket directory.
+[single-instance] Another Orca instance is already running for this userData profile; exiting this launch after requesting the existing window. If no Orca process is running, this may be an Electron/macOS single-instance lock failure.

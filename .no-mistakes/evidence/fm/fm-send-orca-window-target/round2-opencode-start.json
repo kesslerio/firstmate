@@ -1,0 +1,23 @@
+{
+  "id": "4728a5c9-cef8-4598-a9d3-3a02e34746ee",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_aa119bd2-c8bb-4954-9795-46cf204db482",
+      "status": "running",
+      "tail": [
+        "kesslerio@MK-MacBook-Pro-5 fm-round2-positive % opencode"
+      ],
+      "truncated": false,
+      "limited": false,
+      "oldestCursor": "0",
+      "nextCursor": "1",
+      "latestCursor": "1",
+      "returnedLineCount": 1,
+      "source": "screen-unavailable"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4c43b876-3b13-4292-8b64-b8ebbe28324f"
+  }
+}

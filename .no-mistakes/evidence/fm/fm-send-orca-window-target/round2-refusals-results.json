@@ -1,0 +1,41 @@
+[
+  {
+    "scenario": "ambiguous",
+    "pass": true,
+    "commands": [
+      [
+        "terminal",
+        "send",
+        "--terminal",
+        "term_cc38ac43-c623-4736-ba37-73c5a7fb6ed6",
+        "--interrupt",
+        "--json"
+      ],
+      [
+        "terminal",
+        "list",
+        "--worktree",
+        "name:fm-round2-live",
+        "--limit",
+        "200",
+        "--json"
+      ]
+    ],
+    "stderr": "fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l\nWARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.\nerror: key 'C-c' not sent to term_cc38ac43-c623-4736-ba37-73c5a7fb6ed6 (orca send failed; tried meta=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/round2-live.meta; backend=from-meta)\n"
+  },
+  {
+    "scenario": "missing",
+    "pass": true,
+    "commands": [
+      [
+        "terminal",
+        "send",
+        "--terminal",
+        "term_cc38ac43-c623-4736-ba37-73c5a7fb6ed6",
+        "--interrupt",
+        "--json"
+      ]
+    ],
+    "stderr": "fm-gate-refuse: gate agent lifecycle permitted only against lab home /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l\nWARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.\nerror: key 'C-c' not sent to term_cc38ac43-c623-4736-ba37-73c5a7fb6ed6 (orca send failed; tried meta=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4ECD9YTA5D04QXXWWV4FBTW/.l/state/round2-missing.meta; backend=from-meta)\n"
+  }
+]
