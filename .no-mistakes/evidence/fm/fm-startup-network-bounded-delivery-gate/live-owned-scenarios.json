@@ -1,0 +1,23 @@
+[
+  {
+    "name": "The unchanged captured owner runs deferred sweeps under the acquisition lease",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "A held acquisition lease ends the worker without executing sweeps and reports the refusal",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "Publication contention retains completed real probe findings and their matching timings for later recovery",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  }
+]

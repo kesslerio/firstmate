@@ -1,0 +1,463 @@
+
+SCENARIO: A live inline claimant cannot keep the worker running beyond its delivery budget
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+Claimant 94748 remains alive; worker 97032 is awaiting delivery.
+Worker CPU samples:
+97032   0:00.07   8.0 R
+97032   0:00.07   2.0 S
+97032   0:00.08   0.1 S
+97032   0:00.09   0.6 S
+$ fm-startup-network.sh report
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+1000    elapsed=0
+  stage       network-checks probe                       start=+0       elapsed=1000
+  slowest: stage network-checks probe 1000ms, phase gh-auth 0ms
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=done
+pid=97032
+started=1791486170
+finished=1791486171
+rc=0
+locked=0
+phases=probe
+generation=1791486170.95806.94748
+lock_pid=
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	1000	0	
+v1	stage	network-checks	0	1000	probe
+
+.wake-queue:
+1791486176	1	check	startup-network	check: startup-network: deferred startup network checks finished (done); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+delivered
+
+Worker settled in 6.352s while claimant still alive; one notification.
+RESULT pass elapsed=6.749
+
+SCENARIO: Inline harvest acknowledges published findings and suppresses their notification
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh: child setpgid (25186 to 25186): Operation not permitted
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=done
+pid=25154
+started=1791486176
+finished=1791486177
+rc=0
+locked=0
+phases=probe
+generation=1791486176.24163.94748
+lock_pid=
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	0	0	
+v1	stage	network-checks	0	0	probe
+
+.wake-queue:
+
+.startup-network.delivered:
+delivered
+
+RESULT pass elapsed=1.145
+
+SCENARIO: Failed publication retains readable findings and timings; later startup publishes and notifies once
+$ fm-startup-network.sh run --locked 0
+exit=1
+
+$ fm-startup-network.sh report
+exit=0
+NETWORK_CHECKS: completed findings retained pending publication or delivery; a later startup will retry.
+NEEDS_GH_AUTH
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+1000    elapsed=0
+  stage       network-checks probe                       start=+1000    elapsed=0
+  slowest: phase gh-auth 0ms, stage network-checks probe 0ms
+
+$ fm-startup-network.sh harvest
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+The stage itself did not finish cleanly (failed) - the NETWORK_CHECKS line below names what to rerun.
+NETWORK_CHECKS: could not publish the deferred check report, so GitHub authentication results are unavailable; rerun /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh run --locked 0
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 0
+exit=1
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 2s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=done
+pid=48637
+started=1791486182
+finished=1791486184
+rc=0
+locked=0
+phases=probe
+generation=1791486182.45237.94748
+lock_pid=
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	0	0	
+v1	stage	network-checks	0	0	probe
+
+.wake-queue:
+1791486179	1	check	startup-network	check: startup-network: deferred startup network checks finished (done); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+delivered
+
+RESULT pass elapsed=7.965
+
+SCENARIO: A held publication lock ends the reserved worker with retained actionable timeout findings
+Reserved worker exit=1
+
+$ fm-startup-network.sh report
+exit=0
+NETWORK_CHECKS: completed findings retained pending publication or delivery; a later startup will retry.
+NETWORK_CHECKS: the deferred check worker gave up because /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/.test-startup-network/live/precheck/state/.startup-network.lock was still held by pid 59769 at its deadline, so GitHub authentication may be incomplete; rerun /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh run --locked 0 once that lock is released
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=done
+pid=77022
+started=1791486190
+finished=1791486191
+rc=0
+locked=0
+phases=probe
+generation=1791486190.72205.94748
+lock_pid=
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	0	0	
+v1	stage	network-checks	0	1000	probe
+
+.wake-queue:
+1791486190	1	check	startup-network	check: startup-network: deferred startup network checks finished (failed); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+delivered
+
+RESULT pass elapsed=7.446
+
+SCENARIO: A held notification queue lock leaves bounded delivery recoverable at the next startup
+$ fm-startup-network.sh run --locked 0
+exit=0
+
+$ fm-startup-network.sh report
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+0       elapsed=0
+  stage       network-checks probe                       start=+0       elapsed=0
+  slowest: phase gh-auth 0ms, stage network-checks probe 0ms
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=done
+pid=25779
+started=1791486201
+finished=1791486202
+rc=0
+locked=0
+phases=probe
+generation=1791486201.24037.94748
+lock_pid=
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	0	0	
+v1	stage	network-checks	0	0	probe
+
+.wake-queue:
+1791486198	1	check	startup-network	check: startup-network: deferred startup network checks finished (done); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+delivered
+
+RESULT pass elapsed=11.091
+
+SCENARIO: A held nested recovery lock leaves bounded delivery recoverable at the next startup
+$ fm-startup-network.sh run --locked 0
+exit=0
+
+$ fm-startup-network.sh report
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+1000    elapsed=0
+  stage       network-checks probe                       start=+1000    elapsed=0
+  slowest: phase gh-auth 0ms, stage network-checks probe 0ms
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=done
+pid=64381
+started=1791486211
+finished=1791486212
+rc=0
+locked=0
+phases=probe
+generation=1791486211.63153.94748
+lock_pid=
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	1000	0	
+v1	stage	network-checks	0	1000	probe
+
+.wake-queue:
+1791486209	1	check	startup-network	check: startup-network: deferred startup network checks finished (done); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+delivered
+
+RESULT pass elapsed=9.391
+
+SCENARIO: An interrupted reservation leaves staged current-generation findings recoverable by later startup
+Bounded worker exit=1
+
+Recoverable staged status:
+state=failed
+phases=probe
+locked=0
+started=1791486214
+rc=124
+generation=original
+
+Recoverable staged report:
+NETWORK_CHECKS: the deferred check worker gave up because /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/.test-startup-network/live/staged-True/state/.startup-network.lock was still held by pid 73640 at its deadline, so GitHub authentication may be incomplete; rerun /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh run --locked 0 once that lock is released
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=done
+pid=93161
+started=1791486219
+finished=1791486220
+rc=0
+locked=0
+phases=probe
+generation=1791486219.90607.94748
+lock_pid=
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	0	0	
+v1	stage	network-checks	0	0	probe
+
+.wake-queue:
+1791486219	1	check	startup-network	check: startup-network: deferred startup network checks finished (failed); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+delivered
+
+RESULT pass elapsed=7.751
+
+SCENARIO: A committed successor generation rejects stale staged findings without notification
+Bounded worker exit=1
+
+Recoverable staged status:
+state=failed
+phases=probe
+locked=0
+started=1791486221
+rc=124
+generation=original
+
+Recoverable staged report:
+NETWORK_CHECKS: the deferred check worker gave up because /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/.test-startup-network/live/staged-False/state/.startup-network.lock was still held by pid 1415 at its deadline, so GitHub authentication may be incomplete; rerun /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh run --locked 0 once that lock is released
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 94748
+exit=0
+
+$ fm-startup-network.sh harvest --pid 94748
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=done
+pid=19014
+started=1791486226
+finished=1791486227
+rc=0
+locked=0
+phases=probe
+generation=1791486226.17772.94748
+lock_pid=
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	0	0	
+v1	stage	network-checks	0	0	probe
+
+.wake-queue:
+
+.startup-network.delivered:
+delivered
+
+RESULT pass elapsed=7.305
+
+SCENARIO: A replaced owner cannot execute mutating sweeps or launch a locked startup
+
+$ fm-startup-network.sh report
+exit=0
+completed off the startup path in 1s: GitHub authentication.
+NEEDS_GH_AUTH
+NETWORK_CHECKS: the fleet lock was no longer held by the session that requested these, so dead-secondmate relaunch, secondmate convergence, pending handoff delivery, and project clone refresh were skipped; they belong to whichever session holds the lock now
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+1000    elapsed=0
+  stage       network-checks probe                       start=+1000    elapsed=0
+  slowest: phase gh-auth 0ms, stage network-checks probe 0ms
+
+$ fm-startup-network.sh start --locked 1 --harvest-pid 0
+exit=1
+
+.startup-network.status:
+state=done
+pid=26868
+started=1791486228
+finished=1791486229
+rc=0
+locked=0
+phases=probe
+generation=denied
+lock_pid=999999999
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+NETWORK_CHECKS: the fleet lock was no longer held by the session that requested these, so dead-secondmate relaunch, secondmate convergence, pending handoff delivery, and project clone refresh were skipped; they belong to whichever session holds the lock now
+
+.startup-network.timings:
+v1	phase	gh-auth	1000	0	
+v1	stage	network-checks	1000	0	probe
+
+.wake-queue:
+1791486230	1	check	startup-network	check: startup-network: deferred startup network checks finished (done); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+
+RESULT pass elapsed=1.637
+Disposable homes and owned processes cleaned up.

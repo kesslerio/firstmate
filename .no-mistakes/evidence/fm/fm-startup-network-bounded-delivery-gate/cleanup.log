@@ -1,0 +1,1 @@
+Private fm-lab tmux server stopped; primary and its captured descendants exited. Both CLI drivers removed their disposable homes and stopped owned processes. Temporary test roots and selector driver removed; only the intentional timing-fixture correction remains in the worktree.

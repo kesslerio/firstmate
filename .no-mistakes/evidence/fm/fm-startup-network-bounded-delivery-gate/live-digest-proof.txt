@@ -1,0 +1,25 @@
+Real Claude primary: isolated fm-lab tmux socket, 100x30 grid.
+Unpublished findings stay out of the digest, no notification was appended, and retained generation stayed current.
+
+Published status:
+state=failed
+pid=26532
+started=1791486375
+finished=1791486380
+rc=1
+locked=0
+phases=probe
+generation=1791486375.8964.manual
+lock_pid=
+report_published=0
+
+Retained status:
+state=done
+phases=probe
+locked=0
+started=1791486375
+rc=0
+generation=1791486375.8964.manual
+
+Retained report:
+NEEDS_GH_AUTH

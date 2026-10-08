@@ -1,0 +1,93 @@
+[
+  {
+    "name": "A live inline claimant cannot keep the worker running beyond its delivery budget",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "Inline harvest acknowledges published findings and suppresses their notification",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "Failed publication retains readable findings and timings; later startup publishes and notifies once",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "A held publication lock ends the reserved worker with retained actionable timeout findings",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "A held notification queue lock leaves bounded delivery recoverable at the next startup",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "A held nested recovery lock leaves bounded delivery recoverable at the next startup",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "An interrupted reservation leaves staged current-generation findings recoverable by later startup",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "A committed successor generation rejects stale staged findings without notification",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "A replaced owner cannot execute mutating sweeps or launch a locked startup",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-startup-network.log",
+    "reason": ""
+  },
+  {
+    "name": "The unchanged captured owner runs deferred sweeps under the acquisition lease",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-owned-sweeps.log",
+    "reason": ""
+  },
+  {
+    "name": "A held acquisition lease ends the worker without executing sweeps and reports the refusal",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-owned-sweeps.log",
+    "reason": ""
+  },
+  {
+    "name": "Publication contention retains completed real probe findings and their matching timings for later recovery",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-owned-sweeps.log",
+    "reason": ""
+  },
+  {
+    "name": "A real primary sees an explicit fresh-check failure in its startup digest while unpublished findings remain retained",
+    "result": "pass",
+    "live": true,
+    "evidence": "live-session-digest.log; live-digest-proof.txt",
+    "reason": ""
+  }
+]

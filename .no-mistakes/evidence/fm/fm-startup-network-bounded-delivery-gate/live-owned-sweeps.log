@@ -1,0 +1,132 @@
+
+SCENARIO: The unchanged captured owner runs deferred sweeps under the acquisition lease
+
+$ fm-startup-network.sh report
+exit=0
+completed off the startup path in 3s: GitHub authentication, dead-secondmate relaunch, secondmate convergence, pending handoff delivery, project clone refresh with its drift reporting, and inactive terminal-outcome reconciliation.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+1000    elapsed=0
+  phase       secondmate-liveness                        start=+1000    elapsed=0
+  phase       secondmate-sync                            start=+1000    elapsed=0
+  phase       handoff-delivery                           start=+1000    elapsed=0
+  phase       fleet-sync                                 start=+1000    elapsed=1000
+  stage       network-checks probe_sweeps                start=+0       elapsed=2000
+  slowest: stage network-checks probe_sweeps 2000ms, phase fleet-sync 1000ms, phase secondmate-sync 0ms
+
+.startup-network.status:
+state=done
+pid=69121
+started=1791486338
+finished=1791486341
+rc=0
+locked=1
+phases=probe,sweeps
+generation=owned
+lock_pid=68194
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	1000	0	
+v1	phase	secondmate-liveness	1000	0	
+v1	phase	secondmate-sync	1000	0	
+v1	phase	handoff-delivery	1000	0	
+v1	phase	fleet-sync	1000	1000	
+v1	stage	network-checks	0	2000	probe_sweeps
+
+.wake-queue:
+1791486341	1	check	startup-network	check: startup-network: deferred startup network checks finished (done); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+
+RESULT pass elapsed=3.52
+
+SCENARIO: A held acquisition lease ends the worker without executing sweeps and reports the refusal
+
+$ fm-startup-network.sh report
+exit=0
+completed off the startup path in 3s: GitHub authentication, dead-secondmate relaunch, secondmate convergence, pending handoff delivery, project clone refresh with its drift reporting, and inactive terminal-outcome reconciliation.
+The stage itself did not finish cleanly (failed) - the NETWORK_CHECKS line below names what to rerun.
+NETWORK_CHECKS: the deferred check worker gave up because /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/.test-startup-network/live/held-lease/state/.lock.acquire was still held by pid 84658 at its deadline, so GitHub authentication, dead-secondmate relaunch, secondmate convergence, pending handoff delivery, project clone refresh with its drift reporting, and inactive terminal-outcome reconciliation did not run; rerun /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh run --locked 1 once that lease is released
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=failed
+pid=85526
+started=1791486342
+finished=1791486345
+rc=124
+locked=1
+phases=probe,sweeps
+generation=lease
+lock_pid=68194
+report_published=1
+
+.startup-network.report:
+NETWORK_CHECKS: the deferred check worker gave up because /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/.test-startup-network/live/held-lease/state/.lock.acquire was still held by pid 84658 at its deadline, so GitHub authentication, dead-secondmate relaunch, secondmate convergence, pending handoff delivery, project clone refresh with its drift reporting, and inactive terminal-outcome reconciliation did not run; rerun /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh run --locked 1 once that lease is released
+
+.startup-network.timings:
+
+.wake-queue:
+1791486346	1	check	startup-network	check: startup-network: deferred startup network checks finished (failed); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+
+RESULT pass elapsed=4.489
+
+SCENARIO: Publication contention retains completed real probe findings and their matching timings for later recovery
+
+$ fm-startup-network.sh report
+exit=0
+NETWORK_CHECKS: completed findings retained pending publication or delivery; a later startup will retry.
+NEEDS_GH_AUTH
+NETWORK_CHECKS: the deferred check worker gave up because /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/.test-startup-network/live/completed-publication/state/.startup-network.lock was still held by pid 4099 at its deadline, so GitHub authentication, dead-secondmate relaunch, secondmate convergence, pending handoff delivery, project clone refresh with its drift reporting, and inactive terminal-outcome reconciliation may be incomplete; rerun /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh run --locked 1 once that lock is released
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+1000    elapsed=0
+  phase       secondmate-liveness                        start=+1000    elapsed=0
+  phase       secondmate-sync                            start=+1000    elapsed=0
+  phase       handoff-delivery                           start=+1000    elapsed=0
+  phase       fleet-sync                                 start=+1000    elapsed=1000
+  stage       network-checks probe_sweeps                start=+0       elapsed=2000
+  slowest: stage network-checks probe_sweeps 2000ms, phase fleet-sync 1000ms, phase secondmate-sync 0ms
+
+$ fm-startup-network.sh start --locked 0 --harvest-pid 68194
+exit=0
+
+$ fm-startup-network.sh harvest --pid 68194
+exit=0
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+.startup-network.status:
+state=done
+pid=23714
+started=1791486352
+finished=1791486352
+rc=0
+locked=0
+phases=probe
+generation=1791486352.20891.68194
+lock_pid=68194
+report_published=1
+
+.startup-network.report:
+NEEDS_GH_AUTH
+
+.startup-network.timings:
+v1	phase	gh-auth	0	0	
+v1	stage	network-checks	0	0	probe
+
+.wake-queue:
+1791486352	1	check	startup-network	check: startup-network: deferred startup network checks finished (failed); read them with /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4E63C3Z7SP0Z1415AH2WBNA/bin/fm-startup-network.sh report
+
+.startup-network.delivered:
+delivered
+
+RESULT pass elapsed=7.965
+Disposable homes and owned processes cleaned up.
