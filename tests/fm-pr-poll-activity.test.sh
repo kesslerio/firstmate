@@ -13,6 +13,7 @@ WATCH="$ROOT/bin/fm-watch.sh"
 URL=https://github.com/o/r/pull/1
 TMP_ROOT=$(fm_test_tmproot fm-pr-poll-activity)
 BASE_PATH=${FM_TEST_BASE_PATH:-/usr/bin:/bin:/usr/sbin:/sbin}
+REAL_MV=$(command -v mv)
 REAL_JQ=$(command -v jq) || fail "these tests run gh's query with the real jq, which was not found"
 
 file_mode() {
@@ -41,14 +42,39 @@ if [ "${FM_TEST_GH_TRUNCATED:-0}" = 1 ]; then
   exit 0
 fi
 [ -n "${FM_TEST_GH_JSON_FILE:-}" ] && [ -f "$FM_TEST_GH_JSON_FILE" ] || exit 2
+[ "${1:-} ${2:-}" = "api graphql" ] || exit 2
+shift 2
 prog=
-prev=
-for arg in "$@"; do
-  [ "$prev" != --jq ] || prog=$arg
-  prev=$arg
+query=
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --hostname) [ "${2:-}" = github.com ] || exit 2 ;;
+    -f)
+      case "${2:-}" in
+        query=*) query=${2#query=} ;;
+        owner=o|repo=r) ;;
+        *) exit 2 ;;
+      esac
+      ;;
+    -F) [ "${2:-}" = number=1 ] || exit 2 ;;
+    --jq) prog=${2:-} ;;
+    *) exit 2 ;;
+  esac
+  shift 2
 done
+case "$query" in
+  *"comments(first: 100)"*"reviews(first: 100)"*) ;;
+  *) exit 2 ;;
+esac
+case "$query" in
+  *pageInfo*|*after:*|*endCursor*) exit 2 ;;
+esac
 [ -n "$prog" ] || exit 2
-jq -r "$prog" "$FM_TEST_GH_JSON_FILE"
+if [ "${FM_TEST_GH_UNFRAMED:-0}" = 1 ]; then
+  printf 'MERGED\n'
+  exit 0
+fi
+jq '{data:{repository:{pullRequest:{state:.state, comments:{nodes:.comments[:100]}, reviews:{nodes:.reviews[:100]}}}}}' "$FM_TEST_GH_JSON_FILE" | jq -r "$prog"
 SH
   chmod +x "$dir/fakebin/gh"
   cp "$POLL" "$dir/home/state/task-a.check.sh"
@@ -68,6 +94,7 @@ run_direct() {
   FM_TEST_GH_JSON_FILE="$dir/pr.json" FM_TEST_GH_LOG="$dir/gh.log" \
     FM_TEST_GH_FAIL="${FM_TEST_GH_FAIL:-0}" \
     FM_TEST_GH_TRUNCATED="${FM_TEST_GH_TRUNCATED:-0}" \
+    FM_TEST_GH_UNFRAMED="${FM_TEST_GH_UNFRAMED:-0}" \
     PATH="$dir/fakebin:$BASE_PATH" \
     bash "$dir/home/state/task-a.check.sh"
 }
@@ -78,12 +105,14 @@ run_validated() {
     FM_TEST_GH_JSON_FILE="$dir/pr.json" FM_TEST_GH_LOG="$dir/gh.log" \
       FM_TEST_GH_FAIL="${FM_TEST_GH_FAIL:-0}" \
       FM_TEST_GH_TRUNCATED="${FM_TEST_GH_TRUNCATED:-0}" \
+      FM_TEST_GH_UNFRAMED="${FM_TEST_GH_UNFRAMED:-0}" \
       PATH="$dir/fakebin:$BASE_PATH" \
       bash "$POLL" --validated github "$URL" github.com o/r 1 "$check"
   else
     FM_TEST_GH_JSON_FILE="$dir/pr.json" FM_TEST_GH_LOG="$dir/gh.log" \
       FM_TEST_GH_FAIL="${FM_TEST_GH_FAIL:-0}" \
       FM_TEST_GH_TRUNCATED="${FM_TEST_GH_TRUNCATED:-0}" \
+      FM_TEST_GH_UNFRAMED="${FM_TEST_GH_UNFRAMED:-0}" \
       PATH="$dir/fakebin:$BASE_PATH" \
       bash "$POLL" --validated github "$URL" github.com o/r 1
   fi
@@ -120,7 +149,12 @@ test_seed_comment_replay_and_one_wake() {
   sidecar_after=$(cat "$dir/home/state/task-a.pr-poll")
   [ "$sidecar_after" = "$sidecar_before" ] || fail "activity polling rewrote the sidecar"
   [ "$(wc -l < "$dir/gh.log" | tr -d ' ')" = 1 ] || fail "seed sweep did not use exactly one forge read"
-  grep -q -- '--json state,comments,reviews' "$dir/gh.log" || fail "seed sweep did not ask for comments and reviews"
+  grep -q -- '^api graphql ' "$dir/gh.log" || fail "seed did not make a GraphQL request"
+  grep -qF -- 'comments(first: 100)' "$dir/gh.log" || fail "comments request was not bounded"
+  grep -qF -- 'reviews(first: 100)' "$dir/gh.log" || fail "reviews request was not bounded"
+  if grep -qE -- '--paginate|pageInfo|endCursor' "$dir/gh.log"; then
+    fail "seed requested pagination"
+  fi
   : > "$dir/gh.log"
   out=$(run_direct "$dir")
   assert_silent "$out" "replaying the seeded comment woke"
@@ -129,10 +163,12 @@ test_seed_comment_replay_and_one_wake() {
     '[]'
   out=$(run_direct "$dir")
   assert_one_line "$out" "pr-activity: $URL comment maint: please look at the failure"
-  grep -qx 'C2' "$cursor" || fail "wake did not advance the cursor"
+  if grep -qx 'C2' "$cursor"; then fail "unqueued activity advanced the cursor"; fi
+  grep -qx 'C2' "$cursor.pending" || fail "activity did not stage the next cursor"
+  [ "$(file_mode "$cursor.pending")" = 600 ] || fail "staged cursor mode was not 0600"
   out=$(run_direct "$dir")
-  assert_silent "$out" "replaying the advanced cursor woke again"
-  pass "a fresh comment wakes once and a replay stays silent"
+  assert_one_line "$out" "pr-activity: $URL comment maint: please look at the failure"
+  pass "unqueued activity is staged and repeats until committed"
 }
 
 test_review_batch_and_pending_are_one_line() {
@@ -176,23 +212,30 @@ test_errors_and_merged_wording_stay_silent() {
   write_json "$dir/pr.json" OPEN \
     '[{"id":"C1","author":{"login":"alice"},"createdAt":"2026-10-01T00:00:00Z","body":"seed me"}]' \
     '[]'
-  FM_TEST_GH_FAIL=1 out=$(run_direct "$dir")
+  out=$(FM_TEST_GH_FAIL=1 run_direct "$dir")
   assert_silent "$out" "gh failure woke"
   [ ! -e "$cursor" ] || fail "gh failure created a cursor"
-  FM_TEST_GH_TRUNCATED=1 out=$(run_direct "$dir")
+  out=$(FM_TEST_GH_TRUNCATED=1 run_direct "$dir")
   assert_silent "$out" "truncated activity output woke"
   [ ! -e "$cursor" ] || fail "truncated output created a cursor"
-  unset FM_TEST_GH_FAIL FM_TEST_GH_TRUNCATED
+  out=$(FM_TEST_GH_UNFRAMED=1 run_direct "$dir")
+  assert_silent "$out" "an unframed merged response woke"
+  [ ! -e "$cursor" ] || fail "an unframed response seeded a cursor"
   out=$(run_direct "$dir")
   assert_silent "$out" "recovery seed woke"
   before=$(cat "$cursor")
-  FM_TEST_GH_FAIL=1 out=$(run_direct "$dir")
+  out=$(FM_TEST_GH_UNFRAMED=1 run_direct "$dir")
+  assert_silent "$out" "an unframed response after seed woke"
+  [ "$(cat "$cursor")" = "$before" ] || fail "an unframed response changed the cursor"
+  [ ! -e "$cursor.pending" ] || fail "an unframed response staged a cursor"
+  out=$(FM_TEST_GH_FAIL=1 run_direct "$dir")
   assert_silent "$out" "gh failure after seed woke"
   [ "$(cat "$cursor")" = "$before" ] || fail "gh failure advanced the cursor"
-  FM_TEST_GH_TRUNCATED=1 out=$(run_direct "$dir")
+  out=$(FM_TEST_GH_TRUNCATED=1 run_direct "$dir")
   assert_silent "$out" "truncated output after seed woke"
   [ "$(cat "$cursor")" = "$before" ] || fail "truncated output advanced the cursor"
-  unset FM_TEST_GH_FAIL FM_TEST_GH_TRUNCATED
+  printf 'staged-sentinel\n' > "$cursor.pending"
+  chmod 0600 "$cursor.pending"
   write_json "$dir/pr.json" MERGED \
     '[{"id":"C9","author":{"login":"alice"},"createdAt":"2026-10-05T00:00:00Z","body":"landed"}]' \
     '[]'
@@ -202,6 +245,7 @@ test_errors_and_merged_wording_stay_silent() {
   printf '%s\n' merged > "$dir/want"
   cmp -s "$dir/got" "$dir/want" || fail "merged wording was not byte-stable"
   [ "$(cat "$cursor")" = "$before" ] || fail "a merged sweep changed the activity cursor"
+  [ "$(cat "$cursor.pending")" = staged-sentinel ] || fail "a merged sweep changed the staged cursor"
   rm -f "$cursor"
   out=$(run_direct "$dir")
   [ "$out" = merged ] || fail "merged wording without a cursor was '$out'"
@@ -288,6 +332,158 @@ test_url_mismatch_reseeds_without_a_wake() {
   pass "a cursor for another pull request is reseeded without a wake"
 }
 
+run_watcher() {
+  local dir=$1
+  set +e
+  WATCH_OUT=$(perl -MPOSIX=WNOHANG -MTime::HiRes=time,sleep -e 'my $left=25; my $pid=fork; die unless defined $pid; if (!$pid) { exec @ARGV } my $last=time; while (waitpid($pid, WNOHANG) == 0) { my $now=time; $left -= $now - $last; $last=$now; if ($left <= 0) { kill "TERM", $pid; waitpid $pid, 0; exit 124 } sleep 0.02 } exit(($? & 127) ? 128 + ($? & 127) : $? >> 8)' \
+    env FM_HOME="$dir/home" FM_ROOT_OVERRIDE="$ROOT" FM_CHECK_INTERVAL=0 \
+      FM_POLL=0.02 FM_HEARTBEAT=999999 FM_SIGNAL_GRACE=0 \
+      FM_TEST_GH_JSON_FILE="$dir/pr.json" FM_TEST_GH_LOG="$dir/gh.log" \
+      FM_WAKE_QUEUE="$dir/home/state/.wake-queue" \
+      FM_TEST_REAL_MV="$REAL_MV" \
+      PATH="$dir/fakebin:$BASE_PATH" "$WATCH")
+  WATCH_RC=$?
+  set -e
+}
+
+make_activity_watcher_case() {
+  local dir state
+  dir=$(make_case "$1")
+  state="$dir/home/state"
+  fm_write_meta "$state/task-a.meta" "window=fm-task-a" "worktree=$dir/wt" "pr=$URL"
+  if ! fm_pr_poll_prepare "$state" task-a github "$URL" github.com o/r 1 "$POLL" \
+    || ! fm_pr_poll_publish_prepared; then
+    fail "could not publish the watcher fixture"
+  fi
+  write_json "$dir/pr.json" OPEN \
+    '[{"id":"C1","author":{"login":"alice"},"createdAt":"2026-10-01T00:00:00Z","body":"seed"}]' '[]'
+  run_direct "$dir" >/dev/null
+  write_json "$dir/pr.json" OPEN \
+    '[{"id":"C1","author":{"login":"alice"},"createdAt":"2026-10-01T00:00:00Z","body":"seed"},{"id":"C2","author":{"login":"maint"},"createdAt":"2026-10-03T00:00:00Z","body":"watcher note"}]' '[]'
+  printf '%s\n' "$dir"
+}
+
+test_failed_delivery_keeps_activity_retryable() {
+  local dir cursor before out
+  dir=$(make_activity_watcher_case append-failure)
+  cursor="$dir/home/state/task-a.pr-activity"
+  before=$(cat "$cursor")
+  mkdir "$dir/home/state/.wake-queue.seq"
+  fm_test_track_watcher_state "$dir/home/state"
+  run_watcher "$dir"
+  [ "$WATCH_RC" -ne 0 ] || fail "watcher accepted a failed queue append"
+  [ "$(cat "$cursor")" = "$before" ] || fail "failed queue append committed activity"
+  grep -qx C2 "$cursor.pending" || fail "failed queue append lost the staged activity"
+  out=$(run_direct "$dir")
+  assert_one_line "$out" "pr-activity: $URL comment maint: watcher note"
+
+  dir=$(make_activity_watcher_case interrupted-commit)
+  cursor="$dir/home/state/task-a.pr-activity"
+  before=$(cat "$cursor")
+  cat > "$dir/fakebin/mv" <<'SH'
+#!/usr/bin/env bash
+for last in "$@"; do :; done
+case "$last" in
+  *.pr-activity)
+    grep -qF 'pr-activity:' "$FM_WAKE_QUEUE" || exit 2
+    kill -TERM "$PPID"
+    exit 1
+    ;;
+esac
+exec "$FM_TEST_REAL_MV" "$@"
+SH
+  chmod +x "$dir/fakebin/mv"
+  fm_test_track_watcher_state "$dir/home/state"
+  run_watcher "$dir"
+  [ "$WATCH_RC" -ne 0 ] || fail "watcher was not interrupted before cursor commit"
+  grep -qF 'pr-activity:' "$dir/home/state/.wake-queue" || fail "interruption did not reach the queued activity"
+  [ "$(cat "$cursor")" = "$before" ] || fail "interruption committed undelivered activity"
+  grep -qx C2 "$cursor.pending" || fail "interruption lost staged activity"
+  rm -f "$dir/fakebin/mv"
+  out=$(run_direct "$dir")
+  assert_one_line "$out" "pr-activity: $URL comment maint: watcher note"
+  pass "failed append and interrupted commit leave activity retryable"
+}
+
+test_unsafe_cursor_siblings_are_refused() {
+  local dir cursor file target before kind suffix out
+  for suffix in '' .pending; do
+    for kind in symlink hardlink mode directory; do
+      dir=$(make_case "unsafe${suffix}-$kind")
+      cursor="$dir/home/state/task-a.pr-activity"
+      file="$cursor$suffix"
+      write_json "$dir/pr.json" OPEN '[]' '[]'
+      out=$(run_direct "$dir")
+      assert_silent "$out" "unsafe-file fixture seed woke"
+      before=$(cat "$cursor")
+      target="$dir/outside/target"
+      printf 'sentinel\n' > "$target"
+      chmod 0600 "$target"
+      rm -f "$file"
+      case "$kind" in
+        symlink) ln -s "$target" "$file" ;;
+        hardlink) ln "$target" "$file" ;;
+        mode) printf 'sentinel\n' > "$file"; chmod 0644 "$file" ;;
+        directory) mkdir "$file" ;;
+      esac
+      write_json "$dir/pr.json" OPEN \
+        '[{"id":"C2","author":{"login":"a"},"createdAt":"2026-10-03T00:00:00Z","body":"new"}]' '[]'
+      out=$(run_direct "$dir")
+      assert_silent "$out" "an unsafe $kind cursor$suffix woke"
+      [ "$(cat "$target")" = sentinel ] || fail "an unsafe cursor changed another file"
+      if [ -n "$suffix" ]; then
+        [ "$(cat "$cursor")" = "$before" ] || fail "an unsafe staged cursor changed the committed cursor"
+      fi
+      case "$kind" in
+        symlink) [ -L "$file" ] || fail "unsafe symlink was replaced" ;;
+        hardlink|mode) [ "$(cat "$file")" = sentinel ] || fail "unsafe file was replaced" ;;
+        directory) [ -d "$file" ] || fail "unsafe directory was replaced" ;;
+      esac
+    done
+  done
+  pass "committed and staged cursors enforce the same file protections"
+}
+
+test_bounded_activity_stays_unread() {
+  local dir out
+  dir=$(make_case bounded)
+  jq -n '{state:"OPEN", comments:[range(0;101) | {id:("C"+tostring), author:{login:"a"}, createdAt:"2026-10-01T00:00:00Z", body:"old"}], reviews:[range(0;101) | {id:("R"+tostring), author:{login:"b"}, state:"COMMENTED", submittedAt:"2026-10-01T00:00:00Z", body:"old"}]}' > "$dir/pr.json"
+  out=$(run_direct "$dir")
+  assert_silent "$out" "bounded fixture seed woke"
+  jq '.comments[100].id="Cnew" | .reviews[100].id="Rnew"' "$dir/pr.json" > "$dir/next.json"
+  mv "$dir/next.json" "$dir/pr.json"
+  out=$(run_direct "$dir")
+  assert_silent "$out" "activity beyond the 100-item bounds woke"
+  if grep -qE 'C100|R100|Cnew|Rnew' "$dir/home/state/task-a.pr-activity"; then
+    fail "the cursor recorded unread activity"
+  fi
+  pass "comments and reviews past the request bounds stay unread"
+}
+
+test_unicode_and_author_rendering() {
+  local dir out kind author expected body
+  for kind in comment review; do
+    for author in a 'bad!' -bad missing long legal39; do
+      dir=$(make_case "$kind-author-$author")
+      write_json "$dir/pr.json" OPEN '[]' '[]'
+      out=$(run_direct "$dir")
+      assert_silent "$out" "rendering fixture seed woke"
+      case "$author" in
+        a) expected=a ;;
+        legal39) author=$(printf '%039d' 0); expected=$author ;;
+        long) author=$(printf '%040d' 0); expected=unknown ;;
+        *) expected=unknown ;;
+      esac
+      body=$(printf '%0199d' 0)😀
+      jq -n --arg kind "$kind" --arg author "$author" --arg body "${body}discard" \
+        '{state:"OPEN", comments:[], reviews:[]} | (if $kind == "comment" then .comments else .reviews end) = [{id:"NEW", author:(if $author == "missing" then null else {login:$author} end), createdAt:"2026-10-03T00:00:00Z", submittedAt:"2026-10-03T00:00:00Z", state:"COMMENTED", body:$body}]' > "$dir/pr.json"
+      out=$(run_direct "$dir")
+      assert_one_line "$out" "pr-activity: $URL $kind $expected: $body"
+    done
+  done
+  pass "comments and reviews preserve Unicode and validate all author lengths"
+}
+
 test_watcher_passes_the_anchor() {
   local dir state out rc
   dir=$(make_case watcher)
@@ -310,20 +506,21 @@ test_watcher_passes_the_anchor() {
     '[]'
   rm -f "$state/.last-check"
   fm_test_track_watcher_state "$state"
-  set +e
-  out=$(perl -MPOSIX=WNOHANG -MTime::HiRes=time,sleep -e 'my $left=25; my $pid=fork; die unless defined $pid; if (!$pid) { exec @ARGV } my $last=time; while (waitpid($pid, WNOHANG) == 0) { my $now=time; $left -= $now - $last; $last=$now; if ($left <= 0) { kill "TERM", $pid; waitpid $pid, 0; exit 124 } sleep 0.02 } exit($? >> 8)' \
-    env FM_HOME="$dir/home" FM_ROOT_OVERRIDE="$ROOT" FM_CHECK_INTERVAL=0 \
-      FM_POLL=0.02 FM_HEARTBEAT=999999 FM_SIGNAL_GRACE=0 \
-      FM_TEST_GH_JSON_FILE="$dir/pr.json" FM_TEST_GH_LOG="$dir/gh.log" \
-      PATH="$dir/fakebin:$BASE_PATH" "$WATCH")
-  rc=$?
-  set -e
+  run_watcher "$dir"
+  out=$WATCH_OUT
+  rc=$WATCH_RC
   [ "$rc" -eq 0 ] || fail "watcher did not surface the activity wake (rc=$rc)"
   printf '%s\n' "$out" | grep -F "pr-activity: $URL comment maint: watcher note" >/dev/null \
     || fail "watcher did not relay the activity line"
   [ "$(printf '%s\n' "$out" | grep -c -F "pr-activity: $URL comment maint: watcher note")" -eq 1 ] \
     || fail "watcher relayed the activity line more than once"
-  pass "the sweep relays one activity line for a new comment"
+  grep -qx 'C2' "$state/task-a.pr-activity" || fail "queued activity did not commit the cursor"
+  [ ! -e "$state/task-a.pr-activity.pending" ] || fail "committed activity left a staged cursor"
+  grep -F "pr-activity: $URL comment maint: watcher note" "$state/.wake-queue" >/dev/null \
+    || fail "cursor advanced without a queued activity wake"
+  out=$(run_direct "$dir")
+  assert_silent "$out" "queued activity woke on replay"
+  pass "the sweep queues activity before committing and replay stays silent"
 }
 
 test_seed_comment_replay_and_one_wake
@@ -334,3 +531,7 @@ test_legacy_sidecar_seeds_and_validated_anchor
 test_cursor_symlink_and_path_escape_refused
 test_url_mismatch_reseeds_without_a_wake
 test_watcher_passes_the_anchor
+test_failed_delivery_keeps_activity_retryable
+test_unsafe_cursor_siblings_are_refused
+test_bounded_activity_stays_unread
+test_unicode_and_author_rendering

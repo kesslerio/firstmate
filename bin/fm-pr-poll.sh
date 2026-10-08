@@ -3,7 +3,7 @@
 # change poll sidecar.
 # It emits exactly one merged line for a merged change and stays silent on
 # every error, so a failed lookup can never be read as a merge.
-# A GitHub read of that same single gh pr view call also reports new top-level
+# A GitHub read of that same single gh api graphql call also reports new top-level
 # pull request comments and submitted reviews.
 # One new group in a sweep is one activity line, never one line per comment:
 # pr-activity: <url> <kind> <author>: <first line>
@@ -22,7 +22,8 @@
 # A six-argument --validated read has no cursor anchor and stays merge-only.
 # The cursor is created on first sight: that sweep records the current item ids
 # and the pull request URL and does not wake, so pre-existing history is silent.
-# A later sweep wakes only for ids not in the cursor, then advances it.
+# A later sweep wakes only for ids not in the cursor, staging them in
+# <stem>.pr-activity.pending until the watcher queues the wake and commits them.
 # Replaying the same items emits nothing.
 # Cursor file lines are fm-pr-activity-v1, the pull request URL, then one id.
 # A missing anchor, a parse miss, a forge error, a symlink cursor, a hard link,
@@ -41,9 +42,10 @@ set -u
 LC_ALL=C
 export LC_ALL
 
-# One gh pr view, selected with gh's own query language so this path does not
+# One bounded gh api graphql read, selected with gh's own query language so it does not
 # grow a jq binary dependency. Pending reviews are drafts, not submissions.
-POLL_ACTIVITY_JQ='"state=\(.state)", ((.comments // [])[] | select((.id|type)=="string" and .id != "") | ["comment", .id, (.author.login // "unknown"), (.createdAt // ""), ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200])] | join("\t")), ((.reviews // [])[] | select(.state != "PENDING" and (.state|type)=="string" and .state != "" and (.id|type)=="string" and .id != "") | ["review", .id, (.author.login // "unknown"), (.submittedAt // ""), (if ((.body // "") | gsub("[[:space:]]"; "") | length) == 0 then .state else ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200]) end)] | join("\t"))'
+POLL_ACTIVITY_QUERY="query(\$owner: String!, \$repo: String!, \$number: Int!) { repository(owner: \$owner, name: \$repo) { pullRequest(number: \$number) { state comments(first: 100) { nodes { id author { login } createdAt body } } reviews(first: 100) { nodes { id author { login } submittedAt state body } } } } }"
+POLL_ACTIVITY_JQ='.data.repository.pullRequest | "state=\(.state)", ((.comments.nodes // [])[] | select((.id|type)=="string" and .id != "") | ["comment", .id, (.author.login // "unknown"), (.createdAt // ""), ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200])] | join("\t")), ((.reviews.nodes // [])[] | select(.state != "PENDING" and (.state|type)=="string" and .state != "" and (.id|type)=="string" and .id != "") | ["review", .id, (.author.login // "unknown"), (.submittedAt // ""), (if ((.body // "") | gsub("[[:space:]]"; "") | length) == 0 then .state else ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200]) end)] | join("\t"))'
 
 POLL_CHECK_PATH=
 if [ "$#" -eq 7 ] && [ "$1" = --validated ]; then
@@ -140,12 +142,27 @@ poll_same_device() {
   [ -n "$left" ] && [ "$left" = "$right" ]
 }
 
+poll_private_cursor_or_absent() {
+  local file=$1 sidecar=$2 mode
+  [ ! -L "$file" ] || return 1
+  [ -e "$file" ] || return 0
+  [ -f "$file" ] || return 1
+  [ "$(poll_link_count "$file")" = 1 ] || return 1
+  poll_same_device "$file" "$sidecar" || return 1
+  if [ "$(uname)" = Darwin ]; then
+    mode=$(/usr/bin/stat -f %Lp "$file" 2>/dev/null) || return 1
+  else
+    mode=$(stat -c %a "$file" 2>/dev/null) || return 1
+  fi
+  [ "$mode" = 600 ]
+}
+
 poll_one_line() {
   local text=$1
   text=$(printf '%s' "$text" | tr -d '\000-\037\177' || true)
   text=${text#"${text%%[![:space:]]*}"}
   text=${text%"${text##*[![:space:]]}"}
-  printf '%s' "${text:0:200}"
+  printf '%s' "$text"
 }
 
 poll_state_of() {
@@ -155,10 +172,7 @@ poll_state_of() {
 '*}
   case "$line" in
     state=*) state=${line#state=} ;;
-    *)
-      [ "$raw" = "$line" ] || return 1
-      state=$line
-      ;;
+    *) return 1 ;;
   esac
   case "$state" in
     [A-Z]*) ;;
@@ -214,14 +228,8 @@ poll_activity_anchor() {
   [ ! -L "$dir" ] && [ -d "$dir" ] || return 1
   poll_sidecar_matches "$sidecar" || return 1
   poll_same_device "$dir" "$sidecar" || return 1
-  if [ -L "$cursor" ] || [ -d "$cursor" ]; then
-    return 1
-  fi
-  if [ -e "$cursor" ]; then
-    [ -f "$cursor" ] || return 1
-    [ "$(poll_link_count "$cursor")" = 1 ] || return 1
-    poll_same_device "$cursor" "$sidecar" || return 1
-  fi
+  poll_private_cursor_or_absent "$cursor" "$sidecar" || return 1
+  poll_private_cursor_or_absent "$cursor.pending" "$sidecar" || return 1
   printf '%s\n' "$check"
 }
 
@@ -257,12 +265,7 @@ poll_cursor_ids() {
 poll_write_cursor() {
   local cursor=$1 sorted=$2 dir tmp
   dir=$(poll_dirname "$cursor")
-  [ -L "$cursor" ] && return 1
-  [ -d "$cursor" ] && return 1
-  if [ -e "$cursor" ]; then
-    [ -f "$cursor" ] || return 1
-    [ "$(poll_link_count "$cursor")" = 1 ] || return 1
-  fi
+  poll_private_cursor_or_absent "$cursor" "$dir" || return 1
   tmp=$(mktemp "$dir/.fm-pr-activity.XXXXXX") || return 1
   chmod 0600 "$tmp" || { rm -f -- "$tmp"; return 1; }
   {
@@ -277,11 +280,13 @@ poll_write_cursor() {
       esac
     fi
   } > "$tmp" || { rm -f -- "$tmp"; return 1; }
-  [ -L "$cursor" ] && { rm -f -- "$tmp"; return 1; }
+  if ! poll_private_cursor_or_absent "$tmp" "$dir" \
+    || ! poll_private_cursor_or_absent "$cursor" "$dir"; then
+    rm -f -- "$tmp"
+    return 1
+  fi
   mv -f -- "$tmp" "$cursor" || { rm -f -- "$tmp"; return 1; }
-  [ -f "$cursor" ] && [ ! -L "$cursor" ] || return 1
-  chmod 0600 "$cursor" || return 1
-  [ "$(poll_link_count "$cursor")" = 1 ]
+  [ -f "$cursor" ] && poll_private_cursor_or_absent "$cursor" "$dir"
 }
 
 poll_is_newer() {
@@ -343,11 +348,9 @@ poll_parse_activity() {
     POLL_READ_IDS="${POLL_READ_IDS}${id}"$'
 '
     case "$author" in
-      [A-Za-z0-9][A-Za-z0-9_-]*)
-        [ "${#author}" -le 39 ] || author=unknown
-        ;;
-      *) author=unknown ;;
+      ''|[!A-Za-z0-9]*|*[!A-Za-z0-9_-]*) author=unknown ;;
     esac
+    [ "${#author}" -le 39 ] || author=unknown
     case "$ts" in
       ''|*[!0-9A-Za-z:._+-]*) return 1 ;;
     esac
@@ -413,9 +416,12 @@ poll_emit_github_activity() {
   if [ "$mode" -eq 0 ] && [ "$new_count" -eq 0 ] && [ "$loaded" = "$sorted" ]; then
     return 0
   fi
-  poll_write_cursor "$cursor" "$sorted" || return 0
-  [ "$mode" -eq 0 ] && [ "$new_count" -gt 0 ] || return 0
+  if [ "$mode" -ne 0 ] || [ "$new_count" -eq 0 ]; then
+    poll_write_cursor "$cursor" "$sorted" || return 0
+    return 0
+  fi
   [ -n "$best_kind" ] && [ -n "$best_author" ] || return 0
+  poll_write_cursor "$cursor.pending" "$sorted" || return 0
   summary=$best_text
   if [ "$new_count" -gt 1 ]; then
     summary="$new_count new: $best_text"
@@ -441,15 +447,15 @@ case "$provider" in
       .|..|*[!A-Za-z0-9._-]*) exit 0 ;;
     esac
     [ "$url" = "https://github.com/$owner/$repo/pull/$number" ] || exit 0
-    raw=$(gh pr view "$url" --json state,comments,reviews --jq "$POLL_ACTIVITY_JQ" 2>/dev/null) || exit 0
+    raw=$(gh api graphql --hostname github.com -f query="$POLL_ACTIVITY_QUERY" \
+      -f owner="$owner" -f repo="$repo" -F number="$number" \
+      --jq "$POLL_ACTIVITY_JQ" 2>/dev/null) || exit 0
     state=$(poll_state_of "$raw") || exit 0
     if [ "$state" = MERGED ]; then
       printf '%s\n' merged
       exit 0
     fi
-    case "$raw" in
-      state=*) poll_emit_github_activity "$raw" || exit 0 ;;
-    esac
+    poll_emit_github_activity "$raw" || exit 0
     ;;
   gitlab)
     [ "${#host}" -ge 1 ] && [ "${#host}" -le 253 ] || exit 0

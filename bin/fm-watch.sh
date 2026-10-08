@@ -2900,8 +2900,20 @@ EOF
           fi
           wake "$reason"
         fi
-        pr_poll_control_release || exit 1
         fm_wake_append check "$c" "$reason" || exit 1
+        if [ "$is_pr_poll" -eq 1 ]; then
+          case "$out" in
+            'pr-activity: '*)
+              fm_pr_poll_snapshot_matches "$STATE" "$id" "$SCRIPT_DIR/fm-pr-poll.sh" || exit 1
+              activity_device=$(fm_pr_file_device "$STATE") || exit 1
+              activity_cursor="${c%.check.sh}.pr-activity"
+              fm_pr_private_file_valid "$activity_cursor" 600 "$activity_device" \
+                && fm_pr_private_file_valid "$activity_cursor.pending" 600 "$activity_device" \
+                && mv -f -- "$activity_cursor.pending" "$activity_cursor" || exit 1
+              ;;
+          esac
+        fi
+        pr_poll_control_release || exit 1
         touch "$STATE/.last-check"
         wake "$reason"
       fi
