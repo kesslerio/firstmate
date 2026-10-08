@@ -104,6 +104,8 @@
 #                             decision, and losing it never downgrades a run.
 #   .startup-network.lock     serializes publication, harvest acknowledgement,
 #                             and the wake decision; every wait on it is bounded.
+#   .startup-network.reserve.lock
+#                             serializes generation reservation and pending commit.
 #   .startup-network.pending  one completed report, result metadata, and timings
 #                             retained until publication and delivery settle.
 #
@@ -137,6 +139,7 @@ CLAIM_FILE="$STATE/.startup-network.claim"
 DELIVERED_FILE="$STATE/.startup-network.delivered"
 TIMINGS_FILE="$STATE/.startup-network.timings"
 PUBLISH_LOCK="$STATE/.startup-network.lock"
+RESERVE_LOCK="$STATE/.startup-network.reserve.lock"
 PENDING_DIR="$STATE/.startup-network.pending"
 
 # shellcheck source=bin/fm-timeout-lib.sh
@@ -250,6 +253,27 @@ worker_covers_request() {  # <locked> <lock-pid>
     && [ "$(status_get phases)" = probe,sweeps ]
 }
 
+reserve_generation() {
+  local generation=$1 pid=$2 started=$3 locked=$4 phases=$5 lock_pid=$6 deadline=$7 rc
+  take_lock "$RESERVE_LOCK" "$(seconds_until "$deadline")" || return 1
+  if [ -e "$PENDING_DIR" ]; then
+    fm_lock_release "$RESERVE_LOCK"
+    return 1
+  fi
+  write_atomic "$STATUS_FILE" <<EOF
+state=running
+pid=$pid
+started=$started
+locked=$locked
+phases=$phases
+generation=$generation
+lock_pid=$lock_pid
+EOF
+  rc=$?
+  fm_lock_release "$RESERVE_LOCK"
+  return "$rc"
+}
+
 cmd_start() {  # <locked> <harvest-pid>
   local locked=$1 harvest_pid=$2 lock_pid generation worker_pid phases started
   mkdir -p "$STATE" 2>/dev/null || return 1
@@ -282,16 +306,7 @@ cmd_start() {  # <locked> <harvest-pid>
   started=$(now)
   phases=probe
   [ "$locked" != 1 ] || phases=probe,sweeps
-  if ! write_atomic "$STATUS_FILE" <<EOF
-state=running
-pid=0
-started=$started
-locked=$locked
-phases=$phases
-generation=$generation
-lock_pid=$lock_pid
-EOF
-  then
+  if ! reserve_generation "$generation" 0 "$started" "$locked" "$phases" "$lock_pid" "$DELIVERY_DEADLINE"; then
     fm_lock_release "$PUBLISH_LOCK"
     return 1
   fi
@@ -395,10 +410,7 @@ pending_get() {
 }
 
 save_pending() {
-  local generation=$1 state=$2 phases=$3 locked=$4 started=$5 rc=$6 out=$7 timings=${8:-} pending current
-  current=$(status_get generation)
-  [ -z "$current" ] || [ "$current" = "$generation" ] || return 1
-  [ ! -e "$PENDING_DIR" ] || return 1
+  local generation=$1 state=$2 phases=$3 locked=$4 started=$5 rc=$6 out=$7 timings=$8 deadline=$9 pending current saved
   pending=$(mktemp -d "$STATE/.startup-network-pending.XXXXXX") || return 1
   if ! cp "$out" "$pending/report" || ! cat > "$pending/status" <<EOF
 state=$state
@@ -413,9 +425,20 @@ EOF
     return 1
   fi
   [ -z "$timings" ] || cp "$timings" "$pending/timings" 2>/dev/null || true
-  if mv "$pending" "$PENDING_DIR"; then
-    return 0
+  if ! take_lock "$RESERVE_LOCK" "$(seconds_until "$deadline")"; then
+    rm -rf "$pending"
+    return 1
   fi
+  current=$(status_get generation)
+  if { [ -n "$current" ] && [ "$current" != "$generation" ]; } || [ -e "$PENDING_DIR" ]; then
+    fm_lock_release "$RESERVE_LOCK"
+    rm -rf "$pending"
+    return 1
+  fi
+  mv "$pending" "$PENDING_DIR"
+  saved=$?
+  fm_lock_release "$RESERVE_LOCK"
+  [ "$saved" -eq 0 ] && return 0
   rm -rf "$pending"
   return 1
 }
@@ -499,8 +522,8 @@ record_result() {  # <generation> <state> <phases> <locked> <started> <rc> <outp
   # and whatever the killed sweeps managed to append is a real partial answer.
   # A timing record is diagnostic only, so a failure to publish it is discarded
   # rather than downgrading the run - the report itself is the contract.
-  if [ -n "$timings" ] && [ -f "$timings" ]; then
-    write_atomic "$TIMINGS_FILE" < "$timings" || true
+  if [ -z "$timings" ] || [ ! -f "$timings" ] || ! write_atomic "$TIMINGS_FILE" < "$timings"; then
+    rm -f "$TIMINGS_FILE" 2>/dev/null || true
   fi
   if ! write_atomic "$REPORT_FILE" < "$out"; then
     state=failed
@@ -527,14 +550,14 @@ publish() {  # <generation> <state> <phases> <locked> <started> <rc> <output-fil
   local generation=$1 state=$2 phases=$3 locked=$4 started=$5 rc=$6 out=$7 timings=${8:-}
   DELIVERY_DEADLINE=$(( $(now) + $(delivery_budget) ))
   if ! take_lock "$PUBLISH_LOCK" "$(seconds_until "$DELIVERY_DEADLINE")"; then
-    publish_lock_held "$generation" "$phases" "$locked" "$started" "$PUBLISH_LOCK" "$out" "$timings"
+    publish_lock_held "$generation" "$phases" "$locked" "$started" "$PUBLISH_LOCK" "$out" "$timings" "$DELIVERY_DEADLINE"
     return 1
   fi
   if [ "$(status_get generation)" != "$generation" ]; then
     fm_lock_release "$PUBLISH_LOCK"
     return 0
   fi
-  if ! save_pending "$generation" "$state" "$phases" "$locked" "$started" "$rc" "$out" "$timings" \
+  if ! save_pending "$generation" "$state" "$phases" "$locked" "$started" "$rc" "$out" "$timings" "$DELIVERY_DEADLINE" \
     || ! record_result "$generation" "$state" "$phases" "$locked" "$started" "$rc" "$out" "$timings" >/dev/null; then
     fm_lock_release "$PUBLISH_LOCK"
     return 1
@@ -543,11 +566,11 @@ publish() {  # <generation> <state> <phases> <locked> <started> <rc> <output-fil
   await_delivery "$generation"
 }
 
-publish_lock_held() {  # <generation> <phases> <locked> <started> <lockdir> <output-file> <timing-file>
-  local generation=$1 phases=$2 locked=$3 started=$4 lockdir=$5 out=$6 timings=${7:-}
+publish_lock_held() {  # <generation> <phases> <locked> <started> <lockdir> <output-file> <timing-file> <deadline>
+  local generation=$1 phases=$2 locked=$3 started=$4 lockdir=$5 out=$6 timings=$7 deadline=$8
   printf 'NETWORK_CHECKS: the deferred check worker gave up because %s was still held by %s at its deadline, so %s may be incomplete; rerun %s/bin/fm-startup-network.sh run --locked %s once that lock is released\n' \
     "$lockdir" "$(held_by)" "$(phase_label "$phases")" "$FM_ROOT" "$locked" >> "$out"
-  save_pending "$generation" failed "$phases" "$locked" "$started" 124 "$out" "$timings"
+  save_pending "$generation" failed "$phases" "$locked" "$started" 124 "$out" "$timings" "$deadline"
 }
 
 cmd_run() {  # <locked> <lock-pid> <generation>
@@ -569,7 +592,7 @@ cmd_run() {  # <locked> <lock-pid> <generation>
   [ -z "$timings" ] || fm_timing_start "$timings"
   if [ -n "$generation" ]; then
     if ! take_lock "$PUBLISH_LOCK" "$(seconds_until "$stage_deadline")"; then
-      publish_lock_held "$generation" "$(status_get phases)" "$locked" "$(status_get started)" "$PUBLISH_LOCK" "$out" "$timings"
+      publish_lock_held "$generation" "$(status_get phases)" "$locked" "$(status_get started)" "$PUBLISH_LOCK" "$out" "$timings" "$stage_deadline"
       run_cleanup "$out" "$timings"
       return 1
     fi
@@ -596,7 +619,7 @@ cmd_run() {  # <locked> <lock-pid> <generation>
   if [ "$internal" -eq 0 ]; then
     generation="$(now).$$.manual"
     if ! take_lock "$PUBLISH_LOCK" "$(seconds_until "$stage_deadline")"; then
-      publish_lock_held "$generation" "$phases" "$sweep_locked" "$started" "$PUBLISH_LOCK" "$out" "$timings"
+      publish_lock_held "$generation" "$phases" "$sweep_locked" "$started" "$PUBLISH_LOCK" "$out" "$timings" "$stage_deadline"
       run_cleanup "$out" "$timings"
       return 1
     fi
@@ -611,15 +634,11 @@ cmd_run() {  # <locked> <lock-pid> <generation>
       run_cleanup "$out" "$timings"
       return 1
     fi
-    write_atomic "$STATUS_FILE" <<EOF || true
-state=running
-pid=$$
-started=$started
-locked=$sweep_locked
-phases=$phases
-generation=$generation
-lock_pid=$lock_pid
-EOF
+    if ! reserve_generation "$generation" "$$" "$started" "$sweep_locked" "$phases" "$lock_pid" "$stage_deadline"; then
+      fm_lock_release "$PUBLISH_LOCK"
+      run_cleanup "$out" "$timings"
+      return 1
+    fi
     fm_lock_release "$PUBLISH_LOCK"
   fi
 
@@ -725,7 +744,7 @@ print_finished() {  # <state>
 # by the on-demand `report` command, so the timings cost a reader nothing until
 # a run is actually slow enough to ask about.
 print_timings() {
-  fm_timing_render "$TIMINGS_FILE"
+  fm_timing_render "$1"
 }
 
 print_pending() {
@@ -830,10 +849,11 @@ case "$MODE" in
       && { [ -z "$(status_get generation)" ] || [ "$(pending_get generation)" = "$(status_get generation)" ]; }; then
       printf 'NETWORK_CHECKS: completed findings retained pending publication or delivery; a later startup will retry.\n'
       cat "$PENDING_DIR/report"
+      print_timings "$PENDING_DIR/timings"
     else
       print_state
+      print_timings "$TIMINGS_FILE"
     fi
-    print_timings
     ;;
   wait) cmd_wait "${1:-120}" || exit $? ;;
   -h|--help) usage ;;
