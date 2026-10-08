@@ -58,7 +58,9 @@
 #                       (FM_SESSION_START_ENDPOINT_TIMEOUT, default 10s) and
 #                       can itself reach the digest's runtime bound.
 #   7. network checks - the result of the deferred network stage started back at
-#                       step 1, harvested WITHOUT waiting for it.
+#                       step 1, harvested WITHOUT waiting for it. If start failed,
+#                       an explicit diagnostic precedes the harvest: an earlier
+#                       report does not confirm a fresh sweep.
 #   8. context digest - data/projects.md, data/secondmates.md, data/captain.md,
 #                       data/captain-shared.md, data/learnings.md: read-only,
 #                       always safe, always runs.

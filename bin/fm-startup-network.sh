@@ -16,17 +16,18 @@
 # inactive-outcome scan also runs here because its local current-state reads can
 # be just as slow; that scan publishes its own findings to the durable wake queue.
 #
-# WHAT IS PRESERVED. Nothing is dropped. bin/fm-bootstrap.sh remains the single
+# WHAT IS PRESERVED. bin/fm-bootstrap.sh remains the single
 # owner of every network sweep and still runs all of them, unchanged, via its
 # FM_BOOTSTRAP_NETWORK=only phase. bin/fm-inactive-reconcile.sh remains the
 # owner of the startup scan and its separate watcher cadence. Deferral changes
-# WHEN they run, not WHETHER, and three properties make the later run safe:
+# WHEN they run; a refused fresh start is explicit in the digest rather than
+# treated as a completed sweep. Three properties make the later run safe:
 #   - The work is idempotent detection. A run whose report is lost (killed
 #     worker, truncated digest, crashed session) loses no finding: the next run
 #     re-derives the same inactive terminal child, dead secondmate, stuck clone,
 #     or undelivered handoff. There is no once-only signal to miss.
-#   - Completed results are retained until delivery settles. Network sweep output lands in
-#     state/.startup-network.report and reaches the agent either inline in the
+#   - Completed results are retained until delivery settles. Published network
+#     sweep output lands in state/.startup-network.report and reaches the agent either inline in the
 #     digest or, when it finishes too late for the digest to inline it, as a
 #     `check: startup-network` wake. Inactive-scan findings land directly in the
 #     ordinary durable wake queue. The report wakes only when the late result is
@@ -46,7 +47,9 @@
 #     that run settles, so old and new owners can never sweep concurrently.
 #
 # Usage: fm-startup-network.sh start --locked <0|1> --harvest-pid <pid>
-#          Launch the detached worker and return immediately. Single-flight: a
+#          Retry retained results before launching a detached worker, with bounded
+#          lock and delivery waits. Exit non-zero if recovery or reservation fails;
+#          no fresh checks start in that case. Single-flight: a
 #          running worker is reused only when its phases cover this request and,
 #          for locked work, it belongs to the same lock owner. A probe-only
 #          worker therefore cannot satisfy a later locked request; the later
@@ -67,9 +70,10 @@
 #          Print the digest's NETWORK CHECKS section and release the inline-print
 #          claim. Called by bin/fm-session-start.sh, not by hand.
 #        fm-startup-network.sh report
-#          Print the current state and report without changing anything, then the
-#          last run's per-step elapsed times. This is the ONLY command that prints
-#          those timings: `harvest` composes the session-start digest, and adding
+#          Print the current state and report without changing anything, selecting
+#          the current committed pending report when it is unpublished. Print only
+#          that result's per-step elapsed times, when available. This is the ONLY
+#          command that prints those timings: `harvest` composes the session-start digest, and adding
 #          diagnostic detail there would make every startup pay for a question
 #          only a slow run raises.
 #        fm-startup-network.sh wait [<seconds>]
@@ -79,8 +83,9 @@
 # STATE, all under this home's state/ and gitignored with it:
 #   .startup-network.status   key=value record - generation, lock_pid, state,
 #                             pid, started, finished, rc, locked, phases, and
-#                             whether the report was published. The single
-#                             source of truth for what ran and how it ended.
+#                             whether the report was published. Owns the current
+#                             generation and published run state; unpublished
+#                             completed results keep their metadata with the report.
 #   .startup-network.report   the sweep output, byte for byte as
 #                             bin/fm-bootstrap.sh produced it, plus a
 #                             NETWORK_CHECKS: line whenever the stage itself
@@ -108,11 +113,19 @@
 #                             serializes generation reservation and pending commit.
 #   .startup-network.pending  one completed report, result metadata, and timings
 #                             retained until publication and delivery settle.
+#   .startup-network-pending.*
+#                             staged report and optional timings; writing status
+#                             last makes the completed result recoverable if its
+#                             bounded reservation-lock wait fails. Recovery and
+#                             reservation commit it only for the current generation
+#                             under .startup-network.reserve.lock; superseded
+#                             results are discarded. `report` reads only committed
+#                             pending results, not these staging directories.
 #
 # The whole stage is bounded by FM_STARTUP_NETWORK_TIMEOUT (default 120s), one
 # aggregate deadline covering both the inactive-outcome scan and network sweeps
 # plus every lock the worker waits on before them, including the publication
-# lock taken before the report is written.
+# lock checked before the probes and sweeps run.
 # Publication and delivery are bounded the same way by FM_SESSION_START_TIMEOUT,
 # including the wake append. A live inline claimant is checked once a second and
 # is not waited on past that deadline.
@@ -125,7 +138,9 @@
 # timed append may duplicate a wake; broader delivery guarantees are tracked at
 # https://github.com/kunchenguid/firstmate/issues/5378.
 # Hitting the bound is reported as an actionable NETWORK_CHECKS: line, never as
-# silence. bin/fm-timeout-lib.sh remains the single owner of bounded execution.
+# silence. Focused retention, ownership, delivery, and matching-timing regressions
+# live in tests/fm-startup-network.test.sh.
+# bin/fm-timeout-lib.sh remains the single owner of bounded execution.
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -446,6 +461,9 @@ EOF
     rm -rf "$pending"
     return 1
   fi
+  # Status is the completion marker. Leave the staged result recoverable when
+  # this bounded wait fails; reservation and recovery adjudicate its generation
+  # under the same lock, so an interrupted reservation cannot discard its report.
   take_lock "$RESERVE_LOCK" "$(seconds_until "$deadline")" || return 1
   commit_staged_pending && [ "$(pending_get generation)" = "$generation" ]
   saved=$?
@@ -477,9 +495,9 @@ recover_pending() {
 
 # Bounded by DELIVERY_DEADLINE, which publish() sets from the delivery budget.
 # Once the deadline passes, a still-live claimant is no longer waited for: the
-# wake decision is made as if it were gone, exactly as the old iteration cap did.
-# The check is once a second. A tenth-second poll acquired and released this lock
-# and forked a reader on every tick for as long as the claimant stayed alive.
+# wake decision is made as if it were gone.
+# The one-second cadence limits lock and subprocess work while harvest has its
+# bounded opportunity to acknowledge the report.
 await_delivery() {  # <generation>
   local generation=$1 claim_record claim_generation claim_pid claim_live
   while :; do
