@@ -1,0 +1,37 @@
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+/tmp/fm6238-approved.5yNEnD
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '"'"'mkdir "$1/code" && tar -xf - -C "$1/code"'"'"' _ /tmp/fm6238-approved.5yNEnD'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+fm-lab-6238-approved-3128665-8832
+
+exit=0
+/tmp/fm6238-approved.5yNEnD/home
+/tmp/fm6238-approved.5yNEnD/parent
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+LAB_READY
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-approved-lab/parent
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-approved-lab/parent
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh launch lab6238 claude - - herdr --herdr-session fm-lab-6238-approved-3128665-8832
+fatal: not a git repository (or any of the parent directories): .git
+error: not a git worktree: /tmp/fm6238-approved.5yNEnD/home
+error: could not install the AI-trailer strip hooks for lab6238
+error: remote host-local secondmate launch failed
+
+exit=1
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+CLEANUP_OK
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0

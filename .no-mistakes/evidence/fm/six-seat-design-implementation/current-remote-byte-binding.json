@@ -1,0 +1,19 @@
+{
+  "head_sha": "37d3f6af277c17e88907f89b0d6f36a8e1d00e79",
+  "expected": {
+    "bin/fm-fleet-seats.sh": "eeda8cc120a4935fd34da3d73cc309b15f8dc3663054e6eea6ea375b577a81f5",
+    "bin/fm-remote-secondmate-control.sh": "3689684cc76b966b8ed72d7e41d2d863aa6e7452d79e44b657645ab3be38dc53",
+    "bin/fm-spawn.sh": "02d22a3992017d82303007bfa3f7f231d7d36b717fc6f2682ff1f3b52c366916",
+    "bin/fm-control.sh": "b33677bfa520da721147f0aea0311d9409d6f0b3102f9a54c8824aa1c65ecc2a",
+    "bin/fm-remote-entrypoint.sh": "7b1a40404f78dd89fdd97e3627a8a00cae8cfb284bc8c78de1bc127aab774f57"
+  },
+  "actual": {
+    "bin/fm-fleet-seats.sh": "eeda8cc120a4935fd34da3d73cc309b15f8dc3663054e6eea6ea375b577a81f5",
+    "bin/fm-remote-secondmate-control.sh": "3689684cc76b966b8ed72d7e41d2d863aa6e7452d79e44b657645ab3be38dc53",
+    "bin/fm-spawn.sh": "02d22a3992017d82303007bfa3f7f231d7d36b717fc6f2682ff1f3b52c366916",
+    "bin/fm-control.sh": "b33677bfa520da721147f0aea0311d9409d6f0b3102f9a54c8824aa1c65ecc2a",
+    "bin/fm-remote-entrypoint.sh": "7b1a40404f78dd89fdd97e3627a8a00cae8cfb284bc8c78de1bc127aab774f57"
+  },
+  "match": true,
+  "exit": 0
+}

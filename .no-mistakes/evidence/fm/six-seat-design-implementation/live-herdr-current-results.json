@@ -1,0 +1,76 @@
+{
+  "tested_head_sha": "72bab8ebc1dcb76026a4e27fb11428740c674df5",
+  "verdict": "inconclusive",
+  "live_lifecycle_executed": false,
+  "checks": [
+    "Named controller route accepted over real SSH and returns its persisted generation",
+    "Default route compatibility and named/default/invalid/mismatched retirement refusals driven through SSH; remote fixture inventory preserved",
+    "Parent and host stale-generation requests refuse with exit 6 and preserve synthetic remote files",
+    "Helper refuses fm-remote provisioning, literal-default stop, and server-global operations before executing them; before/after session observations identical"
+  ],
+  "lab_session": "fm-lab-current-head-70309-17165",
+  "local_lab_attempt": {
+    "prepare_exit": 1,
+    "provision_exit": 1,
+    "output": "fm-herdr-lab: fleet-state tripwire requires exactly one running default session\n",
+    "sessions_before": {
+      "sessions": [
+        {
+          "default": true,
+          "name": "default",
+          "running": false,
+          "session_dir": "/Users/kesslerio/.config/herdr",
+          "socket_path": "/Users/kesslerio/.config/herdr/herdr.sock"
+        },
+        {
+          "default": false,
+          "name": "fm-remote",
+          "running": false,
+          "session_dir": "/Users/kesslerio/.config/herdr/sessions/fm-remote",
+          "socket_path": "/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock"
+        }
+      ]
+    }
+  },
+  "task": "herdr-current",
+  "ownership": {
+    "fixture_root": "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current",
+    "homes": [
+      "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent",
+      "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/remote-home"
+    ],
+    "session_provisioned": false,
+    "synthetic_registration": true
+  },
+  "default_session_observation_before": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr\",\"socket_path\":\"/Users/kesslerio/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n",
+  "replacement": {
+    "result": "untested",
+    "reason": "The real parent wrapper and SSH worker reach host control, but a matching-generation synthetic fm-lab-* route refuses before replacement because remote control requires fm-remote. The host supports the new trailing --herdr-session option, but the actual parent wrapper does not forward it. The current ruling forbids extending beyond controller selection. Local prepare/provision also refuses because the default session is stopped; the current worktree boundary forbids remote synthetic-home writes."
+  },
+  "retirement": {
+    "result": "untested",
+    "reason": "The controller accepts named-lab routes and rejects unsafe overrides over real SSH, but successful selective cleanup requires a real owned Herdr endpoint. Local prepare/provision refuses without a running default; starting or repairing it is forbidden. The current boundary forbids creating homes or sessions on the reachable remote host. No success inferred from refused calls."
+  },
+  "default_session_observation_after": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr\",\"socket_path\":\"/Users/kesslerio/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n",
+  "default_session_tripwire": {
+    "observations_identical": true,
+    "running_default_proven": false,
+    "snapshot": [
+      {
+        "default": true,
+        "name": "default",
+        "running": false,
+        "session_dir": "/Users/kesslerio/.config/herdr",
+        "socket_path": "/Users/kesslerio/.config/herdr/herdr.sock"
+      }
+    ],
+    "session_provisioned": false
+  },
+  "cleanup": {
+    "fixture_tree_removed": true,
+    "ssh_daemon_stopped": true,
+    "herdr_sessions_created": 0,
+    "real_secondmates_changed": false,
+    "source_changes": false
+  }
+}

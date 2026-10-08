@@ -1,0 +1,148 @@
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/parent
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/parent
+exit=0
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/remote-home
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/remote-home
+exit=0
+$ git -C /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/remote-code init -q
+exit=0
+$ git -C /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/remote-code add bin AGENTS.md
+exit=0
+$ bin/fm-fleet-seats.sh serve-remotes
+served ios policy=3217406285-63 epoch=r17914154018315126219.1 holders=0
+exit=0
+Real SSH policy certificate persisted: {"schema": "fm-fleet-seats-serve.v2", "policy_digest": "3217406285-63", "epoch": "r17914154018315126219.1", "complete": true, "holders": []}
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h0 --reason prelaunch
+fleet-seats: released id=ios generation=h0 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h1 --reason prelaunch
+fleet-seats: released id=ios generation=h1 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h2 --reason prelaunch
+fleet-seats: released id=ios generation=h2 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h3 --reason prelaunch
+fleet-seats: released id=ios generation=h3 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h4 --reason prelaunch
+fleet-seats: released id=ios generation=h4 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h5 --reason prelaunch
+fleet-seats: released id=ios generation=h5 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h6 --reason prelaunch
+fleet-seats: released id=ios generation=h6 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h7 --reason prelaunch
+fleet-seats: released id=ios generation=h7 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h8 --reason prelaunch
+fleet-seats: released id=ios generation=h8 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65077 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h9 --reason prelaunch
+fleet-seats: released id=ios generation=h9 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65078 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h10 --reason prelaunch
+fleet-seats: released id=ios generation=h10 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65078 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h11 --reason prelaunch
+fleet-seats: released id=ios generation=h11 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65078 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h12 --reason prelaunch
+fleet-seats: released id=ios generation=h12 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65078 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h13 --reason prelaunch
+fleet-seats: released id=ios generation=h13 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65078 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h14 --reason prelaunch
+fleet-seats: released id=ios generation=h14 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65078 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h15 --reason prelaunch
+fleet-seats: released id=ios generation=h15 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65078 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h16 --reason prelaunch
+fleet-seats: released id=ios generation=h16 reason=prelaunch
+exit=0
+$ [historical generation reservation with 65KB model contract]
+[historical reservation output omitted: 65078 bytes]
+exit=0
+$ bin/fm-fleet-seats.sh release ios --generation h17 --reason prelaunch
+fleet-seats: released id=ios generation=h17 reason=prelaunch
+exit=0
+$ bin/fm-fleet-seats.sh reserve ios --generation livepayload --previous-generation h17 --kind secondmate --harness claude --model pool-a --holder-pid 82542
+fleet-seats: reserved pool=shared id=ios generation=livepayload used=1 capacity=6
+exit=0
+$ bin/fm-fleet-seats.sh dispatch ios --generation livepayload --route-file /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/parent/state/route.json
+fleet-seats: dispatched id=ios generation=livepayload
+exit=0
+Parent holder serialized bytes=1182006 (> transport stdin bound 1048576)
+$ bin/fm-on.sh ios fm-remote-secondmate-control.sh relaunch ios unverified-harness pool-a medium --operation livepayload --previous h17
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"livepayload","requested_generation":"livepayload","actual_generation":null,"previous_generation":"h17","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: unverified remote secondmate harness: unverified-harness
+exit=1
+Remote reservation serialized bytes=965; normalized payload={"schema": "fm-fleet-seat-holder.v2", "task": "ios", "incarnations": [{"generation": "livepayload", "previous_generation": "h17", "kind": "secondmate", "model": "pool-a", "policy_digest_at_reserve": "3217406285-63", "lifecycle": "reserved", "launch_phase": "dispatching", "owner_pid": 82542, "owner_pid_identity": "Wed Oct  7 16:23:19 2026     /opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-ssh-driver.py", "route": {"placement": "remote", "backend": "herdr", "target": null, "home": "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/remote-home", "host": "127.0.0.1", "remote_root": "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/remote-code", "spawn_gen": null, "operation": "livepayload"}, "startup_confirmed": false, "disposition": null}]}
+$ bin/fm-on.sh ios fm-remote-secondmate-control.sh relaunch ios unverified-harness pool-a medium --operation livepayload --previous h17
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"livepayload","requested_generation":"livepayload","actual_generation":null,"previous_generation":"h17","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: seat operation livepayload was already handled on this host (prelaunch)
+exit=1
+$ bin/fm-fleet-seats.sh reclaim ios --generation livepayload
+fleet-seats: retained - the process that launched ios generation livepayload (pid 82542) is still running (the seat stays counted until evidence resolves it)
+exit=3
+$ bin/fm-fleet-seats.sh reconcile-remote ios --generation livepayload --response-file /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/parent/state/host-response.json
+fleet-seats: released id=ios generation=livepayload reason=prelaunch
+exit=0
+$ bash -c '. bin/fm-remote-job-lib.sh; fm_remote_job_stop_worker_tree "$(cat "$1")"' _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live-ssh/jobs/worker.pid
+exit=0
+Disposable SSH daemon, worker tree, keys, known_hosts, homes, copied code, and state removed.

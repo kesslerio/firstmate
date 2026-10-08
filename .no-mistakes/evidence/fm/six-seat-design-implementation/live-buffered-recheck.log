@@ -1,0 +1,52 @@
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary
+exit=0
+$ bin/fm-lab-home.sh tmux-dir /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary
+/tmp/fml.wCDyeV
+exit=0
+$ tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q -e FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary claude
+exit=0
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/private/tmp/fml.wCDyeV/tmux-502/fm-lab
+exit=0
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered
+exit=0
+$ tmux -L fm-lab new-window -d -t primary -n fm-buffered -c /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q 'bash --noprofile --norc'
+exit=0
+$ bash -c 'bin/fm-fleet-seats.sh reserve buffered --generation g-buffered --kind secondmate --harness claude --model pool-a --holder-pid "$$" && bin/fm-fleet-seats.sh dispatch buffered --generation g-buffered --route-file /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered/state/route-g-buffered'
+fleet-seats: reserved pool=shared id=buffered generation=g-buffered used=1 capacity=1
+fleet-seats: dispatched id=buffered generation=g-buffered
+exit=0
+$ bin/fm-fleet-seats.sh confirm buffered --generation g-buffered
+fleet-seats: retained - the endpoint for buffered generation g-buffered reads 'dead', not alive (the seat stays counted until evidence resolves it)
+exit=3
+$ bin/fm-fleet-seats.sh dispatch buffered --generation g-buffered --route-file /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered/state/route-g-buffered
+fleet-seats: refused - only the process that reserved buffered generation g-buffered may dispatch its launch
+exit=5
+$ bin/fm-fleet-seats.sh release buffered --generation g-buffered --reason prelaunch
+fleet-seats: refused - generation g-buffered of buffered was already dispatched; only proven cancellation or recovery can release it
+exit=5
+$ bin/fm-fleet-seats.sh reclaim buffered --generation g-buffered
+fleet-seats: retained - the endpoint for buffered generation g-buffered holds only a shell; a submitted launch may still execute there (the seat stays counted until evidence resolves it)
+exit=3
+$ bin/fm-fleet-seats.sh reserve other --generation g-other --kind ship --harness claude --model pool-a --holder-pid 52262
+fleet-seats: pool shared is full (1 of 1 seats held); other gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered/state buffered
+exit=4
+$ tmux -L fm-lab kill-window -t primary:fm-buffered
+exit=0
+$ bin/fm-fleet-seats.sh reclaim buffered --generation g-buffered
+fleet-seats: retained - the endpoint for buffered generation g-buffered is not proven destroyed: tmux absence cannot be proven from a task record: the record does not carry the endpoint's socket identity, and a server-wide window inventory only describes the tmux server this process addresses, so a window absent from it may still be alive on another (the seat stays counted until evidence resolves it)
+exit=3
+$ bin/fm-fleet-seats.sh show buffered
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered/state","task":"buffered","revision":2,"incarnations":[{"generation":"g-buffered","previous_generation":null,"kind":"secondmate","model":"pool-a","policy_digest_at_reserve":"1834577730-72","lifecycle":"reserved","launch_phase":"dispatching","owner_pid":53848,"owner_pid_identity":"Wed Oct  7 16:16:34 2026     bash -c bin/fm-fleet-seats.sh reserve buffered --generation g-buffered --kind secondmate --harness claude --model pool-a --holder-pid \"$$\" && bin/fm-fleet-seats.sh dispatch buffered --generation g-buffered --route-file /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered/state/route-g-buffered","route":{"placement":"local","backend":"tmux","target":"primary:fm-buffered","home":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered","host":null,"remote_root":null,"spawn_gen":"g-buffered","operation":null},"startup_confirmed":false,"disposition":null}]}
+exit=0
+SCENARIO PASS: Unconfirmed shell-only and missing endpoints retain their seats; replay and prelaunch release refuse
+$ tmux -L fm-lab kill-server
+exit=0
+$ bin/fm-lab-home.sh teardown /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary
+exit=0
+$ rm -rf /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live
+exit=0
+All live lab homes and the private tmux server/socket directory removed.

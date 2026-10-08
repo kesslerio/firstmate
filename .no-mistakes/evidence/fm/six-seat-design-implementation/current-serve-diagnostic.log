@@ -1,0 +1,2 @@
+error: remote root and home must be separate, non-overlapping directories
+DIRECT_TRANSPORT_EXIT=64

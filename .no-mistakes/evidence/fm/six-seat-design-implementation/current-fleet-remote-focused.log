@@ -1,0 +1,3 @@
+ok - the primary requires a current policy and readable snapshot for every remote
+ok - serve epochs fence lost, late, replayed, and truncated responses
+ok - remote certificates and descendant transitions share one host authority

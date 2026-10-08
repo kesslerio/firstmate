@@ -1,0 +1,31 @@
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-live/primary
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-live/primary
+exit=0
+$ bin/fm-lab-home.sh tmux-dir /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-live/primary
+/tmp/fml.chbFJR
+exit=0
+$ tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q -e FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-live/primary 'bash --noprofile --norc'
+exit=0
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/private/tmp/fml.chbFJR/tmux-502/fm-lab
+exit=0
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-live/prepared
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-live/prepared
+exit=0
+$ bash -c 'bin/fm-fleet-seats.sh reserve mate --generation g-prepared --kind secondmate --harness claude --model pool-a --holder-pid "$$"'
+fleet-seats: reserved pool=shared id=mate generation=g-prepared used=1 capacity=1
+exit=0
+$ bash -c '. bin/fm-secondmate-liveness-lib.sh; fm_supervisor_lifecycle_acquire "$FM_HOME/state" mate 0 || exit; lock=$(fm_meta_lock_path "$FM_HOME/state/mate.meta"); fm_lock_acquire_wait_max "$lock" 2 || exit; trap '"'"'fm_lock_release "$lock"; fm_supervisor_lifecycle_release "$FM_HOME/state" mate'"'"' EXIT; bin/fm-fleet-seats.sh reclaim mate --generation g-prepared'
+fleet-seats: reclaimed id=mate generation=g-prepared (never-dispatched)
+exit=0
+$ bin/fm-fleet-seats.sh show mate
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-live/prepared/state","task":"mate","revision":2,"incarnations":[{"generation":"g-prepared","previous_generation":null,"kind":"secondmate","model":"pool-a","policy_digest_at_reserve":"1834577730-72","lifecycle":"reclaimed","launch_phase":"prepared","owner_pid":98984,"owner_pid_identity":"Wed Oct  7 17:55:25 2026     bash bin/fm-fleet-seats.sh reserve mate --generation g-prepared --kind secondmate --harness claude --model pool-a --holder-pid 98984","route":null,"startup_confirmed":false,"disposition":{"reason":"never-dispatched","source":"reclaim","generation":"g-prepared","route":null,"operation":null}}]}
+exit=0
+SCENARIO PASS: Never-dispatched supervisor reservation reclaims inside an owned lifecycle episode and held metadata lock
+$ tmux -L fm-lab kill-server
+exit=0
+$ bin/fm-lab-home.sh teardown /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-live/primary
+exit=0
+$ rm -rf /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-live
+exit=0
+All live lab homes and the private tmux server/socket directory removed.

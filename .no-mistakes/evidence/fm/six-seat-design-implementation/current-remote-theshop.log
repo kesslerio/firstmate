@@ -1,0 +1,184 @@
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+/tmp/fm6238-current.gnU5zW
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '"'"'mkdir "$1/code" && tar -xf - -C "$1/code"'"'"' _ /tmp/fm6238-current.gnU5zW'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+fm-lab-6238-current-3320234-22343
+
+exit=0
+/tmp/fm6238-current.gnU5zW/home
+/tmp/fm6238-current.gnU5zW/parent
+/tmp/fm6238-current.gnU5zW/neighbor
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+LAB_READY
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-remote/parent
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-remote/parent
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh route lab6238
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w999:p999
+herdr_session=fm-remote
+harness=pi
+model=
+effort=
+spawn_gen=synthetic.g0
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh route lab6238 --herdr-session fm-lab-6238-current-3320234-22343
+error: remote secondmate lab6238 endpoint is recorded in Herdr session 'fm-remote', expected 'fm-lab-6238-current-3320234-22343'; refusing access until it is explicitly migrated
+
+exit=1
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh launch lab6238 pi - - herdr --herdr-session fm-lab-6238-current-3320234-22343
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-6238-current-3320234-22343:w1:p2
+herdr_session=fm-lab-6238-current-3320234-22343
+harness=pi
+model=default
+effort=default
+spawn_gen=s1791420407.3329796.26305
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/home-summary.json": "6816044f99d791d3044e06ed886b4cdd5b5e2ab0bfbc9271e796a7b919228136", "state/parent-route/lab6238.meta": "6b08576fdce2253063f5ec1f939f517c26a26ef8243dc27eed6630e704e332b9"}
+
+exit=0
+$ bash bin/fm-remote-secondmate-relaunch.sh lab6238 pi - - --expect-generation stale.gen
+error: generation-mismatch: remote secondmate lab6238 now records generation 's1791420407.3329796.26305', not the expected stale.gen; nothing was changed
+
+exit=6
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh relaunch lab6238 pi - - --expect-generation stale.gen --herdr-session fm-lab-6238-current-3320234-22343
+error: generation-mismatch: the host incarnation is not stale.gen; nothing was changed
+
+exit=6
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/home-summary.json": "6816044f99d791d3044e06ed886b4cdd5b5e2ab0bfbc9271e796a7b919228136", "state/parent-route/lab6238.meta": "6b08576fdce2253063f5ec1f939f517c26a26ef8243dc27eed6630e704e332b9"}
+
+exit=0
+$ bash bin/fm-remote-secondmate-relaunch.sh lab6238 pi - - --expect-generation s1791420407.3329796.26305
+relaunched lab6238 harness=pi from=pi model=default effort=default backend=herdr endpoint=fm-lab-6238-current-3320234-22343:w1:p2 worktree=/tmp/fm6238-current.gnU5zW/home
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-6238-current-3320234-22343:w1:p2
+herdr_session=fm-lab-6238-current-3320234-22343
+harness=pi
+model=default
+effort=default
+spawn_gen=s1791420420.3338749.31046
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh capture lab6238 40 --herdr-session fm-lab-6238-current-3320234-22343
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ export
+GOTMPDIR=/tmp/fm-lab6238/gotmp
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ export
+COMPACT_ADVISER_DISABLE=1
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ . '/tmp
+/fm-lab6238+64610c9b3a3ecebf55d3fff41b3df7a9f66a34ccb2
+6aa67192b8bd693e92a8fb/launch.s1791420407.3329796.2630
+5.sh'
+Error: Failed to load extension "/tmp/fm6238-current.g
+nU5zW/home/.pi/extensions/fm-calm.ts": Failed to load
+extension: Cannot find module './fm-calm-preservation.
+ts'
+Require stack:
+- /tmp/fm6238-current.gnU5zW/home/.pi/extensions/lib/f
+m-calm-assistant-layout.ts
+Hint: Start without extensions using "pi -ne".
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ export
+GOTMPDIR=/tmp/fm-lab6238/gotmp
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ export
+COMPACT_ADVISER_DISABLE=1
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ . '/tmp
+/fm-lab6238+64610c9b3a3ecebf55d3fff41b3df7a9f66a34ccb2
+6aa67192b8bd693e92a8fb/launch.s1791420420.3338749.3104
+6.sh'
+Error: Failed to load extension "/tmp/fm6238-current.g
+nU5zW/home/.pi/extensions/fm-calm.ts": Failed to load
+extension: Cannot find module './fm-calm-preservation.
+ts'
+Require stack:
+- /tmp/fm6238-current.gnU5zW/home/.pi/extensions/lib/f
+m-calm-assistant-layout.ts
+Hint: Start without extensions using "pi -ne".
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh route lab6238 --herdr-session fm-lab-6238-current-3320234-22343
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-6238-current-3320234-22343:w1:p2
+herdr_session=fm-lab-6238-current-3320234-22343
+harness=pi
+model=default
+effort=default
+spawn_gen=s1791420420.3338749.31046
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/.guard-watcher-stale-banner": "8c40be4a4e662bea4bfa4ee40ca3b0ea03e0af97893535e7b2995279118d7e64", "state/parent-route/home-summary.json": "60e247191f2a9aadf1326bc87fe956c5636380f9669bb6db362c268f93a7c170", "state/parent-route/lab6238.control-relaunch": "95c25255d38191610b77fe1b0e2b63ec54f40d17db7157904145b8ac9dd30590", "state/parent-route/lab6238.control-relaunch.meta-prior": "6b08576fdce2253063f5ec1f939f517c26a26ef8243dc27eed6630e704e332b9", "state/parent-route/lab6238.meta": "54185ef821a8a1623293a8d98b4348f8a9cb21a1ebf9f5604b7ab3ebf19d08fa"}
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh retire lab6238 --herdr-session default
+error: invalid remote Herdr lab session: default; expected an owned fm-lab-* name
+
+exit=1
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh retire lab6238 --herdr-session fm-remote
+error: invalid remote Herdr lab session: fm-remote; expected an owned fm-lab-* name
+
+exit=1
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh retire lab6238 --herdr-session fm-lab-bad.name
+error: invalid remote Herdr lab session: fm-lab-bad.name; expected an owned fm-lab-* name
+
+exit=1
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/.guard-watcher-stale-banner": "8c40be4a4e662bea4bfa4ee40ca3b0ea03e0af97893535e7b2995279118d7e64", "state/parent-route/home-summary.json": "60e247191f2a9aadf1326bc87fe956c5636380f9669bb6db362c268f93a7c170", "state/parent-route/lab6238.control-relaunch": "95c25255d38191610b77fe1b0e2b63ec54f40d17db7157904145b8ac9dd30590", "state/parent-route/lab6238.control-relaunch.meta-prior": "6b08576fdce2253063f5ec1f939f517c26a26ef8243dc27eed6630e704e332b9", "state/parent-route/lab6238.meta": "54185ef821a8a1623293a8d98b4348f8a9cb21a1ebf9f5604b7ab3ebf19d08fa"}
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh retire lab6238 --herdr-session fm-lab-6238-current-3320234-22343
+teardown lab6238 complete (window fm-lab-6238-current-3320234-22343:w1:p2, worktree /tmp/fm6238-current.gnU5zW/home)
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+CLEANUP_OK
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0

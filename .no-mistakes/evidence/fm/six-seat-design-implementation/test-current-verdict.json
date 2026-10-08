@@ -1,0 +1,79 @@
+{
+  "verdict": "inconclusive",
+  "summary": "Tested 72bab8ebc1dcb76026a4e27fb11428740c674df5 without source changes. Denied paths passed; successful replacement and retirement remain unproven.",
+  "findings": [
+    {
+      "id": "test-current-isolated-success-unproven",
+      "severity": "warning",
+      "action": "ask-user",
+      "file": "bin/fm-remote-secondmate-relaunch.sh",
+      "line": 144,
+      "description": "This test step cannot demonstrate the two required success paths. A matching-generation parent relaunch reaches the SSH host but refuses the lab route because RELAUNCH_ARGS omits the controller\u2019s new --herdr-session input. Extending that wrapper exceeds the recorded single-controller-selection scope. Proposed line before line 144, not applied: [[ \"$(fm_meta_get \"$META\" remote_herdr_session)\" == fm-lab-* ]] && RELAUNCH_ARGS+=(--herdr-session \"$(fm_meta_get \"$META\" remote_herdr_session)\"). Local helper prepare/provision also refuses because default is stopped; starting or repairing default is forbidden. Theshop has a running default, but the current worktree boundary prohibits remote synthetic-home/session writes. Provide authority for this forwarding change and a specific disposable remote location/session, or another compliant host with an already-running default."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "Replace a remote supervisor and publish its confirmed generation to the parent",
+      "result": "untested",
+      "live": false,
+      "evidence": "live-herdr-current.log; live-herdr-current-results.json",
+      "reason": "Tried the real parent wrapper through private localhost SSH with marked synthetic homes. Matching-generation replacement refused because the parent does not forward --herdr-session. Local helper prepare and provision both refused the stopped-default tripwire. Read-only SSH confirmed theshop has a running default, but remote fixture writes are outside the current boundary. Requires approved wrapper forwarding and remote scratch/session authority; no translated-source or fake-endpoint workaround was used."
+    },
+    {
+      "name": "Retire a remote supervisor and remove only its per-operation seat files",
+      "result": "untested",
+      "live": false,
+      "evidence": "live-herdr-current.log; remote-current-access.json",
+      "reason": "Created synthetic task and neighboring operation files inside the worktree and drove SSH retirement refusal/selection paths. Successful cleanup needs a real owned Herdr endpoint: local helper prepare/provision refused because default is stopped; starting default is forbidden. A real SSH host with a running default was found, but creating its disposable home/session violates the current boundary. Provide a permitted remote scratch location and owned named-lab session authority."
+    },
+    {
+      "name": "Stale-generation replacement requests refuse at parent and SSH host without changing remote records",
+      "result": "pass",
+      "live": true,
+      "evidence": "live-herdr-current.log: parent and named-session host return exit 6; live-herdr-current-results.json records unchanged fixture inventory",
+      "reason": ""
+    },
+    {
+      "name": "Accept named-lab and ordinary routes while refusing unsafe session operations and preserving default sessions",
+      "result": "pass",
+      "live": true,
+      "evidence": "live-herdr-current.log: named/default route readbacks and invalid/mismatched retirement refusals; remote-current-access.json: unsafe calls refused and before/after inventories equal",
+      "reason": ""
+    }
+  ],
+  "testing_summary": "Retained earlier fleet/relaunch baseline logs without rerunning those suites. On the current head, the focused controller test passed and real SSH exercised route selection, stale-generation fencing, and denied operations; theshop/mama default snapshots stayed unchanged. Local prepare/provision refused safely, leaving both lifecycle success paths untested. All disposable homes, SSH processes, and test directories were removed. No rendered UI was reached, so no screenshot was produced. Lint, CI, and pipeline attestation remain with the outer executor.",
+  "tested": [
+    "`TMPDIR=\"$PWD/.test-tmp\" bash bin/fm-test-run.sh tests/fm-remote-secondmate-session.test.sh --per-script-timeout-secs 60`",
+    "`python3 /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-herdr-current.py` \u2014 private real SSH daemon, fm-on/entrypoint/job worker, parent and host controllers, synthetic records, hash inventory assertions, helper prepare/provision attempts, cleanup",
+    "`ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop|mama` \u2014 streamed current helper to run scoped session lists and refused provision fm-remote, stop default, server stop, and session delete default",
+    "Compared real remote default-session inventories before/after and verified no owned fixture processes or directories remained",
+    "`git rev-parse HEAD`, committed-source hash comparisons, and `git status --short` \u2014 unchanged target head and clean worktree; retained earlier baseline evidence reviewed"
+  ],
+  "artifacts": [
+    {
+      "label": "Current-head SSH scenario transcript",
+      "kind": "log",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-herdr-current.log"
+    },
+    {
+      "label": "Ownership, lab attempts, scenario outcomes, and cleanup",
+      "kind": "log",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-herdr-current-results.json"
+    },
+    {
+      "label": "Remote refusal transcripts and default-session tripwires",
+      "kind": "log",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/remote-current-access.json"
+    },
+    {
+      "label": "Focused controller regression output",
+      "kind": "log",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/session-current-head.log"
+    },
+    {
+      "label": "Tested source hashes and final cleanup",
+      "kind": "log",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/current-head-cleanup.json"
+    }
+  ]
+}

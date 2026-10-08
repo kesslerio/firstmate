@@ -1,0 +1,52 @@
+{
+  "tested_head_sha": "7e0dba0c62246b324b92856ee52f2c4ba7cd3c29",
+  "verdict": "inconclusive",
+  "live_lifecycle_executed": false,
+  "checks": [
+    "Reproduced the lab-session refusal before endpoint access through the real controller",
+    "Parent and host stale-generation requests refuse with exit 6 and preserve synthetic remote files",
+    "Helper refuses fm-remote provisioning, literal-default stop, and server-global operations before executing them; before/after session observations identical"
+  ],
+  "task": "herdr-round3",
+  "lab_session": "fm-lab-herdr-round3-64313-31716",
+  "ownership": {
+    "fixture_root": "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3",
+    "homes": [
+      "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/parent",
+      "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/remote-home"
+    ],
+    "session_provisioned": false,
+    "synthetic_registration": true
+  },
+  "default_session_observation_before": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr\",\"socket_path\":\"/Users/kesslerio/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n",
+  "replacement": {
+    "result": "untested",
+    "reason": "The real parent wrapper and SSH worker reach host control, but a matching-generation synthetic fm-lab-* route refuses before replacement because remote control requires fm-remote. Provisioning fm-remote or translating the endpoint would violate the required lab isolation or change the tested source behavior."
+  },
+  "retirement": {
+    "result": "untested",
+    "reason": "The real SSH retirement interface rejects the fm-lab-* route before teardown; all synthetic task and neighboring operation files remain unchanged. Successful live retirement and selective cleanup cannot be claimed."
+  },
+  "default_session_observation_after": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr\",\"socket_path\":\"/Users/kesslerio/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n",
+  "default_session_tripwire": {
+    "observations_identical": true,
+    "running_default_proven": false,
+    "snapshot": [
+      {
+        "default": true,
+        "name": "default",
+        "running": false,
+        "session_dir": "/Users/kesslerio/.config/herdr",
+        "socket_path": "/Users/kesslerio/.config/herdr/herdr.sock"
+      }
+    ],
+    "session_provisioned": false
+  },
+  "cleanup": {
+    "fixture_tree_removed": true,
+    "ssh_daemon_stopped": true,
+    "herdr_sessions_created": 0,
+    "real_secondmates_changed": false,
+    "source_changes": false
+  }
+}

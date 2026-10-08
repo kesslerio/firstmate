@@ -1,0 +1,22 @@
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -s'
+/tmp/fm6238-current.2PAAmQ
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -c '"'"'mkdir "$1/code" && tar -xf - -C "$1/code"'"'"' _ /tmp/fm6238-current.2PAAmQ'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -s'
+fm-lab-6238-current-3375203-2032
+
+exit=0
+/tmp/fm6238-current.2PAAmQ/home
+/tmp/fm6238-current.2PAAmQ/parent
+/tmp/fm6238-current.2PAAmQ/neighbor
+{"sessions":[{"default":true,"name":"default","running":false,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+PROVISION_REFUSED
+{"sessions":[{"default":true,"name":"default","running":false,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+fm-herdr-lab: fleet-state tripwire requires exactly one running default session
+CLEANUP_OK
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -s'
+
+exit=0

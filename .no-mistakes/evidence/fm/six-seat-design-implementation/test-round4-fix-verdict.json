@@ -1,0 +1,59 @@
+{
+  "head_sha": "7e0dba0c62246b324b92856ee52f2c4ba7cd3c29",
+  "tested_source": "HEAD plus uncommitted controller fix and focused regression; no committed-head pass or attestation claimed",
+  "source_sha256": {
+    "bin/fm-remote-secondmate-control.sh": "3689684cc76b966b8ed72d7e41d2d863aa6e7452d79e44b657645ab3be38dc53",
+    "tests/fm-remote-secondmate-session.test.sh": "1a6c1f29a2c1c290ef717208f87577874e0a551a976f025adab1e343a342aeae",
+    "docs/remote-secondmates.md": "0953d65a4d951f5c1920c65d9f426e3b76befe7042e3305185b59ebf2f48353b"
+  },
+  "root_cause": "Host controller pinned every endpoint to fm-remote, refusing helper-owned lab sessions.",
+  "fix": "One trailing --herdr-session input at the existing controller selection point, restricted to fm-lab-* names; omitted input retains fm-remote.",
+  "focused_verification": {
+    "before": "session-before.log: ordinary route passes; helper-named lab route fails",
+    "after": "session-after.log: all five behavior groups pass",
+    "command": "TMPDIR=\"$PWD/.test-tmp\" bash bin/fm-test-run.sh tests/fm-remote-secondmate-session.test.sh --per-script-timeout-secs 60",
+    "observable_contracts": [
+      "route output",
+      "invalid explicit input refusal",
+      "persisted endpoint preservation",
+      "no Herdr invocation on denied paths"
+    ]
+  },
+  "live_validation_verdict": "inconclusive",
+  "unproven_scenarios": [
+    "Real SSH replacement with confirmed generation publication",
+    "Real SSH retirement with selective operation-file cleanup"
+  ],
+  "blockers": [
+    {
+      "reason": "Current worktree-only boundary prohibits intentional remote scratch/home writes required to create synthetic registrations and task-owned homes. Earlier remote authorization does not override the current boundary."
+    },
+    {
+      "file": "bin/fm-remote-secondmate-relaunch.sh",
+      "line": 144,
+      "reason": "Parent wrapper forwards RELAUNCH_ARGS without the lab session input; extending that wrapper exceeds the authorized single controller selection point.",
+      "proposed_one_line_patch_before_dispatch": "[[ \"$(fm_meta_get \"$META\" remote_herdr_session)\" == fm-lab-* ]] && RELAUNCH_ARGS+=(--herdr-session \"$(fm_meta_get \"$META\" remote_herdr_session)\")",
+      "applied": false
+    }
+  ],
+  "not_run": [
+    "lint",
+    "formatters",
+    "static analysis",
+    "full repository suite",
+    "UI QA (CLI-only change)",
+    "CI",
+    "attestation",
+    "pipeline control"
+  ],
+  "cleanup": {
+    "test_temp_root_removed": true,
+    "remote_writes": false,
+    "live_herdr_lifecycle_calls": false,
+    "source_fix_and_test_retained": true
+  },
+  "standards_unavailable": [
+    "/Users/kesslerio/.ai/CODING_STANDARDS.md",
+    "/Users/kesslerio/.ai/references/shared/PROCESS_EXECUTION.md"
+  ]
+}

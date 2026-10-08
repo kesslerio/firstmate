@@ -1,0 +1,33 @@
+[
+  {
+    "name": "No declaration stays uncapped; declared pools refuse unresolved models, raw commands, and invalid policy",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Twelve simultaneous callers across two homes get six seats; replay and same-holder replacement never create a seventh seat",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Never-dispatched supervisor reservation reclaims inside an owned lifecycle episode and held metadata lock",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Unconfirmed shell-only and missing endpoints retain their seats; replay and prelaunch release refuse",
+    "result": "fail",
+    "live": true,
+    "reason": "(['bin/fm-fleet-seats.sh', 'dispatch', 'buffered', '--generation', 'g-buffered', '--route-file', '/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered/state/route-g-buffered'], 5, 'fleet-seats: refused - only the process that reserved buffered generation g-buffered may dispatch its launch\\n')"
+  },
+  {
+    "name": "An unmanaged pooled supervisor stays counted with an actionable diagnostic after shell-only or missing endpoint readings",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "A real Claude endpoint confirms startup, holds its seat while alive, and releases after confirmed agent death",
+    "result": "pass",
+    "live": true
+  }
+]

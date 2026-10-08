@@ -1,0 +1,99 @@
+$ bin/fm-herdr-lab.sh name current-head
+fm-lab-current-head-70309-17165
+exit=0
+$ bin/fm-herdr-lab.sh run fm-lab-current-head-70309-17165 session list --json
+{"sessions":[{"default":true,"name":"default","running":false,"session_dir":"/Users/kesslerio/.config/herdr","socket_path":"/Users/kesslerio/.config/herdr/herdr.sock"},{"default":false,"name":"fm-remote","running":false,"session_dir":"/Users/kesslerio/.config/herdr/sessions/fm-remote","socket_path":"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+exit=0
+$ bin/fm-herdr-lab.sh prepare fm-lab-current-head-70309-17165
+fm-herdr-lab: fleet-state tripwire requires exactly one running default session
+exit=1
+$ bin/fm-herdr-lab.sh provision fm-lab-current-head-70309-17165
+fm-herdr-lab: fleet-state tripwire requires exactly one running default session
+exit=1
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent
+exit=0
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/remote-home
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/remote-home
+exit=0
+$ git -C /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/remote-code init -q
+exit=0
+$ git -C /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/remote-code add bin AGENTS.md
+exit=0
+$ ssh-keygen -q -t ed25519 -N '' -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/ssh/host
+exit=0
+$ ssh-keygen -q -t ed25519 -N '' -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/ssh/identity
+exit=0
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh route herdr-current --herdr-session fm-lab-current-head-70309-17165
+Warning: Permanently added '[127.0.0.1]:63229' (ED25519) to the list of known hosts.
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-current-head-70309-17165:w1:p1
+herdr_session=fm-lab-current-head-70309-17165
+harness=claude
+model=
+effort=
+spawn_gen=synthetic.g0
+exit=0
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh route herdr-current
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w1:p1
+herdr_session=fm-remote
+harness=claude
+model=
+effort=
+spawn_gen=synthetic.g0
+exit=0
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh retire herdr-current --herdr-session fm-lab-current-head-70309-17165
+error: remote secondmate herdr-current endpoint is recorded in Herdr session 'fm-remote', expected 'fm-lab-current-head-70309-17165'; refusing access until it is explicitly migrated
+exit=1
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh retire herdr-current --herdr-session default
+error: invalid remote Herdr lab session: default; expected an owned fm-lab-* name
+exit=1
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh retire herdr-current --herdr-session fm-remote
+error: invalid remote Herdr lab session: fm-remote; expected an owned fm-lab-* name
+exit=1
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh retire herdr-current --herdr-session fm-lab-
+error: invalid remote Herdr lab session: fm-lab-; expected an owned fm-lab-* name
+exit=1
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh retire herdr-current --herdr-session fm-lab-bad.name
+error: invalid remote Herdr lab session: fm-lab-bad.name; expected an owned fm-lab-* name
+exit=1
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh retire herdr-current --herdr-session fm-lab-bad/name
+error: invalid remote Herdr lab session: fm-lab-bad/name; expected an owned fm-lab-* name
+exit=1
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh retire herdr-current --herdr-session ''
+error: invalid remote Herdr lab session: ; expected an owned fm-lab-* name
+exit=1
+$ bin/fm-herdr-lab.sh run fm-lab-current-head-70309-17165 session list --json
+{"sessions":[{"default":true,"name":"default","running":false,"session_dir":"/Users/kesslerio/.config/herdr","socket_path":"/Users/kesslerio/.config/herdr/herdr.sock"},{"default":false,"name":"fm-remote","running":false,"session_dir":"/Users/kesslerio/.config/herdr/sessions/fm-remote","socket_path":"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+exit=0
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-remote-secondmate-relaunch.sh herdr-current claude - - --expect-generation synthetic.stale
+error: generation-mismatch: remote secondmate herdr-current now records generation 'synthetic.g0', not the expected synthetic.stale; nothing was changed
+exit=6
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh relaunch herdr-current claude - - --expect-generation synthetic.stale --herdr-session fm-lab-current-head-70309-17165
+error: generation-mismatch: the host incarnation is not synthetic.stale; nothing was changed
+exit=6
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-remote-secondmate-relaunch.sh herdr-current claude - - --expect-generation synthetic.g0
+relaunch_failure=prelaunch
+error: remote secondmate herdr-current endpoint is recorded in Herdr session 'fm-lab-current-head-70309-17165', expected 'fm-remote'; refusing access until it is explicitly migrated
+exit=1
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/parent bin/fm-on.sh herdr-current fm-remote-secondmate-control.sh retire herdr-current
+error: remote secondmate herdr-current endpoint is recorded in Herdr session 'fm-lab-current-head-70309-17165', expected 'fm-remote'; refusing access until it is explicitly migrated
+exit=1
+$ bin/fm-herdr-lab.sh provision fm-remote
+fm-herdr-lab: session name must start with 'fm-lab-' and contain only letters, digits, underscores, or dashes: fm-remote
+exit=1
+$ bin/fm-herdr-lab.sh stop default
+fm-herdr-lab: refusing session name 'default'
+exit=1
+$ bin/fm-herdr-lab.sh run fm-lab-current-head-70309-17165 server stop
+fm-herdr-lab: run forbids server operations; use provision for the named lab server
+exit=1
+$ bin/fm-herdr-lab.sh run fm-lab-current-head-70309-17165 session list --json
+{"sessions":[{"default":true,"name":"default","running":false,"session_dir":"/Users/kesslerio/.config/herdr","socket_path":"/Users/kesslerio/.config/herdr/herdr.sock"},{"default":false,"name":"fm-remote","running":false,"session_dir":"/Users/kesslerio/.config/herdr/sessions/fm-remote","socket_path":"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+exit=0
+$ bash -c '. bin/fm-remote-job-lib.sh; fm_remote_job_stop_worker_tree "$(cat "$1")"' _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-current/jobs/worker.pid
+exit=0
+Cleanup: private SSH daemon and worker stopped; synthetic homes, copied code, keys, and worker state removed. Prepare/provision attempted and safely refused; no Herdr session created or endpoint lifecycle executed.

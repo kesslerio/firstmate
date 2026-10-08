@@ -1,0 +1,57 @@
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/parent
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/parent
+exit=0
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/remote-home
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/remote-home
+exit=0
+$ git -C /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/remote-code init -q
+exit=0
+$ git -C /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/remote-code add bin AGENTS.md
+exit=0
+$ bin/fm-herdr-lab.sh name herdr-round3
+fm-lab-herdr-round3-64313-31716
+exit=0
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/remote-home bin/fm-remote-secondmate-control.sh relaunch herdr-round3 claude - - --expect-generation synthetic.g0
+relaunch_failure=prelaunch
+error: remote secondmate herdr-round3 endpoint is recorded in Herdr session 'fm-lab-herdr-round3-64313-31716', expected 'fm-remote'; refusing access until it is explicitly migrated
+exit=1
+$ ssh-keygen -q -t ed25519 -N '' -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/ssh/host
+exit=0
+$ ssh-keygen -q -t ed25519 -N '' -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/ssh/identity
+exit=0
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/parent bin/fm-on.sh herdr-round3 fm-remote-secondmate-control.sh state herdr-round3
+Warning: Permanently added '[127.0.0.1]:50906' (ED25519) to the list of known hosts.
+unverified
+error: remote secondmate herdr-round3 endpoint is recorded in Herdr session 'fm-lab-herdr-round3-64313-31716', expected 'fm-remote'; refusing access until it is explicitly migrated
+exit=0
+$ bin/fm-herdr-lab.sh run fm-lab-herdr-round3-64313-31716 session list --json
+{"sessions":[{"default":true,"name":"default","running":false,"session_dir":"/Users/kesslerio/.config/herdr","socket_path":"/Users/kesslerio/.config/herdr/herdr.sock"},{"default":false,"name":"fm-remote","running":false,"session_dir":"/Users/kesslerio/.config/herdr/sessions/fm-remote","socket_path":"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+exit=0
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/parent bin/fm-remote-secondmate-relaunch.sh herdr-round3 claude - - --expect-generation synthetic.stale
+error: generation-mismatch: remote secondmate herdr-round3 now records generation 'synthetic.g0', not the expected synthetic.stale; nothing was changed
+exit=6
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/parent bin/fm-on.sh herdr-round3 fm-remote-secondmate-control.sh relaunch herdr-round3 claude - - --expect-generation synthetic.stale
+error: generation-mismatch: the host incarnation is not synthetic.stale; nothing was changed
+exit=6
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/parent bin/fm-remote-secondmate-relaunch.sh herdr-round3 claude - - --expect-generation synthetic.g0
+relaunch_failure=prelaunch
+error: remote secondmate herdr-round3 endpoint is recorded in Herdr session 'fm-lab-herdr-round3-64313-31716', expected 'fm-remote'; refusing access until it is explicitly migrated
+exit=1
+$ FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/parent bin/fm-on.sh herdr-round3 fm-remote-secondmate-control.sh retire herdr-round3
+error: remote secondmate herdr-round3 endpoint is recorded in Herdr session 'fm-lab-herdr-round3-64313-31716', expected 'fm-remote'; refusing access until it is explicitly migrated
+exit=1
+$ bin/fm-herdr-lab.sh provision fm-remote
+fm-herdr-lab: session name must start with 'fm-lab-' and contain only letters, digits, underscores, or dashes: fm-remote
+exit=1
+$ bin/fm-herdr-lab.sh stop default
+fm-herdr-lab: refusing session name 'default'
+exit=1
+$ bin/fm-herdr-lab.sh run fm-lab-herdr-round3-64313-31716 server stop
+fm-herdr-lab: run forbids server operations; use provision for the named lab server
+exit=1
+$ bin/fm-herdr-lab.sh run fm-lab-herdr-round3-64313-31716 session list --json
+{"sessions":[{"default":true,"name":"default","running":false,"session_dir":"/Users/kesslerio/.config/herdr","socket_path":"/Users/kesslerio/.config/herdr/herdr.sock"},{"default":false,"name":"fm-remote","running":false,"session_dir":"/Users/kesslerio/.config/herdr/sessions/fm-remote","socket_path":"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+exit=0
+$ bash -c '. bin/fm-remote-job-lib.sh; fm_remote_job_stop_worker_tree "$(cat "$1")"' _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-round3/jobs/worker.pid
+exit=0
+Cleanup: private SSH daemon and worker stopped; synthetic homes, copied code, keys, and worker state removed. No Herdr session provisioned or lifecycle executed.

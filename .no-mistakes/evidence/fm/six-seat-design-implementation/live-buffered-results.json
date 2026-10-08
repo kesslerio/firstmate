@@ -1,0 +1,7 @@
+[
+  {
+    "name": "Unconfirmed shell-only and missing endpoints retain their seats; replay and prelaunch release refuse",
+    "result": "pass",
+    "live": true
+  }
+]

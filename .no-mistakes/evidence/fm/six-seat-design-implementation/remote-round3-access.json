@@ -1,0 +1,116 @@
+{
+  "session": "fm-lab-remote-round3-47564-30196",
+  "read_only": true,
+  "probes": [
+    {
+      "host": "shop",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no shop 'bash -s -- run fm-lab-remote-round3-47564-30196 session list --json'",
+      "exit": 255,
+      "output": "ssh: Could not resolve hostname shop: nodename nor servname provided, or not known\n"
+    },
+    {
+      "host": "mama",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -s -- run fm-lab-remote-round3-47564-30196 session list --json'",
+      "exit": 1,
+      "output": "bash: line 590: BASH_SOURCE[0]: unbound variable\n"
+    },
+    {
+      "host": "mama",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_cli \"$@\"'\"'\"' _ fm-lab-remote-round3-47564-30196 session list --json'",
+      "exit": 0,
+      "output": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":false,\"session_dir\":\"/home/art/.config/herdr\",\"socket_path\":\"/home/art/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":true,\"session_dir\":\"/home/art/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/home/art/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n"
+    },
+    {
+      "host": "theshop",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_cli \"$@\"'\"'\"' _ fm-lab-remote-round3-47564-30196 session list --json'",
+      "exit": 0,
+      "output": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":true,\"session_dir\":\"/home/art/.config/herdr\",\"socket_path\":\"/home/art/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"firstmate\",\"running\":true,\"session_dir\":\"/home/art/.config/herdr/sessions/firstmate\",\"socket_path\":\"/home/art/.config/herdr/sessions/firstmate/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":true,\"session_dir\":\"/home/art/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/home/art/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n"
+    }
+  ],
+  "guards": [
+    {
+      "host": "theshop",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_main \"$@\"'\"'\"' _ provision fm-remote'",
+      "exit": 1,
+      "output": "fm-herdr-lab: session name must start with 'fm-lab-' and contain only letters, digits, underscores, or dashes: fm-remote\n"
+    },
+    {
+      "host": "theshop",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_main \"$@\"'\"'\"' _ stop default'",
+      "exit": 1,
+      "output": "fm-herdr-lab: refusing session name 'default'\n"
+    },
+    {
+      "host": "theshop",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_main \"$@\"'\"'\"' _ run fm-lab-remote-round3-47564-30196 server stop'",
+      "exit": 1,
+      "output": "fm-herdr-lab: run forbids server operations; use provision for the named lab server\n"
+    },
+    {
+      "host": "theshop",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_main \"$@\"'\"'\"' _ run fm-lab-remote-round3-47564-30196 session list --json'",
+      "exit": 0,
+      "output": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":true,\"session_dir\":\"/home/art/.config/herdr\",\"socket_path\":\"/home/art/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"firstmate\",\"running\":true,\"session_dir\":\"/home/art/.config/herdr/sessions/firstmate\",\"socket_path\":\"/home/art/.config/herdr/sessions/firstmate/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":true,\"session_dir\":\"/home/art/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/home/art/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n"
+    },
+    {
+      "host": "mama",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_main \"$@\"'\"'\"' _ provision fm-remote'",
+      "exit": 1,
+      "output": "fm-herdr-lab: session name must start with 'fm-lab-' and contain only letters, digits, underscores, or dashes: fm-remote\n"
+    },
+    {
+      "host": "mama",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_main \"$@\"'\"'\"' _ stop default'",
+      "exit": 1,
+      "output": "fm-herdr-lab: refusing session name 'default'\n"
+    },
+    {
+      "host": "mama",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_main \"$@\"'\"'\"' _ run fm-lab-remote-round3-47564-30196 server stop'",
+      "exit": 1,
+      "output": "fm-herdr-lab: run forbids server operations; use provision for the named lab server\n"
+    },
+    {
+      "host": "mama",
+      "command": "ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no mama 'bash -c '\"'\"'source /dev/stdin; fm_herdr_lab_main \"$@\"'\"'\"' _ run fm-lab-remote-round3-47564-30196 session list --json'",
+      "exit": 0,
+      "output": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":false,\"session_dir\":\"/home/art/.config/herdr\",\"socket_path\":\"/home/art/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":true,\"session_dir\":\"/home/art/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/home/art/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n"
+    }
+  ],
+  "default_tripwires": {
+    "theshop": {
+      "session_inventory_identical": true,
+      "before": {
+        "default": true,
+        "name": "default",
+        "running": true,
+        "session_dir": "/home/art/.config/herdr",
+        "socket_path": "/home/art/.config/herdr/herdr.sock"
+      },
+      "after": {
+        "default": true,
+        "name": "default",
+        "running": true,
+        "session_dir": "/home/art/.config/herdr",
+        "socket_path": "/home/art/.config/herdr/herdr.sock"
+      }
+    },
+    "mama": {
+      "session_inventory_identical": true,
+      "before": {
+        "default": true,
+        "name": "default",
+        "running": false,
+        "session_dir": "/home/art/.config/herdr",
+        "socket_path": "/home/art/.config/herdr/herdr.sock"
+      },
+      "after": {
+        "default": true,
+        "name": "default",
+        "running": false,
+        "session_dir": "/home/art/.config/herdr",
+        "socket_path": "/home/art/.config/herdr/herdr.sock"
+      }
+    }
+  }
+}

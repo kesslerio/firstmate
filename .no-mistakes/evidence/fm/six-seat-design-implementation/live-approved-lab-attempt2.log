@@ -1,0 +1,30 @@
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+/tmp/fm6238-approved.g6VbCQ
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '"'"'mkdir "$1/code" && tar -xf - -C "$1/code"'"'"' _ /tmp/fm6238-approved.g6VbCQ'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+fm-lab-6238-approved-3121472-8909
+
+exit=0
+/tmp/fm6238-approved.g6VbCQ/home
+/tmp/fm6238-approved.g6VbCQ/parent
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+LAB_READY
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+  File "<string>", line 1
+    import pathlib,sys; (pathlib.Path(sys.argv[1])/"data/charter.md").write_text("# Lab charter
+                                                                                 ^
+SyntaxError: unterminated string literal (detected at line 1)
+
+exit=1
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+CLEANUP_OK
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0

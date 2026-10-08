@@ -1,0 +1,142 @@
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+/tmp/fm6238-approved.SWmAtK
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '"'"'mkdir "$1/code" && tar -xf - -C "$1/code"'"'"' _ /tmp/fm6238-approved.SWmAtK'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+fm-lab-6238-approved-3181761-25219
+
+exit=0
+/tmp/fm6238-approved.SWmAtK/home
+/tmp/fm6238-approved.SWmAtK/parent
+/tmp/fm6238-approved.SWmAtK/neighbor
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+LAB_READY
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-approved-lab/parent
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-approved-lab/parent
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh route lab6238
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w999:p999
+herdr_session=fm-remote
+harness=claude
+model=
+effort=
+spawn_gen=synthetic.g0
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh route lab6238 --herdr-session fm-lab-6238-approved-3181761-25219
+error: remote secondmate lab6238 endpoint is recorded in Herdr session 'fm-remote', expected 'fm-lab-6238-approved-3181761-25219'; refusing access until it is explicitly migrated
+
+exit=1
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh launch lab6238 claude - - herdr --herdr-session fm-lab-6238-approved-3181761-25219
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-6238-approved-3181761-25219:w1:p2
+herdr_session=fm-lab-6238-approved-3181761-25219
+harness=claude
+model=default
+effort=default
+spawn_gen=s1791420115.3189717.19951
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/home-summary.json": "d04f37e9c8cb28920347c6111eae8f3ba76ceb5c86e8db85f90b30f1ee76ee59", "state/parent-route/lab6238.meta": "920d23e6a1db044bc24ba6ccafc93adc100630b2d7805e3dc305ab81afb7a9d9"}
+
+exit=0
+$ bash bin/fm-remote-secondmate-relaunch.sh lab6238 claude - - --expect-generation stale.gen
+error: generation-mismatch: remote secondmate lab6238 now records generation 's1791420115.3189717.19951', not the expected stale.gen; nothing was changed
+
+exit=6
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh relaunch lab6238 claude - - --expect-generation stale.gen --herdr-session fm-lab-6238-approved-3181761-25219
+error: generation-mismatch: the host incarnation is not stale.gen; nothing was changed
+
+exit=6
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/home-summary.json": "d04f37e9c8cb28920347c6111eae8f3ba76ceb5c86e8db85f90b30f1ee76ee59", "state/parent-route/lab6238.meta": "920d23e6a1db044bc24ba6ccafc93adc100630b2d7805e3dc305ab81afb7a9d9"}
+
+exit=0
+$ bash bin/fm-remote-secondmate-relaunch.sh lab6238 claude - - --expect-generation s1791420115.3189717.19951
+relaunched lab6238 harness=claude from=claude model=default effort=default backend=herdr endpoint=fm-lab-6238-approved-3181761-25219:w1:p2 worktree=/tmp/fm6238-approved.SWmAtK/home
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-6238-approved-3181761-25219:w1:p2
+herdr_session=fm-lab-6238-approved-3181761-25219
+harness=claude
+model=default
+effort=default
+spawn_gen=s1791420125.3195094.9199
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh route lab6238 --herdr-session fm-lab-6238-approved-3181761-25219
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-6238-approved-3181761-25219:w1:p2
+herdr_session=fm-lab-6238-approved-3181761-25219
+harness=claude
+model=default
+effort=default
+spawn_gen=s1791420125.3195094.9199
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/.guard-watcher-stale-banner": "8c40be4a4e662bea4bfa4ee40ca3b0ea03e0af97893535e7b2995279118d7e64", "state/parent-route/home-summary.json": "12c90f8122ab6cc4576ab1be3ff3ed429fb4cb7bc1b45336c35d1959a03c7255", "state/parent-route/lab6238.control-relaunch": "e76b8d976654d83ab425fa6cea774bc2039cce17e9ad51adba97c2e68961b70e", "state/parent-route/lab6238.control-relaunch.meta-prior": "920d23e6a1db044bc24ba6ccafc93adc100630b2d7805e3dc305ab81afb7a9d9", "state/parent-route/lab6238.meta": "a325e73d2c4d1fdfdb4cc49cf7ec119648869d385e322d5d0410e9cb868683c5"}
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh retire lab6238 --herdr-session default
+error: invalid remote Herdr lab session: default; expected an owned fm-lab-* name
+
+exit=1
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh retire lab6238 --herdr-session fm-remote
+error: invalid remote Herdr lab session: fm-remote; expected an owned fm-lab-* name
+
+exit=1
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh retire lab6238 --herdr-session fm-lab-bad.name
+error: invalid remote Herdr lab session: fm-lab-bad.name; expected an owned fm-lab-* name
+
+exit=1
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/.guard-watcher-stale-banner": "8c40be4a4e662bea4bfa4ee40ca3b0ea03e0af97893535e7b2995279118d7e64", "state/parent-route/home-summary.json": "12c90f8122ab6cc4576ab1be3ff3ed429fb4cb7bc1b45336c35d1959a03c7255", "state/parent-route/lab6238.control-relaunch": "e76b8d976654d83ab425fa6cea774bc2039cce17e9ad51adba97c2e68961b70e", "state/parent-route/lab6238.control-relaunch.meta-prior": "920d23e6a1db044bc24ba6ccafc93adc100630b2d7805e3dc305ab81afb7a9d9", "state/parent-route/lab6238.meta": "a325e73d2c4d1fdfdb4cc49cf7ec119648869d385e322d5d0410e9cb868683c5"}
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh retire lab6238 --herdr-session fm-lab-6238-approved-3181761-25219
+teardown lab6238 complete (window fm-lab-6238-approved-3181761-25219:w1:p2, worktree /tmp/fm6238-approved.SWmAtK/home)
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+CLEANUP_OK
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0

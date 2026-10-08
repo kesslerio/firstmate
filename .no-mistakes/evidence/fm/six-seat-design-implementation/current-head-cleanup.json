@@ -1,0 +1,19 @@
+{
+  "tested_sha": "72bab8ebc1dcb76026a4e27fb11428740c674df5",
+  "source_unchanged": true,
+  "source_sha256": {
+    "bin/fm-remote-secondmate-control.sh": "3689684cc76b966b8ed72d7e41d2d863aa6e7452d79e44b657645ab3be38dc53",
+    "bin/fm-remote-secondmate-relaunch.sh": "00851ba8458662d9c8cea0d7fcabe8ce6a152a75521feec2945de9f839e8b4b2",
+    "bin/fm-on.sh": "2d31c664c818b15df6267b4fecd8251f253cf8149b4e7dafb3da495d6d57a99f",
+    "bin/fm-fleet-seats.sh": "eeda8cc120a4935fd34da3d73cc309b15f8dc3663054e6eea6ea375b577a81f5",
+    "bin/fm-teardown.sh": "3bb1d78cd5509131e74c62f136a815cf677ebee402a4e02112b713f46f3c83bc"
+  },
+  "ssh_execution_source": "git archive HEAD extracted inside worktree; no source translation or edits",
+  "source_hash_check_limit": "Worktree hashes equal committed HEAD; copied SSH source removed by driver before separate hash comparison could run. Driver source and transcript record archive provenance.",
+  "owned_fixture_processes_remaining": [],
+  "fixture_root_removed": true,
+  "test_temp_root_removed": true,
+  "git_status_short": "",
+  "default_tripwire": "remote-current-access.json: theshop running default unchanged; mama stopped default unchanged",
+  "no_herdr_sessions_created": true
+}

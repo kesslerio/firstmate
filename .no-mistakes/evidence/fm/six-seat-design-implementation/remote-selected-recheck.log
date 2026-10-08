@@ -1,0 +1,6 @@
+Selected existing behavioral checks: test_remote_policy_must_be_confirmed_before_any_grant and test_remote_home_shares_the_fleet_capacity. Disposable sibling remote code/home directories; simulated SSH, real remote entrypoint/job worker.
+ok - the primary requires a current policy and readable snapshot for every remote
+ok - primary, local, and remote homes share one capacity; remote grants, denials, retries, and proven release hold
+SELECTED REMOTE CHECKS PASSED
+
+exit=0

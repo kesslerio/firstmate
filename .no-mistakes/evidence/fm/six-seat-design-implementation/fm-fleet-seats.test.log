@@ -1,0 +1,16 @@
+$ bash tests/fm-fleet-seats.test.sh
+ok - without config/fleet-seats a reservation is a silent no-op
+ok - path-like pool names refuse while ordinary dotted names reserve
+ok - legacy default, empty, and missing models occupy every declared pool
+ok - the primary and a local secondmate share one capacity and pre-existing agents count
+ok - nested local homes count existing agents once and refuse ambiguous occupancy
+ok - pooled supervisors hold seats while idle and after unproven death
+ok - declared pools reject harness defaults and raw launch commands
+ok - maintenance reclaims a proven-undispatched reservation while a live task record keeps its seat
+ok - twelve simultaneous reservations from two homes grant exactly six seats
+ok - a held lock, a dead holder, a missing or unreadable home, and malformed records refuse
+not ok - the remote was not served (missing: 'served theshop')
+--- output ---
+unreachable theshop
+
+exit=1 elapsed=73.2s

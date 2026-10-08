@@ -1,0 +1,274 @@
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary
+exit=0
+$ bin/fm-lab-home.sh tmux-dir /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary
+/tmp/fml.LG99Xb
+exit=0
+$ tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q -e FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary claude
+exit=0
+$ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
+/private/tmp/fml.LG99Xb/tmux-502/fm-lab
+exit=0
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/defaults
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/defaults
+exit=0
+$ bin/fm-fleet-seats.sh reserve off --generation g-off --harness claude --model default --holder-pid 50694
+exit=0
+$ bin/fm-fleet-seats.sh reserve default --generation g-default --harness claude --model default --holder-pid 50694
+fleet-seats: no seat - harness claude launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+$ bin/fm-fleet-seats.sh reserve raw --generation g-raw --harness claude --model pool-a --holder-pid 50694 --raw-launch
+fleet-seats: no seat - a raw launch command cannot verify its actual model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+$ bin/fm-fleet-seats.sh reserve bad --generation g-bad --kind ship --harness claude --model pool-a --holder-pid 50694
+fleet-seats: no seat - /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/defaults/config/fleet-seats is malformed (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+SCENARIO PASS: No declaration stays uncapped; declared pools refuse unresolved models, raw commands, and invalid policy
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity
+exit=0
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child
+exit=0
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity task=0 exit=0
+fleet-seats: reserved pool=shared id=task0 generation=g0 used=1 capacity=6
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child task=1 exit=4
+fleet-seats: pool shared is full (6 of 6 seats held); task1 gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task0
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task4
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task8
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task3
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task7
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task9
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity task=2 exit=4
+fleet-seats: pool shared is full (6 of 6 seats held); task2 gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task0
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task4
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task8
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task3
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task7
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task9
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child task=3 exit=0
+fleet-seats: reserved pool=shared id=task3 generation=g3 used=6 capacity=6
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity task=4 exit=0
+fleet-seats: reserved pool=shared id=task4 generation=g4 used=3 capacity=6
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child task=5 exit=4
+fleet-seats: pool shared is full (6 of 6 seats held); task5 gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task0
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task4
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task8
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task3
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task7
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task9
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity task=6 exit=4
+fleet-seats: pool shared is full (6 of 6 seats held); task6 gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task0
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task4
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task8
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task3
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task7
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task9
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child task=7 exit=0
+fleet-seats: reserved pool=shared id=task7 generation=g7 used=5 capacity=6
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity task=8 exit=0
+fleet-seats: reserved pool=shared id=task8 generation=g8 used=4 capacity=6
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child task=9 exit=0
+fleet-seats: reserved pool=shared id=task9 generation=g9 used=2 capacity=6
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity task=10 exit=4
+fleet-seats: pool shared is full (6 of 6 seats held); task10 gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task0
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task4
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task8
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task3
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task7
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task9
+home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child task=11 exit=4
+fleet-seats: pool shared is full (6 of 6 seats held); task11 gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task0
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task4
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task8
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task3
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task7
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task9
+$ bin/fm-fleet-seats.sh reserve task0 --generation g0 --kind ship --harness claude --model pool-a --holder-pid 50694
+fleet-seats: reserved pool=shared id=task0 generation=g0 (already reserved) used=6 capacity=6
+exit=0
+$ bin/fm-fleet-seats.sh show task0
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state","task":"task0","revision":1,"incarnations":[{"generation":"g0","previous_generation":null,"kind":"ship","model":"pool-a","policy_digest_at_reserve":"780760713-72","lifecycle":"reserved","launch_phase":"prepared","owner_pid":50694,"owner_pid_identity":"Wed Oct  7 16:14:27 2026     /opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-fleet-driver.py","route":null,"startup_confirmed":false,"disposition":null}]}
+exit=0
+$ bin/fm-fleet-seats.sh reserve task0 --generation replacement --kind ship --harness claude --model pool-a --holder-pid 50694 --previous-generation g0
+fleet-seats: reserved pool=shared id=task0 generation=replacement (already held) used=6 capacity=6
+exit=0
+$ bin/fm-fleet-seats.sh show task0
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state","task":"task0","revision":2,"incarnations":[{"generation":"g0","previous_generation":null,"kind":"ship","model":"pool-a","policy_digest_at_reserve":"780760713-72","lifecycle":"reserved","launch_phase":"prepared","owner_pid":50694,"owner_pid_identity":"Wed Oct  7 16:14:27 2026     /opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-fleet-driver.py","route":null,"startup_confirmed":false,"disposition":null},{"generation":"replacement","previous_generation":"g0","kind":"ship","model":"pool-a","policy_digest_at_reserve":"780760713-72","lifecycle":"reserved","launch_phase":"prepared","owner_pid":50694,"owner_pid_identity":"Wed Oct  7 16:14:27 2026     /opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-fleet-driver.py","route":null,"startup_confirmed":false,"disposition":null}]}
+exit=0
+$ bin/fm-fleet-seats.sh release task0 --generation foreign --reason prelaunch
+fleet-seats: no seat held id=task0 generation=foreign
+exit=0
+$ bin/fm-fleet-seats.sh show task0
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state","task":"task0","revision":2,"incarnations":[{"generation":"g0","previous_generation":null,"kind":"ship","model":"pool-a","policy_digest_at_reserve":"780760713-72","lifecycle":"reserved","launch_phase":"prepared","owner_pid":50694,"owner_pid_identity":"Wed Oct  7 16:14:27 2026     /opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-fleet-driver.py","route":null,"startup_confirmed":false,"disposition":null},{"generation":"replacement","previous_generation":"g0","kind":"ship","model":"pool-a","policy_digest_at_reserve":"780760713-72","lifecycle":"reserved","launch_phase":"prepared","owner_pid":50694,"owner_pid_identity":"Wed Oct  7 16:14:27 2026     /opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-fleet-driver.py","route":null,"startup_confirmed":false,"disposition":null}]}
+exit=0
+$ bin/fm-fleet-seats.sh reserve extra --generation g-extra --kind ship --harness claude --model pool-a --holder-pid 50694
+fleet-seats: pool shared is full (6 of 6 seats held); extra gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task0
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task4
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task8
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task3
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task7
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task9
+exit=4
+$ bin/fm-fleet-seats.sh release task0 --generation replacement --reason prelaunch
+fleet-seats: released id=task0 generation=replacement reason=prelaunch
+exit=0
+$ bin/fm-fleet-seats.sh show task0
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state","task":"task0","revision":3,"incarnations":[{"generation":"g0","previous_generation":null,"kind":"ship","model":"pool-a","policy_digest_at_reserve":"780760713-72","lifecycle":"reserved","launch_phase":"prepared","owner_pid":50694,"owner_pid_identity":"Wed Oct  7 16:14:27 2026     /opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-fleet-driver.py","route":null,"startup_confirmed":false,"disposition":null},{"generation":"replacement","previous_generation":"g0","kind":"ship","model":"pool-a","policy_digest_at_reserve":"780760713-72","lifecycle":"released","launch_phase":"prepared","owner_pid":50694,"owner_pid_identity":"Wed Oct  7 16:14:27 2026     /opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-fleet-driver.py","route":null,"startup_confirmed":false,"disposition":{"reason":"prelaunch","source":"release","generation":"replacement","route":null,"operation":null}}]}
+exit=0
+$ bin/fm-fleet-seats.sh reserve still-full --generation g-still-full --kind ship --harness claude --model pool-a --holder-pid 50694
+fleet-seats: pool shared is full (6 of 6 seats held); still-full gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task0
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task4
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/capacity/state task8
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task3
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task7
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/child/state task9
+exit=4
+$ bin/fm-fleet-seats.sh release task0 --generation g0 --reason prelaunch
+fleet-seats: released id=task0 generation=g0 reason=prelaunch
+exit=0
+$ bin/fm-fleet-seats.sh reserve new-slot --generation g-new-slot --kind ship --harness claude --model pool-a --holder-pid 50694
+fleet-seats: reserved pool=shared id=new-slot generation=g-new-slot used=6 capacity=6
+exit=0
+SCENARIO PASS: Twelve simultaneous callers across two homes get six seats; replay and same-holder replacement never create a seventh seat
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/prepared
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/prepared
+exit=0
+$ bash -c 'bin/fm-fleet-seats.sh reserve mate --generation g-prepared --kind secondmate --harness claude --model pool-a --holder-pid "$$"'
+fleet-seats: reserved pool=shared id=mate generation=g-prepared used=1 capacity=1
+exit=0
+$ bash -c '. bin/fm-secondmate-liveness-lib.sh; fm_supervisor_lifecycle_acquire "$FM_HOME/state" mate 0 || exit; lock=$(fm_meta_lock_path "$FM_HOME/state/mate.meta"); fm_lock_acquire_wait_max "$lock" 2 || exit; trap '"'"'fm_lock_release "$lock"; fm_supervisor_lifecycle_release "$FM_HOME/state" mate'"'"' EXIT; bin/fm-fleet-seats.sh reclaim mate --generation g-prepared'
+fleet-seats: reclaimed id=mate generation=g-prepared (never-dispatched)
+exit=0
+$ bin/fm-fleet-seats.sh show mate
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/prepared/state","task":"mate","revision":2,"incarnations":[{"generation":"g-prepared","previous_generation":null,"kind":"secondmate","model":"pool-a","policy_digest_at_reserve":"1834577730-72","lifecycle":"reclaimed","launch_phase":"prepared","owner_pid":87953,"owner_pid_identity":"Wed Oct  7 16:14:58 2026     bash bin/fm-fleet-seats.sh reserve mate --generation g-prepared --kind secondmate --harness claude --model pool-a --holder-pid 87953","route":null,"startup_confirmed":false,"disposition":{"reason":"never-dispatched","source":"reclaim","generation":"g-prepared","route":null,"operation":null}}]}
+exit=0
+SCENARIO PASS: Never-dispatched supervisor reservation reclaims inside an owned lifecycle episode and held metadata lock
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered
+exit=0
+$ tmux -L fm-lab new-window -d -t primary -n fm-buffered -c /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q 'bash --noprofile --norc'
+exit=0
+$ bash -c 'bin/fm-fleet-seats.sh reserve buffered --generation g-buffered --kind secondmate --harness claude --model pool-a --holder-pid "$$" && bin/fm-fleet-seats.sh dispatch buffered --generation g-buffered --route-file /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered/state/route-g-buffered'
+fleet-seats: reserved pool=shared id=buffered generation=g-buffered used=1 capacity=1
+fleet-seats: dispatched id=buffered generation=g-buffered
+exit=0
+$ bin/fm-fleet-seats.sh confirm buffered --generation g-buffered
+fleet-seats: retained - the endpoint for buffered generation g-buffered reads 'dead', not alive (the seat stays counted until evidence resolves it)
+exit=3
+$ bin/fm-fleet-seats.sh dispatch buffered --generation g-buffered --route-file /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered/state/route-g-buffered
+fleet-seats: refused - only the process that reserved buffered generation g-buffered may dispatch its launch
+exit=5
+SCENARIO FAIL: Unconfirmed shell-only and missing endpoints retain their seats; replay and prelaunch release refuse AssertionError((['bin/fm-fleet-seats.sh', 'dispatch', 'buffered', '--generation', 'g-buffered', '--route-file', '/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/buffered/state/route-g-buffered'], 5, 'fleet-seats: refused - only the process that reserved buffered generation g-buffered may dispatch its launch\n'))
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/legacy
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/legacy
+exit=0
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/legacy-home
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/legacy-home
+exit=0
+$ tmux -L fm-lab new-window -d -t primary -n fm-legacy -c /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q 'bash --noprofile --norc'
+exit=0
+$ bin/fm-fleet-seats.sh reserve candidate --generation g-candidate --kind ship --harness claude --model pool-a --holder-pid 50694
+fleet-seats: unmanaged pooled supervisor legacy stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+fleet-seats: pool shared is full (1 of 1 seats held); candidate gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/legacy/state legacy
+exit=4
+$ tmux -L fm-lab kill-window -t primary:fm-legacy
+exit=0
+$ bin/fm-fleet-seats.sh reserve candidate --generation g-candidate --kind ship --harness claude --model pool-a --holder-pid 50694
+fleet-seats: unmanaged pooled supervisor legacy stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+fleet-seats: pool shared is full (1 of 1 seats held); candidate gets no seat for model pool-a - choose an overflow route or wait for a holder to finish
+  holder /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/legacy/state legacy
+exit=4
+$ bin/fm-fleet-seats.sh reserve candidate --generation g-candidate --kind ship --harness claude --model pool-a --holder-pid 50694
+fleet-seats: reserved pool=shared id=candidate generation=g-candidate used=1 capacity=1
+exit=0
+SCENARIO PASS: An unmanaged pooled supervisor stays counted with an actionable diagnostic after shell-only or missing endpoint readings
+$ bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/confirmed
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/confirmed
+exit=0
+$ tmux -L fm-lab new-window -d -t primary -n fm-confirmed -c /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q 'bash --noprofile --norc'
+exit=0
+$ tmux -L fm-lab send-keys -t primary:fm-confirmed claude Enter
+exit=0
+$ bash -c 'bin/fm-fleet-seats.sh reserve confirmed --generation g-confirmed --kind secondmate --harness claude --model pool-a --holder-pid "$$" && bin/fm-fleet-seats.sh dispatch confirmed --generation g-confirmed --route-file /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/confirmed/state/route-g-confirmed'
+fleet-seats: reserved pool=shared id=confirmed generation=g-confirmed used=1 capacity=1
+fleet-seats: dispatched id=confirmed generation=g-confirmed
+exit=0
+real Claude endpoint state=alive
+$ bin/fm-fleet-seats.sh confirm confirmed --generation g-confirmed
+fleet-seats: confirmed id=confirmed generation=g-confirmed
+exit=0
+$ tmux -L fm-lab capture-pane -p -t primary:fm-confirmed
+
+ ▐▛███▛█   Claude Code v2.1.293
+▝▜██████▀  Opus 5.5 (1M context) with high effort · Claude Team
+ ▝▝   ▝▝   ~/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                      ● high · /effort
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ Try "how do I log an error?"
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  ⏵⏵ auto mode on (shift+tab to cycle) · ← for agents
+exit=0
+$ bin/fm-fleet-seats.sh reclaim confirmed --generation g-confirmed
+fleet-seats: retained - the endpoint for confirmed generation g-confirmed is alive (the seat stays counted until evidence resolves it)
+exit=3
+$ tmux -L fm-lab send-keys -t primary:fm-confirmed C-c C-c
+exit=0
+after Claude exit state=dead
+$ bin/fm-fleet-seats.sh reclaim confirmed --generation g-confirmed
+fleet-seats: reclaimed id=confirmed generation=g-confirmed (dead-after-start)
+exit=0
+$ bin/fm-fleet-seats.sh show confirmed
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/confirmed/state","task":"confirmed","revision":4,"incarnations":[{"generation":"g-confirmed","previous_generation":null,"kind":"secondmate","model":"pool-a","policy_digest_at_reserve":"1834577730-72","lifecycle":"reclaimed","launch_phase":"started","owner_pid":96425,"owner_pid_identity":"Wed Oct  7 16:15:08 2026     bash -c bin/fm-fleet-seats.sh reserve confirmed --generation g-confirmed --kind secondmate --harness claude --model pool-a --holder-pid \"$$\" && bin/fm-fleet-seats.sh dispatch confirmed --generation g-confirmed --route-file /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/confirmed/state/route-g-confirmed","route":{"placement":"local","backend":"tmux","target":"primary:fm-confirmed","home":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/confirmed","host":null,"remote_root":null,"spawn_gen":"g-confirmed","operation":null},"startup_confirmed":true,"disposition":{"reason":"dead-after-start","source":"reclaim","generation":"g-confirmed","route":{"placement":"local","backend":"tmux","target":"primary:fm-confirmed","home":"/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/confirmed","host":null,"remote_root":null,"spawn_gen":"g-confirmed","operation":null},"operation":null}}]}
+exit=0
+$ bin/fm-fleet-seats.sh reserve after-death --generation g-after-death --kind ship --harness claude --model pool-a --holder-pid 50694
+fleet-seats: reserved pool=shared id=after-death generation=g-after-death used=1 capacity=1
+exit=0
+SCENARIO PASS: A real Claude endpoint confirms startup, holds its seat while alive, and releases after confirmed agent death
+$ tmux -L fm-lab kill-server
+exit=0
+$ bin/fm-lab-home.sh teardown /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live/primary
+exit=0
+$ rm -rf /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-phase.tmp/live
+exit=0
+All live lab homes and the private tmux server/socket directory removed.

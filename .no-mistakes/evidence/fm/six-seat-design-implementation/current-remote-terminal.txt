@@ -1,0 +1,40 @@
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ export
+GOTMPDIR=/tmp/fm-lab6238/gotmp
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ export
+COMPACT_ADVISER_DISABLE=1
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ . '/tmp
+/fm-lab6238+64610c9b3a3ecebf55d3fff41b3df7a9f66a34ccb2
+6aa67192b8bd693e92a8fb/launch.s1791420407.3329796.2630
+5.sh'
+Error: Failed to load extension "/tmp/fm6238-current.g
+nU5zW/home/.pi/extensions/fm-calm.ts": Failed to load
+extension: Cannot find module './fm-calm-preservation.
+ts'
+Require stack:
+- /tmp/fm6238-current.gnU5zW/home/.pi/extensions/lib/f
+m-calm-assistant-layout.ts
+Hint: Start without extensions using "pi -ne".
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ export
+GOTMPDIR=/tmp/fm-lab6238/gotmp
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ export
+COMPACT_ADVISER_DISABLE=1
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$ . '/tmp
+/fm-lab6238+64610c9b3a3ecebf55d3fff41b3df7a9f66a34ccb2
+6aa67192b8bd693e92a8fb/launch.s1791420420.3338749.3104
+6.sh'
+Error: Failed to load extension "/tmp/fm6238-current.g
+nU5zW/home/.pi/extensions/fm-calm.ts": Failed to load
+extension: Cannot find module './fm-calm-preservation.
+ts'
+Require stack:
+- /tmp/fm6238-current.gnU5zW/home/.pi/extensions/lib/f
+m-calm-assistant-layout.ts
+Hint: Start without extensions using "pi -ne".
+
+[art@theshop:/tmp/fm6238-current.gnU5zW/home]$

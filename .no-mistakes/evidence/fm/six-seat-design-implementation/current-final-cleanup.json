@@ -1,0 +1,26 @@
+{
+  "head_sha": "37d3f6af277c17e88907f89b0d6f36a8e1d00e79",
+  "remote_fixture_paths": [
+    "/tmp/fm6238-current.gnU5zW",
+    "/tmp/fm6238-current.VDgJ9x",
+    "/tmp/fm6238-current.qF4EWJ",
+    "/tmp/fm6238-current.wFJlcy"
+  ],
+  "remote_launch_paths": [
+    "/tmp/fm-lab6238+06a4945a6ba7abdb69408162386b1783dfaecac5cd4b4c99f1e517597ffc217a",
+    "/tmp/fm-lab6238+094d5d289401410b0e49637e6dc7fe51fddedeb09c9bf43346d5de6ce95a5919",
+    "/tmp/fm-lab6238+0fbbf9d377962c26e774b6bc3d29c13f5f4b3cc189dee910134564b9be6dcb33",
+    "/tmp/fm-lab6238+198eb05d0406a450c053ec494972c236d308cf83b67d36db214bfc0dbd57908e",
+    "/tmp/fm-lab6238+64610c9b3a3ecebf55d3fff41b3df7a9f66a34ccb26aa67192b8bd693e92a8fb",
+    "/tmp/fm-lab6238+99f545edf85f711bec9af74ce08b74b81b093997dbde91d0018a2420a4b217a5",
+    "/tmp/fm-lab6238+0f94823f982ea5b2df6c24ffdf4f7986558503406efbb45a7e4b998dbbe62860",
+    "/tmp/fm-lab6238+e355f3f272d90d612905f945d0c4aa1e129179cf27dcae998201ea3e55488986"
+  ],
+  "remote_cleanup_exit": 0,
+  "remote_cleanup_receipt": "OWNED_FIXTURES_AND_LAUNCH_FILES_REMOVED\nCODE_ROOT_LAUNCH_FILES_REMOVED\n",
+  "default_tripwire": "current-remote-pooled-recheck.json: helper verified unchanged running default",
+  "mama_fixture_removed": true,
+  "remaining_local_fixture_processes": [],
+  "source_changes": [],
+  "additional_reclaim_lab_removed": true
+}

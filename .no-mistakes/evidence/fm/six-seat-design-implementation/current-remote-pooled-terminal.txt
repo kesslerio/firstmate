@@ -1,0 +1,58 @@
+
+[Skills]
+  1password, agent-browser, autoreview, ce-babysit-pr,
+ce-brainstorm, ce-code-review, ce-commit,
+ce-commit-push-pr, ce-compound, ce-debug, ce-dogfood,
+ce-explain, ce-handoff, ce-ideate, ce-plan, ce-polish,
+ce-pov, ce-prototype, ce-simplify-code, ce-strategy,
+ce-work, ce-worktree, comfyui-image, director,
+document-reader, firecrawl, firecrawl-agent,
+firecrawl-build-interact, firecrawl-build-onboarding,
+firecrawl-build-scrape, firecrawl-build-search,
+firecrawl-crawl, firecrawl-download,
+firecrawl-interact, firecrawl-map, firecrawl-scrape,
+firecrawl-search, git-commit-push-pr,
+github-activity-summary, health, humanizer, hygiene,
+impeccable, kb, kun, lfg, location-raw-intake,
+no-mistakes, oracle, paseo, paseo-advisor,
+paseo-committee, paseo-handoff, paseo-help,
+paseo-plugin, shapescale-design, shapescale-gog,
+shapescale-media, shapescale-sim-capture, skill-router
+
+[Extensions]
+  compound-engineering-compat.ts,
+fm-branch-supervision.ts, fm-calm.ts,
+fm-primary-pi-watch.ts, fm-primary-turnend-guard.ts,
+openrouter-zdr-routing.ts, pr-body-lint.js,
+tokenjuice-policy.js, tokenjuice.js
+
+
+──────────────────────────────────────────────────────
+ Update Available
+ New version 1.1.0 is available. Run pi update
+ Changelog: https://pi.dev/changelog
+──────────────────────────────────────────────────────
+
+
+ FIRSTMATE_OP: v1 launch-brief: # Lab charter: Remain
+ idle. Do not mutate any fleet, project, or user
+ files; this disposable home exists only for
+ lifecycle validation.
+
+
+ Error: 402: {"message":"This request requires more
+ credits, or fewer max_tokens. You requested up to
+ 131072 tokens, but can only afford 78607. To
+ increase, visit
+ [provider key identifier redacted] and adjust the key's total
+ limit","code":402,"metadata":{"limit_source":"openro
+ uter_credits","remedy_hint":"Add credits at
+ https://openrouter.ai/settings/credits, or lower
+ max_tokens / prompt size to fit your remaining
+ balance.","provider_name":null}}
+
+──────────────────────────────────────────────────────
+
+──────────────────────────────────────────────────────
+/tmp/fm6238-current.wFJlcy/home (master)
+0.3%/1.0M (auto)             z-ai/glm-5.3-flash • high

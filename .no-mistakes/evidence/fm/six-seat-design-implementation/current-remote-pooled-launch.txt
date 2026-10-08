@@ -1,0 +1,60 @@
+[art@theshop:/tmp/fm6238-current.wFJlcy/home]$ export
+COMPACT_ADVISER_DISABLE=1
+
+[art@theshop:/tmp/fm6238-current.wFJlcy/home]$ . '/tmp
+/fm-lab6238+e355f3f272d90d612905f945d0c4aa1e129179cf27
+dcae998201ea3e55488986/launch.s1791420748.3517760.566.
+sh'
+
+ pi v0.85.1
+ escape interrupt · ctrl+c/ctrl+d clear/exit · /
+ commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded
+ resources.
+
+ Pi can explain its own features and look up its
+ docs. Ask it how to use or extend Pi.
+
+
+[Context]
+  ~/.pi/agent/AGENTS.md, AGENTS.md
+
+[Skills]
+  1password, agent-browser, autoreview, ce-babysit-pr,
+ce-brainstorm, ce-code-review, ce-commit,
+ce-commit-push-pr, ce-compound, ce-debug, ce-dogfood,
+ce-explain, ce-handoff, ce-ideate, ce-plan, ce-polish,
+ce-pov, ce-prototype, ce-simplify-code, ce-strategy,
+ce-work, ce-worktree, comfyui-image, director,
+document-reader, firecrawl, firecrawl-agent,
+firecrawl-build-interact, firecrawl-build-onboarding,
+firecrawl-build-scrape, firecrawl-build-search,
+firecrawl-crawl, firecrawl-download,
+firecrawl-interact, firecrawl-map, firecrawl-scrape,
+firecrawl-search, git-commit-push-pr,
+github-activity-summary, health, humanizer, hygiene,
+impeccable, kb, kun, lfg, location-raw-intake,
+no-mistakes, oracle, paseo, paseo-advisor,
+paseo-committee, paseo-handoff, paseo-help,
+paseo-plugin, shapescale-design, shapescale-gog,
+shapescale-media, shapescale-sim-capture, skill-router
+
+[Extensions]
+  compound-engineering-compat.ts,
+fm-branch-supervision.ts, fm-calm.ts,
+fm-primary-pi-watch.ts, fm-primary-turnend-guard.ts,
+openrouter-zdr-routing.ts, pr-body-lint.js,
+tokenjuice-policy.js, tokenjuice.js
+
+
+──────────────────────────────────────────────────────
+ Update Available
+ New version 1.1.0 is available. Run pi update
+ Changelog: https://pi.dev/changelog
+──────────────────────────────────────────────────────
+
+──────────────────────────────────────────────────────
+
+──────────────────────────────────────────────────────
+/tmp/fm6238-current.wFJlcy/home (master)
+0.0%/1.0M (auto)             z-ai/glm-5.3-flash • high

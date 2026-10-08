@@ -1,0 +1,175 @@
++ set -u
+++ dirname tests/fm-remote-secondmate-session.test.sh
++ . tests/lib.sh
+++ '[' -n '' ']'
+++ FM_TEST_LIB_SOURCED=1
+++ umask 022
++++ dirname tests/lib.sh
+++ . tests/git-config-helpers.sh
++++ export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
++++ GIT_CONFIG_GLOBAL=/dev/null
++++ GIT_CONFIG_NOSYSTEM=1
+++ export FM_GATE_REFUSE_BYPASS=1
+++ FM_GATE_REFUSE_BYPASS=1
+++ export FM_TEST_SEAM=1
+++ FM_TEST_SEAM=1
+++ unset FM_TASK_ID
+++ unset TASKS_AXI_FILE TASKS_AXI_BACKEND
+++++ dirname tests/lib.sh
++++ cd tests/..
++++ pwd
+++ ROOT=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q
++++ fm_test_tmpdir
++++ local base=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp physical
++++ base=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
++++ '[' -n /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp ']'
++++ case "$base" in
+++++ CDPATH=
+++++ cd -- /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
+++++ pwd -P
++++ physical=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
++++ base=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
++++ '[' -e /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.git ']'
++++ printf '%s\n' /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
+++ FM_TEST_TMPDIR=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
+++ FM_TEST_CLEANUP_DIRS=()
++++ mktemp /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-cleanup.56738.XXXXXX
+++ FM_TEST_CLEANUP_REGISTRY=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-cleanup.56738.SC0JNv
++++ fm_test_pid_identity 56738
++++ local pid=56738
++++ FM_STATE_OVERRIDE=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
++++ bash -c '. "$1"; fm_pid_identity "$2"' _ /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/bin/fm-wake-lib.sh 56738
+++ FM_TEST_OWNER_IDENTITY='Wed Oct  7 17:20:09 2026     bash -x tests/fm-remote-secondmate-session.test.sh'
++++ mktemp /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-procevent.56738.XXXXXX
+++ FM_TEST_PROCEVENT_REGISTRY=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-procevent.56738.BizUFS
++++ mktemp /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-watcher.56738.XXXXXX
+++ FM_TEST_WATCHER_REGISTRY=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-watcher.56738.SvuYP5
+++ FM_TEST_STUB_MAX_BLOCK_SECONDS=120
+++ export FM_TEST_STUB_MAX_BLOCK_SECONDS
+++ trap fm_test_cleanup EXIT
+++ trap 'fm_test_cleanup; exit 130' INT
+++ trap 'fm_test_cleanup; exit 143' TERM
+++ trap 'fm_test_cleanup; exit 129' HUP
+++ trap 'fm_test_cleanup; exit 131' QUIT
+++ FM_TEST_ORPHAN_MAX_AGE_SECONDS=3600
+++ '[' 0 '!=' 1 ']'
+++ fm_test_reap_orphans
+++ local marker dir mtime now owner_pid owner_identity current_identity
++++ date +%s
+++ now=1791418810
+++ for marker in '"$FM_TEST_TMPDIR"/fm-*/.fm-test-fixture'
+++ '[' -e '/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-*/.fm-test-fixture' ']'
+++ continue
+++ fm_test_tmproot fm-remote-secondmate-session
+++ local prefix=fm-remote-secondmate-session root tmp_base
++++ fm_test_tmpdir
++++ local base=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp physical
++++ base=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
++++ '[' -n /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp ']'
++++ case "$base" in
+++++ CDPATH=
+++++ cd -- /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
+++++ pwd -P
++++ physical=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
++++ base=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
++++ '[' -e /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.git ']'
++++ printf '%s\n' /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
+++ tmp_base=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
+++ tmp_base=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp
++++ mktemp -d /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.XXXXXX
+++ root=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr
++++ cd -P -- /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr
++++ pwd -P
+++ root=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr
+++ printf '%s\n%s\n' 56738 'Wed Oct  7 17:20:09 2026     bash -x tests/fm-remote-secondmate-session.test.sh'
+++ printf '%s\n' /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr
+++ printf '%s\n' /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr
++ TMP_ROOT=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr
++ REMOTE_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home
+++ fm_fakebin /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/fake
+++ local dir=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/fake fakebin=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/fake/fakebin
+++ mkdir -p /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/fake/fakebin
+++ printf '%s\n' /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/fake/fakebin
++ FAKEBIN=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/fake/fakebin
++ META=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home/state/parent-route/lab.meta
++ mkdir -p /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home/state/parent-route /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home/bin
++ printf 'lab\n'
++ printf 'Synthetic controller fixture.\n'
++ cat
++ chmod +x /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/fake/fakebin/herdr
++ export FM_TEST_HERDR_LOG=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/herdr.log
++ FM_TEST_HERDR_LOG=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/herdr.log
++ unset FM_REMOTE_HERDR_SESSION
++ seed_route fm-remote
++ fm_write_meta /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home/state/parent-route/lab.meta window=fm-remote:w1:p1 backend=herdr endpoint_task_id=lab herdr_session=fm-remote herdr_workspace_id=w1 herdr_tab_id=w1:t1 herdr_pane_id=w1:p1 worktree=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home harness=claude kind=secondmate mode=secondmate spawn_gen=synthetic.g0
++ local file=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home/state/parent-route/lab.meta kv
++ shift
++ :
++ for kv in '"$@"'
++ printf '%s\n' window=fm-remote:w1:p1
++ for kv in '"$@"'
++ printf '%s\n' backend=herdr
++ for kv in '"$@"'
++ printf '%s\n' endpoint_task_id=lab
++ for kv in '"$@"'
++ printf '%s\n' herdr_session=fm-remote
++ for kv in '"$@"'
++ printf '%s\n' herdr_workspace_id=w1
++ for kv in '"$@"'
++ printf '%s\n' herdr_tab_id=w1:t1
++ for kv in '"$@"'
++ printf '%s\n' herdr_pane_id=w1:p1
++ for kv in '"$@"'
++ printf '%s\n' worktree=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home
++ for kv in '"$@"'
++ printf '%s\n' home=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home
++ for kv in '"$@"'
++ printf '%s\n' harness=claude
++ for kv in '"$@"'
++ printf '%s\n' kind=secondmate
++ for kv in '"$@"'
++ printf '%s\n' mode=secondmate
++ for kv in '"$@"'
++ printf '%s\n' spawn_gen=synthetic.g0
+++ control route lab
+++ env FM_HOME=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/home 'PATH=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr/fake/fakebin:/Users/kesslerio/.local/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/VMware Fusion.app/Contents/Public:/Users/kesslerio/.local/lib/node_modules/@openai/codex/node_modules/@openai/codex-darwin-arm64/vendor/aarch64-apple-darwin/codex-path:/Users/kesslerio/.codex/tmp/arg0/codex-arg08jMJ06:/Users/kesslerio/.grok/bin:/Users/kesslerio/.local/bin:/Users/kesslerio/.opencode/bin:/Users/kesslerio/go/bin:/Users/kesslerio/bin:/Users/kesslerio/.antigravity/antigravity/bin:/Users/kesslerio/.ai/bin:/Users/kesslerio/.bun/bin:/Users/kesslerio/.codeium/windsurf/bin:/opt/homebrew/bin:/Users/kesslerio/Library/pnpm:/opt/homebrew/Cellar/pyenv-virtualenv/1.2.4/shims:/Users/kesslerio/.pyenv/shims:/Users/kesslerio/.nvm/versions/node/v24.15.0/bin:/Users/kesslerio/opt/anaconda3/bin:/opt/homebrew/sbin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/Users/kesslerio/.cargo/bin:/usr/local/sbin:/Users/kesslerio/Library/Android/sdk/cmdline-tools/latest/bin:/Users/kesslerio/Library/Android/sdk/platform-tools:/Users/kesslerio/.local/bin' bash /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/bin/fm-remote-secondmate-control.sh route lab
++ out='error: remote secondmate lab endpoint metadata is invalid; refusing access until it is explicitly migrated'
++ rc=1
++ expect_code 0 1 'unset session retains the ordinary remote route'
++ local expected=0 actual=1 'label=unset session retains the ordinary remote route'
++ '[' 1 = 0 ']'
++ fail 'unset session retains the ordinary remote route: expected exit 0, got 1'
++ printf 'not ok - %s\n' 'unset session retains the ordinary remote route: expected exit 0, got 1'
+not ok - unset session retains the ordinary remote route: expected exit 0, got 1
++ exit 1
++ fm_test_cleanup
++ local d
++ fm_test_reap_watchers
++ local state lock_home 'seen=
+'
++ '[' -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-watcher.56738.SvuYP5 ']'
++ IFS=
++ read -r state
++ rm -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-watcher.56738.SvuYP5
++ fm_test_reap_procevent_homes
++ local home claim_root 'seen=
+'
++ '[' -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-procevent.56738.BizUFS ']'
++ IFS='	'
++ read -r home claim_root
++ rm -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-procevent.56738.BizUFS
++ for d in '"${FM_TEST_CLEANUP_DIRS[@]:-}"'
++ '[' -n '' ']'
++ '[' -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-cleanup.56738.SC0JNv ']'
++ IFS=
++ read -r d
++ '[' -n /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr ']'
++ fm_test_remove_tree /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr
++ local dir=/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr
++ '[' -d /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr ']'
++ '[' '!' -L /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr ']'
++ find /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr -type d -exec chmod u+rwx '{}' +
++ rm -rf /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/fm-remote-secondmate-session.reMgZr
++ IFS=
++ read -r d
++ rm -f /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-tmp/.fm-test-cleanup.56738.SC0JNv

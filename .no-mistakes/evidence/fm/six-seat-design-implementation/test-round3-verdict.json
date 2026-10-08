@@ -1,0 +1,73 @@
+{
+  "verdict": "inconclusive",
+  "summary": "Current head is unchanged. Successful remote replacement and retirement remain unproven under the required isolation contract.",
+  "findings": [
+    {
+      "id": "test-1",
+      "severity": "warning",
+      "action": "ask-user",
+      "file": "bin/fm-remote-secondmate-control.sh",
+      "line": 100,
+      "description": "The targeted step cannot demonstrate successful remote replacement and retirement: host control requires fm-remote, while the mandatory helper admits only fm-lab-* sessions. Real theshop/mama access is available, but cannot resolve this source/isolation conflict. Provide an approved controller path supporting owned named lab sessions and a permitted remote scratch location; changing the tested head or translating endpoint identities would not attest this head."
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "Replace a remote Herdr supervisor and publish its confirmed generation",
+      "result": "untested",
+      "live": false,
+      "evidence": "live-herdr-round3.log; remote-round3-access.json",
+      "reason": "Executed the real parent wrapper and SSH job worker with an owned synthetic registration; matching-generation replacement refused its fm-lab-* route before endpoint access. Read-only helper calls reached theshop and mama, but the helper refused fm-remote provisioning. The controller requires fm-remote and cannot target an owned lab; source changes are forbidden by the preserve-head decision. Provide an approved named-lab controller path and remote scratch authority within the workspace boundary."
+    },
+    {
+      "name": "Retire a remote supervisor and remove only its per-operation seat files",
+      "result": "untested",
+      "live": false,
+      "evidence": "live-herdr-round3.log; live-herdr-round3-results.json",
+      "reason": "Executed retirement through the real SSH interface with synthetic task and neighboring operation files. The controller rejected the fm-lab-* route before teardown, and every fixture file remained unchanged. Existing remote fm-remote sessions cannot be used under the mandatory named-lab contract. Provide the same approved named-lab controller path and remote scratch authority; cleanup success cannot be inferred from this refusal."
+    },
+    {
+      "name": "Stale-generation restart requests refuse at parent and host without changing remote state",
+      "result": "pass",
+      "live": true,
+      "evidence": "live-herdr-round3.log: parent wrapper and host via fm-on each exit 6; live-herdr-round3-results.json records unchanged file inventories",
+      "reason": ""
+    },
+    {
+      "name": "Unsafe session and global-server commands refuse while remote default-session tripwires remain unchanged",
+      "result": "pass",
+      "live": true,
+      "evidence": "remote-round3-access.json: fm-remote provisioning, default stop, and server stop each exit 1 on theshop and mama; before/after session inventories identical",
+      "reason": ""
+    }
+  ],
+  "testing_summary": "Retained prior-round baseline evidence without rerunning its suites or eight scenarios. This revalidation exercised real localhost SSH parent/host generation fencing and lab-route refusals, plus read-only helper and guard calls on theshop/mama. Denied paths passed; both success paths remain untested. Default inventories stayed identical; all local fixtures, SSH daemon, and worker descendants were removed. No UI was exercised or visual artifact required. Lint, CI, and head attestation remain with the outer executor.",
+  "tested": [
+    "`python3 /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-herdr-round3.py`",
+    "`ssh` with BatchMode=yes, StrictHostKeyChecking=yes, UpdateHostKeys=no, ForwardAgent=no to theshop/mama; streamed the current bin/fm-herdr-lab.sh for scoped session lists and refused provision fm-remote, stop default, and run <lab> server stop",
+    "Compared synthetic remote file SHA-256 inventories before/after stale and matching-generation requests and retirement refusal",
+    "Checked owned fixture process descendants, fixture removal, `git status --short`, and `git rev-parse HEAD`"
+  ],
+  "artifacts": [
+    {
+      "label": "Current-head remote-controller and SSH scenario transcript",
+      "kind": "log",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-herdr-round3.log"
+    },
+    {
+      "label": "Ownership, refusal results, and fixture cleanup",
+      "kind": "log",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-herdr-round3-results.json"
+    },
+    {
+      "label": "Real remote access, denied commands, and default-session tripwires",
+      "kind": "log",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/remote-round3-access.json"
+    },
+    {
+      "label": "Final owned-process cleanup and unchanged source head",
+      "kind": "log",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/round3-cleanup.json"
+    }
+  ]
+}

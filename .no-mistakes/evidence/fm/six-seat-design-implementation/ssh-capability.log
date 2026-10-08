@@ -1,0 +1,4 @@
+BSM audit: bsm_audit_session_setup: setaudit_addr failed: Operation not permitted
+Private localhost SSH connection: exit=0
+Warning: Permanently added '[127.0.0.1]:65012' (ED25519) to the list of known hosts.
+disposable-ssh-ready

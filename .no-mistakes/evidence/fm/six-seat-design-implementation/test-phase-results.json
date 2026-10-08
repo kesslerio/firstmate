@@ -1,0 +1,123 @@
+{
+  "live_scenarios": [
+    {
+      "name": "No declaration stays uncapped; declared pools refuse unresolved models, raw commands, and invalid policy",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Twelve simultaneous callers across two homes get six seats; replay and same-holder replacement never create a seventh seat",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Never-dispatched supervisor reservation reclaims inside an owned lifecycle episode and held metadata lock",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "Unconfirmed shell-only and missing endpoints retain their seats; replay and prelaunch release refuse",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "An unmanaged pooled supervisor stays counted with an actionable diagnostic after shell-only or missing endpoint readings",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "A real Claude endpoint confirms startup, holds its seat while alive, and releases after confirmed agent death",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "A parent delivers fleet policy over real SSH to a disposable remote worker and persists its matching certificate",
+      "result": "pass",
+      "live": true
+    },
+    {
+      "name": "A holder larger than the SSH stdin limit sends one compact incarnation; host prelaunch refusal and replay preserve receipts and release only that candidate",
+      "result": "pass",
+      "live": true
+    }
+  ],
+  "targeted_regressions": {
+    "fleet_seats_initial": "Setup failure: remote home nested under code root",
+    "remote_policy_selected_recheck": "passed using sibling code and home fixtures",
+    "remote_secondmate_relaunch": "passed"
+  },
+  "cleanup": "No processes remain with the disposable SSH lab code/config path. Private tmux and SSH labs and their process trees stopped; disposable files removed.",
+  "limitations": "Successful Herdr launch/relaunch and retirement were not exercised because current recorded user decisions prohibit Herdr lifecycle. Lint and attestation belong to other outer phases.",
+  "summary": "Targeted Herdr revalidation remains inconclusive: remote control requires fm-remote and rejects authorized fm-lab sessions. No source changes; synthetic SSH fixtures and processes cleaned.",
+  "testing_summary": "Previous eight live passes are retained as prior-round evidence, not rerun. This revalidation exercised the real parent wrapper, real localhost SSH worker, host generation fencing, and retirement refusal against synthetic registrations. Both stale-generation checks returned exit 6 without changing remote files. Matching-generation replacement and retirement refused the fm-lab session before endpoint access. The helper refused fm-remote provisioning, default stop, and server-global operations. Before/after actual Herdr session lists were identical, but default was already stopped, so the required running-default tripwire could not be established. No live Herdr endpoint was created, replaced, or retired; neither success scenario is proven. Lint and head attestation remain with the outer executor.",
+  "verdict": "inconclusive",
+  "tested_head_sha": "7e0dba0c62246b324b92856ee52f2c4ba7cd3c29",
+  "revalidation": {
+    "tested_head_sha": "7e0dba0c62246b324b92856ee52f2c4ba7cd3c29",
+    "verdict": "inconclusive",
+    "live_lifecycle_executed": false,
+    "checks": [
+      "Reproduced the lab-session refusal before endpoint access through the real controller",
+      "Parent and host stale-generation requests refuse with exit 6 and preserve synthetic remote files",
+      "Helper refuses fm-remote provisioning, literal-default stop, and server-global operations before executing them; before/after session observations identical"
+    ],
+    "task": "herdr-revalidate",
+    "lab_session": "fm-lab-herdr-revalidate-30464-23146",
+    "ownership": {
+      "fixture_root": "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-revalidation",
+      "homes": [
+        "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-revalidation/parent",
+        "/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-herdr-revalidation/remote-home"
+      ],
+      "session_provisioned": false,
+      "synthetic_registration": true
+    },
+    "default_session_observation_before": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr\",\"socket_path\":\"/Users/kesslerio/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n",
+    "replacement": {
+      "result": "untested",
+      "reason": "The real parent wrapper and SSH worker reach host control, but a matching-generation synthetic fm-lab-* route refuses before replacement because remote control requires fm-remote. Provisioning fm-remote or translating the endpoint would violate the required lab isolation or change the tested source behavior."
+    },
+    "retirement": {
+      "result": "untested",
+      "reason": "The real SSH retirement interface rejects the fm-lab-* route before teardown; all synthetic task and neighboring operation files remain unchanged. Successful live retirement and selective cleanup cannot be claimed."
+    },
+    "default_session_observation_after": "{\"sessions\":[{\"default\":true,\"name\":\"default\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr\",\"socket_path\":\"/Users/kesslerio/.config/herdr/herdr.sock\"},{\"default\":false,\"name\":\"fm-remote\",\"running\":false,\"session_dir\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote\",\"socket_path\":\"/Users/kesslerio/.config/herdr/sessions/fm-remote/herdr.sock\"}]}\n",
+    "default_session_tripwire": {
+      "observations_identical": true,
+      "running_default_proven": false,
+      "snapshot": [
+        {
+          "default": true,
+          "name": "default",
+          "running": false,
+          "session_dir": "/Users/kesslerio/.config/herdr",
+          "socket_path": "/Users/kesslerio/.config/herdr/herdr.sock"
+        }
+      ],
+      "session_provisioned": false
+    },
+    "cleanup": {
+      "fixture_tree_removed": true,
+      "ssh_daemon_stopped": true,
+      "herdr_sessions_created": 0,
+      "real_secondmates_changed": false,
+      "source_changes": false,
+      "remaining_fixture_processes": []
+    }
+  },
+  "tested": [
+    "python3 /Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-herdr-revalidation.py \u2014 denied paths passed; successful Herdr replacement and retirement blocked"
+  ],
+  "artifacts": [
+    {
+      "kind": "log",
+      "label": "Targeted Herdr replacement, stale-generation, retirement, and isolation refusal transcripts",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-herdr-revalidation.log"
+    },
+    {
+      "kind": "other",
+      "label": "Targeted Herdr revalidation ownership, blockers, default-session observations, and cleanup",
+      "path": "/Users/kesslerio/.no-mistakes/evidence/01M4C86PSDNBECPTMSZ1YVFF8Q/live-herdr-revalidation-results.json"
+    }
+  ]
+}

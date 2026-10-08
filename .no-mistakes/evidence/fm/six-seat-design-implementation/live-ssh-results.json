@@ -1,0 +1,12 @@
+[
+  {
+    "name": "A parent delivers fleet policy over real SSH to a disposable remote worker and persists its matching certificate",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "A holder larger than the SSH stdin limit sends one compact incarnation; host prelaunch refusal and replay preserve receipts and release only that candidate",
+    "result": "pass",
+    "live": true
+  }
+]

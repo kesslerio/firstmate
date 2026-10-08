@@ -1,0 +1,163 @@
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+/tmp/fm6238-current.qF4EWJ
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -c '"'"'mkdir "$1/code" && tar -xf - -C "$1/code"'"'"' _ /tmp/fm6238-current.qF4EWJ'
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+fm-lab-6238-current-3470209-26387
+
+exit=0
+/tmp/fm6238-current.qF4EWJ/home
+/tmp/fm6238-current.qF4EWJ/parent
+/tmp/fm6238-current.qF4EWJ/neighbor
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+LAB_READY
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-lab-home.sh create /Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-remote/parent
+/Users/kesslerio/.no-mistakes/worktrees/8036f35f7c08/01M4C86PSDNBECPTMSZ1YVFF8Q/.test-current-remote/parent
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh route lab6238
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w999:p999
+herdr_session=fm-remote
+harness=pi
+model=
+effort=
+spawn_gen=synthetic.g0
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh route lab6238 --herdr-session fm-lab-6238-current-3470209-26387
+error: remote secondmate lab6238 endpoint is recorded in Herdr session 'fm-remote', expected 'fm-lab-6238-current-3470209-26387'; refusing access until it is explicitly migrated
+
+exit=1
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh launch lab6238 pi - - herdr --herdr-session fm-lab-6238-current-3470209-26387
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-6238-current-3470209-26387:w1:p2
+herdr_session=fm-lab-6238-current-3470209-26387
+harness=pi
+model=default
+effort=default
+spawn_gen=s1791420665.3477513.32044
+
+exit=0
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh capture lab6238 60 --herdr-session fm-lab-6238-current-3470209-26387
+[art@theshop:/tmp/fm6238-current.qF4EWJ/home]$ export
+COMPACT_ADVISER_DISABLE=1
+
+[art@theshop:/tmp/fm6238-current.qF4EWJ/home]$ . '/tmp
+/fm-lab6238+0f94823f982ea5b2df6c24ffdf4f7986558503406e
+fbb45a7e4b998dbbe62860/launch.s1791420665.3477513.3204
+4.sh'
+
+ pi v0.85.1
+ escape interrupt · ctrl+c/ctrl+d clear/exit · /
+ commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded
+ resources.
+
+ Pi can explain its own features and look up its
+ docs. Ask it how to use or extend Pi.
+
+
+[Context]
+  ~/.pi/agent/AGENTS.md, AGENTS.md
+
+[Skills]
+  1password, agent-browser, autoreview, ce-babysit-pr,
+ce-brainstorm, ce-code-review, ce-commit,
+ce-commit-push-pr, ce-compound, ce-debug, ce-dogfood,
+ce-explain, ce-handoff, ce-ideate, ce-plan, ce-polish,
+ce-pov, ce-prototype, ce-simplify-code, ce-strategy,
+ce-work, ce-worktree, comfyui-image, director,
+document-reader, firecrawl, firecrawl-agent,
+firecrawl-build-interact, firecrawl-build-onboarding,
+firecrawl-build-scrape, firecrawl-build-search,
+firecrawl-crawl, firecrawl-download,
+firecrawl-interact, firecrawl-map, firecrawl-scrape,
+firecrawl-search, git-commit-push-pr,
+github-activity-summary, health, humanizer, hygiene,
+impeccable, kb, kun, lfg, location-raw-intake,
+no-mistakes, oracle, paseo, paseo-advisor,
+paseo-committee, paseo-handoff, paseo-help,
+paseo-plugin, shapescale-design, shapescale-gog,
+shapescale-media, shapescale-sim-capture, skill-router
+
+[Extensions]
+  compound-engineering-compat.ts,
+fm-branch-supervision.ts, fm-calm.ts,
+fm-primary-pi-watch.ts, fm-primary-turnend-guard.ts,
+openrouter-zdr-routing.ts, pr-body-lint.js,
+tokenjuice-policy.js, tokenjuice.js
+
+
+──────────────────────────────────────────────────────
+ Update Available
+ New version 1.1.0 is available. Run pi update
+ Changelog: https://pi.dev/changelog
+──────────────────────────────────────────────────────
+
+──────────────────────────────────────────────────────
+
+──────────────────────────────────────────────────────
+/tmp/fm6238-current.qF4EWJ/home (master)
+0.0%/1.0M (auto)             z-ai/glm-5.3-flash • high
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/home-summary.json": "0bcea5988d42356f4a9c507d00b5ed20b597d8e497758ee3283b9d1ca5229dd4", "state/parent-route/lab6238.meta": "96efd62111c7e3a84e9cc4e40af532b9002cb271fd39967249b80abdc8d28d01"}
+
+exit=0
+$ bash bin/fm-remote-secondmate-relaunch.sh lab6238 pi - - --expect-generation stale.gen
+error: generation-mismatch: remote secondmate lab6238 now records generation 's1791420665.3477513.32044', not the expected stale.gen; nothing was changed
+
+exit=6
+$ bash bin/fm-on.sh lab6238 fm-remote-secondmate-control.sh relaunch lab6238 pi - - --expect-generation stale.gen --herdr-session fm-lab-6238-current-3470209-26387
+error: generation-mismatch: the host incarnation is not stale.gen; nothing was changed
+
+exit=6
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+{"state/parent-route/home-summary.json": "0bcea5988d42356f4a9c507d00b5ed20b597d8e497758ee3283b9d1ca5229dd4", "state/parent-route/lab6238.meta": "96efd62111c7e3a84e9cc4e40af532b9002cb271fd39967249b80abdc8d28d01"}
+
+exit=0
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+  File "<string>", line 1
+    import pathlib,sys; (pathlib.Path(sys.argv[1])/".fm-secondmate-parent").write_text("schema=fm-secondmate-parent.v1
+                                                                                       ^
+SyntaxError: unterminated string literal (detected at line 1)
+
+exit=1
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=0
+{"sessions":[{"default":true,"name":"default","running":true,"session_dir":"/home/art/.config/herdr","socket_path":"/home/art/.config/herdr/herdr.sock"},{"default":false,"name":"firstmate","running":true,"session_dir":"/home/art/.config/herdr/sessions/firstmate","socket_path":"/home/art/.config/herdr/sessions/firstmate/herdr.sock"},{"default":false,"name":"fm-remote","running":true,"session_dir":"/home/art/.config/herdr/sessions/fm-remote","socket_path":"/home/art/.config/herdr/sessions/fm-remote/herdr.sock"}]}
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm6238-current.qF4EWJ/home/state/parent-route/lab6238.git-hooks/pre-rebase': Permission denied
+CLEANUP_OK
+$ ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -o UpdateHostKeys=no -o ConnectTimeout=8 -o ForwardAgent=no theshop 'bash -s'
+
+exit=1

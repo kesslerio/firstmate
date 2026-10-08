@@ -1,0 +1,22 @@
+[
+  {
+    "name": "No declaration stays uncapped; declared pools refuse unresolved models, raw commands, and invalid policy",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Twelve simultaneous callers across two homes get six seats; replay and same-holder replacement never create a seventh seat",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "Unconfirmed shell-only and missing endpoints retain their seats; replay and prelaunch release refuse",
+    "result": "pass",
+    "live": true
+  },
+  {
+    "name": "An unmanaged pooled supervisor stays counted with an actionable diagnostic after shell-only or missing endpoint readings",
+    "result": "pass",
+    "live": true
+  }
+]
