@@ -256,7 +256,7 @@ worker_covers_request() {  # <locked> <lock-pid>
 reserve_generation() {
   local generation=$1 pid=$2 started=$3 locked=$4 phases=$5 lock_pid=$6 deadline=$7 rc
   take_lock "$RESERVE_LOCK" "$(seconds_until "$deadline")" || return 1
-  if [ -e "$PENDING_DIR" ]; then
+  if ! commit_staged_pending || [ -e "$PENDING_DIR" ]; then
     fm_lock_release "$RESERVE_LOCK"
     return 1
   fi
@@ -409,10 +409,32 @@ pending_get() {
   sed -n "s/^$1=//p" "$PENDING_DIR/status" 2>/dev/null | tail -1
 }
 
+commit_staged_pending() {
+  local pending generation current
+  current=$(status_get generation)
+  if [ -d "$PENDING_DIR" ] && [ -n "$current" ] && [ "$(pending_get generation)" != "$current" ]; then
+    rm -rf "$PENDING_DIR" || return 1
+  fi
+  for pending in "$STATE"/.startup-network-pending.*; do
+    [ -f "$pending/status" ] || continue
+    generation=$(sed -n 's/^generation=//p' "$pending/status" | tail -1)
+    if { [ -n "$current" ] && [ "$generation" != "$current" ]; } || [ -e "$PENDING_DIR" ]; then
+      rm -rf "$pending" || return 1
+    else
+      mv "$pending" "$PENDING_DIR" || return 1
+    fi
+  done
+}
+
 save_pending() {
-  local generation=$1 state=$2 phases=$3 locked=$4 started=$5 rc=$6 out=$7 timings=$8 deadline=$9 pending current saved
+  local generation=$1 state=$2 phases=$3 locked=$4 started=$5 rc=$6 out=$7 timings=$8 deadline=$9 pending saved
   pending=$(mktemp -d "$STATE/.startup-network-pending.XXXXXX") || return 1
-  if ! cp "$out" "$pending/report" || ! cat > "$pending/status" <<EOF
+  if ! cp "$out" "$pending/report"; then
+    rm -rf "$pending"
+    return 1
+  fi
+  [ -z "$timings" ] || cp "$timings" "$pending/timings" 2>/dev/null || true
+  if ! write_atomic "$pending/status" <<EOF
 state=$state
 phases=$phases
 locked=$locked
@@ -424,34 +446,22 @@ EOF
     rm -rf "$pending"
     return 1
   fi
-  [ -z "$timings" ] || cp "$timings" "$pending/timings" 2>/dev/null || true
-  if ! take_lock "$RESERVE_LOCK" "$(seconds_until "$deadline")"; then
-    rm -rf "$pending"
-    return 1
-  fi
-  current=$(status_get generation)
-  if { [ -n "$current" ] && [ "$current" != "$generation" ]; } || [ -e "$PENDING_DIR" ]; then
-    fm_lock_release "$RESERVE_LOCK"
-    rm -rf "$pending"
-    return 1
-  fi
-  mv "$pending" "$PENDING_DIR"
+  take_lock "$RESERVE_LOCK" "$(seconds_until "$deadline")" || return 1
+  commit_staged_pending && [ "$(pending_get generation)" = "$generation" ]
   saved=$?
   fm_lock_release "$RESERVE_LOCK"
-  [ "$saved" -eq 0 ] && return 0
-  rm -rf "$pending"
-  return 1
+  return "$saved"
 }
 
 recover_pending() {
-  local generation current state
+  local generation state rc
+  take_lock "$RESERVE_LOCK" "$(seconds_until "$DELIVERY_DEADLINE")" || return 1
+  commit_staged_pending
+  rc=$?
+  fm_lock_release "$RESERVE_LOCK"
+  [ "$rc" -eq 0 ] || return "$rc"
   [ -d "$PENDING_DIR" ] || return 0
   generation=$(pending_get generation)
-  current=$(status_get generation)
-  if [ -n "$current" ] && [ "$generation" != "$current" ]; then
-    rm -rf "$PENDING_DIR"
-    return 0
-  fi
   state=$(pending_get state)
   if [ "$(status_get report_published)" != 1 ]; then
     state=$(record_result "$generation" "$state" "$(pending_get phases)" \

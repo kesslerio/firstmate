@@ -1173,7 +1173,7 @@ test_pending_commit_and_reservation_share_ownership() {
   FM_RACE_REAL_SED=$real_sed
   FM_RACE_REAL_MV=$real_mv
   export FM_RACE_REAL_SED FM_RACE_REAL_MV
-  for mode in phases reservation; do
+  for mode in phases reservation delayed-reservation interrupted-reservation; do
     rec=$(new_world "reservation-ownership-$mode")
     IFS='|' read -r home root log <<EOF
 $rec
@@ -1199,6 +1199,7 @@ SH
 #!/usr/bin/env bash
 if [ "${FM_RACE_BOUNDARY:-}" = reservation ] && [ "${3:-}" = "$FM_HOME/state/.startup-network.status" ] \
   && [ ! -f "$FM_HOME/state/race-ready" ]; then
+  printf '%s\n' "$$" > "$FM_HOME/state/race-mv-pid"
   : > "$FM_HOME/state/race-ready"
   waited=0
   while [ ! -f "$FM_HOME/state/race-release" ] && [ "$waited" -lt 100 ]; do
@@ -1220,9 +1221,11 @@ SH
       waited=$((waited + 1))
     done
     [ -s "$log" ] || fail "worker A never started before the reservation race"
-    PATH="$root/bin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_FAKE_HARNESS_PID="$$" \
+    fm_run_timed "$([ "$mode" = interrupted-reservation ] && printf 8 || printf 20)" \
+      env PATH="$root/bin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_FAKE_HARNESS_PID="$$" \
       FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT='FINDING_B' FM_SESSION_START_TIMEOUT=12 \
-      FM_RACE_BOUNDARY="$mode" FM_RACE_REAL_SED="$real_sed" FM_RACE_REAL_MV="$real_mv" \
+      FM_RACE_BOUNDARY="$([ "$mode" = phases ] && printf phases || printf reservation)" \
+      FM_RACE_REAL_SED="$real_sed" FM_RACE_REAL_MV="$real_mv" \
       bash -c 'export FM_RACE_START_PID=$$; exec "$FM_ROOT_OVERRIDE/bin/fm-startup-network.sh" start --locked 1 --harvest-pid 999999999' &
     starter=$!
     waited=0
@@ -1234,7 +1237,7 @@ SH
     if [ "$mode" = phases ]; then
       await_pid_exit "$worker" 80 || fail "worker A exceeded its bounded exit during reservation"
       assert_grep 'FINDING_A' "$home/state/.startup-network.pending/report" "the allowed pending commit lost worker A's report"
-    else
+    elif [ "$mode" = reservation ]; then
       waited=0
       prepared=0
       while [ "$prepared" -eq 0 ] && [ "$waited" -lt 80 ]; do
@@ -1247,8 +1250,21 @@ SH
         waited=$((waited + 1))
       done
       [ "$prepared" -eq 1 ] || fail "worker A never prepared its completed report during reservation"
+    else
+      await_pid_exit "$worker" 80 || fail "worker A exceeded its bounded exit behind a stalled reservation"
+      prepared=0
+      for staged_status in "$home/state"/.startup-network-pending.*/status; do
+        [ -f "$staged_status" ] || continue
+        assert_grep 'FINDING_A' "${staged_status%/status}/report" "reservation contention deleted the completed findings"
+        assert_grep 'gh-auth' "${staged_status%/status}/timings" "reservation contention deleted the matching timings"
+        prepared=1
+      done
+      [ "$prepared" -eq 1 ] || fail "reservation timeout discarded the recoverable staged report"
+      [ "$(sed -n 's/^generation=//p' "$home/state/.startup-network.status")" = "$generation" ] \
+        || fail "the stalled reservation committed before the retention assertion"
+      assert_absent "$home/state/.wake-queue" "unpublished staged findings produced a wake"
     fi
-    : > "$home/state/race-release"
+    [ "$mode" = interrupted-reservation ] || : > "$home/state/race-release"
     rc=0
     wait "$starter" || rc=$?
     if [ "$mode" = phases ]; then
@@ -1258,6 +1274,22 @@ SH
       [ "$(wc -l < "$log" | tr -d ' ')" -eq 1 ] || fail "startup B ran fresh checks over a retained report"
       FM_FAKE_BOOTSTRAP_LOG="$log" run_stage "$home" "$root" run --locked 0 \
         || fail "manual recovery could not settle the allowed pending commit"
+    elif [ "$mode" = interrupted-reservation ]; then
+      fm_timed_out "$rc" || fail "startup B did not terminate at its reservation bound"
+      await_pid_exit "$(cat "$home/state/race-mv-pid")" 10 \
+        || fail "the interrupted startup left its stalled reservation child alive"
+      [ "$(sed -n 's/^generation=//p' "$home/state/.startup-network.status")" = "$generation" ] \
+        || fail "the interrupted startup replaced the retained generation"
+      FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_SLEEP=2 \
+        run_stage "$home" "$root" start --locked 0 --harvest-pid 999999999 \
+        || fail "later startup could not recover the interrupted reservation"
+      assert_grep 'FINDING_A' "$home/state/.startup-network.report" "later startup did not publish the completed staged findings"
+      assert_grep 'gh-auth' "$home/state/.startup-network.timings" "later startup did not publish the staged timings"
+      wait_for_startup_network_wake "$home" || fail "later startup did not wake for the recovered findings"
+      run_stage "$home" "$root" wait 30 >/dev/null || fail "recovery blocked fresh checks"
+      await_pid_exit "$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")" 80 \
+        || fail "the fresh worker did not settle after recovery"
+      [ "$(wc -l < "$log" | tr -d ' ')" -eq 2 ] || fail "interrupted reservation skipped or duplicated the fresh checks"
     else
       [ "$rc" -eq 0 ] || fail "startup B could not complete its owned reservation"
       await_pid_exit "$worker" 80 || fail "worker A exceeded its bounded exit after losing reservation ownership"
@@ -1269,6 +1301,9 @@ SH
       assert_no_grep 'FINDING_A' "$home/state/.startup-network.report" "the denied generation overwrote startup B's findings"
     fi
     assert_absent "$home/state/.startup-network.pending" "the reservation race left a blocking pending directory"
+    for staged_status in "$home/state"/.startup-network-pending.*/status; do
+      assert_absent "$staged_status" "the settled reservation left an uncommitted completed report"
+    done
     wakes=$(grep -Fc $'check\tstartup-network' "$home/state/.wake-queue" 2>/dev/null || true)
     [ "$wakes" -eq 1 ] || fail "the $mode reservation race queued $wakes wakes, want 1"
   done
