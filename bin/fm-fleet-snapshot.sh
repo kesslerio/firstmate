@@ -1997,7 +1997,7 @@ if [ "$OUTPUT_MODE" = contribution-input ]; then
   # argument, so both documents ride temp files via --slurpfile instead of argv.
   contribution_tasks=$(contribution_tasks_json) || { echo "fm-fleet-snapshot: contribution task read failed" >&2; exit 1; }
   contribution_input_dir=$(mktemp -d "${TMPDIR:-/tmp}/fm-fleet-snapshot.contrib.XXXXXX") || { echo "fm-fleet-snapshot: contribution temp dir failed" >&2; exit 1; }
-  # shellcheck disable=SC2064  # Expanding now is intended: the trap pins this invocation's directory.
+  # shellcheck disable=SC2064  # The trap resolves this invocation's directory at exit.
   trap 'rm -rf -- "$contribution_input_dir"' EXIT
   printf '%s' "$BACKLOG_JSON" > "$contribution_input_dir/backlog.json" || { echo "fm-fleet-snapshot: contribution backlog write failed" >&2; exit 1; }
   printf '%s' "$contribution_tasks" > "$contribution_input_dir/tasks.json" || { echo "fm-fleet-snapshot: contribution tasks write failed" >&2; exit 1; }
