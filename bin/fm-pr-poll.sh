@@ -1,10 +1,38 @@
 #!/usr/bin/env bash
 # Static watcher program for a validated pull request, merge request, or Gerrit
 # change poll sidecar.
-# It emits exactly one merged line for a merged change and stays silent
-# otherwise, including on every error, so a failed lookup can never be read as
-# a merge. The provider-tagged identity is data in the sidecar and is never
-# interpolated into this source: these bytes are identical for every task.
+# It emits exactly one merged line for a merged change and stays silent on
+# every error, so a failed lookup can never be read as a merge.
+# A GitHub read of that same single gh pr view call also reports new top-level
+# pull request comments and submitted reviews.
+# One new group in a sweep is one activity line, never one line per comment:
+# pr-activity: <url> <kind> <author>: <first line>
+# kind is comment or review.
+# When the sweep has more than one new item, that first line is prefixed with
+# "<count> new:" and the kind, author, and text are the newest item's.
+# The first line is the body up to its first newline, with ASCII controls
+# removed, trimmed, and capped at 200 characters.
+# An empty review body uses the review state instead, so a changes-requested
+# review with no text still names the decision.
+# The provider-tagged identity is data in the sidecar and is never interpolated
+# into this source: these bytes are identical for every task.
+# The activity cursor is a poll-owned sibling, <stem>.pr-activity, derived from
+# the check path the same way this program derives <stem>.pr-poll from $0.
+# The watcher passes that check path as the seventh --validated argument.
+# A six-argument --validated read has no cursor anchor and stays merge-only.
+# The cursor is created on first sight: that sweep records the current item ids
+# and the pull request URL and does not wake, so pre-existing history is silent.
+# A later sweep wakes only for ids not in the cursor, then advances it.
+# Replaying the same items emits nothing.
+# Cursor file lines are fm-pr-activity-v1, the pull request URL, then one id.
+# A missing anchor, a parse miss, a forge error, a symlink cursor, a hard link,
+# or a path with an empty, dot, or dot-dot component stays silent and does not
+# wake or write through the bad path.
+# A cursor whose stored URL does not match this pull request is reseeded
+# without a wake.
+# GitLab and Gerrit stay merge-only: their one standard-CLI read does not
+# expose comments without a second call or a JSON tool the GitLab path does
+# not require.
 # Each provider is read through its own standard CLI, gh for GitHub, glab for
 # GitLab, and gerrit-axi for Gerrit, so an upstream checkout needs no extra
 # tooling to follow the first two. The Gerrit branch additionally needs jq,
@@ -13,7 +41,19 @@ set -u
 LC_ALL=C
 export LC_ALL
 
-if [ "$#" -eq 6 ] && [ "$1" = --validated ]; then
+# One gh pr view, selected with gh's own query language so this path does not
+# grow a jq binary dependency. Pending reviews are drafts, not submissions.
+POLL_ACTIVITY_JQ='"state=\(.state)", ((.comments // [])[] | select((.id|type)=="string" and .id != "") | ["comment", .id, (.author.login // "unknown"), (.createdAt // ""), ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200])] | join("\t")), ((.reviews // [])[] | select(.state != "PENDING" and (.state|type)=="string" and .state != "" and (.id|type)=="string" and .id != "") | ["review", .id, (.author.login // "unknown"), (.submittedAt // ""), (if ((.body // "") | gsub("[[:space:]]"; "") | length) == 0 then .state else ((.body // "") | split("\n")[0] | gsub("\t"; " ") | gsub("\r"; "") | .[0:200]) end)] | join("\t"))'
+
+POLL_CHECK_PATH=
+if [ "$#" -eq 7 ] && [ "$1" = --validated ]; then
+  provider=$2
+  url=$3
+  host=$4
+  path=$5
+  number=$6
+  POLL_CHECK_PATH=$7
+elif [ "$#" -eq 6 ] && [ "$1" = --validated ]; then
   provider=$2
   url=$3
   host=$4
@@ -24,6 +64,7 @@ elif [ "$#" -eq 0 ]; then
     *.check.sh) data=${0%.check.sh}.pr-poll ;;
     *) exit 0 ;;
   esac
+  POLL_CHECK_PATH=$0
 
   [ -f "$data" ] && [ ! -L "$data" ] || exit 0
   { exec 3< "$data"; } 2>/dev/null || exit 0
@@ -48,6 +89,341 @@ case "$number" in
   *[!0-9]*) exit 0 ;;
 esac
 
+poll_dirname() {
+  case "$1" in
+    */*) printf '%s\n' "${1%/*}" ;;
+    *) printf '.\n' ;;
+  esac
+}
+
+poll_components_safe() {
+  local path=$1 rest segment
+  [ -n "$path" ] || return 1
+  case "$path" in
+    *$'\n'*|*$'\t'*) return 1 ;;
+  esac
+  rest=$path
+  case "$rest" in
+    /*) rest=${rest#/} ;;
+  esac
+  while [ -n "$rest" ]; do
+    case "$rest" in
+      */*) segment=${rest%%/*}; rest=${rest#*/} ;;
+      *) segment=$rest; rest= ;;
+    esac
+    case "$segment" in
+      ''|.|..) return 1 ;;
+    esac
+  done
+}
+
+poll_device() {
+  if [ "$(uname)" = Darwin ]; then
+    /usr/bin/stat -f %d "$1" 2>/dev/null
+  else
+    stat -c %d "$1" 2>/dev/null
+  fi
+}
+
+poll_link_count() {
+  if [ "$(uname)" = Darwin ]; then
+    /usr/bin/stat -f %l "$1" 2>/dev/null
+  else
+    stat -c %h "$1" 2>/dev/null
+  fi
+}
+
+poll_same_device() {
+  local left right
+  left=$(poll_device "$1") || return 1
+  right=$(poll_device "$2") || return 1
+  [ -n "$left" ] && [ "$left" = "$right" ]
+}
+
+poll_one_line() {
+  local text=$1
+  text=$(printf '%s' "$text" | tr -d '\000-\037\177' || true)
+  text=${text#"${text%%[![:space:]]*}"}
+  text=${text%"${text##*[![:space:]]}"}
+  printf '%s' "${text:0:200}"
+}
+
+poll_state_of() {
+  local raw=$1 line state
+  [ -n "$raw" ] || return 1
+  line=${raw%%$'
+'*}
+  case "$line" in
+    state=*) state=${line#state=} ;;
+    *)
+      [ "$raw" = "$line" ] || return 1
+      state=$line
+      ;;
+  esac
+  case "$state" in
+    [A-Z]*) ;;
+    *) return 1 ;;
+  esac
+  case "$state" in
+    *[!A-Z_]*) return 1 ;;
+  esac
+  printf '%s\n' "$state"
+}
+
+poll_sidecar_matches() {
+  local file=$1 provider_line url_line host_line path_line number_line
+  [ -f "$file" ] && [ ! -L "$file" ] || return 1
+  exec 5< "$file" || return 1
+  IFS= read -r provider_line <&5 || { exec 5<&-; return 1; }
+  IFS= read -r url_line <&5 || { exec 5<&-; return 1; }
+  IFS= read -r host_line <&5 || { exec 5<&-; return 1; }
+  IFS= read -r path_line <&5 || { exec 5<&-; return 1; }
+  IFS= read -r number_line <&5 || { exec 5<&-; return 1; }
+  if IFS= read -r _extra <&5; then
+    exec 5<&-
+    return 1
+  fi
+  exec 5<&-
+  [ "$provider_line" = "$provider" ] && [ "$url_line" = "$url" ] \
+    && [ "$host_line" = "$host" ] && [ "$path_line" = "$path" ] \
+    && [ "$number_line" = "$number" ]
+}
+
+# Print the check path whose sibling cursor may be used, or fail closed.
+poll_activity_anchor() {
+  local check stem sidecar cursor dir
+  check=${POLL_CHECK_PATH:-}
+  [ -n "$check" ] || return 1
+  poll_components_safe "$check" || return 1
+  case "$check" in
+    *.check.sh) ;;
+    *) return 1 ;;
+  esac
+  stem=${check%.check.sh}
+  [ -n "$stem" ] || return 1
+  case "$stem" in
+    */) return 1 ;;
+  esac
+  sidecar=$stem.pr-poll
+  cursor=$stem.pr-activity
+  poll_components_safe "$sidecar" || return 1
+  poll_components_safe "$cursor" || return 1
+  dir=$(poll_dirname "$check")
+  [ "$dir" = "$(poll_dirname "$sidecar")" ] || return 1
+  [ "$dir" = "$(poll_dirname "$cursor")" ] || return 1
+  [ ! -L "$dir" ] && [ -d "$dir" ] || return 1
+  poll_sidecar_matches "$sidecar" || return 1
+  poll_same_device "$dir" "$sidecar" || return 1
+  if [ -L "$cursor" ] || [ -d "$cursor" ]; then
+    return 1
+  fi
+  if [ -e "$cursor" ]; then
+    [ -f "$cursor" ] || return 1
+    [ "$(poll_link_count "$cursor")" = 1 ] || return 1
+    poll_same_device "$cursor" "$sidecar" || return 1
+  fi
+  printf '%s\n' "$check"
+}
+
+# 0 ready, 1 reseed without a wake, 2 absent (seed), 3 refuse.
+poll_cursor_ids() {
+  local cursor=$1 line version stored_url ids=
+  if [ -L "$cursor" ] || [ -d "$cursor" ]; then
+    return 3
+  fi
+  if [ ! -e "$cursor" ]; then
+    return 2
+  fi
+  [ -f "$cursor" ] || return 3
+  [ "$(poll_link_count "$cursor")" = 1 ] || return 3
+  exec 4< "$cursor" || return 1
+  IFS= read -r version <&4 || { exec 4<&-; return 1; }
+  IFS= read -r stored_url <&4 || { exec 4<&-; return 1; }
+  [ "$version" = fm-pr-activity-v1 ] || { exec 4<&-; return 1; }
+  [ "$stored_url" = "$url" ] || { exec 4<&-; return 1; }
+  while IFS= read -r line <&4 || [ -n "$line" ]; do
+    [ -n "$line" ] || { exec 4<&-; return 1; }
+    case "$line" in
+      *[!A-Za-z0-9_+=/-]*) exec 4<&-; return 1 ;;
+    esac
+    [ "${#line}" -le 200 ] || { exec 4<&-; return 1; }
+    ids="${ids}${line}"$'
+'
+  done
+  exec 4<&-
+  printf '%s' "$ids"
+}
+
+poll_write_cursor() {
+  local cursor=$1 sorted=$2 dir tmp
+  dir=$(poll_dirname "$cursor")
+  [ -L "$cursor" ] && return 1
+  [ -d "$cursor" ] && return 1
+  if [ -e "$cursor" ]; then
+    [ -f "$cursor" ] || return 1
+    [ "$(poll_link_count "$cursor")" = 1 ] || return 1
+  fi
+  tmp=$(mktemp "$dir/.fm-pr-activity.XXXXXX") || return 1
+  chmod 0600 "$tmp" || { rm -f -- "$tmp"; return 1; }
+  {
+    printf '%s\n' fm-pr-activity-v1
+    printf '%s\n' "$url"
+    if [ -n "$sorted" ]; then
+      printf '%s' "$sorted"
+      case "$sorted" in
+        *$'
+') ;;
+        *) printf '\n' ;;
+      esac
+    fi
+  } > "$tmp" || { rm -f -- "$tmp"; return 1; }
+  [ -L "$cursor" ] && { rm -f -- "$tmp"; return 1; }
+  mv -f -- "$tmp" "$cursor" || { rm -f -- "$tmp"; return 1; }
+  [ -f "$cursor" ] && [ ! -L "$cursor" ] || return 1
+  chmod 0600 "$cursor" || return 1
+  [ "$(poll_link_count "$cursor")" = 1 ]
+}
+
+poll_is_newer() {
+  local cts=$1 cid=$2 bts=$3 bid=$4
+  [ -n "$bid" ] || return 0
+  if [ -n "$cts" ] && [ -z "$bts" ]; then
+    return 0
+  fi
+  if [ -z "$cts" ] && [ -n "$bts" ]; then
+    return 1
+  fi
+  if [ "$cts" \> "$bts" ]; then
+    return 0
+  fi
+  if [ "$cts" \< "$bts" ]; then
+    return 1
+  fi
+  [ "$cid" \> "$bid" ]
+}
+
+poll_parse_activity() {
+  local raw=$1 line first=1 kind id author ts text rest
+  POLL_ROWS=
+  POLL_READ_IDS=$'\n'
+  while IFS= read -r line || [ -n "$line" ]; do
+    if [ "$first" -eq 1 ]; then
+      first=0
+      case "$line" in
+        state=*) continue ;;
+        *) return 1 ;;
+      esac
+    fi
+    [ -n "$line" ] || return 1
+    case "$line" in
+      *$'	'*$'	'*$'	'*$'	'*) ;;
+      *) return 1 ;;
+    esac
+    kind=${line%%$'	'*}
+    rest=${line#*$'	'}
+    id=${rest%%$'	'*}
+    rest=${rest#*$'	'}
+    author=${rest%%$'	'*}
+    rest=${rest#*$'	'}
+    ts=${rest%%$'	'*}
+    text=${rest#*$'	'}
+    case "$kind" in
+      comment|review) ;;
+      *) return 1 ;;
+    esac
+    case "$id" in
+      ''|*[!A-Za-z0-9_+=/-]*) return 1 ;;
+    esac
+    [ "${#id}" -le 200 ] || return 1
+    case "$POLL_READ_IDS" in
+      *$'
+'"$id"$'
+'*) return 1 ;;
+    esac
+    POLL_READ_IDS="${POLL_READ_IDS}${id}"$'
+'
+    case "$author" in
+      [A-Za-z0-9][A-Za-z0-9_-]*)
+        [ "${#author}" -le 39 ] || author=unknown
+        ;;
+      *) author=unknown ;;
+    esac
+    case "$ts" in
+      ''|*[!0-9A-Za-z:._+-]*) return 1 ;;
+    esac
+    text=$(poll_one_line "$text")
+    POLL_ROWS="${POLL_ROWS}${kind}"$'	'"${id}"$'	'"${author}"$'	'"${ts}"$'	'"${text}"$'
+'
+  done < <(printf '%s' "$raw")
+}
+
+poll_emit_github_activity() {
+  local raw=$1 anchor cursor loaded mode seen sorted current_ids new_count
+  local line kind id author ts text rest best_kind best_id best_author best_ts best_text summary
+  anchor=$(poll_activity_anchor) || return 0
+  cursor=${anchor%.check.sh}.pr-activity
+  poll_parse_activity "$raw" || return 0
+  loaded=$(poll_cursor_ids "$cursor")
+  mode=$?
+  case "$mode" in
+    0|1|2) ;;
+    *) return 0 ;;
+  esac
+  new_count=0
+  best_id=
+  best_ts=
+  best_kind=
+  best_author=
+  best_text=
+  current_ids=
+  # Command substitution strips the cursor's trailing newline, so put one back
+  # or the last id never matches and every replay wakes.
+  seen=$'\n'"${loaded}"$'
+'
+  if [ -n "$POLL_ROWS" ]; then
+    while IFS= read -r line || [ -n "$line" ]; do
+      [ -n "$line" ] || continue
+      kind=${line%%$'	'*}
+      rest=${line#*$'	'}
+      id=${rest%%$'	'*}
+      rest=${rest#*$'	'}
+      author=${rest%%$'	'*}
+      rest=${rest#*$'	'}
+      ts=${rest%%$'	'*}
+      text=${rest#*$'	'}
+      current_ids="${current_ids}${id}"$'
+'
+      [ "$mode" -eq 0 ] || continue
+      case "$seen" in
+        *$'
+'"$id"$'
+'*) continue ;;
+      esac
+      new_count=$((new_count + 1))
+      if poll_is_newer "$ts" "$id" "$best_ts" "$best_id"; then
+        best_ts=$ts
+        best_id=$id
+        best_kind=$kind
+        best_author=$author
+        best_text=$text
+      fi
+    done < <(printf '%s' "$POLL_ROWS")
+  fi
+  sorted=$(printf '%s' "$current_ids" | LC_ALL=C sort -u)
+  if [ "$mode" -eq 0 ] && [ "$new_count" -eq 0 ] && [ "$loaded" = "$sorted" ]; then
+    return 0
+  fi
+  poll_write_cursor "$cursor" "$sorted" || return 0
+  [ "$mode" -eq 0 ] && [ "$new_count" -gt 0 ] || return 0
+  [ -n "$best_kind" ] && [ -n "$best_author" ] || return 0
+  summary=$best_text
+  if [ "$new_count" -gt 1 ]; then
+    summary="$new_count new: $best_text"
+  fi
+  printf 'pr-activity: %s %s %s: %s\n' "$url" "$best_kind" "$best_author" "$summary"
+  return 0
+}
+
 # Every component is revalidated here rather than trusted from the sidecar, and
 # the stored URL must then be exactly reconstructible from those components, so
 # a doctored sidecar cannot redirect this poll at another host or project.
@@ -65,8 +441,15 @@ case "$provider" in
       .|..|*[!A-Za-z0-9._-]*) exit 0 ;;
     esac
     [ "$url" = "https://github.com/$owner/$repo/pull/$number" ] || exit 0
-    state=$(gh pr view "$url" --json state -q .state 2>/dev/null) || exit 0
-    [ "$state" = MERGED ] && printf '%s\n' merged
+    raw=$(gh pr view "$url" --json state,comments,reviews --jq "$POLL_ACTIVITY_JQ" 2>/dev/null) || exit 0
+    state=$(poll_state_of "$raw") || exit 0
+    if [ "$state" = MERGED ]; then
+      printf '%s\n' merged
+      exit 0
+    fi
+    case "$raw" in
+      state=*) poll_emit_github_activity "$raw" || exit 0 ;;
+    esac
     ;;
   gitlab)
     [ "${#host}" -ge 1 ] && [ "${#host}" -le 253 ] || exit 0
