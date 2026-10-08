@@ -267,3 +267,49 @@ were met above; the alternatives are kept below for the record.
 
 Port question stands separately: keep the live tailscale port 5556 (evidence says that is the
 dashboard) or introduce 26000 (no support found anywhere).
+
+## Collection-path check (asked after the first report)
+
+Question: is the MacBook being read through the new Mac-agent path or the SSH collector?
+
+**Answer: the agent path is what serves this node, and it is the only working transport.** No second
+entry was added, and nothing about the existing entry's auth was changed to make the errors stop.
+
+Config proof - exactly one entry with that id, agent block set, no SSH target:
+
+```
+kind=mac  agent={'url': None, 'host': '100.71.122.118', 'port': 8790}  lanIp=100.71.122.118
+ssh={'host': '', 'user': 'root', 'auth': 'key'}      # host empty: nothing is targeted over SSH
+ids: ['qualitycorp', 'john', 'mama', 'ofus', 'mk-macbook-pro-5']
+```
+
+Runtime proof - `GET /api/sparks/mk-macbook-pro-5/metrics` returns `runtimes` (3 entries, all
+`serving`, with ports and served model) plus the agent's `unavailable` declarations
+(`cpu.perCore`, `gpu.utilization`, `gpu.power`, `ane.power`). Per `SparkMonitor.js:676`
+("Only agent-backed units can report runtimes / declared gaps") those fields cannot come from the
+SSH collector, so the agent answered.
+
+The `[MacSystemCollector]` lines are a fallback that fires on an occasional agent miss, not a second
+collector: `MacAgentCollector extends MacSystemCollector` and each `collectX()` ends with
+`if (!snapshot) return super.collectX()`, where the parent builds its target from `lanIp` as
+`root@100.71.122.118` rather than from the empty `ssh.host`. Burst structure over 40 minutes
+(`docker logs -t` bucketed by timestamp) is exactly **6 lines per burst** - gpu, cpu, ram,
+unifiedMemory, storage, network - one burst per failed snapshot, roughly 5 bursts per 10 minutes
+(`23:40:42`, `23:46:00`, `23:46:05`, `23:48:58`, `23:51:00`, `23:51:58`, `23:52:04`, `23:54:26`,
+`23:59:40`, `23:59:55`, `00:00:10`, `00:00:14`).
+
+Why the misses happen, measured from john: 12 sequential `curl … :8790/metrics` calls gave
+**2 timeouts at the 6 s cap, then 3.56 s, 2.26 s, 1.41 s, and eight fast answers at 0.03-0.10 s** -
+so the first requests after a quiet period are slow while warm requests are instant. The collector's
+own `FETCH_TIMEOUT_MS = 4000` (`MacAgentCollector.js:22`) turns one of those cold starts into a null
+snapshot and therefore 6 fallback errors. `SNAPSHOT_TTL_MS = 1500` is why warm polls are free.
+The agent serves with `ThreadingHTTPServer` (`sparkdash_mac_agent.py:847`) and shares one
+2-second sample across close-together requests.
+
+SSH is genuinely unavailable as a transport, which rules out silencing the fallback that way:
+`timeout 8 ssh -o BatchMode=yes kesslerio@100.71.122.118 hostname` from john answers
+`Permission denied (publickey,password,keyboard-interactive)`, and the container's read-only
+`/home/kesslerio/.ssh` holds john's own `id_ed25519` only. So the honest remaining options, none of
+them mine to take here, are (a) leave the noise, (b) a code change so an agent-configured unit does
+not fall back to SSH, or (c) install a john->Mac key as `kesslerio`, which is a credential change
+nobody asked me to make.
