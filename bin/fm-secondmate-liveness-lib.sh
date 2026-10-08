@@ -340,7 +340,7 @@ fm_secondmate_liveness_probe() {  # <meta> <id> <full|poll>
   local meta=$1 id=$2 mode=$3
   FM_SM_LIVE_STATUS=skipped FM_SM_LIVE_STATE=unknown FM_SM_LIVE_KILL=0
   FM_SM_LIVE_CAUSE='' FM_SM_LIVE_WHERE='' FM_SM_LIVE_REASON='' FM_SM_LIVE_LINE=''
-  FM_SM_LIVE_GENERATION='' FM_SM_LIVE_ROUTE='' FM_SM_LIVE_BACKEND='' FM_SM_LIVE_TARGET=''
+  FM_SM_LIVE_GENERATION='' FM_SM_LIVE_ROUTE='' FM_SM_LIVE_BACKEND='' FM_SM_LIVE_TARGET='' FM_SM_LIVE_SOCKET=''
   local window harness remote_host remote_rc out agent_state readiness_reason route_out remote_backend seat_record incarnation backend target
   window=$(fm_meta_get "$meta" window)
   [ -n "$window" ] || { FM_SM_LIVE_STATUS=silent; return 0; }
@@ -365,6 +365,7 @@ fm_secondmate_liveness_probe() {  # <meta> <id> <full|poll>
       if [ "$(printf '%s\n' "$incarnation" | jq -r '.route.placement // empty')" = local ]; then
         backend=$(printf '%s\n' "$incarnation" | jq -r .route.backend)
         target=$(printf '%s\n' "$incarnation" | jq -r .route.target)
+        FM_SM_LIVE_SOCKET=$(printf '%s\n' "$incarnation" | jq -r '.route.socket_path // empty')
       fi
     fi
   fi
@@ -377,7 +378,7 @@ fm_secondmate_liveness_probe() {  # <meta> <id> <full|poll>
     fi
     FM_SM_LIVE_ROUTE="remote:$remote_host:$target"
   else
-    FM_SM_LIVE_ROUTE="$backend:$target"
+    FM_SM_LIVE_ROUTE="$backend:$target:$FM_SM_LIVE_SOCKET"
   fi
   if [ -n "$remote_host" ]; then
     if [ "$mode" = full ]; then
@@ -451,6 +452,14 @@ fm_secondmate_liveness_probe() {  # <meta> <id> <full|poll>
     return 0
   fi
 
+  if [ "$backend" = tmux ] && [ -n "${incarnation:-}" ]; then
+    case "$FM_SM_LIVE_SOCKET" in
+      /*) ;;
+      *) FM_SM_LIVE_REASON="the recorded tmux socket is unverified; recovery is refused"; return 0 ;;
+    esac
+    local TMUX="$FM_SM_LIVE_SOCKET,0,0"
+    export TMUX
+  fi
   agent_state=$(fm_backend_agent_state "$backend" "$target" 2>/dev/null) || agent_state=unreadable
   case "$harness" in
     claude|codex|opencode|pi|pi-signed|grok|kimi|omp) ;;
@@ -566,6 +575,10 @@ fm_secondmate_liveness_relaunch() {  # <meta> <id> [timeout-secs]
     return 1
   fi
   if [ "$FM_SM_LIVE_KILL" = 1 ]; then
+    if [ "$FM_SM_LIVE_BACKEND" = tmux ] && [ -n "$FM_SM_LIVE_SOCKET" ]; then
+      local TMUX="$FM_SM_LIVE_SOCKET,0,0"
+      export TMUX
+    fi
     [ -z "$FM_SM_LIVE_TARGET" ] || fm_backend_kill "$FM_SM_LIVE_BACKEND" "$FM_SM_LIVE_TARGET" 2>/dev/null || true
   fi
   if [ -n "$timeout" ]; then
