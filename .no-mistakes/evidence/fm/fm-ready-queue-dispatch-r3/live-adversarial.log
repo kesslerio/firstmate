@@ -1,0 +1,9 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/.validation/edge-home-rerun
+LIVE empty queue: reviewed without wake
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/.validation/unavailable-home
+heartbeat
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/bin/fm-supervise-daemon.sh: line 756: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/.validation/unavailable-home/state/.subsuper-escalations: Is a directory
+1791496688	1	heartbeat	heartbeat	heartbeat
+[2026-10-08T14:58:09-0700] escalate: heartbeat -> ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+[2026-10-08T14:58:09-0700] wake classification failed; retaining durable wakes
+LIVE unavailable readiness: heartbeat surfaced; refused handoff retained durable wake

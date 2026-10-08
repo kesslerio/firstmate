@@ -1,0 +1,18 @@
+ok - absolute backlog addressing preserves ready, empty, and unavailable verdicts
+ok - relative backlog addressing preserves ready, empty, and unavailable verdicts
+ok - trailing-slash backlog addressing preserves ready, empty, and unavailable verdicts
+ok - relative-home backlog addressing preserves ready, empty, and unavailable verdicts
+ok - trailing-slash-home backlog addressing preserves ready, empty, and unavailable verdicts
+ok - ready queue reaches supervision despite stale title and silent status logs
+ok - unreadable queue reaches supervision despite stale title and silent status logs
+ok - empty queue remains quiet without dispatchable work
+ok - held queue remains quiet without dispatchable work
+ok - emitted supervision prompt requires current stop verification after finish
+ok - emitted supervision prompt gates away dispatch to the recorded words and keeps the attended handoff
+ok - daemon ready heartbeat respects readiness before skip=heartbeat and acknowledgement
+ok - daemon ready heartbeat respects readiness before skip=signal and acknowledgement
+ok - daemon empty heartbeat respects readiness before skip=heartbeat and acknowledgement
+ok - daemon held heartbeat respects readiness before skip=heartbeat and acknowledgement
+ok - daemon unreadable heartbeat respects readiness before skip=heartbeat and acknowledgement
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/bin/fm-supervise-daemon.sh: line 756: /tmp/fm-watch-ready-queue.NBRHPF/daemon-failed-heartbeat/state/.subsuper-escalations: Is a directory
+ok - daemon failed heartbeat respects readiness before skip=heartbeat and acknowledgement

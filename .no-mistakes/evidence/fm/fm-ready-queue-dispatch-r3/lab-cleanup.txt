@@ -1,0 +1,3 @@
+Private fm-lab server stopped. Tracked 7 lab pane processes and descendants. Surviving non-zombie processes: [['2971893', '1262', 'Ssl', 'codex'], ['2972098', '1262', 'Ssl', 'codex'], ['4012579', '2972098', 'S', 'sh'], ['4013463', '4012579', 'S', 'curl']]
+Terminated identity-tracked lab sidecars left by tmux shutdown. Remaining: []
+All disposable lab homes, fixture repositories, Treehouse pools and local drivers removed from the worktree.

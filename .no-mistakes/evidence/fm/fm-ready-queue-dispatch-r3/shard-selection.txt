@@ -1,0 +1,2 @@
+portable-serial-2of9: tests/fm-supervision-host-late.test.sh
+portable-serial-3of9: tests/fm-supervision-host.test.sh

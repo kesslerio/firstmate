@@ -1,0 +1,81 @@
+ok: added successor -> Queued
+task:
+  id: successor
+  title: authorized successor
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-08
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start successor` to move it to in flight
+  - Run `tasks-axi block successor --by <other>` to record a dependency
+ok: block successor -> blocked-by probe
+help[2]:
+  - Run `tasks-axi unblock successor --by <other>` to clear it
+  - Run `tasks-axi ready` to see what is still dispatchable
+scaffolded: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/.validation/home/data/successor/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/.validation/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+deferred: project probe admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/.validation/home/config/project-capacity) and 1 already hold a place (probe); task successor was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR or is cleaned up
+task:
+  id: successor
+  title: authorized successor
+  state: queued
+  blocked: yes
+  blocked_by: probe
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-08
+  closed: "-"
+  deps: "blocked-by:probe"
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi unblock successor --by <other>` to clear a blocker
+  - Run `tasks-axi start successor` to move it to in flight
+LIVE capacity: second worker deferred without acquiring endpoint
+Updating f5516fb..0232938
+Fast-forward
+ processed.txt | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 processed.txt
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/.validation/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process group for probe: 3111920
+teardown: force-killing leaked worktree process group for probe: 3111920
+A new version of treehouse is available: v2.0.1 → v3.1.2
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown probe complete (window primary:fm-probe, worktree /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/.validation/home/projects/probe/.treehouse/probe-4b3cc5/1/probe)
+Backlog: probe is closed in /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EQXX97HJEM6W27NF7DPAB6/.validation/home/data/backlog.md.
+Apply the ready-work check in bin/fm-branch-prompt.sh (AGENTS.md section 10 for MAIN); if you cannot spawn, report a captain-verdict ready-work handoff for MAIN to act on before acknowledgement.
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  successor,queued,task,"-",authorized successor
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+LIVE teardown: finished worker retired, successor dependency cleared, ready-work check surfaced
