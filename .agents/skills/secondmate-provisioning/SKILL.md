@@ -85,19 +85,8 @@ Release happens only on explicit retirement or seed rollback, never on routine r
 
 `bin/fm-home-seed.sh` copies the charter into the secondmate home as `data/charter.md`.
 It also writes the gitignored `.fm-secondmate-parent` durable binding before the required `.fm-secondmate-home` identity marker; the parser header in [`bin/fm-secondmate-parent-lib.sh`](../../../bin/fm-secondmate-parent-lib.sh) owns the record contract, and both files must remain in place.
-`bin/fm-spawn.sh --secondmate` launches it through the secondmate harness path, resolving `config/secondmate-harness` -> `config/crew-harness` -> the primary's own harness unless an explicit per-spawn harness override is passed.
-
-`config/secondmate-harness` may also pin a concrete model and effort for the secondmate agent, in the SAME file rather than a new one: the default line is a single whitespace-separated `<harness> [<model>] [<effort>]`, and an additional `mate <secondmate-id>: <harness> [<model>] [<effort>]` line pins one named mate rather than the whole home.
-[`docs/configuration.md`](../../../docs/configuration.md#choose-the-secondmate-harness) owns that schema, its precedence, and its malformed-line refusal.
-A bare `<harness>` (the format that predates the override grammar, e.g. `claude`) behaves exactly as before - harness only, no model/effort flag - so this is fully backward-compatible.
-`bin/fm-harness.sh secondmate`, `secondmate-model`, and `secondmate-effort` each take the secondmate id as an optional second argument; they read only `config/secondmate-harness`, never `config/crew-harness`, which stays a bare adapter name, and print empty when no token applies.
-An override for that id wins over the default line for that mate, so moving the default pin cannot migrate a mate the captain pinned separately.
-For a `--secondmate` spawn, `bin/fm-spawn.sh` populates `MODEL`/`EFFORT` from those tokens only when the harness itself came from the secondmate config path for that spawn.
-For a local route, an explicit per-spawn `--harness` flag, positional harness arg, or raw launch command starts clean on model and effort too, unless the caller also passes explicit `--model` or `--effort`.
-A remote route accepts only a verified harness adapter and refuses a raw launch command at the host boundary.
-When the file's tokens do apply, an explicit per-spawn `--model` or `--effort` flag always wins over the file's token for that axis.
-Because this resolves from the file on every spawn, the pin is durable across every respawn (recovery, `/updatefirstmate`, restart) exactly like the harness axis itself - e.g. `config/secondmate-harness` containing `claude opus` keeps a secondmate pinned to Opus even if the primary's own default model later changes.
-This is secondmate-only: crewmate/scout model resolution is untouched by this file.
+[`docs/configuration.md`](../../../docs/configuration.md#choose-the-secondmate-harness) owns the primary's secondmate runtime pins, per-mate overrides, launch precedence, compatibility, and malformed-file refusal.
+Select the registered mate's id when resolving its pin; [`bin/fm-harness.sh`](../../../bin/fm-harness.sh)'s header owns the resolver commands.
 
 This section is the single owner of the secondmate sync and inherited-local-material propagation contract; `AGENTS.md` sections 3 and 4 point here.
 Before a local launch, `fm-spawn.sh --secondmate` locally fast-forwards the home to the primary firstmate checkout's current default-branch commit when it is safe, or reconciles a clean divergence whose complete local result is already present there (e.g. after a squash merge) with `reset --keep`; dirty, uniquely diverged, or in-flight homes launch unchanged with a warning, and a genuine divergence gets the same durable reconciliation record `bin/fm-ff-lib.sh` writes for `/updatefirstmate`.

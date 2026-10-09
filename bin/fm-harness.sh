@@ -45,16 +45,8 @@
 #                                        so a caller that knows the terminal's foreground
 #                                        process group can keep a backgrounded process out
 #                                        of the selection.
-# config/secondmate-harness format: a default line "<harness> [<model>] [<effort>]",
-# whitespace-separated, plus any number of per-mate override lines
-# "mate <secondmate-id>: <harness> [<model>] [<effort>]". A bare "<harness>"
-# (today's format) behaves exactly as before: harness only, no model/effort.
-# Blank lines and '#' comments are legal anywhere. A line that is neither the
-# single default line nor a well-formed override line is an actionable error
-# with its line number, never a silently ignored extra, because an ignored
-# override is how a mate drifts onto the default runtime unnoticed.
-# Model/effort come ONLY from this file - config/crew-harness stays a bare adapter
-# name and is never parsed for a model.
+# docs/configuration.md "Choose the secondmate harness" owns the pin-file schema
+# and resolution contract; the usage above owns the resolver command arguments.
 # Detection evidence and precedence:
 #   Markers  - verified environment variables a harness publishes about itself.
 #              Cheap and unambiguous about WHICH harness set them, but they are
@@ -462,18 +454,9 @@ resolve_crew() {
   if [ -z "$crew" ] || [ "$crew" = "default" ]; then detect_own; else echo "$crew"; fi
 }
 
-# secondmate_parse is the single owner of the config/secondmate-harness grammar:
-# the single default line "<harness> [<model>] [<effort>]", plus optional
-# "mate <secondmate-id>: <harness> [<model>] [<effort>]" per-mate overrides that
-# replace the default line for that exact id. Blank lines and '#' comments are
-# legal anywhere. A line that is neither is reported with its line number and
-# returns 1, so malformed pin config is an actionable error rather than a silent
-# fallback to the default pin - which is exactly how a pinned mate would drift
-# onto the default runtime unnoticed. A line carrying the 'mate' keyword is
-# treated as an override wherever it sits, so listing the overrides above the
-# default line stays legal.
-#
-# It fills SM_DEFAULT_LINE and the parallel SM_MATE_IDS, SM_MATE_VALS and
+# Validate the entire file before selecting a mate, so an invalid override cannot
+# be silently skipped and migrate that mate onto the default runtime.
+# Fills SM_DEFAULT_LINE and the parallel SM_MATE_IDS, SM_MATE_VALS and
 # SM_MATE_LINES arrays for the reader below.
 secondmate_parse() {
   local file="$CONFIG/secondmate-harness"
