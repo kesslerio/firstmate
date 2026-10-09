@@ -1,0 +1,7 @@
+Host: Linux
+Orca readiness probe:
+/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/orca-ide: error while loading shared libraries: libnspr4.so: cannot open shared object file: No such file or directory
+Exit status: 127
+Orca help probe:
+/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/orca-ide: error while loading shared libraries: libnspr4.so: cannot open shared object file: No such file or directory
+Exit status: 127
