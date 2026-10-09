@@ -1,0 +1,15 @@
+window=primary:fm-gamma
+endpoint_task_id=gamma
+worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma
+project=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma
+harness=pi
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-gamma
+model=openai-codex/gpt-6.1-sol
+effort=max
+spawn_gen=s1791504563.1633587.668
+home=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma
+projects=
+control_relaunch_tx=1630981.20261009T000921Z.8185

@@ -1,0 +1,4 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/fm-lab.mgza8g
+error: task gamma's composer state is 'unknown', not proven empty; refusing to type the /quit exit command because it could concatenate onto existing text. Clear the composer, then retry 'relaunch'
+error: relaunch of gamma failed while stopping the old agent, which is still running; its original instructions were restored
+relaunch exit=1

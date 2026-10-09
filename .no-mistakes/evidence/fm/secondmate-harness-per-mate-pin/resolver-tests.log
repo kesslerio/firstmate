@@ -1,0 +1,535 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 195: fm_cursor_process_matches: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 199: fm_gemini_path_is_gemini: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 203: basename: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 278: tr: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 195: fm_cursor_process_matches: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 199: fm_gemini_path_is_gemini: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 203: basename: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 278: tr: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+ok - C1 fm-harness.sh secondmate-model/secondmate-effort resolve the optional tokens; bare harness stays empty (backward-compat)
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 195: fm_cursor_process_matches: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 199: fm_gemini_path_is_gemini: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 203: basename: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 278: tr: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 195: fm_cursor_process_matches: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 199: fm_gemini_path_is_gemini: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 203: basename: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 278: tr: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+ok - D1 fm-harness.sh honors a mate override line for its id and changes nothing else
+not ok - override with no tokens after the colon: fm-harness.sh secondmate accepted the malformed pin: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: dirname: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 81: cd: null directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 87: /fm-cursor-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 89: /fm-gemini-lib.sh: No such file or directory
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 524: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 525: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 508: wc: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 509: [: : integer expected
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 195: fm_cursor_process_matches: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 199: fm_gemini_path_is_gemini: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 203: basename: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/bin/fm-harness.sh: line 278: tr: command not found
+claude

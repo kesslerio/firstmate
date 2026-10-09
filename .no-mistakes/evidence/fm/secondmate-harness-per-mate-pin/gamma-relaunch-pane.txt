@@ -1,0 +1,40 @@
+ but only to RECONCILE work that is already yours: in-flight crewmates, tracked backlog items, and durable watches
+ recorded in this home.
+ When you have no assigned or in-flight work after that reconciliation, go idle and wait silently for the main
+ firstmate to route you a task.
+ An empty queue is a healthy resting state, not a cue to invent work: never spawn a survey, audit, or any self-directed
+ "find work" task on your own initiative.
+ If this charter cannot be carried out, append blocked [at=<epoch>]: {why} or failed [at=<epoch>]: {why} to the main
+ status file and stop.
+
+
+
+ [skill] session-start-recovery (ctrl+o to expand)
+
+
+ Thinking...
+
+
+ fm_watch_arm_pi
+ watcher: started Pi extension arm child 1; future ordinary re-arms are automatic; call fm_watch_arm_pi again only
+ after a later notification says the cycle is missing, failed, or unhealthy
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma (master)
+↑41k ↓143 R79k CH99.4% $0.090 (sub) 14.8%/272k (auto)                                 (openai-codex) gpt-6.1-sol • xhigh
+🚀 TPS: 23.6 tok/s (143 tok in 6.1s · TTFT: 2349 ms)​
+To resume this session: pi --session 01a11dfd-f245-73f7-9233-4e347ba7e608
+
+[art@zeppola:~/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma]$ export GOTMPDIR=/tm
+p/fm-gamma/gotmp
+export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:~/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma]$ export COMPACT_ADVI
+SER_DISABLE=1
+
+[art@zeppola:~/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma]$ . '/tmp/fm-gamma+4f
+3a777046ccfadc1486e8dd5ff2421dc6677aa0070722335141009d6f8a6350/launch.s1791504563.1633587.668.sh'
+

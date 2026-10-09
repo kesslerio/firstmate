@@ -1,0 +1,40 @@
+ && { [ ! -e
+ '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/fm-lab.mgza8g/config/fleet-ledger'
+ ] ||
+ '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/product/bin/fm-fleet-ledger.sh'
+ appended '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/fm-lab.mgza8g/config'
+ '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/fm-lab.mgza8g/state/gamma.status'
+ >/dev/null 2>&1 || true; } (timeout 10s)
+
+ (no output)
+
+ Took 0.0s
+
+
+ Warning: MCP servers need attention:
+   aside: failed: fetch failed
+ Run /mcp to fix.
+
+
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: watcher: FAILED - Pi extension could not restore watcher continuity
+ after 5 retries
+ watcher: FAILED - refusing to arm from a disposable validation checkout:
+ /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma/bin
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.
+
+
+
+ $ bin/fm-wake-drain.sh (timeout 30s)
+
+ (no output)
+
+ Took 0.4s
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma (master)
+↑50k ↓683 R439k CH99.6% $0.151 (sub) 17.9%/272k (auto)                                 (openai-codex) gpt-6.1-sol • high
+🚀 TPS: 30.5 tok/s (615 tok in 20.1s · TTFT: 1556 ms)​

@@ -1,0 +1,40 @@
+ On startup and restart, run normal firstmate bootstrap and recovery through bin/fm-session-start.sh for your own home,
+ but only to RECONCILE work that is already yours: in-flight crewmates, tracked backlog items, and durable watches
+ recorded in this home.
+ When you have no assigned or in-flight work after that reconciliation, go idle and wait silently for the main
+ firstmate to route you a task.
+ An empty queue is a healthy resting state, not a cue to invent work: never spawn a survey, audit, or any self-directed
+ "find work" task on your own initiative.
+ If this charter cannot be carried out, append blocked [at=<epoch>]: {why} or failed [at=<epoch>]: {why} to the main
+ status file and stop.
+
+
+ Thinking...
+
+
+ codemode
+ const root="/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma";
+ const files=["session-start-recovery","operational-home-layout","secondmate-provisioning"];
+ const results=await
+ Promise.allSettled(files.map(s=>tools.read({path:`${root}/.agents/skills/${s}/SKILL.md`,offset:null,limit:null})));
+ for(let i=0;i<results.length;i++)text({skill:files[i],result:results[i]});
+
+ ✓ read {"path":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE... 8ms
+ ✓ read {"path":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE... 7ms
+ ✓ read {"path":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE... 5ms
+
+ Warning: truncated output (original token count: 16276)
+ Total output lines: 6
+
+ ==> text 1/3 <==
+ {"skill":"session-start-recovery","result":{"status":"fulfilled","value":"---\nname:
+ ... (355 more lines, ctrl+o to expand)
+ Full output: /tmp/pi-codemode-d54db2ff30c8f24b.txt
+
+
+── ⠇ Working ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-gamma (master)
+↑39k ↓396 $0.081 (sub) 18.1%/272k (auto)                                                (openai-codex) gpt-6.1-sol • max
+🚀 TPS: 61.4 tok/s (100 tok in 9.6s · TTFT: 1795 ms)​

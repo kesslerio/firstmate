@@ -1,0 +1,3 @@
+ok - T6a a remote mate with a per-mate override restarts onto that override, not the default pin
+ok - T6b a remote mate with no override line still restarts onto the default pin
+ok - T6c an unreadable per-mate pin falls back to the re-read path with its agent left running

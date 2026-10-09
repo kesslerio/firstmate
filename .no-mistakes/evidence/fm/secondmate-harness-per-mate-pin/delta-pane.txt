@@ -1,0 +1,40 @@
+
+ (no output)
+
+ Took 0.4s
+
+
+ Thinking...
+
+
+ fm_watch_arm_pi
+ watcher: started Pi extension arm child 12; future ordinary re-arms are automatic; call fm_watch_arm_pi again only
+ after a later notification says the cycle is missing, failed, or unhealthy
+
+
+ Captain, I retried the required repair. The disposable-checkout restriction remains unchanged; the main firstmate
+ already has the blocker report.
+
+
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: watcher: FAILED - Pi extension could not restore watcher continuity
+ after 5 retries
+ watcher: FAILED - refusing to arm from a disposable validation checkout:
+ /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-delta/bin
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.
+
+
+
+ $ bin/fm-wake-drain.sh (timeout 20s)
+
+ (no output)
+
+ Took 0.4s
+
+
+── ⠦ Working ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-delta (master)
+↑57k ↓1.3k R986k CH98.3% $0.016 (sub) 15.9%/272k (auto)                               (openai-codex) gpt-6-luna • medium
+🚀 TPS: 177.2 tok/s (231 tok in 58.0s · TTFT: 937 ms)​

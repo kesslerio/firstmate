@@ -1,0 +1,110 @@
+[
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate alpha",
+    "exit": 0,
+    "stdout": "codex\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-model alpha",
+    "exit": 0,
+    "stdout": "exception-model\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-effort alpha",
+    "exit": 0,
+    "stdout": "max\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate beta",
+    "exit": 0,
+    "stdout": "pi\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-model beta",
+    "exit": 0,
+    "stdout": "default-model\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-effort beta",
+    "exit": 0,
+    "stdout": "xhigh\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate alpha-other",
+    "exit": 0,
+    "stdout": "pi\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-model alpha-other",
+    "exit": 0,
+    "stdout": "default-model\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-effort alpha-other",
+    "exit": 0,
+    "stdout": "xhigh\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate alpha",
+    "exit": 0,
+    "stdout": "codex\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-model alpha",
+    "exit": 0,
+    "stdout": "exception-model\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-effort alpha",
+    "exit": 0,
+    "stdout": "max\n",
+    "stderr": ""
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate alpha",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: config/secondmate-harness line 3: duplicate 'mate alpha:' override (already set on line 2)\n"
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-model alpha",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: config/secondmate-harness line 3: duplicate 'mate alpha:' override (already set on line 2)\n"
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-effort alpha",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: config/secondmate-harness line 3: duplicate 'mate alpha:' override (already set on line 2)\n"
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate beta",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: config/secondmate-harness line 3: duplicate 'mate alpha:' override (already set on line 2)\n"
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-model beta",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: config/secondmate-harness line 3: duplicate 'mate alpha:' override (already set on line 2)\n"
+  },
+  {
+    "command": "FM_HOME=<disposable lab> bin/fm-harness.sh secondmate-effort beta",
+    "exit": 1,
+    "stdout": "",
+    "stderr": "error: config/secondmate-harness line 3: duplicate 'mate alpha:' override (already set on line 2)\n"
+  }
+]

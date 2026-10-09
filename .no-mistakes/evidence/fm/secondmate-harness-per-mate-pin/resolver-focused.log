@@ -1,0 +1,3 @@
+ok - C1 fm-harness.sh secondmate-model/secondmate-effort resolve the optional tokens; bare harness stays empty (backward-compat)
+ok - D1 fm-harness.sh honors a mate override line for its id and changes nothing else
+ok - D2 malformed config/secondmate-harness refuses with its line number on every read verb

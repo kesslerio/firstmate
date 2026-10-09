@@ -1,0 +1,3 @@
+unreached: gamma: the request to write down its open work could not be delivered: refusing fleet lifecycle from inside a no-mistakes gate worktree (/home/art/.no-mistakes/repos/9f75ec418609.git); the re-read message could not be delivered either: refusing fleet lifecycle from inside a no-mistakes gate worktree (/home/art/.no-mistakes/repos/9f75ec418609.git)
+summary: 0 of 1 restarted, 0 nudged, 1 unreached
+restart exit=3

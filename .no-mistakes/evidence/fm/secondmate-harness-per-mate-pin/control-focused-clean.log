@@ -1,0 +1,4 @@
+ok - fm-control relaunch: a mate with a per-mate override line lands on that override, not the default pin
+ok - fm-control relaunch: a mate with no override line still resolves the default pin
+ok - fm-control relaunch: an unparseable secondmate pin refuses before anything is stopped
+ok - fm-control relaunch: explicit secondmate harness resets unnamed profile axes

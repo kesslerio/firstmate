@@ -1,0 +1,14 @@
+window=primary:fm-alpha
+endpoint_task_id=alpha
+worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-alpha
+project=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-alpha
+harness=codex
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-alpha
+model=gpt-6.1-sol
+effort=xhigh
+spawn_gen=s1791504494.1589477.2050
+home=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EZ0452GNASX9PTK5RE1RMM/.test-tmp/mate-alpha
+projects=
