@@ -1219,6 +1219,15 @@ test_explicit_secondmate_harness_ignores_configured_profile_axes() {
     || fail "an explicit secondmate harness must not inherit the configured model"
   [ "$(meta_field "$dir" sm4 effort)" = default ] \
     || fail "an explicit secondmate harness must not inherit the configured effort"
+  printf 'claude opus high\nmate sm4: claude opus high\nmate sm4: codex other-model max\n' > "$home/config/secondmate-harness"
+  out=$(run_control "$dir" sm4 relaunch --harness codex --model explicit-model --effort xhigh); rc=$?
+  expect_code 0 "$rc" "an explicit profile must ignore an unreadable configured pin"$'\n'"$out"
+  [ "$(meta_field "$dir" sm4 harness)" = codex ] \
+    || fail "the explicit harness must be published"
+  [ "$(meta_field "$dir" sm4 model)" = explicit-model ] \
+    || fail "the explicit model must be published"
+  [ "$(meta_field "$dir" sm4 effort)" = xhigh ] \
+    || fail "the explicit effort must be published"
   pass "fm-control relaunch: explicit secondmate harness resets unnamed profile axes"
 }
 
