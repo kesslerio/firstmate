@@ -1,0 +1,107 @@
+[3816441:1010/202635.987374:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.kde.KWallet.isEnabled: object_path= /modules/kwalletd6: org.freedesktop.DBus.Error.NoReply: Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.
+[3816441:1010/202635.987834:ERROR:components/os_crypt/sync/kwallet_dbus.cc:113] Error contacting kwalletd6 (isEnabled)
+[3816441:1010/202635.988785:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.kde.KLauncher.start_service_by_desktop_name: object_path= /KLauncher: org.freedesktop.DBus.Error.ServiceUnknown: The name org.kde.klauncher was not provided by any .service files
+[3816441:1010/202635.988790:ERROR:components/os_crypt/sync/kwallet_dbus.cc:82] Error contacting klauncher to start kwalletd6
+[3816441:1010/202701.013462:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.kde.KWallet.close: object_path= /modules/kwalletd6: org.freedesktop.DBus.Error.NoReply: Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken.
+[3816441:1010/202701.013485:ERROR:components/os_crypt/sync/kwallet_dbus.cc:408] Error contacting kwalletd6 (close)
+[secrets] The OS keyring is unavailable, so secrets are stored unencrypted. Install and unlock gnome-keyring or kwallet to seal them.
+[opencode-binder] session store read failed; skipping round Error: SQLite database does not exist: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/data/opencode/opencode.db
+    at new D (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/chunks/sync-database-Dd8Vgy2T.js:1:4837)
+    at ct (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/chunks/session-scanner-opencode-sqlite-open-CPoHuj50.js:3:4412)
+    at Object.lt (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/chunks/session-scanner-opencode-sqlite-open-CPoHuj50.js:3:4569)
+    at Obe (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:213:1989)
+    at Object.listSessions (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:213:86475)
+    at xwe.runOpenCodeBinderRoundOnce (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:213:87632)
+    at xwe.startOpenCodeBinderLoop (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:213:86818)
+    at xwe.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:213:102958)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async startAgentHookServer (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:7127:54049)
+[daemon] startup failed; captured stderr tail:
+[daemon] Fatal: Error: listen EINVAL: invalid argument /home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/daemon/.p75d905b0c1
+    at Server.setupListenHandle [as _listen2] (node:net:2306:21)
+    at listenInCluster (node:net:2437:12)
+    at Server.listen (node:net:2579:5)
+    at /nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:1:18561
+    at new Promise (<anonymous>)
+    at e.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:1:18256)
+    at e.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:2:13265)
+    at Sn (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:2:15206)
+    at Ln (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:18:3602) {
+  code: 'EINVAL',
+  errno: -22,
+  syscall: 'listen',
+  address: '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/daemon/.p75d905b0c1',
+  port: -1
+}
+[daemon] durable cgroup-scope launch failed, retrying without cgroup isolation: Daemon exited during startup with code 1
+Daemon stderr (tail):
+[daemon] Fatal: Error: listen EINVAL: invalid argument /home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/daemon/.p75d905b0c1
+    at Server.setupListenHandle [as _listen2] (node:net:2306:21)
+    at listenInCluster (node:net:2437:12)
+    at Server.listen (node:net:2579:5)
+    at /nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:1:18561
+    at new Promise (<anonymous>)
+    at e.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:1:18256)
+    at e.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:2:13265)
+    at Sn (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:2:15206)
+    at Ln (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:18:3602) {
+  code: 'EINVAL',
+  errno: -22,
+  syscall: 'listen',
+  address: '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/daemon/.p75d905b0c1',
+  port: -1
+}
+[daemon] startup failed; captured stderr tail:
+[daemon] Fatal: Error: listen EINVAL: invalid argument /home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/daemon/.p4196c20d90
+    at Server.setupListenHandle [as _listen2] (node:net:2306:21)
+    at listenInCluster (node:net:2437:12)
+    at Server.listen (node:net:2579:5)
+    at /nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:1:18561
+    at new Promise (<anonymous>)
+    at e.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:1:18256)
+    at e.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:2:13265)
+    at Sn (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:2:15206)
+    at Ln (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:18:3602) {
+  code: 'EINVAL',
+  errno: -22,
+  syscall: 'listen',
+  address: '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/daemon/.p4196c20d90',
+  port: -1
+}
+[daemon] STARTUP FAILED — falling back to local PTYs; terminals will not persist across quit. Reason: Daemon exited during startup with code 1
+Daemon stderr (tail):
+[daemon] Fatal: Error: listen EINVAL: invalid argument /home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/daemon/.p4196c20d90
+    at Server.setupListenHandle [as _listen2] (node:net:2306:21)
+    at listenInCluster (node:net:2437:12)
+    at Server.listen (node:net:2579:5)
+    at /nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:1:18561
+    at new Promise (<anonymous>)
+    at e.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:1:18256)
+    at e.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:2:13265)
+    at Sn (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:2:15206)
+    at Ln (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar.unpacked/out/main/daemon-entry.js:18:3602) {
+  code: 'EINVAL',
+  errno: -22,
+  syscall: 'listen',
+  address: '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/daemon/.p4196c20d90',
+  port: -1
+}
+[runtime] Failed to start headless RPC transport: Error: listen EINVAL: invalid argument /home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/o-3816441-2f36.sock
+    at Server.setupListenHandle [as _listen2] (node:net:2306:21)
+    at listenInCluster (node:net:2437:12)
+    at Server.listen (node:net:2579:5)
+    at /nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:8198:62066
+    at new Promise (<anonymous>)
+    at Jto.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:8198:62026)
+    at Gro.start (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:8202:46165)
+    at Ico (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:8263:18454)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Rco (/nix/store/q0cbq0ff9r25c9i03nlciyqkq1mx3225-orca-ide-1.4.218-extracted/resources/app.asar/out/main/index.js:8263:21230) {
+  code: 'EINVAL',
+  errno: -22,
+  syscall: 'listen',
+  address: '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/o-3816441-2f36.sock',
+  port: -1
+}
+[codex-trust-grant] granted 8 managed hook entries via codex app-server (host=native, wrote=true, 317ms)
+[profile-state] Orca could not finish starting: listen EINVAL: invalid argument /home/art/.no-mistakes/worktrees/9f75ec418609/01M4MFHE1WV6TMFFC1XMF2CXBK/.test-tmp/orca-isolated/config/orca/o-3816441-2f36.sock

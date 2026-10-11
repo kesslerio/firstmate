@@ -1,0 +1,11 @@
+{
+  "id": "local",
+  "ok": false,
+  "error": {
+    "code": "runtime_open_timeout",
+    "message": "Timed out waiting for an Orca desktop window. The runtime may still be running headlessly."
+  },
+  "_meta": {
+    "runtimeId": null
+  }
+}
