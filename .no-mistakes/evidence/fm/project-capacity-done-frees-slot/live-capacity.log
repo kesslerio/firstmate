@@ -1,0 +1,146 @@
+
+SCENARIO: ship/no-mistakes: paused before completion
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+deferred: project project admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/config/project-capacity) and 1 already hold a place (holder); task candidate was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+exit: 75
+Observed: capacity retained; candidate deferred without a record
+
+SCENARIO: no-mistakes: done before PR handoff
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+deferred: project project admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/config/project-capacity) and 1 already hold a place (holder); task candidate was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+exit: 75
+Observed: capacity retained; candidate deferred without a record
+
+SCENARIO: no-mistakes: recorded PR handoff
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: ship/direct-PR: paused before completion
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+deferred: project project admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/config/project-capacity) and 1 already hold a place (holder); task candidate was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+exit: 75
+Observed: capacity retained; candidate deferred without a record
+
+SCENARIO: direct-PR: done before PR handoff
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+deferred: project project admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/config/project-capacity) and 1 already hold a place (holder); task candidate was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+exit: 75
+Observed: capacity retained; candidate deferred without a record
+
+SCENARIO: direct-PR: recorded PR handoff
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: ship/local-only: paused before completion
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+deferred: project project admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/config/project-capacity) and 1 already hold a place (holder); task candidate was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+exit: 75
+Observed: capacity retained; candidate deferred without a record
+
+SCENARIO: ship/local-only: done frees capacity
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: ship/local-only: done then captain-held
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: ship/local-only: done then resolved
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: ship/local-only: done then needs-decision
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: ship/local-only: done then paused
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: ship/local-only: done then blocked
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: ship/local-only: later working restores occupancy
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+deferred: project project admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/config/project-capacity) and 1 already hold a place (holder); task candidate was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+exit: 75
+Observed: capacity retained; candidate deferred without a record
+
+SCENARIO: ship/local-only: newest done releases again without trailing newline
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: scout/no-mistakes: paused before completion
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+deferred: project project admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/config/project-capacity) and 1 already hold a place (holder); task candidate was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+exit: 75
+Observed: capacity retained; candidate deferred without a record
+
+SCENARIO: scout/no-mistakes: done frees capacity
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: scout/no-mistakes: done then captain-held
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: scout/no-mistakes: done then resolved
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: scout/no-mistakes: done then needs-decision
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: scout/no-mistakes: done then paused
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: scout/no-mistakes: done then blocked
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+SCENARIO: scout/no-mistakes: later working restores occupancy
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+deferred: project project admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/config/project-capacity) and 1 already hold a place (holder); task candidate was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+exit: 75
+Observed: capacity retained; candidate deferred without a record
+
+SCENARIO: scout/no-mistakes: newest done releases again without trailing newline
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex
+error: task candidate has no brief at inaccessible data path /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.test-capacity-tmp/lab-3kcjbcex/data/candidate/brief.md
+exit: 1
+Observed: capacity released; candidate reached subsequent brief validation
+
+Disposable lab removed.

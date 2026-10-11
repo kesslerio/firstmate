@@ -1,0 +1,86 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l
+warning: You appear to have cloned an empty repository.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l
+warning: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/data/candidate/launch-brief.md records no ship branch; defaulting to legacy branch fm/candidate
+notice: candidate ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned candidate harness=codex kind=ship mode=local-only yolo=off window=firstmate:fm-candidate worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/.treehouse/project-68550a/1/project
+window=firstmate:fm-candidate
+endpoint_task_id=candidate
+worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/.treehouse/project-68550a/1/project
+project=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/projects/project
+harness=codex
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/candidate
+tasktmp=/tmp/fm-candidate
+model=default
+effort=default
+spawn_gen=s1791747850.2693657.19135
+
+Candidate pane after launch:
+treehouse get
+
+[art@zeppola:~/projects/project]$ treehouse get
+🌳 Setting up worktree...
+🌳 Entered worktree at ~/.treehouse/project-68550a/1/project. Type 'exit' to return.
+
+[art@zeppola:~/.treehouse/project-68550a/1/project]$ cd -- '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06
+A6VCBQ4JMFR5/.l/.treehouse/project-68550a/1/project'
+
+[art@zeppola:~/.treehouse/project-68550a/1/project]$ export GOTMPDIR=/tmp/fm-candidate/gotmp
+export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:~/.treehouse/project-68550a/1/project]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:~/.treehouse/project-68550a/1/project]$ export FM_TASK_ID=candidate
+
+[art@zeppola:~/.treehouse/project-68550a/1/project]$ . '/tmp/fm-candidate+19523aed62a78cff209fff15703edd6a0d3d97f494abad
+cb1f628c5ecee22616/launch.s1791747850.2693657.19135.sh'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Attempting a second candidate while first candidate holds the slot:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l
+deferred: project project admits 1 worker(s) at once on this machine (/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/config/project-capacity) and 1 already hold a place (candidate); task second was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+bash bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5
+fm-candidate node /home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/.treehouse/project-68550a/1/project
+
+Launch verified; private server and disposable lab will be removed.
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/pre-push': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/post-merge': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/post-commit': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/home/art/.no-mistakes/worktrees/9f75ec418609/01M4P7AHGVXH06A6VCBQ4JMFR5/.l/state/candidate.git-hooks/commit-msg': Permission denied
+
+Cleanup completed after making the lab-owned read-only hook directory writable. No lab pane processes remain; .l, treehouse.toml, and generated gitignore entry removed.
