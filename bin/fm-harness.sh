@@ -472,8 +472,9 @@ resolve_crew() {
   if [ -z "$crew" ] || [ "$crew" = "default" ]; then detect_own; else echo "$crew"; fi
 }
 
-# Validate the entire file before selecting a mate, so an invalid override cannot
-# be silently skipped and migrate that mate onto the default runtime.
+# Preserve first-line-wins parsing unless the file declares a mate override.
+# Override files validate completely before selecting a mate, so an invalid
+# override cannot silently migrate that mate onto the default runtime.
 # Fills SM_DEFAULT_LINE and the parallel SM_MATE_IDS, SM_MATE_VALS and
 # SM_MATE_LINES arrays for the reader below.
 secondmate_parse() {
@@ -484,7 +485,21 @@ secondmate_parse() {
   SM_MATE_VALS=()
   SM_MATE_LINES=()
   [ -f "$file" ] || return 0
-  local line num=0 id rest i ntok
+  local line num=0 id rest i ntok has_overrides=0
+  local override_pattern='^mate[[:space:]]+([^:[:space:]]+)[[:space:]]*:[[:space:]]*(.*)$'
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+    [ -n "$line" ] || continue
+    case "$line" in '#'*) continue ;; esac
+    [ -n "$SM_DEFAULT_LINE" ] || SM_DEFAULT_LINE=$line
+    if [[ "$line" =~ $override_pattern ]]; then
+      has_overrides=1
+      break
+    fi
+  done < "$file"
+  [ "$has_overrides" -eq 1 ] || return 0
+  SM_DEFAULT_LINE=
   while IFS= read -r line || [ -n "$line" ]; do
     num=$((num + 1))
     line="${line#"${line%%[![:space:]]*}"}"
@@ -493,7 +508,7 @@ secondmate_parse() {
     case "$line" in
       '#'*) continue ;;
     esac
-    if [[ "$line" =~ ^mate[[:space:]]+([^:[:space:]]+)[[:space:]]*:[[:space:]]*(.*)$ ]]; then
+    if [[ "$line" =~ $override_pattern ]]; then
       id=${BASH_REMATCH[1]}
       rest=${BASH_REMATCH[2]}
       if [[ ! "$id" =~ ^[A-Za-z0-9._-]+$ ]]; then
@@ -518,6 +533,11 @@ secondmate_parse() {
       SM_MATE_LINES+=("$num")
       continue
     fi
+    case "$line" in
+      mate|mate[[:space:]]*|mate:*)
+        echo "error: config/secondmate-harness line $num: malformed 'mate <secondmate-id>: ...' override" >&2
+        return 1 ;;
+    esac
     if [ -n "$SM_DEFAULT_LINE" ]; then
       echo "error: config/secondmate-harness line $num: '$line' is neither the default line (already set on line $SM_DEFAULT_LINE_NUM) nor a 'mate <secondmate-id>: ...' override" >&2
       return 1
@@ -534,7 +554,7 @@ secondmate_parse() {
 
 # Echo the line that governs a secondmate id: its "mate <id>:" override when the
 # file names one, otherwise the file's default line. Nothing is echoed when the
-# file is absent or holds neither. A malformed file errors here on every read
+# file is absent or holds neither. A malformed override file errors on every read
 # path, whether or not an id was passed, so the refusal never depends on the
 # caller asking about the right mate.
 secondmate_line() {

@@ -205,8 +205,12 @@ test_secondmate_per_mate_override_lines() {
     [ "$got_m" = "$exp_model" ] || fail "$label: model resolved '$got_m', expected '$exp_model'"
     [ "$got_e" = "$exp_effort" ] || fail "$label: effort resolved '$got_e', expected '$exp_effort'"
   done <<'ROWS'
-default-only file with an id resolves the default (backward-compat)^pi john-remote/x xhigh^android^pi^john-remote/x^xhigh
-default-only file with no id resolves the default (backward-compat)^pi john-remote/x xhigh^^pi^john-remote/x^xhigh
+default-only file with an id resolves the default (backward-compat)^pi model-a xhigh^alpha^pi^model-a^xhigh
+default-only file with no id resolves the default (backward-compat)^pi model-a xhigh^^pi^model-a^xhigh
+legacy file ignores a second default line^pi model-a xhigh\ngrok model-b low^alpha^pi^model-a^xhigh
+legacy file ignores extra tokens^pi model-a xhigh extra^alpha^pi^model-a^xhigh
+legacy file ignores trailing malformed text without an override^pi model-a xhigh\nmate: grok model-b low^alpha^pi^model-a^xhigh
+legacy default fallback ignores later lines and extra tokens^default ignored high extra\ngrok model-b low^alpha^claude^^
 mate line wins for that exact id^pi def-m xhigh\nmate alpha: claude opus max^alpha^claude^opus^max
 mate line leaves every other id on the default^pi def-m xhigh\nmate alpha: claude opus max^beta^pi^def-m^xhigh
 mate line is ignored when no id is passed^pi def-m xhigh\nmate alpha: claude opus max^^pi^def-m^xhigh
@@ -224,7 +228,7 @@ ROWS
 # must refuse with the line number and print no token on stdout, so a mistyped
 # override cannot land a mate on the default runtime in silence.
 test_secondmate_malformed_pin_refuses_with_line_number() {
-  local label file case_dir cfg out got_stdout rc verb n
+  local label file case_dir cfg out got_stdout rc verb id n
   n=0
   while IFS='^' read -r label file; do
     [ -n "$label" ] || continue
@@ -233,25 +237,30 @@ test_secondmate_malformed_pin_refuses_with_line_number() {
     cfg="$case_dir/config"
     mkdir -p "$cfg"
     printf '%b\n' "$file" > "$cfg/secondmate-harness"
+    for id in alpha beta ''; do
     for verb in secondmate secondmate-model secondmate-effort; do
       out=$(PATH="$BLIND_BIN:$BASE_PATH" CLAUDECODE=1 FM_CONFIG_OVERRIDE="$cfg" \
-        "$ROOT/bin/fm-harness.sh" "$verb" alpha 2>&1); rc=$?
+        "$ROOT/bin/fm-harness.sh" "$verb" "$id" 2>&1); rc=$?
       [ "$rc" -ne 0 ] || fail "$label: fm-harness.sh $verb accepted the malformed pin: $out"
       assert_contains "$out" "config/secondmate-harness line " \
         "$label: fm-harness.sh $verb refused without naming the offending line"
       got_stdout=$(PATH="$BLIND_BIN:$BASE_PATH" CLAUDECODE=1 FM_CONFIG_OVERRIDE="$cfg" \
-        "$ROOT/bin/fm-harness.sh" "$verb" alpha 2>/dev/null)
+        "$ROOT/bin/fm-harness.sh" "$verb" "$id" 2>/dev/null)
       [ -z "$got_stdout" ] \
         || fail "$label: a refused pin must print no token on stdout, got '$got_stdout'"
     done
+    done
   done <<'ROWS'
 duplicate override for the same mate^pi def-m xhigh\nmate alpha: grok g1 max\nmate alpha: muse m2 low
-unknown line that is not the default and not an override^pi def-m xhigh\npi def-m low
-mate keyword with no id^pi def-m xhigh\nmate: grok g1 max
-mate id containing a space^pi def-m xhigh\nmate an alpha: grok
+unknown line that is not the default and not an override^pi def-m xhigh\nmate alpha: grok\npi def-m low
+mate keyword with no id^pi def-m xhigh\nmate alpha: grok\nmate: grok g1 max
+mate id containing a space^pi def-m xhigh\nmate alpha: grok\nmate an alpha: grok
 override with no tokens after the colon^pi def-m xhigh\nmate alpha:
 override with too many tokens^pi def-m xhigh\nmate alpha: grok g1 max extra
-default line with too many tokens^pi def-m xhigh extra
+default line with too many tokens^pi def-m xhigh extra\nmate alpha: grok
+malformed mate with no default line^mate alpha: claude opus high\nmate : grok
+malformed mate keyword with no default line^mate alpha: claude opus high\nmate: grok
+invalid mate id with no default line^mate alpha: claude opus high\nmate bad/id: grok
 ROWS
   pass "D2 malformed config/secondmate-harness refuses with its line number on every read verb"
 }

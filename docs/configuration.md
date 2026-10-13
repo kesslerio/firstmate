@@ -907,7 +907,8 @@ When it is absent or contains `default`, crewmates mirror the firstmate's own ha
 ### Choose the secondmate harness
 
 `config/secondmate-harness` is a separate local, gitignored file containing the adapter the primary uses to launch secondmate agents, optionally followed by model and effort tokens on the same line.
-At most one non-empty, non-comment line without the `mate <secondmate-id>:` prefix supplies the default, parsed as `<harness> [<model>] [<effort>]`.
+Without a `mate <secondmate-id>:` declaration, the first non-empty, non-comment line supplies the default, parsed as `<harness> [<model>] [<effort>]`; later lines and additional tokens retain their legacy ignored behavior.
+With an override declaration, at most one non-empty, non-comment line without that prefix supplies the default.
 Any number of override lines can pin named secondmates rather than the whole home:
 
 ```text
@@ -926,7 +927,7 @@ When the harness token is absent or `default`, secondmate launch falls back thro
 
 [`fm-harness.sh`](../bin/fm-harness.sh)'s header owns the resolver commands and optional secondmate-id argument.
 Without an id they select the default line only; model and effort output is empty when no token applies.
-Every resolver read validates the whole file, even when no id is supplied or the malformed line concerns another mate.
+When the file declares an override, every resolver read validates the whole file, even when no id is supplied or the malformed line concerns another mate.
 Every resolution site that knows which mate it is launching passes that id, so spawn, control-plane relaunch, and secondmate restart all land on one decision.
 `config/crew-harness` remains a bare adapter-name file and is never parsed for a model.
 Changing this pin affects the next secondmate spawn or control-plane relaunch; the relaunch profile rules are owned by [`docs/agent-control.md`](agent-control.md#transactional-relaunch).
