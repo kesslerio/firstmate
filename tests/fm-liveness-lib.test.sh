@@ -35,7 +35,7 @@ case "${1:-}" in
     payload=${1:-}
     case "$payload" in ". '"*"'") staged=${payload#". '"}; staged=${staged%"'"}; payload=$(cat "$staged") ;; esac
     printf '%s\n' "$payload" >> "$FM_FAKE_DIR/delivery"
-    case "$payload" in /exit|/quit) printf zsh > "$FM_FAKE_DIR/command" ;; *'encode launch-brief'*) printf claude > "$FM_FAKE_DIR/command" ;; esac ;;
+    case "$payload" in /exit|/quit) printf zsh > "$FM_FAKE_DIR/command" ;; *'encode launch-brief'*) printf '%s' "${FM_FAKE_LAUNCH_HARNESS:-claude}" > "$FM_FAKE_DIR/command" ;; esac ;;
 esac
 SH
   chmod +x "$tools/tmux"
@@ -118,13 +118,41 @@ test_relaunch_withdraws_previous_ready_handoff() {
 }
 
 test_no_pr_relaunch_keeps_working_seat() {
-  local dir home project worktree tools out head before state live admission extra_tools route result expected result_state
-  dir="$TMP_ROOT/no-pr-relaunch"; home="$dir/home"
+  local dir home project worktree tools out head before state live admission extra_tools route result expected result_state variant harness expected_state uncertainty old_gen
+  local -a backend_fields=()
+  variant=${1:-native}; harness=claude; expected_state=working
+  [ "$variant" != codex ] || { harness=codex; expected_state=unknown; }
+  dir="$TMP_ROOT/no-pr-relaunch-$variant"; home="$dir/home"
   project="$dir/project"; worktree="$dir/worker"
   fm_test_spawn_home "$home" claude
   fm_git_worktree "$project" "$worktree" replacement-worker
   fm_test_spawn_brief "$home" worker
   tools=$(liveness_relaunch_tools "$dir")
+  fm_fake_exit0 "$tools" codex
+  if [ "$variant" = herdr ]; then
+    command -v jq >/dev/null 2>&1 || fail 'Herdr regression requires jq'
+    backend_fields=(backend=herdr window=fm-lab-liveness:w1:p2 herdr_session=fm-lab-liveness herdr_workspace_id=w1 herdr_tab_id=t1 herdr_pane_id=w1:p2)
+    cat > "$tools/herdr" <<'SH'
+#!/usr/bin/env bash
+case "${1:-} ${2:-}" in
+  'status --json') printf '{"client":{"version":"0.7.1","protocol":14},"server":{"running":true}}\n' ;;
+  'pane get') printf '{"result":{"pane":{"pane_id":"%s","foreground_cwd":"%s"}}}\n' "$3" "$FM_FAKE_PANE_PATH" ;;
+  'agent get')
+    if [ "$(cat "$FM_FAKE_DIR/command")" = zsh ]; then printf '{"error":{"code":"agent_not_found"}}\n'
+    else printf '{"result":{"agent":{"agent_status":"idle"}}}\n'; fi ;;
+  'pane read')
+    if [ -e "$FM_FAKE_DIR/capture-fail" ]; then printf 'capture failed\n' >&2; exit 1; fi
+    printf 'all quiet\n> \n' ;;
+  'pane process-info') printf '{"result":{"process_info":{"foreground_processes":[{"name":"claude","argv0":"claude"}]}}}\n' ;;
+  'pane send-text')
+    payload=${4:-}
+    case "$payload" in ". '"*"'") staged=${payload#". '"}; staged=${staged%"'"}; payload=$(cat "$staged") ;; esac
+    printf '%s\n' "$payload" >> "$FM_FAKE_DIR/delivery"
+    case "$payload" in *'encode launch-brief'*) printf claude > "$FM_FAKE_DIR/command" ;; esac ;;
+esac
+SH
+    chmod +x "$tools/herdr"
+  fi
   cat > "$tools/no-mistakes" <<'SH'
 #!/usr/bin/env bash
 case "${1:-}" in
@@ -152,16 +180,29 @@ outcome: failed
 EOF
   export FM_FAKE_RUN_RECORD="$dir/run"
   fm_write_meta "$home/state/worker.meta" window=fmses:fm-worker endpoint_task_id=worker \
-    "worktree=$worktree" "project=$project" harness=claude kind=ship mode=no-mistakes yolo=off \
+    "worktree=$worktree" "project=$project" "harness=$harness" kind=ship mode=no-mistakes yolo=off \
     "tasktmp=$dir/tasktmp" model=default effort=default
+  if [ "$variant" = herdr ]; then
+    sed '/^window=/d' "$home/state/worker.meta" > "$dir/meta"
+    mv "$dir/meta" "$home/state/worker.meta"
+    printf '%s\n' "${backend_fields[@]}" >> "$home/state/worker.meta"
+  fi
   . "$ROOT/bin/fm-liveness-lib.sh"
   PATH="$tools:$PATH" fm_liveness_snapshot "$home"
   assert_equals 0 "$FM_LIVENESS_LIVE" 'idle failed predecessor releases its seat'
-  out=$(FM_FAKE_DIR="$dir/endpoint" fm_test_run_spawn "$home" "$worktree" "$tools" worker --relaunch) \
-    || fail "no-PR relaunch failed: $out"
-  assert_equals claude "$(cat "$dir/endpoint/command")" 'no-PR replacement delivered'
+  out=$(FM_FAKE_DIR="$dir/endpoint" FM_FAKE_LAUNCH_HARNESS="$harness" fm_test_run_spawn "$home" "$worktree" "$tools" worker --relaunch) \
+    || fail "no-PR $variant relaunch failed: $out"
+  assert_equals "$harness" "$(cat "$dir/endpoint/command")" 'no-PR replacement delivered'
   assert_equals "$head" "$(git -C "$worktree" rev-parse HEAD)" 'relaunch leaves head unchanged'
-  "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker busy --current-gen --source claude-hook --event user-prompt-submit >/dev/null
+  if [ "$variant" = herdr ]; then
+    : > "$dir/endpoint/capture-fail"
+    if FM_HOME="$home" FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" "$ROOT/bin/fm-peek.sh" worker 1 > "$dir/capture.log" 2>&1; then
+      fail 'Herdr capture fault did not fail through public peek'
+    fi
+  fi
+  if [ "$variant" != codex ]; then
+    "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker busy --current-gen --source claude-hook --event user-prompt-submit >/dev/null
+  fi
   before=$(find "$home/state" -type f -exec cksum {} \; | sort)
   state=$(FM_HOME="$home" FM_CREW_STATE_NO_FORGE=1 FM_FAKE_DIR="$dir/endpoint" \
     FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" "$ROOT/bin/fm-crew-state.sh" worker)
@@ -173,15 +214,42 @@ EOF
   fm_test_spawn_brief "$home" extra
   extra_tools=$(fm_test_make_spawn_fakebin "$dir/extra-tools")
   cp "$tools/no-mistakes" "$extra_tools/no-mistakes"
+  [ "$variant" != herdr ] || cp "$tools/herdr" "$extra_tools/herdr"
   admission=denied
   if out=$(FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" FM_FAKE_LAUNCH_LOG="$dir/extra-delivery" \
     fm_test_run_spawn "$home" "$worktree" "$extra_tools" extra "$project" --mode no-mistakes --yolo off); then admission=allowed; fi
-  printf 'no-PR replacement: %s; seats=%s; cap-1 admission=%s\n' "$state" "$live" "$admission"
-  assert_contains "$state" 'state: working' 'current native activity outranks old failed run'
+  [ "$admission" = allowed ] || printf 'R1-%s admission refusal: %s\n' "$variant" "$out"
+  printf 'R1-%s replacement: %s; seats=%s; cap-1 admission=%s\n' "$variant" "$state" "$live" "$admission"
+  assert_contains "$state" "state: $expected_state" "R1-$variant: current incarnation outranks old failed run"
   assert_equals 1 "$live" 'working no-PR replacement retains seat'
   assert_equals denied "$admission" 'cap-1 denies extra worker'
   assert_contains "$out" 'caps concurrent workers at 1' 'denial comes from real admission'
   [ ! -e "$home/state/extra.meta" ] || fail 'denied launch published metadata'
+  cp "$dir/run" "$dir/terminal-run"
+  for result in running awaiting_approval; do
+    cat > "$dir/run" <<EOF
+run:
+  id: "01CURRENT"
+  branch: replacement-worker
+  status: $result
+  head: "$head"
+  pr: ""
+EOF
+    state=$(FM_HOME="$home" FM_CREW_STATE_NO_FORGE=1 FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" "$ROOT/bin/fm-crew-state.sh" worker)
+    expected=working
+    [ "$result" != awaiting_approval ] || expected=parked
+    assert_contains "$state" "state: $expected" 'active validation and parked gates preserve their verdict'
+    assert_contains "$state" 'source: run-step' 'active validation and parked gates remain authoritative'
+  done
+  cp "$dir/terminal-run" "$dir/run"
+  if [ "$variant" = codex ]; then
+    "$ROOT/bin/fm-busy-event.sh" arm "$home/state" worker --state idle --source claude-hook --event stop >/dev/null
+    state=$(FM_HOME="$home" FM_CREW_STATE_NO_FORGE=1 FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" "$ROOT/bin/fm-crew-state.sh" worker)
+    assert_contains "$state" 'unknown' 'unverified Codex does not acquire idle certainty from another harness record'
+    printf zsh > "$dir/endpoint/command"
+    out=$(FM_FAKE_DIR="$dir/endpoint" fm_test_run_spawn "$home" "$worktree" "$tools" worker --relaunch --harness claude) \
+      || fail "verified-harness replacement failed: $out"
+  fi
   for route in full coarse; do
     export FM_FAKE_COARSE=0 FM_FAKE_LEDGER_HEAD="$head"
     [ "$route" != coarse ] || FM_FAKE_COARSE=1
@@ -204,8 +272,36 @@ EOF
           assert_contains "$state" 'state: working' "$route $result yields to current activity"
         else
           assert_contains "$state" 'source: run-step' "$route $result retains settled terminal result"
+          if [ "$result" = completed ]; then expected_state=done; else expected_state=failed; fi
+          assert_contains "$state" "state: $expected_state" "$route $result retains exact terminal state"
         fi
       done
+    done
+    for uncertainty in unknown missing malformed foreign-generation foreign-source; do
+      "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker unknown --current-gen --source claude-hook --event stop >/dev/null
+      case "$uncertainty" in
+        missing) rm "$home/state/worker.busy-state" ;;
+        malformed) printf 'malformed native record\n' > "$home/state/worker.busy-state" ;;
+        foreign-generation)
+          "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker idle --current-gen --source claude-hook --event stop >/dev/null
+          old_gen=$(cat "$home/state/worker.busy-gen")
+          cp "$home/state/worker.busy-state" "$dir/prior-record"
+          "$ROOT/bin/fm-busy-event.sh" arm "$home/state" worker --state idle --source claude-hook --event stop >/dev/null
+          cp "$dir/prior-record" "$home/state/worker.busy-state"
+          before=$(cksum "$home/state/worker.busy-state")
+          if "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker idle --gen "$old_gen" --source claude-hook --event stop > "$dir/late-event.log" 2>&1; then
+            fail 'foreign-generation event was accepted'
+          fi
+          assert_equals "$before" "$(cksum "$home/state/worker.busy-state")" 'late event preserves current record' ;;
+        foreign-source)
+          "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker idle --current-gen --source opencode-plugin --event stop >/dev/null ;;
+      esac
+      state=$(FM_HOME="$home" FM_CREW_STATE_NO_FORGE=1 FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" "$ROOT/bin/fm-crew-state.sh" worker)
+      assert_contains "$state" 'state: unknown' "$route $uncertainty retains uncertainty"
+      FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+      assert_equals 1 "$FM_LIVENESS_LIVE" "$route $uncertainty retains replacement seat"
+      assert_contains "$FM_LIVENESS_WARNINGS" 'current state unknown; seat retained' "$route $uncertainty reports uncertainty"
+      "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker idle --current-gen --source claude-hook --event stop >/dev/null
     done
   done
   unset FM_FAKE_COARSE FM_FAKE_LEDGER_HEAD FM_FAKE_LEDGER_STATUS
@@ -572,7 +668,7 @@ PERL
 }
 
 case "${1:-all}" in
-  R1terminal) test_no_pr_relaunch_keeps_working_seat; exit ;;
+  R1terminal) test_no_pr_relaunch_keeps_working_seat "${2:-native}"; exit ;;
   R1) test_relaunch_withdraws_previous_ready_handoff; exit ;;
   R1race)
     case "${2:-all}" in
@@ -583,7 +679,7 @@ case "${1:-all}" in
     exit ;;
   R2) test_native_muse_snapshot_never_writes_home; exit ;;
   R3|R4) test_postlaunch_stamp_failure_reports_confirmed_work "$1"; exit ;;
-  all) test_no_pr_relaunch_keeps_working_seat; test_relaunch_withdraws_previous_ready_handoff; test_delayed_handoff_refuses_replacement; test_native_muse_snapshot_never_writes_home
+  all) test_no_pr_relaunch_keeps_working_seat; test_no_pr_relaunch_keeps_working_seat herdr; test_no_pr_relaunch_keeps_working_seat codex; test_relaunch_withdraws_previous_ready_handoff; test_delayed_handoff_refuses_replacement; test_native_muse_snapshot_never_writes_home
     test_postlaunch_stamp_failure_reports_confirmed_work R3; test_postlaunch_stamp_failure_reports_confirmed_work R4 ;;
   *) fail 'usage: fm-liveness-lib.test.sh [R1|R1terminal|R1race|R2|R3|R4]' ;;
 esac

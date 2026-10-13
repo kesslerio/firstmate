@@ -1136,12 +1136,17 @@ if [ "$HAVE_RUN" = 1 ]; then
 
   case "$RUN_STATE" in
     done|failed)
-      if { { [ "$RUN_SOURCE" = full ] && ! fm_nm_run_is_active "$RUN_OUT"; } \
-        || { [ "$RUN_SOURCE" = coarse ] && [ "$(fm_nm_run_status_class "$COARSE_STATUS")" = terminal ]; }; } \
-        && [ -n "$BACKEND_TARGET" ] && pane_readable "$BACKEND_TARGET"; then
+      if { [ "$RUN_SOURCE" = full ] && ! fm_nm_run_is_active "$RUN_OUT"; } \
+        || { [ "$RUN_SOURCE" = coarse ] && [ "$(fm_nm_run_status_class "$COARSE_STATUS")" = terminal ]; }; then
         BUSY_VERDICT=$(crew_busy_verdict "$BACKEND_TARGET")
         case "${BUSY_VERDICT%% *}" in
           busy) emit working pane "harness busy (${BUSY_VERDICT#* })" ;;
+          idle) ;;
+          *)
+            if grep -q '^spawn_gen=' "$META"; then
+              emit unknown pane "current incarnation harness state unavailable ($BUSY_VERDICT); terminal run attribution unverified"
+            fi
+            ;;
         esac
       fi
       ;;
