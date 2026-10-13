@@ -127,7 +127,7 @@ It excludes the row when any `needs-decision` remains open or the current meanin
 An unreadable or symlinked status log fails the scope closed rather than influencing routing.
 
 Before cross-referencing them, the dispatcher resolves trigger keys and every currently unread excluded decision row to task identity.
-If a task key or endpoint alias names more than one task, the metadata scan is corrupt and the entire wake stays on main rather than selecting an owner by record order.
+If a task key or endpoint alias names more than one task, including a record with a missing or empty project, the metadata scan is corrupt and the entire wake stays on main rather than selecting an owner by record order.
 The cross-reference then applies two rules:
 
 - Any signal or stale trigger containing a decision-owned task goes wholly to main, including a batch that also contains routine rows.

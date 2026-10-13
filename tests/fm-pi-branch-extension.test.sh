@@ -4983,16 +4983,28 @@ for (const heartbeat of [false, true]) {
 // another task's window or canonical task key. Exercise both record orders.
 for (const owner of ["a-owner", "z-owner"]) {
   for (const field of ["terminal", "window", "task"]) {
-    const terminal = field === "task" ? owner : "orca-term-1";
-    writeFileSync(`${state}/orca-task.meta`, `project=${project}\nterminal=${terminal}\n`);
-    writeFileSync(`${state}/${owner}.meta`, `project=${project}\n${field === "task" ? "" : `${field}=${terminal}\n`}`);
-    writeFileSync(`${state}/.wake-queue`, `1\t1\tsignal\torca-task.status\tsignal: orca-task.status\n1\t2\tstale\t${terminal}\tstale: ${terminal}`);
-    const scope = scopeForUnreadWake(state, false);
-    if (scope.eligible || !scope.corrupted || scope.eligibleSeqs.length !== 0) {
-      throw new Error(`conflicting ${field} ownership must leave the whole wake to MAIN (${owner}): ${JSON.stringify(scope)}`);
+    for (const ownerProject of [`project=${project}\n`, "", "project=\n"]) {
+      const terminal = field === "task" ? owner : "orca-term-1";
+      writeFileSync(`${state}/orca-task.meta`, `project=${project}\nterminal=${terminal}\n`);
+      writeFileSync(`${state}/${owner}.meta`, `${ownerProject}${field === "task" ? "" : `${field}=${terminal}\n`}`);
+      writeFileSync(`${state}/${owner}.status`, "needs-decision: choose owner\n");
+      writeFileSync(`${state}/.wake-queue`, `1\t1\tsignal\torca-task.status\tsignal: orca-task.status\n1\t2\tstale\t${terminal}\tstale: ${terminal}`);
+      const scope = scopeForUnreadWake(state, false);
+      if (scope.eligible || !scope.corrupted || scope.eligibleSeqs.length !== 0) {
+        throw new Error(`conflicting ${field} ownership must leave the whole wake to MAIN (${owner}, project=${JSON.stringify(ownerProject)}): ${JSON.stringify(scope)}`);
+      }
+      // The empty record retains its task key but no endpoint claim.
+      writeFileSync(`${state}/${owner}.meta`, "");
     }
-    // Empty metadata removes this disposable owner from the next index.
-    writeFileSync(`${state}/${owner}.meta`, "");
+  }
+}
+for (const projectField of ["", "project=\n"]) {
+  writeFileSync(`${state}/orca-task.meta`, `${projectField}terminal=orca-term-1\n`);
+  writeFileSync(`${state}/orca-task.status`, "needs-decision: choose owner\n");
+  writeFileSync(`${state}/.wake-queue`, "1\t1\tstale\torca-term-1\tstale: orca-term-1");
+  const scope = scopeForUnreadWake(state, false);
+  if (scope.eligible || !scope.corrupted) {
+    throw new Error(`a unique projectless owner must remain unmappable: ${JSON.stringify(scope)}`);
   }
 }
 process.exit(0);

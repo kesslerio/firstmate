@@ -398,16 +398,16 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
       // An Orca task's stale rows name its terminal handle, not its window
       // (bin/fm-watch.sh keys Orca endpoints by terminal=), so index both.
       const terminal = fields.find((line) => line.startsWith("terminal="))?.slice(9) ?? "";
+      const aliases = [task, `${task}.status`, `${task}.turn-ended`, window, terminal];
+      for (const key of aliases) {
+        if (!key) continue;
+        const owner = taskByKey.get(key);
+        // Even an incomplete record claims its endpoint. Ambiguous ownership
+        // must not inherit another record's decision state or project context.
+        if (owner !== undefined && owner !== task) return UNSAFE_SCOPE;
+        taskByKey.set(key, task);
+      }
       if (project) {
-        const aliases = [task, `${task}.status`, `${task}.turn-ended`, window, terminal];
-        for (const key of aliases) {
-          if (!key) continue;
-          const owner = taskByKey.get(key);
-          // Ambiguous ownership must stay on MAIN, never inherit the last
-          // record's decision state or project context.
-          if (owner !== undefined && owner !== task) return UNSAFE_SCOPE;
-          taskByKey.set(key, task);
-        }
         metadata.set(task, project);
         for (const endpoint of [window, terminal]) {
           if (!endpoint) continue;
@@ -482,6 +482,8 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
       // ordinary main-only row.
       return UNSAFE_SCOPE;
     }
+    // Projectless records may establish ambiguity, never routing authority.
+    if (!project || !task) return UNSAFE_SCOPE;
     // A second mate's signal is judged by its new span on both paths. For a
     // single-task log, an attended host can have accepted a routine signal
     // before its task gained a main-owned decision, so it checks the whole
@@ -551,7 +553,6 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
         if (!afk) continue;
       }
     }
-    if (!project || !task) return UNSAFE_SCOPE;
     projects.add(project);
     eligibleTasks.add(task);
     eligibleSeqs.push(seq);
