@@ -12,10 +12,19 @@
 #     stops rather than starting a third attempt
 #   - a failure that does name the requested runner is not treated as stale
 #     registration at all, so no reinstall churn is spent on a real failure
+#   - staleness is judged by component, so the same class left over under the
+#     previous width's package still earns the one retry, while a stack trace that
+#     names no registration spends no reinstall round and cannot reach a two-hit
+#     skip
+#   - a run counts as ok only when adb itself exited zero, so printed text that
+#     claims a test count cannot outlive a failed command
+#   - an archive that cannot be read is unusable input, never "no native code"
 #
 # Everything runs against a fixture APK zip, a fixture AVD config, and a stub adb:
 # no emulator, no SDK, and no model tokens. The two things a stub cannot prove are
-# named in the script header as hand-integration-only.
+# named in the script header as hand-integration-only. The fixture PATH drops aapt
+# with the shared absent-tool helper rather than skipping this suite on a host that
+# has an SDK installed, because that tool would otherwise decide the ABI read.
 set -u
 
 # shellcheck source=tests/lib.sh
@@ -39,11 +48,16 @@ fi
 EXTRA_PATH="$(dirname "$UNZIP"):$(dirname "$PY3")"
 RUN_PATH="$EXTRA_PATH:$BASE_PATH"
 
-# No ambient aapt may leak into the zip-listing cases.
-if PATH="$RUN_PATH" command -v aapt >/dev/null 2>&1 || PATH="$RUN_PATH" command -v aapt2 >/dev/null 2>&1; then
-  printf 'skip: live: an aapt on PATH would decide the ABI read, not this fixture\n'
+# The zip-listing cases only mean something when no real aapt can be found, because
+# that tool decides the ABI read ahead of the fixture. A host with an SDK installed
+# does not get to skip the whole suite, so only aapt is dropped out of the fixture
+# PATH, the way tests/lib.sh documents for asserting one named tool is absent.
+SANS_AAPT=$(fm_test_base_path_sans "$BASE_PATH" aapt aapt2 || true)
+if [ -z "$SANS_AAPT" ]; then
+  printf 'skip: live: the shared absent-tool path could not be built on this host\n'
   exit 0
 fi
+RUN_PATH="$EXTRA_PATH:$SANS_AAPT"
 
 # make_apk <path> <abis-or-empty>: a real zip carrying lib/<abi>/*.so, which is
 # the only part of an APK the preflight read depends on.
@@ -84,10 +98,16 @@ APK_DIR="$TMP_ROOT/apks"
 mkdir -p "$APK_DIR"
 ARM_ONLY="$APK_DIR/arm-only.apk"
 ARM_X86="$APK_DIR/arm-and-x86_64.apk"
+X86_ONLY="$APK_DIR/x86-only.apk"
 NO_NATIVE="$APK_DIR/no-native.apk"
 make_apk "$ARM_ONLY" 'arm64-v8a armeabi-v7a'
 make_apk "$ARM_X86" 'arm64-v8a x86_64'
+make_apk "$X86_ONLY" 'x86'
 make_apk "$NO_NATIVE" ''
+# An archive that is not a ZIP at all, which is the artifact case where "I looked
+# inside and found nothing" has to be an error rather than a pass.
+CORRUPT="$APK_DIR/corrupt.apk"
+printf 'this is not an APK archive' >"$CORRUPT"
 
 AVD_HOME="$TMP_ROOT/avd"
 make_avd "$AVD_HOME" qa-x86_64 x86_64
@@ -146,6 +166,22 @@ PATH="$RUN_PATH" "$QA" preflight "$ARM_ONLY" qa-arm64 --avd-home "$AVD_HOME" \
 expect_code 0 "$STATUS" "an arm-only APK on an arm64 image is the normal case, not a blocker"
 pass "the arm-only check does not fire against an ARM image"
 
+# An x86-only APK against an ARM image is a real mismatch but has no proven recipe,
+# so it must be named as itself and still report, not die on an unset variable.
+STATUS=0
+PATH="$RUN_PATH" "$QA" preflight "$X86_ONLY" qa-arm64 --avd-home "$AVD_HOME" \
+  --recipe-out "$TMP_ROOT/unused-recipe.gradle" \
+  >"$TMP_ROOT/preflight-x86-on-arm.out" 2>&1 || STATUS=$?
+expect_code 2 "$STATUS" "an x86-only APK against an arm64 image is a blocker, not a pass"
+assert_grep 'PREFLIGHT fail reason=abi_mismatch_on_arm64-v8a_image' "$TMP_ROOT/preflight-x86-on-arm.out" \
+  "a non-ARM mismatch must be named as itself: $(cat "$TMP_ROOT/preflight-x86-on-arm.out")"
+assert_not_contains "$(cat "$TMP_ROOT/preflight-x86-on-arm.out")" 'finalizeDsl' \
+  'the x86_64 recipe is the arm-only unblock and must not ride along on a different mismatch'
+if [ -e "$TMP_ROOT/unused-recipe.gradle" ]; then
+  fail "--recipe-out must write only when the printed recipe applies"
+fi
+pass "an ABI mismatch with no proven recipe is named without a recipe attached"
+
 STATUS=0
 PATH="$RUN_PATH" "$QA" preflight "$ARM_ONLY" qa-noabi --avd-home "$AVD_HOME" \
   >"$TMP_ROOT/preflight-sysdir.out" 2>&1 || STATUS=$?
@@ -153,6 +189,16 @@ expect_code 2 "$STATUS" "an AVD naming its ABI only through image.sysdir.1 must 
 assert_grep 'image_abi=x86_64' "$TMP_ROOT/preflight-sysdir.out" \
   "the image ABI must fall back to the system-image path: $(cat "$TMP_ROOT/preflight-sysdir.out")"
 pass "an AVD with no abi.type line is classified from its system-image directory"
+
+STATUS=0
+PATH="$RUN_PATH" "$QA" preflight "$CORRUPT" qa-x86_64 --avd-home "$AVD_HOME" \
+  >"$TMP_ROOT/preflight-corrupt.out" 2>&1 || STATUS=$?
+expect_code 1 "$STATUS" "an archive nothing can read is unusable input, not a compatible build"
+assert_contains "$(cat "$TMP_ROOT/preflight-corrupt.out")" 'corrupt.apk' \
+  'the unreadable artifact must be named'
+assert_not_contains "$(cat "$TMP_ROOT/preflight-corrupt.out")" 'no_native_code' \
+  'an unreadable archive must never be reported as carrying no native code'
+pass "an archive unzip cannot open stops preflight instead of passing it"
 
 STATUS=0
 PATH="$RUN_PATH" "$QA" preflight "$TMP_ROOT/nope.apk" qa-x86_64 --avd-home "$AVD_HOME" \
@@ -175,13 +221,15 @@ pass "an AVD with no config.ini stops preflight by name rather than passing unch
 # The SDK's aapt is not on a lane's PATH, so a lane inside the container gets the
 # authoritative read and a lane outside it gets the zip read. The fake below
 # reports x86_64 while the fixture zip carries only ARM, so the two sources are
-# genuinely distinguishable.
+# genuinely distinguishable. It quotes each ABI the way aapt does, because an
+# unquoted fixture would leave the quote handling untested and an APK that really
+# does ship x86_64 would read as a blocker.
 FAKE_AAPT="$TMP_ROOT/fake-aapt"
 cat >"$FAKE_AAPT" <<'SH'
 #!/usr/bin/env bash
 case "${1:-}" in
   dump) printf "package: name='com.shapescale.qa' versionCode='1'\n"
-        printf 'native-code: arm64-v8a x86_64\n' ;;
+        printf "native-code: 'arm64-v8a' 'x86_64'\n" ;;
 esac
 exit 0
 SH
@@ -191,8 +239,28 @@ PATH="$RUN_PATH" "$QA" preflight "$ARM_ONLY" qa-x86_64 --avd-home "$AVD_HOME" \
   --aapt "$FAKE_AAPT" >"$TMP_ROOT/preflight-aapt.out" 2>&1 || STATUS=$?
 expect_code 0 "$STATUS" "aapt reporting an x86_64 library must override the ARM-only zip listing"
 assert_grep 'abis=arm64-v8a x86_64' "$TMP_ROOT/preflight-aapt.out" \
-  'the ABI read must come from the aapt that was passed in'
+  'the ABI read must come from the aapt that was passed in, quotes and all'
 pass "preflight uses aapt when one is reachable and falls back to the zip listing when not"
+
+# The other direction: a quoted all-ARM listing from aapt must still block, so the
+# quote stripping cannot swallow a real mismatch.
+FAKE_AAPT_ARM="$TMP_ROOT/fake-aapt-arm"
+cat >"$FAKE_AAPT_ARM" <<'SH'
+#!/usr/bin/env bash
+case "${1:-}" in
+  dump) printf "package: name='com.shapescale.qa' versionCode='1'\n"
+        printf "native-code: 'arm64-v8a' 'armeabi-v7a'\n" ;;
+esac
+exit 0
+SH
+chmod +x "$FAKE_AAPT_ARM"
+STATUS=0
+PATH="$RUN_PATH" "$QA" preflight "$ARM_X86" qa-x86_64 --avd-home "$AVD_HOME" \
+  --aapt "$FAKE_AAPT_ARM" >"$TMP_ROOT/preflight-aapt-arm.out" 2>&1 || STATUS=$?
+expect_code 2 "$STATUS" "aapt listing only ARM libraries is the blocker, whatever the zip carries"
+assert_grep 'PREFLIGHT fail reason=arm_only_apk_on_x86_64_image' "$TMP_ROOT/preflight-aapt-arm.out" \
+  "the arm-only reason must survive quote stripping: $(cat "$TMP_ROOT/preflight-aapt-arm.out")"
+pass "a quoted all-ARM aapt listing still stops preflight with the named reason"
 
 # --- instrument: the two-hit stop --------------------------------------------
 
@@ -221,6 +289,21 @@ case "$*" in
         ;;
       real-failure)
         printf 'INSTRUMENTATION_FAILED: com.shapescale.qa.test/com.shapescale.qa.ScanAssemblyInstrumentation\n'
+        ;;
+      stale-other-pkg)
+        printf 'INSTRUMENTATION_FAILED: com.shapescale.qa.legacy.test/ScanAssemblyInstrumentation\n'
+        exit 1
+        ;;
+      no-component)
+        printf 'INSTRUMENTATION_FAILED:\n'
+        printf 'java.lang.SecurityException: unread permission under management\n'
+        printf '    at android.os.Parcel.readException(Parcel.java:2373)\n'
+        printf '    at android.app.Instrumentation.execStartActivity(Instrumentation.java:1795)\n'
+        exit 1
+        ;;
+      ok-but-adb-failed)
+        printf 'INSTRUMENTATION_RESULT: stream=\nOK (3 tests)\n'
+        exit 1
         ;;
     esac
     ;;
@@ -298,6 +381,41 @@ inst_attempts=$(grep -c 'am instrument' "$FM_QA_ADB_LOG")
   fail "a real failure must not spend a reinstall round: $inst_attempts attempts\n$(cat "$FM_QA_ADB_LOG")"
 pass "a failure that names the requested runner stops immediately without reinstall churn"
 
+# A stale registration that keeps the same class name under the previous width's
+# package is still the signature a reinstall clears, so the comparison has to be by
+# component and not by the class name alone: this mode must get its retry.
+run_instrument stale-other-pkg "$TMP_ROOT/evidence-otherpkg.txt"
+expect_code 2 "$I_STATUS" "a different package carrying the same class name is stale, not a real failure"
+assert_contains "$I_OUT" 'seen=com.shapescale.qa.legacy.test/ScanAssemblyInstrumentation' \
+  'the stale record must name the component the emulator really launched'
+inst_attempts=$(grep -c 'am instrument' "$FM_QA_ADB_LOG")
+[ "$inst_attempts" = 2 ] ||
+  fail "the same class under another package must earn the one retry, got $inst_attempts: $(cat "$FM_QA_ADB_LOG")"
+pass "a stale runner under a different package is retried once and then stops at the two-hit"
+
+# A failure that names no component is not evidence of any registration, so it must
+# not be pushed into a two-hit skip. The stack lines below carry no pkg/component
+# pair, which is also what proves a trace path cannot be read as a component.
+run_instrument no-component "$TMP_ROOT/evidence-nocomp.txt"
+expect_code 1 "$I_STATUS" "a failure that names no component is a real failure, not stale registration"
+assert_not_contains "$I_OUT" 'INSTRUMENTATION_STALE_RUNNER' \
+  'a stack trace must not be recorded as a stale-runner signature'
+inst_attempts=$(grep -c 'am instrument' "$FM_QA_ADB_LOG")
+[ "$inst_attempts" = 1 ] ||
+  fail "an unclassifiable failure must not spend a reinstall round: $inst_attempts: $(cat "$FM_QA_ADB_LOG")"
+pass "a failure naming no component stops at once instead of ending in a two-hit skip"
+
+# Text that claims a completed test count cannot override adb's own exit status:
+# that is the difference between a passing run and a run that merely printed.
+run_instrument ok-but-adb-failed "$TMP_ROOT/evidence-adbexit.txt"
+expect_code 1 "$I_STATUS" "adb exiting nonzero is a failed run even when the text reports a test count"
+assert_not_contains "$I_OUT" 'INSTRUMENTATION ok' \
+  'a run that reported a count while adb failed must not be recorded as ok'
+inst_attempts=$(grep -c 'am instrument' "$FM_QA_ADB_LOG")
+[ "$inst_attempts" = 1 ] ||
+  fail "a failed adb run must not be retried as if it were stale: $inst_attempts: $(cat "$FM_QA_ADB_LOG")"
+pass "a reported test count does not outrun adb's exit status"
+
 # --- instrument: fail-closed on the tools and names it depends on -------------
 
 STATUS=0
@@ -308,9 +426,11 @@ expect_code 1 "$STATUS" 'an unusable adb path is a bad input, not an instrumenta
 assert_grep 'not-adb' "$TMP_ROOT/instrument-nosuchadb.out" 'the unusable adb path must be named'
 pass "instrument refuses an adb path it cannot execute"
 
-if ! PATH="$BASE_PATH" command -v adb >/dev/null 2>&1; then
+# adb must read as absent for this case, not merely happen to be absent here.
+NOSUCH_ADB=$(fm_test_base_path_sans "$BASE_PATH" adb || true)
+if [ -n "$NOSUCH_ADB" ]; then
   STATUS=0
-  PATH="$BASE_PATH" "$QA" instrument emulator-5554 "$TEST_APK" "$APP_APK" \
+  PATH="$NOSUCH_ADB" "$QA" instrument emulator-5554 "$TEST_APK" "$APP_APK" \
     com.shapescale.qa.ScanAssemblyInstrumentation \
     >"$TMP_ROOT/instrument-noadb.out" 2>&1 || STATUS=$?
   expect_code 1 "$STATUS" 'no adb anywhere is a blocker the lane must be told about'

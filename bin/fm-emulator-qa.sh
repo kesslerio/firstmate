@@ -33,11 +33,17 @@
 #    runner discovery. `instrument` performs exactly that and applies the two-hit
 #    stop, so a lane skips a width instead of spending its remaining session on it
 #    (the blocked [key=emulator-probe-registration] outcome in the same store).
+#    A retry is spent only on the one signature a reinstall can clear: the reported
+#    component differs from the requested one. Everything else is a real failure
+#    and stops at once, so a stack trace that names no registration, a failure that
+#    already names this runner, or a run that claims success while adb exited
+#    nonzero cannot end in a two-hit skip.
 #
 # Verification: tests/fm-emulator-qa.test.sh drives `preflight` against a fixture
 # APK tree and a fixture AVD config, and drives `instrument` against a stub adb, so
-# the ABI classification, the two-hit stop, and the exact adb call sequence are all
-# covered with no emulator and no SDK. Hand-integration-tested only, because a
+# the ABI classification including quoted aapt output, the two-hit stop, which
+# failures must not be retried, and the exact adb call sequence are all covered with
+# no emulator and no SDK. Hand-integration-tested only, because a
 # stub cannot prove them and asserting the stub would prove nothing: a real
 # `am instrument` run reaching `OK (N tests)` through this path, and a real x86_64
 # QA APK assembled with the printed init script.
@@ -63,15 +69,18 @@ Usage:
 
 preflight compares the ABIs the APK ships (aapt when one is reachable, otherwise
 its lib/<abi>/ and jni/<abi>/ entries) against the ABI the AVD's system image is
-(config.ini abi.type, falling back to the ABI named in image.sysdir.1), and
-prints the scratch-init x86_64 recipe when the two cannot intersect.
---recipe-out writes just the init-script body to a task-local path, ready for
-`gradlew -I`.
+(config.ini abi.type, falling back to the ABI named in image.sysdir.1), prints the
+scratch-init x86_64 recipe when an all-ARM APK cannot load on an x86_64 image, and
+names any other ABI disagreement without a recipe. An archive unzip cannot read is
+unusable input at exit 1, never "no native code", and --recipe-out is written only
+when the printed recipe is the arm-only one.
 
 instrument uninstalls the app package and the test package, reinstalls both, and
 runs `am instrument -w` against the explicit <test-package>/<runner-class>
-component. A failure naming a component other than the requested runner gets one
-repeat of the clean reinstall; a second hit on that signature stops with exit 2.
+component. A failure is retried once through that clean reinstall only when the
+emulator names a component other than the requested one; any other failure stops
+immediately, because a reinstall cannot fix it. That includes a run that reports a
+test count while adb itself exited nonzero, which is never reported as success.
 Package names come from --app-package/--test-package, then from aapt, never from
 a file name. With --evidence-file the failure signature is appended there too.
 
@@ -95,19 +104,37 @@ die() {
 
 # apk_abis <apk> <aapt-path-or-empty>: prints one ABI per line, and nothing for a
 # pure-Java APK. aapt is authoritative when reachable; the zip listing is the
-# fallback, because aapt lives in the SDK and not on a lane's PATH.
+# fallback, because aapt lives in the SDK and not on a lane's PATH. An archive that
+# cannot be read exits 1 instead of printing nothing, because "no native code" is
+# the one verdict that lets an uninspected artifact reach the emulator.
 apk_abis() {
-  local apk=$1 aapt_bin=$2 line
+  local apk=$1 aapt_bin=$2 line listing
   if [ -n "$aapt_bin" ]; then
     line=$("$aapt_bin" dump badging "$apk" 2>/dev/null | sed -n 's/^native-code: //p' | head -1 || true)
     if [ -n "$line" ]; then
+      # aapt quotes every ABI it lists, so the quotes must not survive into the
+      # comparison, or an APK that does ship x86_64 reads as a false blocker.
+      line=${line//\'/}
+      line=${line//\"/}
       printf '%s\n' "$line" | tr ' ,' '\n' | sed '/^$/d'
       return 0
     fi
   fi
-  unzip -Z1 "$apk" 'lib/*' 'jni/*' 2>/dev/null | awk -F/ '
+  # Listing the whole archive is what answers "is this an APK at all". A pattern
+  # list cannot, because unzip exits 11 on a pattern that matched nothing, which
+  # is indistinguishable from an unreadable file.
+  if ! listing=$(unzip -Z1 "$apk" 2>/dev/null); then
+    return 1
+  fi
+  unzip_native_abi_lines "$listing"
+}
+
+# unzip_native_abi_lines <newline-separated archive entries>: the ABIs that carry
+# a native library under lib/ or jni/.
+unzip_native_abi_lines() {
+  printf '%s\n' "$1" | awk -F/ '
     ($1 == "lib" || $1 == "jni") && NF >= 3 && $NF ~ /\.so$/ { print $2 }
-  ' | sort -u || true
+  ' | sort -u
 }
 
 # avd_abi <avd-dir>: prints the ABI the AVD's system image is, from abi.type or
@@ -245,8 +272,12 @@ cmd_preflight() {
   image_abi=$(avd_abi "$avd_dir") ||
     die "cannot read an ABI from $avd_dir/config.ini (abi.type or image.sysdir.1)"
 
-  local abis
-  abis=$(apk_abis "$apk" "$aapt_bin" | tr '\n' ' ' | sed 's/ *$//')
+  local abis_raw abis
+  # The archive read must be able to fail loudly: an artifact nothing inspected
+  # is never reported as "compatible".
+  abis_raw=$(apk_abis "$apk" "$aapt_bin") ||
+    die "cannot read $apk as an APK archive; unzip found no entries, so this is not a build to boot"
+  abis=$(printf '%s\n' "$abis_raw" | tr '\n' ' ' | sed 's/ *$//')
   printf 'preflight apk=%s abis=%s\n' "$apk" "${abis:-none}"
   printf 'preflight avd=%s image_abi=%s\n' "$avd" "$image_abi"
 
@@ -255,7 +286,7 @@ cmd_preflight() {
     return 0
   fi
 
-  local supported reason abi arms_only=1
+  local supported abi arms_only=1 reason=''
   supported=$(abis_supported_by "$image_abi")
   if apks_abis_supported "$(printf '%s\n' "$abis" | tr ' ' '\n')" "$supported"; then
     printf 'PREFLIGHT ok reason=abi_compatible\n'
@@ -271,12 +302,20 @@ cmd_preflight() {
       *) arms_only=0 ;;
     esac
   done
+  # An all-ARM APK is the mismatch with a proven unblock; anything else is named
+  # without a recipe, because the recipe fixes that one shape and not a general
+  # ABI disagreement.
+  reason='abi_mismatch'
   [ "$arms_only" -eq 1 ] && reason='arm_only_apk'
   printf 'PREFLIGHT fail reason=%s_on_%s_image\n' "$reason" "$image_abi"
   printf 'BLOCKER The APK ships %s; the %s image can only load %s.\n' \
     "$abis" "$avd" "$(printf '%s' "$supported" | tr '\n' ' ')"
-  print_recipe
-  if [ -n "$recipe_out" ]; then
+  if [ "$reason" = 'arm_only_apk' ]; then
+    print_recipe
+  else
+    printf 'NOTE No recipe printed: the proven unblock is all-ARM libraries on an x86_64 image, and this is not that mismatch.\n'
+  fi
+  if [ -n "$recipe_out" ] && [ "$reason" = 'arm_only_apk' ]; then
     mkdir -p "$(dirname "$recipe_out")"
     recipe_gradle_body >"$recipe_out"
     printf 'RECIPE wrote=%s\n' "$recipe_out"
@@ -286,25 +325,57 @@ cmd_preflight() {
 
 # --- instrumentation ---------------------------------------------------------
 
-# instrument_failure_kind <output> <requested-runner-simple-name>: prints `stale`
-# when the emulator could not launch what it was asked for and named some other
-# registration instead, `ok` on a completed run, and `failed` for a real failure
-# that does name the requested runner.
+# instrument_failure_kind <output> <requested-component> <adb-exit-status>:
+# `ok` only when adb ran to completion AND the run reported a completed test
+# count; `stale` when the failure names a component that is not the one asked for,
+# which is the signature a clean reinstall can clear; `failed` for everything else,
+# including a failure that names the requested component or names no component.
+#
+# The comparison is by component, not by a substring of the class name, for the two
+# things the first cut got wrong: a stale registration left over from the previous
+# width under the same package is exactly the signature a reinstall fixes, and a
+# stack trace that names nothing is not evidence of a stale registration and so
+# must not end in a two-hit skip.
 instrument_failure_kind() {
-  local out=$1 requested=$2
+  local out=$1 requested=$2 status=$3 reported
+  if [ "$status" -eq 0 ]; then
+    case $out in
+      *INSTRUMENTATION_FAILED* | *INSTRUMENTATION_ERROR*) : ;;
+      *'OK ('*) printf 'ok\n'
+        return 0 ;;
+    esac
+  fi
   case $out in
-    *INSTRUMENTATION_FAILED* | *INSTRUMENTATION_ERROR*)
-      case $out in
-        *"$requested"*) printf 'failed\n' ;;
-        *) printf 'stale\n' ;;
-      esac
-      ;;
-    *'OK ('*) printf 'ok\n' ;;
-    *) printf 'failed\n' ;;
+    *INSTRUMENTATION_FAILED* | *INSTRUMENTATION_ERROR*) : ;;
+    *) printf 'failed\n'
+      return 0 ;;
   esac
+  reported=$(failure_component "$out")
+  case $reported in
+    */*) ;;
+    *) printf 'failed\n'
+      return 0 ;;
+  esac
+  if same_component "$reported" "$requested"; then
+    printf 'failed\n'
+  else
+    printf 'stale\n'
+  fi
 }
 
-# failure_component <output>: the component the emulator says it tried.
+# same_component <reported> <requested>: true when both name one package and the
+# same class. A runner passed as a fully qualified class and one reported by its
+# registered simple name are the same component; the package is what separates
+# this build's runner from an older width's.
+same_component() {
+  local rp=${1%%/*} rq=${2%%/*} cp=${1##*/} cq=${2##*/}
+  [ "$rp" = "$rq" ] || return 1
+  [ "$cp" = "$cq" ] && return 0
+  [ "${cp##*.}" = "${cq##*.}" ]
+}
+
+# failure_component <output>: the component the emulator says it tried. A token
+# with no slash is not a component, and the caller must not treat it as one.
 failure_component() {
   local out=$1
   printf '%s\n' "$out" |
@@ -359,13 +430,11 @@ cmd_instrument() {
 
   # The component is always explicit: registered-runner discovery is what picks up
   # the previous width's instrumentation in the first place.
-  local component requested_simple
+  local component
   case "$runner" in
     */*) component=$runner ;;
     *) component="$test_pkg/$runner" ;;
   esac
-  requested_simple=${runner##*/}
-  requested_simple=${requested_simple##*.}
 
   record() {
     printf '%s\n' "$1"
@@ -375,7 +444,7 @@ cmd_instrument() {
     fi
   }
 
-  local attempt=1 out kind component_seen
+  local attempt=1 out kind component_seen run_status
   while [ "$attempt" -le 2 ]; do
     # A clean slate for BOTH packages. A test package left over from the previous
     # width keeps its own runner registration, and an instrumentation run then
@@ -387,8 +456,10 @@ cmd_instrument() {
     "$adb_bin" -s "$serial" install -r -t "$test_apk" >/dev/null ||
       die "could not install $test_apk on $serial"
 
-    out=$("$adb_bin" -s "$serial" shell am instrument -w "$component" 2>&1 || true)
-    kind=$(instrument_failure_kind "$out" "$requested_simple")
+    run_status=0
+    out=$("$adb_bin" -s "$serial" shell am instrument -w "$component" 2>&1) ||
+      run_status=$?
+    kind=$(instrument_failure_kind "$out" "$component" "$run_status")
     case "$kind" in
       ok)
         record "INSTRUMENTATION ok serial=$serial component=$component attempt=$attempt"
@@ -401,7 +472,7 @@ cmd_instrument() {
         ;;
       *)
         printf '%s\n' "$out" | tail -20
-        die "instrumentation failed for $component on $serial; a clean reinstall does not fix a failure that names the requested runner"
+        die "instrumentation failed for $component on $serial (adb exit $run_status); a clean reinstall cannot clear a failure that names this component, names nothing, or reported success while adb failed"
         ;;
     esac
     attempt=$((attempt + 1))
