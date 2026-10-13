@@ -2071,10 +2071,25 @@ if (pending.options.triggerTurn !== true || pending.options.deliverAs !== "follo
 if (!pending.message.content.includes(`[seq ${seq1}, recorded 0m ago] `)) {
   throw new Error(`the first queued request lost seq ${seq1}: ${pending.message.content}`);
 }
-contract(["enter", "--words", "merge task-d when green, then cut the prerelease\n\n"]);
 const processingMsg = { role: "custom", customType: pending.message.customType, content: pending.message.content, display: false };
 let aborted = false;
 const abortCtx = { ...defaultSessionCtx, abort() { aborted = true; } };
+await fire("agent_end", {});
+await fire("before_agent_start", { messageType: "custom", message: processingMsg }, abortCtx);
+await fire("agent_start", {}, defaultSessionCtx);
+const attendedProcessing = await fire("context", { messages: [processingMsg] }, abortCtx);
+if (aborted || attendedProcessing !== undefined) throw new Error("attended custom processing was aborted or filtered");
+await fire("agent_end", {});
+contract(["enter", "--words", "merge task-d when green, then cut the prerelease\n\n"]);
+for (const message of [
+  { ...processingMsg, customType: "unrelated" },
+  { ...processingMsg, content: "unrelated processing content" },
+]) {
+  await fire("before_agent_start", { messageType: "custom", message }, abortCtx);
+  const unrelated = await fire("context", { messages: [message, processingMsg] }, abortCtx);
+  if (aborted) throw new Error("unrelated custom trigger was treated as a dedicated processing run");
+  if (unrelated?.messages?.some((item) => item === processingMsg)) throw new Error("away processing was not stripped");
+}
 const streamingResult = await fire("context", {
   messages: [
     { role: "user", content: "captain still in this turn" },
@@ -2120,15 +2135,24 @@ if (stolen?.messages?.some((message) => message.customType === "fm-branch-proces
   throw new Error(`joined processing was not stripped from the captain-opened run: ${JSON.stringify(stolen)}`);
 }
 await fire("agent_end", {});
-aborted = false;
-await fire("before_agent_start", { messageType: "custom", message: processingMsg }, abortCtx);
-await fire("agent_start", {}, defaultSessionCtx);
-const openedByRequest = await fire("context", { messages: [...history, processingMsg] }, abortCtx);
-if (!aborted) throw new Error("a dedicated processing turn with history was not aborted under the record");
-if (openedByRequest?.messages?.some((message) => message.customType === "fm-branch-process")) {
-  throw new Error(`dedicated processing with history was not stripped: ${JSON.stringify(openedByRequest)}`);
+for (const event of [
+  { prompt: pending.message.content },
+  { messageType: "user", prompt: pending.message.content },
+  { messageType: "custom", message: processingMsg },
+]) {
+  contract(["archive"]);
+  aborted = false;
+  await fire("before_agent_start", event, abortCtx);
+  contract(["enter", "--words", "merge task-d when green, then cut the prerelease\n\n"]);
+  await fire("agent_start", {}, defaultSessionCtx);
+  if (event.messageType === "custom") await fire("message_start", { message: processingMsg }, abortCtx);
+  const openedByRequest = await fire("context", { messages: [...history, processingMsg] }, abortCtx);
+  if (!aborted) throw new Error(`a dedicated ${event.messageType ?? "legacy"} processing turn with history was not aborted under the record`);
+  if (openedByRequest?.messages?.some((message) => message.customType === "fm-branch-process")) {
+    throw new Error(`dedicated processing with history was not stripped: ${JSON.stringify(openedByRequest)}`);
+  }
+  await fire("agent_end", {});
 }
-await fire("agent_end", {});
 await fire("agent_settled", {});
 if (requests().length !== 1) throw new Error("a request pending when the record appeared was re-presented to the parked main");
 if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq1])) throw new Error(`the record moved the processed marker: ${unprocessedSeqs()}`);
