@@ -1,10 +1,299 @@
 #!/usr/bin/env bash
 # Public seat-snapshot, config propagation, and confirmed-launch behavior.
+# Optional R1, R2, R3 or R4 argument runs that public review regression alone.
 set -eu
 # shellcheck source=tests/fixtures.sh
 . "$(dirname "${BASH_SOURCE[0]}")/fixtures.sh"
 
 TMP_ROOT=$(fm_test_tmproot fm-liveness)
+
+test_relaunch_withdraws_previous_ready_handoff() {
+  local dir home project worktree tools extra_tools out before contract records stamp state pr head
+  dir="$TMP_ROOT/relaunch"; home="$dir/home"
+  project="$dir/project"; worktree="$dir/worker"
+  fm_test_spawn_home "$home" claude
+  fm_git_worktree "$project" "$worktree" replacement-worker
+  fm_test_spawn_brief "$home" worker
+  tools=$(fm_test_make_spawn_fakebin "$dir/tools" gh)
+  fm_test_fake_no_mistakes "$tools"
+  mkdir -p "$dir/endpoint"
+  printf zsh > "$dir/endpoint/command"
+  cat > "$tools/tmux" <<'SH'
+#!/usr/bin/env bash
+case "${1:-}" in
+  display-message)
+    case "$*" in
+      *pane_current_command*) cat "$FM_FAKE_DIR/command"; echo ;;
+      *pane_current_path*) echo "$FM_FAKE_PANE_PATH" ;;
+      *cursor_y*) echo 1 ;;
+      *) echo fakepane ;;
+    esac ;;
+  list-windows) echo fm-worker ;;
+  capture-pane) printf '╭────╮\n│    │\n╰────╯\n' ;;
+  send-keys)
+    shift
+    literal=0
+    while [ $# -gt 0 ]; do
+      case "$1" in -t) shift 2 ;; -l) literal=1; shift ;; *) break ;; esac
+    done
+    [ "$literal" = 1 ] || exit 0
+    payload=${1:-}
+    case "$payload" in ". '"*"'") staged=${payload#". '"}; staged=${staged%"'"}; payload=$(cat "$staged") ;; esac
+    printf '%s\n' "$payload" >> "$FM_FAKE_DIR/delivery"
+    case "$payload" in /exit|/quit) printf zsh > "$FM_FAKE_DIR/command" ;; *'encode launch-brief'*) printf claude > "$FM_FAKE_DIR/command" ;; esac ;;
+esac
+SH
+  chmod +x "$tools/tmux"
+  pr=https://github.com/example/project/pull/7
+  head=0123456789abcdef0123456789abcdef01234567
+  fm_write_meta "$home/state/worker.meta" window=fmses:fm-worker endpoint_task_id=worker \
+    "worktree=$worktree" "project=$project" harness=claude kind=ship mode=no-mistakes yolo=off \
+    "tasktmp=$dir/tasktmp" model=default effort=default "pr=$pr" "pr_head=$head"
+  # A legitimate legacy ready handoff frees its seat before replacement.
+  . "$ROOT/bin/fm-liveness-lib.sh"
+  PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+  assert_equals 0 "$FM_LIVENESS_LIVE" 'ordinary canonical legacy handoff releases its seat'
+  out=$(FM_FAKE_DIR="$dir/endpoint" fm_test_run_spawn "$home" "$worktree" "$tools" worker --relaunch) \
+    || fail "primary relaunch failed: $out"
+  assert_equals claude "$(cat "$dir/endpoint/command")" 'replacement was delivered to the stopped endpoint'
+  [ -s "$dir/endpoint/delivery" ] || fail 'replacement has no launch delivery'
+  assert_equals "$pr" "$(fm_meta_get "$home/state/worker.meta" pr)" 'replacement retains lifecycle PR association'
+  assert_equals "$head" "$(fm_meta_get "$home/state/worker.meta" pr_head)" 'replacement retains review head association'
+  fm_pr_metadata_identity_parse "$home/state/worker.meta" || fail 'replacement PR association must remain canonically valid'
+  "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker busy --current-gen --source claude-hook --event user-prompt-submit >/dev/null
+  out=$(FM_HOME="$home" FM_CREW_STATE_NO_FORGE=1 FM_FAKE_DIR="$dir/endpoint" \
+    FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" "$ROOT/bin/fm-crew-state.sh" worker)
+  assert_contains "$out" 'state: working' 'real current generation is working'
+  FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+  assert_equals '1:3' "$FM_LIVENESS_LIVE:$FM_LIVENESS_FREE" 'R1: new working incarnation must occupy a seat'
+  assert_contains "$FM_LIVENESS_LANES" $'worker\tship\tworking\t' 'replacement lane reports native working state'
+  assert_contains "$FM_LIVENESS_WARNINGS" 'prior incarnation' 'old handoff is visibly withdrawn'
+  for state in paused unknown; do
+    "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker idle --current-gen --source claude-hook --event stop >/dev/null
+    if [ "$state" = paused ]; then printf 'paused: wait for external input\n' > "$home/state/worker.status"; else rm -f "$home/state/worker.busy-state"; fi
+    FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+    assert_equals 1 "$FM_LIVENESS_LIVE" "replacement $state occupies its seat"
+    assert_contains "$FM_LIVENESS_LANES" "$(printf 'worker\tship\t%s\t' "$state")" 'native lane state remains accurate'
+  done
+  "$ROOT/bin/fm-busy-event.sh" arm "$home/state" worker --state busy --source claude-hook --event user-prompt-submit >/dev/null
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" propose --words 'continue authorized work' --spend 1 >/dev/null
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" confirm >/dev/null
+  fm_test_spawn_brief "$home" extra
+  before=$(cksum "$home/state/worker.meta")
+  contract=$(cksum "$home/state/.afk-contract"); stamp=$(cksum "$home/state/.last-launch")
+  records=$(find "$home/state" -name '*.meta' -type f -exec cksum {} \; | sort)
+  if out=$(FM_FAKE_DIR="$dir/endpoint" fm_test_run_spawn "$home" "$worktree" "$tools" extra "$project" --mode no-mistakes --yolo off); then fail 'R1: replacement admitted an extra worker at cap 1'; fi
+  assert_contains "$out" 'caps concurrent workers at 1 and 1 ordinary task(s) are live' 'actual away cap denies the extra launch'
+  assert_equals "$records" "$(find "$home/state" -name '*.meta' -type f -exec cksum {} \; | sort)" 'denial preserves task records'
+  assert_equals "$contract" "$(cksum "$home/state/.afk-contract")" 'denial preserves away authority'
+  assert_equals "$stamp" "$(cksum "$home/state/.last-launch")" 'denial preserves stamp'
+  # Use the real handoff publisher, with forge reads confined to a fake CLI.
+  out=$(FM_HOME="$home" HOME="$home/user-home" FM_GUARD_READ_ONLY=1 PATH="$tools:$PATH" \
+    "$ROOT/bin/fm-pr-check.sh" worker "$pr" 2>&1) || fail "new handoff publication failed: $out"
+  [ "$before" != "$(cksum "$home/state/worker.meta")" ] || fail 'new handoff did not republish metadata'
+  PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+  assert_equals 0 "$FM_LIVENESS_LIVE" 'new valid ready handoff frees replacement capacity'
+  extra_tools=$(fm_test_make_spawn_fakebin "$dir/extra-tools" no-mistakes)
+  out=$(FM_FAKE_LAUNCH_LOG="$dir/extra-delivery" fm_test_run_spawn "$home" "$worktree" "$extra_tools" extra "$project" --mode no-mistakes --yolo off) \
+    || fail "new handoff did not permit authorized within-cap launch: $out"
+  [ -s "$dir/extra-delivery" ] && [ -f "$home/state/extra.meta" ] || fail 'allowed extra launch was not delivered and published'
+  assert_equals "$contract" "$(cksum "$home/state/.afk-contract")" 'allowed launch preserves authority'
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" archive >/dev/null
+  out=$(FM_HOME="$home" HOME="$home/user-home" CLAUDE_CONFIG_DIR='' FM_SPAWN_NO_GUARD=1 \
+    FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" \
+    FM_CONTROL_POLL=0.1 FM_CONTROL_EXIT_WAIT=5 FM_CONTROL_LAUNCH_WAIT=5 \
+    "$ROOT/bin/fm-control.sh" worker relaunch --note 'continue authorized work' 2>&1) || fail "operator relaunch failed: $out"
+  fm_pr_metadata_identity_parse "$home/state/worker.meta" || fail 'operator relaunch must preserve valid association deliberately'
+  "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker busy --current-gen --source claude-hook --event user-prompt-submit >/dev/null
+  FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+  assert_equals 2 "$FM_LIVENESS_LIVE" 'operator replacement and extra worker occupy two seats'
+  assert_contains "$FM_LIVENESS_WARNINGS" 'prior incarnation' 'operator path invalidates readiness at source'
+  pass 'R1: primary and operator relaunch withdraw prior readiness, retain association, and enforce the away cap'
+}
+
+test_native_muse_snapshot_never_writes_home() {
+  local dir home tools worktree sessions log variant before cache verdict other
+  dir="$TMP_ROOT/muse"; home="$dir/home"; worktree="$dir/worker"; sessions="$dir/sessions"
+  fm_test_spawn_home "$home"
+  mkdir -p "$worktree"
+  tools=$(fm_test_make_spawn_fakebin "$dir/tools" no-mistakes)
+  fm_write_meta "$home/state/worker.meta" kind=ship mode=direct-PR harness=muse window=fm-worker "worktree=$worktree"
+  log="$sessions/$(date +%Y/%m/%d)/native-session/session.jsonl"
+  mkdir -p "${log%/*}"
+  printf '{"schema_version":1,"payload_type":"runtime.session.metadata","payload":{"kind":"metadata","record":{"workspace_root":"%s"}}}\n' "$worktree" > "$log"
+  printf '{"schema_version":1,"payload_type":"runtime.session","payload":{"kind":"run","run_id":"native-run","event":{"kind":"started"}}}\n' >> "$log"
+  printf 'sessions_root=%s\nworkspace_root=%s\nbinding_id=fixture-incarnation\n' "$sessions" "$worktree" > "$home/state/worker.muse-session"
+  cache="$home/state/worker.muse-session-current"
+  . "$ROOT/bin/fm-liveness-lib.sh"
+  . "$ROOT/bin/fm-busy-lib.sh"
+  for variant in missing stale valid; do
+    case "$variant" in
+      missing) rm -f "$cache" ;;
+      stale) printf 'binding_id=old-incarnation\nsession_log=untrusted\n' > "$cache" ;;
+      valid)
+        # Direct cache-owner default behavior remains available to its callers.
+        verdict=$(FM_BUSY_CACHE_READ_ONLY=0 fm_busy_muse_session_log "$home/state" worker) || fail 'default cache-owner discovery failed'
+        assert_equals "$log" "$verdict" 'default cache owner selects the native owned log'
+        [ -f "$cache" ] || fail 'default cache owner did not publish its cache' ;;
+    esac
+    before=$(find "$home" -exec ls -ld {} \; -type f -exec cksum {} \; | sort)
+    PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+    assert_equals 1 "$FM_LIVENESS_LIVE" "native Muse $variant cache reports working capacity"
+    assert_contains "$FM_LIVENESS_LANES" $'worker\tship\tworking\t' 'real native run lifecycle is used'
+    assert_equals "$before" "$(find "$home" -exec ls -ld {} \; -type f -exec cksum {} \; | sort)" "R2: $variant cache snapshot preserves every home path and byte"
+    verdict=$(FM_HOME="$home" PATH="$tools:$PATH" "$ROOT/bin/fm-crew-state.sh" worker)
+    assert_contains "$verdict" 'state: working' 'public current-state also observes without cache writes'
+    assert_equals "$before" "$(find "$home" -exec ls -ld {} \; -type f -exec cksum {} \; | sort)" 'current-state preserves home bytes'
+  done
+  # New matching logs make even a formerly valid cache ambiguous.
+  other="${log%/*}/../other/session.jsonl"; mkdir -p "${other%/*}"; cp "$log" "$other"
+  for variant in ambiguous foreign malformed prior missing; do
+    case "$variant" in
+      foreign) rm "$other"; sed "s|$worktree|$dir/foreign|" "$log" > "$dir/foreign-log"; cp "$dir/foreign-log" "$log" ;;
+      malformed) printf 'not native JSON\n' > "$log" ;;
+      prior)
+        printf '{"payload":{"record":{"workspace_root":"%s"}}}\n' "$worktree" > "$log"
+        printf 'prior_log=%s\n' "$log" >> "$home/state/worker.muse-session" ;;
+      missing) rm "$log" ;;
+    esac
+    before=$(find "$home" -exec ls -ld {} \; -type f -exec cksum {} \; | sort)
+    PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+    assert_equals 1 "$FM_LIVENESS_LIVE" "untrusted $variant native inputs retain capacity"
+    assert_contains "$FM_LIVENESS_WARNINGS" 'current state unknown; seat retained' 'native observation failure is visible'
+    assert_equals "$before" "$(find "$home" -exec ls -ld {} \; -type f -exec cksum {} \; | sort)" 'failed observation preserves home bytes and stale cache'
+  done
+  pass 'R2: native Muse cache miss, stale, valid and failed reads preserve the operational home'
+}
+
+test_postlaunch_stamp_failure_reports_confirmed_work() {
+  local finding=$1 dir home project worktree tools variant variants out rc contract real_mktemp real_perl real_date stamp destination_before
+  real_mktemp=$(command -v mktemp); real_perl=$(command -v perl); real_date=$(command -v date)
+  export FM_STAMP_REAL_MKTEMP="$real_mktemp" FM_STAMP_REAL_PERL="$real_perl" FM_STAMP_REAL_DATE="$real_date"
+  dir="$TMP_ROOT/stamp-$finding"; project="$dir/project"; worktree="$dir/worker"
+  fm_git_worktree "$project" "$worktree" stamp-worker
+  if [ "$finding" = R3 ]; then variants='directory symlink-directory symlink-file fifo rename race normal'; else variants='mktemp date write invalid-epoch'; fi
+  for variant in $variants; do
+    home="$dir/$variant/home"
+    fm_test_spawn_home "$home" codex
+    fm_test_spawn_brief "$home" worker
+    tools=$(fm_test_make_spawn_fakebin "$dir/$variant/tools" no-mistakes)
+    mv "$tools/tmux" "$tools/tmux-subject"
+    cat > "$tools/tmux" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$FM_STAMP_ENDPOINT_LOG"
+exec "$(dirname "$0")/tmux-subject" "$@"
+SH
+    chmod +x "$tools/tmux"
+    printf 'backend = "markdown"\n[markdown]\npath = "data/backlog.md"\n' > "$home/.tasks.toml"
+    printf '# Backlog\n\n## In flight\n\n## Queued\n\n## Done\n' > "$home/data/backlog.md"
+    TASKS_AXI_BACKEND=markdown tasks-axi add worker 'stamp behavior' --kind ship --file "$home/data/backlog.md" >/dev/null
+    FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" propose --words 'continue authorized work' --spend 1 >/dev/null
+    FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" confirm >/dev/null
+    contract=$(cksum "$home/state/.afk-contract")
+    stamp="$home/state/.last-launch"
+    case "$variant" in
+      directory) mkdir "$stamp" ;;
+      symlink-directory) mkdir "$home/destination"; ln -s "$home/destination" "$stamp" ;;
+      symlink-file) printf '1234567890\n' > "$home/destination"; ln -s "$home/destination" "$stamp" ;;
+      fifo) mkfifo "$stamp" ;;
+      rename|date|write|invalid-epoch) printf '1234567890\n' > "$stamp" ;;
+    esac
+    destination_before=
+    [ ! -f "$home/destination" ] || destination_before=$(cksum "$home/destination")
+    if [ "$variant" = mktemp ] || [ "$variant" = write ]; then
+      cat > "$tools/mktemp" <<'SH'
+#!/usr/bin/env bash
+case "${1:-}" in
+  */.last-launch.XXXXXX)
+    if [ "$FM_STAMP_FAULT" = mktemp ]; then echo 'fixture: stamp mktemp refused' >&2; exit 1; fi
+    # A directory returned at the source path forces the epoch write to fail.
+    path="$FM_HOME/state/.last-launch.source-directory"; mkdir "$path"; echo "$path"; exit 0 ;;
+esac
+exec "$FM_STAMP_REAL_MKTEMP" "$@"
+SH
+      chmod +x "$tools/mktemp"
+    fi
+    if [ "$variant" = date ] || [ "$variant" = invalid-epoch ]; then
+      cat > "$tools/date" <<'SH'
+#!/usr/bin/env bash
+if [ "${1:-}" = +%s ] && [ -f "$FM_HOME/state/worker.meta" ]; then
+  if [ "$FM_STAMP_FAULT" = date ]; then echo 'fixture: stamp date refused' >&2; exit 1; fi
+  printf '0\n'; exit 0
+fi
+exec "$FM_STAMP_REAL_DATE" "$@"
+SH
+      chmod +x "$tools/date"
+    fi
+    if [ "$variant" = rename ] || [ "$variant" = race ]; then
+      cat > "$tools/perl" <<'SH'
+#!/usr/bin/env bash
+case "${*: -1}" in
+  */.last-launch)
+    if [ "$FM_STAMP_FAULT" = rename ]; then echo 'fixture: stamp exact rename refused' >&2; exit 1; fi
+    exec "$FM_STAMP_REAL_PERL" -I "$(dirname "$0")" -MStampRace "$@" ;;
+esac
+exec "$FM_STAMP_REAL_PERL" "$@"
+SH
+      # Inject only at rename(2), after the production destination check.
+      cat > "$tools/StampRace.pm" <<'PERL'
+package StampRace;
+BEGIN {
+  *CORE::GLOBAL::rename = sub {
+    my ($source, $destination) = @_;
+    mkdir($destination) or die "fixture: directory race failed: $!";
+    open my $receipt, '>', "$ENV{FM_HOME}/rename-race" or die $!;
+    print {$receipt} "destination replaced immediately before rename\n";
+    close $receipt;
+    return CORE::rename($source, $destination);
+  };
+}
+1;
+PERL
+      chmod +x "$tools/perl"
+    fi
+    if out=$(FM_STAMP_FAULT="$variant" FM_STAMP_ENDPOINT_LOG="$dir/$variant/endpoint-log" FM_FAKE_LAUNCH_LOG="$dir/$variant/delivery" \
+      fm_test_run_spawn "$home" "$worktree" "$tools" worker "$project" --mode no-mistakes --yolo off); then rc=0; else rc=$?; fi
+    [ -f "$home/state/worker.meta" ] && [ -s "$dir/$variant/delivery" ] || fail "$variant did not reach confirmed publication and delivery"
+    assert_contains "$(TASKS_AXI_BACKEND=markdown tasks-axi show worker --file "$home/data/backlog.md")" 'state: in_flight' 'confirmed worker stays owned by the real backlog'
+    assert_not_contains "$(cat "$dir/$variant/endpoint-log")" 'kill-window' 'postlaunch failure must never kill confirmed work'
+    if [ -f "$home/data/done-archive.md" ]; then
+      assert_not_contains "$(cat "$home/data/done-archive.md")" 'worker' 'confirmed worker must never be archived'
+    fi
+    assert_equals "$contract" "$(cksum "$home/state/.afk-contract")" 'postlaunch bookkeeping preserves away authority'
+    if [ "$variant" = normal ]; then
+      assert_equals 0 "$rc" 'ordinary launch succeeds'
+      [ -f "$stamp" ] && [ ! -L "$stamp" ] || fail 'stamp is not an ordinary exact-path file'
+      perl -e 'local $/; open my $f,"<",$ARGV[0] or die; my $v=<$f>; $v =~ /\A[1-9][0-9]*\n\z/ or die "bad epoch"' "$stamp" || fail 'stamp must be one positive epoch and newline'
+    else
+      assert_equals 1 "$rc" "$finding: $variant stamp failure returns an error after preserving launch"
+      assert_contains "$out" 'task worker launched, but state/.last-launch could not be published; task record preserved' "$finding: $variant names confirmed work truthfully"
+      assert_not_contains "$out" 'spawned worker' 'failed bookkeeping cannot report normal success'
+      case "$variant" in
+        directory|race)
+          [ -d "$stamp" ] && [ -z "$(ls -A "$stamp")" ] || fail 'exact rename must never move the temporary stamp into a directory'
+          [ "$variant" != race ] || [ -f "$home/rename-race" ] || fail 'test did not reach the production rename boundary' ;;
+        symlink-directory|symlink-file)
+          [ -L "$stamp" ] || fail 'unsafe symlink was replaced'
+          [ -z "$(find "$home/destination" -name '.last-launch.*')" ] || fail 'publication followed the symlink'
+          [ -z "$destination_before" ] || assert_equals "$destination_before" "$(cksum "$home/destination")" 'unsafe destination bytes remain unchanged' ;;
+        fifo) [ -p "$stamp" ] || fail 'unsafe FIFO was replaced' ;;
+        mktemp) [ ! -e "$stamp" ] || fail 'failed temporary creation left a stamp' ;;
+        *) assert_equals 1234567890 "$(cat "$stamp")" 'failed replacement retains the prior epoch' ;;
+      esac
+    fi
+  done
+  pass "$finding: exact-path stamp publication and every postlaunch failure preserve confirmed work"
+}
+
+case "${1:-all}" in
+  R1) test_relaunch_withdraws_previous_ready_handoff; exit ;;
+  R2) test_native_muse_snapshot_never_writes_home; exit ;;
+  R3|R4) test_postlaunch_stamp_failure_reports_confirmed_work "$1"; exit ;;
+  all) test_relaunch_withdraws_previous_ready_handoff; test_native_muse_snapshot_never_writes_home
+    test_postlaunch_stamp_failure_reports_confirmed_work R3; test_postlaunch_stamp_failure_reports_confirmed_work R4 ;;
+  *) fail 'usage: fm-liveness-lib.test.sh [R1|R2|R3|R4]' ;;
+esac
+
 fixture="$TMP_ROOT/code"
 home="$TMP_ROOT/home"
 mkdir -p "$fixture/bin" "$home/state" "$home/config"

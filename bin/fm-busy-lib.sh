@@ -74,6 +74,9 @@
 # MUSE_EXPERIMENTAL_PLUGINS). Nothing is armed for muse for the same reason
 # standalone Kimi is not: a seeded record with no writer could never be
 # cleared. See fm_busy_muse_run_state for the fold.
+# FM_BUSY_CACHE_READ_ONLY=1 observes validated caches and discovers native
+# inputs without removing or publishing the Muse cache. Other callers retain
+# the default cache maintenance; fm-crew-state always requests observation.
 #
 # The cursor pull source works the same way and for the same reason: it folds
 # cursor's own durable per-conversation transcript, which brackets each turn
@@ -487,6 +490,7 @@ fm_busy_muse_cache_session_log() {  # <state-dir> <id> <binding-id> <session-log
   [ -n "$3" ] || return 0
   current=$(fm_busy_muse_binding_field "$1" "$2" binding_id) || return 1
   [ "$current" = "$3" ] || return 1
+  [ "${FM_BUSY_CACHE_READ_ONLY:-0}" != 1 ] || return 0
   cache=$(fm_busy_muse_cache_path "$1" "$2")
   tmp="$cache.tmp.$$"
   {
@@ -510,7 +514,9 @@ fm_busy_muse_session_log() {  # <state-dir> <id>
     printf '%s' "$cache"
     return 0
   fi
-  rm -f "$(fm_busy_muse_cache_path "$1" "$2")"
+  if [ "${FM_BUSY_CACHE_READ_ONLY:-0}" != 1 ]; then
+    rm -f "$(fm_busy_muse_cache_path "$1" "$2")"
+  fi
   namespace_day=$(fm_busy_muse_namespace_day "$root") || return 1
   namespace_before=$(fm_busy_muse_namespace_signature "$namespace_day") || return 1
   while IFS= read -r candidate; do

@@ -8,7 +8,11 @@
 # single-integer format and must fit signed 64-bit arithmetic.
 #
 # A live worker has a task record here, is not kind=secondmate, has no canonical
-# PR-ready handoff, and is not currently done or failed. Invalid PR metadata
+# PR-ready handoff for this incarnation, and is not currently done or failed.
+# fm-pr-check.sh owns the readiness binding; replacement launches retain PR
+# association but withdraw the prior incarnation's handoff. Legacy unbound
+# canonical handoffs remain ready until a replacement pins their generation.
+# Invalid PR metadata
 # retains a seat as unknown until repaired, even if crew-state reports done.
 # fm-crew-state.sh owns current state for every backend and harness; each read
 # is bounded to 10s.
@@ -24,7 +28,10 @@
 # FM_LIVENESS_ERROR; callers must not consume a partial snapshot.
 #
 # state/.last-launch is an atomic single-line Unix epoch written by fm-spawn.sh
-# after confirmed ordinary worker publication and delivery, including relaunch.
+# after confirmed ordinary worker publication, delivery and backlog commit,
+# including relaunch. It is an ordinary single-link positive decimal epoch
+# with exactly one newline; unsafe destinations or publication failures report
+# the started task and preserved record without rolling back confirmed work.
 # Secondmates are homes, not worker launches. Teardown does not remove the stamp.
 
 FM_LIVENESS_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -67,7 +74,7 @@ fm_liveness_target() { # <home>
 
 # shellcheck disable=SC2034 # Public snapshot globals are consumed by callers.
 fm_liveness_snapshot() { # <home> [state-dir]
-  local home=$1 state_dir=${2:-$1/state} meta id kind raw current stamp age now
+  local home=$1 state_dir=${2:-$1/state} meta id kind raw current stamp age now prior_handoff invalid_pr
   FM_LIVENESS_LIVE=0
   FM_LIVENESS_FREE=0
   FM_LIVENESS_OVER_TARGET=0
@@ -91,16 +98,33 @@ fm_liveness_snapshot() { # <home> [state-dir]
     kind=${kind:-ship}
     id=${meta##*/}; id=${id%.meta}
     current=unknown
+    prior_handoff=0
+    invalid_pr=0
     if grep -q '^pr=' "$meta"; then
-      fm_pr_metadata_identity_parse "$meta" && continue
-      # Crew-state's completion can itself rely on PR metadata. An invalid
-      # handoff must not release capacity through that lower-level verdict.
-      FM_LIVENESS_WARNINGS="${FM_LIVENESS_WARNINGS}${meta}: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh"$'\n'
-    elif raw=$(fm_run_timed 10 env FM_HOME="$home" FM_STATE_OVERRIDE="$state_dir" \
+      if ! fm_pr_metadata_identity_parse "$meta"; then
+        invalid_pr=1
+        # Crew-state's completion can itself rely on PR metadata. An invalid
+        # handoff must not release capacity through that lower-level verdict.
+        FM_LIVENESS_WARNINGS="${FM_LIVENESS_WARNINGS}${meta}: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh"$'\n'
+      elif ! grep -q '^pr_spawn_gen=' "$meta"; then
+        continue
+      elif awk -F= '
+        $1 == "spawn_gen" { spawn_count++; spawn = substr($0, 11) }
+        $1 == "pr_spawn_gen" { ready_count++; ready = substr($0, 14) }
+        END { exit !(spawn_count == 1 && ready_count == 1 &&
+          spawn ~ /^s[1-9][0-9]*\.[0-9]+\.[0-9]+$/ && ready == spawn) }
+      ' "$meta"; then
+        continue
+      else
+        prior_handoff=1
+        FM_LIVENESS_WARNINGS="${FM_LIVENESS_WARNINGS}${meta}: prior incarnation or invalid PR readiness binding; seat retained; renew the handoff with bin/fm-pr-check.sh"$'\n'
+      fi
+    fi
+    if [ "$invalid_pr" = 0 ] && raw=$(fm_run_timed 10 env FM_HOME="$home" FM_STATE_OVERRIDE="$state_dir" \
       FM_CONFIG_OVERRIDE="$home/config" FM_DATA_OVERRIDE="$home/data" \
       FM_PROJECTS_OVERRIDE="$home/projects" FM_CREW_STATE_META_OVERRIDE="$meta" \
       FM_CREW_STATE_STATUS_OVERRIDE="$state_dir/$id.status" \
-      FM_CREW_STATE_NO_FORGE=1 "$FM_LIVENESS_LIB_DIR/fm-crew-state.sh" "$id" 2>/dev/null); then
+      FM_CREW_STATE_NO_FORGE=1 FM_BUSY_CACHE_READ_ONLY=1 "$FM_LIVENESS_LIB_DIR/fm-crew-state.sh" "$id" 2>/dev/null); then
       case "$raw" in
         'state: '*' · source: '*)
           current=${raw#state: }; current=${current%% · *}
@@ -108,7 +132,12 @@ fm_liveness_snapshot() { # <home> [state-dir]
           ;;
       esac
     fi
-    case "$current" in done|failed) continue ;; esac
+    case "$current" in
+      done|failed)
+        # This base retains predecessor status/run evidence on replacement.
+        # A superseded handoff cannot be laundered through that terminal read.
+        if [ "$prior_handoff" = 1 ]; then current=unknown; else continue; fi ;;
+    esac
     if [ "$current" = unknown ]; then
       FM_LIVENESS_WARNINGS="${FM_LIVENESS_WARNINGS}${id}: current state unknown; seat retained"$'\n'
     fi

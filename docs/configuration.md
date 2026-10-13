@@ -32,6 +32,7 @@ Ordinary dead-direct-report recovery is owned by `stuck-crewmate-recovery`, whil
 The local, gitignored `config/worker-target` setting supplies this home's reported worker target.
 [`bin/fm-liveness-lib.sh`](../bin/fm-liveness-lib.sh) owns its strict integer format, primary and secondmate defaults, live-worker definition, and read-only snapshot API.
 The away spend cap and return cost line use that shared live count.
+PR association survives replacement, while [`bin/fm-pr-check.sh`](../bin/fm-pr-check.sh) owns the incarnation-bound ready handoff that releases capacity.
 A capacity observation grants no launch, spend, merge, or acknowledgement authority; the target does not impose a new dispatch limit.
 `bin/fm-spawn.sh` records confirmed worker launches in `state/.last-launch` under the library's stamp contract.
 

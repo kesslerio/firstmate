@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Record a PR-ready task: store one validated canonical pr=<url> and the forge's
 # exact pr_head=<sha> when available, then atomically arm a static merge poll.
+# pr_spawn_gen binds readiness to the task's current spawn_gen; pr/pr_head
+# remain durable lifecycle association across replacement launches. Legacy
+# records without spawn_gen stay unbound until a replacement pins their old
+# handoff. Re-registering a ready PR publishes readiness for the current worker.
 # The watcher check source is byte-for-byte bin/fm-pr-poll.sh; task and PR data
 # live only in a private sidecar and are never interpolated into shell source.
 # A GitHub pull request URL and a GitLab merge request URL are both accepted,
@@ -113,10 +117,12 @@ STATE_DEVICE=$(fm_pr_file_device "$STATE") || exit 1
 META_TMP=$(mktemp "$STATE/.fm-pr-meta.XXXXXX") || exit 1
 while IFS= read -r line || [ -n "$line" ]; do
   case "$line" in
-    pr=*|pr_head=*) ;;
+    pr=*|pr_head=*|pr_spawn_gen=*) ;;
     *) printf '%s\n' "$line" >> "$META_TMP" || exit 1 ;;
   esac
 done < "$META"
+PR_SPAWN_GEN=$(grep '^spawn_gen=' "$META" | tail -1 | cut -d= -f2- || true)
+[ -z "$PR_SPAWN_GEN" ] || printf 'pr_spawn_gen=%s\n' "$PR_SPAWN_GEN" >> "$META_TMP" || exit 1
 printf 'pr=%s\n' "$URL" >> "$META_TMP" || exit 1
 [ -z "$PR_HEAD" ] || printf 'pr_head=%s\n' "$PR_HEAD" >> "$META_TMP" || exit 1
 chmod 0600 "$META_TMP" || exit 1

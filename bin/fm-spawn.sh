@@ -43,7 +43,10 @@
 #   ordinary relaunch. It refuses unless the recorded endpoint is positively
 #   agent-free on a backend with a recovery-grade agent-state classifier (tmux
 #   or herdr), and clears the previous harness's per-task wiring before arming
-#   the new incarnation. Two verdicts are agent-free: a `dead` endpoint is
+#   the new incarnation. Replacement publication retains PR association but
+#   binds any legacy ready handoff to the prior incarnation (fm-pr-check.sh
+#   owns readiness binding); only a newly published handoff frees its seat.
+#   Two verdicts are agent-free: a `dead` endpoint is
 #   ADOPTED as-is, while an endpoint PROVEN gone is RE-CREATED in the recorded
 #   worktree and the republished record rebinds the task to it. That proof is
 #   its own step, because a backend's `missing` also covers an endpoint that is
@@ -4479,11 +4482,15 @@ preserve_relaunch_meta() {
     echo "home=$PROJ_ABS"
     echo "projects=$SECONDMATE_PROJECTS"
   fi
-  if [ "$RELAUNCH" -eq 1 ]; then
-    preserve_relaunch_meta
-  fi
   if [ "$SPAWN_CONTROL_PARENT" = 1 ] && [ -n "${FM_CONTROL_RELAUNCH_TX:-}" ]; then
     echo "control_relaunch_tx=$FM_CONTROL_RELAUNCH_TX"
+  fi
+  if [ "$RELAUNCH" -eq 1 ]; then
+    if grep -q '^pr=' "$RELAUNCH_META" && ! grep -q '^pr_spawn_gen=' "$RELAUNCH_META"; then
+      RELAUNCH_PR_GEN=$(fm_meta_get "$RELAUNCH_META" spawn_gen)
+      echo "pr_spawn_gen=${RELAUNCH_PR_GEN:-legacy}"
+    fi
+    preserve_relaunch_meta
   fi
 } >"$SPAWN_META_PATH" || {
   echo "error: task record for $ID could not be prepared at $SPAWN_META_PATH" >&2
@@ -4934,9 +4941,47 @@ fi
 # Publication and launch delivery are now confirmed. Keep the durable launch
 # time after teardown removes the task record (bin/fm-liveness-lib.sh).
 if [ "$KIND" != secondmate ]; then
-  SPAWN_LAST_LAUNCH_TMP=$(mktemp "$STATE/.last-launch.XXXXXX") || exit 1
-  if ! date +%s > "$SPAWN_LAST_LAUNCH_TMP" || ! mv -f "$SPAWN_LAST_LAUNCH_TMP" "$STATE/.last-launch"; then
-    rm -f "$SPAWN_LAST_LAUNCH_TMP"
+  SPAWN_LAST_LAUNCH_TMP=
+  # Keep every fallible stamp step in this guarded path: confirmed workers
+  # must survive bookkeeping errors, and the caller must know they started.
+  # CORE rename publishes this exact pathname on Unix, including stock macOS;
+  # unlike mv it never treats a directory destination as a container.
+  if ! SPAWN_LAST_LAUNCH_TMP=$(mktemp "$STATE/.last-launch.XXXXXX") \
+    || ! date +%s > "$SPAWN_LAST_LAUNCH_TMP" \
+    || ! perl - "$SPAWN_LAST_LAUNCH_TMP" "$STATE/.last-launch" <<'PERL'
+use strict;
+use warnings;
+use Fcntl qw(S_ISREG);
+my ($source, $destination) = @ARGV;
+sub ordinary {
+  my ($path) = @_;
+  my @st = lstat($path);
+  @st && S_ISREG($st[2]) && $st[3] == 1 or die "stamp is not an ordinary single-link file\n";
+  return @st;
+}
+sub epoch {
+  my ($path) = @_;
+  open my $file, '<', $path or die "cannot read stamp: $!\n";
+  local $/;
+  my $value = <$file>;
+  close $file or die "cannot close stamp: $!\n";
+  defined($value) && $value =~ /\A[1-9][0-9]*\n\z/ or die "stamp is not one positive Unix epoch and newline\n";
+  return $value;
+}
+my @source_identity = ordinary($source);
+my $value = epoch($source);
+if (lstat($destination)) {
+  ordinary($destination);
+} elsif (!$!{ENOENT}) {
+  die "cannot inspect stamp destination: $!\n";
+}
+rename($source, $destination) or die "cannot publish exact stamp pathname: $!\n";
+my @published = ordinary($destination);
+$published[0] == $source_identity[0] && $published[1] == $source_identity[1]
+  && epoch($destination) eq $value or die "published stamp could not be verified\n";
+PERL
+  then
+    [ -z "$SPAWN_LAST_LAUNCH_TMP" ] || rm -f "$SPAWN_LAST_LAUNCH_TMP" || true
     echo "error: task $ID launched, but state/.last-launch could not be published; task record preserved" >&2
     exit 1
   fi
