@@ -80,9 +80,20 @@ EOF
 }
 
 test_pi_stream_extension_activation_and_lifecycle() {
-  local rec id=stream-pi state ext out version
-  for version in disabled 1.2.0 0.82.0; do
-    rec=$(make_spawn_case "stream-$version" pi "$id")
+  local rec id=stream-pi state ext out version option enabled label
+  for label in disabled zero negative malformed leading maximum overflow verified older; do
+    version=1.2.0 option=300 enabled=1
+    case "$label" in
+      disabled) option='' enabled=0 ;;
+      zero) option=0 enabled=0 ;;
+      negative) option=-1 enabled=0 ;;
+      malformed) option=invalid enabled=0 ;;
+      leading) option=00300 ;;
+      maximum) option=999999999 ;;
+      overflow) option=1000000000 enabled=0 ;;
+      older) version=0.82.0 enabled=0 ;;
+    esac
+    rec=$(make_spawn_case "stream-$label" pi "$id")
     read_case_record "$rec"
     cat > "$FAKEBIN_DIR/pi" <<SH
 #!/usr/bin/env bash
@@ -90,15 +101,11 @@ if [ "\${1:-}" = --version ]; then printf '%s\\n' '$version'; fi
 exit 0
 SH
     chmod +x "$FAKEBIN_DIR/pi"
-    if [ "$version" = disabled ]; then
-      out=$(FM_STREAM_SILENT_MAX_SECS='' run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$id" "$PROJ_DIR")
-    else
-      out=$(FM_STREAM_SILENT_MAX_SECS=300 run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$id" "$PROJ_DIR")
-    fi
+    out=$(FM_STREAM_SILENT_MAX_SECS="$option" run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$id" "$PROJ_DIR")
     expect_code 0 $? "stream spawn should succeed: $out"
     state="$HOME_DIR/state"
     ext="$state/$id.pi-ext.ts"
-    STREAM_STATE="$state" STREAM_ID="$id" STREAM_ENABLED="$version" EXT_PATH="$ext" node --input-type=module <<'JS' || fail "generated stream lifecycle failed for $version"
+    STREAM_STATE="$state" STREAM_ID="$id" STREAM_ENABLED="$enabled" EXT_PATH="$ext" node --input-type=module <<'JS' || fail "generated stream lifecycle failed for $label"
 import { pathToFileURL } from "node:url";
 import { existsSync, readFileSync } from "node:fs";
 const { default: extension } = await import(pathToFileURL(process.env.EXT_PATH).href);
@@ -106,14 +113,15 @@ const handlers = {};
 extension({on: (name, fn) => { handlers[name] = fn; }, events: { on() {} }});
 const state = process.env.STREAM_STATE, id = process.env.STREAM_ID;
 const marker = state + "/" + id + ".model-stream";
-const ctx = {isIdle: () => true};
+let idle = true;
+const ctx = {isIdle: () => idle};
 let clock = 10000;
 Date.now = () => clock;
 const fire = async (name, event = {}) => { await handlers[name]?.(event, ctx); };
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
 await fire("agent_start");
 await fire("context", {messages: []});
-if (process.env.STREAM_ENABLED !== "1.2.0") {
+if (process.env.STREAM_ENABLED !== "1") {
   assert(!existsSync(marker), "disabled/unverified worker produced stream evidence");
 } else {
   assert(existsSync(marker), "foreground context did not open stream evidence");
@@ -128,6 +136,14 @@ if (process.env.STREAM_ENABLED !== "1.2.0") {
   clock += 1001;
   await fire("message_update", {message: {role: "assistant", content: [{type:"toolCall",name:"bash",arguments:{command:"true"}}]}});
   assert(readFileSync(marker,"utf8") !== progressed, "tool arguments did not advance progress");
+  const last = readFileSync(marker,"utf8");
+  clock += 1001;
+  await fire("message_update", {message: {role: "assistant", content: [{type:"toolCall",name:"bash",arguments:{command:"true"}}]}});
+  assert(readFileSync(marker,"utf8") === last, "unchanged content refreshed progress after throttle");
+  idle = false;
+  await fire("agent_settled");
+  assert(readFileSync(marker,"utf8") === last, "continuing settlement closed active request");
+  idle = true;
   await fire("message_end", {message: {role:"user"}});
   assert(existsSync(marker), "user message end closed assistant stream");
   await fire("message_end", {message: {role:"assistant"}});
@@ -137,6 +153,11 @@ if (process.env.STREAM_ENABLED !== "1.2.0") {
   assert(!existsSync(marker), "late event resurrected closed stream");
   await fire("context", {messages: []});
   assert(existsSync(marker), "retry did not open new stream");
+  const retry = readFileSync(marker,"utf8");
+  const closing = fire("message_end", {message: {role:"assistant"}});
+  const opening = fire("context", {messages: []});
+  await Promise.all([closing, opening]);
+  assert(existsSync(marker) && readFileSync(marker,"utf8") !== retry, "overlapping close/open lost new request");
   await fire("tool_execution_start");
   assert(!existsSync(marker), "tool phase retained stream");
   await fire("context", {messages: []});

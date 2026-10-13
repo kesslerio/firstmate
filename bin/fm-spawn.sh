@@ -5130,7 +5130,9 @@ export default function (pi: any) {
   let streamWrites: Promise<void> = Promise.resolve();
   const streamEvent = (operation: string, current: number) => {
     streamWrites = streamWrites.then(() => new Promise<void>((resolve) => {
-      execFile("$FM_ROOT/bin/fm-busy-event.sh", [
+      execFile("bash", [
+        "-c", '. "\$1"; shift; fm_exec_timed 5 1 "\$@"', "fm-stream-observation",
+        "$FM_ROOT/bin/fm-timeout-lib.sh", "$FM_ROOT/bin/fm-busy-event.sh",
         "stream", "$STATE_REAL", "$ID", operation,
         "--gen", "$BUSY_GEN", "--request", String(current),
       ], (error) => {
@@ -5156,6 +5158,8 @@ export default function (pi: any) {
     });
     pi.on("message_update", (event: any) => {
       if (!activeRequest || event.message?.role !== "assistant") return streamWrites;
+      const now = Date.now();
+      if (now - lastStreamProgress < 1000) return streamWrites;
       const content = (event.message.content || []).map((part: any) => {
         if (part.type === "text" && part.text) return ["text", part.text];
         if (part.type === "thinking" && (part.thinking || part.thinkingSignature)) {
@@ -5166,8 +5170,7 @@ export default function (pi: any) {
       }).filter(Boolean);
       if (!content.length) return streamWrites;
       const signature = JSON.stringify(content);
-      const now = Date.now();
-      if (signature === lastContent || now - lastStreamProgress < 1000) return streamWrites;
+      if (signature === lastContent) return streamWrites;
       lastContent = signature;
       lastStreamProgress = now;
       return streamEvent("progress", activeRequest);

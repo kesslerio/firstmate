@@ -177,12 +177,15 @@ write_record() {  # <gen> <seq>
 
 clear_stream() {
   local order order_gen request phase
+  # Active observation must disappear even when closing-order persistence fails.
+  # The retained order still denies duplicate open, and progress needs a marker.
+  rm -f "$STATE/$ID.model-stream" || return 1
   if order=$(fm_busy_stream_order_read "$STATE" "$ID"); then
     read -r order_gen request phase <<< "$order"
     printf 'v1 gen=%s request=%s phase=closed\n' "$order_gen" "$request" > "$STATE/$ID.model-stream-order.tmp.$$" &&
       mv -f "$STATE/$ID.model-stream-order.tmp.$$" "$STATE/$ID.model-stream-order" || return 1
   fi
-  rm -f "$STATE/$ID.model-stream"
+  return 0
 }
 
 clear_stream_incarnation() {
