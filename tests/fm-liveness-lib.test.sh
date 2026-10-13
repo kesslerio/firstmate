@@ -1,19 +1,14 @@
 #!/usr/bin/env bash
 # Public seat-snapshot, config propagation, and confirmed-launch behavior.
-# Optional R1, R2, R3 or R4 argument runs that public review regression alone.
+# Optional R1, R1race, R2, R3 or R4 argument runs that public review regression alone.
 set -eu
 # shellcheck source=tests/fixtures.sh
 . "$(dirname "${BASH_SOURCE[0]}")/fixtures.sh"
 
 TMP_ROOT=$(fm_test_tmproot fm-liveness)
 
-test_relaunch_withdraws_previous_ready_handoff() {
-  local dir home project worktree tools extra_tools out before contract records stamp state pr head
-  dir="$TMP_ROOT/relaunch"; home="$dir/home"
-  project="$dir/project"; worktree="$dir/worker"
-  fm_test_spawn_home "$home" claude
-  fm_git_worktree "$project" "$worktree" replacement-worker
-  fm_test_spawn_brief "$home" worker
+liveness_relaunch_tools() { # <directory>
+  local dir=$1 tools
   tools=$(fm_test_make_spawn_fakebin "$dir/tools" gh)
   fm_test_fake_no_mistakes "$tools"
   mkdir -p "$dir/endpoint"
@@ -44,6 +39,17 @@ case "${1:-}" in
 esac
 SH
   chmod +x "$tools/tmux"
+  printf '%s\n' "$tools"
+}
+
+test_relaunch_withdraws_previous_ready_handoff() {
+  local dir home project worktree tools extra_tools out before contract records stamp state pr head
+  dir="$TMP_ROOT/relaunch"; home="$dir/home"
+  project="$dir/project"; worktree="$dir/worker"
+  fm_test_spawn_home "$home" claude
+  fm_git_worktree "$project" "$worktree" replacement-worker
+  fm_test_spawn_brief "$home" worker
+  tools=$(liveness_relaunch_tools "$dir")
   pr=https://github.com/example/project/pull/7
   head=0123456789abcdef0123456789abcdef01234567
   fm_write_meta "$home/state/worker.meta" window=fmses:fm-worker endpoint_task_id=worker \
@@ -109,6 +115,183 @@ SH
   assert_equals 2 "$FM_LIVENESS_LIVE" 'operator replacement and extra worker occupy two seats'
   assert_contains "$FM_LIVENESS_WARNINGS" 'prior incarnation' 'operator path invalidates readiness at source'
   pass 'R1: primary and operator relaunch withdraw prior readiness, retain association, and enforce the away cap'
+}
+
+test_delayed_handoff_case() (
+  # Each probe is a child of this shell. Every exit releases its external
+  # response barrier and reaps it before the suite removes its fixture.
+  local variant=$1 dir home project worktree tools pr head probe='' rc out old new
+  local before polls records contract stamp extra_tools fields
+  dir="$TMP_ROOT/delayed-$variant"; home="$dir/home"
+  project="$dir/project"; worktree="$dir/worker"
+  fm_test_spawn_home "$home" claude
+  fm_git_worktree "$project" "$worktree" delayed-worker
+  fm_test_spawn_brief "$home" worker
+  tools=$(liveness_relaunch_tools "$dir")
+  trap ': > "$dir/endpoint/probe-release"; [ -z "$probe" ] || wait "$probe" || true' EXIT
+  trap 'exit 1' HUP INT TERM
+  cat > "$tools/gh" <<'SH'
+#!/usr/bin/env bash
+if [ "${1:-}" = pr ] && [ "${2:-}" = view ]; then
+  if [ "${FM_FAKE_PROBE_HOLD:-0}" = 1 ]; then
+    : > "$FM_FAKE_DIR/probe-entered"
+    for ((i=0;i<300;i++)); do
+      [ ! -f "$FM_FAKE_DIR/probe-release" ] || break
+      sleep 0.1
+    done
+    [ -f "$FM_FAKE_DIR/probe-release" ] || exit 1
+  fi
+  printf '%s\n' "${FM_FAKE_HEAD:-0123456789abcdef0123456789abcdef01234567}"
+  exit 0
+fi
+exit 1
+SH
+  chmod +x "$tools/gh"
+  pr=https://github.com/example/project/pull/7
+  head=0123456789abcdef0123456789abcdef01234567
+  fields=spawn_gen=s1700000000.1.1
+  case "$variant" in legacy-*) fields=fixture=legacy ;; esac
+  fm_write_meta "$home/state/worker.meta" window=fmses:fm-worker endpoint_task_id=worker \
+    "worktree=$worktree" "project=$project" harness=claude kind=ship mode=no-mistakes yolo=off \
+    "tasktmp=$dir/tasktmp" model=default effort=default "$fields"
+  # Establish real durable PR and poll artifacts before the delayed call.
+  out=$(FM_HOME="$home" HOME="$home/user-home" FM_GUARD_READ_ONLY=1 PATH="$tools:$PATH" \
+    "$ROOT/bin/fm-pr-check.sh" worker "$pr" 2>&1) || fail "initial handoff failed: $out"
+  # shellcheck source=bin/fm-liveness-lib.sh
+  . "$ROOT/bin/fm-liveness-lib.sh"
+  old=$(fm_meta_get "$home/state/worker.meta" spawn_gen)
+  FM_HOME="$home" HOME="$home/user-home" FM_GUARD_READ_ONLY=1 PATH="$tools:$PATH" \
+    FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PROBE_HOLD=1 \
+    FM_FAKE_HEAD=89abcdef89abcdef89abcdef89abcdef89abcdef \
+    "$ROOT/bin/fm-pr-check.sh" worker "$pr" > "$dir/probe.log" 2>&1 &
+  probe=$!
+  for ((i=0;i<200;i++)); do [ ! -f "$dir/endpoint/probe-entered" ] || break; sleep 0.1; done
+  [ -f "$dir/endpoint/probe-entered" ] || fail 'delayed forge probe never entered'
+  case "$variant" in
+    replacement|legacy-replacement)
+      out=$(FM_FAKE_DIR="$dir/endpoint" fm_test_run_spawn "$home" "$worktree" "$tools" worker --relaunch) \
+        || fail "public replacement failed: $out"
+      assert_equals claude "$(cat "$dir/endpoint/command")" 'replacement actually delivered'
+      [ -s "$dir/endpoint/delivery" ] || fail 'replacement launch delivery absent'
+      new=$(fm_meta_get "$home/state/worker.meta" spawn_gen)
+      [ -n "$new" ] && [ "$new" != "$old" ] || fail 'replacement did not change incarnation'
+      "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker busy --current-gen --source claude-hook --event user-prompt-submit >/dev/null
+      FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" propose --words 'continue authorized work' --spend 1 >/dev/null
+      FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" confirm >/dev/null
+      ;;
+    legacy-unchanged|unchanged) new=$old ;;
+    removed|duplicate|malformed|empty)
+      # Corrupt only fixture input, using the existing metadata lock owner.
+      . "$ROOT/bin/fm-wake-lib.sh"
+      local lock
+      lock=$(fm_meta_lock_path "$home/state/worker.meta")
+      fm_lock_acquire_wait "$lock"
+      sed '/^spawn_gen=/d' "$home/state/worker.meta" > "$dir/meta"
+      case "$variant" in
+        duplicate) printf 'spawn_gen=%s\nspawn_gen=%s\n' "$old" "$old" >> "$dir/meta" ;;
+        malformed) printf 'spawn_gen=broken\n' >> "$dir/meta" ;;
+        empty) printf 'spawn_gen=\n' >> "$dir/meta" ;;
+      esac
+      chmod 0600 "$dir/meta"; mv "$dir/meta" "$home/state/worker.meta"
+      fm_lock_release "$lock"
+      new=$(fm_meta_get "$home/state/worker.meta" spawn_gen)
+      ;;
+  esac
+  before=$(cksum "$home/state/worker.meta")
+  polls=$(find "$home/state" -type f \( -name '*.pr-poll*' -o -name '*.check.sh' \) -exec cksum {} \; | sort)
+  records=$(find "$home/state" -name '*.meta' -type f -exec cksum {} \; | sort)
+  if [ "$variant" = replacement ] || [ "$variant" = legacy-replacement ]; then
+    contract=$(cksum "$home/state/.afk-contract"); stamp=$(cksum "$home/state/.last-launch")
+    out=$(FM_HOME="$home" FM_CREW_STATE_NO_FORGE=1 FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" \
+      PATH="$tools:$PATH" "$ROOT/bin/fm-crew-state.sh" worker)
+    assert_contains "$out" 'state: working' 'current replacement works before old probe returns'
+    FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+    assert_equals '1:3' "$FM_LIVENESS_LIVE:$FM_LIVENESS_FREE" 'replacement occupies seat before stale publication'
+  fi
+  printf 'R1race %s before: observed=%s current=%s ready=%s\n' "$variant" "${old:-ABSENT}" "${new:-ABSENT}" "$(fm_meta_get "$home/state/worker.meta" pr_spawn_gen)"
+  : > "$dir/endpoint/probe-release"
+  rc=0; wait "$probe" || rc=$?; probe=
+  printf 'R1race %s probe rc=%s\n' "$variant" "$rc"
+  cat "$dir/probe.log"
+  if [ "$variant" = legacy-unchanged ] || [ "$variant" = unchanged ]; then
+    assert_equals 0 "$rc" 'unchanged observed incarnation permits legitimate handoff'
+    if [ "$variant" = legacy-unchanged ]; then
+      assert_not_contains "$(cat "$home/state/worker.meta")" 'pr_spawn_gen=' 'legacy publication stays unbound'
+    else
+      assert_equals "$old" "$(fm_meta_get "$home/state/worker.meta" pr_spawn_gen)" 'unchanged handoff binds observed generation'
+    fi
+    assert_equals 89abcdef89abcdef89abcdef89abcdef89abcdef "$(fm_meta_get "$home/state/worker.meta" pr_head)" 'legitimate delayed result records its observed head'
+    fm_pr_poll_artifacts_valid "$home/state" worker "$ROOT/bin/fm-pr-poll.sh" || fail 'unchanged poll association is invalid'
+    PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+    assert_equals 0 "$FM_LIVENESS_LIVE" 'legitimate unchanged handoff releases seat'
+  else
+    [ "$rc" -ne 0 ] || fail "R1race: $variant stale or invalid invocation published readiness"
+    assert_contains "$(cat "$dir/probe.log")" 'PR readiness refused' 'refusal names failed publication'
+    assert_equals "$before" "$(cksum "$home/state/worker.meta")" 'stale denial preserves current record and association'
+    assert_equals "$polls" "$(find "$home/state" -type f \( -name '*.pr-poll*' -o -name '*.check.sh' \) -exec cksum {} \; | sort)" 'stale denial preserves registered poll artifacts'
+    [ -z "$(find "$home/state" -name '.fm-pr-*' -type f -print)" ] || fail 'stale denial leaked prepared artifacts'
+  fi
+  if [ "$variant" = replacement ] || [ "$variant" = legacy-replacement ]; then
+    assert_contains "$(cat "$dir/probe.log")" 'changed incarnation' 'old observed generation refuses explicitly'
+    assert_equals "$head" "$(fm_meta_get "$home/state/worker.meta" pr_head)" 'old probe cannot replace durable head'
+    FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+    assert_equals '1:3' "$FM_LIVENESS_LIVE:$FM_LIVENESS_FREE" 'stale denial retains current working seat'
+    assert_contains "$FM_LIVENESS_LANES" $'worker\tship\tworking\t' 'current worker remains working'
+    assert_contains "$FM_LIVENESS_WARNINGS" 'prior incarnation' 'prior ready binding stays visible'
+    fm_test_spawn_brief "$home" extra
+    extra_tools=$(fm_test_make_spawn_fakebin "$dir/extra-tools" no-mistakes)
+    if out=$(FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" \
+      FM_FAKE_LAUNCH_LOG="$dir/extra-delivery" fm_test_run_spawn "$home" "$worktree" "$extra_tools" extra "$project" --mode no-mistakes --yolo off); then
+      fail 'stale denial admitted extra worker at cap 1'
+    fi
+    assert_contains "$out" 'caps concurrent workers at 1 and 1 ordinary task(s) are live' 'actual public cap refuses extra worker'
+    assert_equals "$records" "$(find "$home/state" -name '*.meta' -type f -exec cksum {} \; | sort)" 'cap denial preserves current tasks'
+    assert_equals "$contract" "$(cksum "$home/state/.afk-contract")" 'stale/cap denial preserves authority'
+    assert_equals "$stamp" "$(cksum "$home/state/.last-launch")" 'stale/cap denial preserves stamp'
+    [ ! -s "$dir/extra-delivery" ] && [ ! -e "$home/state/extra.meta" ] || fail 'denied extra worker delivered'
+    out=$(FM_HOME="$home" HOME="$home/user-home" FM_GUARD_READ_ONLY=1 PATH="$tools:$PATH" \
+      "$ROOT/bin/fm-pr-check.sh" worker "$pr" 2>&1) || fail "fresh current handoff refused: $out"
+    assert_equals "$new" "$(fm_meta_get "$home/state/worker.meta" pr_spawn_gen)" 'fresh handoff binds actual new incarnation'
+    fm_pr_poll_artifacts_valid "$home/state" worker "$ROOT/bin/fm-pr-poll.sh" || fail 'fresh poll association invalid'
+    PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+    assert_equals '0:4' "$FM_LIVENESS_LIVE:$FM_LIVENESS_FREE" 'fresh current handoff releases seat'
+    out=$(FM_FAKE_LAUNCH_LOG="$dir/extra-delivery" fm_test_run_spawn "$home" "$worktree" "$extra_tools" extra "$project" --mode no-mistakes --yolo off) \
+      || fail "fresh handoff failed authorized cap allowance: $out"
+    [ -s "$dir/extra-delivery" ] && [ -f "$home/state/extra.meta" ] || fail 'fresh allowed worker absent'
+    assert_equals "$contract" "$(cksum "$home/state/.afk-contract")" 'fresh allowed launch preserves authority'
+    printf 'R1race %s: stale live=1 cap denied; fresh live=0 cap allowed\n' "$variant"
+  fi
+)
+
+test_delayed_handoff_refuses_replacement() {
+  local variant home tools out before
+  for variant in replacement legacy-replacement legacy-unchanged unchanged removed duplicate malformed empty; do
+    test_delayed_handoff_case "$variant"
+  done
+  # Invalid initial observations must refuse before reaching the external probe.
+  home="$TMP_ROOT/invalid-initial/home"
+  fm_test_spawn_home "$home"
+  mkdir -p "$home/worker"
+  tools=$(fm_test_make_spawn_fakebin "$TMP_ROOT/invalid-initial/tools" gh)
+  cat > "$tools/gh" <<'SH'
+#!/usr/bin/env bash
+: > "$FM_FAKE_PROBE_ENTERED"
+printf '0123456789abcdef0123456789abcdef01234567\n'
+SH
+  chmod +x "$tools/gh"
+  for variant in 'spawn_gen=broken' 'spawn_gen=' 'spawn_gen=s0.1.1' 'spawn_gen=s1700000000.1.1\nspawn_gen=s1700000000.1.1'; do
+    printf 'kind=ship\nworktree=%s\n%b\n' "$home/worker" "$variant" > "$home/state/worker.meta"
+    before=$(cksum "$home/state/worker.meta")
+    if out=$(FM_HOME="$home" HOME="$home/user-home" FM_GUARD_READ_ONLY=1 PATH="$tools:$PATH" \
+      FM_FAKE_PROBE_ENTERED="$home/probe-entered" "$ROOT/bin/fm-pr-check.sh" worker https://github.com/example/project/pull/7 2>&1); then
+      fail 'invalid initial generation published readiness'
+    fi
+    assert_contains "$out" 'PR readiness refused' 'invalid initial generation diagnoses publication refusal'
+    [ ! -e "$home/probe-entered" ] || fail 'invalid initial generation reached slow forge probe'
+    assert_equals "$before" "$(cksum "$home/state/worker.meta")" 'invalid initial generation preserves record'
+    [ ! -e "$home/state/worker.check.sh" ] || fail 'invalid initial generation published poll'
+  done
+  pass 'R1race: delayed predecessor and invalid generations refuse; unchanged legacy and fresh current handoffs release capacity'
 }
 
 test_native_muse_snapshot_never_writes_home() {
@@ -287,11 +470,18 @@ PERL
 
 case "${1:-all}" in
   R1) test_relaunch_withdraws_previous_ready_handoff; exit ;;
+  R1race)
+    case "${2:-all}" in
+      all) test_delayed_handoff_refuses_replacement ;;
+      replacement|legacy-replacement|legacy-unchanged|unchanged|removed|duplicate|malformed|empty) test_delayed_handoff_case "$2" ;;
+      *) fail 'invalid R1race case' ;;
+    esac
+    exit ;;
   R2) test_native_muse_snapshot_never_writes_home; exit ;;
   R3|R4) test_postlaunch_stamp_failure_reports_confirmed_work "$1"; exit ;;
-  all) test_relaunch_withdraws_previous_ready_handoff; test_native_muse_snapshot_never_writes_home
+  all) test_relaunch_withdraws_previous_ready_handoff; test_delayed_handoff_refuses_replacement; test_native_muse_snapshot_never_writes_home
     test_postlaunch_stamp_failure_reports_confirmed_work R3; test_postlaunch_stamp_failure_reports_confirmed_work R4 ;;
-  *) fail 'usage: fm-liveness-lib.test.sh [R1|R2|R3|R4]' ;;
+  *) fail 'usage: fm-liveness-lib.test.sh [R1|R1race|R2|R3|R4]' ;;
 esac
 
 fixture="$TMP_ROOT/code"
