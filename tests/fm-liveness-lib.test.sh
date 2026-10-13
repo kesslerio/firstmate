@@ -117,6 +117,109 @@ test_relaunch_withdraws_previous_ready_handoff() {
   pass 'R1: primary and operator relaunch withdraw prior readiness, retain association, and enforce the away cap'
 }
 
+test_no_pr_relaunch_keeps_working_seat() {
+  local dir home project worktree tools out head before state live admission extra_tools route result expected result_state
+  dir="$TMP_ROOT/no-pr-relaunch"; home="$dir/home"
+  project="$dir/project"; worktree="$dir/worker"
+  fm_test_spawn_home "$home" claude
+  fm_git_worktree "$project" "$worktree" replacement-worker
+  fm_test_spawn_brief "$home" worker
+  tools=$(liveness_relaunch_tools "$dir")
+  cat > "$tools/no-mistakes" <<'SH'
+#!/usr/bin/env bash
+case "${1:-}" in
+  --version) printf '%s\n' "$FM_TEST_NO_MISTAKES_FAKE_VERSION" ;;
+  axi)
+    case "${2:-}" in
+      ''|status)
+        if [ "${FM_FAKE_COARSE:-0}" = 1 ]; then sed 's/branch: replacement-worker/branch: another-worker/' "$FM_FAKE_RUN_RECORD"
+        else cat "$FM_FAKE_RUN_RECORD"; fi ;;
+    esac ;;
+  runs) printf '%s replacement-worker %s 2026-10-13 00:00\n' "$FM_FAKE_LEDGER_STATUS" "$FM_FAKE_LEDGER_HEAD" ;;
+  daemon) echo 'daemon running' ;;
+esac
+SH
+  chmod +x "$tools/no-mistakes"
+  head=$(git -C "$worktree" rev-parse HEAD)
+  cat > "$dir/run" <<EOF
+run:
+  id: "01OLD"
+  branch: replacement-worker
+  status: completed
+  head: "$head"
+  pr: ""
+outcome: failed
+EOF
+  export FM_FAKE_RUN_RECORD="$dir/run"
+  fm_write_meta "$home/state/worker.meta" window=fmses:fm-worker endpoint_task_id=worker \
+    "worktree=$worktree" "project=$project" harness=claude kind=ship mode=no-mistakes yolo=off \
+    "tasktmp=$dir/tasktmp" model=default effort=default
+  . "$ROOT/bin/fm-liveness-lib.sh"
+  PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+  assert_equals 0 "$FM_LIVENESS_LIVE" 'idle failed predecessor releases its seat'
+  out=$(FM_FAKE_DIR="$dir/endpoint" fm_test_run_spawn "$home" "$worktree" "$tools" worker --relaunch) \
+    || fail "no-PR relaunch failed: $out"
+  assert_equals claude "$(cat "$dir/endpoint/command")" 'no-PR replacement delivered'
+  assert_equals "$head" "$(git -C "$worktree" rev-parse HEAD)" 'relaunch leaves head unchanged'
+  "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker busy --current-gen --source claude-hook --event user-prompt-submit >/dev/null
+  before=$(find "$home/state" -type f -exec cksum {} \; | sort)
+  state=$(FM_HOME="$home" FM_CREW_STATE_NO_FORGE=1 FM_FAKE_DIR="$dir/endpoint" \
+    FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" "$ROOT/bin/fm-crew-state.sh" worker)
+  FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+  live=$FM_LIVENESS_LIVE
+  assert_equals "$before" "$(find "$home/state" -type f -exec cksum {} \; | sort)" 'current-state observation preserves records'
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" propose --words 'continue authorized work' --spend 1 >/dev/null
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" confirm >/dev/null
+  fm_test_spawn_brief "$home" extra
+  extra_tools=$(fm_test_make_spawn_fakebin "$dir/extra-tools")
+  cp "$tools/no-mistakes" "$extra_tools/no-mistakes"
+  admission=denied
+  if out=$(FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" FM_FAKE_LAUNCH_LOG="$dir/extra-delivery" \
+    fm_test_run_spawn "$home" "$worktree" "$extra_tools" extra "$project" --mode no-mistakes --yolo off); then admission=allowed; fi
+  printf 'no-PR replacement: %s; seats=%s; cap-1 admission=%s\n' "$state" "$live" "$admission"
+  assert_contains "$state" 'state: working' 'current native activity outranks old failed run'
+  assert_equals 1 "$live" 'working no-PR replacement retains seat'
+  assert_equals denied "$admission" 'cap-1 denies extra worker'
+  assert_contains "$out" 'caps concurrent workers at 1' 'denial comes from real admission'
+  [ ! -e "$home/state/extra.meta" ] || fail 'denied launch published metadata'
+  for route in full coarse; do
+    export FM_FAKE_COARSE=0 FM_FAKE_LEDGER_HEAD="$head"
+    [ "$route" != coarse ] || FM_FAKE_COARSE=1
+    for result in failed completed cancelled; do
+      export FM_FAKE_LEDGER_STATUS="$result"
+      cat > "$dir/run" <<EOF
+run:
+  id: "01OLD"
+  branch: replacement-worker
+  status: $result
+  head: "$head"
+  pr: ""
+EOF
+      for expected in working terminal; do
+        if [ "$expected" = working ]; then result_state=busy; else result_state=idle; fi
+        "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker "$result_state" --current-gen --source claude-hook --event stop >/dev/null
+        state=$(FM_HOME="$home" FM_CREW_STATE_NO_FORGE=1 FM_FAKE_DIR="$dir/endpoint" \
+          FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" "$ROOT/bin/fm-crew-state.sh" worker)
+        if [ "$expected" = working ]; then
+          assert_contains "$state" 'state: working' "$route $result yields to current activity"
+        else
+          assert_contains "$state" 'source: run-step' "$route $result retains settled terminal result"
+        fi
+      done
+    done
+  done
+  unset FM_FAKE_COARSE FM_FAKE_LEDGER_HEAD FM_FAKE_LEDGER_STATUS
+  "$ROOT/bin/fm-busy-event.sh" apply "$home/state" worker idle --current-gen --source claude-hook --event stop >/dev/null
+  FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" PATH="$tools:$PATH" fm_liveness_snapshot "$home"
+  assert_equals 0 "$FM_LIVENESS_LIVE" 'settled terminal result still releases seat'
+  out=$(FM_FAKE_DIR="$dir/endpoint" FM_FAKE_PANE_PATH="$worktree" FM_FAKE_LAUNCH_LOG="$dir/extra-delivery" \
+    fm_test_run_spawn "$home" "$worktree" "$extra_tools" extra "$project" --mode no-mistakes --yolo off) \
+    || fail "settled terminal result blocked allowed launch: $out"
+  [ -f "$home/state/extra.meta" ] && [ -s "$dir/extra-delivery" ] || fail 'allowed launch not delivered'
+  unset FM_FAKE_RUN_RECORD
+  pass 'no-PR replacement activity retains seat and terminal settlement permits admission'
+}
+
 test_delayed_handoff_case() (
   # Each probe is a child of this shell. Every exit releases its external
   # response barrier and reaps it before the suite removes its fixture.
@@ -469,6 +572,7 @@ PERL
 }
 
 case "${1:-all}" in
+  R1terminal) test_no_pr_relaunch_keeps_working_seat; exit ;;
   R1) test_relaunch_withdraws_previous_ready_handoff; exit ;;
   R1race)
     case "${2:-all}" in
@@ -479,9 +583,9 @@ case "${1:-all}" in
     exit ;;
   R2) test_native_muse_snapshot_never_writes_home; exit ;;
   R3|R4) test_postlaunch_stamp_failure_reports_confirmed_work "$1"; exit ;;
-  all) test_relaunch_withdraws_previous_ready_handoff; test_delayed_handoff_refuses_replacement; test_native_muse_snapshot_never_writes_home
+  all) test_no_pr_relaunch_keeps_working_seat; test_relaunch_withdraws_previous_ready_handoff; test_delayed_handoff_refuses_replacement; test_native_muse_snapshot_never_writes_home
     test_postlaunch_stamp_failure_reports_confirmed_work R3; test_postlaunch_stamp_failure_reports_confirmed_work R4 ;;
-  *) fail 'usage: fm-liveness-lib.test.sh [R1|R1race|R2|R3|R4]' ;;
+  *) fail 'usage: fm-liveness-lib.test.sh [R1|R1terminal|R1race|R2|R3|R4]' ;;
 esac
 
 fixture="$TMP_ROOT/code"

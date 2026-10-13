@@ -1134,6 +1134,19 @@ if [ "$HAVE_RUN" = 1 ]; then
       ;;
   esac
 
+  case "$RUN_STATE" in
+    done|failed)
+      if { { [ "$RUN_SOURCE" = full ] && ! fm_nm_run_is_active "$RUN_OUT"; } \
+        || { [ "$RUN_SOURCE" = coarse ] && [ "$(fm_nm_run_status_class "$COARSE_STATUS")" = terminal ]; }; } \
+        && [ -n "$BACKEND_TARGET" ] && pane_readable "$BACKEND_TARGET"; then
+        BUSY_VERDICT=$(crew_busy_verdict "$BACKEND_TARGET")
+        case "${BUSY_VERDICT%% *}" in
+          busy) emit working pane "harness busy (${BUSY_VERDICT#* })" ;;
+        esac
+      fi
+      ;;
+  esac
+
   [ -z "$SELECTED_RUN_ID" ] || RUN_DETAIL="$RUN_DETAIL${SEP}run: $SELECTED_RUN_ID"
   emit "$RUN_STATE" run-step "$RUN_DETAIL"
 fi
