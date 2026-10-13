@@ -1,0 +1,73 @@
+{
+  "head": "0f3d6932d035d750ab870e08566ebdc32da86df7",
+  "predecessor": {
+    "schema": "fm-remote-seat-operation.v2",
+    "task": "mate",
+    "operation": "observing.old",
+    "requested_generation": "observing.old",
+    "actual_generation": "s1791863000.225609.18097",
+    "previous_generation": null,
+    "disposition": "dead-after-start",
+    "startup_confirmed": true,
+    "old_stopped": false,
+    "old_destroyed": false,
+    "route": {
+      "placement": "remote",
+      "backend": "herdr",
+      "target": "fm-remote:w2:p2",
+      "home": "/tmp/fm-receipt-current.hQPG1l/remote",
+      "host": null,
+      "remote_root": null,
+      "spawn_gen": "s1791863000.225609.18097"
+    },
+    "actual_model": "default",
+    "complete": true
+  },
+  "stale_observing_receipt": {
+    "schema": "fm-remote-seat-operation.v2",
+    "task": "mate",
+    "operation": "observing.old",
+    "requested_generation": "observing.old",
+    "actual_generation": "s1791863000.225609.18097",
+    "previous_generation": null,
+    "disposition": "dead-after-start",
+    "startup_confirmed": true,
+    "old_stopped": false,
+    "old_destroyed": false,
+    "route": {
+      "placement": "remote",
+      "backend": "herdr",
+      "target": "fm-remote:w2:p2",
+      "home": "/tmp/fm-receipt-current.hQPG1l/remote",
+      "host": null,
+      "remote_root": null,
+      "spawn_gen": "s1791863000.225609.18097"
+    },
+    "actual_model": "default",
+    "complete": true
+  },
+  "replacement": {
+    "schema": "fm-remote-seat-operation.v2",
+    "task": "mate",
+    "operation": "replacement.new",
+    "requested_generation": "replacement.new",
+    "actual_generation": "replacement.new",
+    "previous_generation": "s1791863000.225609.18097",
+    "disposition": "started",
+    "startup_confirmed": true,
+    "old_stopped": false,
+    "old_destroyed": false,
+    "route": {
+      "placement": "remote",
+      "backend": "herdr",
+      "target": "fm-remote:w3:p2",
+      "home": "/tmp/fm-receipt-current.hQPG1l/remote",
+      "host": null,
+      "remote_root": null,
+      "spawn_gen": "replacement.new"
+    },
+    "actual_model": "default",
+    "complete": true
+  },
+  "fixture": "Synthetic agent on real Herdr; actual Firstmate lifecycle scripts"
+}

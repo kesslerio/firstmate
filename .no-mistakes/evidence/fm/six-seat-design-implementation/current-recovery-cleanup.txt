@@ -1,0 +1,1 @@
+Disposable runner /tmp/fm-receipt-current.hQPG1l absent. Original owned shell and synthetic agent PIDs absent. Herdr helper teardown succeeded; viewer/session removed and fleet tripwire unchanged. Source worktree unchanged.
