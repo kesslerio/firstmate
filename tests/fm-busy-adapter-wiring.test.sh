@@ -79,6 +79,75 @@ if (["turn-end", "progress"].includes(process.env.MODE)) {
 EOF
 }
 
+test_pi_stream_extension_activation_and_lifecycle() {
+  local rec id=stream-pi state ext out version
+  for version in disabled 1.2.0 0.82.0; do
+    rec=$(make_spawn_case "stream-$version" pi "$id")
+    read_case_record "$rec"
+    cat > "$FAKEBIN_DIR/pi" <<SH
+#!/usr/bin/env bash
+if [ "\${1:-}" = --version ]; then printf '%s\\n' '$version'; fi
+exit 0
+SH
+    chmod +x "$FAKEBIN_DIR/pi"
+    if [ "$version" = disabled ]; then
+      out=$(FM_STREAM_SILENT_MAX_SECS='' run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$id" "$PROJ_DIR")
+    else
+      out=$(FM_STREAM_SILENT_MAX_SECS=300 run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$id" "$PROJ_DIR")
+    fi
+    expect_code 0 $? "stream spawn should succeed: $out"
+    state="$HOME_DIR/state"
+    ext="$state/$id.pi-ext.ts"
+    STREAM_STATE="$state" STREAM_ID="$id" STREAM_ENABLED="$version" EXT_PATH="$ext" node --input-type=module <<'JS' || fail "generated stream lifecycle failed for $version"
+import { pathToFileURL } from "node:url";
+import { existsSync, readFileSync } from "node:fs";
+const { default: extension } = await import(pathToFileURL(process.env.EXT_PATH).href);
+const handlers = {};
+extension({on: (name, fn) => { handlers[name] = fn; }, events: { on() {} }});
+const state = process.env.STREAM_STATE, id = process.env.STREAM_ID;
+const marker = state + "/" + id + ".model-stream";
+const ctx = {isIdle: () => true};
+let clock = 10000;
+Date.now = () => clock;
+const fire = async (name, event = {}) => { await handlers[name]?.(event, ctx); };
+const assert = (ok, message) => { if (!ok) throw new Error(message); };
+await fire("agent_start");
+await fire("context", {messages: []});
+if (process.env.STREAM_ENABLED !== "1.2.0") {
+  assert(!existsSync(marker), "disabled/unverified worker produced stream evidence");
+} else {
+  assert(existsSync(marker), "foreground context did not open stream evidence");
+  const initial = readFileSync(marker, "utf8");
+  await fire("message_update", {message: {role: "assistant", content: [{type:"text",text:""}]}});
+  assert(readFileSync(marker,"utf8") === initial, "empty event refreshed stream");
+  await fire("message_update", {message: {role: "assistant", content: [{type:"thinking",thinking:"reason"}]}});
+  const progressed = readFileSync(marker,"utf8");
+  assert(progressed !== initial, "thinking did not advance progress");
+  await fire("message_update", {message: {role: "assistant", content: [{type:"text",text:"token"}]}});
+  assert(readFileSync(marker,"utf8") === progressed, "unthrottled content event");
+  clock += 1001;
+  await fire("message_update", {message: {role: "assistant", content: [{type:"toolCall",name:"bash",arguments:{command:"true"}}]}});
+  assert(readFileSync(marker,"utf8") !== progressed, "tool arguments did not advance progress");
+  await fire("message_end", {message: {role:"user"}});
+  assert(existsSync(marker), "user message end closed assistant stream");
+  await fire("message_end", {message: {role:"assistant"}});
+  assert(!existsSync(marker), "assistant end left stream open");
+  clock += 1001;
+  await fire("message_update", {message: {role:"assistant", content:[{type:"text",text:"late"}]}});
+  assert(!existsSync(marker), "late event resurrected closed stream");
+  await fire("context", {messages: []});
+  assert(existsSync(marker), "retry did not open new stream");
+  await fire("tool_execution_start");
+  assert(!existsSync(marker), "tool phase retained stream");
+  await fire("context", {messages: []});
+  await fire("agent_settled");
+  assert(!existsSync(marker), "settlement retained stream");
+}
+JS
+  done
+  pass "generated Pi wiring gates stream observation and clears model phases without accepting late updates"
+}
+
 test_pi_extension_semantic_lifecycle() {
   local rec id=busy-pi-1 out state ext
   rec=$(make_spawn_case pi-lifecycle pi "$id")
@@ -841,6 +910,7 @@ test_raw_secondmate_launch_writes_no_busy_wiring
 test_secondmate_claude_stop_guard_owns_the_stop_verdict
 test_secondmate_claude_older_home_guard_keeps_the_stop_idle_hook
 test_secondmate_claude_spawn_leaves_local_settings_untouched
+test_pi_stream_extension_activation_and_lifecycle
 test_secondmate_pi_extension_reports_busy_without_a_parent_turnend
 test_secondmate_omp_extension_reports_busy_without_a_parent_turnend
 test_secondmate_opencode_plugin_closes_without_a_parent_turnend
