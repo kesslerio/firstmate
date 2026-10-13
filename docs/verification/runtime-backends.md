@@ -3234,6 +3234,9 @@ Observed output:
 ```text
 ok - real Pi 1.2.0 stream, tool, completion, and background request phases
 ok - real Pi 1.2.0 default-off worker
+Firstmate model-stream observation write failed; inspect worker instrumentation.
+ok - real Pi 1.2.0 instrumentation deadline terminated writer and output-holding descendant
+ok - real Pi 1.2.0 stream, tool, completion, and background request phases
 # pi-signed unavailable: signed executable not exercised
 ok - real Pi 1.2.0 worker stream lifecycle, background exclusion, and default-off behavior
 ```
@@ -3241,6 +3244,7 @@ ok - real Pi 1.2.0 worker stream lifecycle, background exclusion, and default-of
 The guard runs the generated worker extension through Pi's real resource loader, model runtime, agent loop, and custom tool execution in isolated directories.
 Synthetic transport holds an accepted response, supplies substantive and empty events, enters a tool phase, and completes a subsequent request.
 The real provider callback is also exercised outside the foreground agent loop to disconfirm background-request tracking.
+An isolated copy of the toolkit injects one stalled writer command and a descendant that retains output, proving the real extension's deadline ends both processes and Pi continues through its remaining phases.
 No external provider, credentials, primary extension, or live fleet is used.
 The signed executable was absent and is not credited as live-verified on this version.
 The portable busy-state, adapter-wiring, and watcher-triage suites own generation/request rejection and inspection notification behavior.

@@ -14,14 +14,38 @@ PI_VERSION=$(jq -r '.version' "$PI_PACKAGE_DIR/package.json") || fail "Pi packag
 TMP_ROOT=$(fm_test_tmproot fm-pi-worker-stream-live)
 fakebin=$(make_spawn_fakebin "$TMP_ROOT/fake")
 
-for enabled in 300 0; do
-  home="$TMP_ROOT/home-$enabled"
-  project="$TMP_ROOT/project-$enabled"
-  wt="$TMP_ROOT/wt-$enabled"
+for case_label in enabled disabled stalled; do
+  enabled=300
+  [ "$case_label" != disabled ] || enabled=0
+  home="$TMP_ROOT/home-$case_label"
+  project="$TMP_ROOT/project-$case_label"
+  wt="$TMP_ROOT/wt-$case_label"
   fm_test_spawn_home "$home" pi
-  fm_git_worktree "$project" "$wt" "stream-$enabled"
+  fm_git_worktree "$project" "$wt" "stream-$case_label"
   fm_test_spawn_brief "$home" stream
-  out=$(FM_STREAM_SILENT_MAX_SECS="$enabled" fm_test_run_spawn "$home" "$wt" "$fakebin" stream "$project" pi --mode no-mistakes --yolo off) \
+  spawn_root=$ROOT fault_dir=''
+  if [ "$case_label" = stalled ]; then
+    fault_dir="$home/fault"
+    spawn_root="$home/toolkit"
+    mkdir -p "$fault_dir" "$spawn_root"
+    cp -R "$ROOT/bin" "$spawn_root/bin"
+    mv "$spawn_root/bin/fm-busy-event.sh" "$spawn_root/bin/fm-busy-event-real.sh"
+    # Inject one command stall at the generated extension's executable boundary.
+    # The SDK, extension, deadline owner, and subsequent writer calls remain real.
+    cat > "$spawn_root/bin/fm-busy-event.sh" <<SH
+#!/usr/bin/env bash
+if [ "\${1:-}" = stream ] && [ "\${4:-}" = progress ] && [ ! -e "$fault_dir/once" ]; then
+  touch "$fault_dir/once"
+  trap '' TERM
+  sleep 300 &
+  printf '%s\n%s\n' "\$\$" "\$!" > "$fault_dir/pids"
+  wait
+fi
+exec "$spawn_root/bin/fm-busy-event-real.sh" "\$@"
+SH
+    chmod +x "$spawn_root/bin/fm-busy-event.sh"
+  fi
+  out=$(ROOT="$spawn_root" FM_STREAM_SILENT_MAX_SECS="$enabled" fm_test_run_spawn "$home" "$wt" "$fakebin" stream "$project" pi --mode no-mistakes --yolo off) \
     || fail "Pi $PI_VERSION: could not generate worker extension: $out"
   mkdir -p "$home/agent"
   cat > "$home/agent/models.json" <<'JSON'
@@ -32,8 +56,8 @@ JSON
   env -i PATH="$PATH" HOME="$home/user-home" NODE_NO_WARNINGS=1 \
     PI_PACKAGE_DIR="$PI_PACKAGE_DIR" PI_CODING_AGENT_DIR="$home/agent" \
     STREAM_STATE="$home/state" STREAM_EXTENSION="$home/state/stream.pi-ext.ts" \
-    STREAM_CWD="$wt" STREAM_ENABLED="$enabled" \
-    node "$ROOT/tests/fm-pi-worker-stream-live.mjs" || fail "Pi $PI_VERSION: real worker stream guard failed (enabled=$enabled)"
+    STREAM_CWD="$wt" STREAM_ENABLED="$enabled" STREAM_FAULT_DIR="$fault_dir" \
+    node "$ROOT/tests/fm-pi-worker-stream-live.mjs" || fail "Pi $PI_VERSION: real worker stream guard failed ($case_label)"
 done
 if ! command -v pi-signed >/dev/null 2>&1; then
   printf '# pi-signed unavailable: signed executable not exercised\n'

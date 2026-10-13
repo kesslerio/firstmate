@@ -674,6 +674,31 @@ test_model_stream_lifecycle_is_fenced() {
   pass "model streams preserve state and reject stale, closed, superseded, foreign, and retired events"
 }
 
+test_model_stream_close_failure_invalidates_observation() {
+  local state gen fakebin real_mv
+  state=$(new_state_dir model-stream-close-failure)
+  gen=$("$EV" arm "$state" t1)
+  "$EV" apply "$state" t1 busy --gen "$gen" --source pi-ext --event agent-start
+  "$EV" stream "$state" t1 open --gen "$gen" --request 1
+  fakebin=$(fm_fakebin "$TMP_ROOT/model-stream-close-failure")
+  real_mv=$(command -v mv)
+  cat > "$fakebin/mv" <<SH
+#!/usr/bin/env bash
+case "\${!#}" in *.model-stream-order) exit 1 ;; esac
+exec "$real_mv" "\$@"
+SH
+  chmod +x "$fakebin/mv"
+  if PATH="$fakebin:$PATH" "$EV" stream "$state" t1 close --gen "$gen" --request 1; then
+    fail "faulted close reported success"
+  fi
+  if fm_busy_stream_read "$state" t1 pi >/dev/null; then fail "failed close left active observation"; fi
+  if "$EV" stream "$state" t1 progress --gen "$gen" --request 1; then fail "late progress resurrected failed close"; fi
+  if "$EV" stream "$state" t1 open --gen "$gen" --request 1; then fail "failed close admitted duplicate request"; fi
+  "$EV" stream "$state" t1 open --gen "$gen" --request 2 || fail "new request after failed close refused"
+  pass "failed close invalidates observation before persistence and denies late replay"
+}
+
+test_model_stream_close_failure_invalidates_observation
 test_model_stream_lifecycle_is_fenced
 test_progress_is_generation_bound_and_not_semantic_state
 test_turn_ended_notification_is_generation_bound

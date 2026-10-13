@@ -3192,6 +3192,7 @@ Pi worker model-stream observation is optional.
 Set `FM_STREAM_SILENT_MAX_SECS=300` before launching workers and their watcher to inspect a foreground request that stops producing substantive content for five minutes.
 The interval includes foreground request preparation; the existing wedge delay and declared-wait deferrals still apply before an inspection notification, and no worker is interrupted or restarted.
 New instrumentation is version-gated to Pi 1.2.0 and takes effect on launch or relaunch; older workers and unsupported versions retain the general busy bound.
+Observation writes have a five-second subprocess deadline and one-second termination grace; a failed write reports an instrumentation warning while Pi continues.
 Unset, empty, zero, negative, malformed, and values longer than nine decimal digits disable the option, including its separate normal-model progress anchor.
 `bin/fm-busy-lib.sh` owns stream evidence and ordering; the [real-Pi verification guard](verification/runtime-backends.md#pi-worker-model-stream-observation) refreshes the vendor evidence.
 

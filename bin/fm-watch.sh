@@ -2532,6 +2532,10 @@ busy_turn_bound_check() {  # <window> <task> <hash> <since-file> <escalation-fil
     fi
     label="busy (model stream silent)"
   else
+    if [ -e "$stream_episode" ]; then
+      rm -f "$since_file" "$escalation_file"
+      clear_write_tracking "$(window_key "$win")"
+    fi
     rm -f "$stream_episode"
   fi
   wedge_timer_check "$win" "$since_file" "$label" "$escalation_file" "$task" "$h" "$dialog" "$stream_snapshot"

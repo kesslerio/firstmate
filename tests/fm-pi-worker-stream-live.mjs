@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 
 const sdk = await import(pathToFileURL(process.env.PI_PACKAGE_DIR + "/dist/index.js").href);
@@ -85,6 +86,28 @@ let prompt;
 try {
   prompt = session.prompt("Exercise the synthetic local stream.");
   if (enabled) {
+    if (process.env.STREAM_FAULT_DIR) {
+      const pidsFile = process.env.STREAM_FAULT_DIR + "/pids";
+      await until(() => controller && existsSync(pidsFile), "stalled writer injection");
+      await delay(1100);
+      send(controller, {content: " recovered"});
+      await until(() => existsSync(progress), "progress after instrumentation deadline");
+      const pids = readFileSync(pidsFile, "utf8").trim().split("\n").map(Number);
+      assert.equal(pids.length, 2, "writer descendant injection missing");
+      for (const pid of pids) {
+        let alive = false;
+        try {
+          process.kill(pid, 0);
+          const status = spawnSync("ps", ["-p", String(pid), "-o", "stat="], {encoding: "utf8", timeout: 1000});
+          if (status.status === 0) alive = !status.stdout.trim().startsWith("Z");
+          else { process.kill(pid, 0); alive = true; }
+        } catch (error) {
+          if (!["ESRCH", "ENOENT"].includes(error.code)) throw error;
+        }
+        assert.equal(alive, false, "instrumentation deadline left owned descendant alive: " + pid);
+      }
+      console.log("ok - real Pi 1.2.0 instrumentation deadline terminated writer and output-holding descendant");
+    }
     await until(() => controller && existsSync(progress), "foreground progress");
     const first = record();
     assert.ok(first, "accepted real stream has no marker");
