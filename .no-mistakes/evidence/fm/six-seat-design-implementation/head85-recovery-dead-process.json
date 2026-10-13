@@ -1,0 +1,1 @@
+{"id":"cli:pane:process_info","result":{"process_info":{"foreground_process_group_id":4126914,"foreground_processes":[{"argv":["/run/current-system/sw/bin/bash"],"cmdline":"/run/current-system/sw/bin/bash","cwd":"/tmp/fm-receipt-home.34TirT","name":"bash","pid":4126914}],"pane_id":"w2:p2","shell_pid":4126914},"type":"pane_process_info"}}

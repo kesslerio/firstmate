@@ -1,0 +1,10 @@
+{
+  "head": "85f25591b493d2c377dd21b99a59d337d07e672d",
+  "owned_agent_processes": {
+    "4129514": "stopped",
+    "297363": "stopped"
+  },
+  "workspace_labs_removed": true,
+  "herdr_teardown": "guarded teardown completed; default-session tripwires verified",
+  "source_changes": ""
+}

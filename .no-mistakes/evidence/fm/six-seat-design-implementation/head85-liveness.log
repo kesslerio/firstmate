@@ -1,0 +1,14 @@
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - recovery probes and closes only the generation's owning socket
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - home-lock timeout retries retain terminal socket ownership and refuse missing identity
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - unknown and stale tracked routes refuse recovery before endpoint or ledger mutation
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - recovery treats a shell-only submitted launch as pending startup, not death
+fleet-seats: unmanaged pooled supervisor sm1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+ok - a late startup confirmation never authorizes destructive recovery

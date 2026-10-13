@@ -1,0 +1,16 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/home
+fleet-seats: reserved pool=shared id=sm1 generation=g1 used=1 capacity=1
+fleet-seats: dispatched id=sm1 generation=g1
+fleet-seats: retained - the endpoint for sm1 generation g1 holds only a shell; a submitted launch may still execute there (the seat stays counted until evidence resolves it)
+Observed: shell-only dispatched launch remains reserved; reclaim refused.
+Fixture: g1 previously confirmed; current runtime is the real exited-agent shell on A.
+Denied socket=relative/socket status=skipped reason=the recorded tmux socket is unverified; recovery is refused
+Denied socket= status=skipped reason=the recorded tmux socket is unverified; recovery is refused
+Recovery probe from B: status=relaunchable state=dead socket=/home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/a target=firstmate:fm-sm1
+Timeout retained endpoint A after reclamation: rc=1 reason=another secondmate relaunch still owns the per-home relaunch lock after 1s; endpoint left dead
+Terminal-generation retry resolved its recorded socket A from ambient B.
+Replacement launch result=1 reason= output=fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M4EGNATFWY186FV48C2W9EBR/.test-labs/home
+fleet-seats: no seat - harness codex launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+error: spawn refused - sm1 has no fleet seat for model default (see the fleet-seats line above)
+Decoy on B survives: pane=%0 dead=0 command=bash
+Observed: recovery reclaimed g1, closed the shell on A, and preserved the identically named unrelated window on B.

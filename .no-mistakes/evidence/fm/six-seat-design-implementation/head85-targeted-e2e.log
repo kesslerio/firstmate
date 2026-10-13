@@ -1,0 +1,29 @@
+FM_TEST_BEGIN 2026-10-13T19:14:32Z tests/fm-remote-seat-adoption.test.sh family=unclassified expected_gate_skip=none
+ok - failed existing-generation persistence is unknown and retains its receipt
+ok - an owned-process crash before binding leaves received retries unknown
+ok - received crash and retries retain parent capacity without repeating lifecycle effects
+ok - successful existing-generation import keeps the legacy supervisor counted
+ok - foreign operations and stale generation evidence stay unknown
+ok - damaged-home retries preserve started receipts and proven absence reclaims the exact generation
+ok - verified fresh refusals remain prelaunch before opening a receipt
+FM_TEST_END 2026-10-13T19:14:36Z tests/fm-remote-seat-adoption.test.sh exit=0 duration_ms=3956 gate_skip=false
+FM_TEST_BEGIN 2026-10-13T19:14:36Z tests/fm-teardown-tmux-child-seat.test.sh family=unclassified expected_gate_skip=none
+ok - forced teardown preserves wrong-socket children until owning-home cleanup
+ok - top-level cleanup requires owning-socket destruction evidence
+ok - remote cleanup requires generation-bound host destruction evidence
+FM_TEST_END 2026-10-13T19:14:49Z tests/fm-teardown-tmux-child-seat.test.sh exit=0 duration_ms=12460 gate_skip=false
+FM_TEST_BEGIN 2026-10-13T19:14:49Z tests/fm-backend-herdr-focus-flash-e2e.test.sh family=real-herdr-gated expected_gate_skip=herdr
+ok - old path note: this Herdr release preserves focus across the explicit close; continuing with outcome-only assertions
+ok - mitigation: every in-operation sample preserved exact focus while the doomed workspace was removed
+ok - fallback: a doomed pane holding a persistent child exhausts the proof and takes the plain explicit close
+ok - fallback on a focus-preserving release: the plain explicit close preserved exact focus throughout
+ok - version floor: herdr 0.9.3 protocol 22 is at or above the floor and preserves focus
+ok - version floor: an unconfigured home stays projected on herdr 0.9.3 and the explicit opt-in agrees
+evidence: herdr=0.9.3 protocol=22 steal_live=0 floor_verdict=0 default-session-tripwire=armed
+FM_TEST_END 2026-10-13T19:14:51Z tests/fm-backend-herdr-focus-flash-e2e.test.sh exit=0 duration_ms=2455 gate_skip=false
+FM_TEST_SUMMARY total=3 failed=0 skipped_gate=0 duration_ms=18965
+FM_TEST_SUMMARY_FAMILY family=real-herdr-gated count=1 duration_ms=2455 failed=0
+FM_TEST_SUMMARY_FAMILY family=unclassified count=2 duration_ms=16416 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-teardown-tmux-child-seat.test.sh duration_ms=12460
+FM_TEST_SLOWEST rank=2 script=tests/fm-remote-seat-adoption.test.sh duration_ms=3956
+FM_TEST_SLOWEST rank=3 script=tests/fm-backend-herdr-focus-flash-e2e.test.sh duration_ms=2455

@@ -1,0 +1,17 @@
+
+[art@zeppola:/tmp/fm-receipt-home.34TirT]$ export PATH=/home/art/.no-mistakes/worktrees/9f75e
+c418609/01M4EGNATFWY186FV48C2W9EBR/.live-recovery.mAxZji/shims:/home/art/.npm-packages/lib/no
+de_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-mus
+l/codex-path:/home/art/.local/bin:/home/art/.npm-packages/bin:/run/wrappers/bin:/home/art/.lo
+cal/share/flatpak/exports/bin:/var/lib/flatpak/exports/bin:/home/art/.nix-profile/bin:/nix/pr
+ofile/bin:/home/art/.local/state/nix/profile/bin:/etc/profiles/per-user/art/bin:/nix/var/nix/
+profiles/default/bin:/run/current-system/sw/bin HOME=/home/art/.no-mistakes/worktrees/9f75ec4
+18609/01M4EGNATFWY186FV48C2W9EBR/.live-recovery.mAxZji/user-home; export GOTMPDIR=/tmp/fm-mat
+e/gotmp
+
+[art@zeppola:/tmp/fm-receipt-home.34TirT]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-receipt-home.34TirT]$ . '/tmp/fm-mate+8ec28583d9ef9e0b37125a252595cb5a92
+0505b73fb82d7e69dc321c02dbafac/launch.s1791918848.4125929.28943.sh'
+Claude Code synthetic fixture
+❯

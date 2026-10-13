@@ -1,0 +1,4 @@
+ok - maintenance retains matching process owners and reclaims reservations with reused PIDs
+ok - legacy routes without socket ownership and invalid endpoints stay counted
+ok - a buffered supervisor launch keeps its seat until it starts and later dies
+ok - only a proven endpoint cancellation frees a submitted launch
