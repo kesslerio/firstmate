@@ -110,8 +110,9 @@ export interface UnreadWakeScope {
   eligibleTasks: string[];
   /**
    * True only when this scan itself is untrustworthy: the queue or its
-   * metadata could not be read, a line fails the structural tab-field check,
-   * or an unresolvable signal/stale row was found. False whenever the scan
+   * metadata could not be read, a metadata alias has conflicting task owners,
+   * a line fails the structural tab-field check, or an unresolvable
+   * signal/stale row was found. False whenever the scan
    * completed cleanly and simply found nothing (or nothing further) eligible
    * for the branch right now: status "unsafe" with corrupted false is the
    * ordinary "ordinary main-only content, nothing here for the branch" case,
