@@ -4979,12 +4979,28 @@ for (const heartbeat of [false, true]) {
     throw new Error(`the terminal-keyed task lost its project context: ${JSON.stringify(scope.projects)}`);
   }
 }
+// A terminal must never silently change owners, including collisions with
+// another task's window or canonical task key. Exercise both record orders.
+for (const owner of ["a-owner", "z-owner"]) {
+  for (const field of ["terminal", "window", "task"]) {
+    const terminal = field === "task" ? owner : "orca-term-1";
+    writeFileSync(`${state}/orca-task.meta`, `project=${project}\nterminal=${terminal}\n`);
+    writeFileSync(`${state}/${owner}.meta`, `project=${project}\n${field === "task" ? "" : `${field}=${terminal}\n`}`);
+    writeFileSync(`${state}/.wake-queue`, `1\t1\tsignal\torca-task.status\tsignal: orca-task.status\n1\t2\tstale\t${terminal}\tstale: ${terminal}`);
+    const scope = scopeForUnreadWake(state, false);
+    if (scope.eligible || !scope.corrupted || scope.eligibleSeqs.length !== 0) {
+      throw new Error(`conflicting ${field} ownership must leave the whole wake to MAIN (${owner}): ${JSON.stringify(scope)}`);
+    }
+    // Empty metadata removes this disposable owner from the next index.
+    writeFileSync(`${state}/${owner}.meta`, "");
+  }
+}
 process.exit(0);
 EOF
   status=$?
   out=$(cat "$TMP_ROOT/node-output")
   expect_code 0 "$status" "a terminal-keyed Orca stale row must resolve to its task: $out"
-  pass "scopeForUnreadWake resolves a terminal-keyed Orca stale row to its task alongside another eligible row"
+  pass "scopeForUnreadWake resolves unique Orca terminal owners and refuses conflicting aliases alongside another eligible row"
 }
 
 # A second mate's status log is one shared channel for many independently keyed

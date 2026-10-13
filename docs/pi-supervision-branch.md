@@ -127,6 +127,7 @@ It excludes the row when any `needs-decision` remains open or the current meanin
 An unreadable or symlinked status log fails the scope closed rather than influencing routing.
 
 Before cross-referencing them, the dispatcher resolves trigger keys and every currently unread excluded decision row to task identity.
+If a task key or endpoint alias names more than one task, the metadata scan is corrupt and the entire wake stays on main rather than selecting an owner by record order.
 The cross-reference then applies two rules:
 
 - Any signal or stale trigger containing a decision-owned task goes wholly to main, including a batch that also contains routine rows.
@@ -649,7 +650,7 @@ The generated prompt includes the [scout-completion](../.agents/skills/scout-com
 - Cache key, and model and effort selection.
 - In `test_branch_dispatch_classifies_main_only_rows_and_writes_the_eligible_snapshot`: decision-owned signal and stale rows' exclusion from `eligibleSeqs`, their presence in `needsDecisionKeys`, task alias resolution, reserved-key configuration, status-log race and symlink refusal, non-vetoing behavior for unrelated eligible rows, and decision-only queues reading as ordinary main-only absence.
 - In `test_branch_dispatch_routes_secondmate_signal_by_new_span`: second-mate signal routing by new span on the Pi and attended-host paths, including an unrelated open hold, mixed, same-key, stamped-key, key-less blocked, and resolution spans, the whole-log fallback, stale-row isolation, and crewmate routing.
-- In `test_branch_dispatch_resolves_terminal_keyed_orca_stale_row`: an Orca stale row keyed by its `terminal=` handle resolving to its task and project in the routine and heartbeat scans instead of vetoing the wake to main.
+- In `test_branch_dispatch_resolves_terminal_keyed_orca_stale_row`: a unique Orca `terminal=` handle resolving to its task and project in routine and heartbeat scans, and conflicting terminal, window, or task aliases refusing the whole scan in either record order.
 
 `tests/fm-branch-supervision.test.sh` covers:
 

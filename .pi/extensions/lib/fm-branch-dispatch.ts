@@ -398,14 +398,19 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
       // (bin/fm-watch.sh keys Orca endpoints by terminal=), so index both.
       const terminal = fields.find((line) => line.startsWith("terminal="))?.slice(9) ?? "";
       if (project) {
+        const aliases = [task, `${task}.status`, `${task}.turn-ended`, window, terminal];
+        for (const key of aliases) {
+          if (!key) continue;
+          const owner = taskByKey.get(key);
+          // Ambiguous ownership must stay on MAIN, never inherit the last
+          // record's decision state or project context.
+          if (owner !== undefined && owner !== task) return UNSAFE_SCOPE;
+          taskByKey.set(key, task);
+        }
         metadata.set(task, project);
-        taskByKey.set(task, task);
-        taskByKey.set(`${task}.status`, task);
-        taskByKey.set(`${task}.turn-ended`, task);
         for (const endpoint of [window, terminal]) {
           if (!endpoint) continue;
           metadata.set(endpoint, project);
-          taskByKey.set(endpoint, task);
         }
       }
     }
