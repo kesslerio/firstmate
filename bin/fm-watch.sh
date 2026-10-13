@@ -1680,7 +1680,7 @@ wedge_defer_guard() {  # <window> <since-file> <triage-label> <idle-age> <guard-
 # never reaches it.
 wedge_timer_check() {  # <window> <since-file> <triage-label> <escalation-count-file> <task> <pane-hash> [dialog-name] [stream snapshot]
   local win=$1 since_file=$2 label=$3 escalation_file=$4 task=$5 hash=$6 dialog=${7-} since age n reason evidence guard guard_note
-  local stream_snapshot=${8:-} stream_gen stream_request stream_rev stream_ts stream_detail='' append_status
+  local stream_snapshot=${8:-} stream_ts stream_detail='' append_status
   since=$(cat "$since_file" 2>/dev/null || true)
   case "$since" in
     ''|*[!0-9]*)
@@ -1720,7 +1720,7 @@ wedge_timer_check() {  # <window> <since-file> <triage-label> <escalation-count-
             clear_write_tracking "$(window_key "$win")"
             return 0
           fi
-          read -r stream_gen stream_request stream_rev stream_ts <<< "$stream_snapshot"
+          read -r _ _ _ stream_ts <<< "$stream_snapshot"
           stream_detail=", model stream silent for $(( $(date +%s) - stream_ts ))s (foreground request)"
         fi
         n=$(( $(cat "$escalation_file" 2>/dev/null || echo 0) + 1 ))

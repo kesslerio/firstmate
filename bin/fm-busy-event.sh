@@ -285,7 +285,7 @@ if [ "$CMD" = stream ]; then
   if [ "$STREAM_OP" = progress ]; then
     [ "$phase" = active ] || { lock_release; exit 1; }
     snapshot=$(fm_busy_stream_record_read "$STATE/$ID.model-stream") || { lock_release; exit 1; }
-    read -r stream_gen stream_request old_rev stream_ts <<< "$snapshot"
+    read -r stream_gen stream_request old_rev _ <<< "$snapshot"
     [ "$stream_gen" = "$GEN" ] && [ "$stream_request" = "$REQUEST" ] || { lock_release; exit 1; }
     rev=$((old_rev + 1))
   else
