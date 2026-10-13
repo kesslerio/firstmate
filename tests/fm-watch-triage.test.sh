@@ -15,6 +15,9 @@
 # Daemon-side classification/injection lives in fm-daemon.test.sh; watcher/lock
 # liveness in fm-watcher-lock.test.sh; the durable-queue safety matrix in
 # fm-wake-queue.test.sh.
+#
+# FM_WATCH_TRIAGE_CASES selects space-separated test functions for local focused
+# validation. Unset runs the complete suite; an invalid or empty selection fails.
 set -u
 
 # shellcheck source=tests/wake-helpers.sh
@@ -7169,6 +7172,101 @@ if [ -n "${FM_TEST_ONLY:-}" ]; then
   exit 0
 fi
 
+test_pi_stream_silence_uses_inspection_timer() {
+  local dir state fakebin out capture_file window key gen snapshot pid mode enabled
+  for mode in enabled disabled closed foreign fresh malformed stale resumed racing; do
+    dir=$(make_case "pi-stream-$mode"); state="$dir/state"; fakebin="$dir/fakebin"
+    out="$dir/watch.out"; capture_file="$dir/pane.txt"; window="test:fm-stream-$mode"
+    key=$(printf '%s' "$window" | tr ':/.' '___')
+    printf 'Working...' > "$capture_file"
+    printf 'window=%s\nkind=ship\nharness=pi\n' "$window" > "$state/stream.meta"
+    record_pi_busy "$state" stream
+    gen=$(cat "$state/stream.busy-gen")
+    "$ROOT/bin/fm-busy-event.sh" stream "$state" stream open --gen "$gen" --request 1
+    # Backdate the owned protocol fixture, not production source or a UI guess.
+    snapshot="v1 gen=$gen request=1 rev=1 ts=$(( $(date +%s) - 600 ))"
+    printf '%s\n' "$snapshot" > "$state/stream.model-stream"
+    printf 'working: setup complete\n' > "$state/stream.status"
+    seen_sig "$state/stream.status" > "$state/.seen-stream_status"
+    enabled=300
+    case "$mode" in
+      disabled) enabled=0 ;;
+      closed) "$ROOT/bin/fm-busy-event.sh" stream "$state" stream close --gen "$gen" --request 1 ;;
+      foreign) printf 'window=%s\nkind=ship\nharness=claude\n' "$window" > "$state/stream.meta"
+               "$ROOT/bin/fm-busy-event.sh" apply "$state" stream busy --gen "$gen" --source claude-hook --event start ;;
+      fresh) "$ROOT/bin/fm-busy-event.sh" stream "$state" stream progress --gen "$gen" --request 1 ;;
+      malformed) printf 'malformed\n' > "$state/stream.model-stream" ;;
+      stale) record_pi_busy "$state" stream
+             printf '%s\n' "$snapshot" > "$state/stream.model-stream" ;;
+    esac
+    PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+      FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS="$enabled" FM_BUSY_TURN_MAX_SECS=99999 \
+      FM_STALE_ESCALATE_SECS=999 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+      "$WATCH" > "$out" &
+    pid=$!
+    wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "stream case $mode surfaced before inspection delay: $(cat "$out")"; }
+    if [ "$mode" = enabled ] || [ "$mode" = resumed ] || [ "$mode" = racing ]; then
+      [ -s "$state/.stale-since-$key" ] || { reap "$pid"; fail "expired stream did not enter inspection timer"; }
+    else
+      [ ! -e "$state/.stale-since-$key" ] || { reap "$pid"; fail "$mode stream started inspection timer"; }
+    fi
+    reap "$pid"
+    if [ "$mode" = enabled ] || [ "$mode" = resumed ] || [ "$mode" = racing ]; then
+      ack_stopped_cycle "$state" || fail "cannot acknowledge test stop"
+      echo $(( $(date +%s) - 500 )) > "$state/.stale-since-$key"
+      printf 'Working... next tick' > "$capture_file"
+      if [ "$mode" = resumed ]; then
+        "$ROOT/bin/fm-busy-event.sh" stream "$state" stream progress --gen "$gen" --request 1
+      elif [ "$mode" = racing ]; then
+        # The recovery-grade endpoint read runs inside the escalation path.
+        # Close the request there to exercise the final evidence revalidation.
+        mv "$fakebin/tmux" "$fakebin/tmux-base"
+        cat > "$fakebin/tmux" <<SH
+#!/usr/bin/env bash
+if [ "\${1:-}" = display-message ]; then
+  "$ROOT/bin/fm-busy-event.sh" stream "$state" stream close --gen "$gen" --request 1
+  touch "$dir/race-fired"
+  exit 1
+fi
+exec "$fakebin/tmux-base" "\$@"
+SH
+        chmod +x "$fakebin/tmux"
+      fi
+      PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+        FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS=300 FM_BUSY_TURN_MAX_SECS=99999 \
+        FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+        "$WATCH" > "$out" &
+      pid=$!
+      if [ "$mode" = enabled ]; then
+        wait_for_exit "$pid" 100 || { reap "$pid"; fail "expired stream never surfaced"; }
+        grep -F 'model stream silent for' "$out" >/dev/null || fail "stream reason missing: $(cat "$out")"
+        grep -F 'possible wedge' "$out" >/dev/null || fail "stream bypassed inspection reason"
+      else
+        wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "$mode request published obsolete stream inspection: $(cat "$out")"; }
+        [ ! -e "$state/.stale-since-$key" ] || { reap "$pid"; fail "$mode request retained obsolete timer"; }
+        [ ! -s "$out" ] || { reap "$pid"; fail "$mode request produced a wake"; }
+        if [ "$mode" = racing ]; then
+          [ -e "$dir/race-fired" ] && [ ! -e "$state/stream.model-stream" ] || { reap "$pid"; fail "notification-time close was not exercised"; }
+        fi
+        reap "$pid"
+      fi
+    fi
+  done
+  pass "opted-in current stream silence uses inspection delay across changing panes; disabled, tool, and foreign phases do not"
+}
+
+if [ "${FM_WATCH_TRIAGE_CASES+x}" = x ]; then
+  IFS=' ' read -r -a selected_cases <<< "$FM_WATCH_TRIAGE_CASES"
+  [ "${#selected_cases[@]}" -gt 0 ] || fail "empty watcher case selection"
+  for selected_case in "${selected_cases[@]}"; do
+    case "$selected_case" in test_*) : ;; *) fail "invalid watcher case: $selected_case" ;; esac
+    declare -F "$selected_case" >/dev/null || fail "unknown watcher case: $selected_case"
+    "$selected_case"
+  done
+  exit 0
+fi
+
+test_pi_stream_silence_uses_inspection_timer
 test_status_span_actionable_classifier
 test_status_span_survives_a_later_routine_append
 test_status_span_respects_decision_closure
