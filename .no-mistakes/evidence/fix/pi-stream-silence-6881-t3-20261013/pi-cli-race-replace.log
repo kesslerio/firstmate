@@ -1,0 +1,3 @@
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791870005.769356.9908 request=1791870007342 rev=2 ts=1791870007
+PASS: real Pi CLI replace during queue lock wait cancelled obsolete notification; recovery marker remains absent.

@@ -1,0 +1,18 @@
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791869994.751770.23292 request=1791869996020 rev=2 ts=1791869996
+PASS: real Pi CLI progress during queue lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791870005.769352.32510 request=1791870007344 rev=2 ts=1791870007
+PASS: real Pi CLI close during queue lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791870005.769356.9908 request=1791870007342 rev=2 ts=1791870007
+PASS: real Pi CLI replace during queue lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791870047.859243.17953 request=1791870049142 rev=2 ts=1791870049
+PASS: real Pi CLI progress during recovery lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791870047.859232.28559 request=1791870049212 rev=2 ts=1791870049
+PASS: real Pi CLI close during recovery lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791870047.859226.3091 request=1791870049157 rev=2 ts=1791870049
+PASS: real Pi CLI replace during recovery lock wait cancelled obsolete notification; recovery marker remains absent.

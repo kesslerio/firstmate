@@ -1,0 +1,89 @@
+{"type":"prompt","message":"Hold the isolated local stream."}
+{"type":"response","command":"prompt","success":true,"data":{"disposition":"started"}}
+{"type":"agent_start"}
+{"type":"turn_start"}
+{"type":"message_start","message":{"role":"system","content":"","sections":{"preamble":"You are an expert coding assista
+nt operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and w
+riting new files.","tools":"<tools>\n(none)\n\nIn addition to the tools above, you may have access to other custom tools
+ depending on the project.\n</tools>","rules":"<rules>\n- Be concise in your responses\n- Show file paths clearly when w
+orking with files\n</rules>","docs":"<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, ex
+tensions, themes, skills, or TUI):\n- Main documentation: /home/art/.npm-packages/lib/node_modules/@earendil-works/pi-co
+ding-agent/README.md\n- Additional docs: /home/art/.npm-packages/lib/node_modules/@earendil-works/pi-coding-agent/docs\n
+- Examples: /home/art/.npm-packages/lib/node_modules/@earendil-works/pi-coding-agent/examples (extensions, custom tools,
+ SDK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not t
+he current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/th
+emes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybinding
+s (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs
+/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md), MCP servers (docs/mc
+p.md), codemode scripts and non-LLM models such as classifiers and image models (docs/codemode.md)\n- When working on pi
+ topics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files com
+pletely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>","cwd":"<cwd>\n/home/art/.no-mistak
+es/evidence/01M4SVYM577RRP7SBS7M9Y8NFN/l.yafrV0/wt\n</cwd>"},"timestamp":1791870196934}}
+{"type":"message_end","message":{"role":"system","content":"","sections":{"preamble":"You are an expert coding assistant
+ operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and wri
+ting new files.","tools":"<tools>\n(none)\n\nIn addition to the tools above, you may have access to other custom tools d
+epending on the project.\n</tools>","rules":"<rules>\n- Be concise in your responses\n- Show file paths clearly when wor
+king with files\n</rules>","docs":"<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, exte
+nsions, themes, skills, or TUI):\n- Main documentation: /home/art/.npm-packages/lib/node_modules/@earendil-works/pi-codi
+ng-agent/README.md\n- Additional docs: /home/art/.npm-packages/lib/node_modules/@earendil-works/pi-coding-agent/docs\n-
+Examples: /home/art/.npm-packages/lib/node_modules/@earendil-works/pi-coding-agent/examples (extensions, custom tools, S
+DK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the
+ current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/them
+es.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings
+(docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/m
+odels.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md), MCP servers (docs/mcp.
+md), codemode scripts and non-LLM models such as classifiers and image models (docs/codemode.md)\n- When working on pi t
+opics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files compl
+etely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>","cwd":"<cwd>\n/home/art/.no-mistakes
+/evidence/01M4SVYM577RRP7SBS7M9Y8NFN/l.yafrV0/wt\n</cwd>"},"timestamp":1791870196934}}
+{"type":"message_start","message":{"role":"user","content":[{"type":"text","text":"Hold the isolated local stream."}],"t
+imestamp":1791870196934}}
+{"type":"message_end","message":{"role":"user","content":[{"type":"text","text":"Hold the isolated local stream."}],"tim
+estamp":1791870196934}}
+{"type":"message_start","message":{"role":"assistant","content":[{"type":"text","text":"hello"}],"api":"openai-completio
+ns","provider":"fm-worker-stream","model":"stream","usage":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"totalToke
+ns":0,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},"stopReason":"pending","timestamp":179187019
+7038}}
+{"type":"message_update","usage":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"totalTokens":0,"cost":{"input":0,"o
+utput":0,"cacheRead":0,"cacheWrite":0,"total":0}},"assistantMessageEvent":{"type":"text_start","contentIndex":0}}
+{"type":"message_update","usage":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"totalTokens":0,"cost":{"input":0,"o
+utput":0,"cacheRead":0,"cacheWrite":0,"total":0}},"assistantMessageEvent":{"type":"text_delta","contentIndex":0,"delta":
+"hello"}}
+{"type":"message_update","usage":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"totalTokens":0,"cost":{"input":0,"o
+utput":0,"cacheRead":0,"cacheWrite":0,"total":0}},"assistantMessageEvent":{"type":"text_delta","contentIndex":0,"delta":
+" more"}}
+{"type":"message_update","usage":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"totalTokens":0,"cost":{"input":0,"o
+utput":0,"cacheRead":0,"cacheWrite":0,"total":0}},"assistantMessageEvent":{"type":"text_end","contentIndex":0,"content":
+"hello more"}}
+{"type":"message_end","message":{"role":"assistant","content":[{"type":"text","text":"hello more"}],"api":"openai-comple
+tions","provider":"fm-worker-stream","model":"stream","usage":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"totalT
+okens":0,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},"stopReason":"stop","timestamp":179187019
+7038,"responseId":"local","rawStopReason":"stop","durationMs":7529,"thinkingLevel":"off"}}
+{"type":"turn_end","message":{"role":"assistant","content":[{"type":"text","text":"hello more"}],"api":"openai-completio
+ns","provider":"fm-worker-stream","model":"stream","usage":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"totalToke
+ns":0,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},"stopReason":"stop","timestamp":179187019703
+8,"responseId":"local","rawStopReason":"stop","durationMs":7529,"thinkingLevel":"off"},"toolResults":[]}
+{"type":"agent_end","messages":[{"role":"system","content":"","sections":{"preamble":"You are an expert coding assistant
+ operating inside pi, a coding agent harness. You help users by reading files, executing commands, editing code, and wri
+ting new files.","tools":"<tools>\n(none)\n\nIn addition to the tools above, you may have access to other custom tools d
+epending on the project.\n</tools>","rules":"<rules>\n- Be concise in your responses\n- Show file paths clearly when wor
+king with files\n</rules>","docs":"<docs>\nPi documentation (read only when the user asks about pi itself, its SDK, exte
+nsions, themes, skills, or TUI):\n- Main documentation: /home/art/.npm-packages/lib/node_modules/@earendil-works/pi-codi
+ng-agent/README.md\n- Additional docs: /home/art/.npm-packages/lib/node_modules/@earendil-works/pi-coding-agent/docs\n-
+Examples: /home/art/.npm-packages/lib/node_modules/@earendil-works/pi-coding-agent/examples (extensions, custom tools, S
+DK)\n- When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the
+ current working directory\n- When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/them
+es.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings
+(docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/m
+odels.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md), MCP servers (docs/mcp.
+md), codemode scripts and non-LLM models such as classifiers and image models (docs/codemode.md)\n- When working on pi t
+opics, read the docs and examples, and follow .md cross-references before implementing\n- Always read pi .md files compl
+etely and follow links to related docs (e.g., tui.md for TUI API details)\n</docs>","cwd":"<cwd>\n/home/art/.no-mistakes
+/evidence/01M4SVYM577RRP7SBS7M9Y8NFN/l.yafrV0/wt\n</cwd>"},"timestamp":1791870196934},{"role":"user","content":[{"type":
+"text","text":"Hold the isolated local stream."}],"timestamp":1791870196934},{"role":"assistant","content":[{"type":"tex
+t","text":"hello more"}],"api":"openai-completions","provider":"fm-worker-stream","model":"stream","usage":{"input":0,"o
+utput":0,"cacheRead":0,"cacheWrite":0,"totalTokens":0,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":
+0}},"stopReason":"stop","timestamp":1791870197038,"responseId":"local","rawStopReason":"stop","durationMs":7529,"thinkin
+gLevel":"off"}],"willRetry":false}
+{"type":"agent_settled","aborted":false}
+

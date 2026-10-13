@@ -1,0 +1,7 @@
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791869941.698863.20953 request=1791869943494 rev=2 ts=1791869943
+stale: fm-lab-stream:fm-stream (idle 3s, possible wedge, escalation 1, model stream silent for 5s (foreground request))
+1791869948	1	stale	fm-lab-stream:fm-stream	stale: fm-lab-stream:fm-stream (idle 3s, possible wedge, escalation 1, model stream silent for 5s (foreground request))
+Progress after notification (worker still running): v1 gen=g1791869941.698863.20953 request=1791869943494 rev=3 ts=1791869948
+After settlement: v1 gen=g1791869941.698863.20953 seq=3 state=idle source=pi-ext event=agent-settled ts=1791869949
+PASS: real Pi CLI silence produced inspection notification; worker continued and settled.

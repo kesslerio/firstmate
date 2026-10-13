@@ -1,0 +1,10 @@
+FM_TEST_BEGIN 2026-10-13T05:35:15Z tests/fm-watch-triage.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - opted-in current stream silence uses inspection delay across changing panes; disabled, tool, and foreign phases do not
+ok - model progress extends only opted-in bounds and obsolete stream episodes reset before legacy fallback
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+FM_TEST_END 2026-10-13T05:37:41Z tests/fm-watch-triage.test.sh exit=0 duration_ms=146490 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=146542
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=146490 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-watch-triage.test.sh duration_ms=146490
+fm-test-run: wrote timing artifact: /home/art/.no-mistakes/evidence/01M4SVYM577RRP7SBS7M9Y8NFN/watcher-targeted.json

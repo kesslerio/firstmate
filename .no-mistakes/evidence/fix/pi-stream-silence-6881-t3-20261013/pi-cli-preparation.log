@@ -1,0 +1,9 @@
+Foreground request before first response content: v1 gen=g1791870195.1000844.28874 request=1791870196961 rev=1 ts=1791870196
+PASS: request observation starts before response progress.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791870195.1000844.28874 request=1791870196961 rev=2 ts=1791870199
+stale: fm-lab-stream:fm-stream (idle 2s, possible wedge, escalation 1, model stream silent for 4s (foreground request))
+1791870203	1	stale	fm-lab-stream:fm-stream	stale: fm-lab-stream:fm-stream (idle 2s, possible wedge, escalation 1, model stream silent for 4s (foreground request))
+Progress after notification (worker still running): v1 gen=g1791870195.1000844.28874 request=1791870196961 rev=3 ts=1791870203
+After settlement: v1 gen=g1791870195.1000844.28874 seq=3 state=idle source=pi-ext event=agent-settled ts=1791870204
+PASS: real Pi CLI silence produced inspection notification; worker continued and settled.

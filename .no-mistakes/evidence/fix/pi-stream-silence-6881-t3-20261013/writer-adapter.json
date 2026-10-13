@@ -1,0 +1,40 @@
+{
+  "families": [
+    {
+      "count": 2,
+      "duration_ms": 4430,
+      "failed": 1,
+      "name": "standalone"
+    }
+  ],
+  "finished_at": "2026-10-13T05:35:56Z",
+  "run_id": "fm-test-run-1791869751901-456579",
+  "scripts": [
+    {
+      "duration_ms": 295,
+      "exit": 1,
+      "expected_gate_skip": "none",
+      "family": "standalone",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-busy-adapter-wiring.test.sh"
+    },
+    {
+      "duration_ms": 4135,
+      "exit": 0,
+      "expected_gate_skip": "none",
+      "family": "standalone",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-busy-state.test.sh"
+    }
+  ],
+  "selection": "scripts;jobs=4",
+  "started_at": "2026-10-13T05:35:51Z",
+  "summary": {
+    "duration_ms": 4247,
+    "failed": 1,
+    "skipped_gate": 0,
+    "total": 2
+  }
+}

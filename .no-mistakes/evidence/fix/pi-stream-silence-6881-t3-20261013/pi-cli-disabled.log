@@ -1,0 +1,5 @@
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1791870165.985219.17236 request=1791870167102 rev=2 ts=1791870167
+PASS: disabled observation ignores even a current real Pi stream after the short silence bound.
+stale: fm-lab-stream:fm-stream (idle 2s, possible wedge, escalation 1)
+PASS: disabled observation preserves the legacy busy bound and leaves Pi running.
