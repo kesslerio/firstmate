@@ -809,10 +809,10 @@ cmd_update() {
 }
 
 cmd_retire() {
-  local id=$1 force=${2:-} rc generation target
+  local id=$1 force=${2:-} rc=0 generation target
   validate_id "$id"
   validate_home "$id" yes || rc=$?
-  if [ "${rc:-0}" -eq 2 ]; then
+  if [ "$rc" -eq 2 ]; then
     printf 'already-retired: %s\n' "$id"
     return 0
   fi
@@ -826,17 +826,19 @@ cmd_retire() {
     FM_HOME="$FM_ROOT" FM_ROOT_OVERRIDE="$FM_ROOT" \
       FM_STATE_OVERRIDE="$CONTROL_STATE" FM_DATA_OVERRIDE="$CONTROL_DATA" \
       FM_CONFIG_OVERRIDE="$TARGET_HOME/config" FM_TEARDOWN_GUARD_DONE=1 \
-      "$SCRIPT_DIR/fm-teardown.sh" "$id" --force || return "$?"
+      "$SCRIPT_DIR/fm-teardown.sh" "$id" --force || rc=$?
   else
     FM_HOME="$FM_ROOT" FM_ROOT_OVERRIDE="$FM_ROOT" \
       FM_STATE_OVERRIDE="$CONTROL_STATE" FM_DATA_OVERRIDE="$CONTROL_DATA" \
       FM_CONFIG_OVERRIDE="$TARGET_HOME/config" FM_TEARDOWN_GUARD_DONE=1 \
-      "$SCRIPT_DIR/fm-teardown.sh" "$id" || return "$?"
+      "$SCRIPT_DIR/fm-teardown.sh" "$id" || rc=$?
   fi
+  [ "$rc" -eq 0 ] || [ "$rc" -eq 4 ] || return "$rc"
   fm_backend_source herdr || return 1
   fm_backend_herdr_endpoint_confirmed_gone "$target" || return 1
   printf 'seat_retirement={"task":%s,"generation":%s,"home":%s,"backend":"herdr","target":%s,"destroyed":true}\n' \
     "$(json_str "$id")" "$(json_str "$generation")" "$(json_str "$TARGET_HOME")" "$(json_str "$target")"
+  return "$rc"
 }
 
 case "${1:-}" in
