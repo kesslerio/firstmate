@@ -407,13 +407,7 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
         if (owner !== undefined && owner !== task) return UNSAFE_SCOPE;
         taskByKey.set(key, task);
       }
-      if (project) {
-        metadata.set(task, project);
-        for (const endpoint of [window, terminal]) {
-          if (!endpoint) continue;
-          metadata.set(endpoint, project);
-        }
-      }
+      if (project) metadata.set(task, project);
     }
   } catch {
     return UNSAFE_SCOPE;
@@ -476,7 +470,7 @@ export function scopeForUnreadWake(state: string, heartbeat: boolean, afk = fals
       project = metadata.get(task) ?? "";
     } else if (kind === "stale") {
       task = taskByKey.get(key) ?? taskByKey.get(key.replace(/^fm-/, "")) ?? "";
-      project = metadata.get(key) ?? metadata.get(key.replace(/^fm-/, "")) ?? "";
+      project = metadata.get(task) ?? "";
     } else {
       // A kind fm_wake_append never emits: structural corruption, not an
       // ordinary main-only row.

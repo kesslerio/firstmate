@@ -1063,6 +1063,10 @@ await fire("before_agent_start", { messageType: "user", prompt: operational.stdo
 entries.push({ type: "message", message: { role: "user", content: operational.stdout } });
 const unsolicitedPrompt = "Please keep responses concise while monitoring the fleet.";
 await fire("before_agent_start", { messageType: "user", prompt: unsolicitedPrompt }, mainCtx);
+await fire("before_agent_start", {
+  messageType: "custom",
+  message: { role: "custom", customType: "fixture", content: "custom content must not become captain dialog", display: true },
+}, mainCtx);
 entries.push({ type: "message", message: { role: "user", content: unsolicitedPrompt } });
 await fire("agent_start", {}, mainCtx);
 await fire("agent_end", {}, mainCtx);
@@ -1121,7 +1125,8 @@ for (const content of [unsolicitedPrompt, ...requestedPrompts]) {
   if (copies !== 1) throw new Error(`current captain prompt was mirrored ${copies} times instead of once`);
 }
 if (mirroredCaptainText.some((text) =>
-  text.includes("operational watcher injection") || text.includes("FIRSTMATE_OP: give me a fresh system-resource report")
+  text.includes("operational watcher injection") || text.includes("FIRSTMATE_OP: give me a fresh system-resource report") ||
+  text.includes("custom content must not become captain dialog")
 )) {
   throw new Error("canonical current or legacy operational input entered captain mirror context");
 }
@@ -5015,6 +5020,74 @@ EOF
   pass "scopeForUnreadWake resolves unique Orca terminal owners and refuses conflicting aliases alongside another eligible row"
 }
 
+
+test_branch_dispatch_keeps_project_with_canonical_owner() {
+  local out status
+  ROOT="$ROOT" CASE_ROOT="$TMP_ROOT/canonical-owner" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
+import { spawnSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
+
+const { scopeForUnreadWake, branchOfferForWake } = await import(pathToFileURL(`${process.env.ROOT}/.pi/extensions/lib/fm-branch-dispatch.ts`).href);
+const originalReaddir = fs.readdirSync;
+let fixture = 0;
+for (const reverse of [false, true]) {
+  const preload = `import fs from "node:fs"; import { syncBuiltinESMExports } from "node:module";
+    const original = fs.readdirSync;
+    fs.readdirSync = (...args) => { const names = original(...args).sort(); return ${reverse} ? names.reverse() : names; };
+    syncBuiltinESMExports();`;
+  fs.readdirSync = (...args) => {
+    const names = originalReaddir(...args).sort();
+    return reverse ? names.reverse() : names;
+  };
+  syncBuiltinESMExports();
+  for (const field of ["window", "terminal"]) {
+    for (const project of ["", "project=\n", "project=/owner\n"]) {
+      for (const key of ["fm-window", "fm-fm-window"]) {
+        const state = `${process.env.CASE_ROOT}/${fixture++}`;
+        fs.mkdirSync(state, { recursive: true });
+        fs.writeFileSync(`${state}/a.meta`, `${project}${field}=fm-window\n`);
+        fs.writeFileSync(`${state}/window.meta`, "project=/approved\n");
+        fs.writeFileSync(`${state}/window.status`, "needs-decision: choose owner\n");
+        fs.writeFileSync(`${state}/.wake-queue`, `1\t1\tstale\t${key}\tstale: ${key}\n`);
+        const check = (eligible, corrupted) => {
+          for (const afk of [false, true]) {
+            const scope = scopeForUnreadWake(state, false, afk);
+            assert.equal(scope.eligible, eligible, JSON.stringify({ reverse, field, project, key, scope }));
+            assert.equal(scope.corrupted, corrupted);
+            if (eligible) {
+              assert.deepEqual(scope.eligibleTasks, ["a"]);
+              assert.deepEqual(scope.projects, ["/owner"]);
+            }
+            assert.equal(branchOfferForWake(state, `stale: ${key}`, afk).eligible, eligible);
+            const cli = spawnSync(process.execPath, ["--import", `data:text/javascript,${encodeURIComponent(preload)}`,
+              `${process.env.ROOT}/bin/fm-branch-dispatch.mjs`, "offer", ...(afk ? ["--afk"] : [])], {
+              env: { ...process.env, FM_STATE_OVERRIDE: state }, input: `stale: ${key}\n`, encoding: "utf8",
+            });
+            assert.equal(cli.status, 0, cli.stderr);
+            const result = Object.fromEntries(cli.stdout.trim().split("\n").map((line) => line.split("=")));
+            assert.equal(result.eligible, eligible ? "1" : "0", cli.stdout);
+            assert.equal(result.corrupted, corrupted ? "1" : "0", cli.stdout);
+          }
+        };
+        check(Boolean(project.includes("/owner")), !project.includes("/owner"));
+        fs.writeFileSync(`${state}/window.meta`, `project=/approved\n${field}=fm-window\n`);
+        check(false, true);
+      }
+    }
+  }
+}
+fs.readdirSync = originalReaddir;
+syncBuiltinESMExports();
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/node-output")
+  expect_code 0 "$status" "canonical ownership must govern scope and CLI offers: $out"
+  pass "scope and CLI keep projects with canonical owners in both discovery orders"
+}
+
 # A second mate's status log is one shared channel for many independently keyed
 # decisions, so its signal rows are judged by the span presented since the last
 # drain (bounded by bin/fm-classify-lib.sh's own presentation-cursor writer),
@@ -6037,6 +6110,7 @@ test_large_unprocessed_backlog_replays_in_batches
 test_undated_unprocessed_outcome_surfaces_and_stays_unprocessed
 test_branch_dispatch_classifies_main_only_rows_and_writes_the_eligible_snapshot
 test_branch_dispatch_resolves_terminal_keyed_orca_stale_row
+test_branch_dispatch_keeps_project_with_canonical_owner
 test_branch_dispatch_routes_secondmate_signal_by_new_span
 test_branch_cache_key_is_per_home_stable
 test_branch_default_on_heartbeat_afk_and_fallback
