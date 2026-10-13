@@ -27,6 +27,14 @@ Wake, watcher, away-mode, and Relay-specific state mechanics remain with their n
 `AGENTS.md` retains the run-once and read-once operator rules, lock-refusal safety, installation consent, and direct-report recovery boundaries because those facts apply at every session start.
 Ordinary dead-direct-report recovery is owned by `stuck-crewmate-recovery`, while persistent-secondmate recovery is owned by `secondmate-provisioning`.
 
+## Worker accounting (config/worker-target)
+
+The local, gitignored `config/worker-target` setting supplies this home's reported worker target.
+[`bin/fm-liveness-lib.sh`](../bin/fm-liveness-lib.sh) owns its strict integer format, primary and secondmate defaults, live-worker definition, and read-only snapshot API.
+The away spend cap and return cost line use that shared live count.
+A capacity observation grants no launch, spend, merge, or acknowledgement authority; the target does not impose a new dispatch limit.
+`bin/fm-spawn.sh` records confirmed worker launches in `state/.last-launch` under the library's stamp contract.
+
 ## Calm preference (config/calm)
 
 The Pi Calm extension and the Claude Code Calm mod share the captain's home-local presentation choice in gitignored `config/calm` under the effective Firstmate home, so one `/calm` choice applies on either harness.

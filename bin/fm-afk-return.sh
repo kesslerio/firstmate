@@ -521,8 +521,13 @@ EOF
   fi
 
   # 6. cost.
-  live=0
-  for meta in "$STATE"/*.meta; do [ -f "$meta" ] && live=$((live + 1)); done
+  if fm_liveness_snapshot "$FM_HOME" "$STATE"; then
+    live=$FM_LIVENESS_LIVE
+    [ -z "$FM_LIVENESS_WARNINGS" ] || printf '%s' "$FM_LIVENESS_WARNINGS" >&2
+  else
+    live=unknown
+    printf 'Live-worker count unavailable: %s\n' "$FM_LIVENESS_ERROR" >&2
+  fi
   printf 'Cost: %s supervision outcome(s) recorded (%s routine, %s captain); %s task(s) live at return.\n' \
     "$((routine + captain))" "$routine" "$captain" "$live"
 }
@@ -731,6 +736,8 @@ main() {
   . "$SCRIPT_DIR/fm-tasks-axi-lib.sh"
   # shellcheck source=bin/fm-backlog-transition-lib.sh
   . "$SCRIPT_DIR/fm-backlog-transition-lib.sh"
+  # shellcheck source=bin/fm-liveness-lib.sh
+  . "$SCRIPT_DIR/fm-liveness-lib.sh"
 
   mkdir -p "$STATE" || return 1
   fm_lock_acquire_wait "$LOCK"

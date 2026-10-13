@@ -537,6 +537,8 @@ fm_backlog_directory_present "$STATE" "state directory" || {
 . "$SCRIPT_DIR/fm-remote-readiness-lib.sh"
 # shellcheck source=bin/fm-timeout-lib.sh
 . "$SCRIPT_DIR/fm-timeout-lib.sh"
+# shellcheck source=bin/fm-liveness-lib.sh
+. "$SCRIPT_DIR/fm-liveness-lib.sh"
 # Fail closed before any fleet mutation: a no-mistakes gate agent must never spawn
 # a direct report (see bin/fm-gate-refuse-lib.sh).
 fm_refuse_if_gate_agent
@@ -1387,7 +1389,7 @@ if [ "$RELAUNCH" -ne 1 ]; then
   fm_lease_forbid_branch "new-task spawn (fm-spawn)" --away-relocated
 fi
 spawn_refuse_if_away_spend_cap() {
-  local cap live meta
+  local cap live
   [ "$RELAUNCH" -ne 1 ] || return 0
   [ "$KIND" != secondmate ] || return 0
   [ -f "$STATE/.afk-contract" ] || return 0
@@ -1396,12 +1398,12 @@ spawn_refuse_if_away_spend_cap() {
   case "$cap" in
   '' | *[!0-9]* | 0) return 0 ;;
   esac
-  live=0
-  for meta in "$STATE"/*.meta; do
-    [ -f "$meta" ] || continue
-    [ "$(grep '^kind=' "$meta" 2>/dev/null | tail -1 | cut -d= -f2-)" != secondmate ] || continue
-    live=$((live + 1))
-  done
+  if ! fm_liveness_snapshot "$FM_HOME" "$STATE"; then
+    echo "error: spawn refused - cannot measure live workers: $FM_LIVENESS_ERROR" >&2
+    exit 1
+  fi
+  [ -z "$FM_LIVENESS_WARNINGS" ] || printf '%s' "$FM_LIVENESS_WARNINGS" >&2
+  live=$FM_LIVENESS_LIVE
   if [ "$live" -ge "$cap" ]; then
     echo "error: spawn refused - the away-posture record caps concurrent workers at $cap and $live ordinary task(s) are live in this home; task $ID stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)" >&2
     exit 1
@@ -1409,9 +1411,8 @@ spawn_refuse_if_away_spend_cap() {
 }
 # Spend cap (bin/fm-afk-contract.sh's spend_max_concurrent_workers): while the
 # away-posture record exists, a fresh ordinary spawn refuses for BOTH actors
-# once this home already holds that many ordinary task records, counted the
-# same way the return brief counts tasks live at return (every state/*.meta
-# whose kind is not secondmate). A relaunch replaces a worker that already
+# once this home already holds that many live workers under
+# bin/fm-liveness-lib.sh's shared definition. A relaunch replaces a worker that already
 # counts, and a secondmate is a persistent home rather than spend, so both are
 # exempt. Checked before any endpoint, worktree, or record exists, so a refusal
 # costs nothing to unwind; rechecked after the task-set lock so two fresh
@@ -4929,6 +4930,16 @@ fi
 trap - HUP INT TERM
 if [ "$SPAWN_BACKLOG_COMMIT_STATUS" -ne 0 ]; then
   exit "$SPAWN_BACKLOG_COMMIT_STATUS"
+fi
+# Publication and launch delivery are now confirmed. Keep the durable launch
+# time after teardown removes the task record (bin/fm-liveness-lib.sh).
+if [ "$KIND" != secondmate ]; then
+  SPAWN_LAST_LAUNCH_TMP=$(mktemp "$STATE/.last-launch.XXXXXX") || exit 1
+  if ! date +%s > "$SPAWN_LAST_LAUNCH_TMP" || ! mv -f "$SPAWN_LAST_LAUNCH_TMP" "$STATE/.last-launch"; then
+    rm -f "$SPAWN_LAST_LAUNCH_TMP"
+    echo "error: task $ID launched, but state/.last-launch could not be published; task record preserved" >&2
+    exit 1
+  fi
 fi
 if [ -n "$SPAWN_DEFERRED_SIGNAL" ]; then
   case "$SPAWN_DEFERRED_SIGNAL" in

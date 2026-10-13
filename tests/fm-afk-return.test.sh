@@ -34,6 +34,10 @@ install_runner() {  # <case-dir>
   cp "$ROOT/bin/fm-branch-outcome.sh" "$dir/bin/"
   cp "$ROOT/bin/fm-tasks-axi-lib.sh" "$dir/bin/"
   cp "$ROOT/bin/fm-backlog-transition-lib.sh" "$dir/bin/"
+  # The shared live-worker count and its production current-state dependencies.
+  for file in "$ROOT/bin"/*; do
+    [ -e "$dir/bin/${file##*/}" ] || cp -R "$file" "$dir/bin/${file##*/}"
+  done
   cp "$ROOT/.tasks.toml" "$dir/home/.tasks.toml"
   printf '## In flight\n\n## Queued\n\n## Done\n' > "$dir/home/data/backlog.md"
   # The fake stop mirrors the real one's ordering: the away flag goes, then the
