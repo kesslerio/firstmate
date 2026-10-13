@@ -7327,9 +7327,10 @@ test_pi_model_progress_and_legacy_fallback() {
 
 test_pi_stream_publication_lock_revalidation() {
   local dir state fakebin out capture_file window key gen pid lock_kind action lock real_mkdir real_cat
+  local uninterrupted=${1:-0}
   for lock_kind in queue recovery; do
     for action in close progress replace; do
-      dir=$(make_case "pi-publication-$lock_kind-$action"); state="$dir/state"; fakebin="$dir/fakebin"
+      dir=$(make_case "pi-publication-$uninterrupted-$lock_kind-$action"); state="$dir/state"; fakebin="$dir/fakebin"
       out="$dir/watch.out"; capture_file="$dir/pane.txt"; window="test:fm-publication-$lock_kind-$action"
       key=$(printf '%s' "$window" | tr ':/.' '___')
       printf 'Working...' > "$capture_file"
@@ -7346,9 +7347,12 @@ test_pi_stream_publication_lock_revalidation() {
         "$WATCH" > "$out" &
       pid=$!
       wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "publication admission failed"; }
-      reap "$pid"
-      ack_stopped_cycle "$state" || fail "publication stop acknowledgement failed"
-      echo $(( $(date +%s) - 500 )) > "$state/.stale-since-$key"
+      if [ "$uninterrupted" -eq 0 ]; then
+        reap "$pid"
+        ack_stopped_cycle "$state" || fail "publication stop acknowledgement failed"
+      else
+        [ ! -e "$state/.watcher-down" ] || { reap "$pid"; fail "fresh watcher unexpectedly has recovery marker"; }
+      fi
       lock="$state/.wake-queue.lock"
       [ "$lock_kind" != recovery ] || lock="$state/.watcher-down.lock"
       real_mkdir=$(command -v mkdir)
@@ -7374,11 +7378,14 @@ fi
 exec "$fakebin/tmux-base" "\$@"
 SH
       chmod +x "$fakebin/tmux"
-      PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+      echo $(( $(date +%s) - 1500 )) > "$state/.stale-since-$key"
+      if [ "$uninterrupted" -eq 0 ]; then
+        PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
         FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS=300 FM_BUSY_TURN_MAX_SECS=99999 \
         FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
         "$WATCH" > "$out" &
-      pid=$!
+        pid=$!
+      fi
       wait_numeric_file "$dir/append-blocked" 100 || { reap "$pid"; fail "$lock_kind publication wait not exercised"; }
       case "$action" in
         close) "$ROOT/bin/fm-busy-event.sh" stream "$state" stream close --gen "$gen" --request 1 ;;
@@ -7397,6 +7404,10 @@ SH
   pass "stream close, progress, and replacement cancel publication after queue and recovery lock waits"
 }
 
+test_pi_stream_uninterrupted_publication() {
+  test_pi_stream_publication_lock_revalidation 1
+}
+
 if [ "${FM_WATCH_TRIAGE_CASES+x}" = x ]; then
   IFS=' ' read -r -a selected_cases <<< "$FM_WATCH_TRIAGE_CASES"
   [ "${#selected_cases[@]}" -gt 0 ] || fail "empty watcher case selection"
@@ -7411,6 +7422,7 @@ fi
 test_pi_stream_silence_uses_inspection_timer
 test_pi_model_progress_and_legacy_fallback
 test_pi_stream_publication_lock_revalidation
+test_pi_stream_uninterrupted_publication
 test_status_span_actionable_classifier
 test_status_span_survives_a_later_routine_append
 test_status_span_respects_decision_closure
