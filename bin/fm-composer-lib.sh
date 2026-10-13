@@ -54,7 +54,7 @@
 #                older claude). The bottom border may carry a TITLE (grok
 #                writes its model name there). A title embedded in the family's
 #                rule is tolerated at the aligned width, including Grok 1.0.44's
-#                typed model/effort title with ` · always-approve`; Grok 1.0.5's
+#                rounded typed model/effort title with ` · always-approve`; Grok 1.0.5's
 #                typed title also permits its proven three-column overhang.
 #   bare       - an agent prompt glyph row with no border at all (claude `❯`,
 #                codex `›`, muse `⟩`, cursor `→`). The agent glyph is itself the container
@@ -1142,6 +1142,8 @@ _fm_composer_titled_bottom_ok() {  # <family> <bottom-inner> <top-spaces>
   # in the geometry comparison, while any other mid-dot stays non-space.
   case "$title" in
     *' · always-approve')
+      # Only the rounded family was observed for this approval-title shape.
+      [ "$family" = rounded ] || return 1
       _fm_composer_grok_typed_title_ok "${title%' · always-approve'}" || return 1
       inner=${inner/' · always-approve'/' . always-approve'}
       ;;

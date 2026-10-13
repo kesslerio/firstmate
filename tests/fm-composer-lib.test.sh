@@ -1076,6 +1076,23 @@ test_matrix_grok_144_approval_titled_bottom_border() {
   assert_screen "grok 1.0.44 idle on cmux/orca" empty "$CAPS_PLAIN" "$idle"
   assert_screen "grok 1.0.44 typed on tmux" pending "$CAPS_TMUX" "$typed" 1
   assert_screen "grok 1.0.44 typed on herdr" pending "$CAPS_STYLED" "$typed"
+  # The approval title is proven only on Grok's rounded box. An otherwise
+  # aligned box from another family must not grant permission to type.
+  local family tl tr bl br edge dash unobserved
+  for family in light heavy double ascii; do
+    case "$family" in
+      light) tl=┌; tr=┐; bl=└; br=┘; edge=│; dash=─ ;;
+      heavy) tl=┏; tr=┓; bl=┗; br=┛; edge=┃; dash=━ ;;
+      double) tl=╔; tr=╗; bl=╚; br=╝; edge=║; dash=═ ;;
+      ascii) tl=+; tr=+; bl=+; br=+; edge='|'; dash=- ;;
+    esac
+    unobserved=${idle//╭/$tl}; unobserved=${unobserved//╮/$tr}
+    unobserved=${unobserved//╰/$bl}; unobserved=${unobserved//╯/$br}
+    unobserved=${unobserved//│/$edge}; unobserved=${unobserved//─/$dash}
+    assert_screen "grok approval title rejects $family on tmux" unknown "$CAPS_TMUX" "$unobserved" 1
+    assert_screen "grok approval title rejects $family on herdr" unknown "$CAPS_STYLED" "$unobserved"
+    assert_screen "grok approval title rejects $family on cmux/orca" unknown "$CAPS_PLAIN" "$unobserved"
+  done
   for effort in low medium high xhigh; do
     bottom=$(_grok_titled_bottom 74 "Grok 4.6 ($effort) · always-approve")
     assert_screen "grok 1.0.44 $effort effort" empty "$CAPS_TMUX" "$top"$'\n'"$empty_row"$'\n'"$bottom" 1
