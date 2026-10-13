@@ -1610,10 +1610,12 @@ wedge_timer_check() {  # <window> <since-file> <triage-label> <escalation-count-
   esac
 }
 
-# busy_turn_over_age: 0 iff the last completed turn or explicit native-harness
-# progress is at least BUSY_TURN_MAX_SECS old. Progress is actual observed model
-# or tool activity, never a timer or a busy footer. It does not emit a wake or
-# change semantic busy state. Before either marker exists, age the spawn record.
+# busy_turn_over_age: 0 iff current opted-in stream silence crosses its bound,
+# or the general busy-age bound is crossed. The latter uses completed turns,
+# native-harness progress, and - only when opted in - model progress under the
+# fm-busy-lib.sh contract; without markers it ages the spawn record.
+# Progress is actual observed activity, never a timer or a busy footer.
+# This probe does not emit a wake or change semantic busy state.
 # The caller checks busy state and routes a crossed bound through inspection.
 busy_turn_over_age() {  # <task>
   local task=$1 f progress harness snapshot gen request rev ts age model_ts model_age
