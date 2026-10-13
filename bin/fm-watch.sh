@@ -1680,7 +1680,7 @@ wedge_defer_guard() {  # <window> <since-file> <triage-label> <idle-age> <guard-
 # never reaches it.
 wedge_timer_check() {  # <window> <since-file> <triage-label> <escalation-count-file> <task> <pane-hash> [dialog-name] [stream snapshot]
   local win=$1 since_file=$2 label=$3 escalation_file=$4 task=$5 hash=$6 dialog=${7-} since age n reason evidence guard guard_note
-  local stream_snapshot=${8:-} stream_gen stream_request stream_rev stream_ts stream_detail=
+  local stream_snapshot=${8:-} stream_gen stream_request stream_rev stream_ts stream_detail='' append_status
   since=$(cat "$since_file" 2>/dev/null || true)
   case "$since" in
     ''|*[!0-9]*)
@@ -1724,13 +1724,25 @@ wedge_timer_check() {  # <window> <since-file> <triage-label> <escalation-count-
           stream_detail=", model stream silent for $(( $(date +%s) - stream_ts ))s (foreground request)"
         fi
         n=$(( $(cat "$escalation_file" 2>/dev/null || echo 0) + 1 ))
-        echo "$n" > "$escalation_file"
+        if [ -z "$stream_snapshot" ]; then echo "$n" > "$escalation_file"; fi
         reason="stale: $win (idle ${age}s, possible wedge, escalation $n$stream_detail$guard_note)"
         if [ "$n" -ge "$FM_WEDGE_DEMAND_INSPECT_COUNT" ]; then
           reason="stale: $win (idle ${age}s, possible wedge, escalation $n$stream_detail, demand-deep-inspection: same pane has wedge-escalated $n times in a row - do not re-absorb on the run-step/pane state alone$guard_note)"
         fi
         reason=$(stale_reason_naming_dialog "$reason" "$dialog")
-        fm_wake_append stale "$win" "$reason" || exit 1
+        if [ -n "$stream_snapshot" ]; then
+          append_status=0
+          fm_wake_append_guarded busy_stream_snapshot_current stale "$win" "$reason" "$task" "$stream_snapshot" || append_status=$?
+          if [ "$append_status" -eq 3 ]; then
+            rm -f "$since_file" "$escalation_file" "$STATE/.model-stream-episode-$(window_key "$win")"
+            clear_write_tracking "$(window_key "$win")"
+            return 0
+          fi
+          [ "$append_status" -eq 0 ] || exit 1
+          echo "$n" > "$escalation_file"
+        else
+          fm_wake_append stale "$win" "$reason" || exit 1
+        fi
         rm -f "$since_file"
         clear_write_tracking "$(window_key "$win")"
         wake "$reason"
@@ -1919,6 +1931,10 @@ busy_turn_bound_check() {  # <window> <task> <hash> <since-file> <escalation-fil
     fi
     label="busy (model stream silent)"
   else
+    if [ -e "$stream_episode" ]; then
+      rm -f "$since_file" "$escalation_file"
+      clear_write_tracking "$(window_key "$win")"
+    fi
     rm -f "$stream_episode"
   fi
   wedge_timer_check "$win" "$since_file" "$label" "$escalation_file" "$task" "$h" "$dialog" "$stream_snapshot"
