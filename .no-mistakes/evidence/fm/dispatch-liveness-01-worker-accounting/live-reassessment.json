@@ -1,0 +1,30 @@
+{
+  "verdict": "inconclusive",
+  "tested_head_sha": "c8ca6126d0c7a7a770432e42843472960967cac1",
+  "source_changes": false,
+  "new_test_execution": false,
+  "evidence_audit": {
+    "tracked_source_objects_matched": 599,
+    "actual_native_launch_cases_verified": 10,
+    "postconfirmation_fault_cases": 9,
+    "receipt_argument_prompt_generation_binding_verified": true,
+    "rename_entry_and_readback_return_chronology_verified": true,
+    "retained_failed_fixture_status_verified": true,
+    "retained_cleanup_verified": true,
+    "existing_evidence_privacy": "No private operational identifiers or operator paths found; synthetic test generations and normalized scratch paths only."
+  },
+  "retained_regressions": {
+    "total": 4,
+    "failed": 0,
+    "skipped_gate": 0,
+    "duration_ms": 257061,
+    "scope": "Accounting, supervision, AFK return, current state; external-interface controls remain mock-backed."
+  },
+  "remaining_limitation": "Genuine verified current no-PR terminal release was not exercised live. The approved Codex adapter retains unknown seats even after model completion; do not manufacture idle certainty or waive Test.",
+  "classification": "Verification capability gap, not a reproduced product failure or failed focused regression. No authorized source correction resolves it.",
+  "preserved_host_gaps": [
+    "Full control-relaunch stops at literal /bin/sleep on this host, identically on base; supported-host CI owns unreached cases.",
+    "Historical PTY and Pi renderer failures; unavailable TypeScript and real-Beads coverage remain omissions."
+  ],
+  "phase_boundary": "No pipeline controls, new worker batches, lint, static analysis, full repository suite, source edits, or credential/configuration changes."
+}

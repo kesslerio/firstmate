@@ -1,0 +1,6 @@
+live=2 target=4 free=2
+invalid	ship	unknown	0
+paused	scout	unknown	0
+<owned-test-workspace>/.test-phase/observation-home/state/invalid.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+invalid: current state unknown; seat retained
+paused: current state unknown; seat retained

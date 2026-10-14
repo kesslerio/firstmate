@@ -1,0 +1,124 @@
+error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+ok: added receipt (ship) -> Queued
+task:
+  id: receipt
+  title: Isolated provider receipt
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: ship
+  repo: "-"
+  priority: "-"
+  created: 2026-10-13
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start receipt` to move it to in flight
+  - Run `tasks-axi block receipt --by <other>` to record a dependency
+ok: added extra (ship) -> Queued
+task:
+  id: extra
+  title: Capacity denial
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: ship
+  repo: "-"
+  priority: "-"
+  created: 2026-10-13
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start extra` to move it to in flight
+  - Run `tasks-axi block extra --by <other>` to record a dependency
+scaffolded: <owned-test-workspace>/.test-phase/r5-pi/native-home/data/receipt/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+Away posture read-back (proposed, not yet confirmed):
+  entered: 2026-10-14T01:01:42Z
+  expected return: not given
+  spend cap: 1 concurrent workers
+  merge when green (task ids): (none)
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Disposable local validation
+  accepted clauses:
+    (none)
+  refused clauses:
+    (none)
+  everything else waits for your return: no red merge without its named check, no discard without a named object and condition, never credentials, legal, financial, or attended prompts, nothing by analogy, and every clause expires at return.
+  hard rule: forbidden, destructive, irreversible, and security-sensitive actions are never pre-authorizable regardless of clause text; no recorded clause is authority by itself.
+  recorded clauses are held for the return brief and are not executed by this release.
+Say go to confirm; restate any refused clause first if you want it recorded.
+Away posture confirmed at 2026-10-14T01:01:42Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. No mandate clauses recorded. Forbidden, destructive, irreversible, and security-sensitive actions are never pre-authorizable regardless of clause text, and no recorded clause is authority by itself. Expected return: not given. Spend cap: 1 concurrent workers.
+notice: receipt ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned receipt harness=codex kind=ship mode=local-only yolo=off window=<owned-lab-06> worktree=<owned-test-workspace>/state/live-validation-fixture.M7XYkx/project/.treehouse/project-1bceff/1/project
+provider-received
+task:
+  id: receipt
+  title: Isolated provider receipt
+  state: in_flight
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: ship
+  repo: "-"
+  priority: "-"
+  created: 2026-10-13
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+1791939707
+Exact ordinary positive epoch launch stamp verified
+state: unknown · source: pane · harness state unavailable (unknown codex-unverified)
+current live=1 free=3
+receipt	ship	unknown	8
+receipt: current state unknown; seat retained
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+receipt: current state unknown; seat retained
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+stopped receipt harness=codex backend=herdr endpoint=<owned-lab-06> worktree=<owned-test-workspace>/state/live-validation-fixture.M7XYkx/project/.treehouse/project-1bceff/1/project
+Previous HEAD position was 61b0aa1 Initialize disposable local fixture
+Switched to branch 'fixture/no-pr'
+Your branch is up to date with 'origin/fixture/no-pr'.
+Real initialized predecessor status: failed; same branch/head; no PR
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+notice: receipt ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned receipt harness=pi kind=ship mode=local-only yolo=off window=<owned-lab-06> worktree=<owned-test-workspace>/state/live-validation-fixture.M7XYkx/project/.treehouse/project-1bceff/1/project
+state: working · source: pane · harness busy (pi-ext)
+Actual Pi agent_start: working; LIVE=1 under genuine predecessor FAILED run
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+Actual next spawn DENIED at cap 1; owned state preserved

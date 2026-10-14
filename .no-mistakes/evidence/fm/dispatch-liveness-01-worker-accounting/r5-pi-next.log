@@ -1,0 +1,33 @@
+v1 gen=g1791939720.2718557.512 seq=3 state=idle source=pi-ext event=agent-settled ts=1791939798
+state: failed · source: run-step · run failed · run: <genuine-disposable-failed-run>
+Verified settled Pi releases seat against real failed predecessor; LIVE=0
+scaffolded: <owned-test-workspace>/.test-phase/r5-pi/native-home/data/extra/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+notice: extra ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned extra harness=codex kind=ship mode=local-only yolo=off window=<owned-lab-07> worktree=<owned-test-workspace>/state/live-validation-fixture.M7XYkx/project/.treehouse/project-1bceff/2/project
+task:
+  id: extra
+  title: Capacity denial
+  state: in_flight
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: ship
+  repo: "-"
+  priority: "-"
+  created: 2026-10-13
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+next-received
+unknown option: w1:p2

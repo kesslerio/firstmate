@@ -1,0 +1,5 @@
+missing cache: state: working · source: pane · harness busy (muse-session-log)
+stale cache: state: working · source: pane · harness busy (muse-session-log)
+$WORKTREE/.test-phase/live-home/native-sessions/2026/10/13/local-session/session.jsonlvalid cache: state: working · source: pane · harness busy (muse-session-log)
+ambiguous log: state: unknown · source: pane · harness state unavailable (unknown muse-session-log)
+native cache observation preserved all files; direct owner maintenance still works

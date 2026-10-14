@@ -1,0 +1,11 @@
+{
+  "head": "c8ca6126d0c7a7a770432e42843472960967cac1",
+  "live_checks": "Targets, seat exclusions and lanes, uncertainty and invalid handoffs, native cache read-only ownership, fresh/legacy readiness publication and poll authentication, AFK return count/unknown with catch-up retained.",
+  "native_dataset": "Disposable serialized Muse logs consumed by the real product; no native Muse model or process is claimed.",
+  "blocked_check": "Actual fm-spawn refused with exit 3: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set). This is not cap-1 denial proof.",
+  "regressions": "Four targeted full scripts passed, no gate skips; mocked interfaces are regression evidence only.",
+  "setup_corrections": "Initial nested Git identity caused a timeout; isolated Git fixture, transparent lab routing, compact native protocol bytes, metadata field order and expected catch-up exit were corrected. No product edits.",
+  "cleanup": "Guarded lab teardown exit 0; bounded supervisors exited; no owned lab or test driver survivors.",
+  "retained_evidence": "Prior native phase evidence inspected; never relabeled as live in this turn. Actual post-idle allowed launch absent from phase3.",
+  "source_changes": false
+}

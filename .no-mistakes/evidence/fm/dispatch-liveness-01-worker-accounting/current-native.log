@@ -1,0 +1,45 @@
+error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+Away posture read-back (proposed, not yet confirmed):
+  entered: 2026-10-14T00:28:03Z
+  expected return: not given
+  spend cap: 1 concurrent workers
+  merge when green (task ids): (none)
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    Disposable local validation
+  accepted clauses:
+    (none)
+  refused clauses:
+    (none)
+  everything else waits for your return: no red merge without its named check, no discard without a named object and condition, never credentials, legal, financial, or attended prompts, nothing by analogy, and every clause expires at return.
+  hard rule: forbidden, destructive, irreversible, and security-sensitive actions are never pre-authorizable regardless of clause text; no recorded clause is authority by itself.
+  recorded clauses are held for the return brief and are not executed by this release.
+Say go to confirm; restate any refused clause first if you want it recorded.
+fm-afk-contract: replaced the earlier away posture; its record is archived at <owned-test-workspace>/.test-phase/native-home/state/afk-contracts/1791937643-superseded-1791937683.afk-contract
+Away posture confirmed at 2026-10-14T00:28:03Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. No mandate clauses recorded. Forbidden, destructive, irreversible, and security-sensitive actions are never pre-authorizable regardless of clause text, and no recorded clause is authority by itself. Expected return: not given. Spend cap: 1 concurrent workers.
+notice: receipt ships mode=local-only while the standing posture for receipt-fixture is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned receipt harness=codex kind=ship mode=local-only yolo=off window=<owned-lab-12> worktree=<owned-test-workspace>/.test-phase/pool/.treehouse/receipt-fixture-<owned-slot>/1/receipt-fixture
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Folder access
+  <owned-test-workspace>/.test-phase/pool/.treehouse/receipt-fixture
+  -fd7aec/1/receipt-fixture
+
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the repository root:
+  <owned-test-workspace>/.test-phase/native-home/projects/receipt-fi
+  xture
+
+  Trust this folder? Codex can read, edit, and run files here, subject to your permission settings. Folder settings
+  can run code automatically, even without a model request. Continue only if you trust these files. Your trust
+  decision will be saved.
+
+› 1. Trust and continue
+  2. Quit
+
+  enter continue · esc quit

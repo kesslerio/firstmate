@@ -1,0 +1,137 @@
+snapshot target=4 live=4 free=0 over=0
+active	ship	working	1
+codex	ship	unknown	1
+invalid	ship	unknown	1
+paused	scout	paused	1
+codex: current state unknown; seat retained
+$WORKTREE/.test-phase/live-home/state/invalid.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+invalid: current state unknown; seat retained
+read-only snapshot preserved all home file bytes
+error: stale busy-state gen for active (event rejected)
+snapshot target=4 live=4 free=0 over=0
+active	ship	working	1
+codex	ship	unknown	1
+invalid	ship	unknown	1
+paused	scout	paused	1
+codex: current state unknown; seat retained
+$WORKTREE/.test-phase/live-home/state/invalid.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+invalid: current state unknown; seat retained
+stale generation refused; current active seat retained
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  7 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+armed: state/active.check.sh
+snapshot target=4 live=3 free=1 over=0
+codex	ship	unknown	3
+invalid	ship	unknown	3
+paused	scout	paused	3
+codex: current state unknown; seat retained
+$WORKTREE/.test-phase/live-home/state/invalid.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+invalid: current state unknown; seat retained
+snapshot target=4 live=4 free=0 over=0
+active	ship	unknown	0
+codex	ship	unknown	3
+invalid	ship	unknown	3
+paused	scout	paused	3
+$WORKTREE/.test-phase/live-home/state/active.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+active: current state unknown; seat retained
+codex: current state unknown; seat retained
+$WORKTREE/.test-phase/live-home/state/invalid.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+invalid: current state unknown; seat retained
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  7 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+armed: state/active.check.sh
+snapshot target=4 live=3 free=1 over=0
+codex	ship	unknown	5
+invalid	ship	unknown	5
+paused	scout	paused	5
+codex: current state unknown; seat retained
+$WORKTREE/.test-phase/live-home/state/invalid.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+invalid: current state unknown; seat retained
+fresh current handoff releases seat; predecessor handoff did not
+target 0 refused: $WORKTREE/.test-phase/live-home/config/worker-target: value must be one positive decimal integer
+target 01 refused: $WORKTREE/.test-phase/live-home/config/worker-target: value must be one positive decimal integer
+target -1 refused: $WORKTREE/.test-phase/live-home/config/worker-target: value must be one positive decimal integer
+target 9223372036854775808 refused: $WORKTREE/.test-phase/live-home/config/worker-target: value exceeds signed 64-bit integer range
+target 4 5 refused: $WORKTREE/.test-phase/live-home/config/worker-target: value must be one positive decimal integer
+dangling target refused: $WORKTREE/.test-phase/live-home/config/worker-target: file is symlinked
+snapshot target=2 live=3 free=0 over=1
+codex	ship	unknown	6
+invalid	ship	unknown	6
+paused	scout	paused	6
+codex: current state unknown; seat retained
+$WORKTREE/.test-phase/live-home/state/invalid.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+invalid: current state unknown; seat retained
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  7 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+=== Return brief ===
+Supervisor health:
+  - GAP: the watcher beat was 999999s old at return (grace 300s)
+  - status file unreadable: $WORKTREE/.test-phase/live-home/state/mate.status; catch-up stays gated
+Mandate clauses:
+  (no away-posture record for this window; legacy away flag only)
+Waiting on you:
+  (nothing)
+Tried and failed, or could not be fixed:
+  - failed: failed: local task state
+Handled while away:
+  0 outcome(s) handled by the away session (0 routine, 0 escalated above)
+  (no routine outcomes recorded in the store for this window)
+Live-worker count unavailable: $WORKTREE/.test-phase/live-home/config/worker-target: value must be one positive decimal integer
+Cost: 0 supervision outcome(s) recorded (0 routine, 0 captain); unknown task(s) live at return.
+fm-afk-return: catch-up must finish before the captain request
+catch-up health: GAP: the watcher beat was 999999s old at return (grace 300s)
+catch-up wake: STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+catch-up wake: active done: predecessor terminal event
+catch-up wake: done done: local task state
+catch-up wake: failed failed: local task state
+catch-up lifecycle: status file unreadable: $WORKTREE/.test-phase/live-home/state/mate.status; catch-up stays gated
+fm-afk-return: handle each blocker now, or close it with resolved [key=...] and append a durable reclassification reason, then run bin/fm-afk-return.sh check
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  7 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+=== Return brief ===
+Supervisor health:
+  - GAP: the watcher beat was 999999s old at return (grace 300s)
+  - status file unreadable: $WORKTREE/.test-phase/live-home/state/mate.status; catch-up stays gated
+Mandate clauses:
+  (no away-posture record for this window; legacy away flag only)
+Waiting on you:
+  (nothing)
+Tried and failed, or could not be fixed:
+  - failed: failed: local task state
+Handled while away:
+  0 outcome(s) handled by the away session (0 routine, 0 escalated above)
+  (no routine outcomes recorded in the store for this window)
+codex: current state unknown; seat retained
+$WORKTREE/.test-phase/live-home/state/invalid.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+invalid: current state unknown; seat retained
+Cost: 0 supervision outcome(s) recorded (0 routine, 0 captain); 3 task(s) live at return.
+fm-afk-return: catch-up must finish before the captain request
+catch-up health: GAP: the watcher beat was 999999s old at return (grace 300s)
+catch-up wake: STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+catch-up wake: active done: predecessor terminal event
+catch-up wake: done done: local task state
+catch-up wake: failed failed: local task state
+catch-up lifecycle: status file unreadable: $WORKTREE/.test-phase/live-home/state/mate.status; catch-up stays gated
+fm-afk-return: handle each blocker now, or close it with resolved [key=...] and append a durable reclassification reason, then run bin/fm-afk-return.sh check
+return gate exit=3 (existing blockers retained)
+secondmate target=6 live=3

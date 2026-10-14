@@ -1,0 +1,62 @@
+{
+  "verdict": "inconclusive",
+  "source_head": "c8ca6126d0c7a7a770432e42843472960967cac1",
+  "production_changes": false,
+  "cause": "The earlier live driver called fleet entrypoints without sourcing the documented isolated-test safety helper.",
+  "fresh_setup_verification": [
+    {
+      "case": "Public spawn without test exemption",
+      "exit": 3,
+      "result": "pass",
+      "gate_marker_preserved": true,
+      "fixture_unchanged": true
+    },
+    {
+      "case": "Public spawn after guarded sourcing of existing Herdr test safety helper",
+      "exit": 1,
+      "result": "pass",
+      "observed": "Reached missing-task validation; no worker launched",
+      "gate_marker_preserved": true,
+      "fixture_unchanged": true
+    }
+  ],
+  "focused_command": "TMPDIR=<owned-worktree-temp> timeout -k 10s 600s bin/fm-test-run.sh --jobs 1 --per-script-timeout-secs 500 --json <owned-timing-file> tests/fm-liveness-lib.test.sh",
+  "focused_verification": {
+    "summary": {
+      "duration_ms": 130905,
+      "failed": 0,
+      "skipped_gate": 0,
+      "total": 1
+    },
+    "scripts": [
+      {
+        "duration_ms": 130860,
+        "exit": 0,
+        "expected_gate_skip": "none",
+        "family": "pure-contract-unit",
+        "gate_skip": false,
+        "gate_skip_reason": "",
+        "path": "tests/fm-liveness-lib.test.sh"
+      }
+    ]
+  },
+  "auth_preflight": {
+    "provider": "openai-codex",
+    "status": "ready",
+    "authType": "oauth",
+    "refresh": false
+  },
+  "remaining_live_cases": [
+    "Actual no-PR relaunch against a genuine predecessor failed run and cap-1 denial",
+    "Verified current idle followed by actual next launch before cleanup",
+    "Public replacement during slow genuine readiness publication",
+    "Provider-confirmed launch with real backlog and postconfirmation bookkeeping faults"
+  ],
+  "limitation": "The supplied genuine failed-run project and registered worker slot are outside the current worktree. The current workspace boundary forbids changing or operating those project files, and this Test phase forbids creating or controlling another validation pipeline. No substitute ledger or business verdict was fabricated. Required live lifecycle validation remains incomplete.",
+  "evidence_scope": "Current public CLI guard checks and focused mock-backed behavior regressions. No live model worker was launched. Archived results are not counted as current passes.",
+  "other_phases_run": false,
+  "full_suite_run": false,
+  "linters_formatters_static_analysis_run": false,
+  "owned_descendants_remaining": false,
+  "transient_worktree_artifacts_removed": true
+}

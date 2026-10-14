@@ -1,0 +1,107 @@
+R1-native admission refusal: error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+R1-native replacement: state: working · source: pane · harness busy (claude-hook); seats=1; cap-1 admission=denied
+ok - no-PR replacement activity retains seat and terminal settlement permits admission
+R1-herdr admission refusal: error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+R1-herdr replacement: state: working · source: pane · harness busy (claude-hook); seats=1; cap-1 admission=denied
+ok - no-PR replacement activity retains seat and terminal settlement permits admission
+R1-codex admission refusal: worker: current state unknown; seat retained
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+R1-codex replacement: state: unknown · source: pane · current incarnation harness state unavailable (unknown codex-unverified); terminal run attribution unverified; seats=1; cap-1 admission=denied
+ok - no-PR replacement activity retains seat and terminal settlement permits admission
+ok - R1: primary and operator relaunch withdraw prior readiness, retain association, and enforce the away cap
+R1race replacement before: observed=s1700000000.1.1 current=s1791937603.4117561.29055 ready=s1700000000.1.1
+R1race replacement probe rc=1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 2s ago).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: PR readiness refused for task worker: changed incarnation; obtain the current worker's handoff and run bin/fm-pr-check.sh again
+R1race replacement: stale live=1 cap denied; fresh live=0 cap allowed
+R1race legacy-replacement before: observed=ABSENT current=s1791937612.4125995.24636 ready=legacy
+R1race legacy-replacement probe rc=1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: PR readiness refused for task worker: changed incarnation; obtain the current worker's handoff and run bin/fm-pr-check.sh again
+R1race legacy-replacement: stale live=1 cap denied; fresh live=0 cap allowed
+R1race legacy-unchanged before: observed=ABSENT current=ABSENT ready=
+R1race legacy-unchanged probe rc=0
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 2s ago).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+armed: state/worker.check.sh
+R1race unchanged before: observed=s1700000000.1.1 current=s1700000000.1.1 ready=s1700000000.1.1
+R1race unchanged probe rc=0
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 2s ago).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+armed: state/worker.check.sh
+R1race removed before: observed=s1700000000.1.1 current=ABSENT ready=s1700000000.1.1
+R1race removed probe rc=1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: PR readiness refused for task worker: changed incarnation; obtain the current worker's handoff and run bin/fm-pr-check.sh again
+R1race duplicate before: observed=s1700000000.1.1 current=s1700000000.1.1 ready=s1700000000.1.1
+R1race duplicate probe rc=1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: PR readiness refused for task worker: invalid or duplicate spawn_gen in <owned-test-workspace>/.test-phase/tmp/fm-liveness.7f46xc/delayed-duplicate/home/state/worker.meta; repair the task record
+R1race malformed before: observed=s1700000000.1.1 current=broken ready=s1700000000.1.1
+R1race malformed probe rc=1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 2s ago).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: PR readiness refused for task worker: invalid or duplicate spawn_gen in <owned-test-workspace>/.test-phase/tmp/fm-liveness.7f46xc/delayed-malformed/home/state/worker.meta; repair the task record
+R1race empty before: observed=s1700000000.1.1 current=ABSENT ready=s1700000000.1.1
+R1race empty probe rc=1
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: PR readiness refused for task worker: invalid or duplicate spawn_gen in <owned-test-workspace>/.test-phase/tmp/fm-liveness.7f46xc/delayed-empty/home/state/worker.meta; repair the task record
+ok - R1race: delayed predecessor and invalid generations refuse; unchanged legacy and fresh current handoffs release capacity
+ok - R2: native Muse cache miss, stale, valid and failed reads preserve the operational home
+ok - R3: exact-path stamp publication and every postlaunch failure preserve confirmed work
+ok - R4: exact-path stamp publication and every postlaunch failure preserve confirmed work
+ok - AE8: current-state seats include paused lanes and release terminal and ready-PR lanes
+ok - scouts and over-target homes use the same count
+ok - invalid ready metadata retains seats despite lower-level completion; ordinary terminal states still release them
+ok - malformed and unsafe targets are actionable errors
+ok - unreadable state roots cannot masquerade as an empty home
+ok - secondmate targets and worker records remain home-local
+ok - failed, malformed, and ten-second-bounded reads retain seats visibly
+ok - only a confirmed worker launch publishes the durable last-launch stamp
+ok - backend failure changes no worker records, launch stamp, or away authority
+ok - native crew-state and canonical identity parser prove shared read-only accounting

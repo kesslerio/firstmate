@@ -1,0 +1,16 @@
+{
+  "source_head": "c8ca6126d0c7a7a770432e42843472960967cac1",
+  "tracked_source_unchanged": true,
+  "final_focused_suites": {
+    "fm-liveness-lib": "exit 0",
+    "fm-branch-supervision": "exit 0",
+    "fm-afk-return": "exit 0",
+    "fm-crew-state": "exit 0"
+  },
+  "native6_exit": 0,
+  "observation5_exit": 0,
+  "target_checks_exit": 0,
+  "owned_processes_remaining": [],
+  "stopped_registration_remaining": "<owned-lab-01>",
+  "cleanup_blocker": "The supported helper refuses destructive calls because the original tripwire was retired after successful teardown; a late cache reader recreated the stopped registration."
+}

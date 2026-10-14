@@ -1,0 +1,102 @@
+r5-targets.log
+absent accepted target=4
+valid accepted target=7
+maximum accepted target=9223372036854775807
+no-newline refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: file must contain exactly one value followed by one newline; free=0
+two-newlines refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: file must contain exactly one value followed by one newline; free=0
+crlf refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: value must be one positive decimal integer; free=0
+zero refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: value must be one positive decimal integer; free=0
+padded refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: value must be one positive decimal integer; free=0
+negative refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: value must be one positive decimal integer; free=0
+overflow refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: value exceeds signed 64-bit integer range; free=0
+hardlink refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: file is hardlinked; free=0
+symlink refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: file is symlinked; free=0
+fifo refused: <owned-test-workspace>/.test-phase/r5-targets/config/worker-target: file is not a regular file; free=0
+secondmate default target=6
+
+r5-home-target.log
+Parent explicit reporting target=9
+Child home target=6, parent target not inherited
+Ordinary independent home default target=4
+
+r5-observe.log
+missing cache: state: working · source: pane · harness busy (muse-session-log)
+stale cache: state: working · source: pane · harness busy (muse-session-log)
+<owned-test-workspace>/.test-phase/r5-observe/home/native-sessions/2026/10/13/first/session.jsonlvalid cache: state: working · source: pane · harness busy (muse-session-log)
+ambiguous native sessions: state: unknown · source: pane · harness state unavailable (unknown muse-session-log)
+snapshot live=2 target=4 free=2
+paused	scout	paused	0
+muse: current state unknown; seat retained
+muse: current state unknown; seat retained
+Cost: 0 supervision outcome(s) recorded (0 routine, 0 captain); 2 task(s) live at return.
+return check exit=3 (catch-up blocked)
+Live-worker count unavailable: <owned-test-workspace>/.test-phase/r5-observe/home/config/worker-target: value must be one positive decimal integer
+Cost: 0 supervision outcome(s) recorded (0 routine, 0 captain); unknown task(s) live at return.
+invalid observation return exit=3
+slow actual-backend read live=2 elapsed=10 warnings=<owned-test-workspace>/.test-phase/r5-observe/home/state/muse.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+muse: current state unknown; seat retained
+paused: current state unknown; seat retained
+Read-only native dataset, paused scout, bounded failed reads, uncertainty and AFK-return verified
+
+r5-native.log
+provider-received
+  state: in_flight
+Exact ordinary positive epoch launch stamp verified
+state: unknown · source: pane · harness state unavailable (unknown codex-unverified)
+current live=1 free=3
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+Stale publisher refused after actual replacement, before persistent readiness publication
+Fresh authenticated current handoff released the seat
+error: task extra launched, but state/.last-launch could not be published; task record preserved
+provider-received
+  state: in_flight
+Unsafe stamp destination reported the started worker; native delivery and In-flight record preserved
+error: task race launched, but state/.last-launch could not be published; task record preserved
+provider-received
+  state: in_flight
+Actual rename race preserved confirmed worker delivery and In-flight record
+
+r5-pi2.log
+error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+  state: in_flight
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+Real initialized predecessor status: failed; same branch/head; no PR
+Genuine failed predecessor / current Codex: state: unknown · source: pane · current incarnation harness state unavailable (unknown codex-unverified); terminal run attribution unverified
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+Actual Pi agent_start: working; LIVE=1 under genuine predecessor FAILED run
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+Actual next spawn DENIED at cap 1; owned state preserved
+Real Pi agent_settled: LIVE=0, same incarnation remains alive
+  state: in_flight
+next-received
+Pi native process alive after next launch
+Actual next spawn ALLOWED and native delivery confirmed while settled Pi still alive
+
+r5-capture.log
+Failed real external scrollback probe with authoritative Pi busy: state: working · source: pane · harness busy (pi-ext)
+Capture failure retained current busy seat LIVE=1
+
+r5-capture-cap.log
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+Actual cap denial under failed capture preserves records and backlog
+
+r5-readiness.log
+Readiness legacy public publication result=0 verified
+Readiness current public publication result=0 verified
+error: PR readiness refused for task malformed: invalid or duplicate spawn_gen in <owned-test-workspace>/.test-phase/readiness-home/state/malformed.meta; repair the task record
+Readiness malformed public publication result=1 verified
+error: PR readiness refused for task duplicate: invalid or duplicate spawn_gen in <owned-test-workspace>/.test-phase/readiness-home/state/duplicate.meta; repair the task record
+Readiness duplicate public publication result=1 verified
+
+
+r5-terminal.log
+Current no-PR done control: state: done · source: status-log · current native terminal control
+Current no-PR failed control: state: failed · source: status-log · current native terminal control
+snapshot live=2 target=4 free=2
+slow actual-backend read live=4 elapsed=30 warnings=done: current state unknown; seat retained
+
+Final current-terminal controls:
+Current no-PR done control: state: done · source: status-log · current native terminal control
+Current no-PR failed control: state: failed · source: status-log · current native terminal control
+snapshot live=2 target=4 free=2
+Verified current terminal rows release seats while paused and invalid rows retain them

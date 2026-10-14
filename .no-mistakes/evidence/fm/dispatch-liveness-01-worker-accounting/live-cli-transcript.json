@@ -1,0 +1,172 @@
+[
+  {
+    "step": "empty-primary-default",
+    "exit": 0,
+    "output": "rc=0 live=0 target=4 free=4\n\n"
+  },
+  {
+    "step": "secondmate-default",
+    "exit": 0,
+    "output": "target=6\n"
+  },
+  {
+    "step": "valid-target-1",
+    "exit": 0,
+    "output": "rc=0 live=0 target=1 free=1\n\n"
+  },
+  {
+    "step": "valid-target-9223372036854775807",
+    "exit": 0,
+    "output": "rc=0 live=0 target=9223372036854775807 free=9223372036854775807\n\n"
+  },
+  {
+    "step": "invalid-target-0",
+    "exit": 1,
+    "output": "rc=1 live=0 target= free=0\n[worktree]/.test-phase/live/home/config/worker-target: value must be one positive decimal integer\n"
+  },
+  {
+    "step": "invalid-target-1",
+    "exit": 1,
+    "output": "rc=1 live=0 target= free=0\n[worktree]/.test-phase/live/home/config/worker-target: value must be one positive decimal integer\n"
+  },
+  {
+    "step": "invalid-target-2",
+    "exit": 1,
+    "output": "rc=1 live=0 target= free=0\n[worktree]/.test-phase/live/home/config/worker-target: value must be one positive decimal integer\n"
+  },
+  {
+    "step": "invalid-target-3",
+    "exit": 1,
+    "output": "rc=1 live=0 target= free=0\n[worktree]/.test-phase/live/home/config/worker-target: value must be one positive decimal integer\n"
+  },
+  {
+    "step": "invalid-target-4",
+    "exit": 1,
+    "output": "rc=1 live=0 target= free=0\n[worktree]/.test-phase/live/home/config/worker-target: file must contain exactly one value followed by one newline\n"
+  },
+  {
+    "step": "invalid-target-5",
+    "exit": 1,
+    "output": "rc=1 live=0 target= free=0\n[worktree]/.test-phase/live/home/config/worker-target: file must contain exactly one value followed by one newline\n"
+  },
+  {
+    "step": "invalid-target-6",
+    "exit": 1,
+    "output": "rc=1 live=0 target= free=0\n[worktree]/.test-phase/live/home/config/worker-target: value exceeds signed 64-bit integer range\n"
+  },
+  {
+    "step": "symlink-target",
+    "exit": 1,
+    "output": "rc=1 live=0 target= free=0\n[worktree]/.test-phase/live/home/config/worker-target: file is symlinked\n"
+  },
+  {
+    "step": "hardlink-target",
+    "exit": 1,
+    "output": "rc=1 live=0 target= free=0\n[worktree]/.test-phase/live/home/config/worker-target: file is hardlinked\n"
+  },
+  {
+    "step": "native-busy-and-exclusions",
+    "exit": 0,
+    "output": "rc=0 live=1 target=4 free=3\nworker\tship\tworking\t60\n\n"
+  },
+  {
+    "step": "paused-scout-retains-seat",
+    "exit": 0,
+    "output": "rc=0 live=1 target=4 free=3\nworker\tscout\tpaused\t60\n\n"
+  },
+  {
+    "step": "read-only-cache-missing",
+    "exit": 0,
+    "output": "rc=0 live=1 target=4 free=3\nworker\tscout\tpaused\t60\n\n"
+  },
+  {
+    "step": "read-only-cache-stale",
+    "exit": 0,
+    "output": "rc=0 live=1 target=4 free=3\nworker\tscout\tpaused\t60\n\n"
+  },
+  {
+    "step": "direct-cache-owner-maintenance",
+    "exit": 0,
+    "output": "[worktree]/.test-phase/live/sessions/2026/10/13/native/session.jsonl"
+  },
+  {
+    "step": "read-only-cache-valid",
+    "exit": 0,
+    "output": "rc=0 live=1 target=4 free=3\nworker\tscout\tpaused\t61\n\n"
+  },
+  {
+    "step": "ambiguous-native-log",
+    "exit": 0,
+    "output": "rc=0 live=1 target=4 free=3\nworker\tscout\tunknown\t61\nworker: current state unknown; seat retained\n\n"
+  },
+  {
+    "step": "malformed-native-log",
+    "exit": 0,
+    "output": "rc=0 live=1 target=4 free=3\nworker\tscout\tunknown\t61\nworker: current state unknown; seat retained\n\n"
+  },
+  {
+    "step": "duplicate-pr-retains",
+    "exit": 0,
+    "output": "rc=0 live=1 target=4 free=3\nworker\tship\tunknown\t60\n[worktree]/.test-phase/live/home/state/worker.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh\nworker: current state unknown; seat retained\n\n"
+  },
+  {
+    "step": "prior-readiness-retains",
+    "exit": 0,
+    "output": "rc=0 live=1 target=4 free=3\nworker\tship\tunknown\t60\n[worktree]/.test-phase/live/home/state/worker.meta: prior incarnation or invalid PR readiness binding; seat retained; renew the handoff with bin/fm-pr-check.sh\nworker: current state unknown; seat retained\n\n"
+  },
+  {
+    "step": "fresh-current-readiness",
+    "exit": 0,
+    "output": "\u25cf\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\u25cf  WATCHER DOWN - SUPERVISION IS OFF\n\u25cf  2 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).\n\u25cf  This read-only session should report the lapse, not repair it.\n\u25cf  This is a supervision warning only; the guarded operation WILL still run.\n\u25cf  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.\n\u25cf\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\narmed: state/worker.check.sh\n"
+  },
+  {
+    "step": "fresh-readiness-releases",
+    "exit": 0,
+    "output": "rc=0 live=0 target=4 free=4\n\n"
+  },
+  {
+    "step": "authenticated-poll-registration",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "step": "return-count",
+    "exit": 3,
+    "output": "\u25cf\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\u25cf  WATCHER DOWN - SUPERVISION IS OFF\n\u25cf  2 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).\n\u25cf  This read-only session should report the lapse, not repair it.\n\u25cf  This is a supervision warning only; the guarded operation WILL still run.\n\u25cf  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.\n\u25cf\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n=== Return brief ===\nSupervisor health:\n  - GAP: the watcher beat was 999999s old at return (grace 300s)\n  - status file unreadable: [worktree]/.test-phase/live/home/state/persistent.status; catch-up stays gated\nMandate clauses:\n  (no away-posture record for this window; legacy away flag only)\nWaiting on you:\n  (nothing)\nTried and failed, or could not be fixed:\n  (nothing)\nHandled while away:\n  0 outcome(s) handled by the away session (0 routine, 0 escalated above)\n  (no routine outcomes recorded in the store for this window)\nCost: 0 supervision outcome(s) recorded (0 routine, 0 captain); 0 task(s) live at return.\nfm-afk-return: catch-up must finish before the captain request\ncatch-up health: GAP: the watcher beat was 999999s old at return (grace 300s)\ncatch-up lifecycle: status file unreadable: [worktree]/.test-phase/live/home/state/persistent.status; catch-up stays gated\nfm-afk-return: handle each blocker now, or close it with resolved [key=...] and append a durable reclassification reason, then run bin/fm-afk-return.sh check\n"
+  },
+  {
+    "step": "return-unknown",
+    "exit": 3,
+    "output": "\u25cf\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\u25cf  WATCHER DOWN - SUPERVISION IS OFF\n\u25cf  2 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).\n\u25cf  This read-only session should report the lapse, not repair it.\n\u25cf  This is a supervision warning only; the guarded operation WILL still run.\n\u25cf  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.\n\u25cf\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n=== Return brief ===\nSupervisor health:\n  - GAP: the watcher beat was 999999s old at return (grace 300s)\n  - status file unreadable: [worktree]/.test-phase/live/home/state/persistent.status; catch-up stays gated\nMandate clauses:\n  (no away-posture record for this window; legacy away flag only)\nWaiting on you:\n  (nothing)\nTried and failed, or could not be fixed:\n  (nothing)\nHandled while away:\n  0 outcome(s) handled by the away session (0 routine, 0 escalated above)\n  (no routine outcomes recorded in the store for this window)\nLive-worker count unavailable: [worktree]/.test-phase/live/home/config/worker-target: value must be one positive decimal integer\nCost: 0 supervision outcome(s) recorded (0 routine, 0 captain); unknown task(s) live at return.\nfm-afk-return: catch-up must finish before the captain request\ncatch-up health: GAP: the watcher beat was 999999s old at return (grace 300s)\ncatch-up lifecycle: status file unreadable: [worktree]/.test-phase/live/home/state/persistent.status; catch-up stays gated\nfm-afk-return: handle each blocker now, or close it with resolved [key=...] and append a durable reclassification reason, then run bin/fm-afk-return.sh check\n"
+  },
+  {
+    "step": "cap-propose",
+    "exit": 0,
+    "output": "Away posture read-back (proposed, not yet confirmed):\n  entered: 2026-10-14T00:13:06Z\n  expected return: not given\n  spend cap: 1 concurrent workers\n  merge when green (task ids): (none)\n  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.\n  your words (verbatim):\n    Disposable validation: one concurrent worker\n  accepted clauses:\n    (none)\n  refused clauses:\n    (none)\n  everything else waits for your return: no red merge without its named check, no discard without a named object and condition, never credentials, legal, financial, or attended prompts, nothing by analogy, and every clause expires at return.\n  hard rule: forbidden, destructive, irreversible, and security-sensitive actions are never pre-authorizable regardless of clause text; no recorded clause is authority by itself.\n  recorded clauses are held for the return brief and are not executed by this release.\nSay go to confirm; restate any refused clause first if you want it recorded.\n"
+  },
+  {
+    "step": "cap-confirm",
+    "exit": 0,
+    "output": "Away posture confirmed at 2026-10-14T00:13:06Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. No mandate clauses recorded. Forbidden, destructive, irreversible, and security-sensitive actions are never pre-authorizable regardless of clause text, and no recorded clause is authority by itself. Expected return: not given. Spend cap: 1 concurrent workers.\n"
+  },
+  {
+    "step": "real-cap-denial",
+    "exit": 3,
+    "output": "error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)\n"
+  },
+  {
+    "step": "guarded-lab-teardown",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "step": "secondmate-target-remains-home-local",
+    "exit": 0,
+    "output": "target=6\n"
+  },
+  {
+    "step": "unchanged-legacy-readiness",
+    "exit": 0,
+    "output": "\u25cf\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\u25cf  WATCHER DOWN - SUPERVISION IS OFF\n\u25cf  2 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).\n\u25cf  This read-only session should report the lapse, not repair it.\n\u25cf  This is a supervision warning only; the guarded operation WILL still run.\n\u25cf  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.\n\u25cf\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\narmed: state/worker.check.sh\n"
+  }
+]

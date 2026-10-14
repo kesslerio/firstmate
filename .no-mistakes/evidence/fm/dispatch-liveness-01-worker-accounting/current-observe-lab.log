@@ -1,0 +1,9 @@
+missing cache: state: working · source: pane · harness busy (muse-session-log)
+stale cache: state: working · source: pane · harness busy (muse-session-log)
+<owned-test-workspace>/.test-phase/observe-lab/home/native-sessions/2026/10/13/first/session.jsonlvalid cache: state: working · source: pane · harness busy (muse-session-log)
+ambiguous native sessions: state: unknown · source: pane · harness state unavailable (unknown muse-session-log)
+snapshot live=2 target=4 free=2
+muse	ship	unknown	0
+paused	scout	working	0
+<owned-test-workspace>/.test-phase/observe-lab/home/state/muse.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+muse: current state unknown; seat retained

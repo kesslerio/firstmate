@@ -1,0 +1,112 @@
+{
+  "provenance": "Independent read-only audit of retained genuine live phase; no native launches repeated in this reassessment.",
+  "head": "c8ca6126d0c7a7a770432e42843472960967cac1",
+  "source_manifest_matches": 599,
+  "launch_cases": [
+    {
+      "case": "success-8",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 0,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    },
+    {
+      "case": "mktemp",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 1,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    },
+    {
+      "case": "date",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 1,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    },
+    {
+      "case": "write",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 1,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    },
+    {
+      "case": "directory",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 1,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    },
+    {
+      "case": "symlink",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 1,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    },
+    {
+      "case": "hardlink",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 1,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    },
+    {
+      "case": "fifo",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 1,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    },
+    {
+      "case": "rename",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 1,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    },
+    {
+      "case": "readback",
+      "receipt_bound_to_actual_native_argv_prompt_generation": true,
+      "receipt_precedes_fault_or_publication": true,
+      "same_record_preserved": true,
+      "backlog_in_flight": true,
+      "spawn_exit": 1,
+      "cap_denied_exit": 1,
+      "public_cleanup_exit": 0
+    }
+  ],
+  "two_stale_readiness_races_and_fresh_authenticated_publication_verified": true,
+  "retained_failed_fixture_and_owned_cleanup_verified": true,
+  "remaining_live_gap": "Verified current no-PR terminal release is unexercised under the permitted Codex provider.",
+  "new_live_execution": "Target validation only; see reassessment-targets.log.",
+  "regression_provenance": "Four retained targeted suites passed on unchanged source; external-interface cases remain mock-backed."
+}

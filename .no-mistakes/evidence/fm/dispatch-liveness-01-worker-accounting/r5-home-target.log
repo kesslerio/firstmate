@@ -1,0 +1,3 @@
+Parent explicit reporting target=9
+Child home target=6, parent target not inherited
+Ordinary independent home default target=4

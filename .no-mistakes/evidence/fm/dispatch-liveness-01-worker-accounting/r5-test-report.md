@@ -1,0 +1,9 @@
+Current Test verdict: go.
+
+All ten scenario groups were exercised against the current product. Real GPT-6.1 Sol Codex and same-account Pi workers ran only in named Herdr labs. The genuine initialized disposable failed run remained attributed at unchanged branch/head. Busy Pi, failed capture with supported busy evidence, and unverified Codex retained seats and denied actual cap-1 overflow. Verified Pi settlement released its seat; the actual next Codex worker delivered its receipt and entered In flight while Pi remained alive. Current no-PR terminal controls released seats independently.
+
+Read-only native-cache checks used disposable Muse protocol data, including ambiguity and stale-cache controls; no Muse provider was launched. Reporting targets, paused scout ages, duplicate PR uncertainty, bounded reads, AFK-return ownership, exact stamps, actual rename collision, stale readiness across actual replacement, unchanged legacy/current readiness, and malformed/duplicate generations were exercised through the real public owners. Forge lookups were disposable external-interface fixtures; the business owners were never replaced.
+
+Accounting, branch supervision, AFK-return and current-state suites passed. Setup-only driver/configuration mistakes were corrected and rerun; no product source or tracked tests changed. Named labs were torn down with their default-session tripwires intact, owned processes exited, transient workspace fixtures were removed, and the supplied registered input fixture was restored clean.
+
+No UI changed; CLI evidence is the relevant surface. This Test phase did not run lint, broad suites, publication, or CI. Previously disclosed full-control NixOS /bin/sleep, PTY/Pi-renderer, TypeScript, and real-Beads gaps remain inherited omissions; supported-host CI remains an outer-executor gate. This validates only the worker-accounting increment, not later feature work.

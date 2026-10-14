@@ -1,0 +1,13 @@
+# Current Test: inconclusive
+
+Eight live CLI scenarios passed: reporting targets; task-only accounting and paused scout ages; uncertain/invalid/bounded slow reads retaining seats; read-only native-cache binding and ambiguity; stale readiness refusal across actual replacement and fresh handoff acceptance; actual cap-1 allowed/denied launches; exact stamps and preservation through unsafe destinations and an actual rename collision; AFK-return known/unknown counts with existing blockers retained.
+
+Real GPT-6.1 Sol workers executed tool receipts in named Herdr labs using the existing account. Codex native state remained unknown. Native-cache and paused-lane checks used disposable Muse protocol data consumed by the real product; Muse was not launched. Strace delayed the actual rename while an owned directory collision was created. The product reported the already-started worker and preserved its record and In-flight backlog row.
+
+Final accounting, supervision, AFK-return and current-state suites passed serially with tracked source unchanged. Reporting-target checks passed. No UI changed; screenshots are not applicable. Supported-host CI and previously disclosed full-control, TypeScript, real-Beads and platform omissions remain outstanding.
+
+Two integrations remain untested: no-PR replacement against a genuinely attributed predecessor FAILED run at unchanged branch/head, and verified idle followed by the actual allowed next launch against that run. The historical disposable fixture was copied into this worktree, but real read-only axi status reports repo not initialized. Preserving its branch/head and local origin did not supply registration. This phase cannot initialize or control another pipeline. No verdict proxy or identity spoof was used. Supply an already initialized disposable failed-run fixture bound to a worktree-local project for a rerun.
+
+Setup retries corrected transport scoping, process-only trust inheritance, read-only supervision mode and fixture protocol/oracle mistakes. Treehouse initially changed tracked .gitignore with temporary pool entries; these were removed, the pool moved inside the disposable fixture repository, and the final live sequence and focused suites ran with tracked source unchanged.
+
+All owned processes exited. Final successful labs verified their default-session tripwires. A late cache-read attempt recreated one earlier stopped lab registration after successful teardown. Its tripwire was already retired; supported cleanup refuses. No guard was bypassed. The stopped registration needs operator cleanup through an authorized recovery path. Worktree fixtures were removed; evidence remains.

@@ -1,0 +1,16 @@
+{
+  "verdict": "inconclusive",
+  "finding": "test-2",
+  "tested_head_sha": "c8ca6126d0c7a7a770432e42843472960967cac1",
+  "source_changes": false,
+  "specific_failure_reproduced": false,
+  "root_cause": "Selected finding is missing live admission proof, not a demonstrated failing code assertion. Prior driver cleans up immediately after verified idle, before next-launch admission.",
+  "blocker": "Current worktree-only write boundary forbids the required existing FAILED fixture branch restoration and real Treehouse allocation outside the worktree. Retained driver also writes external /tmp lab data. No alternative fixture ledger was created or manufactured; no external worker or pipeline was controlled.",
+  "focused_verification": {
+    "command": "timeout -k 5s 60s bash <operator-home>/.no-mistakes/evidence/<owned-run-01>/live-target.sh",
+    "exit": 0,
+    "scope": "Current product target-file acceptance and denial behavior only; does not establish selected live idle/admission scenario."
+  },
+  "remaining": "Actual post-idle allowed launch and all required current-run live scenarios remain unverified. Archived passes are not current live proof.",
+  "cleanup": "Removed all target-check scratch data; no worker processes were launched."
+}

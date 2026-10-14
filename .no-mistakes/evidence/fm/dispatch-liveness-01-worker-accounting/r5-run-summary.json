@@ -1,0 +1,19 @@
+{
+  "head": "c8ca6126d0c7a7a770432e42843472960967cac1",
+  "product_source_unchanged": true,
+  "live_lab_sequences_completed": true,
+  "owned_live_processes_remaining": [],
+  "registered_fixture_restored_clean": true,
+  "focused_suites": {
+    "fm-liveness-lib": 0,
+    "fm-branch-supervision": 0,
+    "fm-afk-return": 0,
+    "fm-crew-state": 0
+  },
+  "setup_retries": [
+    "Replaced an unsupported disposable Herdr configuration key with empty config",
+    "Corrected a private driver idle-record assertion and process-info CLI option; reran the complete native sequence",
+    "Separated the expanded current-terminal dataset from the original two-row slow-read assertion; clean terminal-only rerun passed. The exploratory slow-read produced four retained seats in thirty seconds, consistent with per-record deadlines, and is not counted as an asserted pass."
+  ],
+  "ui_changed": false
+}

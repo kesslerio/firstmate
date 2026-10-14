@@ -1,0 +1,79 @@
+missing cache: state: working · source: pane · harness busy (muse-session-log)
+stale cache: state: working · source: pane · harness busy (muse-session-log)
+<owned-test-workspace>/.test-phase/r5-observe-terminal/home/native-sessions/2026/10/13/first/session.jsonlvalid cache: state: working · source: pane · harness busy (muse-session-log)
+ambiguous native sessions: state: unknown · source: pane · harness state unavailable (unknown muse-session-log)
+Current no-PR done control: state: done · source: status-log · current native terminal control
+Current no-PR failed control: state: failed · source: status-log · current native terminal control
+snapshot live=2 target=4 free=2
+muse	ship	unknown	0
+paused	scout	paused	0
+<owned-test-workspace>/.test-phase/r5-observe-terminal/home/state/muse.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+muse: current state unknown; seat retained
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  5 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+=== Return brief ===
+Supervisor health:
+  - GAP: the watcher beat was 999999s old at return (grace 300s)
+  - status file unreadable: <owned-test-workspace>/.test-phase/r5-observe-terminal/home/state/mate.status; catch-up stays gated
+Mandate clauses:
+  (no away-posture record for this window; legacy away flag only)
+Waiting on you:
+  (nothing)
+Tried and failed, or could not be fixed:
+  - failed: failed: current native terminal control
+Handled while away:
+  0 outcome(s) handled by the away session (0 routine, 0 escalated above)
+  (no routine outcomes recorded in the store for this window)
+<owned-test-workspace>/.test-phase/r5-observe-terminal/home/state/muse.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+muse: current state unknown; seat retained
+Cost: 0 supervision outcome(s) recorded (0 routine, 0 captain); 2 task(s) live at return.
+fm-afk-return: catch-up must finish before the captain request
+catch-up health: GAP: the watcher beat was 999999s old at return (grace 300s)
+catch-up wake: STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+catch-up wake: done done: current native terminal control
+catch-up wake: failed failed: current native terminal control
+catch-up lifecycle: status file unreadable: <owned-test-workspace>/.test-phase/r5-observe-terminal/home/state/mate.status; catch-up stays gated
+fm-afk-return: handle each blocker now, or close it with resolved [key=...] and append a durable reclassification reason, then run bin/fm-afk-return.sh check
+return check exit=3 (catch-up blocked)
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  5 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+=== Return brief ===
+Supervisor health:
+  - GAP: the watcher beat was 999999s old at return (grace 300s)
+  - status file unreadable: <owned-test-workspace>/.test-phase/r5-observe-terminal/home/state/mate.status; catch-up stays gated
+Mandate clauses:
+  (no away-posture record for this window; legacy away flag only)
+Waiting on you:
+  (nothing)
+Tried and failed, or could not be fixed:
+  - failed: failed: current native terminal control
+Handled while away:
+  0 outcome(s) handled by the away session (0 routine, 0 escalated above)
+  (no routine outcomes recorded in the store for this window)
+Live-worker count unavailable: <owned-test-workspace>/.test-phase/r5-observe-terminal/home/config/worker-target: value must be one positive decimal integer
+Cost: 0 supervision outcome(s) recorded (0 routine, 0 captain); unknown task(s) live at return.
+fm-afk-return: catch-up must finish before the captain request
+catch-up health: GAP: the watcher beat was 999999s old at return (grace 300s)
+catch-up wake: STATUS OUTCOME BACKSTOP (newest captain-facing task event has no covering branch outcome):
+catch-up wake: done done: current native terminal control
+catch-up wake: failed failed: current native terminal control
+catch-up lifecycle: status file unreadable: <owned-test-workspace>/.test-phase/r5-observe-terminal/home/state/mate.status; catch-up stays gated
+fm-afk-return: handle each blocker now, or close it with resolved [key=...] and append a durable reclassification reason, then run bin/fm-afk-return.sh check
+invalid observation return exit=3
+slow actual-backend read live=4 elapsed=30 warnings=done: current state unknown; seat retained
+failed: current state unknown; seat retained
+<owned-test-workspace>/.test-phase/r5-observe-terminal/home/state/muse.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+muse: current state unknown; seat retained
+paused: current state unknown; seat retained
+
+Read-only native dataset, paused scout, bounded failed reads, uncertainty and AFK-return verified

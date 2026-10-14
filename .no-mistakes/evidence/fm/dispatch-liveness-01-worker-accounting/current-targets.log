@@ -1,0 +1,14 @@
+absent accepted target=4
+valid accepted target=7
+maximum accepted target=9223372036854775807
+no-newline refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: file must contain exactly one value followed by one newline; free=0
+two-newlines refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: file must contain exactly one value followed by one newline; free=0
+crlf refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: value must be one positive decimal integer; free=0
+zero refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: value must be one positive decimal integer; free=0
+padded refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: value must be one positive decimal integer; free=0
+negative refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: value must be one positive decimal integer; free=0
+overflow refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: value exceeds signed 64-bit integer range; free=0
+hardlink refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: file is hardlinked; free=0
+symlink refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: file is symlinked; free=0
+fifo refused: <owned-test-workspace>/.test-phase/targets/config/worker-target: file is not a regular file; free=0
+secondmate default target=6

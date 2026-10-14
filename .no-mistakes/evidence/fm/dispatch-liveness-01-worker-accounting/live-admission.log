@@ -1,0 +1,15 @@
+fm-afk-contract: replaced the earlier away posture; its record is archived at $WORKTREE/.test-phase/live-home/state/afk-contracts/1791925642-superseded-1791925711.afk-contract
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  8 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  This read-only session should report the lapse, not repair it.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  Watcher repair belongs to the session holding the fleet lock; do not drain, arm, or repair from this read-only session.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+codex: current state unknown; seat retained
+$WORKTREE/.test-phase/live-home/state/invalid.meta: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+invalid: current state unknown; seat retained
+muse: current state unknown; seat retained
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 4 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+spawn exit=1
+real cap denial occurred before endpoint and task publication
