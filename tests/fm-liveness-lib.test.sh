@@ -272,7 +272,7 @@ EOF
           assert_contains "$state" 'state: working' "$route $result yields to current activity"
         else
           assert_contains "$state" 'source: run-step' "$route $result retains settled terminal result"
-          if [ "$result" = completed ]; then expected_state=done; else expected_state=failed; fi
+          if [ "$result" = completed ]; then expected_state="done"; else expected_state=failed; fi
           assert_contains "$state" "state: $expected_state" "$route $result retains exact terminal state"
         fi
       done
