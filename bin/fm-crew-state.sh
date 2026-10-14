@@ -91,10 +91,16 @@
 #      and ambiguity reporting. The selected run's id-addressed status must
 #      agree on id, branch, and live/terminal class before attribution;
 #      disagreement reports unknown with available candidate ids.
-#      The run-step is AUTHORITATIVE: running/fixing -> working, ci -> working
+#      The run-step maps running/fixing -> working, ci -> working
 #      (the id-addressed detail read carries step words the overview does not),
 #      awaiting_approval/fix_review -> parked (with gate findings), terminal
-#      passed/checks-passed -> done, failed/cancelled -> failed. EXCEPT: while
+#      passed/checks-passed -> done, failed/cancelled -> failed. Before emitting
+#      done/failed from an inactive full run or a terminal coarse row, current
+#      semantic busy state is checked: busy reports working, idle permits the
+#      terminal verdict, and an unverified harness reports unknown when the
+#      task has spawn_gen. Legacy records without spawn_gen retain the terminal
+#      fallback. This prevents a predecessor run from completing a working or
+#      unverified replacement at the same branch/head. EXCEPT: while
 #      the active step is ci, `axi status` alone cannot tell "still waiting on
 #      checks" from "checks green, waiting on merge" (see nm_ci_checks_state) -
 #      a ci-step log-tail check overrides working -> done once checks read
