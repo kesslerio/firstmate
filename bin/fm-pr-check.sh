@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # Record a PR-ready task: store one validated canonical pr=<url> and the forge's
 # exact pr_head=<sha> when available, then atomically arm a static merge poll.
+# pr_spawn_gen binds readiness to the task's observed spawn_gen; pr/pr_head
+# remain durable lifecycle association across replacement launches. Legacy
+# records without spawn_gen stay unbound until a replacement pins their old
+# handoff. Capture the incarnation and worktree under the metadata lock before
+# slow work, then refuse publication if that incarnation changed, disappeared,
+# or became ambiguous. Observed legacy absence matches only continued absence.
+# A fresh registration after replacement can publish the new worker's handoff.
 # The watcher check source is byte-for-byte bin/fm-pr-poll.sh; task and PR data
 # live only in a private sidecar and are never interpolated into shell source.
 # A GitHub pull request URL and a GitLab merge request URL are both accepted,
@@ -43,13 +50,51 @@ if [ ! -f "$META" ] || [ -L "$META" ] || [ "$(fm_pr_file_link_count "$META")" !=
   exit 1
 fi
 
-# A prior exact merged result may have queued its durable wake immediately
-# before interruption.
-# Finish only its identity-bound receipt before publishing a replacement poll.
-fm_pr_poll_retirement_recover_one "$STATE" "$ID" "$SCRIPT_DIR/fm-pr-poll.sh" || {
-  echo "error: pending PR poll retirement could not be validated" >&2
+META_TMP=
+META_LOCK=
+META_LOCK_HELD=0
+PR_POLL_PUBLISH_LOCK=
+PR_POLL_PUBLISH_LOCK_HELD=0
+pr_check_cleanup() {
+  fm_pr_poll_cleanup
+  [ -z "$META_TMP" ] || rm -f -- "$META_TMP"
+  if [ "$PR_POLL_PUBLISH_LOCK_HELD" = 1 ]; then
+    fm_lock_release "$PR_POLL_PUBLISH_LOCK" || true
+    PR_POLL_PUBLISH_LOCK_HELD=0
+  fi
+  if [ "$META_LOCK_HELD" = 1 ]; then
+    fm_lock_release "$META_LOCK" || true
+    META_LOCK_HELD=0
+  fi
+}
+trap pr_check_cleanup EXIT
+trap 'exit 1' HUP INT TERM
+
+# Absence is an observed legacy incarnation, never a wildcard. A present
+# field must be unique and match the spawn owner's generation format.
+pr_check_spawn_gen() {
+  LC_ALL=C awk -F= '
+    $1 == "spawn_gen" { count++; generation = substr($0, 11) }
+    END {
+      if (count == 0) print "absent"
+      else if (count == 1 && generation ~ /^s[1-9][0-9]*\.[0-9]+\.[0-9]+$/) print generation
+      else exit 1
+    }
+  ' "$META"
+}
+
+META_LOCK=$(fm_meta_lock_path "$META") || exit 1
+fm_lock_acquire_wait "$META_LOCK"
+META_LOCK_HELD=1
+[ -f "$META" ] && [ ! -L "$META" ] && [ "$(fm_pr_file_link_count "$META")" = 1 ] \
+  || { echo "error: task metadata is unavailable" >&2; exit 1; }
+EXPECTED_SPAWN_GEN=$(pr_check_spawn_gen) || {
+  echo "error: PR readiness refused for task $ID: invalid or duplicate spawn_gen in $META; repair the task record" >&2
   exit 1
 }
+WT=$(grep '^worktree=' "$META" | tail -1 | cut -d= -f2- || true)
+fm_lock_release "$META_LOCK"
+META_LOCK_HELD=0
 
 # Refuse to arm a GitLab watch with no glab on PATH. The poll is silent on
 # every error by design, so a missing CLI would be indistinguishable from a
@@ -71,7 +116,6 @@ fi
 # bin/fm-review-diff.sh resolves the head from the remote when none is recorded.
 # bin/fm-pr-merge.sh reads a GitLab head live at merge time for the same reason,
 # and treats a recorded value that disagrees as stale rather than authoritative.
-WT=$(grep '^worktree=' "$META" | tail -1 | cut -d= -f2- || true)
 PR_HEAD=
 if [ "$PROVIDER" = github ] && [ -n "$WT" ] && [ -d "$WT" ] && command -v gh >/dev/null 2>&1; then
   if REMOTE_HEAD=$(cd "$WT" && gh pr view "$URL" --json headRefOid -q .headRefOid 2>/dev/null) \
@@ -80,29 +124,9 @@ if [ "$PROVIDER" = github ] && [ -n "$WT" ] && [ -d "$WT" ] && command -v gh >/d
   fi
 fi
 
-META_TMP=
-META_LOCK=
-META_LOCK_HELD=0
-PR_POLL_PUBLISH_LOCK=
-PR_POLL_PUBLISH_LOCK_HELD=0
-pr_check_cleanup() {
-  fm_pr_poll_cleanup
-  [ -z "$META_TMP" ] || rm -f -- "$META_TMP"
-  if [ "$PR_POLL_PUBLISH_LOCK_HELD" = 1 ]; then
-    fm_lock_release "$PR_POLL_PUBLISH_LOCK" || true
-    PR_POLL_PUBLISH_LOCK_HELD=0
-  fi
-  if [ "$META_LOCK_HELD" = 1 ]; then
-    fm_lock_release "$META_LOCK" || true
-    META_LOCK_HELD=0
-  fi
-}
-trap pr_check_cleanup EXIT
-trap 'exit 1' HUP INT TERM
 fm_pr_poll_prepare "$STATE" "$ID" "$PROVIDER" "$URL" "$HOST" "$PROJECT_PATH" "$NUMBER" "$SCRIPT_DIR/fm-pr-poll.sh" \
   || { echo "error: could not prepare PR poll" >&2; exit 1; }
 
-META_LOCK=$(fm_meta_lock_path "$META") || exit 1
 fm_lock_acquire_wait "$META_LOCK"
 META_LOCK_HELD=1
 [ -f "$META" ] && [ ! -L "$META" ] && [ "$(fm_pr_file_link_count "$META")" = 1 ] \
@@ -110,13 +134,28 @@ META_LOCK_HELD=1
 META_DEVICE=$(fm_pr_file_device "$META") || exit 1
 STATE_DEVICE=$(fm_pr_file_device "$STATE") || exit 1
 [ "$META_DEVICE" = "$STATE_DEVICE" ] || { echo "error: task metadata is unavailable" >&2; exit 1; }
+CURRENT_SPAWN_GEN=$(pr_check_spawn_gen) || {
+  echo "error: PR readiness refused for task $ID: invalid or duplicate spawn_gen in $META; repair the task record" >&2
+  exit 1
+}
+if [ "$CURRENT_SPAWN_GEN" != "$EXPECTED_SPAWN_GEN" ]; then
+  echo "error: PR readiness refused for task $ID: changed incarnation; obtain the current worker's handoff and run bin/fm-pr-check.sh again" >&2
+  exit 1
+fi
+# Only a still-current invocation may finish the prior identity-bound receipt
+# or publish persistent poll bookkeeping; preparation above owns only temps.
+fm_pr_poll_retirement_recover_one "$STATE" "$ID" "$SCRIPT_DIR/fm-pr-poll.sh" || {
+  echo "error: pending PR poll retirement could not be validated" >&2
+  exit 1
+}
 META_TMP=$(mktemp "$STATE/.fm-pr-meta.XXXXXX") || exit 1
 while IFS= read -r line || [ -n "$line" ]; do
   case "$line" in
-    pr=*|pr_head=*) ;;
+    pr=*|pr_head=*|pr_spawn_gen=*) ;;
     *) printf '%s\n' "$line" >> "$META_TMP" || exit 1 ;;
   esac
 done < "$META"
+[ "$EXPECTED_SPAWN_GEN" = absent ] || printf 'pr_spawn_gen=%s\n' "$EXPECTED_SPAWN_GEN" >> "$META_TMP" || exit 1
 printf 'pr=%s\n' "$URL" >> "$META_TMP" || exit 1
 [ -z "$PR_HEAD" ] || printf 'pr_head=%s\n' "$PR_HEAD" >> "$META_TMP" || exit 1
 chmod 0600 "$META_TMP" || exit 1

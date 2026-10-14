@@ -8,8 +8,8 @@
 # is untouched by all of it.
 set -u
 
-# shellcheck source=tests/lib.sh
-. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+# shellcheck source=tests/fixtures.sh
+. "$(dirname "${BASH_SOURCE[0]}")/fixtures.sh"
 
 TMP_ROOT=$(fm_test_tmproot fm-branch-supervision)
 fm_git_identity fmtest fmtest@example.invalid
@@ -907,6 +907,23 @@ test_away_record_relocates_main_owned_actions_to_the_branch() {
   [ "$status" -eq 1 ] || fail "main spawn past the cap exited $status, not 1: $out"
   assert_contains "$out" "caps concurrent workers" "main was not held to the spend cap"
 
+  # A ready handoff releases a seat even while its metadata and endpoint remain.
+  printf 'pr=https://github.com/example/project/pull/1\n' >> "$home/state/task-b.meta"
+  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_SUPERVISION_ACTOR=branch \
+    "$ROOT/bin/fm-spawn.sh" task-new --mode no-mistakes --yolo off 2>&1)
+  assert_not_contains "$out" "caps concurrent workers" "a finished ready-PR lane still held an away seat"
+  assert_contains "$out" "queued unblocked work" "released seat bypassed the queued-work authority check"
+  [ ! -e "$home/state/.last-launch" ] || fail "a refused spawn wrote a launch stamp"
+  fm_write_meta "$home/state/task-b.meta" "window=fm-task-b" "kind=ship"
+
+  mkdir -p "$home/config"
+  printf 'invalid\n' > "$home/config/worker-target"
+  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" \
+    "$ROOT/bin/fm-spawn.sh" task-new --mode no-mistakes --yolo off 2>&1)
+  assert_contains "$out" "cannot measure live workers" "invalid shared seat config silently admitted a spawn"
+  assert_contains "$out" "config/worker-target" "shared seat error lost its repair path"
+  rm "$home/config/worker-target"
+
   rm -f "$root/bin"
   mkdir -p "$root/bin"
   for f in "$ROOT/bin"/*; do
@@ -1094,6 +1111,63 @@ WRAPPER
   pass "the away spend cap is rechecked under the task-set lock so concurrent spawns cannot both publish"
 }
 
+test_away_spend_cap_retains_invalid_pr_seats() {
+  local home project worktree fakebin out fields count stamp contract records
+  home="$TMP_ROOT/away-invalid-pr-home"
+  project="$TMP_ROOT/away-invalid-pr-project"
+  worktree="$TMP_ROOT/away-invalid-pr-worker"
+  fm_test_spawn_home "$home" codex
+  fm_git_worktree "$project" "$worktree" fixture-worker
+  fm_test_spawn_brief "$home" task-launch
+  fm_test_spawn_brief "$home" task-denied
+  fakebin=$(fm_test_make_spawn_fakebin "$TMP_ROOT/away-invalid-pr-tools" no-mistakes)
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" propose --words 'continue authorized work' --spend 2 >/dev/null || fail 'away proposal failed'
+  FM_HOME="$home" "$ROOT/bin/fm-afk-contract.sh" confirm >/dev/null || fail 'away confirmation failed'
+  contract=$(cat "$home/state/.afk-contract")
+  fm_write_meta "$home/state/existing.meta" kind=ship pr=not-a-url
+  # One uncertain worker leaves one seat: the real spawn must publish within cap.
+  out=$(fm_test_run_spawn "$home" "$worktree" "$fakebin" task-launch "$project" --mode no-mistakes --yolo off) \
+    || fail "within-cap spawn failed: $out"
+  [ -f "$home/state/task-launch.meta" ] || fail 'within-cap spawn did not publish its worker'
+  count=$(find "$home/state" -name '*.meta' -type f | wc -l | tr -d ' ')
+  assert_equals 2 "$count" 'within-cap spawn publishes exactly one worker'
+  stamp=$(cat "$home/state/.last-launch")
+  assert_equals "$contract" "$(cat "$home/state/.afk-contract")" 'allowed launch preserves spend contract'
+  # The real crew-state consumer can accept a recorded PR head as completion
+  # without rejecting duplicate PR fields. Liveness must not inherit that release.
+  fm_write_meta "$home/state/existing.meta" kind=ship mode=no-mistakes "worktree=$worktree" \
+    backend=tmux window=fm-existing harness=claude \
+    pr=https://github.com/example/project/pull/1 pr=https://github.com/example/project/pull/1 \
+    pr_head=0123456789abcdef0123456789abcdef01234567
+  printf 'done: PR https://github.com/example/project/pull/1\n' > "$home/state/existing.status"
+  "$ROOT/bin/fm-busy-event.sh" arm "$home/state" existing --state idle --source claude-hook --event stop >/dev/null \
+    || fail 'could not seed the isolated idle-worker fixture'
+  out=$(FM_HOME="$home" FM_CREW_STATE_NO_FORGE=1 PATH="$fakebin:$PATH" "$ROOT/bin/fm-crew-state.sh" existing) \
+    || fail "crew-state fixture failed: $out"
+  assert_contains "$out" 'state: done' 'fixture must exercise real lower-level PR completion'
+  for fields in \
+    'pr=not-a-url' \
+    'pr=https://github.com/example/project/pull/1\npr=https://github.com/example/project/pull/1' \
+    'pr=https://github.com/example/project/pull/1\npr=https://github.com/example/project/pull/1\npr_head=0123456789abcdef0123456789abcdef01234567' \
+    'pr=\npr=https://github.com/example/project/pull/1'; do
+    printf 'kind=ship\nmode=no-mistakes\nworktree=%s\nbackend=tmux\nwindow=fm-existing\nharness=claude\n%b\n' "$worktree" "$fields" > "$home/state/existing.meta"
+    records=$(find "$home/state" -name '*.meta' -type f -exec cksum {} \; | sort)
+    if out=$(fm_test_run_spawn "$home" "$worktree" "$fakebin" task-denied "$project" --mode no-mistakes --yolo off); then
+      fail "invalid PR admitted a spawn at cap: $fields"
+    fi
+    assert_contains "$out" 'caps concurrent workers at 2 and 2 ordinary task(s) are live' 'invalid PR must not free away capacity'
+    assert_contains "$out" 'invalid PR metadata; seat retained' 'spawn surfaces the actionable PR warning'
+    assert_contains "$out" "$home/state/existing.meta" 'spawn warning identifies the invalid record'
+    assert_equals "$count" "$(find "$home/state" -name '*.meta' -type f | wc -l | tr -d ' ')" 'denied spawn changes no worker count'
+    [ ! -e "$home/state/task-denied.meta" ] || fail 'denied spawn published a worker'
+    assert_equals "$records" "$(find "$home/state" -name '*.meta' -type f -exec cksum {} \; | sort)" 'denied spawn preserves all worker records'
+    assert_equals "$stamp" "$(cat "$home/state/.last-launch")" 'denied spawn preserves launch stamp'
+    assert_equals "$contract" "$(cat "$home/state/.afk-contract")" 'denied spawn preserves spend contract'
+  done
+  pass 'away cap permits a launch within cap and rejects malformed or duplicate PR capacity without spending'
+}
+
+test_away_spend_cap_retains_invalid_pr_seats
 test_branch_prompt_is_byte_stable_and_above_cache_floor
 test_outcome_store_is_append_only_with_cursor_reads
 test_outcome_startup_replay_preserves_silence
