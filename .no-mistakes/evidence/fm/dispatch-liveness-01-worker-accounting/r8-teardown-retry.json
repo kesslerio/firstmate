@@ -1,0 +1,11 @@
+{
+  "tested_head_sha": "92f455616ec1d801b90563a4f0b7ed01ff590560",
+  "command": "TMPDIR=/tmp timeout -k 5s 1020s bash bin/fm-test-run.sh --jobs 1 --per-script-timeout-secs 900 tests/fm-teardown.test.sh",
+  "environment": "Existing supported lsof prepended to test-only PATH and FM_TEST_BASE_PATH; original toolchain retained.",
+  "exit": 0,
+  "duration_seconds": 197.93,
+  "gate_skip": false,
+  "tracked_files_unchanged": 599,
+  "owned_descendants_remaining": 0,
+  "attribution": "Complete teardown root rerun in this turn. Ten native/product groups and five focused roots remain earlier same-run, same-head evidence; they were not rerun in this turn."
+}

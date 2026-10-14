@@ -1,0 +1,98 @@
+Current product evidence
+Source: 92f455616ec1d801b90563a4f0b7ed01ff590560
+All paths and disposable runtime identifiers below are neutral placeholders.
+
+Reporting targets
+Fresh primary fixture: absent accepted target=4
+Existing secondmate fixture: absent accepted target=6
+valid accepted target=7
+maximum accepted target=9223372036854775807
+no-newline refused: <owned-path> file must contain exactly one value followed by one newline; free=0
+two-newlines refused: <owned-path> file must contain exactly one value followed by one newline; free=0
+crlf refused: <owned-path> value must be one positive decimal integer; free=0
+zero refused: <owned-path> value must be one positive decimal integer; free=0
+padded refused: <owned-path> value must be one positive decimal integer; free=0
+negative refused: <owned-path> value must be one positive decimal integer; free=0
+overflow refused: <owned-path> value exceeds signed 64-bit integer range; free=0
+hardlink refused: <owned-path> file is hardlinked; free=0
+symlink refused: <owned-path> file is symlinked; free=0
+fifo refused: <owned-path> file is not a regular file; free=0
+secondmate default target=6
+Home-local reporting target preserved and never inherited
+
+Native protocol observation and read-only cache
+missing cache: state: working · source: pane · harness busy (muse-session-log)
+stale cache: state: working · source: pane · harness busy (muse-session-log)
+valid cache: state: working · source: pane · harness busy (muse-session-log)
+ambiguous native sessions: state: unknown · source: pane · harness state unavailable (unknown muse-session-log)
+Ordinary current terminal: complete state: done · source: status-log · current terminal record
+Ordinary current terminal: failed state: failed · source: status-log · current terminal record
+snapshot live=2 target=4 free=2
+muse	ship	unknown	0
+paused	scout	paused	0
+<owned-path> invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+muse: current state unknown; seat retained
+<owned-path> invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+muse: current state unknown; seat retained
+slow actual-backend read live=4 elapsed=30 warnings=complete: current state unknown; seat retained
+failed: current state unknown; seat retained
+<owned-path> invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh
+muse: current state unknown; seat retained
+paused: current state unknown; seat retained
+Byte, inode, mode and nanosecond timestamp fingerprints preserved during cache observations
+
+Real native workers, predecessor failure and actual admission
+state: working · source: pane · harness busy (pi-ext)
+BUSY predecessor failed run retains live=1
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+Failed capture with current native busy: state: working · source: pane · harness busy (pi-ext)
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task extra stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+state: failed · source: run-step · run failed · run: <disposable-failed-run>
+SETTLED predecessor failed run releases live=0 while Pi remains alive
+next-received
+Exact ordinary positive epoch stamp after actual next launch verified
+ACTUAL next launch ALLOWED after verified settlement; same live Pi process and generation retained
+Native Codex same genuine predecessor FAILED: state: unknown · source: pane · current incarnation harness state unavailable (unknown codex-unverified); terminal run attribution unverified
+error: no armed busy-state gen for worker
+error: spawn refused - the away-posture record caps concurrent workers at 1 and 1 ordinary task(s) are live in this home; task overflow stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)
+Unverified current native replacement retains seat and denies actual cap overflow
+Actual ready-worker replacement preserves canonical PR/head association while withdrawing prior readiness; live=2
+
+Readiness publication
+error: PR readiness refused for task receipt: changed incarnation; obtain the current worker's handoff and run bin/fm-pr-check.sh again
+Stale publisher refused after actual replacement, before persistent readiness publication
+Persisted fresh handoff after actual replacement:
+pr=https://github.com/example/fixture/pull/1
+pr_head=<fixture-head>
+spawn_gen=<current-incarnation>
+pr_spawn_gen=<same-current-incarnation>
+legacy genuine unchanged readiness releases seat
+current genuine unchanged readiness releases seat
+error: PR readiness refused for task ready: invalid or duplicate spawn_gen in <owned-path> repair the task record
+malformed generation refused without metadata publication
+error: PR readiness refused for task ready: invalid or duplicate spawn_gen in <owned-path> repair the task record
+duplicate generation refused without metadata publication
+
+Post-delivery stamp failures
+stamp is not an ordinary single-link file
+error: task receipt launched, but state/.last-launch could not be published; task record preserved
+provider-received
+  state: in_flight
+Unsafe destination: real receipt delivered, In-flight record and started-worker diagnostic preserved
+cannot publish exact stamp pathname: Is a directory
+error: task extra launched, but state/.last-launch could not be published; task record preserved
+race-received
+  state: in_flight
+Actual rename collision preserved real receipt delivery and In-flight record
+1791953554.124812 rename("<owned-home>/state/.last-launch.<temporary>", "<owned-home>/state/.last-launch") = -1 EISDIR (Is a directory) (DELAYED)
+
+AFK-return ownership
+Live-worker count unavailable: <owned-path> value must be one positive decimal integer
+Cost: 0 supervision outcome(s) recorded (0 routine, 0 captain); unknown task(s) live at return.
+invalid observation return exit=3
+Unknown observation preserved the same blocked return catch-up ownership epoch
+
+Inherited targeted-suite limit
+Exact base and target both returned:
+not ok - leaked-process-reap: leaked worktree process survived teardown
+lsof is absent on PATH; later process-reaping controls were not reached. The owned test sleeper was killed by the existing test cleanup. Supported-host CI remains required.

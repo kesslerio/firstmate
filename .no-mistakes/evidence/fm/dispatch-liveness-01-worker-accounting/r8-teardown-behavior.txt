@@ -1,0 +1,11 @@
+Current-turn executable public teardown behavior, using isolated external-interface fixtures and real OS processes.
+ok - lsof errors leave worktree index.lock in place and refuse teardown
+ok - a leaked descendant process rooted under the task's worktree is reaped by teardown, not left surviving
+ok - a leaked descendant process rooted under the task's per-task tasktmp is reaped by teardown too
+ok - missing lsof falls back to reaping the tmux pane process group
+ok - an erroring lsof scan refuses teardown and preserves the task
+ok - a reused pid with a different start time is never force-killed
+ok - an exec change preserves birth identity and the process is reaped
+ok - a process spawned during grace is reaped on a later pass
+ok - persistent leaked processes refuse teardown after bounded retries
+ok - the run abort and the leaked-process reap both complete before the destructive worktree return
