@@ -10,8 +10,9 @@
 #                            active, exit 4 while return catch-up is pending.
 #   fm-afk-return.sh catchup-summary  Read-only catch-up projection for a reporting surface.
 #
-# THE RETURN BRIEF (stdout, on begin and on every check) is rendered from durable
-# records, never from conversation memory: the archived away-posture record
+# THE RETURN BRIEF (stdout, on begin and on every check) combines durable records
+# with the current worker observation owned by bin/fm-liveness-lib.sh, never
+# conversation memory. Its durable inputs are the archived away-posture record
 # (bin/fm-afk-contract.sh), the supervision outcome store
 # (bin/fm-branch-outcome.sh), the held set in the backlog (tasks-axi), and the
 # status logs. Its order is fixed: supervisor health across the away window
