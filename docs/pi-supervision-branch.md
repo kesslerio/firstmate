@@ -362,7 +362,7 @@ The mirror never carries tool calls, tool results, operational injections, or th
 Mirroring happens at two points:
 
 - The idle path mirrors at main's turn end.
-- At `before_agent_start`, Pi's authoritative prompt is staged verbatim before SessionManager persists that user entry.
+- At a user `before_agent_start`, Pi's authoritative prompt is staged verbatim before SessionManager persists that user entry; custom-message events do not stage captain dialog.
   The complete current captain message therefore precedes any branch wake accepted after that boundary.
   The later persisted copy is suppressed, and older dialog entries remain bounded.
 
@@ -569,7 +569,7 @@ A leftover `state/.afk` flag declines nothing.
 - Every actionable row is branch-eligible.
   Check rows, decision-owned signal and stale rows, and heartbeat rows are claimed by the branch on whatever wake finds them unread.
   The trigger class no longer forces a batch to main.
-  The two vetoes that describe a broken queue, an unresolvable task-local row and a structurally invalid row, stay vetoes in both postures.
+  The fail-closed scope checks in [Decision-owned rows](#decision-owned-rows), including ambiguous metadata ownership, still apply, as does structural queue validation.
   A prompt that claims a check row is not scoped by task, so the branch may report it as `fleet`.
 - Main is parked, and reachable only for the classes only main can act on:
   - A watcher-failure alarm is delivered to main as always, because `fm_watch_arm_pi` lives there.
