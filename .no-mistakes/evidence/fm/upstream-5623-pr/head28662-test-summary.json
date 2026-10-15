@@ -1,0 +1,27 @@
+{
+  "head": "28662db9a09c836d1290649fd98b684f7a92eca5",
+  "scope": "Routing acceptance per latest user decision and maintainer-account triage comment 6179844624; not formal approval or PR readiness.",
+  "current_head_live_cli_cases": 54,
+  "exported_scope_checks": 38,
+  "baseline_comparison_cli_cases": 2,
+  "branch_callback_suite_exit": 0,
+  "watch_callback_suite_exit": 0,
+  "callback_boundary": "SDK fixture callbacks; not authenticated Pi-turn proof.",
+  "authenticated_sdk": "NOT RUN; outside revised routing live acceptance. Prior actual watcher consumption, durable captain/custom mirror, user-joined processing and session-reset proof remains incomplete because watcher path overrides are refused by the lab guard. No guard changes or new lab attempts.",
+  "provider_requests_this_phase": 0,
+  "prior_cumulative_requests": 7,
+  "prior_cumulative_input_tokens": 1190,
+  "prior_cumulative_output_tokens": 14,
+  "prior_corrected_attempt_sdk_reported_cost": 0,
+  "cost_caveat": "SDK reported cost does not establish free service. Prior evidence retained unchanged.",
+  "omissions": [
+    "No typecheck, lint or static analysis in this Test phase, as instructed.",
+    "No full repository suite, harness launches, UI testing, review, publication or CI phase."
+  ],
+  "setup_correction": "Initial disposable baseline copy lacked fm-async-exec.ts; copied that dependency from the same revisions and reran successfully.",
+  "cleanup": {
+    "owned_branch_group_remaining": [],
+    "temporary_directory_removed": true
+  },
+  "source_changes": false
+}

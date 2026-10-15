@@ -1,0 +1,143 @@
+{
+  "head": "28662db9a09c836d1290649fd98b684f7a92eca5",
+  "results": [
+    {
+      "version": "fc8972cdc16f988a84588ac6f4ce4e3b0abf20b9",
+      "scenario": "unique terminal baseline reproduction",
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "version": "HEAD",
+      "scenario": "unique terminal baseline reproduction",
+      "output": "eligible=1\nstatus=safe\ncorrupted=0\nrows=1\ntasks=a\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "a",
+      "empty_project": false,
+      "key": "fm-window",
+      "away": false,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "a",
+      "empty_project": false,
+      "key": "fm-window",
+      "away": true,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "a",
+      "empty_project": false,
+      "key": "fm-fm-window",
+      "away": false,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "a",
+      "empty_project": false,
+      "key": "fm-fm-window",
+      "away": true,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "z",
+      "empty_project": false,
+      "key": "fm-window",
+      "away": false,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "z",
+      "empty_project": false,
+      "key": "fm-window",
+      "away": true,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "z",
+      "empty_project": false,
+      "key": "fm-fm-window",
+      "away": false,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "z",
+      "empty_project": false,
+      "key": "fm-fm-window",
+      "away": true,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "a",
+      "empty_project": true,
+      "key": "fm-window",
+      "away": false,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "a",
+      "empty_project": true,
+      "key": "fm-window",
+      "away": true,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "a",
+      "empty_project": true,
+      "key": "fm-fm-window",
+      "away": false,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "a",
+      "empty_project": true,
+      "key": "fm-fm-window",
+      "away": true,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "z",
+      "empty_project": true,
+      "key": "fm-window",
+      "away": false,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "z",
+      "empty_project": true,
+      "key": "fm-window",
+      "away": true,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "z",
+      "empty_project": true,
+      "key": "fm-fm-window",
+      "away": false,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    },
+    {
+      "scenario": "canonical owner cannot borrow project or bypass decision",
+      "owner": "z",
+      "empty_project": true,
+      "key": "fm-fm-window",
+      "away": true,
+      "output": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n"
+    }
+  ]
+}
