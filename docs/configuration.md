@@ -70,7 +70,7 @@ Other transient consumers retain their existing shell-relative behavior.
 
 This section is the single owner of the top-level operational-home layout.
 Producer script headers and their help own exact child-file fields and mutation contracts.
-The tracked code root contains shared instructions, skills, documentation, workflows, and `bin/`.
+The tracked code root contains shared instructions, skills, documentation, workflows, `bin/` entrypoints and their private `libexec/` support.
 Each effective `FM_HOME` contains private operational directories.
 
 `data/` holds durable private fleet records:
