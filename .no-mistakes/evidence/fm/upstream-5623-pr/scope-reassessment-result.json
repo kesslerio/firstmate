@@ -1,0 +1,80 @@
+{
+  "tested_head_sha": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "verdict": "pass for accepted routing scope",
+  "source_changes": false,
+  "scope_authority": "https://github.com/kunchenguid/firstmate/pull/5835#issuecomment-6179844624",
+  "assessment": "Read actual six-file diff. Ownership changes are routing only; two bounded SDK callback compatibility changes preserve custom processing bookkeeping and exclude custom messages from prompt consumption/mirroring. Executable fixture suites cover these SDK changes. Authenticated Pi turns are outside the later accepted routing live-evidence scope, not claimed passed. No formal review approval inferred.",
+  "routing": {
+    "result": "pass",
+    "cli_offers": 38,
+    "exported_scope_checks": 38,
+    "evidence": "scope-routing-replay.log",
+    "boundary": "Unmodified current-head dispatch CLI, disposable state; no live Orca/fleet. Both discovery orders additionally forced in focused executable canonical-owner tests.",
+    "base_regression": "Base refuses unique terminal stale offer as corrupt; exact head accepts same state as task a.",
+    "base_evidence": "scope-base-reproduction.json"
+  },
+  "focused_suites": {
+    "results": "both exit 0",
+    "passed_counts": {
+      "branch": 53,
+      "watch": 60
+    },
+    "commands": [
+      "TMPDIR=\"$PWD/.test-validation-tmp\" timeout -k 5s 300s bash tests/fm-pi-branch-extension.test.sh",
+      "TMPDIR=\"$PWD/.test-validation-tmp\" timeout -k 5s 300s bash tests/fm-pi-watch-extension.test.sh"
+    ],
+    "boundary": "Stubbed SDK callback behavior, real repository scripts on owned fixture state; not authenticated live provider evidence.",
+    "logs": [
+      "scope-branch-tests.log",
+      "scope-watch-tests.log"
+    ]
+  },
+  "authenticated_sdk": {
+    "current_execution": "NOT RUN; outside accepted routing live-evidence scope",
+    "new_provider_requests": 0,
+    "retained_attempt": {
+      "result": "inconclusive",
+      "provider": "john-lan",
+      "model": "qwen3.8-flash-next",
+      "new_requests": 2,
+      "cumulative_requests": 7,
+      "remaining_request_budget": 3,
+      "output_cap_per_request": 512,
+      "new_usage": {
+        "input": 340,
+        "output": 4,
+        "totalTokens": 344
+      },
+      "cumulative_usage": {
+        "input": 1190,
+        "output": 14,
+        "totalTokens": 1204
+      },
+      "sdk_reported_new_cost": 0,
+      "cost_note": "SDK accounting is not a claim of free service.",
+      "input_byte_bound_new": 1578,
+      "failure": "Exact corrected AgentSession probe failed requests==1 assertion: watcher isolation refusal generated a second user turn.",
+      "root_cause": "Watcher startArm supplies FM_ROOT_OVERRIDE and FM_CONFIG_OVERRIDE; fm_gate_lab_permitted rejects nonempty FM_*_OVERRIDE even for a marked lab. Current/base watcher arm and guard behavior is unchanged by reviewed patch.",
+      "proved": [
+        "Both actual extensions loaded with queue initialized and lock established before session binding",
+        "Selected provider completed real user turn and operational failure follow-up, without model tools"
+      ],
+      "not_proved": [
+        "Successful watcher wake consumption and negative custom consumption",
+        "Durable captain/custom branch mirrors",
+        "User-joined processing and session reset"
+      ],
+      "retained_proof": "Prior actual dedicated custom cancellation and attended/unrelated completion retained without repeating provider calls.",
+      "no_bypass": true
+    },
+    "prior_evidence_preserved": true,
+    "limitations": "Actual watcher consumption, durable dialog mirror, user-joined processing and session reset remain incomplete as authenticated SDK evidence; guard conflict not repaired or bypassed."
+  },
+  "omissions": [
+    "No typecheck/static analysis, lint, full repository suite, provider calls, source edits, independent review, rebase, publication or CI phases.",
+    "No claim of seven live SDK scenarios passing or overall PR readiness."
+  ],
+  "cleanup": {
+    "test_artifacts_removed": true
+  }
+}

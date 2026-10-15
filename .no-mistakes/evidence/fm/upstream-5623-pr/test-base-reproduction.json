@@ -1,0 +1,4 @@
+{
+  "base": "eligible=0\nstatus=unsafe\ncorrupted=1\nrows=\ntasks=\nunscoped=0\n",
+  "head": "eligible=1\nstatus=safe\ncorrupted=0\nrows=1\ntasks=a\nunscoped=0\n"
+}

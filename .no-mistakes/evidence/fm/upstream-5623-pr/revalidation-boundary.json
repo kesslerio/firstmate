@@ -1,0 +1,12 @@
+{
+  "head": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "exit_code": 0,
+  "public_sdk_context_checks": 7,
+  "abort_requests": 1,
+  "provider_calls": 0,
+  "source_changes": false,
+  "cleanup": "Removed disposable .sdk-evidence-state after normal process exit; probe started no watcher.",
+  "boundary": "Real public loader and ExtensionRunner; embedding callbacks record delivery and abort. No running AgentSession/provider cancellation proof, watcher consumption proof or completed branch mirror proof.",
+  "prior_evidence": "Retained routing-live.log and focused suites from this run; not rerun. R4 types-clean.log absent; successful target typecheck recorded in focus-clean.log. Initial watcher failure followed by passing watch-clean.log.",
+  "verdict": "inconclusive"
+}

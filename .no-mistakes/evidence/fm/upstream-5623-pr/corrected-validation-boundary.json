@@ -1,0 +1,56 @@
+{
+  "tested_head_sha": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "verdict": "inconclusive",
+  "source_changes": false,
+  "routing": {
+    "executed_cli_offers": 38,
+    "exported_scope_checks": 38,
+    "result": "passed",
+    "evidence": "routing-corrected.log",
+    "boundary": "Actual unmodified dispatch CLI against owned disposable state; no Orca terminal or fleet execution"
+  },
+  "sdk": {
+    "result": "inconclusive",
+    "provider": "john-lan",
+    "model": "qwen3.8-flash-next",
+    "new_requests": 2,
+    "cumulative_requests": 7,
+    "remaining_request_budget": 3,
+    "output_cap_per_request": 512,
+    "new_usage": {
+      "input": 340,
+      "output": 4,
+      "totalTokens": 344
+    },
+    "cumulative_usage": {
+      "input": 1190,
+      "output": 14,
+      "totalTokens": 1204
+    },
+    "sdk_reported_new_cost": 0,
+    "cost_note": "SDK accounting is not a claim of free service.",
+    "input_byte_bound_new": 1578,
+    "failure": "Exact corrected AgentSession probe failed requests==1 assertion: watcher isolation refusal generated a second user turn.",
+    "root_cause": "Watcher startArm supplies FM_ROOT_OVERRIDE and FM_CONFIG_OVERRIDE; fm_gate_lab_permitted rejects nonempty FM_*_OVERRIDE even for a marked lab. Current/base watcher arm and guard behavior is unchanged by reviewed patch.",
+    "proved": [
+      "Both actual extensions loaded with queue initialized and lock established before session binding",
+      "Selected provider completed real user turn and operational failure follow-up, without model tools"
+    ],
+    "not_proved": [
+      "Successful watcher wake consumption and negative custom consumption",
+      "Durable captain/custom branch mirrors",
+      "User-joined processing and session reset"
+    ],
+    "retained_proof": "Prior actual dedicated custom cancellation and attended/unrelated completion retained without repeating provider calls.",
+    "no_bypass": true
+  },
+  "cleanup": {
+    "owned_group": 2977008,
+    "remaining_processes": [],
+    "lab_removed": true
+  },
+  "omissions": [
+    "No static analysis, lint, broad suite, pipeline controls, PR updates or independent review phases executed.",
+    "No new source defect established; no source edits."
+  ]
+}

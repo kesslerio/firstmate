@@ -1,0 +1,16 @@
+{"event":"before_agent_start","mode":"attended","type":"user"}
+{"event":"message_start","mode":"attended","role":"system"}
+{"event":"message_start","mode":"attended","role":"user"}
+{"event":"context","mode":"attended","processingPresent":false}
+{"event":"provider_request","mode":"attended","number":1,"outputCap":512}
+{"event":"message_start","mode":"attended","role":"assistant"}
+{"event":"response","mode":"attended","stopReason":"stop"}
+{"event":"agent_settled","mode":"attended","aborted":false}
+{"event":"before_agent_start","mode":"attended","type":"custom","customType":"fm-branch-process"}
+{"event":"message_start","mode":"attended","role":"custom","customType":"fm-branch-process"}
+{"event":"context","mode":"attended","processingPresent":true}
+{"event":"provider_request","mode":"attended","number":2,"outputCap":512}
+{"event":"message_start","mode":"attended","role":"assistant"}
+{"event":"response","mode":"attended","stopReason":"stop"}
+{"event":"agent_settled","mode":"attended","aborted":false}
+{"verdict":"inconclusive","checks":["Attended matching dedicated custom processing completed real provider turn"],"requests":2,"failure":"Error: the unread wake queue could not be read safely"}

@@ -1,0 +1,88 @@
+[
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "Captain dialog marker: SDK authenticated user control. Reply OK."
+      }
+    ],
+    "timestamp": 1791867738669
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "OK"
+      }
+    ],
+    "api": "openai-completions",
+    "provider": "john-lan",
+    "model": "qwen3.8-flash-next",
+    "usage": {
+      "input": 104,
+      "output": 2,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "totalTokens": 106,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "total": 0
+      }
+    },
+    "stopReason": "stop",
+    "timestamp": 1791867738720,
+    "responseId": "chatcmpl-8b32a3b873e63a2f",
+    "rawStopReason": "stop",
+    "durationMs": 62715,
+    "thinkingLevel": "off"
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: watcher: FAILED - Pi extension could not restore watcher continuity after 5 retries\nwatcher: FAILED - refusing to arm from a disposable validation checkout: /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SNZBKAAYXKDB2538NPVP6S/bin\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned."
+      }
+    ],
+    "timestamp": 1791867746557
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "OK"
+      }
+    ],
+    "api": "openai-completions",
+    "provider": "john-lan",
+    "model": "qwen3.8-flash-next",
+    "usage": {
+      "input": 236,
+      "output": 2,
+      "cacheRead": 0,
+      "cacheWrite": 0,
+      "reasoning": 0,
+      "totalTokens": 238,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "total": 0
+      }
+    },
+    "stopReason": "stop",
+    "timestamp": 1791867801497,
+    "responseId": "chatcmpl-982894fa0bd56a3b",
+    "rawStopReason": "stop",
+    "durationMs": 2552,
+    "thinkingLevel": "off"
+  }
+]

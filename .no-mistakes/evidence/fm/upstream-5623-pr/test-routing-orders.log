@@ -1,0 +1,305 @@
+SCENARIO 1: unique alias term-1
+eligible=1
+status=safe
+corrupted=0
+rows=1
+tasks=a
+unscoped=0
+
+SCENARIO 2: unique alias fm-term-1
+eligible=1
+status=safe
+corrupted=0
+rows=1
+tasks=a
+unscoped=0
+
+SCENARIO 3: unique alias fm-a
+eligible=1
+status=safe
+corrupted=0
+rows=1
+tasks=a
+unscoped=0
+
+SCENARIO 4: unique alias a
+eligible=1
+status=safe
+corrupted=0
+rows=1
+tasks=a
+unscoped=0
+
+SCENARIO 5: unique alias a.status
+eligible=1
+status=safe
+corrupted=0
+rows=1
+tasks=a
+unscoped=0
+
+SCENARIO 6: unique alias a.turn-ended
+eligible=1
+status=safe
+corrupted=0
+rows=1
+tasks=a
+unscoped=0
+
+SCENARIO 7: same-owner window and terminal alias
+eligible=1
+status=safe
+corrupted=0
+rows=1
+tasks=a
+unscoped=0
+
+SCENARIO 8: unknown terminal
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 9: projectless unique owner
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 10: projectless collision a; competing-owner=z-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 11: projectless collision a.status; competing-owner=z-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 12: projectless collision a.turn-ended; competing-owner=z-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 13: projectless collision win-1; competing-owner=z-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 14: projectless collision term-1; competing-owner=z-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 15: projectless collision a; competing-owner=0-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 16: projectless collision a.status; competing-owner=0-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 17: projectless collision a.turn-ended; competing-owner=0-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 18: projectless collision win-1; competing-owner=0-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 19: projectless collision term-1; competing-owner=0-other; field=""
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 20: projectless exact owner cannot borrow prefixed project: fm-window
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 21: projectless exact owner cannot borrow prefixed project: fm-fm-window
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 22: projectless unique owner
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 23: projectless collision a; competing-owner=z-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 24: projectless collision a.status; competing-owner=z-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 25: projectless collision a.turn-ended; competing-owner=z-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 26: projectless collision win-1; competing-owner=z-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 27: projectless collision term-1; competing-owner=z-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 28: projectless collision a; competing-owner=0-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 29: projectless collision a.status; competing-owner=0-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 30: projectless collision a.turn-ended; competing-owner=0-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 31: projectless collision win-1; competing-owner=0-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 32: projectless collision term-1; competing-owner=0-other; field="project=\n"
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 33: projectless exact owner cannot borrow prefixed project: fm-window
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 34: projectless exact owner cannot borrow prefixed project: fm-fm-window
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 35: cross-key project-bearing conflict
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 36: cross-key project-bearing conflict
+eligible=0
+status=unsafe
+corrupted=1
+rows=
+tasks=
+unscoped=0
+
+SCENARIO 37: open decision remains on main despite other eligible task
+eligible=0
+status=safe
+corrupted=0
+rows=2
+tasks=other
+unscoped=0
+
+SCENARIO 38: away open decision retains valid task ownership
+eligible=1
+status=safe
+corrupted=0
+rows=1
+tasks=a
+unscoped=0
+
+Completed 38 real CLI offers plus exported scope checks.

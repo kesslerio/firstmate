@@ -1,0 +1,36 @@
+{
+  "tested_head_sha": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "verdict": "inconclusive",
+  "source_changes": false,
+  "tested": [
+    "Installed Pi 1.2.0 public DefaultResourceLoader loaded the unchanged branch extension and real SDK dependencies with discovery disabled.",
+    "Installed ExtensionRunner emitted real user/custom preflight and lifecycle events; seven context assertions passed and exactly one abort request reached the public bindCore host callback.",
+    "Matching dedicated custom run: attended context retained processing; away appearing after preflight and message_start stripped processing and requested abort.",
+    "Unrelated user, unrelated custom type/content, session replacement and a processing message joining a user run did not request abort. Unprocessed durable outcome remained.",
+    "Real branch dispatch accepted the isolated offer, then refused branch creation with no configured credentials before dialog mirror delivery."
+  ],
+  "boundaries": [
+    "Public embedding host callbacks captured delivery and abort requests; they did not execute an AgentSession turn or demonstrate cancellation of a running model.",
+    "No fabricated ExtensionAPI, substituted SDK module, extracted handler fixture or direct callback invocation used in new probe.",
+    "Actual-runner watcher wake consumption and completed branch dialog mirroring remain unverified.",
+    "Authenticated provider E2E remains unperformed; no credential access/copy/refresh or provider requests authorized or performed.",
+    "Prior focused suite, 38 CLI routing cases and independent review were retained as supplied evidence, not rerun or claimed as newly performed."
+  ],
+  "remaining_prerequisite": "Authorized disposable configured provider credentials and authorization for provider turns are required for authenticated E2E and a real branch mirror session; this phase expressly forbids obtaining credentials or making those calls. Watcher consumption also requires a separate isolated product exercise.",
+  "artifacts": [
+    "public-sdk.mjs",
+    "public-sdk.log"
+  ],
+  "command": "env -i PATH=\"$PATH\" HOME=\"$PWD/.sdk-evidence-state\" PI_CODING_AGENT_DIR=\"$PWD/.sdk-evidence-state/agent\" FM_HOME=\"$PWD/.sdk-evidence-state\" FM_ROOT_OVERRIDE=\"$PWD\" FM_STATE_OVERRIDE=\"$PWD/.sdk-evidence-state/state\" timeout -k 5s 60s node /home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/public-sdk.mjs",
+  "exit_code": 0,
+  "prior_evidence_notes": [
+    "sdk-402.log records original missing-abort failure; sdk-lifecycle.log records fixed stub-loader probe passing.",
+    "focus-clean.log records branch suite and installed SDK typecheck passing, with an initial OpenCode watcher fixture failure; watch-clean.log records the subsequent watcher suite passing.",
+    "Named types-clean.log is absent. baseline-types-clean.log records the two original TS2339 errors.",
+    "ownership.log records 250 fixture cases, 460 CLI invocations and eight prior borrowing reproductions passing."
+  ],
+  "omissions": [
+    "No lint, formatting, static analysis, full suite, independent review, CI, delivery or pipeline control performed in this test phase."
+  ],
+  "cleanup": "Disposable .sdk-evidence-state removed after both bounded focused invocations exited normally; no watcher process was started."
+}

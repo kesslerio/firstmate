@@ -1,0 +1,14 @@
+{"event":"before_agent_start","mode":"user","type":"user"}
+{"event":"message_start","mode":"user","role":"system"}
+{"event":"message_start","mode":"user","role":"user"}
+{"event":"context","mode":"user","processingPresent":false}
+{"event":"provider_request","mode":"user","number":1,"outputCap":512}
+{"event":"message_start","mode":"user","role":"assistant"}
+{"event":"response","mode":"user","stopReason":"stop"}
+{"event":"message_start","mode":"user","role":"user"}
+{"event":"context","mode":"user","processingPresent":false}
+{"event":"provider_request","mode":"user","number":2,"outputCap":512}
+{"event":"message_start","mode":"user","role":"assistant"}
+{"event":"response","mode":"user","stopReason":"stop"}
+{"event":"agent_settled","mode":"user","aborted":false}
+{"verdict":"inconclusive","checks":[],"requests":2,"failure":"AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n2 !== 1\n"}

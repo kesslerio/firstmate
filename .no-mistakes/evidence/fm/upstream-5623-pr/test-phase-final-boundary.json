@@ -1,0 +1,20 @@
+{
+  "head": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "verdict": "inconclusive",
+  "new_provider_calls": 0,
+  "source_changes": false,
+  "retained_requests": 5,
+  "reason": "Existing evidence records exhaustion of the authorized 300-second lab wall limit. No renewed budget is present; another lab was not started.",
+  "remaining": [
+    "Actual watcher consumption and negative custom wake consumption",
+    "Completed durable captain/custom branch mirror assertions",
+    "Processing joined into a user-owned run remains allowed",
+    "Session reset within real AgentSession lifecycle"
+  ],
+  "manual_checks": [
+    "Verified HEAD is 845ee710513334868cbb4bd8ea6e66986c2f55fb and worktree is clean",
+    "Read retained routing, public SDK and authenticated AgentSession evidence",
+    "ps confirmed the three recorded authenticated probe PIDs are absent"
+  ],
+  "required_to_continue": "Explicit authorization for a new bounded isolated lab window to correct queue and lock setup and complete original remaining scenarios."
+}

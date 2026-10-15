@@ -1,0 +1,125 @@
+{
+  "head": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "sdk": "1.2.0",
+  "pid": 2977009,
+  "requests": 2,
+  "inputByteBound": 1578,
+  "responses": [
+    {
+      "mode": "user",
+      "stopReason": "stop",
+      "usage": {
+        "input": 104,
+        "output": 2,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 106,
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        }
+      }
+    },
+    {
+      "mode": "user",
+      "stopReason": "stop",
+      "usage": {
+        "input": 236,
+        "output": 2,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 238,
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        }
+      }
+    }
+  ],
+  "events": [
+    {
+      "event": "before_agent_start",
+      "mode": "user",
+      "type": "user"
+    },
+    {
+      "event": "message_start",
+      "mode": "user",
+      "role": "system"
+    },
+    {
+      "event": "message_start",
+      "mode": "user",
+      "role": "user"
+    },
+    {
+      "event": "context",
+      "mode": "user",
+      "processingPresent": false
+    },
+    {
+      "event": "provider_request",
+      "mode": "user",
+      "number": 1,
+      "outputCap": 512
+    },
+    {
+      "event": "message_start",
+      "mode": "user",
+      "role": "assistant"
+    },
+    {
+      "event": "response",
+      "mode": "user",
+      "stopReason": "stop"
+    },
+    {
+      "event": "message_start",
+      "mode": "user",
+      "role": "user"
+    },
+    {
+      "event": "context",
+      "mode": "user",
+      "processingPresent": false
+    },
+    {
+      "event": "provider_request",
+      "mode": "user",
+      "number": 2,
+      "outputCap": 512
+    },
+    {
+      "event": "message_start",
+      "mode": "user",
+      "role": "assistant"
+    },
+    {
+      "event": "response",
+      "mode": "user",
+      "stopReason": "stop"
+    },
+    {
+      "event": "agent_settled",
+      "mode": "user",
+      "aborted": false
+    }
+  ],
+  "checks": [],
+  "verdict": "inconclusive",
+  "extensions": [
+    "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4SNZBKAAYXKDB2538NPVP6S/.pi/extensions/fm-branch-supervision.ts",
+    "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4SNZBKAAYXKDB2538NPVP6S/.pi/extensions/fm-primary-pi-watch.ts",
+    "<inline:lab-observer>"
+  ],
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n2 !== 1\n",
+  "errors": []
+}

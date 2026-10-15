@@ -1,0 +1,36 @@
+{
+  "head": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "sdk": "1.2.0",
+  "provider": "john-lan",
+  "model": "qwen3.8-flash-next",
+  "pid": 2166705,
+  "requests": 1,
+  "completed": 1,
+  "inputCharacterBound": 490,
+  "outputCap": 512,
+  "providerResponses": [
+    {
+      "stopReason": "stop",
+      "usage": {
+        "input": 91,
+        "output": 2,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 93,
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        }
+      }
+    }
+  ],
+  "verdict": "control-pass",
+  "auth": {
+    "type": "api_key",
+    "source": "configured API key"
+  }
+}

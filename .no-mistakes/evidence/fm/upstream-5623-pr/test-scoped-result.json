@@ -1,0 +1,35 @@
+{
+  "head": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "scope": "Routing live acceptance per maintainer-account comment 6179844624 and latest user decision; not formal review approval or overall PR readiness.",
+  "routing": {
+    "cli_offers": 84,
+    "exported_scope_checks": 76,
+    "result": "pass",
+    "base_regression": "Base refuses terminal-keyed stale; head routes to a.",
+    "boundary": "Actual unmodified product CLI on disposable state, not Orca/fleet interaction. Discovery-order replay uses names sorting before/after owner, no filesystem mocks."
+  },
+  "focused_tests": {
+    "branch": "exit 0",
+    "watch": "exit 0",
+    "boundary": "Executable callback fixtures with stubbed SDK; not authenticated live Pi turns."
+  },
+  "sdk_live": "NOT RUN in this phase; excluded from revised routing live acceptance. Authenticated watcher consumption/dialog/user-joined/session-reset evidence remains incomplete. Prior guard conflict preserved; no bypass or repair.",
+  "new_provider_requests": 0,
+  "prior_accounting": {
+    "requests": 7,
+    "input_tokens": 1190,
+    "output_tokens": 14,
+    "remaining_budget": 3,
+    "latest_attempt_sdk_reported_cost": 0,
+    "cost_caveat": "Not a claim of free service; prior evidence retained unchanged."
+  },
+  "omissions": [
+    "Static analysis/typecheck/lint prohibited in this Test phase",
+    "No full suite, harness launch, review, CI or publication phase"
+  ],
+  "cleanup": {
+    "temporary_state_removed": true,
+    "branch_process_group_remaining": []
+  },
+  "source_changes": false
+}

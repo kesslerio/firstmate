@@ -1,0 +1,63 @@
+{
+  "tested_head_sha": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "verdict": "inconclusive",
+  "source_changes": false,
+  "provider": "john-lan",
+  "model": "qwen3.8-flash-next",
+  "requests": 5,
+  "output_cap_per_request": 512,
+  "usage_reported_by_sdk": {
+    "input": 850,
+    "output": 10,
+    "cacheRead": 0,
+    "cacheWrite": 0,
+    "reasoning": 0,
+    "totalTokens": 860
+  },
+  "cost_reported_by_sdk": 0,
+  "cost_note": "SDK accounting only; zero reported cost is not a claim that provider service is free.",
+  "passed": [
+    "Authenticated tool-free AgentSession control using the selected configured API key without secret files or ambient auth-store access",
+    "Actual public SDK loads both changed extensions",
+    "Matching dedicated custom processing run aborted after before_agent_start and before provider request; outcome remained unprocessed",
+    "Unrelated custom turn completed while away",
+    "Attended matching dedicated processing turn completed real provider request"
+  ],
+  "remaining": [
+    "Actual watcher consumption and negative custom wake consumption",
+    "Completed durable captain/custom branch mirror assertions",
+    "Processing joined into a user-owned run remains allowed",
+    "Session reset within real AgentSession lifecycle"
+  ],
+  "failure_classification": "Mirror lab setup omitted .wake-queue. Branch dispatch failed closed with: the unread wake queue could not be read safely. No introduced source defect established.",
+  "limitations": [
+    "No direct fabricated tracked callbacks or SDK mocks used in authenticated probes",
+    "Watcher extensions loaded but no watcher was armed: session_start ran without the owned .lock, which was created after binding",
+    "Branch dispatch used public event bus; it did not constitute a real watcher-driven wake",
+    "Branch session pointer was created but no branch transcript existed on disk at readback; do not claim persisted mirror delivery",
+    "No branch provider request was issued; no model-executable filesystem, shell, or fleet tools were exposed by primary sessions",
+    "Source unchanged; previous routing and focused-suite evidence retained without rerunning unrelated tests",
+    "No lint, formatter, static analysis, broad suite, review, pipeline control, push or PR operations performed"
+  ],
+  "stop_reason": "Conservative 300-second lab wall limit from first authenticated control was reached during staged preparation and probes; no more provider calls or lab runs attempted.",
+  "cleanup": {
+    "probe_pids_exited": [
+      2166705,
+      2260707,
+      2380579
+    ],
+    "matching_owned_processes_remaining": [],
+    "lab_removed": true
+  },
+  "artifacts": [
+    "/home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/authenticated-control.mjs",
+    "/home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/authenticated-control.log",
+    "/home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/authenticated-control-result.json",
+    "/home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/agent-session-live.mjs",
+    "/home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/agent-session-live.log",
+    "/home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/agent-session-live-result.json",
+    "/home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/agent-session-controls.mjs",
+    "/home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/agent-session-controls.log",
+    "/home/art/.no-mistakes/evidence/01M4SNZBKAAYXKDB2538NPVP6S/agent-session-controls-result.json"
+  ]
+}

@@ -1,0 +1,189 @@
+{
+  "head": "845ee710513334868cbb4bd8ea6e66986c2f55fb",
+  "sdk": "1.2.0",
+  "pid": 2260707,
+  "requests": 2,
+  "inputByteBound": 1143,
+  "responses": [
+    {
+      "mode": "cancel",
+      "stopReason": "stop",
+      "usage": {
+        "input": 96,
+        "output": 2,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 98,
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        }
+      }
+    },
+    {
+      "mode": "cancel",
+      "stopReason": "error",
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "totalTokens": 0,
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        }
+      }
+    },
+    {
+      "mode": "unrelated",
+      "stopReason": "stop",
+      "usage": {
+        "input": 119,
+        "output": 2,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 121,
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        }
+      }
+    }
+  ],
+  "events": [
+    {
+      "event": "before_agent_start",
+      "mode": "cancel",
+      "type": "user"
+    },
+    {
+      "event": "message_start",
+      "mode": "cancel",
+      "role": "system"
+    },
+    {
+      "event": "message_start",
+      "mode": "cancel",
+      "role": "user"
+    },
+    {
+      "event": "context",
+      "mode": "cancel",
+      "processingPresent": false
+    },
+    {
+      "event": "provider_request",
+      "mode": "cancel",
+      "number": 1,
+      "outputCap": 512
+    },
+    {
+      "event": "message_start",
+      "mode": "cancel",
+      "role": "assistant"
+    },
+    {
+      "event": "response",
+      "mode": "cancel",
+      "stopReason": "stop"
+    },
+    {
+      "event": "agent_settled",
+      "mode": "cancel",
+      "aborted": false
+    },
+    {
+      "event": "before_agent_start",
+      "mode": "cancel",
+      "type": "custom",
+      "customType": "fm-branch-process"
+    },
+    {
+      "event": "message_start",
+      "mode": "cancel",
+      "role": "custom",
+      "customType": "fm-branch-process"
+    },
+    {
+      "event": "context",
+      "mode": "cancel",
+      "processingPresent": false
+    },
+    {
+      "event": "message_start",
+      "mode": "cancel",
+      "role": "assistant"
+    },
+    {
+      "event": "response",
+      "mode": "cancel",
+      "stopReason": "error"
+    },
+    {
+      "event": "agent_settled",
+      "mode": "cancel",
+      "aborted": true
+    },
+    {
+      "event": "before_agent_start",
+      "mode": "unrelated",
+      "type": "custom",
+      "customType": "lab-unrelated"
+    },
+    {
+      "event": "message_start",
+      "mode": "unrelated",
+      "role": "custom",
+      "customType": "lab-unrelated"
+    },
+    {
+      "event": "context",
+      "mode": "unrelated",
+      "processingPresent": false
+    },
+    {
+      "event": "provider_request",
+      "mode": "unrelated",
+      "number": 2,
+      "outputCap": 512
+    },
+    {
+      "event": "message_start",
+      "mode": "unrelated",
+      "role": "assistant"
+    },
+    {
+      "event": "response",
+      "mode": "unrelated",
+      "stopReason": "stop"
+    },
+    {
+      "event": "agent_settled",
+      "mode": "unrelated",
+      "aborted": false
+    }
+  ],
+  "checks": [
+    "Matching dedicated custom run cancelled before provider; outcome remains unprocessed",
+    "Unrelated custom turn allowed while away"
+  ],
+  "verdict": "partial-pass",
+  "extensions": [
+    "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4SNZBKAAYXKDB2538NPVP6S/.pi/extensions/fm-branch-supervision.ts",
+    "/home/art/.no-mistakes/worktrees/9f75ec418609/01M4SNZBKAAYXKDB2538NPVP6S/.pi/extensions/fm-primary-pi-watch.ts",
+    "<inline:lab-observer>"
+  ],
+  "errors": []
+}
