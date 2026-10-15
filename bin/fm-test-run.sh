@@ -371,7 +371,7 @@ family_for_basename() {
     fm-opencode-primary-live-e2e.test.sh|fm-pi-branch-live-e2e.test.sh|\
     fm-pi-branch-responsiveness-live-e2e.test.sh|\
     fm-pi-primary-live-e2e.test.sh|fm-pi-codex-native.test.sh|fm-omp-primary-live-e2e.test.sh|\
-    fm-pr-state-live-e2e.test.sh|\
+    fm-pr-state-live-e2e.test.sh|fm-github-media-live.test.sh|\
     fm-sessionstart-hook-live-e2e.test.sh|fm-sessionstart-instruction-refresh-live-e2e.test.sh|\
     fm-supervision-host-live-e2e.test.sh|fm-supervision-host-attended-live-e2e.test.sh|\
     fm-host-mirror-live-e2e.test.sh|\
@@ -428,7 +428,7 @@ family_for_basename() {
     fm-pending-reply.test.sh|fm-pi-branch-extension.test.sh|\
     fm-procevent-quota.test.sh|fm-procevent-when.test.sh|fm-procevent.test.sh|\
     fm-live-gate.test.sh|\
-    fm-project-origin.test.sh|fm-public-followup.test.sh|fm-quota-choose.test.sh|\
+    fm-project-origin.test.sh|fm-public-followup.test.sh|fm-github-media.test.sh|fm-github-media-hygiene.test.sh|fm-github-media-safety.test.sh|fm-quota-choose.test.sh|\
     fm-remote-entrypoint.test.sh|fm-remote-secondmate-parent-binding.test.sh|\
     fm-send-remote-delivery.test.sh|fm-spawn-pool-base-freshen.test.sh|\
     fm-test-fixture-cleanup.test.sh|fm-test-fixtures.test.sh|\
@@ -1688,6 +1688,11 @@ families_for_changed_path() {
       # source this one as well: most suites inherit it only through them.
       families_for_test_reference git-config-helpers.sh lib.sh herdr-test-safety.sh \
         || printf '%s\n' "__unmapped__:$path"
+      ;;
+    bin/fm-github-media.sh|bin/fm-github-media-state.py|bin/fm_github_media_lifecycle.py|\
+    tests/github_media_fixtures.py|libexec/github-media/*)
+      printf '%s\n' __script__:fm-github-media.test.sh __script__:fm-github-media-hygiene.test.sh \
+        __script__:fm-github-media-safety.test.sh __script__:fm-github-media-live.test.sh
       ;;
     tests/fixtures/*/*)
       # A fixture belongs to whichever suite reads its directory, found by the
