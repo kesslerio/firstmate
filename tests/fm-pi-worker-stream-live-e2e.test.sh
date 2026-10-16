@@ -29,6 +29,9 @@ for case_label in enabled disabled stalled; do
     spawn_root="$home/toolkit"
     mkdir -p "$fault_dir" "$spawn_root"
     cp -R "$ROOT/bin" "$spawn_root/bin"
+    # The publication guard must be able to establish that this disposable
+    # toolkit and the fixture project have unrelated histories.
+    fm_git_init_commit "$spawn_root"
     mv "$spawn_root/bin/fm-busy-event.sh" "$spawn_root/bin/fm-busy-event-real.sh"
     # Inject one command stall at the generated extension's executable boundary.
     # The SDK, extension, deadline owner, and subsequent writer calls remain real.
