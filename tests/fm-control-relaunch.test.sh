@@ -734,6 +734,14 @@ test_same_harness_relaunch_keeps_the_profile_axes() {
   expect_code 0 "$rc" "a same-harness relaunch should succeed"$'\n'"$out"
   [ "$(meta_field "$dir" rl6 model)" = opus ] || fail "the model should carry across a same-harness relaunch"
   [ "$(meta_field "$dir" rl6 effort)" = high ] || fail "the effort should carry across a same-harness relaunch"
+  printf '{"rules":[{"use":{"model":"gpt-6.1-sol"}}]}\n' > "$dir/home/config/crew-dispatch.json"
+  sed 's/^model=opus$/model=gpt-6.1-sol/' "$dir/home/state/rl6.meta" > "$dir/home/state/rl6.meta.tmp"
+  mv "$dir/home/state/rl6.meta.tmp" "$dir/home/state/rl6.meta"
+  printf 'rl6\tgpt-6.1-sol\t1\t0\n' > "$dir/home/state/sol-sessions.tsv"
+  out=$(run_control "$dir" rl6 relaunch --harness claude --model default --note "clear the previous model"); rc=$?
+  expect_code 0 "$rc" "a model-clearing relaunch failed: $out"
+  [ "$(meta_field "$dir" rl6 model)" = default ] || fail "replacement did not clear the model"
+  [ ! -s "$dir/home/state/sol-sessions.tsv" ] || fail "cleared model retained Sol occupancy"
   pass "fm-control relaunch: a same-harness relaunch keeps the profile axes it was running with"
 }
 

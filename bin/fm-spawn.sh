@@ -2722,14 +2722,11 @@ fi
 # Sol dispatches runs once the spawn's model axis fully resolves (the
 # secondmate resolution above; a fresh ship or scout carries the explicit
 # --model dispatch resolves at intake) and before any endpoint, worktree, or
-# record exists, so a refusal unwinds to nothing. A relaunch without --model
-# reuses its recorded model=, so the relaunched session keeps its slot
-# identity rather than dropping its own count.
-FM_SPAWN_SOL_MODEL=${MODEL:-}
-if [ "$RELAUNCH" -eq 1 ] && { [ -z "$FM_SPAWN_SOL_MODEL" ] || [ "$FM_SPAWN_SOL_MODEL" = default ]; }; then
-  FM_SPAWN_SOL_MODEL=$(fm_meta_get "$RELAUNCH_META" model 2>/dev/null || true)
+# record exists, so a refusal unwinds to nothing.
+if [ "$RELAUNCH" -eq 1 ] || [ "$KIND" = secondmate ]; then
+  fm_sol_cap_reconcile_local "$ID" "$STATE" || exit 1
 fi
-fm_sol_cap_refuse_and_claim "$ID" "$KIND" "$HARNESS" "$FM_SPAWN_SOL_MODEL" "$CONFIG" "$STATE" || {
+fm_sol_cap_refuse_and_claim "$ID" "$KIND" "$HARNESS" "${MODEL:-}" "$CONFIG" "$STATE" || {
   [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
   exit 1
 }
