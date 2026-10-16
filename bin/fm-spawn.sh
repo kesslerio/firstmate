@@ -1268,8 +1268,6 @@ spawn_remote_secondmate() {
   [ -z "$remote_traceparent" ] || launch_args+=("$remote_traceparent")
   if [ "$FM_SOL_CLAIM_CREATED" = "$id" ]; then
     fm_sol_cap_promote "$id" 0 "$STATE" || return 1
-  else
-    fm_sol_cap_promote "$id" remove "$STATE" || return 1
   fi
   if out=$("$SCRIPT_DIR/fm-on.sh" "$id" fm-remote-secondmate-control.sh launch \
     "${launch_args[@]}" </dev/null 2>&1); then
@@ -1605,6 +1603,9 @@ spawn_abort_cleanup() {
       rm -rf "$GIT_HOOKS_DIR" 2>/dev/null || true
     fi
     fm_lock_release "$SPAWN_TASK_LOCK" || true
+  fi
+  if [ "$SPAWN_ENDPOINT_CLOSED" = 1 ] && [ "${FM_SOL_CLAIM_CREATED:-}" = "$ID" ]; then
+    fm_sol_cap_promote "$ID" remove "$STATE" || status=1
   fi
   return "$status"
 }
@@ -6051,8 +6052,6 @@ spawn_orca_wait_launch_consumed() {
 }
 if [ "$FM_SOL_CLAIM_CREATED" = "$ID" ]; then
   fm_sol_cap_promote "$ID" 0 "$STATE" || exit 1
-else
-  fm_sol_cap_promote "$ID" remove "$STATE" || exit 1
 fi
 SPAWN_LAUNCH_SENT=1
 # errexit is on here: a failed send still exits, and Orca source mode first

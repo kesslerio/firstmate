@@ -17,8 +17,7 @@
 # profile's model ids matching ^gpt-<digits or dots>-sol$), so a future Sol
 # row joins the ceiling by editing the dispatch table, not by editing this
 # file. The registered Sol session carries the task id as its session key, so
-# a relaunch or respawn of the same task id replaces its own entry instead of
-# counting itself. A dispatch with no Sol model never claims a slot.
+# a relaunch or respawn of the same task id requires its prior worker to stop. A dispatch with no Sol model never claims a slot.
 #
 # The count: <state-dir>/sol-sessions.tsv, one TSV row per Sol session
 #
@@ -136,17 +135,17 @@ fm_sol_cap_entry_live() {  # <start> <pid>
   [ "$pid" = 0 ] || fm_pid_alive "$pid"
 }
 
-# fm_sol_cap_active_count <first-state> <own-id>
+# fm_sol_cap_active_count <first-state>
 # Count the live Sol-session registry rows in every local home's state
-# directory on this machine, excluding <own-id>. Sets FM_SOL_COUNT to the
+# directory on this machine. Sets FM_SOL_COUNT to the
 # count and FM_SOL_ACTIVE_LIST to a "; "-joined listing "<id> (<model>, age
 # N)"; an entry in a state directory other than <first-state> is qualified
 # with " in <state-dir>". Returns 1 with FM_SOL_COUNT_ERROR when the local
 # homes cannot be enumerated, a registry cannot be read, or a row is
 # malformed, because skipping a home could claim a free slot that another
 # home holds.
-fm_sol_cap_active_count() {  # <first-state> <own-id>
-  local first=$1 own=$2 state file id model start pid now age entry
+fm_sol_cap_active_count() {  # <first-state>
+  local first=$1 state file id model start pid now age entry
   FM_SOL_COUNT=0
   FM_SOL_ACTIVE_LIST=
   FM_SOL_COUNT_ERROR=
@@ -175,7 +174,6 @@ fm_sol_cap_active_count() {  # <first-state> <own-id>
         return 1
       fi
       fm_sol_cap_entry_live "$start" "$pid" || continue
-      [ "$id" != "$own" ] || { [ "$state" != "$first" ] && [ ! "$state" -ef "$first" ]; } || continue
       age=$((now > start ? now - start : 0))
       entry="$id ($model, age $(fm_sol_cap_age_text "$age"))"
       [ "$state" = "$first" ] || entry="$entry in $state"
@@ -251,7 +249,7 @@ fm_sol_cap_registry_claim() {  # <registry-file> <id> <model> <now>
 # process's pid as the reservation. An unavailable model set, ceiling, count,
 # or claim lock refuses loudly rather than launching possibly uncounted.
 fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <state-dir>
-  local id=$1 harness=$3 model=$4 config=$5 state=$6 registry now lock root local_home
+  local id=$1 harness=$3 model=$4 config=$5 state=$6 registry now lock root local_home existing_pid existing_start
   FM_SOL_CAP_REFUSAL=
   FM_SOL_CLAIM_CREATED=
   [ -n "$model" ] && [ "$model" != default ] || return 0
@@ -277,8 +275,15 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
   registry=$state/$FM_SOL_REGISTRY_NAME
   # The count again under the lock, so two spawns racing the count cannot
   # both take the last slot (active_count is this ceiling's decision pass).
-  if ! fm_sol_cap_active_count "$state" "$id"; then
+  if ! fm_sol_cap_active_count "$state"; then
     FM_SOL_CAP_REFUSAL="error: Sol ceiling could not count its sessions: $FM_SOL_COUNT_ERROR; task $id with model $model was not dispatched rather than launched possibly uncounted"
+    fm_lock_release "$lock" || true
+    return 1
+  fi
+  existing_pid=$(awk -F'\t' -v id="$id" '$1 == id {print $4; exit}' "$registry" 2>/dev/null || true)
+  existing_start=$(awk -F'\t' -v id="$id" '$1 == id {print $3; exit}' "$registry" 2>/dev/null || true)
+  if fm_sol_cap_entry_live "$existing_start" "$existing_pid"; then
+    FM_SOL_CAP_REFUSAL="error: Sol ceiling: task $id already holds a live or uncertain session; confirm its worker stopped through teardown before replacing it"
     fm_lock_release "$lock" || true
     return 1
   fi
@@ -308,6 +313,7 @@ fm_sol_cap_promote() {  # <id> <pid or remove> <state-dir>
   local id=$1 pid=$2 state=$3 registry tmp root lock
   registry=$state/$FM_SOL_REGISTRY_NAME
   [ -f "$registry" ] || return 0
+  awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$registry" || return 0
   root=$(fm_firstmate_root_home "$FM_HOME") || return 1
   lock=$root/state/$FM_SOL_LOCK_NAME
   fm_sol_cap_lock_acquire "$lock" "the promotion of task $id" || return 1
