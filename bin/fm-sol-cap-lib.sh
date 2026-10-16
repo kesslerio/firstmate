@@ -1,35 +1,21 @@
 #!/usr/bin/env bash
 # fm-sol-cap-lib.sh - the mechanical ceiling on concurrent Sol sessions.
 #
-# The fleet dispatches the gpt-6 Sol models (gpt-6.1-sol and gpt-6-sol) by
-# config/crew-dispatch.json's Sol rows, and the no-mistakes gate/review agents
-# ride gpt-6.1-sol too. The captain filed a four-session ceiling (2026-09-29,
-# "four-session Sol ceiling") on concurrent Sol sessions: a fifth launch must
-# stop by construction, not by anyone's attention. This library is the single
-# owner of the ceiling's mechanics; bin/fm-spawn.sh owns where the hook runs
-# (after the harness/model axis resolves, before any endpoint, worktree, or
-# record exists), and docs/configuration.md "Sol session ceiling
-# (config/sol-cap)" is the operator reference.
-#
-# What counts as a Sol session: a worker whose dispatch reaches this guard
-# with an explicit or recorded model id in the Sol set. The set is derived at
-# call time from config/crew-dispatch.json (its rule profiles' and default
-# profile's model ids matching ^gpt-<digits or dots>-sol$), so a future Sol
-# row joins the ceiling by editing the dispatch table, not by editing this
-# file. The registered Sol session carries the task id as its session key, so
-# a relaunch or respawn of the same task id requires its prior worker to stop. A dispatch with no Sol model never claims a slot.
+# This library owns admission, counting, and claim reconciliation; fm-spawn.sh
+# owns the launch hook. docs/configuration.md "Sol session ceiling" owns the
+# operator contract, model classification, supported limit, and exclusions.
 #
 # The count: <state-dir>/sol-sessions.tsv, one TSV row per Sol session
 #
 #   <session-id>	<model>	<start-epoch>	<pid>
 #
 
-# The captain's filed four-session Sol ceiling (2026-09-29, "four-session Sol
-# ceiling"), overridable by one positive integer in config/sol-cap.
+# config/sol-cap may lower this default, never raise it.
 # shellcheck disable=SC2034 # read by bin/fm-spawn.sh after sourcing.
 FM_SOL_CAP_DEFAULT=4
 
-# The registry file name and the claim lock name, under each home's state dir.
+# Registries live in each owning state directory; the claim lock lives in
+# the shared local root home's state directory.
 # shellcheck disable=SC2034 # read by the claim, count, and promotion paths.
 FM_SOL_REGISTRY_NAME=sol-sessions.tsv
 FM_SOL_LOCK_NAME=.sol-cap.lock
@@ -97,7 +83,7 @@ fm_sol_cap_model_set() {  # <config-dir>
 
 # fm_sol_cap_ceiling <config-dir>
 # Resolve the concurrent-Sol ceiling. config/sol-cap in the dispatching home,
-# one positive integer, overrides FM_SOL_CAP_DEFAULT, and the file's absence
+# one integer from 1 through 4, overrides FM_SOL_CAP_DEFAULT; its absence
 # uses the default. Returns 1 with FM_SOL_CEILING_ERROR when the file is
 # present but unreadable or malformed, so the guard refuses instead of
 # guessing the ceiling.
@@ -177,8 +163,8 @@ fm_sol_cap_active_count() {  # <first-state>
     fi
     while :; do
       # A blank or hand-edited inert line is skipped, so a registry note
-      # cannot stop the fleet; anything else that fails the live test is a
-      # malformed row with a loud refusal, because silently skipping a
+      # cannot stop the fleet; any nonblank row that fails the shape test is
+      # malformed and refuses loudly, because silently skipping a
       # home could give away a slot another home holds.
       IFS=$'\t' read -r id model start pid || break
       [ -n "$id" ] || continue

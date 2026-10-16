@@ -1282,14 +1282,15 @@ Secondmate homes inherit this file from the primary, so a secondmate's own crewm
 
 ## Sol session ceiling (config/sol-cap)
 
-The captain filed a four-session ceiling (2026-09-29, "four-session Sol ceiling") on concurrent Sol sessions, and `config/sol-cap` names the mechanical guard that keeps it rather than requiring anyone's attention.
-A Sol session is a worker whose dispatch reaches the guard with an explicit or recorded model id in the Sol set.
-The set is derived at call time from `config/crew-dispatch.json`'s rule and default profiles (model ids matching `gpt-<digits or dots>-sol$`, today `gpt-6.1-sol` and `gpt-6-sol`), so a future Sol row joins the ceiling by editing the dispatch table, not code.
+Firstmate mechanically limits concurrent Sol sessions to four; `config/sol-cap` may lower this ceiling.
+A Sol session is a worker whose actual dispatched model is in the Sol set.
+A recorded model counts only when the replacement launch preserves it; a launch with `--model default` has no explicit model pin.
+The set is derived at call time from `config/crew-dispatch.json`'s rule and default profiles (model ids matching `^gpt-[0-9.]+-sol$`), so a future Sol row joins the ceiling by editing the dispatch table, not code.
 `bin/fm-sol-cap-lib.sh` is the single owner of the guard's mechanics and its CLI (`models`, `ceiling`, `refuse-claim`), `bin/fm-spawn.sh` owns the hook point (after the spawn's harness/model axis resolves, before any endpoint, worktree, or record exists), and this section is the single owner of the operator contract.
 
 **What counts and where it lives**
 
-- The count registry is one TSV file per Firstmate home on this machine: `<state>/sol-sessions.tsv`, one row per Sol session `<session-id>\t<model>\t<start-epoch>\t<pid>`, where the task id is the session key.
+- The count registry is one TSV file per Firstmate home on this machine: `<state>/sol-sessions.tsv`, one row per Sol session keyed by task id; the [`fm-sol-cap-lib.sh` header](../bin/fm-sol-cap-lib.sh) owns the row format.
 - The guard counts live rows across every local Firstmate home's state directory on this machine (the same enumeration `bin/fm-project-capacity-lib.sh` counts through), so local homes share one ceiling and remote homes are never walked because their workers run on another machine; a remote secondmate is counted in the dispatching home.
 - A registered stale row does not count: its recorded positive pid is no longer alive; age never releases a live worker.
 - A fresh spawn claims its row atomically under the local root home's `state/.sol-cap.lock`, with the spawning process's pid until launch delivery begins.
@@ -1298,8 +1299,9 @@ The set is derived at call time from `config/crew-dispatch.json`'s rule and defa
 - Remote or uncertain deliveries keep pid 0 and require reconciliation before their slot can be released; they never expire by age.
 - A Sol retry refuses while its existing worker is live or delivery is uncertain; a non-Sol retry preserves that occupancy.
 - Confirmed endpoint cleanup and remote retirement remove the owned Sol row; failed or uncertain closes retain it.
-- Remote recovery rechecks the recorded route under the spawn locks and retires its conservative claim only for a successful dead or missing verdict.
-- Remote runtime switches reserve any new Sol slot in the parent before delivery and retain existing occupancy until a confirmed non-Sol replacement.
+- Local relaunch and secondmate recovery reconcile an owned claim under the lifecycle locks only after proving the endpoint dead or absent; uncertain state retains the claim.
+- Remote recovery probes the configured route under the spawn locks and retires its conservative claim only for a successful dead or missing verdict, including retries after delivery failed before parent metadata publication.
+- Remote runtime switches reuse only a live reservation or reserve a new Sol slot in the parent before delivery, retaining existing occupancy until a confirmed non-Sol replacement.
 - On the remote host, the nested `state/parent-route` registry shares its operational home's count and root lock with that secondmate's crew.
 - Passing spawns prune stale rows from every walked registry, so old rows do not accumulate.
 - A malformed registry row (bad shape) refuses every Sol dispatch with the row named rather than silently undercounting; staleness is release, but a broken row is a disruption, not a free slot.
@@ -1318,7 +1320,8 @@ FM_HOME=$FM_HOME bin/fm-sol-cap-lib.sh ceiling   $FM_HOME/config
 
 - The default is 4, `FM_SOL_CAP_DEFAULT` in `bin/fm-sol-cap-lib.sh`, in one place.
 - `config/sol-cap` in the dispatching home may lower it with one integer from 1 through 4; larger values are refused.
-- A ceiling file that is present but unreadable, malformed, or an unreadable `config/crew-dispatch.json` refuses every Sol dispatch loudly rather than guessing or counting nothing.
+- A ceiling file that is present but unreadable or malformed, or a dispatch table that cannot be read, refuses Sol dispatch loudly rather than guessing or counting nothing.
+- An absent dispatch table or one with no matching models leaves the guard inert; GLM and qwen dispatches do not claim Sol slots.
 
 **Boundary**: the no-mistakes daemon's internal gate/review agent spawns decode their own agent surface in the daemon's global config (`agent:`, `agent_config:`, `agent_path_override` in the operating no-mistakes config.yaml), its binary lives outside this repository, and a task may not administer it, so those spawns stay outside this count until whoever owns that daemon instance wires a hook to conform to this contract.
 
