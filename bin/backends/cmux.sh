@@ -612,22 +612,40 @@ fm_backend_cmux_window_of_workspace() {  # <workspace_id> -> "<window_id> <count
 # target is the last one in its window a throwaway sibling is created first,
 # leaving that window a fresh default workspace (never an fm-<home>- title, so
 # recovery/list_live ignore it) - cmux's own "closed the last tab" outcome.
+fm_backend_cmux_workspace_absent() {
+  local wsid=$1 label=${2:-} inventory title=
+  [ -z "$label" ] || title=$(fm_backend_cmux_scoped_title "$label")
+  inventory=$(fm_backend_cmux_cli workspace list --json --id-format uuids 2>/dev/null) || return 1
+  printf '%s' "$inventory" | jq -e --arg id "$wsid" --arg title "$title" '
+    type == "object" and (.workspaces | type == "array")
+    and all(.workspaces[]; (.id | type == "string") and (.title | type == "string"))
+    and all(.workspaces[]; .id != $id and ($title == "" or .title != $title))
+  ' >/dev/null 2>&1
+}
+
 fm_backend_cmux_kill() {  # <target> [unused] [expected-label]
   local expected_label=${3:-} wsid wininfo win count
-  if [ -n "$expected_label" ]; then
-    fm_backend_cmux_target_ready "$1" "$expected_label" || return 1
-  else
-    fm_backend_cmux_parse_target "$1" || return 1
-  fi
+  fm_backend_cmux_parse_target "$1" || return 1
   wsid=$FM_BACKEND_CMUX_WORKSPACE
+  if [ -n "$expected_label" ]; then
+    if ! fm_backend_cmux_target_ready "$1" "$expected_label"; then
+      fm_backend_cmux_workspace_absent "$wsid" "$expected_label"
+      return $?
+    fi
+    wsid=$FM_BACKEND_CMUX_WORKSPACE
+  fi
   wininfo=$(fm_backend_cmux_window_of_workspace "$wsid")
-  [ -n "$wininfo" ] || return 1
+  if [ -z "$wininfo" ]; then
+    fm_backend_cmux_workspace_absent "$wsid" "$expected_label"
+    return $?
+  fi
   win=${wininfo%% *}
   count=${wininfo##* }
   if [ -n "$win" ] && [ "$count" = 1 ]; then
     fm_backend_cmux_cli new-workspace --window "$win" --focus false --id-format uuids >/dev/null 2>&1 || return 1
   fi
-  fm_backend_cmux_cli close-workspace --workspace "$wsid" >/dev/null 2>&1 || return 1
+  fm_backend_cmux_cli close-workspace --workspace "$wsid" >/dev/null 2>&1 || true
+  fm_backend_cmux_workspace_absent "$wsid" "$expected_label"
 }
 
 # fm_backend_cmux_list_live: recovery/orphan discovery. Lists every workspace

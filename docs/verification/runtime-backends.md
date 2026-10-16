@@ -364,8 +364,8 @@ The refusal is reached only through a close that could not do its job, and each 
 | --- | --- | --- |
 | tmux | 0, silent | 1, resolved by re-reading the window's exact recorded identity; a read that itself could not run refuses rather than passing for absence |
 | orca | Requires a successful CLI close response | Nonzero on a failed command or an error JSON response |
-| zellij | 0 when a successful session inventory proves the session absent | Nonzero on a failed close, unreadable inventory, or unresolved task identity |
-| cmux | Requires a successful workspace close | Nonzero on a failed close, unresolved target/window, or failed last-workspace sibling creation |
+| zellij | 0 when successful session or pane/tab inventories prove absence | Nonzero when a failed close or unresolved identity cannot be confirmed absent |
+| cmux | 0 when a successful workspace inventory proves absence | Every close requires a confirming inventory; failed reads and surviving workspaces return nonzero |
 | herdr | 0, silent | 0 from this arm; `bin/fm-teardown.sh` gates every Herdr record removal on `fm_backend_herdr_endpoint_confirmed_gone` instead |
 
 tmux's re-read is deliberately exact - `=session` plus a whole-line window-name match - because a prefix match would read a neighboring window as this window's survivor, which is the same exactness the cleanup identity boundary above already requires.
