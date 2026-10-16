@@ -1171,10 +1171,6 @@ spawn_remote_secondmate() {
   # remote home's own dispatches count in theirs.
   remote_sol_model=
   [ "$model" != - ] && [ "$model" != default ] && [ -n "$model" ] && remote_sol_model=$model
-  fm_sol_cap_refuse_and_claim "$id" secondmate "$harness" "$remote_sol_model" "$CONFIG" "$STATE" || {
-    [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
-    return 1
-  }
   meta="$STATE/$id.meta"
   if [ -e "$meta" ] || [ -L "$meta" ]; then
     if ! fm_backlog_record_present "$meta" "task record" "$STATE" ||
@@ -1188,6 +1184,11 @@ spawn_remote_secondmate() {
       return 1
     fi
   fi
+  fm_sol_cap_reconcile_remote "$id" "$STATE" "$SCRIPT_DIR" || return 1
+  fm_sol_cap_refuse_and_claim "$id" secondmate "$harness" "$remote_sol_model" "$CONFIG" "$STATE" || {
+    [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
+    return 1
+  }
   # Gate the host before anything is published or transferred, so a host that
   # cannot hold a durable Herdr endpoint refuses here rather than half-way
   # through a launch. This is also the readiness gate every liveness relaunch

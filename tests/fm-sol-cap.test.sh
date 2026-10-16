@@ -462,6 +462,51 @@ test_retry_and_confirmed_stop() {
   pass "retries preserve occupancy and only confirmed teardown releases it"
 }
 
+test_remote_ownership_and_recovery() (
+  local case_dir out rc=0 i scripts state
+  case_dir=$(make_case remote-owner)
+  state=$case_dir/home/state
+  mkdir -p "$state/parent-route"
+  printf '%s\n' schema=fm-secondmate-parent.v1 route=remote > "$case_dir/home/.fm-secondmate-parent"
+  . "$ROOT/bin/fm-wake-lib.sh"
+  . "$ROOT/bin/fm-secondmate-registry-lib.sh"
+  . "$ROOT/bin/fm-sol-cap-lib.sh"
+  FM_HOME=$case_dir/home
+  write_sol_row "$case_dir/home" crew-a 1 "$$"
+  write_sol_row "$case_dir/home" crew-b 1 "$$"
+  printf 'mate\tgpt-6.1-sol\t1\t0\n' > "$state/parent-route/sol-sessions.tsv"
+  fm_sol_cap_active_count "$state/parent-route" || fail "nested count failed"
+  expect_code 3 "$FM_SOL_COUNT" "nested route did not count itself and crew exactly once"
+  write_sol_row "$case_dir/home" crew-c 1 "$$"
+  fm_sol_cap_refuse_and_claim fifth ship codex gpt-6.1-sol "$case_dir/home/config" "$state" && fail "crew bypassed mate occupancy"
+  FM_HOME=$ROOT
+  fm_sol_cap_refuse_and_claim fifth ship codex gpt-6.1-sol "$case_dir/home/config" "$state/parent-route" && fail "nested route bypassed crew occupancy"
+  FM_HOME=$case_dir/home
+  scripts=$case_dir/probe
+  mkdir "$scripts"
+  cat > "$scripts/fm-on.sh" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$TEST_REMOTE_STATE"
+exit "${TEST_REMOTE_RC:-0}"
+SH
+  chmod +x "$scripts/fm-on.sh"
+  touch "$state/mate.meta"
+  for i in alive unreadable ambiguous dead missing; do
+    printf 'mate\tgpt-6.1-sol\t1\t0\n' > "$state/sol-sessions.tsv"
+    TEST_REMOTE_STATE=$i fm_sol_cap_reconcile_remote mate "$state" "$scripts" || fail "remote reconciliation failed"
+    out=$(registry_row_field "$case_dir" mate 4)
+    case "$i" in
+      dead|missing) [ -z "$out" ] || fail "proven-stopped remote claim survived" ;;
+      *) [ "$out" = 0 ] || fail "uncertain/live claim was removed" ;;
+    esac
+  done
+  printf 'mate\tgpt-6.1-sol\t1\t0\n' > "$state/sol-sessions.tsv"
+  TEST_REMOTE_STATE=dead TEST_REMOTE_RC=255 fm_sol_cap_reconcile_remote mate "$state" "$scripts"
+  [ "$(registry_row_field "$case_dir" mate 4)" = 0 ] || fail "transport failure released remote claim"
+  pass "remote parent-route ownership shares the ceiling and recovery preserves uncertain claims"
+)
+
+test_remote_ownership_and_recovery
 test_retry_and_confirmed_stop
 test_shared_home_admission
 test_review_regressions
