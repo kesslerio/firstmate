@@ -18,62 +18,17 @@
 # row joins the ceiling by editing the dispatch table, not by editing this
 # file. The registered Sol session carries the task id as its session key, so
 # a relaunch or respawn of the same task id replaces its own entry instead of
-# counting itself. A dispatch with no Sol model never claims a slot and passes
-# untouched.
+# counting itself. A dispatch with no Sol model never claims a slot.
 #
 # The count: <state-dir>/sol-sessions.tsv, one TSV row per Sol session
 #
 #   <session-id>	<model>	<start-epoch>	<pid>
 #
-# <pid> is the pid of the worker's pane shell on the default tmux session
-# provider, filled in by this file's promotion step after the launch, and 0
-# when no backend surface answers one. A fresh spawn reserves its row under
-# <state-dir>/.sol-cap.lock with the spawning fm-spawn process's own pid,
-# which dies with a failed dispatch, so an aborted spawn cannot hold a slot;
-# reserve, prune, and promotion all mutate a registry under that lock.
-#
-# Staleness: an entry does not count when it is older than
-# FM_SOL_STALE_SECONDS (6h, so a registered remote worker this machine cannot
-# inspect ages out instead of holding a slot forever) or when its recorded pid
-# is not alive. Teardown-time release is a deliberately unwritten future
-# boundary; these two rules are the ceiling's current release path, and the
-# release usually arrives for free, because a tmux pane shell dies when its
-# worker exits.
-#
-# Home scope: bin/fm-spawn.sh counts live entries in every local Firstmate
-# home's state directory on this machine (bin/fm-wake-lib.sh's
-# fm_local_firstmate_state_dirs, the same surface
-# bin/fm-project-capacity-lib.sh counts through), not through a shared
-# hostname registry, so the guard follows one existing machine-scope precedent
-# instead of inventing a second one. Registered remote homes are never
-# walked, because their workers run on another machine; a remote secondmate
-# is counted in the dispatching home. The no-mistakes daemon's internal
-# gate/review agent spawns are one documented boundary: the shared daemon is
-# installed fleet infrastructure whose global config owns its agent surface
-# (agent:, agent_config:, agent_path_override in the operating no-mistakes
-# config.yaml), its binary lives outside this repository, and a task must not
-# administer it, so those spawns stay outside this count until whoever owns
-# that instance wires a hook to conform to this contract.
-#
-# Refusal, not queueing: a dispatch at the cap refuses with one actionable
-# error naming the active sessions and their ages, and leaves the task
-# unlaunched. The dispatch contract refuses rather than queues a wait with no
-# bounded end.
-#
-# Requires bin/fm-wake-lib.sh (fm_pid_alive, fm_lock_try_acquire, and the
-# local-home enumeration), bin/fm-secondmate-registry-lib.sh to be sourced
-# first (as bin/fm-spawn.sh already does), and jq. No side effects on source.
 
 # The captain's filed four-session Sol ceiling (2026-09-29, "four-session Sol
 # ceiling"), overridable by one positive integer in config/sol-cap.
 # shellcheck disable=SC2034 # read by bin/fm-spawn.sh after sourcing.
 FM_SOL_CAP_DEFAULT=4
-
-# An entry older than this is stale by age even when its pid cannot be
-# checked (0) or when the worker this machine cannot inspect still runs.
-# shellcheck disable=SC2034 # read by fm_sol_cap_entry_live below and the
-# prune-style callers of it.
-FM_SOL_STALE_SECONDS=21600
 
 # The registry file name and the claim lock name, under each home's state dir.
 # shellcheck disable=SC2034 # read by the claim, count, and promotion paths.
@@ -157,11 +112,11 @@ fm_sol_cap_ceiling() {  # <config-dir>
     FM_SOL_CEILING_ERROR="$file is not a readable regular file"
     return 1
   fi
-  cap=$(sed -n 's/^[[:space:]]*\([0-9][0-9]*\)[[:space:]]*$/\1/p' "$file" | head -n1)
-  [ -n "$cap" ] || {
-    FM_SOL_CEILING_ERROR="$file is not a single positive integer"
-    return 1
-  }
+  cap=$(cat "$file")
+  case "$cap" in
+    1 | 2 | 3 | 4) ;;
+    *) FM_SOL_CEILING_ERROR="$file must be one integer from 1 through 4"; return 1 ;;
+  esac
   FM_SOL_CAP=$cap
   return 0
 }
@@ -174,25 +129,11 @@ fm_sol_cap_entry_shape() {  # <start> <pid>
   case "$pid" in '' | *[!0-9]*) return 1 ;; esac
 }
 
-# fm_sol_cap_entry_live <start> <pid> <now>
-# Zero exit when a registry row still holds a live Sol session: a start epoch
-# no more than one hour in the future, younger than FM_SOL_STALE_SECONDS by
-# age, and carrying either no recorded pid (0, age-bound only) or an alive
-# pid. A start more than one hour in the future reads as a bogus clock rather
-# than a live session, because refusing every dispatch on one bad row would
-# let a registry line stop the whole fleet.
-fm_sol_cap_entry_live() {  # <start> <pid> <now>
-  local start=$1 pid=$2 now=$3
+fm_sol_cap_entry_live() {  # <start> <pid>
+  local start=$1 pid=$2
   case "$start" in '' | *[!0-9]*) return 1 ;; esac
   case "$pid" in '' | *[!0-9]*) return 1 ;; esac
-  if [ "$pid" -gt 0 ] && ! fm_pid_alive "$pid"; then
-    return 1
-  fi
-  if [ "$start" -gt "$now" ]; then
-    [ $((start - now)) -le 3600 ]
-    return
-  fi
-  [ $((now - start)) -lt "$FM_SOL_STALE_SECONDS" ]
+  [ "$pid" = 0 ] || fm_pid_alive "$pid"
 }
 
 # fm_sol_cap_active_count <first-state> <own-id>
@@ -233,11 +174,9 @@ fm_sol_cap_active_count() {  # <first-state> <own-id>
         FM_SOL_COUNT_ERROR="Sol registry $file has a malformed row: ${id:-<empty>} ${model:-<empty>} ${start:-<empty>} ${pid:-<empty>}"
         return 1
       fi
-      # A stale row is legal release, not a refusal: old entries do not count.
-      fm_sol_cap_entry_live "$start" "$pid" "$now" || continue
-      [ "$id" != "$own" ] || continue
+      fm_sol_cap_entry_live "$start" "$pid" || continue
+      [ "$id" != "$own" ] || { [ "$state" != "$first" ] && [ ! "$state" -ef "$first" ]; } || continue
       age=$((now > start ? now - start : 0))
-      local entry
       entry="$id ($model, age $(fm_sol_cap_age_text "$age"))"
       [ "$state" = "$first" ] || entry="$entry in $state"
       FM_SOL_COUNT=$((FM_SOL_COUNT + 1))
@@ -275,7 +214,7 @@ fm_sol_cap_registry_claim() {  # <registry-file> <id> <model> <now>
   local file=$1 id=$2 model=$3 now=$4 tmp row rc
   tmp=$file.tmp.$$
   if [ -f "$file" ]; then
-    grep -Fv -e "${id}$(printf '\t')" "$file" > "$tmp" 2>/dev/null
+    awk -F'\t' -v id="$id" '$1 != id' "$file" > "$tmp" 2>/dev/null
     rc=$?
     [ "$rc" -eq 0 ] || [ "$rc" -eq 1 ] || {
       rm -f -- "$tmp"
@@ -312,12 +251,13 @@ fm_sol_cap_registry_claim() {  # <registry-file> <id> <model> <now>
 # process's pid as the reservation. An unavailable model set, ceiling, count,
 # or claim lock refuses loudly rather than launching possibly uncounted.
 fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <state-dir>
-  local id=$1 kind=$2 harness=$3 model=$4 config=$5 state=$6 registry now
+  local id=$1 harness=$3 model=$4 config=$5 state=$6 registry now lock root local_home
   FM_SOL_CAP_REFUSAL=
   FM_SOL_CLAIM_CREATED=
   [ -n "$model" ] && [ "$model" != default ] || return 0
   [ -n "$id" ] || return 0
   fm_sol_cap_model_set "$config" || {
+    if [[ ! "$model" =~ ^gpt-[0-9.]+-sol$ ]]; then return 0; fi
     FM_SOL_CAP_REFUSAL="error: Sol ceiling unavailable: $FM_SOL_CAP_MODELS_ERROR; task $id with model $model was not dispatched rather than launched possibly uncounted"
     return 1
   }
@@ -329,7 +269,9 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
     FM_SOL_CAP_REFUSAL="error: Sol ceiling unavailable: $FM_SOL_CEILING_ERROR; task $id with model $model was not dispatched rather than launched against an unread ceiling"
     return 1
   }
-  if ! fm_sol_cap_lock_acquire "$state/$FM_SOL_LOCK_NAME" "task $id"; then
+  root=$(fm_firstmate_root_home "$FM_HOME") || return 1
+  lock=$root/state/$FM_SOL_LOCK_NAME
+  if ! fm_sol_cap_lock_acquire "$lock" "task $id"; then
     return 1
   fi
   registry=$state/$FM_SOL_REGISTRY_NAME
@@ -337,12 +279,12 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
   # both take the last slot (active_count is this ceiling's decision pass).
   if ! fm_sol_cap_active_count "$state" "$id"; then
     FM_SOL_CAP_REFUSAL="error: Sol ceiling could not count its sessions: $FM_SOL_COUNT_ERROR; task $id with model $model was not dispatched rather than launched possibly uncounted"
-    fm_lock_release "$state/$FM_SOL_LOCK_NAME" || true
+    fm_lock_release "$lock" || true
     return 1
   fi
   if [ "$FM_SOL_COUNT" -ge "$FM_SOL_CAP" ]; then
-    FM_SOL_CAP_REFUSAL="error: Sol ceiling reached: $FM_SOL_COUNT concurrent Sol session(s) already active and this ceiling is $FM_SOL_CAP (config/sol-cap in this home raises it); the dispatch of task $id ($harness, $model) was refused. Active sessions: $FM_SOL_ACTIVE_LIST. A session frees its slot when its worker's process ends, or after 6h by age; the dispatch contract refuses at the ceiling instead of queueing"
-    fm_lock_release "$state/$FM_SOL_LOCK_NAME" || true
+    FM_SOL_CAP_REFUSAL="error: Sol ceiling reached: $FM_SOL_COUNT concurrent Sol session(s) already active and this ceiling is $FM_SOL_CAP (config/sol-cap may lower it); the dispatch of task $id ($harness, $model) was refused. Active sessions: $FM_SOL_ACTIVE_LIST. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing"
+    fm_lock_release "$lock" || true
     return 1
   fi
   now=$(fm_epoch_seconds_to FM_SOL_CAP_NOW; printf '%s' "$FM_SOL_CAP_NOW")
@@ -350,92 +292,48 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
   # once they are no longer counted they do not need to sit in the file. A
   # malformed row is deliberately left in place for its loud refusal.
   for local_home in "${FM_LOCAL_FIRSTMATE_STATES[@]}"; do
-    fm_sol_cap_registry_prune "$local_home/$FM_SOL_REGISTRY_NAME" "$now"
+    fm_sol_cap_registry_prune "$local_home/$FM_SOL_REGISTRY_NAME"
   done
   if ! fm_sol_cap_registry_claim "$registry" "$id" "$model" "$now"; then
     FM_SOL_CAP_REFUSAL="error: Sol ceiling: the claim of task $id in $registry could not be written; the dispatch was refused rather than launched uncounted"
-    fm_lock_release "$state/$FM_SOL_LOCK_NAME" || true
+    fm_lock_release "$lock" || true
     return 1
   fi
   FM_SOL_CLAIM_CREATED=$id
-  fm_lock_release "$state/$FM_SOL_LOCK_NAME" || true
+  fm_lock_release "$lock" || true
   return 0
 }
 
-# fm_sol_cap_promote <id> <backend> <target> <state-dir>
-# After a successful launch, replace the reservation pid with the worker's
-# own liveness surface: the tmux pane shell's pid for the default tmux
-# backend, and 0 for every backend that does not expose one (age-bound only).
-# A claimed row for <id> exists only for Sol models, so promotion of any
-# other dispatch is a no-op. Atomicity rides the same ceiling lock as the
-# claim, so a parallel dispatch cannot corrupt the rewrite; a failed
-# promotion returns 1 for its caller to warn about, and the row then decays
-# by its stale reservation pid instead.
-fm_sol_cap_promote() {  # <id> <backend> <target> <state-dir>
-  local id=$1 backend=$2 target=$3 state=$4 registry file tmp pid pane model start rc
-  FM_SOL_CAP_PROMOTED=
+fm_sol_cap_promote() {  # <id> <pid or remove> <state-dir>
+  local id=$1 pid=$2 state=$3 registry tmp root lock
   registry=$state/$FM_SOL_REGISTRY_NAME
-  if [ ! -f "$registry" ] || [ ! -r "$registry" ]; then
-    return 0
-  fi
-  grep -Fq -e "${id}$(printf '\t')" "$registry" || return 0
-  fm_sol_cap_lock_acquire "$state/$FM_SOL_LOCK_NAME" "the promotion of task $id" || return 1
-  pid=0
-  if [ "$backend" = tmux ]; then
-    pane=$(tmux list-panes -t "$target" -F '#{pane_pid}' 2>/dev/null | head -n1)
-    case "$pane" in
-    '' | *[!0-9]* | 0) ;;
-    *) pid=$pane ;;
-    esac
-  fi
+  [ -f "$registry" ] || return 0
+  root=$(fm_firstmate_root_home "$FM_HOME") || return 1
+  lock=$root/state/$FM_SOL_LOCK_NAME
+  fm_sol_cap_lock_acquire "$lock" "the promotion of task $id" || return 1
   tmp=$registry.tmp.$$
-  grep -Fv -e "${id}$(printf '\t')" "$registry" > "$tmp" 2>/dev/null
-  rc=$?
-  [ "$rc" -eq 0 ] || [ "$rc" -eq 1 ] || {
+  if ! awk -F'\t' -v OFS='\t' -v id="$id" -v pid="$pid" '
+    $1 == id { if (pid == "remove") next; $4 = pid }
+    {print}
+  ' "$registry" > "$tmp" || ! mv -- "$tmp" "$registry"; then
     rm -f -- "$tmp"
-    FM_SOL_CAP_REFUSAL="error: Sol ceiling: the promotion of task $id could not rewrite $registry"
-    fm_lock_release "$state/$FM_SOL_LOCK_NAME" || true
-    return 1
-  }
-  model=$(awk -F'\t' -v id="$id" '$1 == id {print $2; exit}' "$registry")
-  start=$(awk -F'\t' -v id="$id" '$1 == id {print $3; exit}' "$registry")
-  if ! printf '%s\t%s\t%s\t%s\n' "$id" "$model" "$start" "$pid" >> "$tmp"; then
-    rm -f -- "$tmp"
-    FM_SOL_CAP_REFUSAL="error: Sol ceiling: the promotion of task $id could not rewrite $registry"
-    fm_lock_release "$state/$FM_SOL_LOCK_NAME" || true
+    fm_lock_release "$lock" || true
     return 1
   fi
-  mv -- "$tmp" "$registry" || {
-    rm -f -- "$tmp"
-    FM_SOL_CAP_REFUSAL="error: Sol ceiling: the promotion of task $id could not rewrite $registry"
-    fm_lock_release "$state/$FM_SOL_LOCK_NAME" || true
-    return 1
-  }
-  FM_SOL_CAP_PROMOTED=$id
-  fm_lock_release "$state/$FM_SOL_LOCK_NAME" || true
-  return 0
+  fm_lock_release "$lock"
 }
 
 # fm_sol_cap_registry_prune <registry-file> <now>
-# Drop the registry rows that no longer hold a live session (stale by their
-# age or by their dead pid, the ceiling's current release path), so old rows
-# do not accumulate forever. Every otherwise live row stays, and so does
-# every malformed row, because pruning it silently would hide a disruption
-# from fm_sol_cap_active_count's loud refusal. Called under the ceiling
-# claim lock; the rewrite lands in one atomic mv.
-fm_sol_cap_registry_prune() {  # <registry-file> <now>
-  local file=$1 now=$2 tmp rc
+fm_sol_cap_registry_prune() {  # <registry-file>
+  local file=$1 tmp rc
   [ -f "$file" ] && [ -r "$file" ] || return 0
   tmp=$file.tmp.prune.$$
   # One pass: malformed rows (kept loud) print first, live rows print, stale
   # rows fall through silently.
-  awk -F'\t' -v now="$now" -v max="$FM_SOL_STALE_SECONDS" '
+  awk -F'\t' '
     $1 == "" {next}
     $2 == "" || $3 !~ /^[0-9]+$/ || ($4 != "" && $4 !~ /^[0-9]+$/) {print; next}
     {
-      start = $3 + 0
-      if (start > now && start - now > 3600) next
-      if ((start <= now ? now - start : 0) >= max) next
       if ($4 != "" && $4 + 0 > 0 && system("kill -0 " $4 " >/dev/null 2>&1") != 0) next
       print
     }' \
@@ -472,6 +370,12 @@ fm_sol_cap_cli() {
     ;;
   ceiling)
     fm_sol_cap_ceiling "${2:?params: ceiling <config-dir>}" && printf '%s\n' "$FM_SOL_CAP"
+    ;;
+  run)
+    local id=$2 state=$3
+    shift 3
+    fm_sol_cap_promote "$id" "$$" "$state" || return 1
+    exec "$@"
     ;;
   refuse-claim)
     [ "$#" -eq 7 ] || {
