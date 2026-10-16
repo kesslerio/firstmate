@@ -613,14 +613,23 @@ fm_backend_cmux_window_of_workspace() {  # <workspace_id> -> "<window_id> <count
 # leaving that window a fresh default workspace (never an fm-<home>- title, so
 # recovery/list_live ignore it) - cmux's own "closed the last tab" outcome.
 fm_backend_cmux_workspace_absent() {
-  local wsid=$1 label=${2:-} inventory title=
+  local wsid=$1 label=${2:-} inventory title= windows window_ids wid
   [ -z "$label" ] || title=$(fm_backend_cmux_scoped_title "$label")
-  inventory=$(fm_backend_cmux_cli workspace list --json --id-format uuids 2>/dev/null) || return 1
-  printf '%s' "$inventory" | jq -e --arg id "$wsid" --arg title "$title" '
-    type == "object" and (.workspaces | type == "array")
-    and all(.workspaces[]; (.id | type == "string") and (.title | type == "string"))
-    and all(.workspaces[]; .id != $id and ($title == "" or .title != $title))
-  ' >/dev/null 2>&1
+  windows=$(fm_backend_cmux_cli list-windows --json --id-format uuids 2>/dev/null) || return 1
+  window_ids=$(printf '%s' "$windows" | jq -r '
+    if type == "array" and all(.[]; (.id | type == "string") and (.id | length > 0) and (.id | contains("\n") | not))
+    then map(.id) | join("\n") else error("invalid window inventory") end
+  ' 2>/dev/null) || return 1
+  while IFS= read -r wid; do
+    [ -n "$wid" ] || continue
+    inventory=$(fm_backend_cmux_cli workspace list --json --id-format uuids --window "$wid" 2>/dev/null) || return 1
+    printf '%s' "$inventory" | jq -e --arg id "$wsid" --arg title "$title" '
+      type == "object" and (.workspaces | type == "array")
+      and all(.workspaces[]; (.id | type == "string") and (.title | type == "string"))
+      and all(.workspaces[]; .id != $id and ($title == "" or .title != $title))
+    ' >/dev/null 2>&1 || return 1
+  done <<< "$window_ids"
+  return 0
 }
 
 fm_backend_cmux_kill() {  # <target> [unused] [expected-label]

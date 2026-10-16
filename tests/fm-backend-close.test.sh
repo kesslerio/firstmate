@@ -18,13 +18,20 @@ TMP_ROOT=$(fm_test_tmproot fm-backend-close)
   fm_backend_cmux_target_ready() { fm_backend_cmux_parse_target "$1"; }
   fm_backend_cmux_scoped_title() { printf '%s' "$1"; }
   fm_backend_cmux_cli() {
-    if [ "$1 $2" = 'workspace list' ]; then
+    if [ "$1" = list-windows ]; then
       [ "$inventory_status" = 0 ] || return 1
-      if [ -e "$TMP_ROOT/present" ]; then
-        printf '{"workspaces":[{"id":"workspace","title":"fm-task"}]}'
-      else
-        printf '{"workspaces":[]}'
+      printf '[{"id":"current"},{"id":"other"}]'
+    elif [ "$1 $2" = 'workspace list' ]; then
+      [ "$inventory_status" = 0 ] || return 1
+      if [ "${7:-}" = other ]; then
+        [ "$other_status" = 0 ] || return 1
+        [ "$other_malformed" = 0 ] || { printf '{}'; return 0; }
+        if [ -e "$TMP_ROOT/present" ]; then
+          printf '{"workspaces":[{"id":"%s","title":"fm-task"}]}' "$test_workspace_id"
+          return 0
+        fi
       fi
+      printf '{"workspaces":[]}'
     elif [ "$1" = close-workspace ]; then
       [ "$close_status" = 0 ] || return 1
       [ "$effective" = 0 ] || rm -f "$TMP_ROOT/present"
@@ -33,7 +40,7 @@ TMP_ROOT=$(fm_test_tmproot fm-backend-close)
     fi
   }
   touch "$TMP_ROOT/present"
-  inventory_status=0 close_status=1 effective=0
+  inventory_status=0 close_status=1 effective=0 other_status=0 other_malformed=0 test_workspace_id=workspace
   check_close cmux workspace:surface 1 '' fm-task
   close_status=0
   check_close cmux workspace:surface 1 '' fm-task
@@ -46,12 +53,23 @@ TMP_ROOT=$(fm_test_tmproot fm-backend-close)
   inventory_status=0
   touch "$TMP_ROOT/present"
   check_close cmux workspace:surface 1 '' fm-task
+  test_workspace_id=renumbered
+  check_close cmux workspace:surface 1 '' fm-task
+  fm_backend_cmux_window_of_workspace() { return 0; }
   fm_backend_cmux_target_ready() { fm_backend_cmux_parse_target "$1"; }
+  check_close cmux workspace:surface 1 '' fm-task
+  rm -f "$TMP_ROOT/present"
+  other_status=1
+  check_close cmux workspace:surface 1 '' fm-task
+  other_status=0 other_malformed=1
+  check_close cmux workspace:surface 1 '' fm-task
+  other_malformed=0
+  check_close cmux workspace:surface 0 '' fm-task
   fm_backend_cmux_window_of_workspace() { printf 'window 1'; }
   close_status=1
   check_close cmux workspace:surface 1 '' fm-task
 ) || exit 1
-pass "cmux requires confirmed absence after closes and accepts already-absent targets"
+pass "cmux proves absence across every window and refuses incomplete inventories"
 
 (
   . "$ROOT/bin/backends/zellij.sh"
