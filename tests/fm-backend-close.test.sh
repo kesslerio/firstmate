@@ -10,29 +10,63 @@ check_close() {
   expect_code "$expected" "$rc" "$backend close reported an incorrect stop status"
 }
 
+TMP_ROOT=$(fm_test_tmproot fm-backend-close)
+
 (
   . "$ROOT/bin/backends/cmux.sh"
   fm_backend_cmux_window_of_workspace() { printf 'window 2'; }
   fm_backend_cmux_target_ready() { fm_backend_cmux_parse_target "$1"; }
-  fm_backend_cmux_cli() { return "$close_status"; }
-  close_status=1
+  fm_backend_cmux_scoped_title() { printf '%s' "$1"; }
+  fm_backend_cmux_cli() {
+    if [ "$1 $2" = 'workspace list' ]; then
+      [ "$inventory_status" = 0 ] || return 1
+      if [ -e "$TMP_ROOT/present" ]; then
+        printf '{"workspaces":[{"id":"workspace","title":"fm-task"}]}'
+      else
+        printf '{"workspaces":[]}'
+      fi
+    elif [ "$1" = close-workspace ]; then
+      [ "$close_status" = 0 ] || return 1
+      [ "$effective" = 0 ] || rm -f "$TMP_ROOT/present"
+    else
+      return "$close_status"
+    fi
+  }
+  touch "$TMP_ROOT/present"
+  inventory_status=0 close_status=1 effective=0
   check_close cmux workspace:surface 1 '' fm-task
   close_status=0
+  check_close cmux workspace:surface 1 '' fm-task
+  effective=1
   check_close cmux workspace:surface 0 '' fm-task
+  fm_backend_cmux_target_ready() { return 1; }
+  check_close cmux workspace:surface 0 '' fm-task
+  inventory_status=1
+  check_close cmux workspace:surface 1 '' fm-task
+  inventory_status=0
+  touch "$TMP_ROOT/present"
+  check_close cmux workspace:surface 1 '' fm-task
+  fm_backend_cmux_target_ready() { fm_backend_cmux_parse_target "$1"; }
   fm_backend_cmux_window_of_workspace() { printf 'window 1'; }
   close_status=1
   check_close cmux workspace:surface 1 '' fm-task
-  fm_backend_cmux_target_ready() { return 1; }
-  check_close cmux workspace:surface 1 '' fm-task
 ) || exit 1
-pass "cmux refuses failed closes, failed sibling creation and unresolved targets"
+pass "cmux requires confirmed absence after closes and accepts already-absent targets"
 
 (
   . "$ROOT/bin/backends/zellij.sh"
   zellij() { printf 'firstmate\n'; return "$inventory_status"; }
   fm_backend_zellij_tab_for_pane() { printf '3'; }
   fm_backend_zellij_tab_matches_label() { return "$label_status"; }
-  fm_backend_zellij_cli() { return "$close_status"; }
+  fm_backend_zellij_scoped_title() { printf '%s' "$1"; }
+  fm_backend_zellij_cli() {
+    case "$3" in
+      list-panes) printf '%s' "$test_panes"; return "$read_status" ;;
+      list-tabs) printf '%s' "$test_tabs"; return "$read_status" ;;
+      *) return "$close_status" ;;
+    esac
+  }
+  test_panes='[{"id":7}]' test_tabs='[{"tab_id":3,"name":"fm-task"}]' read_status=0
   inventory_status=0 label_status=0 close_status=1
   check_close zellij firstmate:7 1 3 fm-task
   check_close zellij firstmate:7 1
@@ -44,6 +78,14 @@ pass "cmux refuses failed closes, failed sibling creation and unresolved targets
   close_status=0
   check_close zellij firstmate:7 0
   label_status=1
+  check_close zellij firstmate:7 1 3 fm-task
+  test_panes='[]' test_tabs='[]'
+  check_close zellij firstmate:7 0 3 fm-task
+  close_status=1
+  check_close zellij firstmate:7 0
+  read_status=1
+  check_close zellij firstmate:7 1 3 fm-task
+  read_status=0 test_panes='{}'
   check_close zellij firstmate:7 1 3 fm-task
   inventory_status=1
   check_close zellij firstmate:7 1

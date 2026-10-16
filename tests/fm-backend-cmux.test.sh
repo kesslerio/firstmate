@@ -983,6 +983,7 @@ test_kill_closes_workspace_directly_when_not_last() {
   cmux_windows_response "$dir" 1 "eeeeeeee-0000-0000-0000-000000000000" 2
   # 2: workspace list --window eeeeeeee -> contains the target
   cmux_workspace_list_response "$dir" 2 "aaaaaaaa-0000-0000-0000-000000000000" "the-task" "ffffffff-0000-0000-0000-000000000000" "other"
+  cmux_workspace_list_response "$dir" 4
   fb=$(make_cmux_fakebin "$dir")
   PATH="$fb:$PATH" FM_CMUX_LOG="$dir/log" FM_CMUX_RESPONSES="$dir/responses" \
     bash -c '. "$0/bin/backends/cmux.sh"; fm_backend_cmux_kill "aaaaaaaa-0000-0000-0000-000000000000:bbbbbbbb-1111-1111-1111-111111111111"' "$ROOT"
@@ -1004,6 +1005,7 @@ test_kill_adds_sibling_when_last_in_window() {
   cmux_windows_response "$dir" 1 "eeeeeeee-0000-0000-0000-000000000000" 2
   # 2: workspace list --window eeeeeeee -> contains the target
   cmux_workspace_list_response "$dir" 2 "aaaaaaaa-0000-0000-0000-000000000000" "the-task"
+  cmux_workspace_list_response "$dir" 5
   fb=$(make_cmux_fakebin "$dir")
   PATH="$fb:$PATH" FM_CMUX_LOG="$dir/log" FM_CMUX_RESPONSES="$dir/responses" \
     bash -c '. "$0/bin/backends/cmux.sh"; fm_backend_cmux_kill "aaaaaaaa-0000-0000-0000-000000000000:bbbbbbbb-1111-1111-1111-111111111111"' "$ROOT"
@@ -1050,6 +1052,7 @@ test_kill_recovers_stale_target_by_label() {
   # window_of_workspace on the REFRESHED id: 4 list-windows (not last), 5 workspace list --window.
   cmux_windows_response "$dir" 4 "eeeeeeee-0000-0000-0000-000000000000" 2
   cmux_workspace_list_response "$dir" 5 "cccccccc-2222-2222-2222-222222222222" "$title" "ffffffff-0000-0000-0000-000000000000" "other"
+  cmux_workspace_list_response "$dir" 7
   fb=$(make_cmux_fakebin "$dir")
   PATH="$fb:$PATH" FM_CMUX_LOG="$dir/log" FM_CMUX_RESPONSES="$dir/responses" \
     bash -c '. "$0/bin/backends/cmux.sh"; fm_backend_cmux_kill "aaaaaaaa-0000-0000-0000-000000000000:bbbbbbbb-1111-1111-1111-111111111111" "" fm-label' "$ROOT"
