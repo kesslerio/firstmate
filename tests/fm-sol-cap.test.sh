@@ -1,15 +1,4 @@
 #!/usr/bin/env bash
-# Behavior tests for the Sol session ceiling: concurrent Sol dispatches stop
-# by construction at the four-session ceiling the captain filed (2026-09-29,
-# "four-session Sol ceiling"), not by attention (bin/fm-sol-cap-lib.sh owns
-# the contract; bin/fm-spawn.sh runs the hook after its model axis resolves).
-#
-# Every case drives the real bin/fm-spawn.sh against a real project clone
-# with an origin, fake tmux and treehouse binaries that log every call, and
-# a fake tmux list-panes that hands back a live pane pid. A refused spawn is
-# judged by what it left behind - no task record, no rendered launch brief,
-# no endpoint, no worktree allocation - and by its refusal naming the active
-# sessions and their ages, never by wording alone.
 set -u
 
 # shellcheck source=tests/lib.sh
@@ -76,10 +65,6 @@ TOML
   done
 }
 
-# A case: one home, a project clone with an origin, and fake tmux/treehouse
-# that record every call so a refusal can be proved to have created nothing.
-# The fake tmux answers list-panes with a pid the test keeps alive, so a
-# launched Sol session's registry row is promoted off its reservation pid.
 make_case() {  # <name> [task-id...]
   local name=$1 case_dir fakebin
   shift
@@ -142,8 +127,6 @@ SH
   printf '%s\n' "$case_dir"
 }
 
-# A live Sol session already in the registry: pid 0 keeps the row age-bound,
-# which is exactly the shape a registered remote worker leaves behind.
 write_sol_row() {  # <home> <id> <start-epoch> [pid] [model]
   local home=$1 id=$2 start=$3 pid=${4:-0} model=${5:-gpt-6.1-sol}
   printf '%s\t%s\t%s\t%s\n' "$id" "$model" "$start" "$pid" >> "$home/state/sol-sessions.tsv"
@@ -197,8 +180,6 @@ assert_nothing_created() {  # <case-dir> <id> <calls-before> <worktrees-before>
   assert_equals "$worktrees" "$(worktree_list "$case_dir")" "a refused spawn left a git worktree for $id"
 }
 
-# The test's pane pid: the fake tmux hands it back for list-panes, promoting
-# a launched Sol session's registry row off its reservation pid.
 FM_SOL_TEST_LIVE_PID=$$
 
 fresh_start() {
@@ -207,9 +188,6 @@ fresh_start() {
 
 # --- cases ------------------------------------------------------------------
 
-# A Sol dispatch below the ceiling launches the worker, claims its registry
-# row, and promotes that row's pid off the reservation onto the worker's own
-# pane shell, so the slot is tied to the live worker, not to the spawn.
 test_under_cap_sol_spawn_launches_and_claims_its_slot() {
   local case_dir out pid
   case_dir=$(make_case under-cap task-c)
@@ -220,11 +198,11 @@ test_under_cap_sol_spawn_launches_and_claims_its_slot() {
   assert_contains "$out" "spawned task-c" "an under-cap Sol spawn did not launch the worker"
   kill -0 "$FM_SOL_TEST_LIVE_PID" 2>/dev/null || fail "the test's pane pid is not alive"
   pid=$(registry_row_field "$case_dir" task-c 4)
-  [ "$pid" = "$FM_SOL_TEST_LIVE_PID" ] ||
+  [ "$pid" = 0 ] ||
     fail "a launched Sol session's registry row kept its reservation pid: $pid"
   registry_has_row "$case_dir" task-c gpt-6.1-sol ||
     fail "a launched Sol session did not claim its registry row"
-  pass "a Sol spawn under the ceiling launches, claims, and promotes its slot"
+  pass "a Sol delivery under the ceiling retains a conservative claim"
 }
 
 # The ceiling refuses the fifth concurrent Sol dispatch with one actionable
@@ -252,9 +230,6 @@ test_cap_refuses_the_fifth_and_names_its_sessions() {
   pass "a dispatch at the ceiling is refused, naming sessions and ages, and creates nothing"
 }
 
-# The two staleness rules are the ceiling's release path: an entry older than
-# 6h and an entry whose recorded pid is dead do not count against the cap,
-# and a passing spawn prunes both so the registry stays bounded.
 test_stale_entries_do_not_count() {
   local case_dir out old sleep_lab
   case_dir=$(make_case stale task-c)
@@ -262,10 +237,8 @@ test_stale_entries_do_not_count() {
   write_sol_row "$case_dir/home" s2 "$(fresh_start)"
   write_sol_row "$case_dir/home" s3 "$(fresh_start)"
   old=$(( "$(fresh_start)" - 21601 ))
-  write_sol_row "$case_dir/home" aged-junk "$old"
-  sleep_lab=$(sleep 60 & echo $!)
-  kill "$sleep_lab" 2>/dev/null || true
-  wait "$sleep_lab" 2>/dev/null || true
+  write_sol_row "$case_dir/home" aged-junk "$old" 99999999
+  sleep_lab=99999998
   write_sol_row "$case_dir/home" dead-junk "$(fresh_start)" "$sleep_lab"
   out=$(spawn_sol_ship "$case_dir" task-c) || fail "a spawn whose ceiling has stale room was refused: $out"
   assert_contains "$out" "spawned task-c" "a spawn freed by stale entries did not launch"
@@ -277,7 +250,7 @@ test_stale_entries_do_not_count() {
     fail "a stale-by-dead-pid row stayed in the registry"
   [ "$(wc -l < "$case_dir/home/state/sol-sessions.tsv" | tr -d ' ')" -eq 4 ] ||
     fail "the registry did not end with 3 live rows plus the new claim"
-  pass "stale entries (older than 6h, or dead pid) do not count and are pruned"
+  pass "dead workers are pruned regardless of age"
 }
 
 # A non-Sol model never touches the ceiling: a GLM-routed dispatch passes a
@@ -290,6 +263,7 @@ test_non_sol_model_never_claims_a_slot() {
   write_sol_row "$case_dir/home" s3 "$(fresh_start)"
   write_sol_row "$case_dir/home" s4 "$(fresh_start)"
   cp "$case_dir/home/state/sol-sessions.tsv" "$TMP_ROOT/glm-registry-before.tsv"
+  write_sol_row "$case_dir/home" task-c 1 "$$"
   out=$(spawn_sol_ship "$case_dir" task-c gpt-5.6-luna) || rc=$?
   expect_code 0 "$rc" "a non-Sol dispatch was refused by the Sol ceiling: $out"
   assert_contains "$out" "spawned task-c" "a non-Sol dispatch did not launch"
@@ -299,9 +273,6 @@ test_non_sol_model_never_claims_a_slot() {
   pass "a non-Sol model dispatch passes a full ceiling and touches no registry row"
 }
 
-# config/sol-cap in the dispatching home raises or lowers the ceiling without
-# a code edit: 2 refuses the third, and removing the file restores the
-# captain's filed default of 4.
 test_config_sol_cap_overrides_the_filed_default() {
   local case_dir out before rc=0
   case_dir=$(make_case override task-c)
@@ -392,6 +363,74 @@ test_unread_ceiling_or_table_refuses_instead_of_counting_nothing() {
   pass "an unread ceiling or dispatch table refuses instead of counting nothing"
 }
 
+test_review_regressions() {
+  local case_dir out rc=0 worker i
+  case_dir=$(make_case review docs)
+  write_sol_row "$case_dir/home" build-docs 1 "$$"
+  out=$(lib_refuse_claim "$case_dir" docs gpt-6.1-sol) || fail "$out"
+  [ "$(registry_row_field "$case_dir" build-docs 4)" = "$$" ] || fail "suffix collision removed live worker"
+  FM_HOME="$case_dir/home" bash "$ROOT/bin/fm-sol-cap-lib.sh" run docs "$case_dir/home/state" sleep 30 &
+  worker=$!
+  for ((i=0; i<100; i++)); do
+    [ "$(registry_row_field "$case_dir" docs 4)" = "$worker" ] && break
+    sleep 0.02
+  done
+  [ "$(registry_row_field "$case_dir" docs 4)" = "$worker" ] || fail "worker did not acquire reservation"
+  kill "$worker"
+  wait "$worker" 2>/dev/null || true
+  out=$(lib_refuse_claim "$case_dir" another gpt-6.1-sol) || fail "$out"
+  [ -z "$(registry_row_field "$case_dir" docs 4)" ] || fail "exited worker retained occupancy"
+  for i in 1 2 3; do write_sol_row "$case_dir/home" "old-$i" 1 "$$"; done
+  rc=0
+  out=$(lib_refuse_claim "$case_dir" fifth gpt-6.1-sol) || rc=$?
+  expect_code 1 "$rc" "live old workers did not hold ceiling"
+  printf '5\n' > "$case_dir/home/config/sol-cap"
+  rc=0
+  FM_HOME="$case_dir/home" bash "$ROOT/bin/fm-sol-cap-lib.sh" ceiling "$case_dir/home/config" >/dev/null || rc=$?
+  expect_code 1 "$rc" "ceiling above four was accepted"
+  printf '{broken\n' > "$case_dir/home/config/crew-dispatch.json"
+  out=$(lib_refuse_claim "$case_dir" glm glm-5) || fail "GLM blocked by broken table: $out"
+  out=$(lib_refuse_claim "$case_dir" qwen qwen3) || fail "qwen blocked by broken table: $out"
+  pass "exact identities, worker lifetime, live age, bounded overrides and non-Sol isolation"
+}
+
+test_shared_home_admission() {
+  local case_dir root mate out rc=0 a b successes=0 i
+  case_dir=$(make_case shared)
+  root=$case_dir/home
+  mate=$case_dir/mate
+  make_home "$mate"
+  printf '%s\n' schema=fm-secondmate-parent.v1 route=local "parent_home=$root" > "$mate/.fm-secondmate-parent"
+  printf -- '- mate - local mate (home: %s; scope: work; projects: project; added 2026-09-01)\n' "$mate" > "$root/data/secondmates.md"
+  for i in 1 2 3; do write_sol_row "$root" "live-$i" 1 "$$"; done
+  write_sol_row "$mate" same 1 "$$"
+  out=$(lib_refuse_claim "$case_dir" same gpt-6.1-sol) || rc=$?
+  expect_code 1 "$rc" "same id in another home was excluded"
+  rm "$mate/state/sol-sessions.tsv"
+  (
+    . "$ROOT/bin/fm-wake-lib.sh"
+    . "$ROOT/bin/fm-secondmate-registry-lib.sh"
+    . "$ROOT/bin/fm-sol-cap-lib.sh"
+    FM_HOME=$root
+    fm_sol_cap_refuse_and_claim root-task ship codex gpt-6.1-sol "$root/config" "$root/state"
+  ) > "$case_dir/root.out" 2>&1 &
+  a=$!
+  (
+    . "$ROOT/bin/fm-wake-lib.sh"
+    . "$ROOT/bin/fm-secondmate-registry-lib.sh"
+    . "$ROOT/bin/fm-sol-cap-lib.sh"
+    FM_HOME=$mate
+    fm_sol_cap_refuse_and_claim mate-task ship codex gpt-6.1-sol "$mate/config" "$mate/state"
+  ) > "$case_dir/mate.out" 2>&1 &
+  b=$!
+  wait "$a" && successes=$((successes + 1))
+  wait "$b" && successes=$((successes + 1))
+  [ "$successes" = 1 ] || fail "concurrent homes admitted $successes workers into one slot"
+  pass "local homes share admission lock and preserve distinct task identities"
+}
+
+test_shared_home_admission
+test_review_regressions
 test_under_cap_sol_spawn_launches_and_claims_its_slot
 test_cap_refuses_the_fifth_and_names_its_sessions
 test_stale_entries_do_not_count

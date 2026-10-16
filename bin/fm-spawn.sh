@@ -1266,6 +1266,11 @@ spawn_remote_secondmate() {
   fi
   launch_args=("$id" "$harness" "$model" "$effort" "$backend")
   [ -z "$remote_traceparent" ] || launch_args+=("$remote_traceparent")
+  if [ "$FM_SOL_CLAIM_CREATED" = "$id" ]; then
+    fm_sol_cap_promote "$id" 0 "$STATE" || return 1
+  else
+    fm_sol_cap_promote "$id" remove "$STATE" || return 1
+  fi
   if out=$("$SCRIPT_DIR/fm-on.sh" "$id" fm-remote-secondmate-control.sh launch \
     "${launch_args[@]}" </dev/null 2>&1); then
     rc=0
@@ -1361,13 +1366,6 @@ spawn_remote_secondmate() {
     return 1
   fi
   [ ! -e "$CONFIG/fleet-ledger" ] || FM_HOME=$FM_HOME FM_STATE_OVERRIDE=$STATE FM_CONFIG_OVERRIDE=$CONFIG "$SCRIPT_DIR/fm-fleet-ledger.sh" dispatched "$id" secondmate "" "$harness" "${model#-}" || true
-  if ! fm_sol_cap_promote "$id" "$remote_backend" "$remote_target" "$STATE"; then
-    # The remote home exposes no pane pid this home can read, so a failed
-    # promotion leaves the age-bound reservation only; warn and continue
-    # rather than tearing down a launched worker.
-    [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
-    echo "warning: Sol ceiling: remote secondmate $id's slot stays age-bound only (bin/fm-sol-cap-lib.sh)" >&2
-  fi
   echo "spawned $id harness=$harness kind=secondmate mode=secondmate yolo=off window=remote:$id worktree=$home remote=$host backend=$remote_backend"
   return 0
 }
@@ -6008,6 +6006,9 @@ if [ -e "$LAUNCH_FILE" ] || [ -L "$LAUNCH_FILE" ]; then
   echo "error: task launch file $LAUNCH_FILE already exists; refusing to replace it" >&2
   exit 1
 fi
+if [ "$FM_SOL_CLAIM_CREATED" = "$ID" ]; then
+  LAUNCH="FM_HOME=$(shell_quote "$FM_HOME") bash $(shell_quote "$SCRIPT_DIR/fm-sol-cap-lib.sh") run $(shell_quote "$ID") $(shell_quote "$STATE") /bin/sh -c $(shell_quote "$LAUNCH")"
+fi
 if ! (umask 077 && printf '%s\n' "$LAUNCH" >"$LAUNCH_STAGE" &&
   chmod 0600 "$LAUNCH_STAGE" && mv -f "$LAUNCH_STAGE" "$LAUNCH_FILE"); then
   rm -f "$LAUNCH_STAGE"
@@ -6048,6 +6049,11 @@ spawn_orca_wait_launch_consumed() {
     sleep 0.2
   done
 }
+if [ "$FM_SOL_CLAIM_CREATED" = "$ID" ]; then
+  fm_sol_cap_promote "$ID" 0 "$STATE" || exit 1
+else
+  fm_sol_cap_promote "$ID" remove "$STATE" || exit 1
+fi
 SPAWN_LAUNCH_SENT=1
 # errexit is on here: a failed send still exits, and Orca source mode first
 # removes the credential-bearing file the pane never received.
@@ -6219,12 +6225,4 @@ SPAWN_ACCOUNT=
 [ -z "$WORKER_ACCOUNT_PROVIDER" ] || SPAWN_ACCOUNT="$SPAWN_ACCOUNT account_provider=$WORKER_ACCOUNT_PROVIDER"
 # Opt-in fleet activity ledger (docs/fleet-ledger.md); off costs one file test.
 [ ! -e "$CONFIG/fleet-ledger" ] || [ "$RELAUNCH" -eq 1 ] || FM_HOME=$FM_HOME FM_STATE_OVERRIDE=$STATE FM_CONFIG_OVERRIDE=$CONFIG "$SCRIPT_DIR/fm-fleet-ledger.sh" dispatched "$ID" "$KIND" "${PROJ_ABS##*/}" "$HARNESS" "$MODEL" || true
-# Sol session ceiling: the launched worker now owns its own liveness surface
-# (bin/fm-sol-cap-lib.sh). A tmux pane shell keeps the slot tied to the
-# worker's process; a backend without an exposed pane pid keeps the slot
-# age-bound only. A failed promotion warns and keeps the worker launched.
-if ! fm_sol_cap_promote "$ID" "$BACKEND" "$T" "$STATE"; then
-  [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
-  echo "warning: Sol ceiling: task $ID's session slot stays age-bound only (bin/fm-sol-cap-lib.sh)" >&2
-fi
 echo "spawned $ID harness=$HARNESS kind=$KIND$SPAWN_DELIVERY window=$META_WINDOW worktree=$WT$SPAWN_ACCOUNT"

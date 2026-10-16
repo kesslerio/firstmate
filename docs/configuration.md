@@ -1291,8 +1291,12 @@ The set is derived at call time from `config/crew-dispatch.json`'s rule and defa
 
 - The count registry is one TSV file per Firstmate home on this machine: `<state>/sol-sessions.tsv`, one row per Sol session `<session-id>\t<model>\t<start-epoch>\t<pid>`, where the task id is the session key.
 - The guard counts live rows across every local Firstmate home's state directory on this machine (the same enumeration `bin/fm-project-capacity-lib.sh` counts through), so local homes share one ceiling and remote homes are never walked because their workers run on another machine; a remote secondmate is counted in the dispatching home.
-- A registered stale row does not count: older than 6h, or its recorded pid is not alive, or its start epoch lies more than 1h in the future (a bogus-clock row reads as gone rather than wedging every dispatch).
-- A fresh spawn claims its row atomically under `<state>/.sol-cap.lock` during the guarded spawn, with the spawning `fm-spawn.sh` process's pid as the reservation, which dies with a failed dispatch; after the launch, the row is promoted to the worker's tmux pane shell's pid (the default tmux backend), or 0 for a backend that exposes no pane pid, keeping the slot age-bound only.
+- A registered stale row does not count: its recorded positive pid is no longer alive; age never releases a live worker.
+- A fresh spawn claims its row atomically under the local root home's `state/.sol-cap.lock`, with the spawning process's pid until launch delivery begins.
+- Before delivery, the reservation becomes conservative (pid 0), so an uncertain delivery or later spawn error cannot free a running worker's slot.
+- Local launch commands transfer that reservation to their own process before starting the worker; exiting the worker releases occupancy even while its interactive pane remains open.
+- Remote or uncertain deliveries keep pid 0 and require reconciliation before their slot can be released; they never expire by age.
+- Replacing a task with a non-Sol model removes its earlier Sol row.
 - Passing spawns prune stale rows from every walked registry, so old rows do not accumulate.
 - A malformed registry row (bad shape) refuses every Sol dispatch with the row named rather than silently undercounting; staleness is release, but a broken row is a disruption, not a free slot.
 
@@ -1309,7 +1313,7 @@ FM_HOME=$FM_HOME bin/fm-sol-cap-lib.sh ceiling   $FM_HOME/config
 **Ceiling and the override**
 
 - The default is 4, `FM_SOL_CAP_DEFAULT` in `bin/fm-sol-cap-lib.sh`, in one place.
-- `config/sol-cap` in the dispatching home overrides it with one positive integer, so a captain ceiling change needs no code edit.
+- `config/sol-cap` in the dispatching home may lower it with one integer from 1 through 4; larger values are refused.
 - A ceiling file that is present but unreadable, malformed, or an unreadable `config/crew-dispatch.json` refuses every Sol dispatch loudly rather than guessing or counting nothing.
 
 **Boundary**: the no-mistakes daemon's internal gate/review agent spawns decode their own agent surface in the daemon's global config (`agent:`, `agent_config:`, `agent_path_override` in the operating no-mistakes config.yaml), its binary lives outside this repository, and a task may not administer it, so those spawns stay outside this count until whoever owns that daemon instance wires a hook to conform to this contract.
