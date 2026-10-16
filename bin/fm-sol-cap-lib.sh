@@ -262,7 +262,7 @@ fm_sol_cap_registry_claim() {  # <registry-file> <id> <model> <now>
 # process's pid as the reservation. An unavailable model set, ceiling, count,
 # or claim lock refuses loudly rather than launching possibly uncounted.
 fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <state-dir>
-  local id=$1 harness=$3 model=$4 config=$5 state=$6 registry now lock root local_home existing_pid existing_start
+  local id=$1 harness=$3 model=$4 config=$5 state=$6 reuse=${7:-} registry now lock root local_home existing_pid existing_start
   FM_SOL_CAP_REFUSAL=
   FM_SOL_CLAIM_CREATED=
   [ -n "$model" ] && [ "$model" != default ] || return 0
@@ -296,6 +296,11 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
   existing_pid=$(awk -F'\t' -v id="$id" '$1 == id {print $4; exit}' "$registry" 2>/dev/null || true)
   existing_start=$(awk -F'\t' -v id="$id" '$1 == id {print $3; exit}' "$registry" 2>/dev/null || true)
   if fm_sol_cap_entry_live "$existing_start" "$existing_pid"; then
+    if [ "$reuse" = reuse ]; then
+      FM_SOL_CLAIM_CREATED=$id
+      fm_lock_release "$lock" || true
+      return 0
+    fi
     FM_SOL_CAP_REFUSAL="error: Sol ceiling: task $id already holds a live or uncertain session; confirm its worker stopped through teardown before replacing it"
     fm_lock_release "$lock" || true
     return 1

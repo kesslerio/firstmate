@@ -198,6 +198,7 @@ echo "ALL TESTS PASSED"
 reset_meta
 printf '{"rules":[{"use":{"model":"gpt-6.1-sol"}}]}\n' > "$HOME_DIR/config/crew-dispatch.json"
 for i in 1 2 3 4; do printf 'live-%s\tgpt-6.1-sol\t1\t%s\n' "$i" "$$"; done > "$HOME_DIR/state/sol-sessions.tsv"
+printf 'ios\tgpt-6.1-sol\t1\t99999999\n' >> "$HOME_DIR/state/sol-sessions.tsv"
 OUT=$(run_relaunch ios codex gpt-6.1-sol medium); RC=$?
 expect_code 1 "$RC" "a runtime switch bypassed the full parent ceiling"
 awk -F'\t' '$1 != "live-4"' "$HOME_DIR/state/sol-sessions.tsv" > "$TMP/registry"
@@ -205,6 +206,11 @@ mv "$TMP/registry" "$HOME_DIR/state/sol-sessions.tsv"
 OUT=$(run_relaunch ios codex gpt-6.1-sol medium); RC=$?
 expect_code 0 "$RC" "an admitted Sol runtime switch failed: $OUT"
 assert_equals 0 "$(awk -F'\t' '$1 == "ios" {print $4}' "$HOME_DIR/state/sol-sessions.tsv")" "remote switch did not preserve occupancy"
+OUT=$(FM_HOME="$HOME_DIR" bash "$ROOT/bin/fm-sol-cap-lib.sh" refuse-claim fifth ship codex gpt-6.1-sol "$HOME_DIR/config" "$HOME_DIR/state"); RC=$?
+expect_code 1 "$RC" "stale-row replacement left the switched worker uncounted"
+OUT=$(run_relaunch ios codex gpt-6.1-sol medium); RC=$?
+expect_code 0 "$RC" "an existing live reservation could not be reused: $OUT"
+assert_equals 0 "$(awk -F'\t' '$1 == "ios" {print $4}' "$HOME_DIR/state/sol-sessions.tsv")" "reused occupancy was not preserved before delivery"
 OUT=$(FM_FAKE_RELAUNCH_MODE=refuse run_relaunch ios claude claude-opus-5-5 medium); RC=$?
 expect_code 1 "$RC" "refused remote replacement unexpectedly succeeded"
 assert_equals 0 "$(awk -F'\t' '$1 == "ios" {print $4}' "$HOME_DIR/state/sol-sessions.tsv")" "failed runtime switch released occupancy"
