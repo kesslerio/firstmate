@@ -1299,6 +1299,8 @@ The set is derived at call time from `config/crew-dispatch.json`'s rule and defa
 - Remote or uncertain deliveries keep pid 0 and require reconciliation before their slot can be released; they never expire by age.
 - A Sol retry refuses while its existing worker is live or delivery is uncertain; a non-Sol retry preserves that occupancy.
 - Confirmed endpoint cleanup and remote retirement remove the owned Sol row; failed or uncertain closes retain it.
+- Remote recovery rechecks the recorded route under the spawn locks and retires its conservative claim only for a successful dead or missing verdict.
+- On the remote host, the nested `state/parent-route` registry shares its operational home's count and root lock with that secondmate's crew.
 - Passing spawns prune stale rows from every walked registry, so old rows do not accumulate.
 - A malformed registry row (bad shape) refuses every Sol dispatch with the row named rather than silently undercounting; staleness is release, but a broken row is a disruption, not a free slot.
 

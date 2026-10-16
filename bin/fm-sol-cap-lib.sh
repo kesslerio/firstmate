@@ -144,15 +144,28 @@ fm_sol_cap_entry_live() {  # <start> <pid>
 # homes cannot be enumerated, a registry cannot be read, or a row is
 # malformed, because skipping a home could claim a free slot that another
 # home holds.
+fm_sol_cap_home() {
+  case "$1" in
+    */state/parent-route) printf '%s\n' "${1%/state/parent-route}" ;;
+    *) printf '%s\n' "$FM_HOME" ;;
+  esac
+}
+
 fm_sol_cap_active_count() {  # <first-state>
-  local first=$1 state file id model start pid now age entry
+  local first=$1 state file id model start pid now age entry home
   FM_SOL_COUNT=0
   FM_SOL_ACTIVE_LIST=
   FM_SOL_COUNT_ERROR=
-  fm_local_firstmate_state_dirs "$first" || {
+  home=$(fm_sol_cap_home "$first") || return 1
+  FM_HOME=$home fm_local_firstmate_state_dirs "$first" || {
     FM_SOL_COUNT_ERROR=$FM_LOCAL_FIRSTMATE_ERROR
     return 1
   }
+  for state in "${FM_LOCAL_FIRSTMATE_STATES[@]}"; do
+    [ "$state" != "$home/state/parent-route" ] || continue
+    [ "$state/parent-route" != "$first" ] && [ ! "$state/parent-route" -ef "$first" ] || continue
+    [ ! -d "$state/parent-route" ] || FM_LOCAL_FIRSTMATE_STATES+=("$state/parent-route")
+  done
   fm_epoch_seconds_to FM_SOL_CAP_NOW
   now=$FM_SOL_CAP_NOW
   for state in "${FM_LOCAL_FIRSTMATE_STATES[@]}"; do
@@ -267,7 +280,7 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
     FM_SOL_CAP_REFUSAL="error: Sol ceiling unavailable: $FM_SOL_CEILING_ERROR; task $id with model $model was not dispatched rather than launched against an unread ceiling"
     return 1
   }
-  root=$(fm_firstmate_root_home "$FM_HOME") || return 1
+  root=$(fm_firstmate_root_home "$(fm_sol_cap_home "$state")") || return 1
   lock=$root/state/$FM_SOL_LOCK_NAME
   if ! fm_sol_cap_lock_acquire "$lock" "task $id"; then
     return 1
@@ -309,12 +322,22 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
   return 0
 }
 
+fm_sol_cap_reconcile_remote() {
+  local id=$1 state=$2 scripts=$3 remote_state
+  [ -f "$state/$id.meta" ] && [ -f "$state/$FM_SOL_REGISTRY_NAME" ] || return 0
+  awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$state/$FM_SOL_REGISTRY_NAME" || return 0
+  remote_state=$("$scripts/fm-on.sh" "$id" fm-remote-secondmate-control.sh state "$id" </dev/null 2>/dev/null) || return 0
+  case "$remote_state" in
+    dead | missing) fm_sol_cap_promote "$id" remove "$state" ;;
+  esac
+}
+
 fm_sol_cap_promote() {  # <id> <pid or remove> <state-dir>
   local id=$1 pid=$2 state=$3 registry tmp root lock
   registry=$state/$FM_SOL_REGISTRY_NAME
   [ -f "$registry" ] || return 0
   awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$registry" || return 0
-  root=$(fm_firstmate_root_home "$FM_HOME") || return 1
+  root=$(fm_firstmate_root_home "$(fm_sol_cap_home "$state")") || return 1
   lock=$root/state/$FM_SOL_LOCK_NAME
   fm_sol_cap_lock_acquire "$lock" "the promotion of task $id" || return 1
   tmp=$registry.tmp.$$
