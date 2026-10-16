@@ -1,0 +1,1295 @@
++ set -eu
++ LAB=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
++ bin/fm-lab-home.sh create /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
+/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
++ mkdir -p /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/tmux
++ trap cleanup EXIT
++ TMUX_TMPDIR=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/tmux
++ tmux -L fm-lab new-session -d -s primary -x 120 -y 40 -c /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36 bash
++ TMUX_TMPDIR=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/tmux
++ tmux -L fm-lab new-window -t primary -n fm-recover -c /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36 bash
+++ TMUX_TMPDIR=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/tmux
+++ tmux -L fm-lab display-message -p -t primary '#{socket_path}'
++ SOCKET=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/tmux/tmux-1000/fm-lab
++ export TMUX=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/tmux/tmux-1000/fm-lab,0,0 FM_HOME=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
++ TMUX=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/tmux/tmux-1000/fm-lab,0,0
++ FM_HOME=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
++ source bin/fm-backend.sh
+++ FM_BACKEND_SCRIPT=bin/fm-backend.sh
+++++ dirname bin/fm-backend.sh
++++ cd bin
++++ pwd
+++ FM_BACKEND_LIB_DIR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin
+++ unset FM_BACKEND_SCRIPT
++++ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/..
++++ pwd
+++ FM_BACKEND_DEFAULT_ROOT=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36
+++ FM_ROOT=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36
+++ FM_HOME=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
+++ FM_BACKEND_CONFIG_DIR=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/config
+++ FM_BACKEND_KNOWN='tmux herdr zellij orca cmux'
+++ FM_BACKEND_SPAWN='tmux herdr zellij orca cmux'
+++ FM_BACKEND_CMUX_BUNDLE_ID=com.cmuxterm.app
+++ FM_BACKEND_VISIBLE_CAPTURE='tmux herdr zellij'
++ source bin/fm-wake-lib.sh
++++ d=bin
++++ '[' bin '!=' bin/fm-wake-lib.sh ']'
++++ cd bin
++++ pwd
+++ FM_WAKE_LIB_DIR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin
++++ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/..
++++ pwd
+++ FM_WAKE_DEFAULT_ROOT=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36
+++ FM_ROOT=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36
+++ FM_HOME=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
+++ STATE=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
+++ FM_WAKE_QUEUE=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.wake-queue
+++ FM_WAKE_QUEUE_LOCK=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.wake-queue.lock
+++ FM_LOCK_STALE_AFTER=2
+++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-path-lib.sh
++++ uname
+++ _FM_UNAME=Linux
+++ mkdir -p /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
+++ '[' 5 -gt 4 ']'
+++ FM_WATCHER_MATCHED_IDENTITY=
+++ FM_WATCHER_HEALTHY_PID=
+++ FM_WATCHER_HEALTHY_IDENTITY=
+++ FM_WATCHER_VERDICT_OK=false
+++ FM_WATCHER_VERDICT_REASON=stale-beacon
+++ FM_RECOVERY_MARKER_TOKEN=
+++ FM_RECOVERY_MARKER_ACTION=none
+++ FM_RECOVERY_MARKER_WRITTEN_TOKEN=
+++ FM_WAKE_APPEND_RECOVERY_PREVIOUS_TOKEN=
+++ FM_WAKE_APPEND_RECOVERY_PUBLISHED_TOKEN=
+++ FM_RECOVERY_HANDOVER_TOKEN=
+++ FM_RECOVERY_HANDOVER_SEQ=
+++ FM_WAKE_STATUS_KEY=
+++ FM_WAKE_STATUS_HISTORICAL=false
+++ FM_WAKE_EVENT_LINE=
+++ FM_WAKE_UNREAD_LINES=
++ source bin/fm-secondmate-registry-lib.sh
+++ SECONDMATE_REGISTRY_ID=
+++ SECONDMATE_REGISTRY_SUMMARY=
+++ SECONDMATE_REGISTRY_HOST=
+++ SECONDMATE_REGISTRY_ROOT=
+++ SECONDMATE_REGISTRY_HOME=
+++ SECONDMATE_REGISTRY_SCOPE=
+++ SECONDMATE_REGISTRY_PROJECTS=
+++ SECONDMATE_REGISTRY_ADDED=
+++ SECONDMATE_REGISTRY_REMOTE=0
+++ SECONDMATE_REGISTRY_LINE=
+++ SECONDMATE_REGISTRY_MATCH_HOST=
+++ SECONDMATE_REGISTRY_MATCH_ROOT=
+++ SECONDMATE_REGISTRY_MATCH_HOME=
+++ SECONDMATE_REGISTRY_MATCH_HOME_KEY=
+++ SECONDMATE_REGISTRY_MATCH_PROJECTS=
+++ SECONDMATE_REGISTRY_MATCH_REMOTE=0
+++ SECONDMATE_REGISTRY_ERROR=
++ source bin/fm-control-lib.sh
++ source bin/fm-sol-cap-lib.sh
+++ FM_SOL_CAP_DEFAULT=4
+++ FM_SOL_REGISTRY_NAME=sol-sessions.tsv
+++ FM_SOL_LOCK_NAME=.sol-cap.lock
+++ FM_SOL_CAP_REFUSAL=
+++ FM_SOL_CLAIM_CREATED=
+++ FM_SOL_CAP=
+++ FM_SOL_CAP_MODELS_ERROR=
+++ FM_SOL_CEILING_ERROR=
+++ FM_SOL_COUNT_ERROR=
+++ FM_SOL_CAP_MODELS=
+++ '[' bin/fm-sol-cap-lib.sh = .test-sol-lab/recovery-live.sh ']'
++ printf 'backend=tmux\nwindow=primary:fm-recover\n'
++ printf 'recover\tgpt-6.1-sol\t1\t0\n'
++ echo 'Real tmux endpoint state:'
+Real tmux endpoint state:
++ fm_backend_agent_state tmux primary:fm-recover
++ local backend=tmux target=primary:fm-recover
++ fm_backend_source tmux
++ local name=tmux adapter rel sibling
++ fm_backend_validate tmux
++ local name=tmux
++ fm_backend_is_known tmux
++ fm_backend_list_contains 'tmux herdr zellij orca cmux' tmux
++ local 'list=tmux herdr zellij orca cmux' name=tmux
++ case "$name" in
++ case " $list " in
++ return 0
++ return 0
++ adapter=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh
++ case "$name" in
++ set -- fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-session-lock-lib.sh fm-agent-process-lib.sh fm-gemini-lib.sh
++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh ']'
++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh ']'
++ for rel in "$@"
++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh
++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh ']'
++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh ']'
++ for rel in "$@"
++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh
++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh ']'
++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh ']'
++ for rel in "$@"
++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh ']'
++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh ']'
++ for rel in "$@"
++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
++ for rel in "$@"
++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh
++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh ']'
++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh ']'
++ for rel in "$@"
++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh
++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh
++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh ']'
++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh ']'
++ case "$name" in
++ '[' -z '' ']'
++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh
+++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh
++++ _FM_TMUX_LIB_DIR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin
++++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin '!=' /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh ']'
++++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh
+++++ FM_COMPOSER_UNICODE_SPACES=()
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0302\0205'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0302\0240'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0341\0232\0200'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0200'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0201'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0202'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0203'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0204'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0205'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0206'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0207'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0210'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0211'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0212'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0250'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0251'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0200\0257'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0342\0201\0237'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ for _fm_composer_space_octal in '\0302\0205' '\0302\0240' '\0341\0232\0200' '\0342\0200\0200' '\0342\0200\0201' '\0342\0200\0202' '\0342\0200\0203' '\0342\0200\0204' '\0342\0200\0205' '\0342\0200\0206' '\0342\0200\0207' '\0342\0200\0210' '\0342\0200\0211' '\0342\0200\0212' '\0342\0200\0250' '\0342\0200\0251' '\0342\0200\0257' '\0342\0201\0237' '\0343\0200\0200'
+++++ printf -v _fm_composer_space_utf8 %b '\0343\0200\0200'
+++++ FM_COMPOSER_UNICODE_SPACES+=("$_fm_composer_space_utf8")
+++++ unset -v _fm_composer_space_octal _fm_composer_space_utf8
+++++ FM_DELIVERY_BUSY_REGEX_DEFAULT='esc (to )?interrupt|Working(\.\.\.|…)|Ctrl\+c:cancel|ctrl\+c to stop|esc[[:space:]]+to[[:space:]]+cancel|esc twice to interrupt|^[[:space:]]*❭ Guide Devin while it works$'
+++++ FM_DELIVERY_CLAUDE_BUSY_REGEX_DEFAULT='esc to interrupt|…[[:space:]]+\([0-9]+[smh]'
+++++ FM_DELIVERY_DEVIN_BUSY_REGEX_DEFAULT='esc twice to interrupt|^[[:space:]]*❭ Guide Devin while it works$'
+++++ FM_DELIVERY_COMMANDCODE_BUSY_REGEX_DEFAULT='esc to interrupt|•[[:space:]]+[0-9]+[smh]([[:space:]]+[0-9]+[smh])*[[:space:]]+•'
+++++ FM_DELIVERY_CODEX_BUSY_REGEX_DEFAULT='esc to interrupt'
+++++ FM_DELIVERY_OPENCODE_BUSY_REGEX_DEFAULT='esc interrupt'
+++++ FM_DELIVERY_PI_BUSY_REGEX_DEFAULT='Working\.\.\.'
+++++ FM_OMP_SPINNER_FRAMES_RE='(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|⣾|⣽|⣻|⢿|⡿|⣟|⣯|⣷)'
+++++ FM_DELIVERY_OMP_BUSY_REGEX_DEFAULT='Working…|^[[:space:]]*(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|⣾|⣽|⣻|⢿|⡿|⣟|⣯|⣷)[[:space:]]+[0-9]+[smh]'
+++++ FM_DELIVERY_GROK_BUSY_REGEX_DEFAULT='Ctrl\+c:cancel'
+++++ FM_DELIVERY_CURSOR_BUSY_REGEX_DEFAULT='ctrl\+c to stop'
+++++ FM_DELIVERY_AGY_BUSY_REGEX_DEFAULT='esc[[:space:]]+to[[:space:]]+cancel'
+++++ FM_DELIVERY_KIMI_BUSY_REGEX_DEFAULT='^[[:space:]]*(🌑|🌒|🌓|🌔|🌕|🌖|🌗|🌘)[[:space:]]+·[[:space:]]+'
++++++ printf '%s\n' ❯ › ⟩ → ❭
+++++ FM_COMPOSER_AGENT_PROMPT_GLYPHS=$'❯\n›\n⟩\n→\n❭'
++++++ printf '%s\n' '>' '$' % '#'
+++++ FM_COMPOSER_SHELL_PROMPT_GLYPHS=$'>\n$\n%\n#'
+++++ FM_COMPOSER_IDLE_RE_DEFAULT='^Type a message\.\.\.$|^Ask anything(\.\.\.|…)|^Plan, search, build anything$|^Add a follow-up$|^Ask Devin to build features, fix bugs, or work on your code$|^Ask your question\.\.\.$'
+++++ FM_COMPOSER_LEFTBAR_FOOTER_RE_DEFAULT='^(Build|Plan)[[:space:]]+·[[:space:]]+'
+++++ FM_COMPOSER_MODE_HINT_RE_DEFAULT='^[[:space:]]*(⏵|⏸)'
+++++ FM_COMPOSER_OMP_STATUS_RE_DEFAULT='^[[:space:]]*(π|󰵗)[[:space:]]+·[[:space:]]|^[[:space:]]*(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|⣾|⣽|⣻|⢿|⡿|⣟|⣯|⣷)[[:space:]]+[0-9]+[smh]([[:space:]]|$)|[[:space:]]·[[:space:]].*[0-9]+(\.[0-9]+)?%/[0-9]+K'
+++++ FM_COMPOSER_PI_STATUS_RE_DEFAULT='^\$[0-9]+(\.[0-9]+)?([[:space:]]|$)'
+++++ FM_COMPOSER_CAPTURE_LINES=20
+++++ FM_COMPOSER_PI_MAX_LINES=8
+++++ FM_COMPOSER_GROK_TITLE_OVERHANG=3
++++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
+++++ FM_CURSOR_PROBE_TIMEOUT=10
++++ unset _FM_TMUX_LIB_DIR
+++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
++++ _FM_SESSION_LOCK_LIB_DIR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin
++++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin '!=' /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
++++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
+++++ FM_CURSOR_PROBE_TIMEOUT=10
++++ unset _FM_SESSION_LOCK_LIB_DIR
++++ FM_HARNESS_RE='claude|codex|opencode|grok|kimi|^pi$|^pi-signed$|^omp$'
++++ FM_HARNESS_NAMES=(claude codex opencode grok kimi pi-signed pi omp)
++++ FM_HARNESS_IS_CLAUDE=0
++++ FM_SESSION_LOCK_FOREIGN_OWNER_PID=
++++ FM_LOCK_INSPECT_STATE=unknown
++++ FM_LOCK_INSPECT_PID=
++++ FM_LOCK_INSPECT_LIVE_HARNESS=unknown
+++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh
++++ _FM_AGENT_PROCESS_LIB_DIR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin
++++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin '!=' /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh ']'
++++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
+++++ _FM_SESSION_LOCK_LIB_DIR=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin
+++++ '[' /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin '!=' /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
+++++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
++++++ FM_CURSOR_PROBE_TIMEOUT=10
+++++ unset _FM_SESSION_LOCK_LIB_DIR
+++++ FM_HARNESS_RE='claude|codex|opencode|grok|kimi|^pi$|^pi-signed$|^omp$'
+++++ FM_HARNESS_NAMES=(claude codex opencode grok kimi pi-signed pi omp)
+++++ FM_HARNESS_IS_CLAUDE=0
+++++ FM_SESSION_LOCK_FOREIGN_OWNER_PID=
+++++ FM_LOCK_INSPECT_STATE=unknown
+++++ FM_LOCK_INSPECT_PID=
+++++ FM_LOCK_INSPECT_LIVE_HARNESS=unknown
++++ . /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh
++++ unset _FM_AGENT_PROCESS_LIB_DIR
++ _FM_BACKEND_TMUX_SOURCED=1
++ case "$backend" in
++ fm_backend_tmux_agent_state primary:fm-recover
++ local target=primary:fm-recover comm session window windows inventory_status
++ local foreground argv0s name pid fg_seen=0 fg_shell=0 fg_other=0
++ case "$target" in
++ session=primary
++ window=fm-recover
+++ fm_backend_tmux_window_inventory primary
+++ local windows
++++ LC_ALL=C
++++ tmux list-windows -t primary -F '#{window_name}'
+++ windows=$'tmux\nfm-recover'
+++ printf '%s\n' $'tmux\nfm-recover'
+++ return 0
++ windows=$'tmux\nfm-recover'
++ inventory_status=0
++ '[' 0 -ne 0 ']'
++ grep -Fqx fm-recover
++ printf '%s\n' $'tmux\nfm-recover'
+++ fm_backend_tmux_foreground_comms primary:fm-recover
+++ local target=primary:fm-recover tty pid pgid tpgid comm
++++ tmux display-message -p -t primary:fm-recover '#{pane_tty}'
+++ tty=/dev/pts/3
+++ '[' -n /dev/pts/3 ']'
+++ LC_ALL=C
+++ ps -t pts/3 -o pid=,pgid=,tpgid=,comm=
+++ read -r pid pgid tpgid comm
+++ '[' -n bash ']'
+++ '[' 1484376 = 1484376 ']'
+++ printf '%s\n' bash
+++ read -r pid pgid tpgid comm
++ foreground=bash
++ IFS=
++ read -r name
++ '[' -n bash ']'
++ fg_seen=1
++ case "$(fm_agent_process_classify_name "$name")" in
+++ fm_agent_process_classify_name bash
+++ local path=bash argv0= base
+++ base=bash
+++ base=bash
+++ case "$base" in
+++ printf shell
++ fg_shell=1
++ IFS=
++ read -r name
+++ fm_backend_tmux_foreground_argv0s primary:fm-recover
+++ local target=primary:fm-recover tty pid pgid tpgid comm args argv0
++++ tmux display-message -p -t primary:fm-recover '#{pane_tty}'
+++ tty=/dev/pts/3
+++ '[' -n /dev/pts/3 ']'
+++ LC_ALL=C
+++ ps -t pts/3 -o pid=,pgid=,tpgid=,comm=
+++ read -r pid pgid tpgid comm
+++ '[' -n bash ']'
+++ '[' 1484376 = 1484376 ']'
++++ LC_ALL=C
++++ ps -p 1484376 -o args=
+++ args=bash
+++ args=bash
+++ argv0=bash
+++ '[' -n bash ']'
+++ printf '%s\n' bash
+++ read -r pid pgid tpgid comm
++ argv0s=bash
++ IFS=
++ read -r name
++ '[' -n bash ']'
+++ fm_agent_process_classify_name '' bash
+++ local path= argv0=bash base
+++ base=
+++ base=
+++ case "$base" in
+++ fm_harness_path_name ''
+++ local path= name
+++ '[' -n '' ']'
+++ return 1
+++ fm_harness_path_name bash
+++ local path=bash name
+++ '[' -n bash ']'
+++ for name in "${FM_HARNESS_NAMES[@]}"
+++ case "/$path/" in
+++ for name in "${FM_HARNESS_NAMES[@]}"
+++ case "/$path/" in
+++ for name in "${FM_HARNESS_NAMES[@]}"
+++ case "/$path/" in
+++ for name in "${FM_HARNESS_NAMES[@]}"
+++ case "/$path/" in
+++ for name in "${FM_HARNESS_NAMES[@]}"
+++ case "/$path/" in
+++ for name in "${FM_HARNESS_NAMES[@]}"
+++ case "/$path/" in
+++ for name in "${FM_HARNESS_NAMES[@]}"
+++ case "/$path/" in
+++ for name in "${FM_HARNESS_NAMES[@]}"
+++ case "/$path/" in
+++ return 1
+++ fm_cursor_process_matches bash '' bash
+++ local comm=bash argv0=bash base
+++ '[' -n bash ']'
+++ argv0=bash
++++ basename -- bash
+++ base=bash
+++ base=bash
+++ case "$base" in
+++ case "$comm" in
+++ return 1
+++ printf other
++ '[' other = agent ']'
++ IFS=
++ read -r name
+++ fm_backend_tmux_foreground_pids primary:fm-recover
+++ local target=primary:fm-recover tty pid pgid tpgid comm
++++ tmux display-message -p -t primary:fm-recover '#{pane_tty}'
+++ tty=/dev/pts/3
+++ '[' -n /dev/pts/3 ']'
+++ LC_ALL=C
+++ ps -t pts/3 -o pid=,pgid=,tpgid=,comm=
+++ read -r pid pgid tpgid comm
+++ '[' -n bash ']'
+++ '[' 1484376 = 1484376 ']'
+++ printf '%s\n' 1484376
+++ read -r pid pgid tpgid comm
++ IFS=
++ read -r pid
++ '[' -n 1484376 ']'
++ fm_gemini_pid_is_gemini 1484376
++ local pid=1484376 token argv0= index=0
++ '[' -r /proc/1484376/cmdline ']'
++ IFS=
++ read -r -d '' token
++ '[' 0 -eq 0 ']'
++ argv0=bash
++ fm_gemini_path_is_gemini bash
++ local path=bash
++ '[' -n bash ']'
++ case "$path" in
++ case "${path##*/}" in
++ case "$path" in
++ return 1
++ case "${argv0##*/}" in
++ return 1
++ IFS=
++ read -r pid
+++ fm_backend_tmux_foreground_args primary:fm-recover
+++ local target=primary:fm-recover tty pid pgid tpgid comm args
++++ tmux display-message -p -t primary:fm-recover '#{pane_tty}'
+++ tty=/dev/pts/3
+++ '[' -n /dev/pts/3 ']'
+++ read -r pid pgid tpgid comm
+++ LC_ALL=C
+++ ps -t pts/3 -o pid=,pgid=,tpgid=,comm=
+++ '[' -n bash ']'
+++ '[' 1484376 = 1484376 ']'
++++ LC_ALL=C
++++ ps -p 1484376 -o args=
+++ args=bash
+++ '[' -n bash ']'
+++ printf '%s\n' bash
+++ read -r pid pgid tpgid comm
++ IFS=
++ read -r name
++ '[' -n bash ']'
++ fm_gemini_args_are_gemini bash
++ local args=bash argv0 rest token
++ '[' -n bash ']'
++ args=bash
++ argv0=bash
++ fm_gemini_path_is_gemini bash
++ local path=bash
++ '[' -n bash ']'
++ case "$path" in
++ case "${path##*/}" in
++ case "$path" in
++ return 1
++ case "${argv0##*/}" in
++ return 1
++ IFS=
++ read -r name
+++ fm_backend_tmux_current_command primary:fm-recover
+++ tmux display-message -p -t primary:fm-recover '#{pane_current_command}'
++ comm=bash
+++ fm_agent_process_classify_name bash
+++ local path=bash argv0= base
+++ base=bash
+++ base=bash
+++ case "$base" in
+++ printf shell
++ '[' shell = agent ']'
++ '[' 1 -eq 1 ']'
++ '[' 0 -eq 0 ']'
++ '[' 1 -eq 1 ']'
++ printf dead
+dead+ return 0
++ fm_lock_try_acquire /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
+++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock lock_abs
++++ fm_lock_abs_path /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ local path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock dir base
++++ fm_dirname_to dir /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ local fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ '[' -n /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state ']'
++++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state '!=' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state ']'
++++ printf -v dir %s /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ fm_basename_to base /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ local fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ fm_path=.spawn-recover.lock
++++ '[' .spawn-recover.lock '!=' .spawn-recover.lock ']'
++++ printf -v base %s .spawn-recover.lock
+++++ cd /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
+++++ pwd -P
++++ dir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ printf '%s/%s\n' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state .spawn-recover.lock
+++ lock_abs=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
+++ mktemp -d /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.XXXXXX
++ ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ '[' -e /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ']'
++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ']'
++ fm_lock_prepare_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ local ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=1484284
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 1484284
++ printf '%s\n' 1484284
+++ cat /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC/pid
++ back=1484284
++ '[' 1484284 = 1484284 ']'
++ ln -s /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ fm_lock_points_to_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC actual
+++ readlink /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ actual=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC = /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC ']'
++ fm_lock_claim /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC ''
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=1484284
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 1484284
+++ cat /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC/pid
++ back=1484284
++ '[' 1484284 '!=' 1484284 ']'
++ fm_lock_points_to_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC actual
+++ readlink /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ actual=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC = /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC ']'
++ fm_lock_claim_blocked_by_steal /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ''
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock allowed_steal_owner= steal
++ steal=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.steal
++ '[' -e /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.steal ']'
++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ return 0
++ return 0
++ fm_sol_cap_reconcile_local recover /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++ local id=recover state=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state meta backend target verdict absence
++ meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta
++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
++ '[' '!' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv ']'
++ awk '-F\t' -v id=recover '$1 == id {found=1; exit} END {exit !found}' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv
+++ fm_backend_of_meta /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta
+++ local v
++++ fm_meta_get /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta backend
++++ local meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta key=backend line value=
++++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
++++ printf %s tmux
+++ v=tmux
+++ printf %s tmux
++ backend=tmux
+++ fm_backend_target_of_meta /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta
+++ local meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta backend terminal window
++++ fm_backend_of_meta /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta
++++ local v
+++++ fm_meta_get /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta backend
+++++ local meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta key=backend line value=
+++++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
+++++ printf %s tmux
++++ v=tmux
++++ printf %s tmux
+++ backend=tmux
+++ '[' tmux = orca ']'
++++ fm_meta_get /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta window
++++ local meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta key=window line value=
++++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
++++ printf %s primary:fm-recover
+++ window=primary:fm-recover
+++ '[' -n primary:fm-recover ']'
+++ printf %s primary:fm-recover
++ target=primary:fm-recover
++ '[' -n primary:fm-recover ']'
+++ fm_backend_agent_state tmux primary:fm-recover
+++ local backend=tmux target=primary:fm-recover
+++ fm_backend_source tmux
+++ local name=tmux adapter rel sibling
+++ fm_backend_validate tmux
+++ local name=tmux
+++ fm_backend_is_known tmux
+++ fm_backend_list_contains 'tmux herdr zellij orca cmux' tmux
+++ local 'list=tmux herdr zellij orca cmux' name=tmux
+++ case "$name" in
+++ case " $list " in
+++ return 0
+++ return 0
+++ adapter=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh
+++ case "$name" in
+++ set -- fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-session-lock-lib.sh fm-agent-process-lib.sh fm-gemini-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh ']'
+++ case "$name" in
+++ '[' -z 1 ']'
+++ case "$backend" in
+++ fm_backend_tmux_agent_state primary:fm-recover
+++ local target=primary:fm-recover comm session window windows inventory_status
+++ local foreground argv0s name pid fg_seen=0 fg_shell=0 fg_other=0
+++ case "$target" in
+++ session=primary
+++ window=fm-recover
++++ fm_backend_tmux_window_inventory primary
++++ local windows
+++++ LC_ALL=C
+++++ tmux list-windows -t primary -F '#{window_name}'
++++ windows=$'tmux\nfm-recover'
++++ printf '%s\n' $'tmux\nfm-recover'
++++ return 0
+++ windows=$'tmux\nfm-recover'
+++ inventory_status=0
+++ '[' 0 -ne 0 ']'
+++ printf '%s\n' $'tmux\nfm-recover'
+++ grep -Fqx fm-recover
++++ fm_backend_tmux_foreground_comms primary:fm-recover
++++ local target=primary:fm-recover tty pid pgid tpgid comm
+++++ tmux display-message -p -t primary:fm-recover '#{pane_tty}'
++++ tty=/dev/pts/3
++++ '[' -n /dev/pts/3 ']'
++++ LC_ALL=C
++++ ps -t pts/3 -o pid=,pgid=,tpgid=,comm=
++++ read -r pid pgid tpgid comm
++++ '[' -n bash ']'
++++ '[' 1484376 = 1484376 ']'
++++ printf '%s\n' bash
++++ read -r pid pgid tpgid comm
+++ foreground=bash
+++ IFS=
+++ read -r name
+++ '[' -n bash ']'
+++ fg_seen=1
+++ case "$(fm_agent_process_classify_name "$name")" in
++++ fm_agent_process_classify_name bash
++++ local path=bash argv0= base
++++ base=bash
++++ base=bash
++++ case "$base" in
++++ printf shell
+++ fg_shell=1
+++ IFS=
+++ read -r name
++++ fm_backend_tmux_foreground_argv0s primary:fm-recover
++++ local target=primary:fm-recover tty pid pgid tpgid comm args argv0
+++++ tmux display-message -p -t primary:fm-recover '#{pane_tty}'
++++ tty=/dev/pts/3
++++ '[' -n /dev/pts/3 ']'
++++ read -r pid pgid tpgid comm
++++ LC_ALL=C
++++ ps -t pts/3 -o pid=,pgid=,tpgid=,comm=
++++ '[' -n bash ']'
++++ '[' 1484376 = 1484376 ']'
+++++ LC_ALL=C
+++++ ps -p 1484376 -o args=
++++ args=bash
++++ args=bash
++++ argv0=bash
++++ '[' -n bash ']'
++++ printf '%s\n' bash
++++ read -r pid pgid tpgid comm
+++ argv0s=bash
+++ IFS=
+++ read -r name
+++ '[' -n bash ']'
++++ fm_agent_process_classify_name '' bash
++++ local path= argv0=bash base
++++ base=
++++ base=
++++ case "$base" in
++++ fm_harness_path_name ''
++++ local path= name
++++ '[' -n '' ']'
++++ return 1
++++ fm_harness_path_name bash
++++ local path=bash name
++++ '[' -n bash ']'
++++ for name in "${FM_HARNESS_NAMES[@]}"
++++ case "/$path/" in
++++ for name in "${FM_HARNESS_NAMES[@]}"
++++ case "/$path/" in
++++ for name in "${FM_HARNESS_NAMES[@]}"
++++ case "/$path/" in
++++ for name in "${FM_HARNESS_NAMES[@]}"
++++ case "/$path/" in
++++ for name in "${FM_HARNESS_NAMES[@]}"
++++ case "/$path/" in
++++ for name in "${FM_HARNESS_NAMES[@]}"
++++ case "/$path/" in
++++ for name in "${FM_HARNESS_NAMES[@]}"
++++ case "/$path/" in
++++ for name in "${FM_HARNESS_NAMES[@]}"
++++ case "/$path/" in
++++ return 1
++++ fm_cursor_process_matches bash '' bash
++++ local comm=bash argv0=bash base
++++ '[' -n bash ']'
++++ argv0=bash
+++++ basename -- bash
++++ base=bash
++++ base=bash
++++ case "$base" in
++++ case "$comm" in
++++ return 1
++++ printf other
+++ '[' other = agent ']'
+++ IFS=
+++ read -r name
++++ fm_backend_tmux_foreground_pids primary:fm-recover
++++ local target=primary:fm-recover tty pid pgid tpgid comm
+++++ tmux display-message -p -t primary:fm-recover '#{pane_tty}'
++++ tty=/dev/pts/3
++++ '[' -n /dev/pts/3 ']'
++++ LC_ALL=C
++++ ps -t pts/3 -o pid=,pgid=,tpgid=,comm=
++++ read -r pid pgid tpgid comm
++++ '[' -n bash ']'
++++ '[' 1484376 = 1484376 ']'
++++ printf '%s\n' 1484376
++++ read -r pid pgid tpgid comm
+++ IFS=
+++ read -r pid
+++ '[' -n 1484376 ']'
+++ fm_gemini_pid_is_gemini 1484376
+++ local pid=1484376 token argv0= index=0
+++ '[' -r /proc/1484376/cmdline ']'
+++ IFS=
+++ read -r -d '' token
+++ '[' 0 -eq 0 ']'
+++ argv0=bash
+++ fm_gemini_path_is_gemini bash
+++ local path=bash
+++ '[' -n bash ']'
+++ case "$path" in
+++ case "${path##*/}" in
+++ case "$path" in
+++ return 1
+++ case "${argv0##*/}" in
+++ return 1
+++ IFS=
+++ read -r pid
++++ fm_backend_tmux_foreground_args primary:fm-recover
++++ local target=primary:fm-recover tty pid pgid tpgid comm args
+++++ tmux display-message -p -t primary:fm-recover '#{pane_tty}'
++++ tty=/dev/pts/3
++++ '[' -n /dev/pts/3 ']'
++++ LC_ALL=C
++++ ps -t pts/3 -o pid=,pgid=,tpgid=,comm=
++++ read -r pid pgid tpgid comm
++++ '[' -n bash ']'
++++ '[' 1484376 = 1484376 ']'
+++++ LC_ALL=C
+++++ ps -p 1484376 -o args=
++++ args=bash
++++ '[' -n bash ']'
++++ printf '%s\n' bash
++++ read -r pid pgid tpgid comm
+++ IFS=
+++ read -r name
+++ '[' -n bash ']'
+++ fm_gemini_args_are_gemini bash
+++ local args=bash argv0 rest token
+++ '[' -n bash ']'
+++ args=bash
+++ argv0=bash
+++ fm_gemini_path_is_gemini bash
+++ local path=bash
+++ '[' -n bash ']'
+++ case "$path" in
+++ case "${path##*/}" in
+++ case "$path" in
+++ return 1
+++ case "${argv0##*/}" in
+++ return 1
+++ IFS=
+++ read -r name
++++ fm_backend_tmux_current_command primary:fm-recover
++++ tmux display-message -p -t primary:fm-recover '#{pane_current_command}'
+++ comm=bash
++++ fm_agent_process_classify_name bash
++++ local path=bash argv0= base
++++ base=bash
++++ base=bash
++++ case "$base" in
++++ printf shell
+++ '[' shell = agent ']'
+++ '[' 1 -eq 1 ']'
+++ '[' 0 -eq 0 ']'
+++ '[' 1 -eq 1 ']'
+++ printf dead
+++ return 0
++ verdict=dead
++ '[' dead = missing ']'
++ case "$verdict" in
++ fm_sol_cap_promote recover remove /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++ local id=recover pid=remove state=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state registry tmp root lock
++ registry=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv
++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv ']'
++ awk '-F\t' -v id=recover '$1 == id {found=1; exit} END {exit !found}' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv
++++ fm_sol_cap_home /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ case "$1" in
++++ printf '%s\n' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
+++ fm_firstmate_root_home /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
+++ local home=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h marker parent 'seen=|' depth=0
++++ CDPATH=
++++ cd -- /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
++++ pwd -P
+++ home=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
+++ '[' -e /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/.fm-secondmate-parent ']'
+++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/.fm-secondmate-parent ']'
+++ printf '%s\n' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
++ root=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
++ lock=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ fm_sol_cap_lock_acquire /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock 'the promotion of task recover'
++ local lock=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock 'what=the promotion of task recover' tries=40 i=0
++ :
++ fm_lock_try_acquire /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
+++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock lock_abs
++++ fm_lock_abs_path /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++++ local path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock dir base
++++ fm_dirname_to dir /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++++ local fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ '[' -n /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state ']'
++++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state '!=' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state ']'
++++ printf -v dir %s /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ fm_basename_to base /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++++ local fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++++ fm_path=.sol-cap.lock
++++ '[' .sol-cap.lock '!=' .sol-cap.lock ']'
++++ printf -v base %s .sol-cap.lock
+++++ cd /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
+++++ pwd -P
++++ dir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ printf '%s/%s\n' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state .sol-cap.lock
+++ lock_abs=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
+++ mktemp -d /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.XXXXXX
++ ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ '[' -e /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock ']'
++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock ']'
++ fm_lock_prepare_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ local ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=1484284
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 1484284
++ printf '%s\n' 1484284
+++ cat /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I/pid
++ back=1484284
++ '[' 1484284 = 1484284 ']'
++ ln -s /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ fm_lock_points_to_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I actual
+++ readlink /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ actual=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I = /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I ']'
++ fm_lock_claim /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I ''
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=1484284
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 1484284
+++ cat /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I/pid
++ back=1484284
++ '[' 1484284 '!=' 1484284 ']'
++ fm_lock_points_to_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I actual
+++ readlink /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ actual=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I = /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I ']'
++ fm_lock_claim_blocked_by_steal /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock ''
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock allowed_steal_owner= steal
++ steal=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.steal
++ '[' -e /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.steal ']'
++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ return 0
++ return 0
++ return 0
++ tmp=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv.tmp.1484284
++ awk '-F\t' -v 'OFS=\t' -v id=recover -v pid=remove $'\n    $1 == id { if (pid == "remove") next; $4 = pid }\n    {print}\n  ' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv
++ mv -- /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv.tmp.1484284 /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv
++ fm_lock_release /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=1484284
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 1484284
++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock ']'
+++ fm_lock_link_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ '[' -n /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I ']'
+++ cat /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I/pid
++ pid=1484284
++ '[' 1484284 = 1484284 ']'
++ fm_lock_points_to_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I actual
+++ readlink /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ actual=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I = /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I ']'
++ rm -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock
++ fm_lock_discard_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ local ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ '[' -n /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I ']'
++ fm_lock_clean_known_files /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ rm -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I/pid /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I/fm-home /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I/pid-identity /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I/role /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I/watcher-path
++ rmdir /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.sol-cap.lock.owner.qxnl1I
++ return 0
++ fm_lock_release /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=1484284
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 1484284
++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ']'
+++ fm_lock_link_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ '[' -n /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC ']'
+++ cat /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC/pid
++ pid=1484284
++ '[' 1484284 = 1484284 ']'
++ fm_lock_points_to_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC actual
+++ readlink /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ actual=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC = /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC ']'
++ rm -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ fm_lock_discard_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ local ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ '[' -n /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC ']'
++ fm_lock_clean_known_files /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ rm -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC/pid /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC/fm-home /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC/pid-identity /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC/role /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC/watcher-path
++ rmdir /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.ZKUYTC
++ return 0
++ '[' '!' -s /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv ']'
++ echo 'Confirmed agent-free shell endpoint retired its owned pid-zero claim.'
+Confirmed agent-free shell endpoint retired its owned pid-zero claim.
++ printf 'recover\tgpt-6.1-sol\t1\t0\n'
++ TMUX_TMPDIR=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/tmux
++ tmux -L fm-lab kill-window -t primary:fm-recover
++ fm_lock_try_acquire /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock pid steal cur rc steal_owner primary_owner current
++ FM_LOCK_HELD_PID=
++ FM_LOCK_OWNER_DIR=
++ FM_LOCK_RECOVERED_PID=
++ fm_lock_try_create /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock allowed_steal_owner= ownerdir
++ FM_LOCK_OWNER_DIR=
+++ fm_lock_owner_dir /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
+++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock lock_abs
++++ fm_lock_abs_path /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ local path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock dir base
++++ fm_dirname_to dir /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ local fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ '[' -n /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state ']'
++++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state '!=' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state ']'
++++ printf -v dir %s /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ fm_basename_to base /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ local fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ case "$fm_path" in
++++ fm_path=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++++ fm_path=.spawn-recover.lock
++++ '[' .spawn-recover.lock '!=' .spawn-recover.lock ']'
++++ printf -v base %s .spawn-recover.lock
+++++ cd /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
+++++ pwd -P
++++ dir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++++ printf '%s/%s\n' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state .spawn-recover.lock
+++ lock_abs=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
+++ mktemp -d /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.XXXXXX
++ ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ '[' -e /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ']'
++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ']'
++ fm_lock_prepare_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ local ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=1484284
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 1484284
++ printf '%s\n' 1484284
+++ cat /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ/pid
++ back=1484284
++ '[' 1484284 = 1484284 ']'
++ ln -s /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ fm_lock_points_to_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ actual
+++ readlink /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ actual=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ = /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ ']'
++ fm_lock_claim /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ ''
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ allowed_steal_owner= mypid back
++ fm_current_pid mypid
++ local fm_pid
++ fm_pid=1484284
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v mypid %s 1484284
+++ cat /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ/pid
++ back=1484284
++ '[' 1484284 '!=' 1484284 ']'
++ fm_lock_points_to_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ actual
+++ readlink /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ actual=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ = /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ ']'
++ fm_lock_claim_blocked_by_steal /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ''
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock allowed_steal_owner= steal
++ steal=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.steal
++ '[' -e /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.steal ']'
++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.steal ']'
++ return 1
++ return 0
++ FM_LOCK_OWNER_DIR=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ return 0
++ return 0
++ fm_sol_cap_reconcile_local recover /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state
++ local id=recover state=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state meta backend target verdict absence
++ meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta
++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
++ '[' '!' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv ']'
++ awk '-F\t' -v id=recover '$1 == id {found=1; exit} END {exit !found}' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv
+++ fm_backend_of_meta /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta
+++ local v
++++ fm_meta_get /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta backend
++++ local meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta key=backend line value=
++++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
++++ printf %s tmux
+++ v=tmux
+++ printf %s tmux
++ backend=tmux
+++ fm_backend_target_of_meta /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta
+++ local meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta backend terminal window
++++ fm_backend_of_meta /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta
++++ local v
+++++ fm_meta_get /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta backend
+++++ local meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta key=backend line value=
+++++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
+++++ printf %s tmux
++++ v=tmux
++++ printf %s tmux
+++ backend=tmux
+++ '[' tmux = orca ']'
++++ fm_meta_get /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta window
++++ local meta=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta key=window line value=
++++ '[' -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/recover.meta ']'
++++ printf %s primary:fm-recover
+++ window=primary:fm-recover
+++ '[' -n primary:fm-recover ']'
+++ printf %s primary:fm-recover
++ target=primary:fm-recover
++ '[' -n primary:fm-recover ']'
+++ fm_backend_agent_state tmux primary:fm-recover
+++ local backend=tmux target=primary:fm-recover
+++ fm_backend_source tmux
+++ local name=tmux adapter rel sibling
+++ fm_backend_validate tmux
+++ local name=tmux
+++ fm_backend_is_known tmux
+++ fm_backend_list_contains 'tmux herdr zellij orca cmux' tmux
+++ local 'list=tmux herdr zellij orca cmux' name=tmux
+++ case "$name" in
+++ case " $list " in
+++ return 0
+++ return 0
+++ adapter=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh
+++ case "$name" in
+++ set -- fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-session-lock-lib.sh fm-agent-process-lib.sh fm-gemini-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh ']'
+++ case "$name" in
+++ '[' -z 1 ']'
+++ case "$backend" in
+++ fm_backend_tmux_agent_state primary:fm-recover
+++ local target=primary:fm-recover comm session window windows inventory_status
+++ local foreground argv0s name pid fg_seen=0 fg_shell=0 fg_other=0
+++ case "$target" in
+++ session=primary
+++ window=fm-recover
++++ fm_backend_tmux_window_inventory primary
++++ local windows
+++++ LC_ALL=C
+++++ tmux list-windows -t primary -F '#{window_name}'
++++ windows=bash
++++ printf '%s\n' bash
++++ return 0
+++ windows=bash
+++ inventory_status=0
+++ '[' 0 -ne 0 ']'
+++ grep -Fqx fm-recover
+++ printf '%s\n' bash
+++ printf missing
+++ return 0
++ verdict=missing
++ '[' missing = missing ']'
+++ fm_control_endpoint_absence_verdict tmux primary:fm-recover
+++ local backend=tmux target=primary:fm-recover
+++ fm_backend_source tmux
+++ local name=tmux adapter rel sibling
+++ fm_backend_validate tmux
+++ local name=tmux
+++ fm_backend_is_known tmux
+++ fm_backend_list_contains 'tmux herdr zellij orca cmux' tmux
+++ local 'list=tmux herdr zellij orca cmux' name=tmux
+++ case "$name" in
+++ case " $list " in
+++ return 0
+++ return 0
+++ adapter=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh
+++ case "$name" in
+++ set -- fm-tmux-lib.sh fm-composer-lib.sh fm-cursor-lib.sh fm-session-lock-lib.sh fm-agent-process-lib.sh fm-gemini-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/backends/tmux.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-tmux-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-composer-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-cursor-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-session-lock-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-agent-process-lib.sh ']'
+++ for rel in "$@"
+++ sibling=/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh
+++ fm_backend_source_readable /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh
+++ '[' -f /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh ']'
+++ '[' -r /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/bin/fm-gemini-lib.sh ']'
+++ case "$name" in
+++ '[' -z 1 ']'
+++ case "$backend" in
+++ printf 'unproven\ttmux absence cannot be proven from a task record: the record does not carry the endpoint'\''s socket identity, and a server-wide window inventory only describes the tmux server this process addresses, so a window absent from it may still be alive on another'
++ absence=$'unproven\ttmux absence cannot be proven from a task record: the record does not carry the endpoint\'s socket identity, and a server-wide window inventory only describes the tmux server this process addresses, so a window absent from it may still be alive on another'
++ case "${absence%%'	'*}" in
++ return 0
++ fm_lock_release /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock pid current ownerdir
++ fm_current_pid current
++ local fm_pid
++ fm_pid=1484284
++ case "$fm_pid" in
++ '[' 1 -gt 0 ']'
++ printf -v current %s 1484284
++ '[' -L /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ']'
+++ fm_lock_link_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ '[' -n /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ ']'
+++ cat /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ/pid
++ pid=1484284
++ '[' 1484284 = 1484284 ']'
++ fm_lock_points_to_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ actual
+++ readlink /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ actual=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ '[' /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ = /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ ']'
++ rm -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock
++ fm_lock_discard_owner /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ local ownerdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ '[' -n /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ ']'
++ fm_lock_clean_known_files /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ local lockdir=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ rm -f /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ/pid /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ/fm-home /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ/pid-identity /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ/role /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ/watcher-path
++ rmdir /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/.spawn-recover.lock.owner.8lXBtJ
++ return 0
++ '[' '!' -s /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/state/sol-sessions.tsv ']'
++ cleanup
++ TMUX_TMPDIR=/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h/tmux
++ tmux -L fm-lab kill-server
++ rm -rf /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h

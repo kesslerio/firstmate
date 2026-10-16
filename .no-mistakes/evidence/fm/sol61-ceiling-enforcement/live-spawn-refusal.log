@@ -1,0 +1,4 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task fifth (codex, gpt-6.1-sol) was refused. Active sessions: held-1 (gpt-6.1-sol, age 20742d23h); held-2 (gpt-6.1-sol, age 20742d23h); held-3 (gpt-6.1-sol, age 20742d23h); held-4 (gpt-6.1-sol, age 20742d23h). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+
+Verified: exit 1; no fifth.meta, no rendered launch-brief.md, and only the original primary tmux window. Private tmux server stopped and marked home removed.

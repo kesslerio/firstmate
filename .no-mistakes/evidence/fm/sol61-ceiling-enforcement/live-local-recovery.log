@@ -1,0 +1,4 @@
+/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h
+Real tmux endpoint state:
+deadConfirmed agent-free shell endpoint retired its owned pid-zero claim.
+Missing tmux endpoint without persisted socket identity remains uncertain; its claim is retained.

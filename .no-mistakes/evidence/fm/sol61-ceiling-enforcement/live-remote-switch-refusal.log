@@ -1,0 +1,4 @@
+error: error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task mate (codex, gpt-6.1-sol) was refused. Active sessions: held-0 (gpt-6.1-sol, age 20742d23h); held-1 (gpt-6.1-sol, age 20742d23h); held-2 (gpt-6.1-sol, age 20742d23h); held-3 (gpt-6.1-sol, age 20742d23h). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+
+exit=1
+Parent runtime-switch command refused before delivery; existing GLM metadata remained unchanged. No remote route/SSH connection was configured or contacted.

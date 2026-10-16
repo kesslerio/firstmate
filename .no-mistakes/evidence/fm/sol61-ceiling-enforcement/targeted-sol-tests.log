@@ -1,0 +1,13 @@
+ok - proven local stops and unpublished remote recovery release conservative occupancy
+ok - remote parent-route ownership shares the ceiling and recovery preserves uncertain claims
+ok - retries preserve occupancy and only confirmed teardown releases it
+ok - local homes share admission lock and preserve distinct task identities
+ok - exact identities, worker lifetime, live age, bounded overrides and non-Sol isolation
+ok - a Sol delivery under the ceiling retains a conservative claim
+ok - a dispatch at the ceiling is refused, naming sessions and ages, and creates nothing
+ok - dead workers are pruned regardless of age
+ok - a non-Sol model dispatch passes a full ceiling and touches no registry row
+ok - config/sol-cap overrides the filed default, and its absence restores it
+ok - a relaunched task id replaces its own registry row instead of counting itself
+ok - a malformed registry row refuses every Sol dispatch and names the row
+ok - an unread ceiling or dispatch table refuses instead of counting nothing
