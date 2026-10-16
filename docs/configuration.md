@@ -91,6 +91,7 @@ Each effective `FM_HOME` contains private operational directories.
 - Private secondmate config-reread generations with their retry and quarantine state.
 - Per-task steering-inbox records under `state/<id>.inbox/` (`bin/fm-task-inbox-lib.sh`).
 - Parent-owned secondmate pending-reply records under `state/pending-replies/` (`bin/fm-pending-reply-lib.sh`).
+- Per-home live-Sol-session registry rows under `state/sol-sessions.tsv`, owned by `bin/fm-sol-cap-lib.sh` and documented with the ceiling below.
 
 `config/` holds local gitignored operating choices, including explicit extension bindings under `config/extensions.d/`.
 
@@ -1279,6 +1280,40 @@ See [`docs/examples/crew-dispatch.json`](examples/crew-dispatch.json) for a star
 **Inheritance**
 
 Secondmate homes inherit this file from the primary, so a secondmate's own crewmates apply the same dispatch profile behavior.
+
+## Sol session ceiling (config/sol-cap)
+
+The captain filed a four-session ceiling (2026-09-29, "four-session Sol ceiling") on concurrent Sol sessions, and `config/sol-cap` names the mechanical guard that keeps it rather than requiring anyone's attention.
+A Sol session is a worker whose dispatch reaches the guard with an explicit or recorded model id in the Sol set.
+The set is derived at call time from `config/crew-dispatch.json`'s rule and default profiles (model ids matching `gpt-<digits or dots>-sol$`, today `gpt-6.1-sol` and `gpt-6-sol`), so a future Sol row joins the ceiling by editing the dispatch table, not code.
+`bin/fm-sol-cap-lib.sh` is the single owner of the guard's mechanics and its CLI (`models`, `ceiling`, `refuse-claim`), `bin/fm-spawn.sh` owns the hook point (after the spawn's harness/model axis resolves, before any endpoint, worktree, or record exists), and this section is the single owner of the operator contract.
+
+**What counts and where it lives**
+
+- The count registry is one TSV file per Firstmate home on this machine: `<state>/sol-sessions.tsv`, one row per Sol session `<session-id>\t<model>\t<start-epoch>\t<pid>`, where the task id is the session key.
+- The guard counts live rows across every local Firstmate home's state directory on this machine (the same enumeration `bin/fm-project-capacity-lib.sh` counts through), so local homes share one ceiling and remote homes are never walked because their workers run on another machine; a remote secondmate is counted in the dispatching home.
+- A registered stale row does not count: older than 6h, or its recorded pid is not alive, or its start epoch lies more than 1h in the future (a bogus-clock row reads as gone rather than wedging every dispatch).
+- A fresh spawn claims its row atomically under `<state>/.sol-cap.lock` during the guarded spawn, with the spawning `fm-spawn.sh` process's pid as the reservation, which dies with a failed dispatch; after the launch, the row is promoted to the worker's tmux pane shell's pid (the default tmux backend), or 0 for a backend that exposes no pane pid, keeping the slot age-bound only.
+- Passing spawns prune stale rows from every walked registry, so old rows do not accumulate.
+- A malformed registry row (bad shape) refuses every Sol dispatch with the row named rather than silently undercounting; staleness is release, but a broken row is a disruption, not a free slot.
+
+**Refusal, not queueing**
+
+A dispatch at the ceiling is refused before anything is created, with one actionable error naming the active sessions and their ages, in line with the dispatch contract that refuses rather than queues a wait with no bounded end.
+The refusal message names `config/sol-cap`, and the CLI prints the derived Sol set and the resolved ceiling directly for inspection:
+
+```sh
+FM_HOME=$FM_HOME bin/fm-sol-cap-lib.sh models    $FM_HOME/config   # derived Sol ids
+FM_HOME=$FM_HOME bin/fm-sol-cap-lib.sh ceiling   $FM_HOME/config
+```
+
+**Ceiling and the override**
+
+- The default is 4, `FM_SOL_CAP_DEFAULT` in `bin/fm-sol-cap-lib.sh`, in one place.
+- `config/sol-cap` in the dispatching home overrides it with one positive integer, so a captain ceiling change needs no code edit.
+- A ceiling file that is present but unreadable, malformed, or an unreadable `config/crew-dispatch.json` refuses every Sol dispatch loudly rather than guessing or counting nothing.
+
+**Boundary**: the no-mistakes daemon's internal gate/review agent spawns decode their own agent surface in the daemon's global config (`agent:`, `agent_config:`, `agent_path_override` in the operating no-mistakes config.yaml), its binary lives outside this repository, and a task may not administer it, so those spawns stay outside this count until whoever owns that daemon instance wires a hook to conform to this contract.
 
 ## Typed dispatch resolution (.env TYPESAFE_API_KEY)
 

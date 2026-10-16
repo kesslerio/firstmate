@@ -754,6 +754,8 @@ fm_backlog_directory_present "$STATE" "state directory" || {
 . "$SCRIPT_DIR/fm-timeout-lib.sh"
 # shellcheck source=bin/fm-project-capacity-lib.sh
 . "$SCRIPT_DIR/fm-project-capacity-lib.sh"
+# shellcheck source=bin/fm-sol-cap-lib.sh
+. "$SCRIPT_DIR/fm-sol-cap-lib.sh"
 # shellcheck source=bin/fm-worker-account-lib.sh
 . "$SCRIPT_DIR/fm-worker-account-lib.sh"
 # Fail closed before any fleet mutation: a no-mistakes gate agent must never spawn
@@ -1164,6 +1166,15 @@ spawn_remote_secondmate() {
     fm_lock_release "$SPAWN_TASK_LOCK" || true
     return 1
   fi
+  # Sol session ceiling (bin/fm-sol-cap-lib.sh): a remote secondmate counts in
+  # the dispatching home's registry, the only home that records this route; a
+  # remote home's own dispatches count in theirs.
+  remote_sol_model=
+  [ "$model" != - ] && [ "$model" != default ] && [ -n "$model" ] && remote_sol_model=$model
+  fm_sol_cap_refuse_and_claim "$id" secondmate "$harness" "$remote_sol_model" "$CONFIG" "$STATE" || {
+    [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
+    return 1
+  }
   meta="$STATE/$id.meta"
   if [ -e "$meta" ] || [ -L "$meta" ]; then
     if ! fm_backlog_record_present "$meta" "task record" "$STATE" ||
@@ -1350,6 +1361,13 @@ spawn_remote_secondmate() {
     return 1
   fi
   [ ! -e "$CONFIG/fleet-ledger" ] || FM_HOME=$FM_HOME FM_STATE_OVERRIDE=$STATE FM_CONFIG_OVERRIDE=$CONFIG "$SCRIPT_DIR/fm-fleet-ledger.sh" dispatched "$id" secondmate "" "$harness" "${model#-}" || true
+  if ! fm_sol_cap_promote "$id" "$remote_backend" "$remote_target" "$STATE"; then
+    # The remote home exposes no pane pid this home can read, so a failed
+    # promotion leaves the age-bound reservation only; warn and continue
+    # rather than tearing down a launched worker.
+    [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
+    echo "warning: Sol ceiling: remote secondmate $id's slot stays age-bound only (bin/fm-sol-cap-lib.sh)" >&2
+  fi
   echo "spawned $id harness=$harness kind=secondmate mode=secondmate yolo=off window=remote:$id worktree=$home remote=$host backend=$remote_backend"
   return 0
 }
@@ -2699,6 +2717,22 @@ fi
 if [ "$HARNESS" = agy ]; then
   agy_model_validate "$AGY_BIN" "$MODEL" || exit 1
 fi
+# Sol session ceiling (bin/fm-sol-cap-lib.sh; docs/configuration.md "Sol
+# session ceiling (config/sol-cap)"): the mechanical ceiling on concurrent
+# Sol dispatches runs once the spawn's model axis fully resolves (the
+# secondmate resolution above; a fresh ship or scout carries the explicit
+# --model dispatch resolves at intake) and before any endpoint, worktree, or
+# record exists, so a refusal unwinds to nothing. A relaunch without --model
+# reuses its recorded model=, so the relaunched session keeps its slot
+# identity rather than dropping its own count.
+FM_SPAWN_SOL_MODEL=${MODEL:-}
+if [ "$RELAUNCH" -eq 1 ] && { [ -z "$FM_SPAWN_SOL_MODEL" ] || [ "$FM_SPAWN_SOL_MODEL" = default ]; }; then
+  FM_SPAWN_SOL_MODEL=$(fm_meta_get "$RELAUNCH_META" model 2>/dev/null || true)
+fi
+fm_sol_cap_refuse_and_claim "$ID" "$KIND" "$HARNESS" "$FM_SPAWN_SOL_MODEL" "$CONFIG" "$STATE" || {
+  [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
+  exit 1
+}
 # Worker account pin (header above): resolved before any endpoint, worktree, or
 # record exists. An absent pin selects nothing and leaves every later launch
 # step exactly as it was. A pinned Claude root is exported here as well, so the
@@ -6193,4 +6227,12 @@ SPAWN_ACCOUNT=
 # Opt-in Herdr project groups (docs/herdr-backend.md "Project groups") tag the
 # new endpoint now rather than at the next watcher poll; off costs one file test.
 [ ! -e "$CONFIG/herdr-project-groups" ] || [ "$BACKEND" != herdr ] || FM_HOME=$FM_HOME FM_STATE_OVERRIDE=$STATE FM_CONFIG_OVERRIDE=$CONFIG "$SCRIPT_DIR/fm-herdr-groups.sh" sync "$ID" || true
+# Sol session ceiling: the launched worker now owns its own liveness surface
+# (bin/fm-sol-cap-lib.sh). A tmux pane shell keeps the slot tied to the
+# worker's process; a backend without an exposed pane pid keeps the slot
+# age-bound only. A failed promotion warns and keeps the worker launched.
+if ! fm_sol_cap_promote "$ID" "$BACKEND" "$T" "$STATE"; then
+  [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
+  echo "warning: Sol ceiling: task $ID's session slot stays age-bound only (bin/fm-sol-cap-lib.sh)" >&2
+fi
 echo "spawned $ID harness=$HARNESS kind=$KIND$SPAWN_DELIVERY window=$META_WINDOW worktree=$WT$SPAWN_ACCOUNT"
