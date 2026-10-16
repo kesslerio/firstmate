@@ -54,10 +54,7 @@ REMOTE_HOST=$(fm_meta_get "$META" remote_host)
   || die "task $ID is not a remotely placed secondmate; use bin/fm-control.sh $ID relaunch instead"
 
 fm_sol_cap_reconcile_remote "$ID" "$STATE" "$SCRIPT_DIR" || die "cannot reconcile $ID's Sol claim"
-if [ ! -f "$STATE/$FM_SOL_REGISTRY_NAME" ] ||
-  ! awk -F'\t' -v id="$ID" '$1 == id {found=1; exit} END {exit !found}' "$STATE/$FM_SOL_REGISTRY_NAME"; then
-  fm_sol_cap_refuse_and_claim "$ID" secondmate "$HARNESS" "$MODEL" "$CONFIG" "$STATE" || die "$FM_SOL_CAP_REFUSAL"
-fi
+fm_sol_cap_refuse_and_claim "$ID" secondmate "$HARNESS" "$MODEL" "$CONFIG" "$STATE" reuse || die "$FM_SOL_CAP_REFUSAL"
 if [ "$FM_SOL_CLAIM_CREATED" = "$ID" ]; then
   fm_sol_cap_promote "$ID" 0 "$STATE" || die "cannot preserve $ID's delivery reservation"
 fi
