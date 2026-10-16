@@ -73,7 +73,7 @@ pass "cmux proves absence across every window and refuses incomplete inventories
 
 (
   . "$ROOT/bin/backends/zellij.sh"
-  zellij() { printf 'firstmate\n'; return "$inventory_status"; }
+  zellij() { printf 'firstmate\n'; return "$zellij_inventory_status"; }
   fm_backend_zellij_tab_for_pane() { printf '3'; }
   fm_backend_zellij_tab_matches_label() { return "$label_status"; }
   fm_backend_zellij_scoped_title() { printf '%s' "$1"; }
@@ -81,31 +81,31 @@ pass "cmux proves absence across every window and refuses incomplete inventories
     case "$3" in
       list-panes) printf '%s' "$test_panes"; return "$read_status" ;;
       list-tabs) printf '%s' "$test_tabs"; return "$read_status" ;;
-      *) return "$close_status" ;;
+      *) return "$zellij_close_status" ;;
     esac
   }
   test_panes='[{"id":7}]' test_tabs='[{"tab_id":3,"name":"fm-task"}]' read_status=0
-  inventory_status=0 label_status=0 close_status=1
+  zellij_inventory_status=0 label_status=0 zellij_close_status=1
   check_close zellij firstmate:7 1 3 fm-task
   check_close zellij firstmate:7 1
-  close_status=0
+  zellij_close_status=0
   check_close zellij firstmate:7 0 3 fm-task
   fm_backend_zellij_tab_for_pane() { return 0; }
-  close_status=1
+  zellij_close_status=1
   check_close zellij firstmate:7 1
-  close_status=0
+  zellij_close_status=0
   check_close zellij firstmate:7 0
   label_status=1
   check_close zellij firstmate:7 1 3 fm-task
   test_panes='[]' test_tabs='[]'
   check_close zellij firstmate:7 0 3 fm-task
-  close_status=1
+  zellij_close_status=1
   check_close zellij firstmate:7 0
   read_status=1
   check_close zellij firstmate:7 1 3 fm-task
   read_status=0 test_panes='{}'
   check_close zellij firstmate:7 1 3 fm-task
-  inventory_status=1
+  zellij_inventory_status=1
   check_close zellij firstmate:7 1
   zellij() { printf 'other\n'; }
   check_close zellij firstmate:7 0
@@ -114,10 +114,10 @@ pass "zellij distinguishes confirmed absence from failed reads, closes and ident
 
 (
   . "$ROOT/bin/backends/orca.sh"
-  orca() { printf '%s\n' "$close_response"; return "$close_status"; }
-  close_status=1 close_response='{}'
+  orca() { printf '%s\n' "$close_response"; return "$orca_close_status"; }
+  orca_close_status=1 close_response='{}'
   check_close orca terminal 1
-  close_status=0 close_response='{"ok":false}'
+  orca_close_status=0 close_response='{"ok":false}'
   check_close orca terminal 2
   close_response='{"ok":true}'
   check_close orca terminal 0

@@ -613,7 +613,7 @@ fm_backend_cmux_window_of_workspace() {  # <workspace_id> -> "<window_id> <count
 # leaving that window a fresh default workspace (never an fm-<home>- title, so
 # recovery/list_live ignore it) - cmux's own "closed the last tab" outcome.
 fm_backend_cmux_workspace_absent() {
-  local wsid=$1 label=${2:-} inventory title= windows window_ids wid
+  local wsid=$1 label=${2:-} inventory title='' windows window_ids wid
   [ -z "$label" ] || title=$(fm_backend_cmux_scoped_title "$label")
   windows=$(fm_backend_cmux_cli list-windows --json --id-format uuids 2>/dev/null) || return 1
   window_ids=$(printf '%s' "$windows" | jq -r '
