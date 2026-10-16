@@ -71,6 +71,10 @@ IFS=$'\t' read -r cmd action id harness model effort <<EOF
 $command_fields
 EOF
 [ "$cmd" = fm-remote-secondmate-control.sh ] || exit 93
+if [ "$action" = state ]; then
+  printf 'probe diagnostic\nalive\n'
+  exit 0
+fi
 [ "$action" = relaunch ] || exit 94
 case "$FM_FAKE_RELAUNCH_MODE" in
   refuse)
@@ -190,3 +194,21 @@ fm_pr_poll_artifacts_valid "$HOME_DIR/state" ios "$ROOT/bin/fm-pr-poll.sh" \
 pass "a remote relaunch keeps an already-armed PR poll authenticating"
 
 echo "ALL TESTS PASSED"
+
+reset_meta
+printf '{"rules":[{"use":{"model":"gpt-6.1-sol"}}]}\n' > "$HOME_DIR/config/crew-dispatch.json"
+for i in 1 2 3 4; do printf 'live-%s\tgpt-6.1-sol\t1\t%s\n' "$i" "$$"; done > "$HOME_DIR/state/sol-sessions.tsv"
+OUT=$(run_relaunch ios codex gpt-6.1-sol medium); RC=$?
+expect_code 1 "$RC" "a runtime switch bypassed the full parent ceiling"
+awk -F'\t' '$1 != "live-4"' "$HOME_DIR/state/sol-sessions.tsv" > "$TMP/registry"
+mv "$TMP/registry" "$HOME_DIR/state/sol-sessions.tsv"
+OUT=$(run_relaunch ios codex gpt-6.1-sol medium); RC=$?
+expect_code 0 "$RC" "an admitted Sol runtime switch failed: $OUT"
+assert_equals 0 "$(awk -F'\t' '$1 == "ios" {print $4}' "$HOME_DIR/state/sol-sessions.tsv")" "remote switch did not preserve occupancy"
+OUT=$(FM_FAKE_RELAUNCH_MODE=refuse run_relaunch ios claude claude-opus-5-5 medium); RC=$?
+expect_code 1 "$RC" "refused remote replacement unexpectedly succeeded"
+assert_equals 0 "$(awk -F'\t' '$1 == "ios" {print $4}' "$HOME_DIR/state/sol-sessions.tsv")" "failed runtime switch released occupancy"
+OUT=$(run_relaunch ios claude claude-opus-5-5 medium); RC=$?
+expect_code 0 "$RC" "reverse runtime switch failed: $OUT"
+assert_equals '' "$(awk -F'\t' '$1 == "ios" {print $4}' "$HOME_DIR/state/sol-sessions.tsv")" "confirmed non-Sol replacement retained occupancy"
+pass "remote runtime switches enforce parent admission and retain uncertain occupancy"

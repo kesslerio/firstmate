@@ -327,6 +327,7 @@ fm_sol_cap_reconcile_remote() {
   [ -f "$state/$id.meta" ] && [ -f "$state/$FM_SOL_REGISTRY_NAME" ] || return 0
   awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$state/$FM_SOL_REGISTRY_NAME" || return 0
   remote_state=$("$scripts/fm-on.sh" "$id" fm-remote-secondmate-control.sh state "$id" </dev/null 2>/dev/null) || return 0
+  remote_state=$(printf '%s\n' "$remote_state" | tail -1)
   case "$remote_state" in
     dead | missing) fm_sol_cap_promote "$id" remove "$state" ;;
   esac

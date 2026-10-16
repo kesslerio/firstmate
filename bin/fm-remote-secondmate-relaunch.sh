@@ -29,6 +29,9 @@ STATE="${FM_STATE_OVERRIDE:-$FM_HOME/state}"
 . "$SCRIPT_DIR/fm-backend.sh"
 # shellcheck source=bin/fm-wake-lib.sh
 . "$SCRIPT_DIR/fm-wake-lib.sh"
+. "$SCRIPT_DIR/fm-secondmate-registry-lib.sh"
+. "$SCRIPT_DIR/fm-sol-cap-lib.sh"
+CONFIG="${FM_CONFIG_OVERRIDE:-$FM_HOME/config}"
 
 die() { printf 'error: %s\n' "$1" >&2; exit 1; }
 usage() { sed -n '2,4p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
@@ -40,11 +43,24 @@ MODEL=$3
 EFFORT=$4
 case "$ID" in ''|*[!A-Za-z0-9._-]*) die "invalid secondmate id: $ID" ;; esac
 
+SPAWN_LOCK="$STATE/.spawn-$ID.lock"
+fm_lock_try_acquire "$SPAWN_LOCK" || die "another spawn or runtime switch owns $ID"
+trap 'fm_lock_release "$SPAWN_LOCK" || true' EXIT
+
 META="$STATE/$ID.meta"
 [ -f "$META" ] && [ ! -L "$META" ] || die "no metadata for $ID at $META"
 REMOTE_HOST=$(fm_meta_get "$META" remote_host)
 [ -n "$REMOTE_HOST" ] \
   || die "task $ID is not a remotely placed secondmate; use bin/fm-control.sh $ID relaunch instead"
+
+fm_sol_cap_reconcile_remote "$ID" "$STATE" "$SCRIPT_DIR" || die "cannot reconcile $ID's Sol claim"
+if [ ! -f "$STATE/$FM_SOL_REGISTRY_NAME" ] ||
+  ! awk -F'\t' -v id="$ID" '$1 == id {found=1; exit} END {exit !found}' "$STATE/$FM_SOL_REGISTRY_NAME"; then
+  fm_sol_cap_refuse_and_claim "$ID" secondmate "$HARNESS" "$MODEL" "$CONFIG" "$STATE" || die "$FM_SOL_CAP_REFUSAL"
+fi
+if [ "$FM_SOL_CLAIM_CREATED" = "$ID" ]; then
+  fm_sol_cap_promote "$ID" 0 "$STATE" || die "cannot preserve $ID's delivery reservation"
+fi
 
 RELAUNCH_OUT=$("$SCRIPT_DIR/fm-on.sh" "$ID" fm-remote-secondmate-control.sh \
   relaunch "$ID" "$HARNESS" "$MODEL" "$EFFORT" </dev/null 2>&1) || {
@@ -66,6 +82,10 @@ NEW_HARNESS=$(printf '%s\n' "$RELAUNCH_OUT" | sed -n 's/^harness=//p' | tail -1)
 NEW_MODEL=$(printf '%s\n' "$RELAUNCH_OUT" | sed -n 's/^model=//p' | tail -1)
 NEW_EFFORT=$(printf '%s\n' "$RELAUNCH_OUT" | sed -n 's/^effort=//p' | tail -1)
 [ -n "$NEW_HARNESS" ] || die "the host's route confirmation carried no harness to record"
+
+if [[ ! "$NEW_MODEL" =~ ^gpt-[0-9.]+-sol$ ]]; then
+  fm_sol_cap_promote "$ID" remove "$STATE" || die "cannot release $ID's stopped Sol incarnation"
+fi
 
 META_LOCK=$(fm_meta_lock_path "$META") || die "metadata lock path is invalid for $ID"
 fm_lock_acquire_wait "$META_LOCK"

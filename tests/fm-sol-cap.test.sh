@@ -486,7 +486,7 @@ test_remote_ownership_and_recovery() (
   mkdir "$scripts"
   cat > "$scripts/fm-on.sh" <<'SH'
 #!/usr/bin/env bash
-printf '%s\n' "$TEST_REMOTE_STATE"
+printf 'probe diagnostic\n%s\n' "$TEST_REMOTE_STATE"
 exit "${TEST_REMOTE_RC:-0}"
 SH
   chmod +x "$scripts/fm-on.sh"
