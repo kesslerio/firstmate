@@ -506,6 +506,50 @@ SH
   pass "remote parent-route ownership shares the ceiling and recovery preserves uncertain claims"
 )
 
+test_stopped_local_and_unpublished_remote_recovery() (
+  local case_dir state observed_state absence_response out i
+  case_dir=$(make_case stopped-local)
+  state=$case_dir/home/state
+  FM_HOME=$case_dir/home
+  . "$ROOT/bin/fm-wake-lib.sh"
+  . "$ROOT/bin/fm-secondmate-registry-lib.sh"
+  . "$ROOT/bin/fm-sol-cap-lib.sh"
+  fm_backend_of_meta() { printf tmux; }
+  fm_backend_target_of_meta() { printf 'firstmate:fm-mate'; }
+  fm_backend_agent_state() { printf '%s' "$observed_state"; }
+  fm_control_endpoint_absence_verdict() { printf '%s' "$absence_response"; }
+  touch "$state/mate.meta"
+  for i in dead alive unreadable; do
+    observed_state=$i
+    printf 'mate\tgpt-6.1-sol\t1\t0\n' > "$state/sol-sessions.tsv"
+    fm_sol_cap_reconcile_local mate "$state" || fail "local reconciliation failed"
+    out=$(registry_row_field "$case_dir" mate 4)
+    case "$i" in
+      dead) [ -z "$out" ] || fail "dead local conservative claim survived" ;;
+      *) [ "$out" = 0 ] || fail "unproven local stop released occupancy" ;;
+    esac
+  done
+  observed_state=missing absence_response=unknown
+  fm_sol_cap_reconcile_local mate "$state"
+  [ "$(registry_row_field "$case_dir" mate 4)" = 0 ] || fail "ambiguous absence released occupancy"
+  absence_response=gone
+  fm_sol_cap_reconcile_local mate "$state"
+  fm_sol_cap_refuse_and_claim mate secondmate claude default "$case_dir/home/config" "$state" || fail "cleared model was refused"
+  [ -z "$FM_SOL_CLAIM_CREATED" ] || fail "cleared model reserved Sol occupancy"
+  mkdir "$case_dir/probe"
+  cat > "$case_dir/probe/fm-on.sh" <<'SH'
+#!/usr/bin/env bash
+printf 'dead\n'
+SH
+  chmod +x "$case_dir/probe/fm-on.sh"
+  rm "$state/mate.meta"
+  printf 'mate\tgpt-6.1-sol\t1\t0\n' > "$state/sol-sessions.tsv"
+  fm_sol_cap_reconcile_remote mate "$state" "$case_dir/probe" || fail "unpublished route reconciliation failed"
+  [ -z "$(registry_row_field "$case_dir" mate 4)" ] || fail "missing parent metadata blocked proven-stop reconciliation"
+  pass "proven local stops and unpublished remote recovery release conservative occupancy"
+)
+
+test_stopped_local_and_unpublished_remote_recovery
 test_remote_ownership_and_recovery
 test_retry_and_confirmed_stop
 test_shared_home_admission

@@ -327,9 +327,31 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
   return 0
 }
 
+fm_sol_cap_reconcile_local() {
+  local id=$1 state=$2 meta backend target verdict absence
+  meta=$state/$id.meta
+  [ -f "$meta" ] && [ ! -L "$meta" ] && [ -f "$state/$FM_SOL_REGISTRY_NAME" ] || return 0
+  awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$state/$FM_SOL_REGISTRY_NAME" || return 0
+  backend=$(fm_backend_of_meta "$meta") || return 1
+  target=$(fm_backend_target_of_meta "$meta") || return 1
+  [ -n "$target" ] || return 0
+  verdict=$(fm_backend_agent_state "$backend" "$target") || return 0
+  if [ "$verdict" = missing ]; then
+    absence=$(fm_control_endpoint_absence_verdict "$backend" "$target") || return 0
+    case "${absence%%$'\t'*}" in
+      gone) verdict=missing ;;
+      dead) verdict=dead ;;
+      *) return 0 ;;
+    esac
+  fi
+  case "$verdict" in
+    dead | missing) fm_sol_cap_promote "$id" remove "$state" ;;
+  esac
+}
+
 fm_sol_cap_reconcile_remote() {
   local id=$1 state=$2 scripts=$3 remote_state
-  [ -f "$state/$id.meta" ] && [ -f "$state/$FM_SOL_REGISTRY_NAME" ] || return 0
+  [ -f "$state/$FM_SOL_REGISTRY_NAME" ] || return 0
   awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$state/$FM_SOL_REGISTRY_NAME" || return 0
   remote_state=$("$scripts/fm-on.sh" "$id" fm-remote-secondmate-control.sh state "$id" </dev/null 2>/dev/null) || return 0
   remote_state=$(printf '%s\n' "$remote_state" | tail -1)
