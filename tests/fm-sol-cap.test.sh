@@ -128,10 +128,6 @@ case "${1:-}" in
   has-session|new-session|send-keys) : ;;
 esac
 exit 0
-SH <<'SH'
-#!/usr/bin/env bash
-printf 'treehouse %s\n' "$*" >> "$FM_FAKE_CALL_LOG"
-exit 0
 SH
   cat > "$fakebin/treehouse" <<'SH'
 #!/usr/bin/env bash
