@@ -99,6 +99,7 @@ case "${1:-}" in
     grep -Fqx -- "$name" "$window_file" 2>/dev/null || printf '%s\n' "$name" >> "$window_file"
     ;;
   kill-window)
+    [ "${FM_TEST_CLOSE_FAIL:-0}" != 1 ] || exit 1
     target=
     previous=
     for arg in "$@"; do
@@ -262,8 +263,10 @@ test_non_sol_model_never_claims_a_slot() {
   write_sol_row "$case_dir/home" s2 "$(fresh_start)"
   write_sol_row "$case_dir/home" s3 "$(fresh_start)"
   write_sol_row "$case_dir/home" s4 "$(fresh_start)"
-  cp "$case_dir/home/state/sol-sessions.tsv" "$TMP_ROOT/glm-registry-before.tsv"
   write_sol_row "$case_dir/home" task-c 1 "$$"
+  cp "$case_dir/home/state/sol-sessions.tsv" "$TMP_ROOT/glm-registry-before.tsv"
+  mkdir "$case_dir/home/state/.sol-cap.lock"
+  printf '%s\n' "$$" > "$case_dir/home/state/.sol-cap.lock/pid"
   out=$(spawn_sol_ship "$case_dir" task-c gpt-5.6-luna) || rc=$?
   expect_code 0 "$rc" "a non-Sol dispatch was refused by the Sol ceiling: $out"
   assert_contains "$out" "spawned task-c" "a non-Sol dispatch did not launch"
@@ -318,7 +321,7 @@ lib_refuse_claim() {  # <case-dir> <id> <model>
 test_relaunched_session_id_replaces_its_own_row() {
   local case_dir out own_start
   case_dir=$(make_case relaunch task-c)
-  write_sol_row "$case_dir/home" task-c "$(( "$(fresh_start)" - 43201 ))"
+  write_sol_row "$case_dir/home" task-c "$(( "$(fresh_start)" - 43201 ))" 99999999
   write_sol_row "$case_dir/home" live-a "$(fresh_start)"
   write_sol_row "$case_dir/home" live-b "$(fresh_start)"
   write_sol_row "$case_dir/home" live-c "$(fresh_start)"
@@ -429,6 +432,37 @@ test_shared_home_admission() {
   pass "local homes share admission lock and preserve distinct task identities"
 }
 
+test_retry_and_confirmed_stop() {
+  local case_dir out rc=0 id=retry before
+  case_dir=$(make_case retry)
+  write_sol_row "$case_dir/home" "$id" 1 0
+  write_sol_row "$case_dir/home" build-retry 1 0
+  before=$(cat "$case_dir/home/state/sol-sessions.tsv")
+  out=$(lib_refuse_claim "$case_dir" "$id" gpt-6.1-sol) || rc=$?
+  expect_code 1 "$rc" "retry replaced uncertain occupancy"
+  assert_equals "$before" "$(cat "$case_dir/home/state/sol-sessions.tsv")" "retry changed existing occupancy"
+  out=$(lib_refuse_claim "$case_dir" "$id" glm-5) || fail "$out"
+  assert_equals "$before" "$(cat "$case_dir/home/state/sol-sessions.tsv")" "non-Sol retry changed occupancy"
+  printf 'manual\n' > "$case_dir/home/config/backlog-backend"
+  fm_write_meta "$case_dir/home/state/$id.meta" "window=firstmate:fm-$id" "endpoint_task_id=$id" \
+    "worktree=$case_dir/nonexistent-worktree" "project=$case_dir/nonexistent-project" "kind=ship" "mode=no-mistakes"
+  printf 'fm-%s\n' "$id" > "$case_dir/calls.log.window"
+  rc=0
+  out=$(FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$ROOT" FM_TEST_CLOSE_FAIL=1 \
+    FM_FAKE_CALL_LOG="$case_dir/calls.log" PATH="$case_dir/fakebin:$PATH" \
+    bash "$ROOT/bin/fm-teardown.sh" "$id" --force 2>&1) || rc=$?
+  assert_equals "$before" "$(cat "$case_dir/home/state/sol-sessions.tsv")" "unconfirmed close released occupancy"
+  fm_write_meta "$case_dir/home/state/$id.meta" "window=firstmate:fm-$id" "endpoint_task_id=$id" \
+    "worktree=$case_dir/nonexistent-worktree" "project=$case_dir/nonexistent-project" "kind=ship" "mode=no-mistakes"
+  out=$(FM_HOME="$case_dir/home" FM_ROOT_OVERRIDE="$ROOT" \
+    FM_FAKE_CALL_LOG="$case_dir/calls.log" PATH="$case_dir/fakebin:$PATH" \
+    bash "$ROOT/bin/fm-teardown.sh" "$id" --force 2>&1) || fail "confirmed teardown failed: $out"
+  [ -z "$(registry_row_field "$case_dir" "$id" 4)" ] || fail "confirmed teardown retained occupancy"
+  [ "$(registry_row_field "$case_dir" build-retry 4)" = 0 ] || fail "teardown removed sibling occupancy"
+  pass "retries preserve occupancy and only confirmed teardown releases it"
+}
+
+test_retry_and_confirmed_stop
 test_shared_home_admission
 test_review_regressions
 test_under_cap_sol_spawn_launches_and_claims_its_slot

@@ -1297,7 +1297,8 @@ The set is derived at call time from `config/crew-dispatch.json`'s rule and defa
 - Before delivery, the reservation becomes conservative (pid 0), so an uncertain delivery or later spawn error cannot free a running worker's slot.
 - Local launch commands transfer that reservation to their own process before starting the worker; exiting the worker releases occupancy even while its interactive pane remains open.
 - Remote or uncertain deliveries keep pid 0 and require reconciliation before their slot can be released; they never expire by age.
-- Replacing a task with a non-Sol model removes its earlier Sol row.
+- A Sol retry refuses while its existing worker is live or delivery is uncertain; a non-Sol retry preserves that occupancy.
+- Confirmed endpoint cleanup and remote retirement remove the owned Sol row; failed or uncertain closes retain it.
 - Passing spawns prune stale rows from every walked registry, so old rows do not accumulate.
 - A malformed registry row (bad shape) refuses every Sol dispatch with the row named rather than silently undercounting; staleness is release, but a broken row is a disruption, not a free slot.
 
