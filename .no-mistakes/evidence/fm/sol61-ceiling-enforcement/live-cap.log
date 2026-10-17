@@ -1,0 +1,95 @@
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh models /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config
+gpt-6-sol|gpt-6.1-sol|gpt-9.9-sol
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim worker-0 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+claimed
+Actual launch-hook worker PID: 1854781 registry: [['worker-0', 'gpt-6.1-sol', '1792214912', '1854781']]
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim worker-1 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+claimed
+Actual launch-hook worker PID: 1854888 registry: [['worker-0', 'gpt-6.1-sol', '1792214912', '1854781'], ['worker-1', 'gpt-6.1-sol', '1792214912', '1854888']]
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim worker-2 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+claimed
+Actual launch-hook worker PID: 1854983 registry: [['worker-0', 'gpt-6.1-sol', '1792214912', '1854781'], ['worker-1', 'gpt-6.1-sol', '1792214912', '1854888'], ['worker-2', 'gpt-6.1-sol', '1792214912', '1854983']]
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim worker-3 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+claimed
+Actual launch-hook worker PID: 1855197 registry: [['worker-0', 'gpt-6.1-sol', '1792214912', '1854781'], ['worker-1', 'gpt-6.1-sol', '1792214912', '1854888'], ['worker-2', 'gpt-6.1-sol', '1792214912', '1854983'], ['worker-3', 'gpt-6.1-sol', '1792214912', '1855197']]
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim fifth ship codex gpt-9.9-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task fifth (codex, gpt-9.9-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 0s); worker-1 (gpt-6.1-sol, age 0s); worker-2 (gpt-6.1-sol, age 0s); worker-3 (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+SCENARIO PASS: Derived model set admits four real launch-hook processes and refuses the fifth, including a newly configured Sol model
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim glm-5 ship codex glm-5 /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+claimed
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim qwen3 ship codex qwen3 /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+claimed
+SCENARIO PASS: GLM and qwen admissions bypass a full Sol registry without changing occupancy
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim worker-0 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+error: Sol ceiling: task worker-0 already holds a live or uncertain session; confirm its worker stopped through teardown before replacing it
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim replacement ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+claimed
+Actual launch-hook worker PID: 1855523 registry: [['worker-1', 'gpt-6.1-sol', '1792214912', '1854888'], ['worker-2', 'gpt-6.1-sol', '1792214912', '1854983'], ['worker-3', 'gpt-6.1-sol', '1792214912', '1855197'], ['replacement', 'gpt-6.1-sol', '1792214912', '1855523']]
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim sixth ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task sixth (codex, gpt-6.1-sol) was refused. Active sessions: worker-1 (gpt-6.1-sol, age 0s); worker-2 (gpt-6.1-sol, age 0s); worker-3 (gpt-6.1-sol, age 0s); replacement (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+SCENARIO PASS: A live worker cannot be replaced; a confirmed process exit frees exactly one slot
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh ceiling /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config
+2
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim lowered ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 2 (config/sol-cap may lower it); the dispatch of task lowered (codex, gpt-6.1-sol) was refused. Active sessions: worker-1 (gpt-6.1-sol, age 0s); worker-2 (gpt-6.1-sol, age 0s); worker-3 (gpt-6.1-sol, age 0s); replacement (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim invalid-cap ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+error: Sol ceiling unavailable: /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config/sol-cap must be one integer from 1 through 4; task invalid-cap with model gpt-6.1-sol was not dispatched rather than launched against an unread ceiling
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim broken-config ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+error: Sol ceiling unavailable: /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config/crew-dispatch.json exists but cannot be read; task broken-config with model gpt-6.1-sol was not dispatched rather than launched possibly uncounted
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim glm-5 ship codex glm-5 /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+claimed
+$ FM_HOME=<ceiling> fm-sol-cap-lib.sh refuse-claim qwen3 ship codex qwen3 /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/ceiling/state
+claimed
+SCENARIO PASS: Lower-only ceiling and unreadable dispatch configuration refuse Sol while GLM and qwen remain admitted
+$ FM_HOME=<parallel> fm-sol-cap-lib.sh refuse-claim held-0 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/parallel/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/parallel/state
+claimed
+Actual launch-hook worker PID: 1855829 registry: [['held-0', 'gpt-6.1-sol', '1792214912', '1855829']]
+$ FM_HOME=<parallel> fm-sol-cap-lib.sh refuse-claim held-1 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/parallel/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/parallel/state
+claimed
+Actual launch-hook worker PID: 1855944 registry: [['held-0', 'gpt-6.1-sol', '1792214912', '1855829'], ['held-1', 'gpt-6.1-sol', '1792214912', '1855944']]
+$ FM_HOME=<parallel> fm-sol-cap-lib.sh refuse-claim held-2 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/parallel/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/parallel/state
+claimed
+Actual launch-hook worker PID: 1856076 registry: [['held-0', 'gpt-6.1-sol', '1792214912', '1855829'], ['held-1', 'gpt-6.1-sol', '1792214912', '1855944'], ['held-2', 'gpt-6.1-sol', '1792214912', '1856076']]
+Concurrent admission A: 1 error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task race-a (codex, gpt-6.1-sol) was refused. Active sessions: held-0 (gpt-6.1-sol, age 1s); held-1 (gpt-6.1-sol, age 1s); held-2 (gpt-6.1-sol, age 1s); race-b (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+ B: 0 ADMITTED
+
+SCENARIO PASS: Two simultaneous dispatches competing for the fourth slot admit exactly one
+$ FM_HOME=<queued> fm-sol-cap-lib.sh refuse-claim held-0 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/queued/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/queued/state
+claimed
+Actual launch-hook worker PID: 1857953 registry: [['held-0', 'gpt-6.1-sol', '1792214916', '1857953']]
+$ FM_HOME=<queued> fm-sol-cap-lib.sh refuse-claim held-1 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/queued/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/queued/state
+claimed
+Actual launch-hook worker PID: 1858134 registry: [['held-0', 'gpt-6.1-sol', '1792214916', '1857953'], ['held-1', 'gpt-6.1-sol', '1792214916', '1858134']]
+$ FM_HOME=<queued> fm-sol-cap-lib.sh refuse-claim held-2 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/queued/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/queued/state
+claimed
+Actual launch-hook worker PID: 1858350 registry: [['held-0', 'gpt-6.1-sol', '1792214916', '1857953'], ['held-1', 'gpt-6.1-sol', '1792214916', '1858134'], ['held-2', 'gpt-6.1-sol', '1792214916', '1858350']]
+$ FM_HOME=<queued> fm-sol-cap-lib.sh record-actual queued gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/queued/state
+recorded
+$ FM_HOME=<queued> fm-sol-cap-lib.sh refuse-claim fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/queued/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/queued/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task fifth (codex, gpt-6.1-sol) was refused. Active sessions: held-0 (gpt-6.1-sol, age 0s); held-1 (gpt-6.1-sol, age 0s); held-2 (gpt-6.1-sol, age 0s); queued (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+SCENARIO PASS: An uncertain queued delivery retains the fourth slot after its submitting process exits
+$ FM_HOME=<actual> fm-sol-cap-lib.sh record-actual reused gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/actual/state
+recorded
+$ FM_HOME=<actual> fm-sol-cap-lib.sh refuse-claim default-retry ship codex default /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/actual/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/actual/state
+claimed
+$ FM_HOME=<actual> fm-sol-cap-lib.sh record-actual reused glm-5 /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/actual/state
+recorded
+SCENARIO PASS: Confirmed actual-route reports preserve Sol occupancy and release it for a non-Sol replacement
+$ FM_HOME=<shared> fm-sol-cap-lib.sh refuse-claim root-0 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/state
+claimed
+Actual launch-hook worker PID: 1859032 registry: [['root-0', 'gpt-6.1-sol', '1792214916', '1859032']]
+$ FM_HOME=<shared> fm-sol-cap-lib.sh refuse-claim root-1 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/state
+claimed
+Actual launch-hook worker PID: 1859178 registry: [['root-0', 'gpt-6.1-sol', '1792214916', '1859032'], ['root-1', 'gpt-6.1-sol', '1792214916', '1859178']]
+$ FM_HOME=<shared> fm-sol-cap-lib.sh refuse-claim root-2 ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/state
+claimed
+Actual launch-hook worker PID: 1859326 registry: [['root-0', 'gpt-6.1-sol', '1792214916', '1859032'], ['root-1', 'gpt-6.1-sol', '1792214916', '1859178'], ['root-2', 'gpt-6.1-sol', '1792214916', '1859326']]
+$ FM_HOME=<child> fm-sol-cap-lib.sh refuse-claim child-worker ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/child/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/child/state
+claimed
+Actual launch-hook worker PID: 1859451 registry: [['child-worker', 'gpt-6.1-sol', '1792214916', '1859451']]
+$ FM_HOME=<shared> fm-sol-cap-lib.sh refuse-claim root-fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task root-fifth (codex, gpt-6.1-sol) was refused. Active sessions: root-0 (gpt-6.1-sol, age 0s); root-1 (gpt-6.1-sol, age 0s); root-2 (gpt-6.1-sol, age 0s); child-worker (gpt-6.1-sol, age 0s) in /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/child/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+$ FM_HOME=<child> fm-sol-cap-lib.sh refuse-claim child-fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/child/config /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/child/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task child-fifth (codex, gpt-6.1-sol) was refused. Active sessions: child-worker (gpt-6.1-sol, age 0s); root-0 (gpt-6.1-sol, age 0s) in /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/state; root-1 (gpt-6.1-sol, age 0s) in /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/state; root-2 (gpt-6.1-sol, age 0s) in /home/art/.no-mistakes/evidence/01M5416CTFJVDPWBPVA1J6A66S/fixtures/shared/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+SCENARIO PASS: Parent and local secondmate homes share the same four-session ceiling
+All launch-hook and race processes stopped: True

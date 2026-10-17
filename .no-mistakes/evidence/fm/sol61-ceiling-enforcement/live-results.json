@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Derived model set admits four real launch-hook processes and refuses the fifth, including a newly configured Sol model",
+    "result": "pass"
+  },
+  {
+    "name": "GLM and qwen admissions bypass a full Sol registry without changing occupancy",
+    "result": "pass"
+  },
+  {
+    "name": "A live worker cannot be replaced; a confirmed process exit frees exactly one slot",
+    "result": "pass"
+  },
+  {
+    "name": "Lower-only ceiling and unreadable dispatch configuration refuse Sol while GLM and qwen remain admitted",
+    "result": "pass"
+  },
+  {
+    "name": "Two simultaneous dispatches competing for the fourth slot admit exactly one",
+    "result": "pass"
+  },
+  {
+    "name": "An uncertain queued delivery retains the fourth slot after its submitting process exits",
+    "result": "pass"
+  },
+  {
+    "name": "Confirmed actual-route reports preserve Sol occupancy and release it for a non-Sol replacement",
+    "result": "pass"
+  },
+  {
+    "name": "Parent and local secondmate homes share the same four-session ceiling",
+    "result": "pass"
+  }
+]

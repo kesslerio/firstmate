@@ -1,0 +1,11 @@
+portable-serial-1of10: 1 scripts
+portable-serial-2of10: 19 scripts
+portable-serial-3of10: 21 scripts
+portable-serial-4of10: 26 scripts
+portable-serial-5of10: 26 scripts
+portable-serial-6of10: 27 scripts
+portable-serial-7of10: 26 scripts
+portable-serial-8of10: 26 scripts
+portable-serial-9of10: 25 scripts
+portable-serial-10of10: 26 scripts
+Public runner lists ten complete, disjoint serial shards covering every portable-serial script.

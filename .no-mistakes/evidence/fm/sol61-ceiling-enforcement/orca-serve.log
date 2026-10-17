@@ -1,0 +1,4 @@
+Authorization required, but no authorization protocol specified
+
+[2042631:1016/223030.680917:ERROR:ui/ozone/platform/x11/ozone_platform_x11.cc:257] Missing X server or $DISPLAY
+[2042631:1016/223030.680965:ERROR:ui/aura/env.cc:246] The platform failed to initialize.  Exiting.

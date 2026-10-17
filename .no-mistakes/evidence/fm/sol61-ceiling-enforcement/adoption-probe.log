@@ -1,0 +1,49 @@
+
+  Hooks need review
+  6 hooks are new or changed.
+  Hooks can run outside the sandbox after you trust them.
+
+
+› 1. Review hooks
+  2. Trust all and continue
+  3. Continue without trusting (hooks won't run)
+
+  enter confirm · esc skip
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Live endpoint verdict: alive
+Adopted count: 1
+preserved	gpt-6.1-sol	1792215372	-2
+recorded
+Confirmed route report retained adopted reconciliation
+Stopped endpoint verdict: dead
+Count after confirmed worker stop: 0
+preserved	gpt-6.1-sol	1792215373	-1
+Repeated admission retained confirmed-stop evidence
