@@ -415,6 +415,36 @@ fm_sol_cap_reconcile_remote() {
   esac
 }
 
+# fm_sol_cap_record_actual <id> <actual-model> <state-dir> <claimed>
+# Reconcile the ceiling with the model an accepted remote launch reports from
+# the endpoint's own record: a Sol-classified report claims the task's live
+# occupancy even when admission saw no Sol request (a reused live endpoint),
+# and a non-Sol report releases the claim a Sol request reserved. Sets
+# FM_SOL_CAP_REFUSAL on failure so the caller can refuse to record a task it
+# could not reconcile.
+fm_sol_cap_record_actual() {  # <id> <actual-model> <state-dir> <claimed>
+  local id=$1 model=$2 state=$3 claimed=${4:-0} registry root lock
+  FM_SOL_CAP_REFUSAL=
+  if [[ ! "$model" =~ ^gpt-[0-9.]+-sol$ ]]; then
+    [ "$claimed" = 1 ] || return 0
+    fm_sol_cap_promote "$id" remove "$state" || return 1
+    return 0
+  fi
+  [ "$claimed" = 1 ] && return 0
+  root=$(fm_firstmate_root_home "$(fm_sol_cap_home "$state")") || return 1
+  lock=$root/state/$FM_SOL_LOCK_NAME
+  fm_sol_cap_lock_acquire "$lock" "the reported model of task $id" || return 1
+  registry=$state/$FM_SOL_REGISTRY_NAME
+  fm_epoch_seconds_to FM_SOL_CAP_NOW
+  if ! fm_sol_cap_registry_claim "$registry" "$id" "$model" "$FM_SOL_CAP_NOW" 0; then
+    FM_SOL_CAP_REFUSAL="error: Sol ceiling: the reported Sol model of task $id could not be recorded in $registry; the task record was not published rather than recorded uncounted"
+    fm_lock_release "$lock" || true
+    return 1
+  fi
+  fm_lock_release "$lock" || true
+  return 0
+}
+
 fm_sol_cap_registry_promote() {
   local id=$1 pid=$2 state=$3 registry tmp stopped=0 recorded_model now
   registry=$state/$FM_SOL_REGISTRY_NAME
@@ -524,8 +554,20 @@ fm_sol_cap_cli() {
     [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL"
     return 1
     ;;
+  record-actual)
+    [ "$#" -eq 5 ] || {
+      echo "usage: fm-sol-cap-lib.sh record-actual <id> <actual-model> <state-dir> <claimed>" >&2
+      return 2
+    }
+    fm_sol_cap_record_actual "$2" "$3" "$4" "$5" && {
+      printf '%s\n' recorded
+      return 0
+    }
+    [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL"
+    return 1
+    ;;
   *)
-    echo "unknown fm-sol-cap-lib.sh mode: $mode (try: models | ceiling | refuse-claim)" >&2
+    echo "unknown fm-sol-cap-lib.sh mode: $mode (try: models | ceiling | refuse-claim | record-actual)" >&2
     return 2
     ;;
   esac

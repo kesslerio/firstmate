@@ -1290,6 +1290,7 @@ spawn_remote_secondmate() {
   remote_target=$(printf '%s\n' "$out" | sed -n 's/^target=//p' | tail -1)
   remote_harness=$(printf '%s\n' "$out" | sed -n 's/^harness=//p' | tail -1)
   remote_herdr_session=$(printf '%s\n' "$out" | sed -n 's/^herdr_session=//p' | tail -1)
+  remote_model=$(printf '%s\n' "$out" | sed -n 's/^model=//p' | tail -1)
   if [ "$remote_backend" != herdr ]; then
     fm_lock_release "$remote_lock" || true
     fm_lock_release "$registry_lock" || true
@@ -1311,6 +1312,28 @@ spawn_remote_secondmate() {
     echo "error: remote launch returned Herdr session '${remote_herdr_session:-missing}', expected 'fm-remote'; preserving the remote route for reconciliation" >&2
     return 1
   fi
+  # The launch result reports the model the endpoint actually runs, read from
+  # the endpoint's own record: a reused live endpoint answers with the model it
+  # already runs, which can differ from this dispatch's request. Reconcile the
+  # Sol ceiling with that reported model before publishing this side's record,
+  # so both the claim and the metadata carry the identity the endpoint
+  # genuinely runs and a later admission always sees this worker.
+  sol_claim_reported=0
+  [ "$FM_SOL_CLAIM_CREATED" = "$id" ] && sol_claim_reported=1
+  if [ "$sol_claim_reported" = 1 ] || [[ "$remote_model" =~ ^gpt-[0-9.]+-sol$ ]]; then
+    fm_sol_cap_record_actual "$id" "$remote_model" "$STATE" "$sol_claim_reported" || {
+      [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
+      if [ "$SPAWN_TASK_SET_LOCK_HELD" = 1 ]; then
+        SPAWN_TASK_SET_LOCK_HELD=0
+        fm_lock_release "$SPAWN_TASK_SET_LOCK" || true
+      fi
+      fm_lock_release "$remote_lock" || true
+      fm_lock_release "$registry_lock" || true
+      fm_lock_release "$SPAWN_TASK_LOCK" || true
+      echo "error: remote secondmate $id launched, but its Sol occupancy could not be reconciled with the reported model; preserving the remote route for reconciliation" >&2
+      return 1
+    }
+  fi
   # Record what the remote endpoint ACTUALLY carries, read back from its own
   # launch, rather than what this side hoped to deliver. That keeps the #995
   # guarantee that the recorded carrier is the identity the child received even
@@ -1330,7 +1353,7 @@ spawn_remote_secondmate() {
     echo "mode=secondmate"
     echo "yolo=off"
     echo "tasktmp="
-    echo "model=${model#-}"
+    echo "model=$remote_model"
     echo "effort=${effort#-}"
     echo "home=$home"
     echo "projects=$(secondmate_registry_field "$DATA/secondmates.md" "$id" projects)"
