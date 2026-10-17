@@ -551,6 +551,38 @@ SH
   pass "proven local stops and unpublished remote recovery release conservative occupancy"
 )
 
+test_adopt_preserved_workers() (
+  local case_dir state i out rc=0
+  case_dir=$(make_case adopt)
+  state=$case_dir/home/state
+  FM_HOME=$case_dir/home
+  . "$ROOT/bin/fm-wake-lib.sh"
+  . "$ROOT/bin/fm-secondmate-registry-lib.sh"
+  . "$ROOT/bin/fm-sol-cap-lib.sh"
+  fm_backend_of_meta() { printf tmux; }
+  fm_backend_target_of_meta() { printf '%s' "${1##*/}"; }
+  fm_backend_agent_state() {
+    case "$2" in stopped.meta) printf dead ;; uncertain.meta) printf unreadable ;; *) printf alive ;; esac
+  }
+  for i in one two three uncertain stopped; do
+    fm_write_meta "$state/$i.meta" "window=firstmate:fm-$i" "model=gpt-6.1-sol" "kind=ship"
+  done
+  fm_write_meta "$state/glm.meta" "model=glm-5" "kind=ship"
+  fm_sol_cap_refuse_and_claim fifth ship codex gpt-6.1-sol "$case_dir/home/config" "$state" || rc=$?
+  expect_code 1 "$rc" "preserved workers were invisible during admission"
+  [ "$(wc -l < "$state/sol-sessions.tsv")" -eq 4 ] || fail "adoption did not count live and uncertain workers"
+  [ -z "$(registry_row_field "$case_dir" stopped 4)" ] || fail "proven-stopped legacy worker was adopted"
+  [ -z "$(registry_row_field "$case_dir" glm 4)" ] || fail "GLM worker was adopted"
+  fm_sol_cap_refuse_and_claim fifth ship codex gpt-6.1-sol "$case_dir/home/config" "$state" && fail "repeat admission ignored adopted workers"
+  [ "$(wc -l < "$state/sol-sessions.tsv")" -eq 4 ] || fail "repeated adoption duplicated registry rows"
+  rm "$state/one.meta"
+  fm_sol_cap_promote one remove "$state" || fail "fixture stop could not release occupancy"
+  fm_sol_cap_refuse_and_claim fifth ship codex gpt-6.1-sol "$case_dir/home/config" "$state" || fail "$FM_SOL_CAP_REFUSAL"
+  [ "$(wc -l < "$state/sol-sessions.tsv")" -eq 4 ] || fail "admission after confirmed stop did not retain four slots"
+  pass "admission adopts preserved live or uncertain Sol workers without duplicating or counting stopped/non-Sol workers"
+)
+
+test_adopt_preserved_workers
 test_stopped_local_and_unpublished_remote_recovery
 test_remote_ownership_and_recovery
 test_retry_and_confirmed_stop

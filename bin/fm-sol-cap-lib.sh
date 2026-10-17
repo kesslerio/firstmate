@@ -137,6 +137,49 @@ fm_sol_cap_home() {
   esac
 }
 
+fm_sol_cap_adopt_workers() {
+  local state=$1 now=$2 meta id model file home target backend verdict absence host
+  file=$state/$FM_SOL_REGISTRY_NAME
+  case "$state" in
+    */state/parent-route) home=${state%/state/parent-route} ;;
+    */state) home=${state%/state} ;;
+    *) home=$FM_HOME ;;
+  esac
+  for meta in "$state"/*.meta; do
+    [ -e "$meta" ] || continue
+    [ -f "$meta" ] && [ -r "$meta" ] && [ ! -L "$meta" ] || return 1
+    id=${meta##*/}
+    id=${id%.meta}
+    model=$(awk -F= '$1 == "model" {sub(/^[^=]*=/, ""); print; exit}' "$meta") || return 1
+    case "|$FM_SOL_CAP_MODELS|" in *"|$model|"*) [ -n "$model" ] || continue ;; *) continue ;; esac
+    if [ -f "$file" ] && awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$file"; then
+      continue
+    fi
+    verdict=unreadable
+    host=$(awk -F= '$1 == "remote_host" {sub(/^[^=]*=/, ""); print; exit}' "$meta") || return 1
+    if [ -n "$host" ]; then
+      verdict=$(FM_HOME="$home" "$FM_WAKE_LIB_DIR/fm-on.sh" "$id" fm-remote-secondmate-control.sh state "$id" </dev/null 2>/dev/null) || verdict=unreadable
+      verdict=$(printf '%s\n' "$verdict" | tail -1)
+    elif command -v fm_backend_of_meta >/dev/null 2>&1; then
+      backend=$(fm_backend_of_meta "$meta") || return 1
+      target=$(fm_backend_target_of_meta "$meta") || return 1
+      if [ -n "$target" ]; then
+        verdict=$(FM_HOME="$home" fm_backend_agent_state "$backend" "$target") || verdict=unreadable
+        if [ "$verdict" = missing ]; then
+          if command -v fm_control_endpoint_absence_verdict >/dev/null 2>&1; then
+            absence=$(FM_HOME="$home" fm_control_endpoint_absence_verdict "$backend" "$target") || absence=unknown
+            case "${absence%%$'\t'*}" in gone|dead) verdict=dead ;; *) verdict=unreadable ;; esac
+          else
+            verdict=unreadable
+          fi
+        fi
+      fi
+    fi
+    case "$verdict" in dead|missing) continue ;; esac
+    fm_sol_cap_registry_claim "$file" "$id" "$model" "$now" 0 || return 1
+  done
+}
+
 fm_sol_cap_active_count() {  # <first-state>
   local first=$1 state file id model start pid now age entry home
   FM_SOL_COUNT=0
@@ -156,6 +199,10 @@ fm_sol_cap_active_count() {  # <first-state>
   now=$FM_SOL_CAP_NOW
   for state in "${FM_LOCAL_FIRSTMATE_STATES[@]}"; do
     file=$state/$FM_SOL_REGISTRY_NAME
+    if ! fm_sol_cap_adopt_workers "$state" "$now"; then
+      FM_SOL_COUNT_ERROR="cannot reconcile pre-existing Sol workers in $state"
+      return 1
+    fi
     [ -e "$file" ] || [ -L "$file" ] || continue
     if [ ! -f "$file" ] || [ ! -r "$file" ]; then
       FM_SOL_COUNT_ERROR="Sol registry $file is not a readable regular file"
@@ -208,7 +255,7 @@ fm_sol_cap_lock_acquire() {  # <lock-dir> <what>
 # rewrite lands in one atomic mv, so a parallel reader never sees a
 # half-written file.
 fm_sol_cap_registry_claim() {  # <registry-file> <id> <model> <now>
-  local file=$1 id=$2 model=$3 now=$4 tmp row rc
+  local file=$1 id=$2 model=$3 now=$4 owner=${5:-$$} tmp row rc
   tmp=$file.tmp.$$
   if [ -f "$file" ]; then
     awk -F'\t' -v id="$id" '$1 != id' "$file" > "$tmp" 2>/dev/null
@@ -224,7 +271,7 @@ fm_sol_cap_registry_claim() {  # <registry-file> <id> <model> <now>
     echo "error: Sol ceiling: Sol registry $file cannot be claimed" >&2
     return 1
   fi
-  row="${id}"$'\t'"${model}"$'\t'"${now}"$'\t'"$$"
+  row="${id}"$'\t'"${model}"$'\t'"${now}"$'\t'"$owner"
   if ! printf '%s\n' "${row}" >> "$tmp"; then
     rm -f -- "$tmp"
     echo "error: Sol ceiling: Sol registry $file could not record the claim of $id" >&2
