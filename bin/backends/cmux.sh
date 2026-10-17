@@ -616,7 +616,7 @@ fm_backend_cmux_workspace_absent() {
   local wsid=$1 label=${2:-} inventory title='' windows window_ids wid
   [ -z "$label" ] || title=$(fm_backend_cmux_scoped_title "$label")
   windows=$(fm_backend_cmux_cli list-windows --json --id-format uuids 2>/dev/null) || return 1
-  window_ids=$(printf '%s' "$windows" | jq -r '
+  window_ids=$(printf '%s' "$windows" | jq -er '
     if type == "array" and all(.[]; (.id | type == "string") and (.id | length > 0) and (.id | contains("\n") | not))
     then map(.id) | join("\n") else error("invalid window inventory") end
   ' 2>/dev/null) || return 1
