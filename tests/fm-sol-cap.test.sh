@@ -314,10 +314,10 @@ lib_refuse_claim() {  # <case-dir> <id> <model>
   fi
 }
 
-lib_record_actual() {  # <case-dir> <id> <model> <claimed>
-  local case_dir=$1 id=$2 model=$3 claimed=$4 out
+lib_record_actual() {  # <case-dir> <id> <model>
+  local case_dir=$1 id=$2 model=$3 out
   out=$(FM_HOME="$case_dir/home" "$ROOT/bin/fm-sol-cap-lib.sh" \
-    record-actual "$id" "$model" "$case_dir/home/state" "$claimed") || {
+    record-actual "$id" "$model" "$case_dir/home/state") || {
     printf '%s\n' "$out"
     return 1
   }
@@ -360,7 +360,7 @@ test_reused_live_sol_endpoint_records_occupancy_at_publication() {
   write_sol_row "$case_dir/home" live-a "$(fresh_start)"
   write_sol_row "$case_dir/home" live-b "$(fresh_start)"
   write_sol_row "$case_dir/home" live-c "$(fresh_start)"
-  out=$(lib_record_actual "$case_dir" task-c gpt-6.1-sol 0) ||
+  out=$(lib_record_actual "$case_dir" task-c gpt-6.1-sol) ||
     fail "a reused live Sol endpoint's reported model was not recorded: $out"
   assert_equals "$out" "recorded" "record-actual did not confirm the claim"
   assert_equals "$(registry_row_field "$case_dir" task-c 4)" "0" \
@@ -369,22 +369,41 @@ test_reused_live_sol_endpoint_records_occupancy_at_publication() {
     fail "a new Sol dispatch did not count the reused endpoint's occupancy: $out"
   assert_contains "$out" "this ceiling is 4" \
     "the refusal did not credit the re-recorded endpoint against the ceiling"
-  pass "a reused live Sol endpoint's reported model claims its occupancy before publication"
+  pass "a reused live Sol endpoint's reported model claims its occupancy"
 }
 
-# When the endpoint reports it really runs a non-Sol model, a claim admission
-# reserved on the requested model releases: occupancy never holds a slot for a
-# worker that does not run Sol, and the released evidence stays available.
-test_non_sol_report_releases_a_reserved_claim() {
+# When the endpoint's confirmed route reports it does not run a Sol model, the
+# task's Sol claim releases whether or not this dispatch claimed it: a runtime
+# switch whose own release was lost cannot leave its Sol incarnation counted
+# forever, and a live non-Sol worker never occupies a slot.
+test_non_sol_report_releases_a_stale_claim() {
   local case_dir out
   case_dir=$(make_case record-release task-c)
   write_sol_row "$case_dir/home" task-c "$(fresh_start)"
-  out=$(lib_record_actual "$case_dir" task-c gpt-5.6-luna 1) ||
-    fail "a non-Sol reported model did not release its reserved claim: $out"
+  out=$(lib_record_actual "$case_dir" task-c gpt-5.6-luna) ||
+    fail "a non-Sol reported model did not release the task's Sol claim: $out"
   assert_equals "$out" "recorded" "the release did not confirm"
   [ "$(registry_row_count "$case_dir")" -eq 0 ] ||
     fail "the released claim left its row live-countable"
-  pass "a non-Sol reported model releases the claim admission reserved"
+  pass "a non-Sol reported model releases the task's stale Sol claim"
+}
+
+# An adopted uncertain claim is the admission boundary's own recheckable
+# occupancy: the confirmed route reporting Sol never rewrites it into a
+# permanent pid-0 claim whose liveness no later admission may recheck.
+test_adopted_uncertain_claim_survives_reported_sol() {
+  local case_dir out old_start
+  case_dir=$(make_case record-adopted task-c)
+  old_start=$(( "$(fresh_start)" - 43201 ))
+  write_sol_row "$case_dir/home" task-c "$old_start" -2
+  out=$(lib_record_actual "$case_dir" task-c gpt-6.1-sol) ||
+    fail "a Sol report under an adopted uncertain claim failed: $out"
+  assert_equals "$out" "recorded" "the keep case did not confirm"
+  assert_equals "$(registry_row_field "$case_dir" task-c 4)" "-2" \
+    "the Sol report rewrote an adopted uncertain claim into a permanent one"
+  assert_equals "$(registry_row_field "$case_dir" task-c 3)" "$old_start" \
+    "the Sol report reset the adopted claim's start epoch"
+  pass "a confirmed Sol report preserves an adopted uncertain claim's reconciliation"
 }
 
 # A Sol report under a dispatch that already claimed the task leaves the live
@@ -394,7 +413,7 @@ test_sol_report_under_an_existing_claim_keeps_the_row() {
   case_dir=$(make_case record-keep task-c)
   old_start=$(( "$(fresh_start)" - 43201 ))
   write_sol_row "$case_dir/home" task-c "$old_start" 0 claude-sonnet
-  out=$(lib_record_actual "$case_dir" task-c gpt-5.1-sol 1) ||
+  out=$(lib_record_actual "$case_dir" task-c gpt-5.1-sol) ||
     fail "a Sol report under an existing claim failed: $out"
   assert_equals "$out" "recorded" "the keep case did not confirm"
   assert_equals "$(registry_row_field "$case_dir" task-c 3)" "$old_start" \
@@ -790,7 +809,8 @@ test_non_sol_model_never_claims_a_slot
 test_config_sol_cap_overrides_the_filed_default
 test_relaunched_session_id_replaces_its_own_row
 test_reused_live_sol_endpoint_records_occupancy_at_publication
-test_non_sol_report_releases_a_reserved_claim
+test_non_sol_report_releases_a_stale_claim
+test_adopted_uncertain_claim_survives_reported_sol
 test_sol_report_under_an_existing_claim_keeps_the_row
 test_malformed_registry_row_refuses_loudly
 test_unread_ceiling_or_table_refuses_instead_of_counting_nothing

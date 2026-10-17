@@ -415,29 +415,33 @@ fm_sol_cap_reconcile_remote() {
   esac
 }
 
-# fm_sol_cap_record_actual <id> <actual-model> <state-dir> <claimed>
-# Reconcile the ceiling with the model an accepted remote launch reports from
-# the endpoint's own record: a Sol-classified report claims the task's live
-# occupancy even when admission saw no Sol request (a reused live endpoint),
-# and a non-Sol report releases the claim a Sol request reserved. Sets
-# FM_SOL_CAP_REFUSAL on failure so the caller can refuse to record a task it
-# could not reconcile.
-fm_sol_cap_record_actual() {  # <id> <actual-model> <state-dir> <claimed>
-  local id=$1 model=$2 state=$3 claimed=${4:-0} registry root lock
+# fm_sol_cap_record_actual <id> <actual-model> <state-dir>
+# Reconcile the ceiling with the model the endpoint's own record reports after
+# an accepted remote launch: a Sol report claims the task's live occupancy when
+# no live or uncertain claim exists, and a non-Sol report releases the task's
+# Sol claim under the shared admission boundary. A live or uncertain claim
+# keeps its own reconciliation semantics - it is never rewritten, so adopted
+# claims stay recheckable and occupied claims keep their released shape only
+# through proven stops. Sets FM_SOL_CAP_REFUSAL on failure.
+fm_sol_cap_record_actual() {  # <id> <actual-model> <state-dir>
+  local id=$1 model=$2 state=$3 registry root lock existing_pid existing_start
   FM_SOL_CAP_REFUSAL=
   if [[ ! "$model" =~ ^gpt-[0-9.]+-sol$ ]]; then
-    [ "$claimed" = 1 ] || return 0
     fm_sol_cap_promote "$id" remove "$state" || return 1
     return 0
   fi
-  [ "$claimed" = 1 ] && return 0
+  registry=$state/$FM_SOL_REGISTRY_NAME
+  existing_pid=$(awk -F'\t' -v id="$id" '$1 == id {print $4; exit}' "$registry" 2>/dev/null || true)
+  existing_start=$(awk -F'\t' -v id="$id" '$1 == id {print $3; exit}' "$registry" 2>/dev/null || true)
+  if fm_sol_cap_entry_live "$existing_start" "$existing_pid"; then
+    return 0
+  fi
   root=$(fm_firstmate_root_home "$(fm_sol_cap_home "$state")") || return 1
   lock=$root/state/$FM_SOL_LOCK_NAME
   fm_sol_cap_lock_acquire "$lock" "the reported model of task $id" || return 1
-  registry=$state/$FM_SOL_REGISTRY_NAME
   fm_epoch_seconds_to FM_SOL_CAP_NOW
   if ! fm_sol_cap_registry_claim "$registry" "$id" "$model" "$FM_SOL_CAP_NOW" 0; then
-    FM_SOL_CAP_REFUSAL="error: Sol ceiling: the reported Sol model of task $id could not be recorded in $registry; the task record was not published rather than recorded uncounted"
+    FM_SOL_CAP_REFUSAL="error: Sol ceiling: the reported Sol model of task $id could not be recorded in $registry; the confirmed route's record stands for the next admission to reconcile"
     fm_lock_release "$lock" || true
     return 1
   fi
@@ -555,11 +559,11 @@ fm_sol_cap_cli() {
     return 1
     ;;
   record-actual)
-    [ "$#" -eq 5 ] || {
-      echo "usage: fm-sol-cap-lib.sh record-actual <id> <actual-model> <state-dir> <claimed>" >&2
+    [ "$#" -eq 4 ] || {
+      echo "usage: fm-sol-cap-lib.sh record-actual <id> <actual-model> <state-dir>" >&2
       return 2
     }
-    fm_sol_cap_record_actual "$2" "$3" "$4" "$5" && {
+    fm_sol_cap_record_actual "$2" "$3" "$4" && {
       printf '%s\n' recorded
       return 0
     }

@@ -1314,32 +1314,10 @@ spawn_remote_secondmate() {
   fi
   # The launch result reports the model the endpoint actually runs, read from
   # the endpoint's own record: a reused live endpoint answers with the model it
-  # already runs, which can differ from this dispatch's request. Reconcile the
-  # Sol ceiling with that reported model before publishing this side's record,
-  # so both the claim and the metadata carry the identity the endpoint
-  # genuinely runs and a later admission always sees this worker.
-  sol_claim_reported=0
-  [ "$FM_SOL_CLAIM_CREATED" = "$id" ] && sol_claim_reported=1
-  if [ "$sol_claim_reported" = 1 ] || [[ "$remote_model" =~ ^gpt-[0-9.]+-sol$ ]]; then
-    fm_sol_cap_record_actual "$id" "$remote_model" "$STATE" "$sol_claim_reported" || {
-      [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
-      if [ "$SPAWN_TASK_SET_LOCK_HELD" = 1 ]; then
-        SPAWN_TASK_SET_LOCK_HELD=0
-        fm_lock_release "$SPAWN_TASK_SET_LOCK" || true
-      fi
-      fm_lock_release "$remote_lock" || true
-      fm_lock_release "$registry_lock" || true
-      fm_lock_release "$SPAWN_TASK_LOCK" || true
-      echo "error: remote secondmate $id launched, but its Sol occupancy could not be reconciled with the reported model; preserving the remote route for reconciliation" >&2
-      return 1
-    }
-  fi
-  # Record what the remote endpoint ACTUALLY carries, read back from its own
-  # launch, rather than what this side hoped to deliver. That keeps the #995
-  # guarantee that the recorded carrier is the identity the child received even
-  # when the remote host already had a live agent and reused its endpoint. An
-  # off decision delivers no carrier, but an endpoint already holding one still
-  # reports it here so the parent does not deny the agent's actual identity.
+  # already runs, which can differ from this dispatch's request. The record is
+  # published under the reported model first, so a concurrent admission stops
+  # classifying this task from possibly stale metadata, and the Sol occupancy
+  # is then reconciled from the confirmed route.
   remote_recorded_traceparent=$(printf '%s\n' "$out" | sed -n 's/^traceparent=//p' | tail -1)
   fm_trace_context_valid "$remote_recorded_traceparent" || remote_recorded_traceparent=
   tmp="$meta.tmp.$$"
@@ -1382,6 +1360,11 @@ spawn_remote_secondmate() {
   fm_lock_release "$remote_lock" || true
   fm_lock_release "$registry_lock" || true
   fm_lock_release "$SPAWN_TASK_LOCK" || true
+  if ! fm_sol_cap_record_actual "$id" "$remote_model" "$STATE"; then
+    [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
+    echo "error: remote secondmate $id launched, but its Sol occupancy could not be reconciled with the reported model; the confirmed route's record stands for the next admission to reconcile" >&2
+    return 1
+  fi
   "$SCRIPT_DIR/fm-home-summary-refresh.sh" --best-effort || true
   if ! "$SCRIPT_DIR/fm-procevent-remote-reply.sh" arm "$id" >/dev/null; then
     echo "error: remote secondmate $id launched, but its reply source could not be armed; endpoint metadata is preserved" >&2
@@ -1554,6 +1537,13 @@ spawn_abort_cleanup() {
       fi
     fi
   fi
+  # A stopped incarnation releases its Sol claim while its lifecycle ownership
+  # is still held: once the per-id spawn and metadata locks are gone, a fresh
+  # dispatch may already reuse this task id and hold its own live claim, which
+  # this release must never remove.
+  if [ "$SPAWN_ENDPOINT_CLOSED" = 1 ] && [ "${FM_SOL_CLAIM_CREATED:-}" = "$ID" ]; then
+    fm_sol_cap_promote "$ID" remove "$STATE" || status=1
+  fi
   if [ "$SPAWN_TASK_LOCK_HELD" = 1 ]; then
     SPAWN_TASK_LOCK_HELD=0
     fm_lock_release "$SPAWN_TASK_LOCK" || true
@@ -1627,9 +1617,6 @@ spawn_abort_cleanup() {
       rm -rf "$GIT_HOOKS_DIR" 2>/dev/null || true
     fi
     fm_lock_release "$SPAWN_TASK_LOCK" || true
-  fi
-  if [ "$SPAWN_ENDPOINT_CLOSED" = 1 ] && [ "${FM_SOL_CLAIM_CREATED:-}" = "$ID" ]; then
-    fm_sol_cap_promote "$ID" remove "$STATE" || status=1
   fi
   return "$status"
 }
