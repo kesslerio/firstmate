@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -u
 
+# shellcheck source=tests/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 check_close() {
@@ -12,6 +13,7 @@ check_close() {
 
 TMP_ROOT=$(fm_test_tmproot fm-backend-close)
 
+# shellcheck disable=SC2329 # Fixture overrides are called through backend dispatch.
 (
   . "$ROOT/bin/backends/cmux.sh"
   fm_backend_cmux_window_of_workspace() { printf 'window 2'; }
@@ -20,7 +22,7 @@ TMP_ROOT=$(fm_test_tmproot fm-backend-close)
   fm_backend_cmux_cli() {
     if [ "$1" = list-windows ]; then
       [ "$inventory_status" = 0 ] || return 1
-      printf '[{"id":"current"},{"id":"other"}]'
+      printf '%s' "$test_windows"
     elif [ "$1 $2" = 'workspace list' ]; then
       [ "$inventory_status" = 0 ] || return 1
       if [ "${7:-}" = other ]; then
@@ -40,6 +42,7 @@ TMP_ROOT=$(fm_test_tmproot fm-backend-close)
     fi
   }
   touch "$TMP_ROOT/present"
+  test_windows='[{"id":"current"},{"id":"other"}]'
   inventory_status=0 close_status=1 effective=0 other_status=0 other_malformed=0 test_workspace_id=workspace
   check_close cmux workspace:surface 1 '' fm-task
   close_status=0
@@ -65,12 +68,19 @@ TMP_ROOT=$(fm_test_tmproot fm-backend-close)
   check_close cmux workspace:surface 1 '' fm-task
   other_malformed=0
   check_close cmux workspace:surface 0 '' fm-task
+  test_windows=''
+  check_close cmux workspace:surface 1 '' fm-task
+  test_windows='{}'
+  check_close cmux workspace:surface 1 '' fm-task
+  test_windows='[]'
+  check_close cmux workspace:surface 0 '' fm-task
   fm_backend_cmux_window_of_workspace() { printf 'window 1'; }
   close_status=1
   check_close cmux workspace:surface 1 '' fm-task
 ) || exit 1
 pass "cmux proves absence across every window and refuses incomplete inventories"
 
+# shellcheck disable=SC2329 # Fixture overrides are called through backend dispatch.
 (
   . "$ROOT/bin/backends/zellij.sh"
   zellij() { printf 'firstmate\n'; return "$zellij_inventory_status"; }
@@ -112,6 +122,7 @@ pass "cmux proves absence across every window and refuses incomplete inventories
 ) || exit 1
 pass "zellij distinguishes confirmed absence from failed reads, closes and identity checks"
 
+# shellcheck disable=SC2329 # Fixture overrides are called through backend dispatch.
 (
   . "$ROOT/bin/backends/orca.sh"
   orca() { printf '%s\n' "$close_response"; return "$orca_close_status"; }

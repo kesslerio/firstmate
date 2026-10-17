@@ -417,6 +417,7 @@ test_shared_home_admission() {
     FM_HOME=$root
     fm_sol_cap_refuse_and_claim root-task ship codex gpt-6.1-sol "$root/config" "$root/state"
   ) > "$case_dir/root.out" 2>&1 &
+  # shellcheck disable=SC2031 # This is the immediately preceding background job in this shell.
   a=$!
   (
     . "$ROOT/bin/fm-wake-lib.sh"
@@ -425,6 +426,7 @@ test_shared_home_admission() {
     FM_HOME=$mate
     fm_sol_cap_refuse_and_claim mate-task ship codex gpt-6.1-sol "$mate/config" "$mate/state"
   ) > "$case_dir/mate.out" 2>&1 &
+  # shellcheck disable=SC2031 # This is the immediately preceding background job in this shell.
   b=$!
   wait "$a" && successes=$((successes + 1))
   wait "$b" && successes=$((successes + 1))

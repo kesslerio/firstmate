@@ -29,7 +29,9 @@ STATE="${FM_STATE_OVERRIDE:-$FM_HOME/state}"
 . "$SCRIPT_DIR/fm-backend.sh"
 # shellcheck source=bin/fm-wake-lib.sh
 . "$SCRIPT_DIR/fm-wake-lib.sh"
+# shellcheck source=bin/fm-secondmate-registry-lib.sh
 . "$SCRIPT_DIR/fm-secondmate-registry-lib.sh"
+# shellcheck source=bin/fm-sol-cap-lib.sh
 . "$SCRIPT_DIR/fm-sol-cap-lib.sh"
 CONFIG="${FM_CONFIG_OVERRIDE:-$FM_HOME/config}"
 
