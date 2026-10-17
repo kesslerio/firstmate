@@ -1304,7 +1304,9 @@ The set is derived at call time from `config/crew-dispatch.json`'s rule and defa
 - Remote runtime switches reuse only a live reservation or reserve a new Sol slot in the parent before delivery, retaining existing occupancy until a confirmed non-Sol replacement.
 - On the remote host, the nested `state/parent-route` registry shares its operational home's count and root lock with that secondmate's crew.
 - Before admission, owned Sol workers preserved across an update are adopted from task metadata under the shared lock when they have no registry row; live or unverified workers count, while proven-stopped workers do not.
-- Passing spawns prune stale rows from every walked registry, so old rows do not accumulate.
+- Dead-PID rows remain while their task metadata exists, preserving stop evidence against repeated adoption.
+- Explicit confirmed-stop release records pid -1 while Sol metadata remains; that row holds no occupancy and a new admitted incarnation replaces it.
+- Passing spawns prune stopped rows once their metadata is absent.
 - A malformed registry row (bad shape) refuses every Sol dispatch with the row named rather than silently undercounting; staleness is release, but a broken row is a disruption, not a free slot.
 
 **Refusal, not queueing**
