@@ -137,8 +137,9 @@ fm_sol_cap_home() {
   esac
 }
 
-fm_sol_cap_adopt_workers() {
-  local state=$1 now=$2 meta id model file home target backend verdict absence host
+fm_sol_cap_adopt_workers() (
+  local state=$1 now=$2 meta id model file home target backend verdict absence host pid lifecycle_lock= owner current
+  trap '[ -z "$lifecycle_lock" ] || fm_lock_release "$lifecycle_lock"' EXIT
   file=$state/$FM_SOL_REGISTRY_NAME
   case "$state" in
     */state/parent-route) home=${state%/state/parent-route} ;;
@@ -146,6 +147,10 @@ fm_sol_cap_adopt_workers() {
     *) home=$FM_HOME ;;
   esac
   for meta in "$state"/*.meta; do
+    if [ -n "$lifecycle_lock" ]; then
+      fm_lock_release "$lifecycle_lock" || return 1
+      lifecycle_lock=
+    fi
     [ -e "$meta" ] || continue
     [ -f "$meta" ] && [ -r "$meta" ] && [ ! -L "$meta" ] || return 1
     id=${meta##*/}
@@ -153,7 +158,13 @@ fm_sol_cap_adopt_workers() {
     model=$(awk -F= '$1 == "model" {sub(/^[^=]*=/, ""); print; exit}' "$meta") || return 1
     case "|$FM_SOL_CAP_MODELS|" in *"|$model|"*) [ -n "$model" ] || continue ;; *) continue ;; esac
     if [ -f "$file" ] && awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$file"; then
-      continue
+      pid=$(awk -F'\t' -v id="$id" '$1 == id {print $4; exit}' "$file") || return 1
+      [ "$pid" = 0 ] || continue
+      owner=$(cat "$state/.spawn-$id.lock/pid" 2>/dev/null || true)
+      fm_current_pid current || return 1
+      [ "$owner" != "$current" ] || continue
+      fm_lock_try_acquire "$state/.spawn-$id.lock" || continue
+      lifecycle_lock=$state/.spawn-$id.lock
     fi
     verdict=unreadable
     host=$(awk -F= '$1 == "remote_host" {sub(/^[^=]*=/, ""); print; exit}' "$meta") || return 1
@@ -180,7 +191,7 @@ fm_sol_cap_adopt_workers() {
     esac
     fm_sol_cap_registry_claim "$file" "$id" "$model" "$now" 0 || return 1
   done
-}
+)
 
 fm_sol_cap_active_count() {  # <first-state>
   local first=$1 state file id model start pid now age entry home
