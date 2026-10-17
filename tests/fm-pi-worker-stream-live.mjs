@@ -3,6 +3,9 @@ import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 
+assert.equal(process.env.FM_GATE_REFUSE_BYPASS, undefined, "fixture bypass reached the SDK process");
+assert.equal(process.env.AI_GATEWAY_API_KEY, undefined, "ambient credential reached the SDK process");
+
 const sdk = await import(pathToFileURL(process.env.PI_PACKAGE_DIR + "/dist/index.js").href);
 const { DefaultResourceLoader, ModelRegistry, ModelRuntime, SessionManager, SettingsManager, createAgentSession } = sdk;
 const cwd = process.env.STREAM_CWD, agentDir = process.env.PI_CODING_AGENT_DIR;
