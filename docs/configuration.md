@@ -1305,6 +1305,7 @@ The set is derived at call time from `config/crew-dispatch.json`'s rule and defa
 - Remote runtime switches reuse only a live reservation or reserve a new Sol slot in the parent before delivery, retaining existing occupancy until a confirmed non-Sol replacement; publishing that replacement's model and releasing the claim share the admission lock so adoption cannot restore the old Sol claim between them.
 - On the remote host, the nested `state/parent-route` registry shares its operational home's count and root lock with that secondmate's crew.
 - Before admission, owned Sol workers preserved across an update are adopted from task metadata under the shared lock when they have no registry row; live or unverified workers count, while proven-stopped workers do not.
+- Conservative PID-0 claims are rechecked before counting when their spawn lifecycle lock is available; a proven stop becomes a non-counting stop marker, while uncertain workers and active deliveries retain occupancy.
 - Dead-PID rows remain while their task metadata exists, preserving stop evidence against repeated adoption.
 - Explicit confirmed-stop release records pid -1 while Sol metadata remains, even when no registry row or file existed; that row holds no occupancy, prevents re-adoption of the stopped worker, and is replaced by a new admitted incarnation.
 - Passing spawns prune stopped rows once their metadata is absent.

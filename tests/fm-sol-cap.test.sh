@@ -643,6 +643,42 @@ SH
   pass "confirmed-stop paths remember legacy workers with missing registries or rows"
 )
 
+test_adopted_worker_exit() (
+  local case_dir state i
+  case_dir=$(make_case adopted-exit)
+  state=$case_dir/home/state
+  FM_HOME=$case_dir/home
+  . "$ROOT/bin/fm-wake-lib.sh"
+  . "$ROOT/bin/fm-secondmate-registry-lib.sh"
+  . "$ROOT/bin/fm-sol-cap-lib.sh"
+  fm_backend_of_meta() { printf tmux; }
+  fm_backend_target_of_meta() { printf '%s' "${1##*/}"; }
+  fm_backend_agent_state() { printf '%s' "$observed_state"; }
+  for i in one two three four; do
+    fm_write_meta "$state/$i.meta" "model=gpt-6.1-sol"
+  done
+  observed_state=alive
+  fm_sol_cap_model_set "$case_dir/home/config" || fail "model set failed"
+  fm_sol_cap_active_count "$state" || fail "adoption failed"
+  [ "$FM_SOL_COUNT" = 4 ] || fail "live workers not adopted"
+  observed_state=dead
+  fm_lock_try_acquire "$state/.spawn-one.lock" || fail "delivery lock failed"
+  fm_sol_cap_active_count "$state" || fail "exit reconciliation failed"
+  [ "$FM_SOL_COUNT" = 1 ] || fail "stop proof lost or in-flight delivery released"
+  fm_lock_release "$state/.spawn-one.lock"
+  observed_state=unverified
+  fm_sol_cap_active_count "$state" || fail "uncertain reconciliation failed"
+  [ "$FM_SOL_COUNT" = 1 ] || fail "uncertain claim lost or stopped workers resurrected"
+  observed_state=dead
+  fm_sol_cap_refuse_and_claim fresh ship codex gpt-6.1-sol "$case_dir/home/config" "$state" || fail "$FM_SOL_CAP_REFUSAL"
+  for i in one two three four; do
+    [ "$(registry_row_field "$case_dir" "$i" 4)" = -1 ] || fail "stop marker lost"
+  done
+  pass "adopted exits free capacity while uncertain and in-flight claims remain"
+)
+
+test_adopted_worker_exit
+
 test_unregistered_stop_evidence
 test_retained_stop_evidence
 test_adopt_preserved_workers
