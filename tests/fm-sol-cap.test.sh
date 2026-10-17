@@ -677,6 +677,34 @@ test_adopted_worker_exit() (
   pass "adopted exits free capacity while uncertain and in-flight claims remain"
 )
 
+test_queued_delivery_reservation() (
+  local case_dir state i
+  case_dir=$(make_case queued-delivery)
+  state=$case_dir/home/state
+  FM_HOME=$case_dir/home
+  . "$ROOT/bin/fm-wake-lib.sh"
+  . "$ROOT/bin/fm-secondmate-registry-lib.sh"
+  . "$ROOT/bin/fm-sol-cap-lib.sh"
+  fm_backend_of_meta() { printf tmux; }
+  fm_backend_target_of_meta() { printf shell; }
+  fm_backend_agent_state() { printf dead; }
+  for i in one two three; do
+    write_sol_row "$FM_HOME" "$i" 1 "$$"
+  done
+  (
+    fm_sol_cap_refuse_and_claim queued ship codex gpt-6.1-sol "$FM_HOME/config" "$state" || fail "$FM_SOL_CAP_REFUSAL"
+    fm_sol_cap_promote queued 0 "$state" || fail "delivery reservation failed"
+    fm_write_meta "$state/queued.meta" "model=gpt-6.1-sol"
+  ) || fail "spawning process failed"
+  fm_sol_cap_refuse_and_claim fifth ship codex gpt-6.1-sol "$FM_HOME/config" "$state" && fail "queued delivery was released by shell probe"
+  [ "$(registry_row_field "$case_dir" queued 4)" = 0 ] || fail "delivery reservation changed"
+  fm_sol_cap_promote queued "$$" "$state" || fail "late launcher promotion failed"
+  fm_sol_cap_refuse_and_claim fifth ship codex gpt-6.1-sol "$FM_HOME/config" "$state" && fail "late launcher exceeded ceiling"
+  pass "queued delivery retains occupancy after spawning process exits"
+)
+
+test_queued_delivery_reservation
+
 test_adopted_worker_exit
 
 test_unregistered_stop_evidence
