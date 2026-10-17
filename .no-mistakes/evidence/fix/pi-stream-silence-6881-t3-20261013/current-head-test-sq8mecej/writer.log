@@ -1,0 +1,14 @@
+PREFLIGHT PASS: authentic source/history/index and marker equality; readonly source/index; protected paths absent; private PID/proc/network; loopback allowed; caps empty; remount/unmask denied; disposable account home
+Allowed foreground progress: v1 gen=g1792265965.118.29932 request=1 rev=2 ts=1792265965
+Closed request tombstone: v1 gen=g1792265965.118.29932 request=1 phase=closed
+Denied (exit 1): /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-busy-event.sh stream /tmp/writer.YyY0ok probe progress --gen g1792265965.118.29932 --request 1
+Denied (exit 1): /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-busy-event.sh stream /tmp/writer.YyY0ok probe open --gen g1792265965.118.29932 --request 1
+Denied (exit 1): /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-busy-event.sh stream /tmp/writer.YyY0ok probe close --gen g1792265965.118.29932 --request 1
+New request preserved after late close: v1 gen=g1792265965.118.29932 request=2 rev=1 ts=1792265965
+error: stale busy-state gen for probe (event rejected)
+Denied (exit 1): /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-busy-event.sh stream /tmp/writer.YyY0ok probe progress --gen g1792265965.118.29932 --request 2
+Settled: v1 gen=g1792265965.280.15894 seq=3 state=idle source=pi-ext event=agent-settled ts=1792265965
+Denied (exit 1): /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-busy-event.sh stream /tmp/writer.YyY0ok probe progress --gen g1792265965.280.15894 --request 1
+error: no armed busy-state gen for probe
+Denied (exit 1): /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-busy-event.sh stream /tmp/writer.YyY0ok probe open --gen g1792265965.280.15894 --request 2
+PASS: actual writer CLI denies closed, late, and superseded observations; native progress is untouched.

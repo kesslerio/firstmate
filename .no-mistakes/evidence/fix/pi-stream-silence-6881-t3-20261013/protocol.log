@@ -1,0 +1,24 @@
+network denied: [Errno 101] Network is unreachable
+PASS isolation: real home/auth/trust/config/runtime/other checkouts absent; private PID and network namespaces
+
+Current request accepted; model progress is separate from semantic state
+worker.busy-gen: g1792110415.49.25597
+worker.busy-state: v1 gen=g1792110415.49.25597 seq=2 state=busy source=pi-ext event=agent-start ts=1792110415
+worker.model-progress: v1 gen=g1792110415.49.25597 request=1 rev=2 ts=1792110415
+worker.model-stream: v1 gen=g1792110415.49.25597 request=1 rev=2 ts=1792110415
+worker.model-stream-order: v1 gen=g1792110415.49.25597 request=1 phase=active
+refusal exit=1
+refusal exit=1
+
+Closed request rejects progress and replay; active marker absent
+worker.busy-gen: g1792110415.49.25597
+worker.busy-state: v1 gen=g1792110415.49.25597 seq=2 state=busy source=pi-ext event=agent-start ts=1792110415
+worker.model-progress: v1 gen=g1792110415.49.25597 request=1 rev=2 ts=1792110415
+worker.model-stream-order: v1 gen=g1792110415.49.25597 request=1 phase=closed
+refusal exit=1
+error: stale busy-state gen for worker (event rejected)
+refusal exit=1
+error: no armed busy-state gen for worker
+refusal exit=1
+
+Replacement rejects old generation; retirement removes all observations and rejects late open

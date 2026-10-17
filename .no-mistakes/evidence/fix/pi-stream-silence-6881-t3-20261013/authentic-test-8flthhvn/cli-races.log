@@ -1,0 +1,19 @@
+PREFLIGHT PASS: authentic source/history/index and marker equality; readonly source/index; protected paths absent; private PID/proc/network; loopback allowed; caps empty; remount/unmask denied; disposable account home
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1792265739.527.19732 request=1792265740960 rev=2 ts=1792265741
+PASS: real Pi CLI close during queue lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1792265750.3100.5391 request=1792265751648 rev=2 ts=1792265751
+PASS: real Pi CLI progress during queue lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1792265759.5478.20070 request=1792265761165 rev=2 ts=1792265761
+PASS: real Pi CLI replace during queue lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1792265769.7883.12837 request=1792265771125 rev=2 ts=1792265771
+PASS: real Pi CLI close during recovery lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1792265779.10160.32594 request=1792265781201 rev=2 ts=1792265781
+PASS: real Pi CLI progress during recovery lock wait cancelled obsolete notification; recovery marker remains absent.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1792265789.12539.32300 request=1792265791820 rev=2 ts=1792265791
+PASS: real Pi CLI replace during recovery lock wait cancelled obsolete notification; recovery marker remains absent.

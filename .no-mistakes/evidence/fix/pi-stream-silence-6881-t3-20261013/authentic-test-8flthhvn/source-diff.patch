@@ -1,0 +1,29 @@
+diff --git a/tests/fm-pi-worker-stream-live-e2e.test.sh b/tests/fm-pi-worker-stream-live-e2e.test.sh
+index 2190afe8..c09dbaf3 100644
+--- a/tests/fm-pi-worker-stream-live-e2e.test.sh
++++ b/tests/fm-pi-worker-stream-live-e2e.test.sh
+@@ -13,6 +13,12 @@ PI_VERSION=$(jq -r '.version' "$PI_PACKAGE_DIR/package.json") || fail "Pi packag
+ [ "$PI_VERSION" = 1.2.0 ] || fail "Pi $PI_VERSION: worker stream contract verified only on 1.2.0"
+ TMP_ROOT=$(fm_test_tmproot fm-pi-worker-stream-live)
+ fakebin=$(make_spawn_fakebin "$TMP_ROOT/fake")
++sdk_env=(env -i)
++while IFS= read -r name; do
++  case "$name" in
++    *GATE*|*MANAGED*|NO_MISTAKES*) sdk_env+=("$name=${!name}") ;;
++  esac
++done < <(compgen -e)
+ 
+ for case_label in enabled disabled stalled; do
+   enabled=300
+@@ -54,9 +60,8 @@ SH
+   cat > "$home/agent/models.json" <<'JSON'
+ {"providers":{"fm-worker-stream":{"baseUrl":"https://fm-worker-stream.invalid/v1","api":"openai-completions","apiKey":"synthetic-local-only","models":[{"id":"stream","name":"stream","contextWindow":8192,"maxTokens":512}]}}}
+ JSON
+-  # Empty environment and explicit runtime storage prevent ambient credentials
+-  # or resource discovery from entering this provider-free session.
+-  env -i PATH="$PATH" HOME="$home/user-home" NODE_NO_WARNINGS=1 \
++  # Preserve gate identity while excluding ambient credentials and discovery.
++  "${sdk_env[@]}" PATH="$PATH" HOME="$home/user-home" NODE_NO_WARNINGS=1 \
+     PI_PACKAGE_DIR="$PI_PACKAGE_DIR" PI_CODING_AGENT_DIR="$home/agent" \
+     STREAM_STATE="$home/state" STREAM_EXTENSION="$home/state/stream.pi-ext.ts" \
+     STREAM_CWD="$wt" STREAM_ENABLED="$enabled" STREAM_FAULT_DIR="$fault_dir" \

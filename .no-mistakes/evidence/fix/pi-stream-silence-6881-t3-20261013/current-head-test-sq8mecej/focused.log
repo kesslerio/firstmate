@@ -1,0 +1,76 @@
+PREFLIGHT PASS: authentic source/history/index and marker equality; readonly source/index; protected paths absent; private PID/proc/network; loopback allowed; caps empty; remount/unmask denied; disposable account home
+FM_TEST_BEGIN 2026-10-17T19:39:40Z tests/fm-busy-state.test.sh family=standalone expected_gate_skip=none
+ok - failed close invalidates observation before persistence and denies late replay
+ok - model streams preserve state and reject stale, closed, superseded, foreign, and retired events
+ok - native progress is generation-bound, separately recorded, and cleared on arm and retire
+ok - the turn-ended notification rides the apply generation check
+ok - arm mints a gen sidecar and seeds busy fm-spawn at seq=1
+ok - apply advances seq under the armed gen and attributes the writing source
+ok - firstmate-owned interrupt and recovery events bind to the current gen
+ok - apply is refused for a task whose busy contract was never armed
+ok - retire waits for the writer lock and cannot remove a new incarnation
+ok - retire treats only an absent sidecar as already retired
+ok - the writer breaks a stale lock instead of dying on GNU stat output
+ok - a late event from a previous incarnation is rejected, record unchanged
+ok - a record from a stale incarnation classifies unknown, never idle
+ok - a converted adapter with no record classifies unknown, never idle
+ok - malformed records classify unknown malformed, never busy or idle
+ok - a record with no armed gen sidecar classifies unknown
+ok - a record is trusted only by the adapter whose source wrote it
+ok - converted adapters never classify busy from rendered footer text
+ok - a Claude launch parked on its trust or external-imports dialog classifies unknown launch-prompt
+ok - a Pi-family launch (pi, pi-signed, omp) parked on the project-trust dialog classifies unknown launch-prompt
+ok - the Pi signature requires both the dialog heading and its decline option, not the bare word trust
+ok - a Gemini launch parked on its trust, auth-picker, or API-key dialog classifies unknown launch-prompt
+ok - the launch-prompt backstop never reclassifies a genuinely working launch
+ok - the launch-prompt backstop is scoped to harnesses with a verified signature
+ok - the launch-prompt backstop only ever touches the untouched fm-spawn seed
+ok - the launch-prompt backstop never runs without a captured tail
+ok - the grok fallback is regex-scoped to grok and classifies only grok tasks
+ok - codex classifies unknown until a semantic source passes its verification gate
+ok - standalone kimi classifies unknown until the live verification gate opens
+ok - cursor classifies only from its transcript fold, never rendered text or native state
+ok - endpoint death is the only process-level override and yields dead, never busy
+ok - herdr's native verdict is trusted for busy only, and records outrank it
+ok - record parsing never clobbers the caller's positional parameters, glob setting, or fields
+ok - the boolean view reports busy only on an exact busy verdict
+all fm-busy-state tests passed
+FM_TEST_END 2026-10-17T19:39:44Z tests/fm-busy-state.test.sh exit=0 duration_ms=4074 gate_skip=false
+FM_TEST_BEGIN 2026-10-17T19:39:44Z tests/fm-busy-adapter-wiring.test.sh family=standalone expected_gate_skip=none
+ok - a claude secondmate spawn arms the busy contract the stall gate can see, and Stop does not wake the parent
+ok - a raw claude, pi, pi-signed, or omp secondmate launch writes no busy wiring and classifies unknown
+ok - a claude secondmate's Stop guard records busy on a blocked Stop and idle on an allowed one, in any hook order, and a rewake turn reopens busy
+ok - a claude secondmate whose home guard predates .fm-busy-stop keeps the Stop idle hook
+ok - a claude secondmate spawn leaves an existing settings.local.json untouched
+ok - generated Pi wiring gates stream observation and clears model phases without accepting late updates
+ok - a pi secondmate loads the busy extension beside its primary extensions and does not emit a parent turn-end
+ok - an omp secondmate names only the out-of-home busy extension and does not emit a parent turn-end
+ok - an opencode secondmate plugin closes the parent busy record without a parent turn-end
+ok - codex and grok secondmates stay on their existing verdicts and do not emit a parent turn-end
+ok - pi extension reports agent_start busy, settles idle only via ctx.isIdle(), and keeps turn_end a notification
+ok - pi extension awaits agent_settled before the next agent_start without a test delay
+ok - pi extension events from a superseded incarnation are rejected as stale
+ok - kimi and grok install no unverified semantic wiring and classify through their own gates
+ok - opencode plugin classifies from session.status, scoped to the latched worker session
+ok - claude hooks open on UserPromptSubmit and close on Stop, StopFailure, and SessionEnd
+ok - claude hook events from a superseded incarnation are rejected without breaking the hook
+ok - gemini hooks open on BeforeAgent and close on AfterAgent and a repeated SessionEnd
+ok - gemini hook events from a superseded incarnation are rejected without breaking the hook
+ok - raw gemini launch remains unwired and classifies unknown
+ok - gemini is refused as a secondmate because it has no primary supervision protocol
+ok - codex classifies unknown until a semantic source is verified, never idle or footer-matched
+all fm-busy-adapter-wiring tests passed
+FM_TEST_END 2026-10-17T19:41:15Z tests/fm-busy-adapter-wiring.test.sh exit=0 duration_ms=91021 gate_skip=false
+FM_TEST_BEGIN 2026-10-17T19:41:15Z tests/fm-watch-triage.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - opted-in current stream silence uses inspection delay across changing panes; disabled, tool, and foreign phases do not
+ok - model progress extends only opted-in bounds and obsolete stream episodes reset before legacy fallback
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+FM_TEST_END 2026-10-17T19:43:35Z tests/fm-watch-triage.test.sh exit=0 duration_ms=140569 gate_skip=false
+FM_TEST_SUMMARY total=3 failed=0 skipped_gate=0 duration_ms=235768
+FM_TEST_SUMMARY_FAMILY family=standalone count=2 duration_ms=95095 failed=0
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=140569 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-watch-triage.test.sh duration_ms=140569
+FM_TEST_SLOWEST rank=2 script=tests/fm-busy-adapter-wiring.test.sh duration_ms=91021
+FM_TEST_SLOWEST rank=3 script=tests/fm-busy-state.test.sh duration_ms=4074
+fm-test-run: wrote timing artifact: /out/focused.json

@@ -1,0 +1,14 @@
+{
+  "head": "2c1a7e0c5a1f70b190607353b744f1e2c382ce7e",
+  "namespace_probe": {
+    "command": "unshare --user --map-root-user --mount --pid --fork --mount-proc --net --ipc true",
+    "exit": 0,
+    "stderr": ""
+  },
+  "product_tests_executed": false,
+  "prior_enclosure_acceptance": "INVALID/INCONCLUSIVE; prior artifacts preserved unchanged",
+  "blocker": "Required preflight must expose authentic Git metadata read-only at /home/art/.no-mistakes/repos/9f75ec418609.git and its worktree metadata. Current execution context explicitly prohibits reading or operating on that bare repository. No metadata was exposed or inspected. Synthetic metadata, removed identity markers, or product execution before preflight are forbidden. Outer owner must authorize narrowly scoped read-only authentic metadata access or provide a conforming enclosure before tests can run.",
+  "signed_executable": "command -v pi-signed found no executable; no host search or install attempted",
+  "source_changes": false,
+  "acceptance_credit": false
+}

@@ -1,0 +1,14 @@
+network denied: [Errno 101] Network is unreachable
+PASS isolation: real home/auth/trust/config/runtime/other checkouts absent; private PID and network namespaces
+FM_TEST_BEGIN 2026-10-16T00:24:57Z tests/fm-pi-worker-stream-live-e2e.test.sh family=live-harness-optin expected_gate_skip=live-capability
+ok - real Pi 1.2.0 stream, tool, completion, and background request phases
+ok - real Pi 1.2.0 default-off worker
+Firstmate model-stream observation write failed; inspect worker instrumentation.
+ok - real Pi 1.2.0 instrumentation deadline terminated writer and output-holding descendant
+ok - real Pi 1.2.0 stream, tool, completion, and background request phases
+# pi-signed unavailable: signed executable not exercised
+ok - real Pi 1.2.0 worker stream lifecycle, background exclusion, and default-off behavior
+FM_TEST_END 2026-10-16T00:25:18Z tests/fm-pi-worker-stream-live-e2e.test.sh exit=0 duration_ms=21772 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=21822
+FM_TEST_SUMMARY_FAMILY family=live-harness-optin count=1 duration_ms=21772 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-pi-worker-stream-live-e2e.test.sh duration_ms=21772

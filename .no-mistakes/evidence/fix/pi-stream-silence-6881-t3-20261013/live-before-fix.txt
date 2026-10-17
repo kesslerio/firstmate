@@ -1,0 +1,9 @@
+Observed before adding disposable history to the stalled toolkit fixture:
+FM_TEST_BEGIN 2026-10-16T00:24:17Z tests/fm-pi-worker-stream-live-e2e.test.sh family=live-harness-optin expected_gate_skip=live-capability
+ok - real Pi 1.2.0 stream, tool, completion, and background request phases
+ok - real Pi 1.2.0 default-off worker
+not ok - Pi 1.2.0: could not generate worker extension
+error: spawn refused for stream: cannot determine whether the fixture project shares firstmate's history (the copied toolkit code root has no readable history)
+FM_TEST_END 2026-10-16T00:24:28Z tests/fm-pi-worker-stream-live-e2e.test.sh exit=1 duration_ms=10757 gate_skip=false
+
+The exact fixture-only repair is three added lines in tests/fm-pi-worker-stream-live-e2e.test.sh: initialize the copied toolkit with fm_git_init_commit before spawning. Product publication permissions are unchanged. The subsequent live-pi.log records all modes passing.

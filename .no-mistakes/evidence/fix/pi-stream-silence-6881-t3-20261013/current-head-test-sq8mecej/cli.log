@@ -1,0 +1,10 @@
+PREFLIGHT PASS: authentic source/history/index and marker equality; readonly source/index; protected paths absent; private PID/proc/network; loopback allowed; caps empty; remount/unmask denied; disposable account home
+Foreground request before first response content: v1 gen=g1792265975.528.529 request=1792265977222 rev=1 ts=1792265977
+PASS: request observation starts before response progress.
+REAL PI CLI: 1.2.0
+Active stream: v1 gen=g1792265975.528.529 request=1792265977222 rev=2 ts=1792265979
+stale: fm-lab-stream:fm-stream (idle 2s, possible wedge, escalation 1, model stream silent for 4s (foreground request))
+1792265983	1	stale	fm-lab-stream:fm-stream	stale: fm-lab-stream:fm-stream (idle 2s, possible wedge, escalation 1, model stream silent for 4s (foreground request))
+Progress after notification (worker still running): v1 gen=g1792265975.528.529 request=1792265977222 rev=3 ts=1792265983
+After settlement: v1 gen=g1792265975.528.529 seq=3 state=idle source=pi-ext event=agent-settled ts=1792265983
+PASS: real Pi CLI silence produced inspection notification; worker continued and settled.

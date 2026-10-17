@@ -1,0 +1,4 @@
+All owned enclosure drivers exited and private PID namespaces ended.
+Real Pi guard asserted writer and output-holding descendant termination.
+No timeout occurred in successful final invocations.
+Removed only the verified test-created .test-enclosure directory.

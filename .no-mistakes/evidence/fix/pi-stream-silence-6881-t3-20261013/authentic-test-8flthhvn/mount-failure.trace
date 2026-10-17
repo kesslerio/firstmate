@@ -1,0 +1,306 @@
+1703730 execve("/run/current-system/sw/bin/python3", ["python3", "/home/art/.no-mistakes/evidence/"..., "preflight"], 0x7fff4190e108 /* 94 vars */) = 0
+1703730 execve("/run/current-system/sw/bin/unshare", ["unshare", "--user", "--map-root-user", "--mount", "--pid", "--fork", "--kill-child=KILL", "--net", "--ipc", "/bin/bash", "/home/art/.no-mistakes/evidence/"..., "preflight"], 0x7fd35c01cc90 /* 17 vars */) = 0
+1703742 execve("/bin/bash", ["/bin/bash", "/home/art/.no-mistakes/evidence/"..., "preflight"], 0x7ffd48dd5240 /* 17 vars */) = 0
+1703743 execve("/run/current-system/sw/bin/mount", ["mount", "--make-rprivate", "/"], 0x564326f3f540 /* 20 vars */) = 0
+1703743 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=2, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703744 execve("/run/current-system/sw/bin/mount", ["mount", "-t", "tmpfs", "-o", "uid=0,gid=0,nosuid,nodev", "tmpfs", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703744 fsconfig(3, FSCONFIG_SET_STRING, "source", "tmpfs", 0) = 0
+1703744 fsconfig(3, FSCONFIG_SET_STRING, "uid", "0", 0) = 0
+1703744 fsconfig(3, FSCONFIG_SET_STRING, "gid", "0", 0) = 0
+1703744 fsconfig(3, FSCONFIG_CMD_CREATE, NULL, NULL, 0) = 0
+1703744 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=3, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703745 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703745 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=4, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703746 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/nix/store", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703746 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=5, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703747 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703747 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=6, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703748 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703748 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=7, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703749 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/bin", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703749 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=8, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703750 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703750 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=9, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703751 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703751 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=10, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703752 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/usr/bin", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703752 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=11, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703753 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703753 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=12, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703754 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703754 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=13, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703755 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/lib64", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703755 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=14, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703756 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703756 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=15, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703757 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703757 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=16, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703758 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/run/current-system/sw", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703758 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=17, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703759 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703759 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=18, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703760 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703760 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=19, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703762 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/worktrees"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703762 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=20, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703767 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703767 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=21, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703771 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703771 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=22, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703777 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.npm-packages/lib/node"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703777 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=23, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703780 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703780 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=24, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703785 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703785 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=25, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703786 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/repos/9f7"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703786 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=26, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703787 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703787 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=27, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703788 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/evidence/"...], 0x564326f412e0 /* 20 vars */) = 0
+1703788 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=28, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703790 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703790 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=29, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703791 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703791 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=30, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703792 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/repos/9f7"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703792 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=31, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703793 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703793 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=32, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703795 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/evidence/"...], 0x564326f41260 /* 20 vars */) = 0
+1703795 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=33, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703796 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703796 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=34, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703797 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703797 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=35, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703798 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/repos/9f7"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703798 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=36, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703799 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703799 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=37, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703800 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/evidence/"...], 0x564326f41240 /* 20 vars */) = 0
+1703800 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=38, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703801 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703801 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=39, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703802 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703802 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=40, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703807 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/repos/9f7"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703807 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=41, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703808 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703808 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=42, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703809 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/evidence/"...], 0x564326f41240 /* 20 vars */) = 0
+1703809 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=43, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703810 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703810 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=44, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703811 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703811 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=45, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703812 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/repos/9f7"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703812 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=46, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703813 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703813 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=47, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703814 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/evidence/"...], 0x564326f411a0 /* 20 vars */) = 0
+1703814 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=48, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703815 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703815 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=49, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703816 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703816 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=50, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703822 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/repos/9f7"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703822 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=51, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703826 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703826 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=52, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703832 execve("/run/current-system/sw/bin/dirname", ["dirname", "/home/art/.no-mistakes/evidence/"...], 0x564326f41260 /* 20 vars */) = 0
+1703832 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=53, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703838 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703838 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=54, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703840 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703840 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=55, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703841 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/repos/9f7"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703841 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=56, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703842 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703842 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=57, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703843 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703843 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=58, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703844 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/repos/9f7"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703844 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=59, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703845 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,bind,ro,nosuid", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703845 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=60, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703846 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703846 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=61, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703847 execve("/run/current-system/sw/bin/cp", ["cp", "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703847 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=62, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703848 execve("/run/current-system/sw/bin/cp", ["cp", "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703848 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=63, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703849 execve("/run/current-system/sw/bin/cp", ["cp", "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703849 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=64, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703850 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703850 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=65, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703851 execve("/run/current-system/sw/bin/mount", ["mount", "-t", "proc", "-o", "nosuid,nodev,noexec", "proc", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703851 fsconfig(3, FSCONFIG_SET_STRING, "source", "proc", 0) = 0
+1703851 fsconfig(3, FSCONFIG_CMD_CREATE, NULL, NULL, 0) = 0
+1703851 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=66, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703852 execve("/run/current-system/sw/bin/mount", ["mount", "-t", "tmpfs", "-o", "uid=0,gid=0,nosuid", "tmpfs", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703852 fsconfig(3, FSCONFIG_SET_STRING, "source", "tmpfs", 0) = 0
+1703852 fsconfig(3, FSCONFIG_SET_STRING, "uid", "0", 0) = 0
+1703852 fsconfig(3, FSCONFIG_SET_STRING, "gid", "0", 0) = 0
+1703852 fsconfig(3, FSCONFIG_CMD_CREATE, NULL, NULL, 0) = 0
+1703852 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=67, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703853 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703853 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=68, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703854 execve("/run/current-system/sw/bin/mount", ["mount", "-t", "devpts", "-o", "newinstance,ptmxmode=0666,mode=0"..., "devpts", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703854 fsconfig(3, FSCONFIG_SET_STRING, "source", "devpts", 0) = 0
+1703854 fsconfig(3, FSCONFIG_SET_FLAG, "newinstance", NULL, 0) = 0
+1703854 fsconfig(3, FSCONFIG_SET_STRING, "ptmxmode", "0666", 0) = 0
+1703854 fsconfig(3, FSCONFIG_SET_STRING, "mode", "0620", 0) = 0
+1703854 fsconfig(3, FSCONFIG_CMD_CREATE, NULL, NULL, 0) = 0
+1703854 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=69, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703855 execve("/run/current-system/sw/bin/ln", ["ln", "-s", "pts/ptmx", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703855 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=70, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703856 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703856 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=71, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703857 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/dev/null", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703857 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=72, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703858 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703858 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=73, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703859 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/dev/zero", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703859 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=74, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703860 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703860 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=75, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703861 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/dev/random", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703861 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=76, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703862 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703862 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=77, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703863 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/dev/urandom", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703863 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=78, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703864 execve("/run/current-system/sw/bin/touch", ["touch", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703864 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=79, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703865 execve("/run/current-system/sw/bin/mount", ["mount", "--bind", "/dev/tty", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703865 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=80, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703866 execve("/run/current-system/sw/bin/ln", ["ln", "-s", "/proc/self/fd", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703866 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=81, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703867 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=82, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703868 execve("/run/current-system/sw/bin/ln", ["ln", "-s", "/proc/self/fd/0", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703868 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=83, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703869 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=84, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703870 execve("/run/current-system/sw/bin/ln", ["ln", "-s", "/proc/self/fd/1", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703870 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=85, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703871 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=86, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703872 execve("/run/current-system/sw/bin/ln", ["ln", "-s", "/proc/self/fd/2", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703872 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=87, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703873 execve("/run/current-system/sw/bin/mount", ["mount", "-t", "tmpfs", "-o", "uid=0,gid=0,nosuid,nodev", "tmpfs", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703873 fsconfig(3, FSCONFIG_SET_STRING, "source", "tmpfs", 0) = 0
+1703873 fsconfig(3, FSCONFIG_SET_STRING, "uid", "0", 0) = 0
+1703873 fsconfig(3, FSCONFIG_SET_STRING, "gid", "0", 0) = 0
+1703873 fsconfig(3, FSCONFIG_CMD_CREATE, NULL, NULL, 0) = 0
+1703873 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=88, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703874 execve("/run/current-system/sw/bin/mount", ["mount", "-t", "tmpfs", "-o", "uid=0,gid=0,nosuid,nodev", "tmpfs", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703874 fsconfig(3, FSCONFIG_SET_STRING, "source", "tmpfs", 0) = 0
+1703874 fsconfig(3, FSCONFIG_SET_STRING, "uid", "0", 0) = 0
+1703874 fsconfig(3, FSCONFIG_SET_STRING, "gid", "0", 0) = 0
+1703874 fsconfig(3, FSCONFIG_CMD_CREATE, NULL, NULL, 0) = 0
+1703874 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=89, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703875 execve("/run/current-system/sw/bin/mkdir", ["mkdir", "-p", "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703875 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=90, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703876 execve("/run/current-system/sw/bin/chmod", ["chmod", "700", "/home/art/.no-mistakes/evidence/"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703876 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=91, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703880 execve("/run/current-system/sw/bin/ln", ["ln", "-s", "/home/art/.npm-packages/lib/node"..., "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703880 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=92, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703888 execve("/run/current-system/sw/bin/ip", ["ip", "link", "set", "lo", "up"], 0x564326f3f540 /* 20 vars */) = 0
+1703888 +++ exited with 0 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=93, si_uid=0, si_status=0, si_utime=0, si_stime=0} ---
+1703896 execve("/run/current-system/sw/bin/mount", ["mount", "-o", "remount,ro", "/home/art/.no-mistakes/evidence/"...], 0x564326f3f540 /* 20 vars */) = 0
+1703896 fsconfig(4, FSCONFIG_SET_STRING, "uid", "1000", 0) = -1 EINVAL (Invalid argument)
+1703896 +++ exited with 32 +++
+1703742 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=94, si_uid=0, si_status=32, si_utime=0, si_stime=0} ---
+1703742 +++ exited with 32 +++
+1703730 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=1703742, si_uid=0, si_status=32, si_utime=0, si_stime=2 /* 0.02 s */} ---
+1703730 +++ exited with 32 +++

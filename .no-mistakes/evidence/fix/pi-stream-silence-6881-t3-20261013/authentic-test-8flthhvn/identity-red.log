@@ -1,0 +1,4 @@
+PREFLIGHT PASS: authentic source/history/index and marker equality; readonly source/index; protected paths absent; private PID/proc/network; loopback allowed; caps empty; remount/unmask denied; disposable account home
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+AssertionError: SDK child lost inherited gate/managed identity

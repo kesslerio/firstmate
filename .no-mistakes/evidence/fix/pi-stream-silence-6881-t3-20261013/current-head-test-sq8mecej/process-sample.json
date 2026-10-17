@@ -1,0 +1,194 @@
+[
+  {
+    "pid": 2262536,
+    "ppid": 2262512,
+    "pgid": 2262512,
+    "args": "unshare --user --map-root-user --mount --pid --fork --kill-child=KILL --net --ipc /bin/bash /home/art/.no-mistakes/evidence/01M4SVYM577RRP7SBS7M9Y8NFN/current-head-test-sq8mecej/enclose.sh focused"
+  },
+  {
+    "pid": 2262600,
+    "ppid": 2262536,
+    "pgid": 2262512,
+    "args": "/bin/bash /run.sh focused"
+  },
+  {
+    "pid": 2262866,
+    "ppid": 2262600,
+    "pgid": 2262866,
+    "args": "timeout -k 5s 300s bash bin/fm-test-run.sh --jobs 1 --json /out/focused.json tests/fm-busy-state.test.sh tests/fm-busy-adapter-wiring.test.sh tests/fm-watch-triage.test.sh"
+  },
+  {
+    "pid": 2262867,
+    "ppid": 2262866,
+    "pgid": 2262866,
+    "args": "bash bin/fm-test-run.sh --jobs 1 --json /out/focused.json tests/fm-busy-state.test.sh tests/fm-busy-adapter-wiring.test.sh tests/fm-watch-triage.test.sh"
+  },
+  {
+    "pid": 2270439,
+    "ppid": 2262867,
+    "pgid": 2262866,
+    "args": "bash tests/fm-busy-adapter-wiring.test.sh"
+  },
+  {
+    "pid": 2270440,
+    "ppid": 2262867,
+    "pgid": 2262866,
+    "args": "tee /tmp/fm-test-run.YnR81z/out.1"
+  },
+  {
+    "pid": 2277865,
+    "ppid": 2277860,
+    "pgid": 2277860,
+    "args": "unshare --user --map-root-user --mount --pid --fork --kill-child=KILL --net --ipc /bin/bash /home/art/.no-mistakes/evidence/01M4SVYM577RRP7SBS7M9Y8NFN/current-head-test-sq8mecej/enclose.sh cli-races"
+  },
+  {
+    "pid": 2277889,
+    "ppid": 2277865,
+    "pgid": 2277860,
+    "args": "/bin/bash /run.sh cli-races"
+  },
+  {
+    "pid": 2280079,
+    "ppid": 2280052,
+    "pgid": 2280052,
+    "args": "unshare --user --map-root-user --mount --pid --fork --kill-child=KILL --net --ipc /bin/bash /home/art/.no-mistakes/evidence/01M4SVYM577RRP7SBS7M9Y8NFN/current-head-test-sq8mecej/enclose.sh cli-fallback"
+  },
+  {
+    "pid": 2280135,
+    "ppid": 2280079,
+    "pgid": 2280052,
+    "args": "/bin/bash /run.sh cli-fallback"
+  },
+  {
+    "pid": 2297035,
+    "ppid": 2277889,
+    "pgid": 2297035,
+    "args": "timeout -k 5s 45s bash /cli.sh"
+  },
+  {
+    "pid": 2297038,
+    "ppid": 2297035,
+    "pgid": 2297035,
+    "args": "bash /cli.sh"
+  },
+  {
+    "pid": 2302796,
+    "ppid": 2297038,
+    "pgid": 2297035,
+    "args": "/run/current-system/sw/bin/node /tmp/l.abnP40/server.mjs /tmp/l.abnP40/port"
+  },
+  {
+    "pid": 2302971,
+    "ppid": 2277889,
+    "pgid": 2302971,
+    "args": "tmux -L fm-lab new-session -d -s fm-lab-stream -n fm-stream -x 120 -y 40 -c /tmp/l.abnP40/wt -e FM_HOME=/tmp/l.abnP40 env PATH='/tools/bin:/run/current-system/sw/bin:/bin:/usr/bin' HOME='/tmp/l.abnP40/user-home' FM_HOME='/tmp/l.abnP40' PI_CODING_AGENT_DIR='/tmp/l.abnP40/agent' PI_OFFLINE=1 pi --mode rpc --no-session --no-tools --no-mcp --no-skills --no-context-files --no-prompt-templates --no-extensions -e '/tmp/l.abnP40/state/stream.pi-ext.ts' --provider fm-worker-stream --model stream --thinking off"
+  },
+  {
+    "pid": 2302991,
+    "ppid": 2302971,
+    "pgid": 2302991,
+    "args": "pi"
+  },
+  {
+    "pid": 2303911,
+    "ppid": 2280135,
+    "pgid": 2303911,
+    "args": "timeout -k 5s 45s bash /cli.sh"
+  },
+  {
+    "pid": 2303916,
+    "ppid": 2303911,
+    "pgid": 2303911,
+    "args": "bash /cli.sh"
+  },
+  {
+    "pid": 2304541,
+    "ppid": 2297038,
+    "pgid": 2297035,
+    "args": "bash bin/fm-watch.sh"
+  },
+  {
+    "pid": 2306709,
+    "ppid": 2270439,
+    "pgid": 2262866,
+    "args": "bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-watch-checkpoint.sh --seconds 4"
+  },
+  {
+    "pid": 2306714,
+    "ppid": 2306709,
+    "pgid": 2306714,
+    "args": "timeout --signal=INT --kill-after=5s 4 /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-watch.sh"
+  },
+  {
+    "pid": 2306715,
+    "ppid": 2306714,
+    "pgid": 2306714,
+    "args": "bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-watch.sh"
+  },
+  {
+    "pid": 2310091,
+    "ppid": 2303916,
+    "pgid": 2303911,
+    "args": "/run/current-system/sw/bin/node /tmp/l.J0qG7q/server.mjs /tmp/l.J0qG7q/port"
+  },
+  {
+    "pid": 2310286,
+    "ppid": 2280135,
+    "pgid": 2310286,
+    "args": "tmux -L fm-lab new-session -d -s fm-lab-stream -n fm-stream -x 120 -y 40 -c /tmp/l.J0qG7q/wt -e FM_HOME=/tmp/l.J0qG7q env PATH='/tools/bin:/run/current-system/sw/bin:/bin:/usr/bin' HOME='/tmp/l.J0qG7q/user-home' FM_HOME='/tmp/l.J0qG7q' PI_CODING_AGENT_DIR='/tmp/l.J0qG7q/agent' PI_OFFLINE=1 pi --mode rpc --no-session --no-tools --no-mcp --no-skills --no-context-files --no-prompt-templates --no-extensions -e '/tmp/l.J0qG7q/state/stream.pi-ext.ts' --provider fm-worker-stream --model stream --thinking off"
+  },
+  {
+    "pid": 2310293,
+    "ppid": 2310286,
+    "pgid": 2310293,
+    "args": "pi"
+  },
+  {
+    "pid": 2310873,
+    "ppid": 2303916,
+    "pgid": 2303911,
+    "args": "bash bin/fm-watch.sh"
+  },
+  {
+    "pid": 2310874,
+    "ppid": 2303916,
+    "pgid": 2303911,
+    "args": "sleep 6"
+  },
+  {
+    "pid": 2313359,
+    "ppid": 2297038,
+    "pgid": 2297035,
+    "args": "sleep 1"
+  },
+  {
+    "pid": 2314178,
+    "ppid": 2310873,
+    "pgid": 2303911,
+    "args": "sleep 1"
+  },
+  {
+    "pid": 2314279,
+    "ppid": 2304541,
+    "pgid": 2297035,
+    "args": "sleep 1"
+  },
+  {
+    "pid": 2314284,
+    "ppid": 2262600,
+    "pgid": 2314284,
+    "args": "timeout -k 1 11 bash -c      status_file=$1     shift     \"$@\"     command_rc=$?     printf \"%s\\n\" \"$command_rc\" > \"$status_file\"     exit \"$command_rc\"    _ /tmp/fm-timeout-status.mhTOiU /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-inactive-reconcile.sh _scan-locked 0"
+  },
+  {
+    "pid": 2314287,
+    "ppid": 2314284,
+    "pgid": 2314284,
+    "args": "bash -c      status_file=$1     shift     \"$@\"     command_rc=$?     printf \"%s\\n\" \"$command_rc\" > \"$status_file\"     exit \"$command_rc\"    _ /tmp/fm-timeout-status.mhTOiU /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-inactive-reconcile.sh _scan-locked 0"
+  },
+  {
+    "pid": 2314288,
+    "ppid": 2314287,
+    "pgid": 2314284,
+    "args": "bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M4SVYM577RRP7SBS7M9Y8NFN/bin/fm-inactive-reconcile.sh _scan-locked 0"
+  }
+]

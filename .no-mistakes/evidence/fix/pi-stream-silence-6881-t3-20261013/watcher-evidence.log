@@ -1,0 +1,8 @@
+network denied: [Errno 101] Network is unreachable
+PASS isolation: real home/auth/trust/config/runtime/other checkouts absent; private PID and network namespaces
+FM_TEST_BEGIN 2026-10-16T00:30:25Z tests/fm-watch-triage.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - opted-in current stream silence uses inspection delay across changing panes; disabled, tool, and foreign phases do not
+FM_TEST_END 2026-10-16T00:31:18Z tests/fm-watch-triage.test.sh exit=0 duration_ms=53025 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=53173
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=53025 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-watch-triage.test.sh duration_ms=53025

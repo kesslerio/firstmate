@@ -1,0 +1,11 @@
+#!/bin/bash
+set -eu
+if [ -n "${STREAM_EXTENSION:-}" ]; then
+ python3 - <<'PY'
+import json,os
+expected=json.load(open('/expected.json'))['markers']
+assert all(os.environ.get(k)==v for k,v in expected.items()), 'SDK child lost inherited gate/managed identity'
+print('SDK_IDENTITY_PASS: inherited gate and managed markers unchanged',flush=True)
+PY
+fi
+exec /run/current-system/sw/bin/node "$@"

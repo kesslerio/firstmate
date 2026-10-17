@@ -1,0 +1,15 @@
+network denied: [Errno 101] Network is unreachable
+PASS isolation: real home/auth/trust/config/runtime/other checkouts absent; private PID and network namespaces
+FM_TEST_BEGIN 2026-10-16T00:26:29Z tests/fm-watch-triage.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - opted-in current stream silence uses inspection delay across changing panes; disabled, tool, and foreign phases do not
+ok - model progress extends only opted-in bounds and obsolete stream episodes reset before legacy fallback
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+ok - the production default busy-turn-age bound is 3600s (5min under does not wedge, 66min over does)
+ok - native progress resets busy age without a completed turn or notification
+ok - a busy pane under a declared pause is rechecked on the long cadence, and lifting the pause restores the wedge escalation
+FM_TEST_END 2026-10-16T00:28:46Z tests/fm-watch-triage.test.sh exit=0 duration_ms=136254 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=136315
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=136254 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-watch-triage.test.sh duration_ms=136254
+/home/art/.no-mistakes/evidence/01M4SVYM577RRP7SBS7M9Y8NFN/inside.sh: line 30: unexpected EOF while looking for matching `''

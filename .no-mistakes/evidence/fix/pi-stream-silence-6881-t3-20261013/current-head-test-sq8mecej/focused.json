@@ -1,0 +1,55 @@
+{
+  "families": [
+    {
+      "count": 2,
+      "duration_ms": 95095,
+      "failed": 0,
+      "name": "standalone"
+    },
+    {
+      "count": 1,
+      "duration_ms": 140569,
+      "failed": 0,
+      "name": "watcher-wake-lock"
+    }
+  ],
+  "finished_at": "2026-10-17T19:43:35Z",
+  "run_id": "fm-test-run-1792265980176-116",
+  "scripts": [
+    {
+      "duration_ms": 4074,
+      "exit": 0,
+      "expected_gate_skip": "none",
+      "family": "standalone",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-busy-state.test.sh"
+    },
+    {
+      "duration_ms": 91021,
+      "exit": 0,
+      "expected_gate_skip": "none",
+      "family": "standalone",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-busy-adapter-wiring.test.sh"
+    },
+    {
+      "duration_ms": 140569,
+      "exit": 0,
+      "expected_gate_skip": "none",
+      "family": "watcher-wake-lock",
+      "gate_skip": false,
+      "gate_skip_reason": "",
+      "path": "tests/fm-watch-triage.test.sh"
+    }
+  ],
+  "selection": "scripts;jobs=1",
+  "started_at": "2026-10-17T19:39:40Z",
+  "summary": {
+    "duration_ms": 235768,
+    "failed": 0,
+    "skipped_gate": 0,
+    "total": 3
+  }
+}
