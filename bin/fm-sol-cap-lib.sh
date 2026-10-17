@@ -111,13 +111,13 @@ fm_sol_cap_ceiling() {  # <config-dir>
 fm_sol_cap_entry_shape() {  # <start> <pid>
   local start=$1 pid=$2
   case "$start" in '' | *[!0-9]*) return 1 ;; esac
-  case "$pid" in -1) return 0 ;; '' | *[!0-9]*) return 1 ;; esac
+  case "$pid" in -1 | -2) return 0 ;; '' | *[!0-9]*) return 1 ;; esac
 }
 
 fm_sol_cap_entry_live() {  # <start> <pid>
   local start=$1 pid=$2
   case "$start" in '' | *[!0-9]*) return 1 ;; esac
-  case "$pid" in '' | *[!0-9]*) return 1 ;; esac
+  case "$pid" in -2) return 0 ;; '' | *[!0-9]*) return 1 ;; esac
   [ "$pid" = 0 ] || fm_pid_alive "$pid"
 }
 
@@ -159,7 +159,7 @@ fm_sol_cap_adopt_workers() (
     case "|$FM_SOL_CAP_MODELS|" in *"|$model|"*) [ -n "$model" ] || continue ;; *) continue ;; esac
     if [ -f "$file" ] && awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$file"; then
       pid=$(awk -F'\t' -v id="$id" '$1 == id {print $4; exit}' "$file") || return 1
-      [ "$pid" = 0 ] || continue
+      [ "$pid" = -2 ] || continue
       owner=$(cat "$state/.spawn-$id.lock/pid" 2>/dev/null || true)
       fm_current_pid current || return 1
       [ "$owner" != "$current" ] || continue
@@ -189,7 +189,7 @@ fm_sol_cap_adopt_workers() (
     case "$verdict" in
       dead|missing) fm_sol_cap_registry_claim "$file" "$id" "$model" "$now" -1 || return 1; continue ;;
     esac
-    fm_sol_cap_registry_claim "$file" "$id" "$model" "$now" 0 || return 1
+    fm_sol_cap_registry_claim "$file" "$id" "$model" "$now" -2 || return 1
   done
 )
 
@@ -263,7 +263,7 @@ fm_sol_cap_lock_acquire() {  # <lock-dir> <what>
 # fm_sol_cap_registry_claim <registry-file> <id> <model> <now> [owner-pid]
 # While the ceiling lock is held, replace only this task id's row, retaining
 # every other task's row. Admission defaults to the calling process's pid;
-# adoption supplies 0 for uncertain occupancy or -1 for a proven stop. The
+# adoption supplies its occupancy or stop marker. The
 # rewrite lands in one atomic mv, so a parallel reader never sees a
 # half-written file.
 fm_sol_cap_registry_claim() {  # <registry-file> <id> <model> <now>
