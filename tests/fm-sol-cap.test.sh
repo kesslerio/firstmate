@@ -607,6 +607,43 @@ test_retained_stop_evidence() (
   pass "pruning and explicit release preserve stop evidence while metadata survives"
 )
 
+test_unregistered_stop_evidence() (
+  local case_dir state mode id
+  case_dir=$(make_case legacy-stop)
+  state=$case_dir/home/state
+  FM_HOME=$case_dir/home
+  . "$ROOT/bin/fm-wake-lib.sh"
+  . "$ROOT/bin/fm-secondmate-registry-lib.sh"
+  . "$ROOT/bin/fm-sol-cap-lib.sh"
+  fm_backend_of_meta() { printf cmux; }
+  fm_backend_target_of_meta() { printf 'workspace:surface'; }
+  fm_backend_agent_state() { printf dead; }
+  mkdir "$case_dir/probe"
+  cat > "$case_dir/probe/fm-on.sh" <<'SH'
+#!/usr/bin/env bash
+printf 'dead\n'
+SH
+  chmod +x "$case_dir/probe/fm-on.sh"
+  for mode in release local remote; do
+    id=legacy-$mode
+    fm_write_meta "$state/$id.meta" "model=gpt-6.1-sol" "kind=ship"
+    case "$mode" in
+      release) fm_sol_cap_promote "$id" remove "$state" || fail "unregistered stop could not be recorded" ;;
+      local) fm_sol_cap_reconcile_local "$id" "$state" || fail "unregistered local reconciliation failed" ;;
+      remote) fm_sol_cap_reconcile_remote "$id" "$state" "$case_dir/probe" || fail "unregistered remote reconciliation failed" ;;
+    esac
+    [ "$(registry_row_field "$case_dir" "$id" 4)" = -1 ] || fail "$mode forgot an unregistered confirmed stop"
+  done
+  fm_backend_agent_state() { printf unverified; }
+  fm_sol_cap_refuse_and_claim fresh ship codex gpt-6.1-sol "$case_dir/home/config" "$state" || fail "legacy stopped tasks were re-adopted"
+  fm_sol_cap_refuse_and_claim fresh ship codex gpt-6.1-sol "$case_dir/home/config" "$state" reuse || fail "repeat adoption forgot legacy stops"
+  for mode in release local remote; do
+    [ "$(registry_row_field "$case_dir" "legacy-$mode" 4)" = -1 ] || fail "adoption replaced $mode stop evidence"
+  done
+  pass "confirmed-stop paths remember legacy workers with missing registries or rows"
+)
+
+test_unregistered_stop_evidence
 test_retained_stop_evidence
 test_adopt_preserved_workers
 test_stopped_local_and_unpublished_remote_recovery
