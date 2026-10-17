@@ -362,11 +362,22 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
   return 0
 }
 
+fm_sol_cap_has_owned_record() {
+  local id=$1 state=$2 model registry
+  registry=$state/$FM_SOL_REGISTRY_NAME
+  if [ -f "$registry" ] && awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$registry"; then
+    return 0
+  fi
+  [ -f "$state/$id.meta" ] && [ ! -L "$state/$id.meta" ] || return 1
+  model=$(awk -F= '$1 == "model" {sub(/^[^=]*=/, ""); print; exit}' "$state/$id.meta") || return 1
+  [[ "$model" =~ ^gpt-[0-9.]+-sol$ ]]
+}
+
 fm_sol_cap_reconcile_local() {
   local id=$1 state=$2 meta backend target verdict absence
   meta=$state/$id.meta
-  [ -f "$meta" ] && [ ! -L "$meta" ] && [ -f "$state/$FM_SOL_REGISTRY_NAME" ] || return 0
-  awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$state/$FM_SOL_REGISTRY_NAME" || return 0
+  [ -f "$meta" ] && [ ! -L "$meta" ] || return 0
+  fm_sol_cap_has_owned_record "$id" "$state" || return 0
   backend=$(fm_backend_of_meta "$meta") || return 1
   target=$(fm_backend_target_of_meta "$meta") || return 1
   [ -n "$target" ] || return 0
@@ -386,8 +397,7 @@ fm_sol_cap_reconcile_local() {
 
 fm_sol_cap_reconcile_remote() {
   local id=$1 state=$2 scripts=$3 remote_state
-  [ -f "$state/$FM_SOL_REGISTRY_NAME" ] || return 0
-  awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$state/$FM_SOL_REGISTRY_NAME" || return 0
+  fm_sol_cap_has_owned_record "$id" "$state" || return 0
   remote_state=$("$scripts/fm-on.sh" "$id" fm-remote-secondmate-control.sh state "$id" </dev/null 2>/dev/null) || return 0
   remote_state=$(printf '%s\n' "$remote_state" | tail -1)
   case "$remote_state" in
@@ -396,13 +406,19 @@ fm_sol_cap_reconcile_remote() {
 }
 
 fm_sol_cap_registry_promote() {
-  local id=$1 pid=$2 state=$3 registry tmp stopped=0 recorded_model
+  local id=$1 pid=$2 state=$3 registry tmp stopped=0 recorded_model now
   registry=$state/$FM_SOL_REGISTRY_NAME
-  [ -f "$registry" ] || return 0
   if [ "$pid" = remove ] && [ -f "$state/$id.meta" ]; then
     recorded_model=$(awk -F= '$1 == "model" {sub(/^[^=]*=/, ""); print; exit}' "$state/$id.meta") || return 1
     [[ ! "$recorded_model" =~ ^gpt-[0-9.]+-sol$ ]] || stopped=1
   fi
+  if [ "$stopped" = 1 ] &&
+    { [ ! -f "$registry" ] || ! awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$registry"; }; then
+    fm_epoch_seconds_to now
+    fm_sol_cap_registry_claim "$registry" "$id" "$recorded_model" "$now" -1
+    return $?
+  fi
+  [ -f "$registry" ] || return 0
   tmp=$registry.tmp.$$
   if ! awk -F'\t' -v OFS='\t' -v id="$id" -v pid="$pid" -v stopped="$stopped" '
     $1 == id { if (pid == "remove") { if (stopped) $4 = -1; else next } else $4 = pid }
@@ -416,8 +432,12 @@ fm_sol_cap_registry_promote() {
 fm_sol_cap_promote() {
   local id=$1 pid=$2 state=$3 registry root lock rc=0
   registry=$state/$FM_SOL_REGISTRY_NAME
-  [ -f "$registry" ] || return 0
-  awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$registry" || return 0
+  if [ "$pid" = remove ]; then
+    fm_sol_cap_has_owned_record "$id" "$state" || return 0
+  else
+    [ -f "$registry" ] || return 0
+    awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$registry" || return 0
+  fi
   root=$(fm_firstmate_root_home "$(fm_sol_cap_home "$state")") || return 1
   lock=$root/state/$FM_SOL_LOCK_NAME
   fm_sol_cap_lock_acquire "$lock" "the promotion of task $id" || return 1
