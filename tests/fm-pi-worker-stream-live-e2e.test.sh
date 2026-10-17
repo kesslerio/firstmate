@@ -14,11 +14,9 @@ PI_VERSION=$(jq -r '.version' "$PI_PACKAGE_DIR/package.json") || fail "Pi packag
 TMP_ROOT=$(fm_test_tmproot fm-pi-worker-stream-live)
 fakebin=$(make_spawn_fakebin "$TMP_ROOT/fake")
 sdk_env=(env -i)
-while IFS= read -r name; do
-  case "$name" in
-    *GATE*|*MANAGED*|NO_MISTAKES*) sdk_env+=("$name=${!name}") ;;
-  esac
-done < <(compgen -e)
+for name in NO_MISTAKES_GATE CODEX_MANAGED_BY_NPM CODEX_MANAGED_PACKAGE_ROOT; do
+  [ "${!name+x}" != x ] || sdk_env+=("$name=${!name}")
+done
 
 for case_label in enabled disabled stalled; do
   enabled=300
