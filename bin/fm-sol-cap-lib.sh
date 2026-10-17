@@ -531,6 +531,10 @@ fm_sol_cap_registry_prune() {  # <registry-file>
 #   ceiling <config-dir>
 #   refuse-claim <id> <kind> <harness> <model> <config-dir> <state-dir>
 #                prints "claimed" or the refusal, exits 0/1.
+#   record-actual <id> <actual-model> <state-dir>
+#                prints "recorded" or the refusal, exits 0/1.
+#   run <id> <state-dir> <command> [args...]
+#                transfers the reservation to this process, then execs command.
 
 fm_sol_cap_cli() {
   local mode=$1

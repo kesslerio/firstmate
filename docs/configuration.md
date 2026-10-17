@@ -1285,9 +1285,9 @@ Secondmate homes inherit this file from the primary, so a secondmate's own crewm
 
 Firstmate mechanically limits concurrent Sol sessions to four; `config/sol-cap` may lower this ceiling.
 A Sol session is a worker whose actual dispatched model is in the Sol set.
-A recorded model counts only when the replacement launch preserves it; a launch with `--model default` has no explicit model pin.
+A fresh launch with `--model default` has no explicit model pin; remote endpoint reuse follows the reported-model reconciliation below.
 The set is derived at call time from `config/crew-dispatch.json`'s rule and default profiles (model ids matching `^gpt-[0-9.]+-sol$`), so a future Sol row joins the ceiling by editing the dispatch table, not code.
-`bin/fm-sol-cap-lib.sh` is the single owner of the guard's mechanics and its CLI (`models`, `ceiling`, `refuse-claim`), `bin/fm-spawn.sh` owns the hook point (after the spawn's harness/model axis resolves, before any endpoint, worktree, or record exists), and this section is the single owner of the operator contract.
+`bin/fm-sol-cap-lib.sh` is the single owner of the guard's mechanics and CLI, `bin/fm-spawn.sh` owns the hook point (after the spawn's harness/model axis resolves, before any endpoint, worktree, or record exists), and this section is the single owner of the operator contract.
 
 **What counts and where it lives**
 
@@ -1298,7 +1298,8 @@ The set is derived at call time from `config/crew-dispatch.json`'s rule and defa
 - Before delivery, the reservation becomes conservative (pid 0), so an uncertain delivery or later spawn error cannot free a running worker's slot.
 - Local launch commands transfer that reservation to their own process before starting the worker; exiting the worker releases occupancy even while its interactive pane remains open.
 - Remote or uncertain deliveries keep pid 0 and require reconciliation before their slot can be released; they never expire by age.
-- A Sol retry refuses while its existing worker is live or delivery is uncertain; a non-Sol retry preserves that occupancy.
+- A retry requesting an explicit Sol model refuses while its existing worker is live or delivery is uncertain; requesting a non-Sol or default model alone does not release that occupancy.
+- A successful remote launch publishes the endpoint's reported actual model while retaining its per-task spawn lock, then reconciles occupancy under the admission lock: an existing live or uncertain Sol claim keeps its reconciliation semantics, and a confirmed non-Sol route releases stale Sol occupancy.
 - Confirmed endpoint cleanup and remote retirement release the owned Sol occupancy; failed or uncertain closes retain it.
 - Local relaunch and secondmate recovery reconcile an owned claim under the lifecycle locks only after proving the endpoint dead or absent; uncertain state retains the claim.
 - Remote recovery probes the configured route under the spawn locks and retires its conservative claim only for a successful dead or missing verdict, including retries after delivery failed before parent metadata publication.
