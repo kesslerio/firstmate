@@ -42,8 +42,8 @@
 #   stream <state-dir> <id> <open|progress|close> --gen G --request N
 #       Mutate the optional Pi stream contract owned by fm-busy-lib.sh.
 #       Open requires a newer request; progress requires the active request
-#       and a busy pi-ext record. Close retains ordering before removing active
-#       evidence, so a delayed update cannot resurrect a completed request.
+#       and a busy pi-ext record. Close removes active evidence before persisting
+#       closed ordering, so a persistence failure cannot leave observation active.
 #
 # Exit codes: 0 applied; 1 refused (stale gen, unarmed task, lock timeout,
 # invalid input); 2 usage. Adapter hook command lines append `|| true` so a
