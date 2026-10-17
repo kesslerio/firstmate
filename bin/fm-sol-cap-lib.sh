@@ -249,11 +249,10 @@ fm_sol_cap_lock_acquire() {  # <lock-dir> <what>
   return 1
 }
 
-# fm_sol_cap_registry_claim <registry-file> <id> <model> <now>
-# Rewrite <registry-file> in place after the count passed, while the ceiling
-# lock is held: drop this task id's own earlier row (a relaunch or respawn
-# replaces it), drop no live row, and append the claimed row with the calling
-# process's pid as the reservation, which dies with a failed dispatch. The
+# fm_sol_cap_registry_claim <registry-file> <id> <model> <now> [owner-pid]
+# While the ceiling lock is held, replace only this task id's row, retaining
+# every other task's row. Admission defaults to the calling process's pid;
+# adoption supplies 0 for uncertain occupancy or -1 for a proven stop. The
 # rewrite lands in one atomic mv, so a parallel reader never sees a
 # half-written file.
 fm_sol_cap_registry_claim() {  # <registry-file> <id> <model> <now>
@@ -346,9 +345,9 @@ fm_sol_cap_refuse_and_claim() {  # <id> <kind> <harness> <model> <config-dir> <s
     return 1
   fi
   now=$(fm_epoch_seconds_to FM_SOL_CAP_NOW; printf '%s' "$FM_SOL_CAP_NOW")
-  # Keep every walked registry bounded: stale rows are the release path, and
-  # once they are no longer counted they do not need to sit in the file. A
-  # malformed row is deliberately left in place for its loud refusal.
+  # Prune stopped rows only after their metadata disappears; until then they
+  # preserve stop evidence against adoption. A malformed row is deliberately
+  # left in place for its loud refusal.
   for local_home in "${FM_LOCAL_FIRSTMATE_STATES[@]}"; do
     fm_sol_cap_registry_prune "$local_home/$FM_SOL_REGISTRY_NAME"
   done

@@ -1299,14 +1299,14 @@ The set is derived at call time from `config/crew-dispatch.json`'s rule and defa
 - Local launch commands transfer that reservation to their own process before starting the worker; exiting the worker releases occupancy even while its interactive pane remains open.
 - Remote or uncertain deliveries keep pid 0 and require reconciliation before their slot can be released; they never expire by age.
 - A Sol retry refuses while its existing worker is live or delivery is uncertain; a non-Sol retry preserves that occupancy.
-- Confirmed endpoint cleanup and remote retirement remove the owned Sol row; failed or uncertain closes retain it.
+- Confirmed endpoint cleanup and remote retirement release the owned Sol occupancy; failed or uncertain closes retain it.
 - Local relaunch and secondmate recovery reconcile an owned claim under the lifecycle locks only after proving the endpoint dead or absent; uncertain state retains the claim.
 - Remote recovery probes the configured route under the spawn locks and retires its conservative claim only for a successful dead or missing verdict, including retries after delivery failed before parent metadata publication.
-- Remote runtime switches reuse only a live reservation or reserve a new Sol slot in the parent before delivery, retaining existing occupancy until a confirmed non-Sol replacement.
+- Remote runtime switches reuse only a live reservation or reserve a new Sol slot in the parent before delivery, retaining existing occupancy until a confirmed non-Sol replacement; publishing that replacement's model and releasing the claim share the admission lock so adoption cannot restore the old Sol claim between them.
 - On the remote host, the nested `state/parent-route` registry shares its operational home's count and root lock with that secondmate's crew.
 - Before admission, owned Sol workers preserved across an update are adopted from task metadata under the shared lock when they have no registry row; live or unverified workers count, while proven-stopped workers do not.
 - Dead-PID rows remain while their task metadata exists, preserving stop evidence against repeated adoption.
-- Explicit confirmed-stop release records pid -1 while Sol metadata remains; that row holds no occupancy and a new admitted incarnation replaces it.
+- Explicit confirmed-stop release records pid -1 while Sol metadata remains, even when no registry row or file existed; that row holds no occupancy, prevents re-adoption of the stopped worker, and is replaced by a new admitted incarnation.
 - Passing spawns prune stopped rows once their metadata is absent.
 - A malformed registry row (bad shape) refuses every Sol dispatch with the row named rather than silently undercounting; staleness is release, but a broken row is a disruption, not a free slot.
 
