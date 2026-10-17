@@ -1357,14 +1357,17 @@ spawn_remote_secondmate() {
     SPAWN_TASK_SET_LOCK_HELD=0
     fm_lock_release "$SPAWN_TASK_SET_LOCK"
   fi
-  fm_lock_release "$remote_lock" || true
-  fm_lock_release "$registry_lock" || true
-  fm_lock_release "$SPAWN_TASK_LOCK" || true
   if ! fm_sol_cap_record_actual "$id" "$remote_model" "$STATE"; then
     [ -z "$FM_SOL_CAP_REFUSAL" ] || printf '%s\n' "$FM_SOL_CAP_REFUSAL" >&2
     echo "error: remote secondmate $id launched, but its Sol occupancy could not be reconciled with the reported model; the confirmed route's record stands for the next admission to reconcile" >&2
+    fm_lock_release "$remote_lock" || true
+    fm_lock_release "$registry_lock" || true
+    fm_lock_release "$SPAWN_TASK_LOCK" || true
     return 1
   fi
+  fm_lock_release "$remote_lock" || true
+  fm_lock_release "$registry_lock" || true
+  fm_lock_release "$SPAWN_TASK_LOCK" || true
   "$SCRIPT_DIR/fm-home-summary-refresh.sh" --best-effort || true
   if ! "$SCRIPT_DIR/fm-procevent-remote-reply.sh" arm "$id" >/dev/null; then
     echo "error: remote secondmate $id launched, but its reply source could not be armed; endpoint metadata is preserved" >&2

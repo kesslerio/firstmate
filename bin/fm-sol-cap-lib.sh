@@ -430,15 +430,16 @@ fm_sol_cap_record_actual() {  # <id> <actual-model> <state-dir>
     fm_sol_cap_promote "$id" remove "$state" || return 1
     return 0
   fi
+  root=$(fm_firstmate_root_home "$(fm_sol_cap_home "$state")") || return 1
+  lock=$root/state/$FM_SOL_LOCK_NAME
+  fm_sol_cap_lock_acquire "$lock" "the reported model of task $id" || return 1
   registry=$state/$FM_SOL_REGISTRY_NAME
   existing_pid=$(awk -F'\t' -v id="$id" '$1 == id {print $4; exit}' "$registry" 2>/dev/null || true)
   existing_start=$(awk -F'\t' -v id="$id" '$1 == id {print $3; exit}' "$registry" 2>/dev/null || true)
   if fm_sol_cap_entry_live "$existing_start" "$existing_pid"; then
+    fm_lock_release "$lock" || true
     return 0
   fi
-  root=$(fm_firstmate_root_home "$(fm_sol_cap_home "$state")") || return 1
-  lock=$root/state/$FM_SOL_LOCK_NAME
-  fm_sol_cap_lock_acquire "$lock" "the reported model of task $id" || return 1
   fm_epoch_seconds_to FM_SOL_CAP_NOW
   if ! fm_sol_cap_registry_claim "$registry" "$id" "$model" "$FM_SOL_CAP_NOW" 0; then
     FM_SOL_CAP_REFUSAL="error: Sol ceiling: the reported Sol model of task $id could not be recorded in $registry; the confirmed route's record stands for the next admission to reconcile"
