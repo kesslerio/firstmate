@@ -1,0 +1,78 @@
+$ bin/fm-lab-home.sh create /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home
+exit=0
+SCENARIO derived model set including future default profile
+$ bash bin/fm-sol-cap-lib.sh models /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config
+gpt-6-sol|gpt-6.1-sol|gpt-9.9-sol
+exit=0
+RUN worker-0 model=gpt-6.1-sol live pid=1871524
+RUN worker-1 model=gpt-6-sol live pid=1871624
+RUN worker-2 model=gpt-9.9-sol live pid=1872085
+RUN worker-3 model=gpt-6.1-sol live pid=1872198
+SCENARIO fifth Sol refused with four live process workers
+$ bash bin/fm-sol-cap-lib.sh refuse-claim fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task fifth (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 1s); worker-1 (gpt-6-sol, age 0s); worker-2 (gpt-9.9-sol, age 0s); worker-3 (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+worker-0	gpt-6.1-sol	1792197230	1871524
+worker-1	gpt-6-sol	1792197231	1871624
+worker-2	gpt-9.9-sol	1792197231	1872085
+worker-3	gpt-6.1-sol	1792197231	1872198
+
+SCENARIO GLM, qwen and default bypass a full ceiling without registry mutation
+$ bash bin/fm-sol-cap-lib.sh refuse-claim lane-glm-5 ship codex glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+claimed
+exit=0
+$ bash bin/fm-sol-cap-lib.sh refuse-claim lane-qwen3 ship codex qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+claimed
+exit=0
+$ bash bin/fm-sol-cap-lib.sh refuse-claim lane-default ship codex default /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+claimed
+exit=0
+SCENARIO dead positive PID frees a slot and is pruned
+RUN replacement model=gpt-6.1-sol live pid=1873239
+SCENARIO two homes compete for one remaining slot
+$ bin/fm-lab-home.sh create /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/mate
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/mate
+exit=0
+race loser: error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task race-mate (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 2s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; worker-1 (gpt-6-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; worker-2 (gpt-9.9-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; race-root (gpt-6.1-sol, age 0s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+
+exactly one racer remains live; other refused
+$ bash bin/fm-sol-cap-lib.sh refuse-claim cross-home-fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/mate/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/mate/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task cross-home-fifth (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 4s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; worker-1 (gpt-6-sol, age 3s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; worker-2 (gpt-9.9-sol, age 3s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; race-root (gpt-6.1-sol, age 2s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+SCENARIO lower-only cap and malformed configuration fail closed for Sol only
+$ bash bin/fm-sol-cap-lib.sh refuse-claim lowered ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+error: Sol ceiling reached: 3 concurrent Sol session(s) already active and this ceiling is 2 (config/sol-cap may lower it); the dispatch of task lowered (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 4s); worker-1 (gpt-6-sol, age 3s); worker-2 (gpt-9.9-sol, age 3s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+$ bash bin/fm-sol-cap-lib.sh refuse-claim raised ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+error: Sol ceiling unavailable: /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config/sol-cap must be one integer from 1 through 4; task raised with model gpt-6.1-sol was not dispatched rather than launched against an unread ceiling
+exit=1
+$ bash bin/fm-sol-cap-lib.sh refuse-claim broken ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+error: Sol ceiling unavailable: /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config/crew-dispatch.json exists but cannot be read; task broken with model gpt-6.1-sol was not dispatched rather than launched possibly uncounted
+exit=1
+$ bash bin/fm-sol-cap-lib.sh refuse-claim broken-glm-5 ship codex glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+claimed
+exit=0
+$ bash bin/fm-sol-cap-lib.sh refuse-claim broken-qwen3 ship codex qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+claimed
+exit=0
+SCENARIO nested remote parent-route shares admission with host-local crew
+$ bin/fm-lab-home.sh create /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout
+exit=0
+RUN remote-self model=gpt-6.1-sol live pid=1879432
+RUN crew-0 model=gpt-6.1-sol live pid=1879551
+RUN crew-1 model=gpt-6.1-sol live pid=1879763
+RUN crew-2 model=gpt-6.1-sol live pid=1880123
+$ bash bin/fm-sol-cap-lib.sh refuse-claim crew-fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task crew-fifth (codex, gpt-6.1-sol) was refused. Active sessions: crew-0 (gpt-6.1-sol, age 0s); crew-1 (gpt-6.1-sol, age 0s); crew-2 (gpt-6.1-sol, age 0s); remote-self (gpt-6.1-sol, age 0s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state/parent-route. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+$ bash bin/fm-sol-cap-lib.sh refuse-claim route-fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state/parent-route
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task route-fifth (codex, gpt-6.1-sol) was refused. Active sessions: remote-self (gpt-6.1-sol, age 1s); crew-0 (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state; crew-1 (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state; crew-2 (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+SCENARIO pid-zero uncertain delivery blocks replacement
+$ bash bin/fm-sol-cap-lib.sh refuse-claim uncertain ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state
+error: Sol ceiling: task uncertain already holds a live or uncertain session; confirm its worker stopped through teardown before replacing it
+exit=1
+LIVE ADMISSION SCENARIOS PASSED
+Cleanup: all owned worker PIDs exited

@@ -1,0 +1,3 @@
+ok - cmux proves absence across every window and refuses incomplete inventories
+ok - zellij distinguishes confirmed absence from failed reads, closes and identity checks
+ok - orca reports close command and protocol failures while accepting successful closes

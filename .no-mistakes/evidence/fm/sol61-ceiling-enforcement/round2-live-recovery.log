@@ -1,0 +1,8 @@
+/home/art/.no-mistakes/evidence/01M53EGCQXW2H51Q8EPQ12MT36/h2
+Real tmux endpoint state:
+deadConfirmed agent-free shell endpoint retired its owned pid-zero claim.
+Missing tmux endpoint without persisted socket identity remains uncertain; its claim is retained.
+recover	gpt-6.1-sol	1	-1
+fresh	gpt-6.1-sol	1792197258	1917623
+later	gpt-6.1-sol	1792197258	1917623
+Repeated admission kept the legacy worker stopped despite retained metadata and an uncertain missing endpoint.
