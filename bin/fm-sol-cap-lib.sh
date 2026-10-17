@@ -138,7 +138,7 @@ fm_sol_cap_home() {
 }
 
 fm_sol_cap_adopt_workers() (
-  local state=$1 now=$2 meta id model file home target backend verdict absence host pid lifecycle_lock= owner current
+  local state=$1 now=$2 meta id model file home target backend verdict absence host pid lifecycle_lock='' owner current
   trap '[ -z "$lifecycle_lock" ] || fm_lock_release "$lifecycle_lock"' EXIT
   file=$state/$FM_SOL_REGISTRY_NAME
   case "$state" in
