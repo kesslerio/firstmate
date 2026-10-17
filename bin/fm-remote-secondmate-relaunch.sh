@@ -47,7 +47,8 @@ case "$ID" in ''|*[!A-Za-z0-9._-]*) die "invalid secondmate id: $ID" ;; esac
 
 SPAWN_LOCK="$STATE/.spawn-$ID.lock"
 fm_lock_try_acquire "$SPAWN_LOCK" || die "another spawn or runtime switch owns $ID"
-trap 'fm_lock_release "$SPAWN_LOCK" || true' EXIT
+CAP_LOCK=
+trap '[ -z "$CAP_LOCK" ] || fm_lock_release "$CAP_LOCK" || true; fm_lock_release "$SPAWN_LOCK" || true' EXIT
 
 META="$STATE/$ID.meta"
 [ -f "$META" ] && [ ! -L "$META" ] || die "no metadata for $ID at $META"
@@ -82,14 +83,12 @@ NEW_MODEL=$(printf '%s\n' "$RELAUNCH_OUT" | sed -n 's/^model=//p' | tail -1)
 NEW_EFFORT=$(printf '%s\n' "$RELAUNCH_OUT" | sed -n 's/^effort=//p' | tail -1)
 [ -n "$NEW_HARNESS" ] || die "the host's route confirmation carried no harness to record"
 
-if [[ ! "$NEW_MODEL" =~ ^gpt-[0-9.]+-sol$ ]]; then
-  fm_sol_cap_promote "$ID" remove "$STATE" || die "cannot release $ID's stopped Sol incarnation"
-fi
-
 META_LOCK=$(fm_meta_lock_path "$META") || die "metadata lock path is invalid for $ID"
 fm_lock_acquire_wait "$META_LOCK"
 META_TMP=$(mktemp "$STATE/.fm-remote-relaunch-meta.XXXXXX") || {
-  fm_lock_release "$META_LOCK"
+  [ -z "$CAP_LOCK" ] || fm_lock_release "$CAP_LOCK"
+CAP_LOCK=
+fm_lock_release "$META_LOCK"
   die "cannot stage the updated record"
 }
 {
@@ -110,5 +109,23 @@ while IFS= read -r line || [ -n "$line" ]; do
   esac
 done < "$META"
 chmod 0600 "$META_TMP"
+if [[ ! "$NEW_MODEL" =~ ^gpt-[0-9.]+-sol$ ]] &&
+  { [[ "$(fm_meta_get "$META" model)" =~ ^gpt-[0-9.]+-sol$ ]] ||
+    { [ -f "$STATE/$FM_SOL_REGISTRY_NAME" ] && awk -F'\t' -v id="$ID" '$1 == id {found=1; exit} END {exit !found}' "$STATE/$FM_SOL_REGISTRY_NAME"; }; }; then
+  CAP_ROOT=$(fm_firstmate_root_home "$(fm_sol_cap_home "$STATE")") || die "cannot resolve the Sol admission home"
+  CAP_PATH=$CAP_ROOT/state/$FM_SOL_LOCK_NAME
+  fm_sol_cap_lock_acquire "$CAP_PATH" "the model publication of $ID" || die "$FM_SOL_CAP_REFUSAL"
+  CAP_LOCK=$CAP_PATH
+fi
 mv -f -- "$META_TMP" "$META"
+if [[ ! "$NEW_MODEL" =~ ^gpt-[0-9.]+-sol$ ]]; then
+  if [ -n "$CAP_LOCK" ]; then
+    fm_sol_cap_registry_promote "$ID" remove "$STATE" || die "cannot release $ID's stopped Sol incarnation"
+  else
+    fm_sol_cap_promote "$ID" remove "$STATE" || die "cannot release $ID's stopped Sol incarnation"
+  fi
+fi
+
+[ -z "$CAP_LOCK" ] || fm_lock_release "$CAP_LOCK"
+CAP_LOCK=
 fm_lock_release "$META_LOCK"

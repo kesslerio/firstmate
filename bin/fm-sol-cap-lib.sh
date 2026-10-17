@@ -111,7 +111,7 @@ fm_sol_cap_ceiling() {  # <config-dir>
 fm_sol_cap_entry_shape() {  # <start> <pid>
   local start=$1 pid=$2
   case "$start" in '' | *[!0-9]*) return 1 ;; esac
-  case "$pid" in '' | *[!0-9]*) return 1 ;; esac
+  case "$pid" in -1) return 0 ;; '' | *[!0-9]*) return 1 ;; esac
 }
 
 fm_sol_cap_entry_live() {  # <start> <pid>
@@ -175,7 +175,9 @@ fm_sol_cap_adopt_workers() {
         fi
       fi
     fi
-    case "$verdict" in dead|missing) continue ;; esac
+    case "$verdict" in
+      dead|missing) fm_sol_cap_registry_claim "$file" "$id" "$model" "$now" -1 || return 1; continue ;;
+    esac
     fm_sol_cap_registry_claim "$file" "$id" "$model" "$now" 0 || return 1
   done
 }
@@ -393,41 +395,54 @@ fm_sol_cap_reconcile_remote() {
   esac
 }
 
-fm_sol_cap_promote() {  # <id> <pid or remove> <state-dir>
-  local id=$1 pid=$2 state=$3 registry tmp root lock
+fm_sol_cap_registry_promote() {
+  local id=$1 pid=$2 state=$3 registry tmp stopped=0 recorded_model
+  registry=$state/$FM_SOL_REGISTRY_NAME
+  [ -f "$registry" ] || return 0
+  if [ "$pid" = remove ] && [ -f "$state/$id.meta" ]; then
+    recorded_model=$(awk -F= '$1 == "model" {sub(/^[^=]*=/, ""); print; exit}' "$state/$id.meta") || return 1
+    [[ ! "$recorded_model" =~ ^gpt-[0-9.]+-sol$ ]] || stopped=1
+  fi
+  tmp=$registry.tmp.$$
+  if ! awk -F'\t' -v OFS='\t' -v id="$id" -v pid="$pid" -v stopped="$stopped" '
+    $1 == id { if (pid == "remove") { if (stopped) $4 = -1; else next } else $4 = pid }
+    {print}
+  ' "$registry" > "$tmp" || ! mv -- "$tmp" "$registry"; then
+    rm -f -- "$tmp"
+    return 1
+  fi
+}
+
+fm_sol_cap_promote() {
+  local id=$1 pid=$2 state=$3 registry root lock rc=0
   registry=$state/$FM_SOL_REGISTRY_NAME
   [ -f "$registry" ] || return 0
   awk -F'\t' -v id="$id" '$1 == id {found=1; exit} END {exit !found}' "$registry" || return 0
   root=$(fm_firstmate_root_home "$(fm_sol_cap_home "$state")") || return 1
   lock=$root/state/$FM_SOL_LOCK_NAME
   fm_sol_cap_lock_acquire "$lock" "the promotion of task $id" || return 1
-  tmp=$registry.tmp.$$
-  if ! awk -F'\t' -v OFS='\t' -v id="$id" -v pid="$pid" '
-    $1 == id { if (pid == "remove") next; $4 = pid }
-    {print}
-  ' "$registry" > "$tmp" || ! mv -- "$tmp" "$registry"; then
-    rm -f -- "$tmp"
-    fm_lock_release "$lock" || true
-    return 1
-  fi
-  fm_lock_release "$lock"
+  fm_sol_cap_registry_promote "$id" "$pid" "$state" || rc=$?
+  fm_lock_release "$lock" || return 1
+  return "$rc"
 }
 
 # fm_sol_cap_registry_prune <registry-file> <now>
 fm_sol_cap_registry_prune() {  # <registry-file>
-  local file=$1 tmp rc
+  local file=$1 tmp rc id model start pid row state
   [ -f "$file" ] && [ -r "$file" ] || return 0
+  state=${file%/*}
   tmp=$file.tmp.prune.$$
-  # One pass: malformed rows (kept loud) print first, live rows print, stale
-  # rows fall through silently.
-  awk -F'\t' '
-    $1 == "" {next}
-    $2 == "" || $3 !~ /^[0-9]+$/ || ($4 != "" && $4 !~ /^[0-9]+$/) {print; next}
-    {
-      if ($4 != "" && $4 + 0 > 0 && system("kill -0 " $4 " >/dev/null 2>&1") != 0) next
-      print
-    }' \
-    "$file" 2>/dev/null > "$tmp"
+  (
+    while IFS= read -r row || [ -n "$row" ]; do
+      IFS=$'\t' read -r id model start pid <<< "$row"
+      [ -n "$id" ] || continue
+      if [ ! -e "$state/$id.meta" ] && fm_sol_cap_entry_shape "$start" "$pid" &&
+        ! fm_sol_cap_entry_live "$start" "$pid"; then
+        continue
+      fi
+      printf '%s\n' "$row" || exit 1
+    done < "$file"
+  ) > "$tmp"
   rc=$?
   [ "$rc" -eq 0 ] || {
     rm -f -- "$tmp"
