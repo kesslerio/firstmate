@@ -1,0 +1,143 @@
+[
+  {
+    "command": "fm-sol-cap-lib.sh models $LAB/config",
+    "exit": 0,
+    "stdout": "gpt-6-sol|gpt-6.1-sol\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh ceiling $LAB/config",
+    "exit": 0,
+    "stdout": "4\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim fourth ship codex gpt-6.1-sol $LAB/config $LAB/state",
+    "exit": 0,
+    "stdout": "claimed\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh run fourth $LAB/state /run/current-system/sw/bin/true",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh record-actual fourth gpt-6.1-sol $LAB/state",
+    "exit": 0,
+    "stdout": "recorded\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim fifth ship codex gpt-6.1-sol $LAB/config $LAB/state",
+    "exit": 1,
+    "stdout": "error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task fifth (codex, gpt-6.1-sol) was refused. Active sessions: s0 (gpt-6.1-sol, age 0s); s1 (gpt-6.1-sol, age 0s); s2 (gpt-6.1-sol, age 0s); fourth (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim glm ship codex glm-5 $LAB/config $LAB/state",
+    "exit": 0,
+    "stdout": "claimed\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim qwen ship codex qwen3 $LAB/config $LAB/state",
+    "exit": 0,
+    "stdout": "claimed\n",
+    "stderr": ""
+  },
+  {
+    "scenario": "four concurrent admissions for one slot",
+    "results": [
+      [
+        [
+          "admitted\n",
+          ""
+        ],
+        0
+      ],
+      [
+        [
+          "error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task race1 (codex, gpt-6.1-sol) was refused. Active sessions: s0 (gpt-6.1-sol, age 0s); s1 (gpt-6.1-sol, age 0s); s2 (gpt-6.1-sol, age 0s); race0 (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing\n",
+          ""
+        ],
+        1
+      ],
+      [
+        [
+          "error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task race2 (codex, gpt-6.1-sol) was refused. Active sessions: s0 (gpt-6.1-sol, age 1s); s1 (gpt-6.1-sol, age 1s); s2 (gpt-6.1-sol, age 1s); race0 (gpt-6.1-sol, age 1s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing\n",
+          ""
+        ],
+        1
+      ],
+      [
+        [
+          "error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task race3 (codex, gpt-6.1-sol) was refused. Active sessions: s0 (gpt-6.1-sol, age 1s); s1 (gpt-6.1-sol, age 1s); s2 (gpt-6.1-sol, age 1s); race0 (gpt-6.1-sol, age 1s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing\n",
+          ""
+        ],
+        1
+      ]
+    ],
+    "registry": "s0\tgpt-6.1-sol\t1792412968\t0\ns1\tgpt-6.1-sol\t1792412968\t0\ns2\tgpt-6.1-sol\t1792412968\t0\nrace0\tgpt-6.1-sol\t1792412968\t782968\n"
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim lowered ship codex gpt-6.1-sol $LAB/config $LAB/state",
+    "exit": 1,
+    "stdout": "error: Sol ceiling reached: 2 concurrent Sol session(s) already active and this ceiling is 2 (config/sol-cap may lower it); the dispatch of task lowered (codex, gpt-6.1-sol) was refused. Active sessions: s0 (gpt-6.1-sol, age 0s); s1 (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim raised ship codex gpt-6.1-sol $LAB/config $LAB/state",
+    "exit": 1,
+    "stdout": "error: Sol ceiling unavailable: /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-lab/config/sol-cap must be one integer from 1 through 4; task raised with model gpt-6.1-sol was not dispatched rather than launched against an unread ceiling\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim bad-table ship codex gpt-6.1-sol $LAB/config $LAB/state",
+    "exit": 1,
+    "stdout": "error: Sol ceiling unavailable: /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-lab/config/crew-dispatch.json exists but cannot be read; task bad-table with model gpt-6.1-sol was not dispatched rather than launched possibly uncounted\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim glm-bad-table ship codex glm-5 $LAB/config $LAB/state",
+    "exit": 0,
+    "stdout": "claimed\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh record-actual adopted gpt-6.1-sol $LAB/state",
+    "exit": 0,
+    "stdout": "recorded\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh record-actual adopted glm-5 $LAB/state",
+    "exit": 0,
+    "stdout": "recorded\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh record-actual stopped glm-5 $LAB/state",
+    "exit": 0,
+    "stdout": "recorded\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim glm-under-lock ship codex glm-5 $LAB/config $LAB/state",
+    "exit": 0,
+    "stdout": "claimed\n",
+    "stderr": ""
+  },
+  {
+    "command": "fm-sol-cap-lib.sh refuse-claim qwen-under-lock ship codex qwen3 $LAB/config $LAB/state",
+    "exit": 0,
+    "stdout": "claimed\n",
+    "stderr": ""
+  },
+  {
+    "scenario": "stopped Sol marker and GLM/qwen bypass live held lock",
+    "elapsed_seconds": 0.04274575016461313,
+    "registry": "stopped\tgpt-6.1-sol\t1792412972\t-1\n"
+  }
+]
