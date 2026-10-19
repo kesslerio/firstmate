@@ -52,7 +52,13 @@
 #          for locked work, it belongs to the same lock owner. A probe-only
 #          worker therefore cannot satisfy a later locked request; the later
 #          request gets a distinct generation and runs the locked phases. A new
-#          owner also gets a distinct generation. --locked 1 asks
+#          owner also gets a distinct generation. Entry confirmation shares the
+#          bounded publication-lock budget; an unconfirmed start returns nonzero.
+#          A superseded or unreadable acknowledgement is not proof of non-entry:
+#          retirement requires the same current generation, worker PID, explicit
+#          worker_started=0, and captured process start identity under the lock.
+#          An admitted worker retains its cleanup and mutation lease until settled.
+#          --locked 1 asks
 #          for the inactive-outcome scan and mutating sweeps as well as the
 #          read-only probe; --locked 0 asks for the probe only. --harvest-pid
 #          names the session-start process
@@ -79,13 +85,14 @@
 #          Prints a check wake only after its current result is durably queued.
 #        fm-startup-network.sh wait [<seconds>]
 #          Block until the report is published, up to <seconds> (default 120).
-#          For operators and tests only; a session start never waits.
+#          For operators and tests only; session start confirms entry but never
+#          waits for the checks to finish.
 #
 # STATE, all under this home's state/ and gitignored with it:
 #   .startup-network.status   key=value record - generation, lock_pid, state,
 #                             pid, started, finished, rc, locked, phases,
-#                             worker_started, and whether the report was published. The single
-#                             source of truth for the current generation and
+#                             worker_started, and whether the report was published.
+#                             The single source of truth for the current generation and
 #                             its published outcome; a deferred outcome remains
 #                             in that generation's private packet until promoted.
 #   .startup-network.report   the sweep output, byte for byte as

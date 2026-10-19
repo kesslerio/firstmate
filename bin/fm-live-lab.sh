@@ -97,9 +97,21 @@
 #   worker        --worker: its current crew state is paused on the gate.
 #   treehouse     ~/.treehouse gained no entry since up began.
 #
-# down refuses any path without the lab record up writes. It kills only the
-# lab's recorded private tmux server and launch pane PIDs, and their descendants;
-# runs bin/fm-lab-home.sh teardown; removes the task temp and launch dirs the
+# launch retains an identity-bound guardian for its command's process group.
+# Supported detached startup and watcher successors inherit the lab binding and
+# register their own guardian before executing. Admission takes the lab launch
+# lock with a five-second bound and refuses after cleanup seals launches.
+#
+# down refuses any path without the lab record up writes. It seals launches,
+# validates the retained guardians and process identities, and checkpoints cleanup
+# ownership before stopping the private tmux server. Process start identities use
+# the C locale and UTC on both recording and observation. Descendant and group
+# discovery requires continuously retained ownership, never a numeric group alone.
+# Guardians remain until their exact retirement requests are acknowledged and
+# their exits are observed. An unknown observation or unconfirmed retirement
+# refuses removal and retains the lab and checkpoint for inspection or retry.
+# After proving the owned processes gone, down runs bin/fm-lab-home.sh teardown;
+# removes the task temp and launch dirs the
 # lab's spawns kept under /tmp, including a failed spawn's; removes every
 # project entry at or under <lab-root> from the recorded Claude store, following
 # a symlinked store to its target (compare-and-swap atomic replace, unrelated
