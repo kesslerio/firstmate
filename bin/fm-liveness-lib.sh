@@ -106,14 +106,7 @@ fm_liveness_snapshot() { # <home> [state-dir]
         # Crew-state's completion can itself rely on PR metadata. An invalid
         # handoff must not release capacity through that lower-level verdict.
         FM_LIVENESS_WARNINGS="${FM_LIVENESS_WARNINGS}${meta}: invalid PR metadata; seat retained; repair the ready handoff with bin/fm-pr-check.sh"$'\n'
-      elif ! grep -q '^pr_spawn_gen=' "$meta"; then
-        continue
-      elif awk -F= '
-        $1 == "spawn_gen" { spawn_count++; spawn = substr($0, 11) }
-        $1 == "pr_spawn_gen" { ready_count++; ready = substr($0, 14) }
-        END { exit !(spawn_count == 1 && ready_count == 1 &&
-          spawn ~ /^s[1-9][0-9]*\.[0-9]+\.[0-9]+$/ && ready == spawn) }
-      ' "$meta"; then
+      elif fm_pr_current_handoff "$meta"; then
         continue
       else
         prior_handoff=1

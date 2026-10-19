@@ -252,6 +252,7 @@ fm_test_remove_tree() {
 
 fm_test_cleanup() {
   local d
+  fm_test_stop_children
   fm_test_reap_watchers
   fm_test_reap_procevent_homes
   for d in "${FM_TEST_CLEANUP_DIRS[@]:-}"; do
@@ -854,4 +855,66 @@ fm_test_base_path_sans() {
     done
   done
   printf '%s\n' "$dir"
+}
+
+fm_test_track_child() {
+  local pid=$1 identity
+  identity=$(ps -p "$pid" -o lstart= 2>/dev/null) || return 0
+  [ -n "$identity" ] || return 0
+  printf '%s\t%s\t%s\n' "$pid" "$identity" "${2:-term}" >> "$FM_TEST_CHILD_REGISTRY"
+}
+
+fm_test_stop_children() {
+  local pid identity policy
+  [ -f "${FM_TEST_CHILD_REGISTRY:-}" ] || return 0
+  python3 - "$FM_TEST_CHILD_REGISTRY" <<'PYCHILD'
+import os, signal, subprocess, sys, time
+
+def snapshot():
+    rows = subprocess.check_output(['ps', '-axo', 'pid=,ppid=,stat=,lstart='], text=True)
+    return {int(p): (int(parent), status, born) for line in rows.splitlines()
+            for p, parent, status, born in [line.strip().split(None, 3)]}
+
+def signal_owned(pid, born, sig):
+    current = snapshot().get(pid)
+    if current and current[2].strip() == born.strip() and not current[1].startswith('Z'):
+        os.kill(pid, sig)
+
+for line in open(sys.argv[1]):
+    pid, born, policy = line.rstrip('\n').split('\t')
+    pid = int(pid)
+    rows = snapshot()
+    if pid not in rows or rows[pid][2].strip() != born.strip():
+        continue
+    owned = {pid: born}
+    for _ in range(len(rows)):
+        children = {p: info[2] for p, info in rows.items() if info[0] in owned}
+        previous = len(owned); owned.update(children)
+        if len(owned) == previous: break
+    for p, identity in reversed(list(owned.items())):
+        try: signal_owned(p, identity, signal.SIGTERM)
+        except ProcessLookupError: pass
+    deadline = time.monotonic() + 2
+    while time.monotonic() < deadline:
+        rows = snapshot()
+        if not any(p in rows and rows[p][2].strip() == identity.strip() and not rows[p][1].startswith('Z') for p, identity in owned.items()): break
+        time.sleep(.02)
+    else:
+        if policy != 'kill': raise RuntimeError('owned fixture ignored TERM: ' + str(pid))
+        for p, identity in reversed(list(owned.items())):
+            try: signal_owned(p, identity, signal.SIGKILL)
+            except ProcessLookupError: pass
+        deadline = time.monotonic() + 1
+        while time.monotonic() < deadline:
+            rows = snapshot()
+            if not any(p in rows and rows[p][2].strip() == identity.strip() and not rows[p][1].startswith('Z') for p, identity in owned.items()): break
+            time.sleep(.02)
+        else: raise RuntimeError('owned fixture survived KILL: ' + str(pid))
+PYCHILD
+  local cleanup_status=$?
+  [ "$cleanup_status" -eq 0 ] || return "$cleanup_status"
+  while IFS=$'\t' read -r pid identity policy; do
+    wait "$pid" 2>/dev/null || true
+  done < "$FM_TEST_CHILD_REGISTRY"
+  : > "$FM_TEST_CHILD_REGISTRY"
 }

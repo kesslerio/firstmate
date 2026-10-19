@@ -5006,3 +5006,22 @@ PATH="$UNDISP/bin:$PATH" FM_HOME="$UNDISP/home" \
 pass "arm does not launch beside a stale claim whose process group is alive"
 
 printf '\nall procevent tests passed\n'
+
+test_exact_capture_source_identity() {
+  local home="$TMP_ROOT/exact-source" result
+  new_home "$home"
+  pe_register "$home" lavish review.extra -- bash -c 'printf "extra\n"' >/dev/null
+  pe "$home" start review.extra >/dev/null
+  wait_for "$home/state/procevent-inbox/review.extra.1.result" || fail 'dotted source never captured'
+  pe_register "$home" lavish review -- bash -c 'printf "plain\n"' >/dev/null
+  pe "$home" start review >/dev/null
+  wait_for "$home/state/procevent-inbox/review.1.result" || fail 'dotted sibling blocked exact source'
+  if pe "$home" handled review 99 >/dev/null 2>&1; then fail 'wrong-sequence acknowledgement was accepted'; fi
+  pe "$home" handled review 1 >/dev/null || fail 'exact source acknowledgement failed'
+  [ ! -e "$home/state/procevent-inbox/review.extra.1.handled" ] || fail 'wrong-source acknowledgement consumed dotted sibling'
+  result=$(pe "$home" list)
+  [ "$(printf '%s\n' "$result" | awk '$1 == "review.extra" { print $4 }')" = 1 ] || fail 'dotted sibling must remain pending'
+  [ "$(printf '%s\n' "$result" | awk '$1 == "review" { print $4 }')" = 0 ] || fail 'plain source must have no pending capture'
+  pe "$home" handled review.extra 1 >/dev/null || fail 'dotted acknowledgement failed'
+}
+test_exact_capture_source_identity

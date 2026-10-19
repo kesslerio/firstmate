@@ -29,6 +29,8 @@ set -u
 TMP_ROOT=$(fm_test_tmproot fm-startup-network-tests)
 DRAIN="$ROOT/bin/fm-wake-drain.sh"
 FM_TEST_CLEANUP_DIRS+=("$TMP_ROOT")
+FM_TEST_CHILD_REGISTRY="$TMP_ROOT/children"
+export FM_TEST_CHILD_REGISTRY
 trap fm_test_cleanup EXIT
 
 # new_world <name>: an FM_HOME plus a fake code root whose bin/ is a real
@@ -145,13 +147,14 @@ hold_publish_lock() {  # <home>
     fm_lock_try_acquire "$2" || exit 1
     exec sleep 120' _ "$ROOT/bin" "$lock" >/dev/null 2>&1 </dev/null &
   holder=$!
+  fm_test_track_child "$holder"
   while [ "$(cat "$lock/pid" 2>/dev/null || true)" != "$holder" ] && [ "$waited" -lt 50 ]; do
     sleep 0.1
     waited=$((waited + 1))
   done
   [ "$(cat "$lock/pid" 2>/dev/null || true)" = "$holder" ] \
     || fail "could not hold the publish lock from a second process"
-  printf '%s' "$holder"
+  HOLDER_PID=$holder
 }
 
 # await_pid_exit <pid> <tenths>: true when the process exits inside the bound.
@@ -806,7 +809,8 @@ $rec
 EOF
 
   # Before the sweeps: the lock is held before the worker even registers.
-  holder=$(hold_publish_lock "$home")
+  hold_publish_lock "$home"
+  holder=$HOLDER_PID
   began=$(date +%s)
   rc=0
   fm_run_timed 15 env PATH="$root/bin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$root" \
@@ -827,6 +831,7 @@ EOF
   assert_grep 'check	startup-network' "$home/state/.wake-queue" \
     "a worker that gave up on the lock did not surface to the agent"
   kill "$holder" 2>/dev/null || true
+  wait "$holder" 2>/dev/null || true
   await_pid_exit "$holder" 50 || fail "could not release the first lock holder"
 
   # After the sweeps: the worker registers and sweeps freely, then finds the
@@ -843,7 +848,8 @@ EOF
     waited=$((waited + 1))
   done
   [ -f "$log" ] || fail "the detached worker never started its sweep"
-  holder=$(hold_publish_lock "$home")
+  hold_publish_lock "$home"
+  holder=$HOLDER_PID
   await_pid_exit "$worker" 100 \
     || fail "the worker was still alive 10s after its sweep finished against a held publish lock (2s delivery budget)"
   [ "$(sed -n 's/^state=//p' "$home/state/.startup-network.status")" = failed ] \
@@ -856,6 +862,7 @@ EOF
   assert_grep 'check	startup-network' "$home/state/.wake-queue" \
     "a result that could not be published under the lock did not surface to the agent"
   kill "$holder" 2>/dev/null || true
+  wait "$holder" 2>/dev/null || true
   pass "fm-startup-network: a held publish lock ends the worker inside its budget with a failed-rerun record"
 }
 

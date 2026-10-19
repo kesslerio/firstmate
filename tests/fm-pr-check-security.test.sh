@@ -9,6 +9,8 @@ set -u
 . "$ROOT/bin/fm-pr-lib.sh"
 # shellcheck source=/dev/null
 . "$ROOT/bin/fm-check-lib.sh"
+# shellcheck source=bin/fm-timeout-lib.sh
+. "$ROOT/bin/fm-timeout-lib.sh"
 
 PR_CHECK="$ROOT/bin/fm-pr-check.sh"
 PR_MERGE="$ROOT/bin/fm-pr-merge.sh"
@@ -309,7 +311,7 @@ run_check_entry() {
     FM_TEST_GH_AXI_LOG="$dir/gh-axi.log" FM_TEST_GLAB_LOG="$dir/glab.log" \
     FM_TEST_GERRIT_AXI_LOG="$dir/gerrit-axi.log" \
     PATH="$dir/fakebin:$BASE_PATH" \
-    "$PR_CHECK" "$@"
+    fm_run_timed 60 "$PR_CHECK" "$@"
 }
 
 run_merge_entry() {
@@ -868,11 +870,6 @@ SH
   pass "valid direct and merge flows record exact metadata and reject multiline head metadata"
 }
 
-# Runs one watcher under a hang guard that TERMs it and returns 124 once it has
-# used sixty seconds of its own time. The guard pauses while the file named by
-# FM_TEST_WATCH_BOUND_PAUSE exists, so a case that holds the watcher on work it
-# injects, or makes it wait on concurrent work it started, charges that work's
-# duration to itself instead of to the watcher.
 # FM_TEST_CHECK_TIMEOUT sets the per-check timeout for a case that exercises it.
 # Otherwise the product default applies: a tighter override silently kills a
 # correct poll on a loaded machine, and the watcher then only retries it or
@@ -882,8 +879,7 @@ run_watcher_bounded() {
   local check_timeout_env=(-u FM_CHECK_TIMEOUT)
   [ -z "${FM_TEST_CHECK_TIMEOUT:-}" ] || check_timeout_env=("FM_CHECK_TIMEOUT=$FM_TEST_CHECK_TIMEOUT")
   shift 2
-  perl -MPOSIX=WNOHANG -MTime::HiRes=time,sleep -e 'my $pause=shift; my $left=60; my $pid=fork; die unless defined $pid; if (!$pid) { exec @ARGV } my $last=time; while (waitpid($pid, WNOHANG) == 0) { my $now=time; $left -= $now - $last unless length $pause && -e $pause; $last=$now; if ($left <= 0) { kill "TERM", $pid; waitpid $pid, 0; exit 124 } sleep 0.02 } exit($? >> 8)' \
-    "${FM_TEST_WATCH_BOUND_PAUSE:-}" env "${check_timeout_env[@]}" \
+  fm_run_timed 60 env "${check_timeout_env[@]}" \
       FM_HOME="$home" FM_ROOT_OVERRIDE="$watch_root" FM_CHECK_INTERVAL="$check_interval" \
       FM_POLL=0.02 FM_HEARTBEAT=999999 FM_SIGNAL_GRACE=0 PATH="$fakebin:$BASE_PATH" "$WATCH" "$@"
 }
@@ -1057,15 +1053,11 @@ SH
     done
     [ "$i" -lt 100 ] || fail "atomic publication did not reach staged check"
 
-    # The watcher runs while publication is still in flight, and its hang
-    # guard is not charged for the time it spends waiting on that publication.
-    : > "$dir/direct-in-flight"
-    FM_TEST_WATCH_BOUND_PAUSE="$dir/direct-in-flight" FM_TEST_GH_STATE=MERGED \
+    FM_TEST_GH_STATE=MERGED \
       run_watcher_bounded "$dir/home" "$dir/fakebin" > "$dir/watch.out" 2> "$dir/watch.err" &
     watch_pid=$!
     direct_rc=0
     wait "$direct_pid" || direct_rc=$?
-    rm -f "$dir/direct-in-flight"
     rc=0
     wait "$watch_pid" || rc=$?
     [ "$direct_rc" -eq 0 ] || fail "concurrent direct arming failed"
@@ -3080,18 +3072,17 @@ test_authority_retirement_preserves_replacement() {
   cat > "$dir/replace-authority.sh" <<SH
 #!/usr/bin/env bash
 export FM_ROOT_OVERRIDE="$dir/root" FM_TEST_GUARD_LOG="$dir/guard.log"
-"$PR_CHECK" task-a "$url_b" >/dev/null
+. "$ROOT/bin/fm-timeout-lib.sh"
+fm_run_timed 60 "$PR_CHECK" task-a "$url_b" >/dev/null
 (
   FM_TEST_GH_GRAPHQL_STATE=OPEN FM_TEST_GH_GRAPHQL_MERGED=false \\
   FM_TEST_GH_GRAPHQL_QUEUED=true \\
-  "$PR_MERGE" task-a "$url_b" > "$dir/replacement-merge.out" 2> "$dir/replacement-merge.err"
+  fm_run_timed 60 "$PR_MERGE" task-a "$url_b" > "$dir/replacement-merge.out" 2> "$dir/replacement-merge.err"
   printf '%s\n' \$? > "$dir/replacement-merge.rc"
 ) &
 printf '%s\n' "\$!" > "$dir/replacement-merge.pid"
 SH
   chmod +x "$dir/replace-authority.sh"
-  # The watcher is held inside this mv while the replacement re-arms, so that
-  # work pauses the watcher's hang guard.
   cat > "$dir/fakebin/mv" <<'SH'
 #!/usr/bin/env bash
 "$FM_TEST_REAL_MV" "$@" || exit $?
@@ -3099,9 +3090,7 @@ case " $* " in
   *"task-a.pr-poll-merge-notified "*)
     if [ ! -e "$FM_TEST_REPLACEMENT_RAN" ]; then
       : > "$FM_TEST_REPLACEMENT_RAN"
-      : > "$FM_TEST_WATCH_BOUND_PAUSE"
       "$FM_TEST_REPLACEMENT_SCRIPT"
-      rm -f "$FM_TEST_WATCH_BOUND_PAUSE"
     fi
     ;;
 esac
@@ -3112,7 +3101,6 @@ SH
   set +e
   FM_TEST_REAL_MV="$REAL_MV" FM_TEST_REPLACEMENT_RAN="$dir/replacement-ran" \
     FM_TEST_REPLACEMENT_SCRIPT="$dir/replace-authority.sh" \
-    FM_TEST_WATCH_BOUND_PAUSE="$dir/replacement-in-flight" \
     FM_TEST_GH_STATE=MERGED run_watcher_bounded "$dir/home" "$dir/fakebin" \
       > "$dir/watch-a.out" 2> "$dir/watch-a.err"
   rc=$?
@@ -3122,9 +3110,12 @@ SH
   # this shell's child; wait on its recorded process like any merge run here.
   merge_pid=$(cat "$dir/replacement-merge.pid" 2>/dev/null) \
     || fail "replacement: serialized replacement merge was not started"
-  while process_is_live_non_zombie "$merge_pid"; do
+  i=0
+  while process_is_live_non_zombie "$merge_pid" && [ "$i" -lt 6000 ]; do
     sleep 0.01
+    i=$((i + 1))
   done
+  [ "$i" -lt 6000 ] || { kill -TERM "$merge_pid" 2>/dev/null || true; fail "replacement merge exceeded its hard deadline"; }
   [ -e "$dir/replacement-merge.rc" ] || fail "replacement: serialized replacement merge did not finish"
   [ "$(cat "$dir/replacement-merge.rc")" -eq 0 ] \
     || fail "replacement: serialized replacement merge failed: $(cat "$dir/replacement-merge.err")"

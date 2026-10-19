@@ -18,6 +18,11 @@ set -u
 
 LINT="$ROOT/bin/fm-lint.sh"
 INSTALLER="$ROOT/bin/fm-install-shellcheck.sh"
+LINT_FIXTURE_ROOT=$(fm_test_tmproot fm-lint-children)
+FM_TEST_CHILD_REGISTRY="$LINT_FIXTURE_ROOT/children"
+export FM_TEST_CHILD_REGISTRY
+export -f fm_test_track_child
+trap fm_test_cleanup EXIT
 # The pinned version, read from the single source (the one owner itself).
 REQUIRED=$("$LINT" --required-version)
 
@@ -367,6 +372,8 @@ target=${!#}
 case "$target" in
   *blocker*)
     sleep "${FM_TEST_BLOCK_SECS:-300}" &
+    fm_test_track_child "$!"
+    fm_test_track_child "$$"
     printf '%s\n' "$!" > "${FM_TEST_CHILD_PID:-/dev/null}"
     printf '%s\n' "$$" > "${FM_TEST_STUB_PID:-/dev/null}"
     exec sleep "${FM_TEST_BLOCK_SECS:-300}"
@@ -1442,6 +1449,7 @@ test_root_deadline_names_the_root_and_reaps_the_tree() {
 
   sleep 300 &
   sentinel_pid=$!
+  fm_test_track_child "$sentinel_pid"
   rc=0
   out=$(PATH="$fakebin:$PATH" FM_LINT_JOBS=1 \
     FM_LINT_REQUIRE_BOUNDS=1 \
@@ -1512,6 +1520,7 @@ test_root_memory_limit_reports_a_named_death() {
   # the allocator is refused and the run must name the root, not survive.
   sleep 300 &
   sentinel_pid=$!
+  fm_test_track_child "$sentinel_pid"
   rc=0
   out=$(PATH="$fakebin:$PATH" FM_LINT_JOBS=1 \
     FM_LINT_REQUIRE_BOUNDS=1 FM_LINT_ROOT_MEMORY_KIB=262144 \

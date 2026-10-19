@@ -233,3 +233,43 @@ test_fixture_registration_failure_rolls_back_root
 test_orphan_sweep_respects_fixture_ownership
 test_orphan_sweep_reaps_read_only_package_tree
 test_registries_avoid_git_worktree_root
+
+test_owned_children_stop_on_every_exit() {
+  local harness mode result rc leader child unrelated
+  harness=$(fm_test_tmproot fm-owned-child-exits)
+  sleep 30 & unrelated=$!
+  CHILDREN+=("$unrelated")
+  for mode in success failure interrupt; do
+    rc=0
+    result=$(bash -c '
+      . "$1"
+      FM_TEST_CHILD_REGISTRY="$2/registry-$3"
+      python3 - "$2/pids-$3" <<'"'"'PYOWNED'"'"' &
+import os, signal, sys, time
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
+child=os.fork()
+if child==0:
+    while True: time.sleep(.1)
+open(sys.argv[1],"w").write(f"{os.getpid()} {child}\n")
+while True: time.sleep(.1)
+PYOWNED
+      owned=$!
+      fm_test_track_child "$owned" kill
+      i=0
+      while [ ! -s "$2/pids-$3" ] && [ "$i" -lt 200 ]; do sleep .01; i=$((i+1)); done
+      [ -s "$2/pids-$3" ] || exit 4
+      case "$3" in failure) exit 42 ;; interrupt) kill -TERM "$$"; sleep 1 ;; esac
+    ' _ "$LIB" "$harness" "$mode" 2>&1) || rc=$?
+    case "$mode" in success) expect_code 0 "$rc" "$result" ;; failure) expect_code 42 "$rc" "$result" ;; interrupt) expect_code 143 "$rc" "$result" ;; esac
+    read -r leader child < "$harness/pids-$mode"
+    for result in "$leader" "$child"; do
+      case "$(ps -p "$result" -o stat= 2>/dev/null)" in ''|Z*) ;; *) fail "owned process survived $mode cleanup: $result" ;; esac
+    done
+    kill -0 "$unrelated" 2>/dev/null || fail 'owned cleanup signalled an unrelated fixture'
+  done
+  kill "$unrelated" 2>/dev/null || true
+  wait "$unrelated" 2>/dev/null || true
+  CHILDREN[${#CHILDREN[@]}-1]=''
+  pass 'owned TERM-resistant leaders and descendants stop on success, assertion failure and interruption'
+}
+test_owned_children_stop_on_every_exit

@@ -1970,6 +1970,9 @@ const contract = (args) => {
   if (result.status !== 0) throw new Error(`fm-afk-contract.sh ${args.join(" ")} failed: ${result.stderr}`);
   return result.stdout || "";
 };
+process.env.FM_AFK_MODE = "quiet";
+contract(["enter", "--words", "keep routine supervision quiet"]);
+delete process.env.FM_AFK_MODE;
 const requests = () => sentToMain.filter((sent) => sent.message.customType === "fm-branch-process");
 const unprocessedSeqs = () => outcomeScript(["unprocessed"]).split("\n").filter(Boolean).map((line) => JSON.parse(line).seq);
 const runOf = async (fn) => { await fire("agent_start", {}); await fn?.(); await fire("agent_end", {}); await fire("agent_settled", {}); };
@@ -6255,3 +6258,21 @@ test_delivery_keeps_the_event_loop_live_and_ordered
 test_session_replacement_during_delivery_neither_loses_nor_duplicates
 test_store_failure_during_delivery_neither_loses_nor_duplicates
 test_mark_read_failure_keeps_routine_redelivery_and_captain_deduplication
+
+test_quiet_is_present_across_posture_transitions() {
+  node --experimental-strip-types --input-type=module - "$ROOT" "$TMP_ROOT" <<'JS'
+import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+const [root, temp]=process.argv.slice(2);
+const { afkPostureRecordPresent }=await import(pathToFileURL(`${root}/.pi/extensions/lib/fm-branch-dispatch.ts`));
+const state=`${temp}/mode-transitions`; mkdirSync(state);
+if (afkPostureRecordPresent(state)) throw Error('absent posture must be present');
+for (const [record, away] of [['version: 2\nmode: quiet\n',false],['version: 2\nmode: away\n',true],['version: 1\n',true],['version: 2\nmode: quiet\n',false]]) {
+  writeFileSync(`${state}/.afk-contract`,record);
+  if (afkPostureRecordPresent(state)!==away) throw Error(`wrong posture for ${record}`);
+}
+rmSync(`${state}/.afk-contract`);
+if (afkPostureRecordPresent(state)) throw Error('return must be present');
+JS
+}
+test_quiet_is_present_across_posture_transitions

@@ -39,6 +39,9 @@ BASE_PATH=${FM_TEST_BASE_PATH:-/usr/bin:/bin:/usr/sbin:/sbin}
 fm_git_identity fmtest fmtest@example.com
 
 TMP_ROOT=$(fm_test_tmproot fm-secondmate-liveness)
+FM_TEST_CHILD_REGISTRY="$TMP_ROOT/children"
+export FM_TEST_CHILD_REGISTRY
+trap fm_test_cleanup EXIT
 
 # --- unit level: fm_backend_tmux_agent_state --------------------------------
 
@@ -385,10 +388,11 @@ test_sweep_skips_mate_whose_liveness_lock_is_held() {
 
   # A concurrent liveness episode (the watcher's tick) owns the per-mate lock;
   # the sweep must skip rather than probe or relaunch a moving target.
-  ( STATE="$w/home/state" bash -c \
-      '. "$1" && fm_lock_acquire_wait "$2" && sleep 30' \
-      _ "$ROOT/bin/fm-wake-lib.sh" "$w/home/state/.secondmate-liveness-sm1.lock" ) &
+  STATE="$w/home/state" bash -c \
+      '. "$1" && fm_lock_acquire_wait "$2" && exec sleep 30' \
+      _ "$ROOT/bin/fm-wake-lib.sh" "$w/home/state/.secondmate-liveness-sm1.lock" &
   holder=$!
+  fm_test_track_child "$holder"
   while [ ! -d "$w/home/state/.secondmate-liveness-sm1.lock" ] && [ "$i" -lt 100 ]; do
     sleep 0.05
     i=$((i + 1))

@@ -47,8 +47,7 @@
 #     no longer uses local resources.
 # A place therefore frees when a PR-based ship records its ready PR, or when any
 # task is cleaned up and its record removed. A local-only ship and a scout have
-# no recorded handoff and hold their place until cleanup. A worker that is
-# steered back into work after its PR handoff is not counted again.
+# no recorded handoff and hold their place until cleanup.
 # The declaration is matched by the spawning clone's directory name, so clones
 # of one origin share the cap only when they use that same directory name. A
 # clone of that origin under a different directory name finds no declaration
@@ -80,6 +79,9 @@ FM_PROJECT_CAPACITY_DEFER_EXIT=75
 # The config directory holding this machine's declaration: the spawning home's
 # own <config-dir> when that home is the local root (so an override of it
 # applies), otherwise the root home's config/.
+# shellcheck source=bin/fm-pr-lib.sh
+. "$(dirname "${BASH_SOURCE[0]}")/fm-pr-lib.sh"
+
 fm_project_capacity_config_dir() {  # <spawning-home> <spawning-config-dir>
   local home=$1 config=$2 root home_real
   root=$(fm_firstmate_root_home "$home") || return 1
@@ -200,7 +202,7 @@ fm_project_capacity_occupants() {  # <project-lock> <project-dir> <first-state> 
       }
       kind=$(fm_meta_get "$meta" kind)
       [ "$kind" != secondmate ] || continue
-      [ -z "$(fm_meta_get "$meta" pr)" ] || continue
+      if fm_pr_current_handoff "$meta"; then continue; fi
       project=$(fm_meta_get "$meta" project)
       [ -n "$project" ] || continue
       lock=

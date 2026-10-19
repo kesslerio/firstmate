@@ -45,7 +45,7 @@ relaunch_cleanup() {
   for d in "${TASK_TMPS[@]:-}"; do
     [ -n "$d" ] && rm -rf "$d"
   done
-  rm -rf "$TMP_ROOT"
+  fm_test_cleanup
 }
 trap relaunch_cleanup EXIT
 
@@ -2115,7 +2115,7 @@ SH
 # once that server is back; default is the recorded one (it survived the
 # restart). Pass a different id to model a pane that genuinely did not.
 add_herdr_ship_task() {  # <case-dir> <id> [session] [surviving-pane]
-  local dir=$1 id=$2 ses=${3:-fmlab} survivor=${4:-'%7'}
+  local dir=$1 id=$2 ses=${3:-fmlab} survivor=${4:-'%7'} harness=${5:-claude}
   local home="$dir/home" proj="$dir/proj" wt="$dir/wt"
   fm_git_worktree "$proj" "$wt" "task-$id"
   mkdir -p "$home/data/$id"
@@ -2132,7 +2132,7 @@ EOF
     echo "endpoint_task_id=$id"
     echo "worktree=$wt"
     echo "project=$proj"
-    echo "harness=claude"
+    echo "harness=$harness"
     echo "kind=ship"
     echo "mode=no-mistakes"
     echo "yolo=off"
@@ -2162,7 +2162,7 @@ herdr_case_or_skip() {  # <name> <id> [session] [surviving-pane]
   HERDR_CASE_DIR=
   command -v jq >/dev/null 2>&1 || return 1
   HERDR_CASE_DIR=$(new_case "$1" "$2")
-  add_herdr_ship_task "$HERDR_CASE_DIR" "$2" "${3:-fmlab}" "${4:-%7}"
+  add_herdr_ship_task "$HERDR_CASE_DIR" "$2" "${3:-fmlab}" "${4:-%7}" "${5:-claude}"
   make_herdr_stub "$HERDR_CASE_DIR"
   return 0
 }
@@ -2170,13 +2170,13 @@ herdr_case_or_skip() {  # <name> <id> [session] [surviving-pane]
 test_herdr_relaunch_resumes_only_the_registered_pi_session() {
   local dir out rc=0 command registered
   for registered in pi claude; do
-    herdr_case_or_skip "resume-$registered" "resume-$registered" || {
+    herdr_case_or_skip "resume-$registered" "resume-$registered" fmlab %7 pi || {
       echo "skip - herdr relaunch needs jq (the herdr adapter parses JSON with it)"
       return 0
     }
     dir=$HERDR_CASE_DIR
     rm -f "$dir/fake/herdr-stopped"
-    sed -i 's/^harness=claude$/harness=pi/' "$dir/home/state/resume-$registered.meta"
+    [ "$(meta_field "$dir" "resume-$registered" harness)" = pi ] || fail "fixture must seed Pi before relaunch"
     # Keep the pane's status authority registered to an existing Pi session,
     # while process-info proves that its previous agent has exited.
     printf '{"result":{"agent":{"agent":"%s","agent_status":"idle","agent_session":{"kind":"path","value":"/tmp/pi-bound-session.jsonl"}}}}\n' \
@@ -2550,3 +2550,31 @@ test_herdr_reclaim_of_a_secondmate_names_its_own_owner
 test_herdr_rebind_failure_from_a_plain_shell_names_the_real_cause
 test_relaunch_reverifies_an_already_in_flight_item_instead_of_rewriting_it
 test_relaunch_moves_a_drifted_item_back_in_flight
+
+test_relaunch_reacquires_ready_worker_seat() {
+  local dir home out rc=0 old=s1.2.3
+  # shellcheck source=bin/fm-pr-lib.sh
+  . "$ROOT/bin/fm-pr-lib.sh"
+  dir=$(new_case reacquire seat-a)
+  home="$dir/home"
+  add_ship_task "$dir" seat-a claude
+  printf zsh > "$dir/fake/command"
+  mkdir -p "$home/config"
+  printf 'proj 1\n' > "$home/config/project-capacity"
+  printf 'spawn_gen=%s\npr_spawn_gen=%s\npr=https://github.com/o/r/pull/7\n' "$old" "$old" >> "$home/state/seat-a.meta"
+  printf 'kind=ship\nproject=%s\nspawn_gen=s2.3.4\n' "$dir/proj" > "$home/state/seat-b.meta"
+  out=$(run_spawn "$dir" seat-a --relaunch) || rc=$?
+  expect_code 75 "$rc" "a ready worker must reacquire its released project seat: $out"
+  assert_equals "$old" "$(meta_field "$dir" seat-a spawn_gen)" 'denial preserves the original generation'
+  rm "$home/state/seat-b.meta"
+  out=$(run_spawn "$dir" seat-a --relaunch) || fail "released capacity did not admit relaunch: $out"
+  [ "$(meta_field "$dir" seat-a spawn_gen)" != "$old" ] || fail 'replacement reused old generation'
+  assert_equals "$old" "$(meta_field "$dir" seat-a pr_spawn_gen)" 'historical readiness binding must be retained'
+  if fm_pr_current_handoff "$home/state/seat-a.meta"; then fail 'historical readiness released replacement seat'; fi
+  printf zsh > "$dir/fake/command"
+  printf 'kind=ship\nproject=%s\nspawn_gen=s3.4.5\npr_spawn_gen=s2.3.4\npr=https://github.com/o/r/pull/8\n' "$dir/proj" > "$home/state/seat-b.meta"
+  rc=0
+  out=$(run_spawn "$dir" seat-a --relaunch) || rc=$?
+  expect_code 75 "$rc" 'a stale sibling handoff must not free project capacity'
+}
+test_relaunch_reacquires_ready_worker_seat

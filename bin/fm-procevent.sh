@@ -416,7 +416,10 @@ source_kind() { source_field "$1" kind; }
 source_owner_task() { source_field "$1" owner_task; }
 # Every captured round of one source with no handled acknowledgement yet.
 source_pending() {  # <source-id>
-  fm_procevent_pending "$STATE" | awk -v id="$1" 'index($0, "/" id ".") { print }'
+  local result
+  while IFS= read -r result; do
+    [ "$(fm_procevent_result_source_id "$result")" != "$1" ] || printf '%s\n' "$result"
+  done < <(fm_procevent_pending "$STATE")
 }
 # The registration record is a worker-owned board's ONLY ownership evidence, so
 # it cannot be retired while a captured round of it is still unacknowledged.
@@ -2085,7 +2088,7 @@ cmd_handled() {
   owner_lease_refresh
   fm_procevent_source_lock_acquire "$id" || die "cannot lock source: $id"
   if [ "$(source_kind "$id" 2>/dev/null || true)" = task-owned ]; then
-    result=$(source_pending "$id" | awk -v want="/$id.$seq.result" 'index($0, want) { print; exit }')
+    result=$(source_pending "$id" | awk -F / -v want="$id.$seq.result" '$NF == want { print; exit }')
     if [ -n "$result" ] \
       && result_adapter=$(fm_procevent_result_adapter "$result" 2>/dev/null) \
       && adapter_result_is_terminal "$result_adapter" "$result"; then
@@ -2436,7 +2439,7 @@ cmd_list() {
       *) owner=uncertain ;;
     esac
     fm_procevent_source_lock_release "$id"
-    pending=$(fm_procevent_pending "$STATE" | grep -c "/$id\." || true)
+    pending=$(source_pending "$id" | grep -c . || true)
     if [ "$kind" = task-owned ] && [ -n "$task" ]; then
       if [ "$pending" -gt 0 ]; then
         owner="task:$task/round-open"

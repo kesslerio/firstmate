@@ -1398,3 +1398,14 @@ fm_pr_poll_merge_notified_remove() {  # <state> <id>
   [ -f "$marker" ] && [ ! -L "$marker" ] || return 1
   rm -f -- "$marker"
 }
+
+fm_pr_current_handoff() {
+  local meta=$1
+  fm_pr_metadata_identity_parse "$meta" || return 1
+  if ! grep -q '^pr_spawn_gen=' "$meta"; then return 0; fi
+  awk -F= '
+    $1 == "spawn_gen" { n++; spawn = substr($0, 11) }
+    $1 == "pr_spawn_gen" { m++; ready = substr($0, 14) }
+    END { exit !(n == 1 && m == 1 && spawn ~ /^s[1-9][0-9]*\.[0-9]+\.[0-9]+$/ && ready == spawn) }
+  ' "$meta"
+}

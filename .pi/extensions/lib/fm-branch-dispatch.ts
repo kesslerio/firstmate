@@ -31,13 +31,19 @@ import { runCommandAsync } from "./fm-async-exec.ts";
 export const FM_BRANCH_DISPATCH_EVENT = "fm-branch-supervision:dispatch";
 
 // The away-posture record's state-relative filename, exactly as
-// bin/fm-afk-contract.sh writes it. Presence is the only fact read here; the
-// guarded scripts validate the record themselves (bin/fm-lease-lib.sh).
+// bin/fm-afk-contract.sh writes it.
 export const AFK_CONTRACT_FILE = ".afk-contract";
 
 export function afkPostureRecordPresent(state: string): boolean {
   try {
-    return statSync(join(state, AFK_CONTRACT_FILE)).isFile();
+    const path = join(state, AFK_CONTRACT_FILE);
+    if (!statSync(path).isFile()) return false;
+    try {
+      const mode = readFileSync(path, "utf8").split("\n").find((line) => line.startsWith("mode: "));
+      return mode !== "mode: quiet";
+    } catch {
+      return true;
+    }
   } catch {
     return false;
   }

@@ -2508,3 +2508,11 @@ Without Firstmate's hooks, Herdr reported the question panel as `blocked`, which
 This live proof covers the watcher and queue boundary; it does not establish live daemon-consumer delivery.
 `bin/fm-test-run.sh tests/fm-daemon.test.sh` exercises that consumer routing separately with portable regressions for busy escalation and busy-bookkeeping failures in away and quiet mode.
 Repeat the hooked-worker check above before publication if watcher or task-inbox busy code changes; `bin/fm-test-run.sh tests/fm-task-inbox.test.sh` refreshes the portable ladder regressions.
+
+### Quiet posture mode input - 2026-10-18
+
+Pi now reads the record's mode when deciding whether the captain is away.
+A retained quiet record from another harness is a present captain, including after a Pi restart.
+This changes the executed input to watcher dispatch, branch outcome delivery, processing-message retention, and processing-turn cancellation.
+Earlier present and away interaction evidence remains applicable to unchanged rendering, but does not establish the quiet-record transition.
+Fresh interaction and screenshot review must cover a quiet record carried into Pi, a captain outcome delivered while quiet, quiet-to-away suppression, and away-to-quiet delivery of pending outcomes before publication.

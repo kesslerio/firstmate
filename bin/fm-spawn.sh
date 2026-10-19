@@ -1631,7 +1631,6 @@ if [ "$RELAUNCH" -ne 1 ]; then
 fi
 spawn_refuse_if_away_spend_cap() {
   local cap live
-  [ "$RELAUNCH" -ne 1 ] || return 0
   [ "$KIND" != secondmate ] || return 0
   [ -f "$STATE/.afk-contract" ] || return 0
   FM_STATE_OVERRIDE="$STATE" "$SCRIPT_DIR/fm-afk-contract.sh" validate >/dev/null 2>&1 || return 0
@@ -1646,6 +1645,9 @@ spawn_refuse_if_away_spend_cap() {
   fi
   [ -z "$FM_LIVENESS_WARNINGS" ] || printf '%s' "$FM_LIVENESS_WARNINGS" >&2
   live=$FM_LIVENESS_LIVE
+  if [ "$RELAUNCH" -eq 1 ] && printf '%s' "$FM_LIVENESS_LANES" | awk -F '\t' -v id="$ID" '$1 == id { found=1 } END { exit !found }'; then
+    live=$((live - 1))
+  fi
   if [ "$live" -ge "$cap" ]; then
     echo "error: spawn refused - the away-posture record caps concurrent workers at $cap and $live ordinary task(s) are live in this home; task $ID stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)" >&2
     exit 1
@@ -1655,12 +1657,8 @@ spawn_refuse_if_away_spend_cap() {
 # away record exists (never a quiet-mode one, whose captain is present and
 # spends as attended: bin/fm-afk-contract.sh mode), a fresh ordinary spawn
 # refuses for BOTH actors once this home already holds that many live workers
-# under bin/fm-liveness-lib.sh's shared definition. A relaunch replaces a
-# worker that already counts, and a secondmate is a persistent home rather than
-# spend, so both are exempt. Checked before any endpoint, worktree, or record
-# exists, so a refusal costs nothing to unwind; rechecked after the task-set
-# lock so two fresh spawns cannot both publish from a stale count.
-spawn_refuse_if_away_spend_cap
+# under bin/fm-liveness-lib.sh's shared definition.
+[ "$RELAUNCH" -eq 1 ] || spawn_refuse_if_away_spend_cap
 spawn_require_relocated_queued_work() {
   local actor
   [ "$RELAUNCH" -ne 1 ] || return 0
@@ -1676,6 +1674,9 @@ spawn_require_relocated_queued_work() {
   fi
 }
 if [ "$RELAUNCH" -eq 1 ]; then
+  SPAWN_TASK_SET_LOCK=$(fm_task_set_lock_path "$STATE") || exit 1
+  fm_lock_try_acquire "$SPAWN_TASK_SET_LOCK" || { echo "error: task-set lock is busy; retry relaunch" >&2; exit 1; }
+  SPAWN_TASK_SET_LOCK_HELD=1
   SPAWN_CONTROL_LOCK="$STATE/.control-$ID.lock"
   control_owner=$(cat "$SPAWN_CONTROL_LOCK/pid" 2>/dev/null || true)
   if [ "$control_owner" = "$PPID" ] && fm_pid_alive "$control_owner"; then
@@ -1870,6 +1871,7 @@ if [ "$RELAUNCH" -eq 1 ]; then
   RELAUNCH_PRIOR_HARNESS=$(fm_meta_get "$RELAUNCH_META" harness)
   KIND=$(fm_meta_get "$RELAUNCH_META" kind)
   [ -n "$KIND" ] || KIND=ship
+  spawn_refuse_if_away_spend_cap
   # A secondmate whose endpoint is gone already has ONE owner for that
   # recovery: the session-start liveness sweep respawns it with
   # `fm-spawn.sh <id> --secondmate`, which stands its home's own workspace back
@@ -3127,11 +3129,10 @@ fi
 # declaration, what holds a place, and why this is race-safe). A fresh worker
 # for a project whose declared capacity is already held is deferred here, before
 # any brief render, endpoint, worktree, record, or backlog move exists, so the
-# deferral leaves the task exactly as queued as it was. A relaunch replaces a
-# worker that already holds a place, and a secondmate is not a worker.
+# deferral leaves the task exactly as queued as it was.
 SPAWN_PROJECT_CAPACITY=
 SPAWN_PROJECT_CAPACITY_ANY=
-if [ "$RELAUNCH" -eq 0 ] && [ "$KIND" != secondmate ]; then
+if [ "$KIND" != secondmate ]; then
   SPAWN_CAPACITY_CONFIG=$(fm_project_capacity_config_dir "$FM_HOME" "$CONFIG") || {
     echo "error: could not resolve the root Firstmate home that declares project capacity for $PROJ_ABS" >&2
     exit 1
@@ -3143,7 +3144,8 @@ if [ "$RELAUNCH" -eq 0 ] && [ "$KIND" != secondmate ]; then
   SPAWN_PROJECT_CAPACITY=$FM_PROJECT_CAPACITY
   SPAWN_PROJECT_CAPACITY_ANY=$FM_PROJECT_CAPACITY_ANY
 fi
-if [ "$RELAUNCH" -eq 0 ] && [ "$KIND" != secondmate ] &&
+if [ "$KIND" != secondmate ] &&
+  { [ "$RELAUNCH" -eq 0 ] || [ -n "$SPAWN_PROJECT_CAPACITY_ANY" ]; } &&
   { [ "$BACKEND" != orca ] || [ -n "$SPAWN_PROJECT_CAPACITY_ANY" ]; }; then
   SPAWN_TREEHOUSE_PROJECT_LOCK=$(fm_treehouse_project_lock_path "$PROJ_ABS") || {
     echo "error: could not resolve the shared Treehouse project lock for $PROJ_ABS" >&2

@@ -21,6 +21,7 @@ within the same candidate epoch after an unavailable graph recovers.
 Caller provenance and private receipts are consistency checks, not a security
 boundary against an actor able to rewrite this same user's scripts or state.
 """
+from contextlib import contextmanager
 import argparse
 import fcntl
 import hashlib
@@ -63,20 +64,56 @@ def safe_dir(path, create=False):
         raise Refusal(f'unsafe review directory: {path}')
 
 
-def read(path, absent=None):
+@contextmanager
+def input_stream(path):
     try:
         fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW)
     except FileNotFoundError:
-        return absent
+        yield None
+        return
     with os.fdopen(fd, 'r', encoding='utf-8') as stream:
         info = os.fstat(stream.fileno())
-        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1 or info.st_mode & 0o022 or info.st_size > MAX_BYTES:
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1 or info.st_mode & 0o022:
             raise Refusal(f'unsafe review input: {path}')
-        return stream.read(MAX_BYTES + 1)
+        yield stream
+
+
+def read(path, absent=None):
+    with input_stream(path) as stream:
+        if stream is None:
+            return absent
+        value = stream.read(MAX_BYTES + 1)
+        if len(value.encode('utf-8')) > MAX_BYTES:
+            raise Refusal(f'oversized review record: {path}')
+        return value
+
+
+def outcome_rows(path):
+    with input_stream(path) as stream:
+        if stream is None:
+            return
+        while True:
+            line = stream.readline(MAX_BYTES + 1)
+            if not line:
+                return
+            if len(line.encode('utf-8')) > MAX_BYTES:
+                raise Refusal(f'oversized outcome record: {path}')
+            yield json.loads(line)
+
+
+def validate_ledger_records(value):
+    if not isinstance(value, dict):
+        raise Refusal('invalid ready review ledger')
+    for key, record in value.items():
+        records = ({name: item} for name, item in record.items()) if key == 'candidates' and isinstance(record, dict) else ({key: record},)
+        if any(len(json.dumps(item).encode('utf-8')) > MAX_BYTES for item in records):
+            raise Refusal('oversized ready review ledger record')
 
 
 def write(path, value):
-    read(path)  # Reject unsafe destinations, including links and special files.
+    with input_stream(path):
+        pass
+    validate_ledger_records(value)
     fd, name = tempfile.mkstemp(prefix='.ready-review.', dir=path.parent)
     try:
         with os.fdopen(fd, 'w') as stream:
@@ -224,8 +261,9 @@ class Review:
                 if time.monotonic() >= deadline:
                     raise Refusal('ready review lock remained busy; retry review')
                 time.sleep(.05)
-        raw = read(self.path)
-        self.book = json.loads(raw) if raw is not None else {'schema': 1, 'binding': self.binding, 'candidates': {}}
+        with input_stream(self.path) as stream:
+            self.book = json.load(stream) if stream is not None else {'schema': 1, 'binding': self.binding, 'candidates': {}}
+        validate_ledger_records(self.book)
         if self.book.get('schema') != 1 or self.book.get('binding') != self.binding or not isinstance(self.book.get('candidates'), dict):
             raise Refusal('foreign or invalid ready review ledger; repair owning-home state')
         for task, item in self.book['candidates'].items():
@@ -485,15 +523,15 @@ class Review:
                 if not self.settled(task, item)]
 
     def handoffs(self):
-        raw = read(self.state / 'branch-outcomes.jsonl', '')
         processed_raw = read(self.state / '.branch-outcomes-processed', '0\n').strip()
         if not processed_raw.isdigit():
             raise Refusal('invalid outcome processed cursor')
         processed = int(processed_raw)
         covered = set()
         previous = 0
-        for line in raw.splitlines():
-            row = json.loads(line)
+        for row in outcome_rows(self.state / 'branch-outcomes.jsonl'):
+            if not isinstance(row, dict):
+                raise Refusal('invalid outcome handoff record')
             seq = row.get('seq')
             if not isinstance(seq, int) or seq != previous + 1:
                 raise Refusal('invalid outcome handoff sequence')

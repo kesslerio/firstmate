@@ -13,6 +13,9 @@ set -u
 
 TMP_ROOT=$(fm_test_tmproot fm-live-lab)
 : > "$TMP_ROOT/pids"
+FM_TEST_CHILD_REGISTRY="$TMP_ROOT/children"
+export FM_TEST_CHILD_REGISTRY
+export -f fm_test_track_child
 : > "$TMP_ROOT/tmux-dirs"
 LIVE_LAB="$ROOT/bin/fm-live-lab.sh"
 TRUST="$ROOT/bin/fm-claude-trust.sh"
@@ -22,7 +25,8 @@ live_lab_cleanup() {
   for marker in "$TMP_ROOT/orphan-child" "$TMP_ROOT/late-child" "$TMP_ROOT/reused-child"; do
     [ ! -s "$marker" ] || printf '%s\n' "$(<"$marker")" >> "$TMP_ROOT/pids"
   done
-  while read -r pid; do [ -n "$pid" ] && { pkill -P "$pid" 2>/dev/null || true; kill "$pid" 2>/dev/null || true; }; done < "$TMP_ROOT/pids"
+  fm_test_stop_children
+  while read -r pid; do [ -z "$pid" ] || wait "$pid" 2>/dev/null || true; done < "$TMP_ROOT/pids"
   while read -r dir; do
     [ -n "$dir" ] || continue
     env -u TMUX TMUX_TMPDIR="$dir" tmux kill-server 2>/dev/null
@@ -110,7 +114,9 @@ make_lab() {
 }
 
 # Recorded fixture roots must not share the runner's process group.
-start_group() { perl -e 'setpgrp(0,0); exec @ARGV' "$@" >/dev/null 2>&1 & }
+start_group() { perl -e 'setpgrp(0,0); exec @ARGV' "$@" >/dev/null 2>&1 &
+  fm_test_track_child "$!" kill
+}
 
 record_pid() {  # <root> <pid>
   printf 'launch_pid=%s\nlaunch_start=%s\n' "$2" "$(ps -o lstart= -p "$2" | awk '{$1=$1; print}')" >> "$1/.fm-live-lab"
@@ -125,6 +131,7 @@ lab_tmux() {  # <root> <tmux args...>
 
 start_sleeper() {
   sleep 600 >/dev/null 2>&1 &
+  fm_test_track_child "$!"
   printf '%s\n' "$!" >> "$TMP_ROOT/pids"
   printf '%s\n' "$!"
 }
@@ -341,8 +348,10 @@ mkdir -p "/tmp/fm-$WORKER_ID/gotmp" "/tmp/fm-$MATE_ID" "/tmp/fm-$WORKER_ID+$C_HA
 printf 'sleep 600\n' > "$C/stray.sh"
 bash "$C/stray.sh" >/dev/null 2>&1 &
 STRAY=$!
+fm_test_track_child "$STRAY"
 printf '%s\n' "$STRAY" >> "$TMP_ROOT/pids"
 until STRAY_CHILD=$(pgrep -P "$STRAY" sleep); do sleep 0.1; done
+fm_test_track_child "$STRAY_CHILD"
 printf '%s\n' "$STRAY_CHILD" >> "$TMP_ROOT/pids"
 # A launch-recorded process and its child must be stopped even when not in tmux.
 start_group sleep 600
@@ -352,6 +361,7 @@ record_pid "$C" "$OWNED"
 # A process in the runner's group is not part of any recorded lab group.
 sleep 600 >/dev/null 2>&1 &
 UNRELATED=$!
+fm_test_track_child "$UNRELATED"
 printf '%s\n' "$UNRELATED" >> "$TMP_ROOT/pids"
 [ "$(ps -o pgid= -p "$UNRELATED" | awk '{$1=$1; print}')" != "$(ps -o pgid= -p "$OWNED" | awk '{$1=$1; print}')" ] || fail "fixture roots must have their own group"
 # A sibling lab root that shares this root as a string prefix is not this lab.
@@ -359,6 +369,7 @@ mkdir -p "${C}2"
 printf 'sleep 600\n' > "${C}2/stray.sh"
 bash "${C}2/stray.sh" 2>/dev/null &
 SIBLING=$!
+fm_test_track_child "$SIBLING"
 printf '%s\n' "$SIBLING" >> "$TMP_ROOT/pids"
 # The worker spawn failed after keeping its task temp dirs, before its meta.
 rm -f "$CH/state/$WORKER_ID.meta"
@@ -444,6 +455,7 @@ start_group bash -c 'bash "$1" "$2" "$3" "$4" & echo $! > "$5"; while :; do slee
 ORPHAN_ROOT=$!
 until [ -s "$TMP_ROOT/orphan-child" ]; do sleep 0.1; done
 ORPHAN_CHILD=$(cat "$TMP_ROOT/orphan-child")
+fm_test_track_child "$ORPHAN_CHILD" kill
 printf '%s\n%s\n' "$ORPHAN_ROOT" "$ORPHAN_CHILD" >> "$TMP_ROOT/pids"
 record_pid "$ORPHAN" "$ORPHAN_ROOT"
 out=$("$LIVE_LAB" down "$ORPHAN" 2>&1)
@@ -457,7 +469,7 @@ pass "down waits for captured descendants after their root exits"
 LATE=$(make_lab late claude)
 cat > "$TMP_ROOT/late-rewriter.sh" <<'SH'
 store=$1 key=$2 marker=$3
-trap 'bash -c '\''sleep 1; node -e "const fs=require(\"node:fs\");const [s,k]=process.argv.slice(1);const j=JSON.parse(fs.readFileSync(s,\"utf8\"));j.projects[k]={hasTrustDialogAccepted:true};fs.writeFileSync(s,JSON.stringify(j))" "$1" "$2"'\'' _ "$store" "$key" >/dev/null 2>&1 & echo $! > "$marker"; exit 0' TERM
+trap 'bash -c '\''sleep 1; node -e "const fs=require(\"node:fs\");const [s,k]=process.argv.slice(1);const j=JSON.parse(fs.readFileSync(s,\"utf8\"));j.projects[k]={hasTrustDialogAccepted:true};fs.writeFileSync(s,JSON.stringify(j))" "$1" "$2"'\'' _ "$store" "$key" >/dev/null 2>&1 & fm_test_track_child "$!"; echo $! > "$marker"; exit 0' TERM
 echo ready > "$marker.ready"
 while :; do sleep 0.1; done
 SH
@@ -474,6 +486,7 @@ out=$("$LIVE_LAB" down "$LATE" 2>&1)
 expect_code 0 "$?" "down waits for a child born during TERM: $out"
 assert_present "$TMP_ROOT/late-child" "TERM handler spawned a child"
 LATE_CHILD=$(cat "$TMP_ROOT/late-child")
+fm_test_track_child "$LATE_CHILD" kill
 printf '%s\n' "$LATE_CHILD" >> "$TMP_ROOT/pids"
 case "$(ps -o stat= -p "$LATE_CHILD" 2>/dev/null | awk '{$1=$1; print}')" in ''|Z*) ;; *) fail "down leaves a TERM-spawned child alive" ;; esac
 lab_keys=$(node -e 'const j=JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"));console.log(Object.keys(j.projects).filter(k=>k.startsWith(process.argv[2])).join(" "))' "$HOME/.claude.json" "$LATE")
@@ -486,6 +499,7 @@ Y=$(make_lab y claude)
 start_group bash -c 'sleep 600 & echo $! > "$1"; wait' _ "$TMP_ROOT/reused-child"; REUSED=$!
 until [ -s "$TMP_ROOT/reused-child" ]; do sleep 0.1; done
 REUSED_CHILD=$(cat "$TMP_ROOT/reused-child")
+fm_test_track_child "$REUSED_CHILD" kill
 printf '%s\n%s\n' "$REUSED" "$REUSED_CHILD" >> "$TMP_ROOT/pids"
 printf 'launch_pid=%s\nlaunch_start=Mon Jan  1 00:00:00 1990\n' "$REUSED" >> "$Y/.fm-live-lab"
 out=$("$LIVE_LAB" down "$Y" 2>&1)
@@ -508,6 +522,7 @@ record_pid "$GROUP_REUSE" "$GROUP_ROOT"
 record_pid "$GROUP_REUSE" "$WAIT_ROOT"
 sleep 600 >/dev/null 2>&1 &
 GROUP_OUTSIDER=$!
+fm_test_track_child "$GROUP_OUTSIDER"
 printf '%s\n' "$GROUP_OUTSIDER" >> "$TMP_ROOT/pids"
 GROUP_ID=$(ps -o pgid= -p "$GROUP_ROOT" | awk '{$1=$1; print}')
 mkdir -p "$TMP_ROOT/group-ps-bin"
@@ -562,7 +577,8 @@ out=$(REAL_PS="$(command -v ps)" PS_COUNT="$TMP_ROOT/ps-count" PS_TARGET="$TMP_R
 expect_code 0 "$?" "down must not treat the changed PID as a survivor: $out"
 [ "$(( $(date +%s) - start ))" -lt 8 ] || fail "down waited on a PID with a different start time"
 kill -0 "$REPLACED" 2>/dev/null || fail "down killed a PID after its recorded identity changed"
-kill "$REPLACED" 2>/dev/null || true
+kill -KILL "$REPLACED" 2>/dev/null || true
+wait "$REPLACED" 2>/dev/null || true
 pass "down revalidates process identity during its bounded wait"
 
 printf '{"trusted":["/somewhere"]}\n' > "$HOME/.pi/agent/trust.json"

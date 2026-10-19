@@ -3450,7 +3450,7 @@ pad_run() {
 
 test_emit_rules_agree_with_tasks_axi() {
   local home n=0 expected required outcome deliverables verdict mode
-  local emit_verdict axi_verdict obligation out pair key pad staging registry
+  local emit_verdict axi_verdict obligation out pair key pad staging registry event_id result
   local -a emit_args emit_destination
   home=$(make_home emit-agreement)
   # A work home on the far side of a machine boundary, which is the only place
@@ -3511,13 +3511,21 @@ EOF
       emit_verdict=reject
     fi
 
-    publish_raw_event "$home/state/public-followup/events" "$obligation" main "work-agree-$n" \
-      "$outcome" "$deliverables" >/dev/null || fail "could not publish the raw case $n"
-    out=$(run_pf "$home" consume 2>&1) || true
-    case "$out" in
-      *"rejected "*) axi_verdict=reject ;;
-      *) axi_verdict=accept ;;
-    esac
+    event_id=$(publish_raw_event "$home/state/public-followup/events" "$obligation" main "work-agree-$n" \
+      "$outcome" "$deliverables") || fail "could not publish the raw case $n"
+    out=$(run_pf "$home" consume 2>&1) || fail "case $n: operational ingestion failure: $out"
+    if [ -f "$home/state/public-followup/rejected/$event_id.json" ] && [ -s "$home/state/public-followup/rejected/$event_id.reason" ]; then
+      printf '%s' "$(cat "$home/state/public-followup/rejected/$event_id.json")" | jq -e --arg event "$event_id" '.event_id == $event' >/dev/null || fail "case $n: rejection receipt has the wrong event"
+      axi_verdict=reject
+      assert_absent "$home/state/public-followup/consumed/$event_id" "a rejected event must not be consumed"
+    elif [ -f "$home/state/public-followup/consumed/$event_id" ]; then
+      result=$(tasks_in "$home" public-followup list --json | jq -e --arg obligation "$obligation" '.public_followups[] | select(.id == $obligation)') || fail "case $n: could not read accepted event state"
+      printf '%s' "$result" | jq -e --arg event "$event_id" '.. | objects | select(.event_id? == $event)' >/dev/null \
+        || fail "case $n: the exact accepted event is missing from obligation state"
+      axi_verdict=accept
+    else
+      fail "case $n: consumption recorded neither acceptance nor rejection for $event_id: $out"
+    fi
 
     [ "$axi_verdict" = "$verdict" ] \
       || fail "case $n ($expected final, $outcome outcome, $deliverables): tasks-axi says $axi_verdict, the table says $verdict - re-pin the mirrored rule"
@@ -4006,3 +4014,20 @@ test_rejection_wake_survives_a_poll_that_cannot_write
 test_rejection_wake_survives_a_poll_that_cannot_read
 test_an_undroppable_wake_repeats_the_same_refusal
 test_a_retained_refusal_repeats_its_wake_rather_than_a_new_one
+
+test_ingestion_failure_is_not_acceptance() {
+  local result rc=0
+  result=$(
+    TMP_ROOT="$TMP_ROOT/ingestion-failure"
+    mkdir -p "$TMP_ROOT"
+    eval "$(declare -f run_pf | sed '1s/run_pf/pf_normal_run/')"
+    run_pf() {
+      if [ "${2:-}" = consume ]; then printf 'injected storage failure\n'; return 23; fi
+      pf_normal_run "$@"
+    }
+    test_emit_rules_agree_with_tasks_axi 2>&1
+  ) || rc=$?
+  [ "$rc" -ne 0 ] || fail 'the oracle accepted an operational ingestion failure'
+  assert_contains "$result" 'operational ingestion failure' 'the oracle must fail at the first failed consumption'
+}
+test_ingestion_failure_is_not_acceptance

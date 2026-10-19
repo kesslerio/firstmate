@@ -1005,3 +1005,39 @@ test_daemon_heartbeat empty
 test_daemon_heartbeat held
 test_daemon_heartbeat unreadable
 test_daemon_heartbeat failed
+
+test_growing_ready_review_history() {
+  python3 - "$ROOT/bin/fm_ready_review.py" "$TMP_ROOT" <<'PY'
+import importlib.util, json, pathlib, sys
+spec=importlib.util.spec_from_file_location('review_growth',sys.argv[1]); module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+state=pathlib.Path(sys.argv[2])/'growing-review'; state.mkdir()
+review=module.Review.__new__(module.Review); review.state=state; review.path=state/'.ready-review.json'; review.binding={'home':'owned'}; review.lock=None
+book={'schema':1,'binding':review.binding,'candidates':{f't{i}':{'generation':'a'*64,'state':'done','history':'x'*9000} for i in range(1000)}}
+module.write(review.path,book)
+assert review.path.stat().st_size>module.MAX_BYTES
+with review: assert len(review.book['candidates'])==1000; review.save()
+try: module.write(review.path,{'candidates':{'oversized':{'history':'x'*(module.MAX_BYTES+1)}}})
+except module.Refusal: pass
+else: raise AssertionError('oversized ledger record accepted')
+with review: assert len(review.book['candidates'])==1000
+with (state/'branch-outcomes.jsonl').open('w') as stream:
+    for seq in range(1,1001):
+        row={'seq':seq,'verdict':'captain','summary':'x'*9000,'readyReview':{'binding':review.binding,'candidates':[{'task':'pending','generation':'b'*64}]}}
+        stream.write(json.dumps(row)+'\n')
+assert (state/'branch-outcomes.jsonl').stat().st_size>module.MAX_BYTES
+assert ('pending','b'*64) in review.handoffs()
+for raw in ('{"seq":1002}\n','not json\n','x'*(module.MAX_BYTES+1)):
+    with (state/'branch-outcomes.jsonl').open('a') as stream: stream.write(raw)
+    try: review.handoffs()
+    except (module.Refusal,ValueError): pass
+    else: raise AssertionError('malformed outcome accepted')
+    (state/'branch-outcomes.jsonl').write_text('')
+victim=state/'victim'; victim.write_text('untouched')
+review.path.unlink(); review.path.symlink_to(victim)
+try: module.write(review.path,book)
+except (module.Refusal,OSError): pass
+else: raise AssertionError('unsafe ledger destination accepted')
+assert victim.read_text()=='untouched'
+PY
+}
+test_growing_ready_review_history
