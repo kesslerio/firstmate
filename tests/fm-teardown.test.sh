@@ -203,7 +203,7 @@ write_meta() {
     "project=$case_dir/project" \
     "kind=$kind" \
     "mode=$mode" \
-    "spawn_gen=teardown-test-task-x1"
+    "spawn_gen=s1700000000.1.1"
 }
 
 # Commit something on the worktree's task branch. Args: case_dir [message]
@@ -3420,7 +3420,7 @@ PY
   ledger=$case_dir/data/pipeline-spend.jsonl
   assert_present "$ledger" "pipeline-spend: teardown left no pipeline spend record"
   jq -e '
-    .task == "task-x1" and .spawn_gen == "teardown-test-task-x1"
+    .task == "task-x1" and .spawn_gen == "s1700000000.1.1"
     and .source == "no-mistakes-state" and .branch == "fm/task-x1"
     and [.runs[].id] == ["01RUN"]
     and .total.invocations == 2 and .total.exit == {"ok": 1, "cancelled": 1}
@@ -4637,6 +4637,40 @@ test_retained_sources_still_reach_the_ordinary_refusal() {
   pass "present required sources still reach the ordinary teardown refusal"
 }
 
+test_teardown_requires_instruction_disposition() {
+  local case_dir rec rc
+  case_dir=$(make_case instruction-obligation)
+  write_meta "$case_dir" local-only ship
+  printf 'manual\n' > "$case_dir/config/backlog-backend"
+  rec=$(FM_HOME="$case_dir" bash -c '. "$1"; fm_task_inbox_write "$2" task-x1 "Return the requested answer" "" disposition' _ "$ROOT/bin/fm-task-inbox-lib.sh" "$case_dir/state") \
+    || fail 'could not create teardown instruction fixture'
+  mv "$rec" "$case_dir/state/task-x1.inbox/handled/"
+  rec="$case_dir/state/task-x1.inbox/handled/${rec##*/}"
+  rc=0
+  FM_HOME="$case_dir" run_teardown "$case_dir" > "$case_dir/stdout" 2> "$case_dir/stderr" || rc=$?
+  [ "$rc" -ne 0 ] || fail 'teardown deleted an acknowledged but unaccounted instruction'
+  assert_contains "$(cat "$case_dir/stderr")" 'outstanding instruction obligations' 'teardown must name its instruction refusal'
+  [ -f "$rec" ] && [ -f "$case_dir/state/task-x1.meta" ] && [ -d "$case_dir/wt" ] \
+    || fail 'denied teardown changed instruction/task/worktree ownership'
+  rc=0
+  FM_HOME="$case_dir" FM_TASK_INBOX_OWNER_HOME="$case_dir" run_teardown "$case_dir" > "$case_dir/stdout" 2> "$case_dir/stderr" || rc=$?
+  [ "$rc" -ne 0 ] || fail 'remote owner override bypassed exact parent-route shape'
+  printf 'The requested answer is 42.\n' > "$case_dir/data/answer.txt"
+  FM_HOME="$case_dir" FM_STATE_OVERRIDE="$case_dir/state" "$ROOT/bin/fm-task-inbox.sh" \
+    disposition task-x1 "$rec" --gen s1700000000.1.1 --disposition fulfilled --response "$case_dir/data/answer.txt" > /dev/null \
+    || fail 'valid response disposition failed'
+  rc=0
+  FM_HOME="$case_dir" run_teardown "$case_dir" > "$case_dir/stdout" 2> "$case_dir/stderr" || rc=$?
+  [ "$rc" -eq 0 ] || fail "accounted instruction blocked otherwise-safe cleanup: $(cat "$case_dir/stderr")"
+  [ ! -e "$case_dir/state/task-x1.inbox" ] || fail 'allowed teardown retained an orphan inbox'
+  pass 'teardown refuses unaccounted acknowledged instructions and wrong channel overrides; fulfilled response allows cleanup'
+}
+
+if [ "${FM_TEST_OBLIGATION_TEARDOWN_ONLY:-0}" = 1 ]; then
+  test_teardown_requires_instruction_disposition
+  exit 0
+fi
+
 test_missing_startup_source_refuses_before_cleanup
 test_unreadable_startup_source_refuses_before_cleanup
 test_missing_adapter_sibling_refuses_before_cleanup
@@ -4748,3 +4782,5 @@ test_process_spawned_during_grace_is_reaped_on_later_pass
 test_persistent_scan_refuses_after_bounded_retries
 test_process_exit_during_identity_lookup_does_not_refuse
 test_run_abort_precedes_process_reap_precedes_worktree_removal
+
+test_teardown_requires_instruction_disposition

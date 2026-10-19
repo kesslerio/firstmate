@@ -604,3 +604,64 @@ test_recorded_line_stays_recorded_across_a_resolve() {
 }
 
 test_recorded_line_stays_recorded_across_a_resolve
+
+# Publishers need serialization and retry identity without loading the status
+# classifier. Exercise that source-only interface in a fresh shell so the
+# classifier loaded by this suite cannot supply a missing dependency.
+test_status_event_serialization_without_classification() {
+  local dir out
+  dir=$(case_dir serialization-only)
+  out=$(bash -eu -s "$ROOT" "$dir" 2>&1 <<'SH'
+cd /
+FM_HOME="$2/uncreated-home"
+FM_ROOT="$2/uncreated-root"
+FM_CREW_STATE_BIN=preserved-reader
+# shellcheck source=bin/fm-status-event-lib.sh
+. "$1/bin/fm-status-event-lib.sh"
+[ "$FM_CREW_STATE_BIN" = preserved-reader ]
+[ ! -e "$FM_HOME" ] && [ ! -e "$FM_ROOT" ]
+case $- in *u*) ;; *) exit 1 ;; esac
+set +u
+. "$1/bin/fm-status-event-lib.sh"
+case $- in *u*) exit 1 ;; esac
+set -u
+
+[ "$(status_line_at_epoch 'note [at=0]: epoch zero')" = 0 ]
+[ "$(status_line_at_epoch 'note [at=999999999999]: bounded future')" = 999999999999 ]
+for line in 'note: no stamp' 'note [at=01]: leading zero' \
+  'note [at=-1]: negative' 'note [at=<epoch>]: placeholder' \
+  'note [at=1000000000000]: oversized' 'note [at=1] [at=2]: duplicate' \
+  'note: [at=1] note text' 'note [at=1]'; do
+  if status_line_at_epoch "$line"; then exit 1; fi
+done
+line='blocked [key=release] [corr=0123456789abcdef]: awaiting answer'
+stamped=$(status_stamp_line "$line")
+status_line_at_epoch "$stamped" >/dev/null
+[ "$(status_stamp_line "$stamped")" = "$stamped" ]
+[ "$(status_stamp_line 'note [at=<epoch>]: keep malformed')" = 'note [at=<epoch>]: keep malformed' ]
+[ "$(status_stamp_line 'unframed text')" = 'unframed text' ]
+width=$(status_stamp_width)
+case "$width" in ''|*[!0-9]*) exit 1 ;; esac
+[ "$width" -gt 6 ]
+
+if status_event_recorded "$2/missing.status" "$line"; then exit 1; fi
+printf '%s\n%s\n' "$line" 'resolved [key=release]: answered later' > "$2/event.status"
+status_event_recorded "$2/event.status" "$stamped"
+status_event_recorded "$2/event.status" \
+  'blocked [key=release] [corr=0123456789abcdef] [at=999999999999]: awaiting answer'
+for different in \
+  'blocked [key=release] [corr=fedcba9876543210]: awaiting answer' \
+  'blocked [key=release] [corr=0123456789abcdef] [at=01]: awaiting answer' \
+  'blocked [key=release] [corr=0123456789abcdef] [at=1] [at=2]: awaiting answer'; do
+  if status_event_recorded "$2/event.status" "$different"; then exit 1; fi
+done
+
+date() { return 1; }
+[ "$(status_stamp_line "$line")" = "$line" ]
+[ "$(status_stamp_width)" = 0 ]
+SH
+  ) || fail "standalone status-event serialization changed behavior"$'\n'"$out"
+  pass "standalone event serialization preserves timestamps, strict retry identity, source options, and clock failure"
+}
+
+test_status_event_serialization_without_classification

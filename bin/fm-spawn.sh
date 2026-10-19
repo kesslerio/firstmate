@@ -67,7 +67,10 @@
 #   ordinary relaunch. It refuses unless the recorded endpoint is positively
 #   agent-free on a backend with a recovery-grade agent-state classifier (tmux
 #   or herdr), and clears the previous harness's per-task wiring before arming
-#   the new incarnation. Two verdicts are agent-free: a `dead` endpoint is
+#   the new incarnation. Replacement publication retains PR association but
+#   binds any legacy ready handoff to the prior incarnation (fm-pr-check.sh
+#   owns readiness binding); only a newly published handoff frees its seat.
+#   Two verdicts are agent-free: a `dead` endpoint is
 #   ADOPTED as-is, while an endpoint PROVEN gone is RE-CREATED in the recorded
 #   worktree and the republished record rebinds the task to it. That proof is
 #   its own step, because a backend's `missing` also covers an endpoint that is
@@ -207,7 +210,10 @@
 #   whitespace is treated as a RAW launch command - the escape hatch for verifying
 #   new adapters. For pi and pi-signed, fm-spawn resolves the selected executable
 #   name from PATH once, probes that concrete path with --help, and launches the
-#   same path. It adds --tui-mode regular only when that help advertises the flag;
+#   same path for canonical launches, prepending only its directory to the
+#   destination pane's PATH so child tools resolve the same Pi installation.
+#   Raw overrides retain the destination PATH. It adds --tui-mode regular only
+#   when that help advertises the flag;
 #   a failed or inconclusive probe omits it so older Pi versions remain launchable.
 #   A --secondmate launch of a Firstmate-seeded home (the existing
 #   .fm-secondmate-home marker validate_firstmate_home_for_spawn already requires)
@@ -683,6 +689,8 @@ fm_backlog_directory_present "$STATE" "state directory" || {
 . "$SCRIPT_DIR/fm-project-capacity-lib.sh"
 # shellcheck source=bin/fm-worker-account-lib.sh
 . "$SCRIPT_DIR/fm-worker-account-lib.sh"
+# shellcheck source=bin/fm-liveness-lib.sh
+. "$SCRIPT_DIR/fm-liveness-lib.sh"
 # Fail closed before any fleet mutation: a no-mistakes gate agent must never spawn
 # a direct report (see bin/fm-gate-refuse-lib.sh).
 fm_refuse_if_gate_agent
@@ -1622,7 +1630,7 @@ if [ "$RELAUNCH" -ne 1 ]; then
   fm_lease_forbid_branch "new-task spawn (fm-spawn)" --away-relocated
 fi
 spawn_refuse_if_away_spend_cap() {
-  local cap live meta
+  local cap live
   [ "$RELAUNCH" -ne 1 ] || return 0
   [ "$KIND" != secondmate ] || return 0
   [ -f "$STATE/.afk-contract" ] || return 0
@@ -1632,12 +1640,12 @@ spawn_refuse_if_away_spend_cap() {
   case "$cap" in
   '' | *[!0-9]* | 0) return 0 ;;
   esac
-  live=0
-  for meta in "$STATE"/*.meta; do
-    [ -f "$meta" ] || continue
-    [ "$(grep '^kind=' "$meta" 2>/dev/null | tail -1 | cut -d= -f2-)" != secondmate ] || continue
-    live=$((live + 1))
-  done
+  if ! fm_liveness_snapshot "$FM_HOME" "$STATE"; then
+    echo "error: spawn refused - cannot measure live workers: $FM_LIVENESS_ERROR" >&2
+    exit 1
+  fi
+  [ -z "$FM_LIVENESS_WARNINGS" ] || printf '%s' "$FM_LIVENESS_WARNINGS" >&2
+  live=$FM_LIVENESS_LIVE
   if [ "$live" -ge "$cap" ]; then
     echo "error: spawn refused - the away-posture record caps concurrent workers at $cap and $live ordinary task(s) are live in this home; task $ID stays queued for the captain's return or for a worker to finish (spend cap: bin/fm-afk-contract.sh)" >&2
     exit 1
@@ -1646,9 +1654,8 @@ spawn_refuse_if_away_spend_cap() {
 # Spend cap (bin/fm-afk-contract.sh's spend_max_concurrent_workers): while an
 # away record exists (never a quiet-mode one, whose captain is present and
 # spends as attended: bin/fm-afk-contract.sh mode), a fresh ordinary spawn
-# refuses for BOTH actors once this home already holds that many ordinary task
-# records, counted the same way the return brief counts tasks live at return
-# (every state/*.meta whose kind is not secondmate). A relaunch replaces a
+# refuses for BOTH actors once this home already holds that many live workers
+# under bin/fm-liveness-lib.sh's shared definition. A relaunch replaces a
 # worker that already counts, and a secondmate is a persistent home rather than
 # spend, so both are exempt. Checked before any endpoint, worktree, or record
 # exists, so a refusal costs nothing to unwind; rechecked after the task-set
@@ -5131,11 +5138,15 @@ preserve_relaunch_meta() {
     echo "home=$PROJ_ABS"
     echo "projects=$SECONDMATE_PROJECTS"
   fi
-  if [ "$RELAUNCH" -eq 1 ]; then
-    preserve_relaunch_meta
-  fi
   if [ "$SPAWN_CONTROL_PARENT" = 1 ] && [ -n "${FM_CONTROL_RELAUNCH_TX:-}" ]; then
     echo "control_relaunch_tx=$FM_CONTROL_RELAUNCH_TX"
+  fi
+  if [ "$RELAUNCH" -eq 1 ]; then
+    if grep -q '^pr=' "$RELAUNCH_META" && ! grep -q '^pr_spawn_gen=' "$RELAUNCH_META"; then
+      RELAUNCH_PR_GEN=$(fm_meta_get "$RELAUNCH_META" spawn_gen)
+      echo "pr_spawn_gen=${RELAUNCH_PR_GEN:-legacy}"
+    fi
+    preserve_relaunch_meta
   fi
 } >"$SPAWN_META_PATH" || {
   echo "error: task record for $ID could not be prepared at $SPAWN_META_PATH" >&2
@@ -5468,6 +5479,16 @@ if [ -n "$SPAWN_TRACEPARENT" ]; then
     LAUNCH="unset TRACEPARENT; $LAUNCH"
   fi
 fi
+case "$HARNESS" in
+pi | pi-signed)
+  if [ "$RAW_LAUNCH" = 0 ]; then
+    # Backends may create panes from an older environment. Carry only the
+    # selected executable's directory; expand the remaining PATH in that pane,
+    # inside any launch-env-allowlist boundary, rather than copying our PATH.
+    LAUNCH="export PATH=$(shell_quote "${PI_BIN%/*}"):\"\${PATH-}\"; $LAUNCH"
+  fi
+  ;;
+esac
 if [ "$LAUNCH_ENV_ENABLED" = 1 ]; then
   LAUNCH_ENV_PREFIX='/usr/bin/env -i'
   # COMPACT_ADVISER_DISABLE is the intentional declarative floor-membership
@@ -5675,6 +5696,61 @@ trap - HUP INT TERM
 if [ "$SPAWN_BACKLOG_COMMIT_STATUS" -ne 0 ]; then
   exit "$SPAWN_BACKLOG_COMMIT_STATUS"
 fi
+# Publication and launch delivery are now confirmed. Keep the durable launch
+# time after teardown removes the task record (bin/fm-liveness-lib.sh).
+if [ "$KIND" != secondmate ]; then
+  SPAWN_LAST_LAUNCH_TMP=
+  # Keep every fallible stamp step in this guarded path: confirmed workers
+  # must survive bookkeeping errors, and the caller must know they started.
+  # CORE rename publishes this exact pathname on Unix, including stock macOS;
+  # unlike mv it never treats a directory destination as a container.
+  if ! SPAWN_LAST_LAUNCH_TMP=$(mktemp "$STATE/.last-launch.XXXXXX") \
+    || ! date +%s > "$SPAWN_LAST_LAUNCH_TMP" \
+    || ! perl - "$SPAWN_LAST_LAUNCH_TMP" "$STATE/.last-launch" <<'PERL'
+use strict;
+use warnings;
+use Fcntl qw(S_ISREG);
+my ($source, $destination) = @ARGV;
+sub ordinary {
+  my ($path) = @_;
+  my @st = lstat($path);
+  @st && S_ISREG($st[2]) && $st[3] == 1 or die "stamp is not an ordinary single-link file\n";
+  return @st;
+}
+sub epoch {
+  my ($path) = @_;
+  open my $file, '<', $path or die "cannot read stamp: $!\n";
+  local $/;
+  my $value = <$file>;
+  close $file or die "cannot close stamp: $!\n";
+  defined($value) && $value =~ /\A[1-9][0-9]*\n\z/ or die "stamp is not one positive Unix epoch and newline\n";
+  return $value;
+}
+my @source_identity = ordinary($source);
+my $value = epoch($source);
+if (lstat($destination)) {
+  ordinary($destination);
+} elsif (!$!{ENOENT}) {
+  die "cannot inspect stamp destination: $!\n";
+}
+rename($source, $destination) or die "cannot publish exact stamp pathname: $!\n";
+my @published = ordinary($destination);
+$published[0] == $source_identity[0] && $published[1] == $source_identity[1]
+  && epoch($destination) eq $value or die "published stamp could not be verified\n";
+PERL
+  then
+    [ -z "$SPAWN_LAST_LAUNCH_TMP" ] || rm -f "$SPAWN_LAST_LAUNCH_TMP" || true
+    echo "error: task $ID launched, but state/.last-launch could not be published; task record preserved" >&2
+    exit 1
+  fi
+fi
+spawn_record_ready_review() {
+  [ "$KIND" != secondmate ] || return 0
+  if ! "$SCRIPT_DIR/fm-ready-review.sh" launch "$ID" "$SPAWN_GEN"; then
+    echo "error: task $ID launched, but its ready-review launch binding could not be recorded; task record preserved, inspect the review before acknowledging" >&2
+    return 1
+  fi
+}
 if [ -n "$SPAWN_DEFERRED_SIGNAL" ]; then
   case "$SPAWN_DEFERRED_SIGNAL" in
   HUP) SPAWN_DEFERRED_SIGNAL_STATUS=129 ;;
@@ -5686,11 +5762,16 @@ if [ -n "$SPAWN_DEFERRED_SIGNAL" ]; then
   trap 'SPAWN_DEFERRED_SIGNAL=$SPAWN_DEFERRED_SIGNAL' HUP INT TERM
   # Deliberately unguarded against errexit: a failed verification still set
   # the honest attempted-preservation claim the exit below reports.
-  spawn_report_preserved_state || true
+  if spawn_report_preserved_state; then
+    # Bind only the read-back-confirmed publication, after any interrupted
+    # commit repair. A bookkeeping failure must not suppress its diagnostic.
+    spawn_record_ready_review || true
+  fi
   trap - HUP INT TERM
   echo "error: spawn of $ID was interrupted after launch delivery began; $SPAWN_PRESERVED_CLAIM" >&2
   exit "$SPAWN_DEFERRED_SIGNAL_STATUS"
 fi
+spawn_record_ready_review || exit 1
 fm_lock_release "$SPAWN_META_LOCK"
 SPAWN_META_LOCK_HELD=0
 

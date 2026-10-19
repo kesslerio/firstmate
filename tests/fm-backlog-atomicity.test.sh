@@ -2967,6 +2967,50 @@ test_environment_selected_adapter_is_not_forced_to_markdown() {
   pass "environment-selected adapters bypass the legacy markdown file override"
 }
 
+test_manual_queued_launch_retains_pending_accounting() {
+  local kind scanned case_dir id before out gen guard
+  for kind in ship scout; do
+    for scanned in no yes; do
+      id="manual-$kind-$scanned"
+      case_dir=$(make_home "$id" "$id")
+      printf '%s\n' manual > "$(home_of "$case_dir")/config/backlog-backend"
+      add_item "$case_dir" "$id" "$kind"
+      before=$(cat "$(backlog_of "$case_dir")")
+      if [ "$scanned" = yes ]; then
+        FM_HOME="$(home_of "$case_dir")" "$ROOT/bin/fm-ready-review.sh" scan >/dev/null \
+          || fail "manual $kind candidate could not be scanned"
+      fi
+      if [ "$kind" = scout ]; then
+        out=$(run_spawn "$case_dir" "$id" "$case_dir/project" --scout) \
+          || fail "genuine manual queued scout launch acquired an accounting failure: $out"
+      else
+        out=$(run_ship_spawn "$case_dir" "$id") \
+          || fail "genuine manual queued ship launch acquired an accounting failure: $out"
+      fi
+      assert_contains "$out" "spawned $id" 'confirmed manual dispatch did not report success'
+      assert_contains "$out" 'manual backlog transition to In flight remains pending' 'manual dispatch hid its pending accounting'
+      assert_equals "$before" "$(cat "$(backlog_of "$case_dir")")" 'manual launch changed its operator-owned backlog'
+      assert_present "$(home_of "$case_dir")/state/$id.meta" 'confirmed launch lost its task record'
+      python3 - "$(home_of "$case_dir")/state/.ready-review.json" "$id" <<'PY'
+import json
+import sys
+item = json.load(open(sys.argv[1]))['candidates'][sys.argv[2]]
+assert item['state'] == 'queued'
+assert item['confirmed_launch']['generation'] == item['generation']
+assert 'launch' not in item and 'observed_start' not in item
+PY
+      guard=$(FM_HOME="$(home_of "$case_dir")" "$ROOT/bin/fm-ready-review.sh" guard main 2>&1) \
+        && fail 'pending manual transition acknowledged a ready obligation'
+      assert_contains "$guard" 'unhandled ready review' 'pending manual launch lost its review obligation'
+      gen=$(sed -n 's/^spawn_gen=//p' "$(home_of "$case_dir")/state/$id.meta")
+      out=$(FM_HOME="$(home_of "$case_dir")" "$ROOT/bin/fm-ready-review.sh" launch "$id" "$gen" 2>&1) \
+        && fail 'direct manual hook retry manufactured launch provenance'
+      assert_contains "$out" 'requires the confirmed fm-spawn caller' 'direct retry lost its provenance refusal'
+    done
+  done
+  pass 'genuine manual queued ship/scout launches retain pending accounting without editing the backlog'
+}
+
 test_manual_backend_home_dispatches_and_completes_without_touching_the_backlog() {
   local case_dir id data data_resolved out
   id=atomic-manual-b12
@@ -3037,6 +3081,7 @@ test_a_persistent_secondmate_is_never_a_backlog_item() {
 
 test_backend_resolution_preserves_config_errors
 test_backend_resolution_preserves_precedence_and_defaults
+test_manual_queued_launch_retains_pending_accounting
 test_backlog_callers_refuse_unreadable_backend_config
 test_captain_hold_preserves_relocated_backlog_on_backend_error
 test_dispatch_moves_the_item_in_flight_in_the_same_run

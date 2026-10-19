@@ -14,10 +14,9 @@
 // captain-facing outcome opens one sequence-keyed processing turn on main
 // that stays open until main acknowledges that sequence (see
 // presentUnprocessedOutcomes).
-// Main's captain/assistant dialog is mirrored into the branch as read-only
-// fm-main-mirror context from Pi's
-// before_agent_start prompt and at main's turn_end. Pi-only by construction: this
-// file lives in .pi/extensions, so no
+// Dialog mirroring: docs/pi-supervision-branch.md
+// "How the branch knows what the captain said" owns staging and filtering.
+// Pi-only by construction: this file lives in .pi/extensions, so no
 // other harness ever loads it. Supervision is default-on for every task once
 // this Pi session owns the fleet lock: no captain grant file is required.
 // A broken branch between its bounded recovery probes keeps today's
@@ -89,26 +88,18 @@ import {
   DefaultResourceLoader,
   DynamicBorder,
   getAgentDir,
-  keyHint,
   ModelRuntime,
   type ModelRegistry,
   SessionManager,
-  ToolExecutionComponent,
-  VERSION,
   type AgentSession,
   type ExtensionAPI,
   type ExtensionCommandContext,
   type ToolDefinition,
 } from "@earendil-works/pi-coding-agent";
-import { Box, Container, fuzzyFilter, Input, SelectList, Text } from "@earendil-works/pi-tui";
+import { Container, fuzzyFilter, Input, SelectList, Text } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
 import { registerFirstmateTool } from "./lib/fm-native-contract.ts";
 import { runCommandAsync } from "./lib/fm-async-exec.ts";
-import {
-  type CalmPresentationState,
-  calmTranscriptClassIsVisible,
-  FIRSTMATE_CALM_PRESENTATION_EVENT,
-} from "./lib/fm-calm-visibility.ts";
 import {
   activateEligibleRowsOwner,
   afkPostureRecordPresent,
@@ -196,6 +187,7 @@ const PROCESSING_INSTRUCTION =
   "Your reply to the captain covers only the still-open outcomes: give the captain a visible response where one is due, answer or escalate a decision, or act on a blocker or failure. " +
   "Write that reply as if the settled outcomes had never been listed: leave them out entirely, without naming them, summarizing them, or saying they are settled, because checking them is all the processing they need apart from any ready-work handoff. " +
   "Before acknowledging any outcome, including one whose source task has settled, act on every ready-work handoff it contains: check each named unit and dispatch it in this turn, or record its not-ready reason and the condition that must change before retrying on its backlog note; an applicable recorded reason suppresses repeat handoffs. " +
+  "Run bin/fm-ready-review.sh scan and use its generation-bound stop command after recording each current stop; acknowledgment is guarded by that owner and a note alone does not discharge the review. " +
   "When every outcome below is processed, call fm_branch_processed with through={N} exactly once. " +
   "Until that call the outcomes stay open and are presented again; an answer that does not make that call never counts as processing.";
 type MirrorItem = { tag: "captain" | "main"; text: string };
@@ -517,9 +509,8 @@ function sameOutcome(left: OutcomeRow, right: OutcomeRow): boolean {
 type MirrorCollectionState = {
   collectAnchor: MirrorCursor | null;
   pendingCursor: MirrorCursor | null;
-  // Pi emits before_agent_start before it appends that turn's user message to
-  // SessionManager. The prompt is mirrored from the event immediately, then
-  // this marker suppresses the same persisted entry when turn_end collects it.
+  // Suppress the persisted copy of a staged captain prompt; staging and
+  // filtering follow docs/pi-supervision-branch.md's mirroring contract.
   stagedCaptain: { file: string; index: number; text: string } | null;
   // Set at every main session start, where the branch conversation is
   // replaced too (createBranch). The durable cursor records what the PREVIOUS
@@ -1677,13 +1668,13 @@ ${context.command}
     if (!(await enqueueDelivery(() => actingAsOwner(promptGeneration)))) return;
     if (promptGeneration !== generation || !currentMainSession || !collectCurrentMainDialog()) return;
 
-    // This event is Pi's authoritative complete current prompt. At this point
-    // SessionManager still contains only the preceding dialog, so relying on
-    // getEntries() here loses the captain request that the next wake may answer.
-    // Stage it verbatim and remember the future persisted index for turn_end's
-    // duplicate suppression. Operational extension injections are not dialog.
+    // Custom runs can own a processing request, but never become captain dialog.
+    const startedContent = event.messageType === "user" ? event.prompt : event.message.content;
+    processingOpenedThisRun = queuedProcessingContent !== null &&
+      (event.messageType === "user" || isProcessingCustomMessage(event.message)) &&
+      startedContent === queuedProcessingContent;
+    if (event.messageType !== "user") return;
     const prompt = event.prompt;
-    processingOpenedThisRun = queuedProcessingContent !== null && prompt === queuedProcessingContent;
     const trimmed = prompt.trim();
     if (!trimmed || isOperationalUserText(trimmed)) return;
     const file = currentMainSession.getSessionFile() ?? "";
@@ -1712,7 +1703,8 @@ ${context.command}
       event.message.content === queuedProcessingContent
     ) {
       // message_start covers both an idle custom prompt and a follow-up
-      // consumed inside an existing run; neither needs before_agent_start.
+      // consumed inside an existing run. Keep the queued identity through
+      // before_agent_start until this matching message actually starts.
       activeProcessing = !userMessageThisTurn && processing ? { request: processing, retry: processing.triggered > 1 } : null;
       queuedProcessingContent = null;
     }
@@ -1771,9 +1763,9 @@ ${context.command}
     });
   });
 
-  // before_agent_start stages Pi's authoritative in-flight prompt before
-  // SessionManager persists it. The dispatch handler then collects any newly
-  // persisted dialog immediately before accepting a wake, so all context joins
+  // Staging and filtering follow docs/pi-supervision-branch.md's mirroring
+  // contract. The dispatch handler collects newly persisted dialog immediately
+  // before accepting a wake, so all context joins
   // the serialized chain before that wake's branch prompt. turn_end remains
   // the idle-path mirror flush. The durable cursor advances only in
   // flushMirror after the complete pending batch reaches the branch.
@@ -2132,138 +2124,7 @@ ${context.command}
     return applied === pin ? `Effort: ${pin}.` : `Effort: ${pin}, which this model runs at ${applied}.`;
   }
 
-  let calmPresentation: CalmPresentationState = {
-    active: false,
-    stockExportRendering: false,
-  };
-  pi.events?.on?.(FIRSTMATE_CALM_PRESENTATION_EVENT, (data) => {
-    const next = data as Partial<CalmPresentationState>;
-    calmPresentation = {
-      active: next.active === true,
-      stockExportRendering: next.stockExportRendering === true,
-    };
-  });
-  const calmHides = (itemClass: Parameters<typeof calmTranscriptClassIsVisible>[0]): boolean =>
-    calmPresentation.active &&
-    !calmPresentation.stockExportRendering &&
-    !calmTranscriptClassIsVisible(itemClass);
-
-  const outcomesToolAnsiPattern = new RegExp(
-    "(?:\\u001B\\][\\s\\S]*?(?:\\u0007|\\u001B\\u005C|\\u009C))|[\\u001B\\u009B][[\\]\\()#;?]*(?:\\d{1,4}(?:[;:]\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]",
-    "g",
-  );
-  const normalizeOutcomesToolOutput = (value: string): string => {
-    const withoutAnsi = value.includes("\u001B") || value.includes("\u009B")
-      ? value.replace(outcomesToolAnsiPattern, "")
-      : value;
-    return Array.from(withoutAnsi)
-      .filter((char) => {
-        const code = char.codePointAt(0);
-        if (code === undefined) return false;
-        if (code === 0x09 || code === 0x0a || code === 0x0d) return true;
-        if (code <= 0x1f) return false;
-        return code < 0xfff9 || code > 0xfffb;
-      })
-      .join("")
-      .replace(/\r/g, "");
-  };
-
-  let stockOutcomesPreviewLines: number | null | undefined;
-  const getStockOutcomesPreviewLines = (): number | undefined => {
-    if (stockOutcomesPreviewLines !== undefined) return stockOutcomesPreviewLines ?? undefined;
-    const probeTokens = Array.from(
-      { length: 64 },
-      (_, index) => `FM_OUTCOMES_PREVIEW_PROBE_${String(index).padStart(2, "0")}`,
-    );
-    try {
-      const probeDefinition: ToolDefinition = {
-        name: "fm_outcomes_preview_probe",
-        label: "Preview probe",
-        description: "Preview probe",
-        parameters: Type.Object({}),
-        execute: async () => ({ content: [], details: undefined }),
-      };
-      const probe = new ToolExecutionComponent(
-        probeDefinition.name,
-        "fm-outcomes-preview-probe",
-        {},
-        { showImages: false },
-        probeDefinition,
-        { requestRender() {} } as ConstructorParameters<typeof ToolExecutionComponent>[5],
-        root,
-      );
-      probe.updateResult({
-        content: [{ type: "text", text: probeTokens.join("\n") }],
-        isError: false,
-      });
-      const rendered = probe.render(4096).join("\n");
-      const visibleLines = probeTokens.filter((token) => rendered.includes(token)).length;
-      stockOutcomesPreviewLines = visibleLines > 0 && visibleLines < probeTokens.length ? visibleLines : null;
-    } catch {
-      stockOutcomesPreviewLines = null;
-    }
-    return stockOutcomesPreviewLines ?? undefined;
-  };
-
-  type OutcomesToolShellState = {
-    shell?: Box;
-    call?: Text;
-    result?: Text | Container;
-  };
-  const refreshOutcomesToolShell = (
-    shellState: OutcomesToolShellState,
-    theme: Parameters<NonNullable<ToolDefinition["renderCall"]>>[1],
-    context: Parameters<NonNullable<ToolDefinition["renderCall"]>>[2],
-  ): Box => {
-    const background = context.isPartial
-      ? (text: string) => theme.bg("toolPendingBg", text)
-      : context.isError
-        ? (text: string) => theme.bg("toolErrorBg", text)
-        : (text: string) => theme.bg("toolSuccessBg", text);
-    const shell = shellState.shell ?? new Box(1, 1, background);
-    shellState.shell = shell;
-    shell.setBgFn(background);
-    shell.clear();
-    if (shellState.call) shell.addChild(shellState.call);
-    if (shellState.result) shell.addChild(shellState.result);
-    return shell;
-  };
-
-  // Pi's stock call header (formatToolCallWithArgs) is not a public export.
-  // Before Pi 0.99 it is the bold title alone. Since Pi 0.99 a collapsed call
-  // is `title key=json` on the title line, cut at 100 characters, and an
-  // expanded call puts one muted `key: value` line under the title. Calm-off
-  // rendering has to match the installed Pi or the stock comparison fails.
-  // Keep this in step with that function.
-  const [stockMajor = 0, stockMinor = 0] = VERSION.split(".").map((part) => Number.parseInt(part, 10) || 0);
-  const stockCallHeaderShowsArgs = stockMajor > 0 || stockMinor >= 99;
-  const stockCollapsedArgsChars = 100;
-  const stockToolCallHeader = (
-    title: string,
-    args: unknown,
-    theme: Parameters<NonNullable<ToolDefinition["renderCall"]>>[1],
-    expanded: boolean,
-  ): string => {
-    const header = theme.fg("toolTitle", theme.bold(title));
-    if (!stockCallHeaderShowsArgs || args == null) return header;
-    const entries = typeof args === "object" && !Array.isArray(args)
-      ? Object.entries(args)
-      : [["args", args] as [string, unknown]];
-    if (entries.length === 0) return header;
-    if (expanded) {
-      const lines = entries.map(([key, value]) => {
-        const text = typeof value === "string" ? value : (JSON.stringify(value, null, 2) ?? String(value));
-        return `  ${key}: ${text.replace(/\t/g, "   ").replace(/\r/g, "").split("\n").join("\n    ")}`;
-      });
-      return `${header}\n${theme.fg("muted", lines.join("\n"))}`;
-    }
-    const pairs = entries.map(([key, value]) => `${key}=${JSON.stringify(value) ?? String(value)}`).join(" ");
-    const preview = pairs.length > stockCollapsedArgsChars
-      ? `${pairs.slice(0, stockCollapsedArgsChars - 3)}...`
-      : pairs;
-    return `${header} ${theme.fg("muted", preview)}`;
-  };
-
+  // Pi owns tool rendering; Calm's resolver hides the complete stock row.
   registerFirstmateTool(pi, {
     name: "fm_branch_outcomes",
     label: "Read supervision branch outcomes",
@@ -2273,36 +2134,6 @@ ${context.command}
     parameters: Type.Object({
       recent: Type.Optional(Type.Number({ description: "How many most-recent outcomes to read (default 20)" })),
     }),
-    renderShell: "self",
-    renderCall: (args, theme, context) => {
-      if (calmPresentation.stockExportRendering) throw new Error("Use Pi stock export rendering");
-      if (calmHides("assistant-tool-call")) return new Container();
-      const shellState = context.state as OutcomesToolShellState;
-      shellState.call = new Text(stockToolCallHeader("fm_branch_outcomes", args, theme, context.expanded), 0, 0);
-      return refreshOutcomesToolShell(shellState, theme, context);
-    },
-    renderResult: (result, options, theme, context) => {
-      if (calmPresentation.stockExportRendering) throw new Error("Use Pi stock export rendering");
-      if (calmHides("tool-result")) return new Container();
-      const output = result.content
-        .filter((item) => item.type === "text")
-        .map((item) => normalizeOutcomesToolOutput(item.text))
-        .join("\n");
-      const shellState = context.state as OutcomesToolShellState;
-      // Keep each line's ANSI scope independent, matching Pi's stock fallback.
-      // Pi 0.84.4 no longer supplies an implicit reset at multiline boundaries.
-      const lines = output.split("\n");
-      const previewLines = getStockOutcomesPreviewLines();
-      const displayLines = options.expanded || previewLines === undefined ? lines : lines.slice(0, previewLines);
-      const remaining = lines.length - displayLines.length;
-      let renderedOutput = displayLines.map((line) => theme.fg("toolOutput", line)).join("\n");
-      if (remaining > 0) {
-        renderedOutput += `${theme.fg("muted", `\n... (${remaining} more lines,`)} ${keyHint("app.tools.expand", "to expand")}${theme.fg("muted", ")")}`;
-      }
-      shellState.result = output ? new Text(renderedOutput, 0, 0) : new Container();
-      refreshOutcomesToolShell(shellState, theme, context);
-      return new Container();
-    },
     execute: async (_toolCallId, params) => {
       const recentRaw = (params as { recent?: unknown }).recent;
       const recent = typeof recentRaw === "number" && recentRaw >= 1 ? String(Math.floor(recentRaw)) : "20";
@@ -2335,26 +2166,6 @@ ${context.command}
     parameters: Type.Object({
       through: Type.Number({ description: "The highest outcome sequence number this conversation has processed" }),
     }),
-    renderShell: "self",
-    renderCall: (args, theme, context) => {
-      if (calmPresentation.stockExportRendering) throw new Error("Use Pi stock export rendering");
-      if (calmHides("assistant-tool-call")) return new Container();
-      const shellState = context.state as OutcomesToolShellState;
-      shellState.call = new Text(stockToolCallHeader("fm_branch_processed", args, theme, context.expanded), 0, 0);
-      return refreshOutcomesToolShell(shellState, theme, context);
-    },
-    renderResult: (result, _options, theme, context) => {
-      if (calmPresentation.stockExportRendering) throw new Error("Use Pi stock export rendering");
-      if (calmHides("tool-result")) return new Container();
-      const output = result.content
-        .filter((item) => item.type === "text")
-        .map((item) => normalizeOutcomesToolOutput(item.text))
-        .join("\n");
-      const shellState = context.state as OutcomesToolShellState;
-      shellState.result = output ? new Text(theme.fg("toolOutput", output), 0, 0) : new Container();
-      refreshOutcomesToolShell(shellState, theme, context);
-      return new Container();
-    },
     execute: async (_toolCallId, params) => {
       const raw = (params as { through?: unknown }).through;
       const through = typeof raw === "number" && Number.isSafeInteger(raw) && raw >= 1 ? raw : null;

@@ -64,10 +64,15 @@ if [ "${1:-}" = --handling-delivered ]; then
   printf 'confirmed generation=%s watcher=%s\n' "$2" "$4" >> "${FM_LIVE_WATCH_LOG:?}"
   exit 0
 fi
+# Model --restart takeover of the retained predecessor on a same-process
+# session replacement, with one fixture arm owning the next wake.
+arm_pid_file="${FM_LIVE_WATCH_LOG:?}.pid"
+printf '%s\n' "$$" > "$arm_pid_file"
 printf 'arm pid=%s\n' "$$" >> "${FM_LIVE_WATCH_LOG:?}"
 printf 'watcher: started pid=%s (beacon fresh) recovery-generation=live-sdk-generation\n' "$$"
 trap 'exit 0' TERM INT
 while :; do
+  [ "$(cat "$arm_pid_file")" = "$$" ] || exit 0
   if [ -e "$FM_LIVE_WATCH_TRIGGER" ]; then
     reason=$(cat "$FM_LIVE_WATCH_TRIGGER")
     rm -f "$FM_LIVE_WATCH_TRIGGER"
@@ -135,10 +140,10 @@ const pi = {
   async sendUserMessage(content, options) {
     mainUserMessages.push({ content, options: options ?? {} });
     for (const handler of piHandlers.get("before_agent_start") ?? []) {
-      await handler({ prompt: content }, sessionCtx);
+      await handler({ type: "before_agent_start", messageType: "user", prompt: content }, sessionCtx);
     }
     for (const handler of piHandlers.get("message_start") ?? []) {
-      await handler({ message: { role: "user", content: [{ type: "text", text: content }] } }, sessionCtx);
+      await handler({ type: "message_start", message: { role: "user", content: [{ type: "text", text: content }] } }, sessionCtx);
     }
   },
 };
@@ -222,13 +227,24 @@ if (!existsSync(`${home}/state/branch-session`)) {
 // and reject the offer back to watcher-owned main delivery rather than
 // silently running the branch on whatever model main would have used.
 writeFileSync(`${home}/config/supervision-branch-model`, "openai/no-such-live-model\n");
+const previousArmPid = Number(readFileSync(process.env.FM_LIVE_WATCH_LOG, "utf8")
+  .split(/\n/).filter((line) => line.startsWith("arm ")).at(-1).match(/pid=([0-9]+)/)[1]);
+process.kill(previousArmPid, 0);
 for (const handler of piHandlers.get("session_shutdown") ?? []) {
   await handler({ type: "session_shutdown", reason: "new" }, sessionCtx);
 }
+// Replacement shutdown retains this live child until the next arm takes over.
+process.kill(previousArmPid, 0);
 for (const handler of piHandlers.get("session_start") ?? []) {
   await handler({ type: "session_start", reason: "new" }, sessionCtx);
 }
 await waitFor(() => armCount() >= 3, "replacement watcher arm");
+// A replacement arm must retire the retained predecessor, as --restart does
+// in the real shell watcher, before another wake can be published.
+await waitFor(() => {
+  try { process.kill(previousArmPid, 0); return false; }
+  catch (error) { if (error.code === "ESRCH") return true; throw error; }
+}, "replacement watcher to retire its predecessor");
 writeFileSync(`${home}/state/.wake-queue`, "1\t2\tsignal\tlive-probe.status\tsignal: live pin probe\n");
 writeFileSync(process.env.FM_LIVE_WATCH_TRIGGER, "signal: live pin probe\n");
 await waitFor(() => mainUserMessages.length === 2, "pinned watcher-owned main delivery");
@@ -342,10 +358,10 @@ const pi = {
   async sendUserMessage(content, options) {
     mainUserMessages.push({ content, options: options ?? {} });
     for (const handler of piHandlers.get("before_agent_start") ?? []) {
-      await handler({ prompt: content }, sessionCtx);
+      await handler({ type: "before_agent_start", messageType: "user", prompt: content }, sessionCtx);
     }
     for (const handler of piHandlers.get("message_start") ?? []) {
-      await handler({ message: { role: "user", content: [{ type: "text", text: content }] } }, sessionCtx);
+      await handler({ type: "message_start", message: { role: "user", content: [{ type: "text", text: content }] } }, sessionCtx);
     }
   },
   getThinkingLevel() {
@@ -455,20 +471,21 @@ cat > "$modeldir/models.json" <<'JSON'
 JSON
 PI_PACKAGE_DIR="$PI_PACKAGE_DIR" PI_CODING_AGENT_DIR="$modeldir" FM_LIVE_SESSIONS="$TMP_ROOT/model-sessions" \
   node --input-type=module > "$TMP_ROOT/model-output" 2>&1 <<'EOF'
+import { existsSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 const pkg = pathToFileURL(`${process.env.PI_PACKAGE_DIR}/dist/index.js`).href;
-const { ModelRegistry, ModelRuntime, SessionManager, createAgentSession } = await import(pkg);
+const { ModelRegistry, ModelRuntime, SessionManager, SettingsManager, createAgentSession } = await import(pkg);
 const runtime = await ModelRuntime.create({
   authPath: `${process.env.PI_CODING_AGENT_DIR}/auth.json`,
   modelsPath: `${process.env.PI_CODING_AGENT_DIR}/models.json`,
 });
 const registry = new ModelRegistry(runtime);
-await registry.refresh();
+await registry.refresh({ allowNetwork: false });
 
 // The candidates resolve through the same registry calls the picker makes.
-const first = registry.find("fm-live-fake", "fm-live-a");
-const second = registry.find("fm-live-fake", "fm-live-b");
+const first = registry.find("fm-live-fake", "fm-live-b");
+const second = registry.find("fm-live-fake", "fm-live-a");
 if (!first || !second) throw new Error("the real registry did not resolve the locally declared models");
 if (!registry.hasConfiguredAuth(first)) throw new Error("hasConfiguredAuth rejected a locally declared model with a key");
 if (!registry.getAvailable().some((model) => model.id === "fm-live-a")) {
@@ -477,23 +494,52 @@ if (!registry.getAvailable().some((model) => model.id === "fm-live-a")) {
 
 const cwd = process.cwd();
 const sessions = process.env.FM_LIVE_SESSIONS;
+// Keep the unrecorded fallback distinct from the recorded selection, so a
+// missing session file or ignored restore cannot accidentally pass.
+const settings = SettingsManager.inMemory({ defaultProvider: "fm-live-fake", defaultModel: "fm-live-a" });
+const fallback = await createAgentSession({
+  cwd,
+  sessionManager: SessionManager.inMemory(cwd),
+  settingsManager: settings,
+  modelRuntime: runtime,
+  tools: [],
+});
+if (fallback.session.model?.id !== "fm-live-a") {
+  throw new Error(`the control session did not use its distinct default model: ${fallback.session.model?.id}`);
+}
+await fallback.session.dispose();
 const creating = SessionManager.create(cwd, sessions);
-const created = await createAgentSession({ cwd, sessionManager: creating, modelRuntime: runtime, model: first, tools: [] });
-if (created.session.model?.id !== "fm-live-a") {
+const created = await createAgentSession({ cwd, sessionManager: creating, settingsManager: settings, modelRuntime: runtime, model: first, tools: [] });
+if (created.session.model?.id !== "fm-live-b") {
   throw new Error(`a pinned model was not applied on create: ${created.session.model?.id}`);
 }
+// A real conversation entry makes Pi flush its setup entries to disk.
+// Construction alone deliberately leaves a new session file absent.
+const fixturePrompt = "Controlled model restoration fixture.";
+creating.appendMessage({ role: "user", content: [{ type: "text", text: fixturePrompt }], timestamp: 1 });
 const sessionFile = creating.getSessionFile();
+if (!sessionFile || !existsSync(sessionFile)) {
+  throw new Error("the model restoration fixture did not persist its real session file");
+}
+const reopened = SessionManager.open(sessionFile, sessions);
+const persisted = reopened.buildSessionContext();
+if (persisted.model?.provider !== "fm-live-fake" || persisted.model?.modelId !== "fm-live-b" ||
+    !persisted.messages.some((message) => message.role === "user" &&
+      message.content.some((part) => part.type === "text" && part.text === fixturePrompt))) {
+  throw new Error(`the real session did not restore its exact recorded model and conversation: ${JSON.stringify(persisted)}`);
+}
 
 // Reopen the SAME session with a different pin: the explicit model must win
 // over the one the session recorded.
 const repinned = await createAgentSession({
   cwd,
   sessionManager: SessionManager.open(sessionFile, sessions),
+  settingsManager: settings,
   modelRuntime: runtime,
   model: second,
   tools: [],
 });
-if (repinned.session.model?.id !== "fm-live-b") {
+if (repinned.session.model?.id !== "fm-live-a") {
   throw new Error(`a reopened session ignored the pin and kept its recorded model: ${repinned.session.model?.id}`);
 }
 
@@ -502,10 +548,11 @@ if (repinned.session.model?.id !== "fm-live-b") {
 const unpinned = await createAgentSession({
   cwd,
   sessionManager: SessionManager.open(sessionFile, sessions),
+  settingsManager: settings,
   modelRuntime: runtime,
   tools: [],
 });
-if (unpinned.session.model?.id !== "fm-live-a") {
+if (unpinned.session.model?.id !== "fm-live-b") {
   throw new Error(`an unpinned reopen did not restore the session's own model: ${unpinned.session.model?.id}`);
 }
 console.log("MODEL_OK");
@@ -573,7 +620,7 @@ const runtime = await ModelRuntime.create({
   modelsPath: `${process.env.PI_CODING_AGENT_DIR}/models.json`,
 });
 const registry = new ModelRegistry(runtime);
-await registry.refresh();
+await registry.refresh({ allowNetwork: false });
 
 const deep = registry.find("fm-live-fake", "fm-live-deep");
 const shallow = registry.find("fm-live-fake", "fm-live-shallow");
@@ -909,7 +956,7 @@ const runtime = await ModelRuntime.create({
   modelsPath: `${agentDir}/models.json`,
 });
 const registry = new ModelRegistry(runtime);
-await registry.refresh();
+await registry.refresh({ allowNetwork: false });
 const model = registry.find("fm-live-stream", "fm-live-stream-model");
 if (!model) throw new Error("the real registry did not resolve the local streaming model");
 const { session } = await createAgentSession({

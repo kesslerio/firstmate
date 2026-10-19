@@ -24,6 +24,41 @@ export NODE_NO_WARNINGS=1
 # tests are sized against this number.
 ARM_READY_TIMEOUT_MS=2000
 
+# Observe the kernel start identity even while an exited child awaits reaping.
+# The normal process identity helper also reads cmdline, which is empty for zombies.
+ARM_CHILD_IDENTITY_SCRIPT="$TMP_ROOT/arm-child-identity.sh"
+cat > "$ARM_CHILD_IDENTITY_SCRIPT" <<'SH'
+#!/usr/bin/env bash
+pid=$1
+case "$pid" in ''|*[!0-9]*) exit 1 ;; esac
+if [ -r "/proc/$pid/stat" ]; then
+  read -r stat_line < "/proc/$pid/stat" || exit 1
+  read -r -a fields <<< "${stat_line##*)}"
+  [ "${#fields[@]}" -ge 20 ] || exit 1
+  printf 'start=%s\n' "${fields[19]}"
+else
+  identity=$(LC_ALL=C ps -p "$pid" -o lstart= 2>/dev/null) || exit 1
+  [ -n "$identity" ] || exit 1
+  printf '%s\n' "$identity"
+fi
+SH
+
+wait_for_pi_arm_child_cleanup() { # <pid> <start-identity> <TERM-log>
+  local pid=$1 expected=$2 log=$3 current i=0
+  # TERM receipt precedes exit and wait. Spend one completion budget on all three.
+  while [ "$i" -lt 250 ]; do
+    if kill -0 "$pid" 2>/dev/null; then
+      current=$(bash "$ARM_CHILD_IDENTITY_SCRIPT" "$pid") || current=""
+      [ -z "$current" ] || [ "$current" = "$expected" ] || return 2
+    elif grep -qx "$pid" "$log" 2>/dev/null; then
+      return 0
+    fi
+    sleep 0.02
+    i=$((i + 1))
+  done
+  return 1
+}
+
 install_pi_watch_extension_fixture() {
   local repo=$1
   mkdir -p \
@@ -3396,7 +3431,7 @@ done
 SH
   chmod +x "$repo/bin/fm-watch-arm.sh"
   out=$(PLUGIN="$plugin" FM_HOME="$home" FM_ROOT_OVERRIDE="$repo" FM_TRIGGER_FILE="$trigger" node --input-type=module 2>&1 <<'EOF'
-import { writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 function makePi() {
@@ -3470,13 +3505,43 @@ await waitFor(
 if (finalSession.prompts.filter((message) => message.includes("signal: streaming queued actionable outcome")).length !== 1) {
   throw new Error(`second replacement did not replay the idle queued follow-up exactly once: ${finalSession.prompts.join(" | ")}`);
 }
-finalSession.handlers.get("before_agent_start")?.({ prompt: finalSession.prompts[0] }, {});
+const handoffPath = `${process.env.FM_HOME}/state/extensions/pi-primary-watch/session-replacement-actionable.json`;
+const pendingBefore = readFileSync(handoffPath, "utf8");
+const beforeStart = (session, trigger) => session.handlers.get("before_agent_start")?.({
+  type: "before_agent_start", systemPrompt: "", systemPromptOptions: {}, ...trigger,
+}, {});
+// No prompt field exists on custom starts, even when the custom text is an
+// exact copy of the pending user wake. Neither kind of custom content consumes it.
+for (const content of ["unrelated custom text", finalSession.prompts[0]]) {
+  beforeStart(finalSession, { messageType: "custom", message: {
+    role: "custom", customType: "fixture-notice", content, display: false, timestamp: 0,
+  } });
+  if (readFileSync(handoffPath, "utf8") !== pendingBefore) throw new Error("custom start consumed a user wake");
+}
+beforeStart(finalSession, { messageType: "user", prompt: "ordinary nonmatching user text" });
+if (readFileSync(handoffPath, "utf8") !== pendingBefore) throw new Error("nonmatching user consumed a wake");
+// A replaced generation must not consume the replacement's durable handoff.
+beforeStart(original, { messageType: "user", prompt: original.prompts[0] });
+if (!existsSync(handoffPath) || readFileSync(handoffPath, "utf8") !== pendingBefore) throw new Error("stale generation consumed a replacement wake");
+unlinkSync(`${process.env.FM_HOME}/state/.lock`);
+beforeStart(finalSession, { messageType: "user", prompt: finalSession.prompts[0] });
+if (!existsSync(handoffPath) || readFileSync(handoffPath, "utf8") !== pendingBefore) {
+  throw new Error("lockless user start consumed a generation-owned wake");
+}
+writeFileSync(`${process.env.FM_HOME}/state/.lock`, "1\n");
+beforeStart(finalSession, { messageType: "user", prompt: finalSession.prompts[0] });
+if (!existsSync(handoffPath) || readFileSync(handoffPath, "utf8") !== pendingBefore) {
+  throw new Error("foreign-lock user start consumed a generation-owned wake");
+}
+writeFileSync(`${process.env.FM_HOME}/state/.lock`, `${process.pid}\n`);
+beforeStart(finalSession, { messageType: "user", prompt: finalSession.prompts[0] });
+if (existsSync(handoffPath)) throw new Error("matching owned user start did not consume the wake");
 await new Promise((resolve) => setTimeout(resolve, 20));
 process.exit(0);
 EOF
 )
   status=$?
-  expect_code 0 "$status" "Pi replacement must replay a streaming follow-up before consumption"
+  expect_code 0 "$status" "Pi replacement must replay a streaming follow-up before consumption: $out"
   [ -z "$out" ] || fail "Pi streaming follow-up replacement test printed output: $out"
   pass "Pi replacement replays a streaming follow-up before consumption"
 }
@@ -3530,7 +3595,7 @@ const pi = {
     prompts.push(message);
     if (streaming) return;
     beforeAgentStarts += 1;
-    handlers.get("before_agent_start")?.({ prompt: message }, {});
+    handlers.get("before_agent_start")?.({ type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: message }, {});
   },
   events: { on() {}, emit() {} },
 };
@@ -3565,6 +3630,12 @@ if (wakes("signal: streaming chain wake 2") !== 1) throw new Error(`wrong second
 await waitFor(() => arms() === 3, "successor after the second streaming-time delivery");
 if (beforeAgentStarts !== 0) throw new Error(`streaming follow-ups raised before_agent_start ${beforeAgentStarts} times`);
 
+// A custom run carrying the same text is not consumption of the user wake.
+// Only the real user message below consumes it; the second wake must replay.
+handlers.get("before_agent_start")?.({
+  messageType: "custom",
+  message: { role: "custom", customType: "test-custom", content: prompts[1], display: false },
+}, {});
 // The run reaches the first queued follow-up; the second is still queued when
 // the captain replaces the session, so only the second rides the handoff.
 consumeQueued(prompts[0]);
@@ -3991,7 +4062,7 @@ if (!prompts[1].includes("signal: persistence failure actionable outcome")) {
 if (!prompts[1].includes("could not persist a replacement-session actionable wake")) {
   throw new Error(`replacement did not surface the persistence failure: ${prompts[1]}`);
 }
-handlers.get("before_agent_start")?.({ prompt: prompts[1] }, {});
+handlers.get("before_agent_start")?.({ type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: prompts[1] }, {});
 process.exit(0);
 EOF
 )
@@ -4045,7 +4116,7 @@ EOF
 }
 
 test_pi_process_exit_cleanup_stops_arm_child() {
-  local repo home plugin cleanup_log pid_file out status pid i
+  local repo home plugin cleanup_log pid_file out status pid identity
   repo="$TMP_ROOT/pi-process-exit-root"
   home="$TMP_ROOT/pi-process-exit-home"
   cleanup_log="$TMP_ROOT/pi-process-exit-cleaned"
@@ -4056,12 +4127,14 @@ test_pi_process_exit_cleanup_stops_arm_child() {
   cat > "$repo/bin/fm-watch-arm.sh" <<'SH'
 #!/usr/bin/env bash
 trap 'printf "%s\n" "$$" >> "$FM_CLEANUP_LOG"; exit 0' TERM
+bash "$FM_CHILD_IDENTITY_SCRIPT" "$$" > "$FM_CHILD_PID_FILE.$$.identity" || exit 1
 printf '%s\n' "$$" > "$FM_CHILD_PID_FILE"
 while :; do sleep 1; done
 SH
   chmod +x "$repo/bin/fm-watch-arm.sh"
-  out=$(PLUGIN="$plugin" FM_HOME="$home" FM_ROOT_OVERRIDE="$repo" FM_CLEANUP_LOG="$cleanup_log" FM_CHILD_PID_FILE="$pid_file" node --input-type=module 2>&1 <<'EOF'
+  out=$(PLUGIN="$plugin" FM_HOME="$home" FM_ROOT_OVERRIDE="$repo" FM_CLEANUP_LOG="$cleanup_log" FM_CHILD_PID_FILE="$pid_file" FM_CHILD_IDENTITY_SCRIPT="$ARM_CHILD_IDENTITY_SCRIPT" node --input-type=module 2>&1 <<'EOF'
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
 let tool = null;
@@ -4085,6 +4158,14 @@ for (let i = 0; i < 250 && !existsSync(process.env.FM_CHILD_PID_FILE); i += 1) {
 }
 if (!existsSync(process.env.FM_CHILD_PID_FILE)) throw new Error("arm child did not start");
 const firstChild = readFileSync(process.env.FM_CHILD_PID_FILE, "utf8").trim();
+const verifyOwnedChild = (pid) => {
+  const parent = execFileSync("ps", ["-p", pid, "-o", "ppid="], { encoding: "utf8" }).trim();
+  if (parent !== String(process.pid)) throw new Error(`arm child ${pid} is not owned by this Pi fixture`);
+  const expected = readFileSync(`${process.env.FM_CHILD_PID_FILE}.${pid}.identity`, "utf8").trim();
+  const current = execFileSync("bash", [process.env.FM_CHILD_IDENTITY_SCRIPT, pid], { encoding: "utf8" }).trim();
+  if (!expected || current !== expected) throw new Error(`arm child ${pid} changed identity`);
+};
+verifyOwnedChild(firstChild);
 await handlers.get("session_shutdown")?.({ type: "session_shutdown" }, {});
 await handlers.get("session_start")?.({ type: "session_start" }, {});
 await tool.execute("tool-call-replacement", {}, undefined, undefined, {});
@@ -4096,6 +4177,7 @@ for (let i = 0; i < 250; i += 1) {
 if (readFileSync(process.env.FM_CHILD_PID_FILE, "utf8").trim() === firstChild) {
   throw new Error("replacement arm child did not start");
 }
+verifyOwnedChild(readFileSync(process.env.FM_CHILD_PID_FILE, "utf8").trim());
 process.exit(0);
 EOF
 )
@@ -4103,17 +4185,50 @@ EOF
   expect_code 0 "$status" "Pi process exit must run the watcher cleanup fallback"
   [ -z "$out" ] || fail "Pi process-exit cleanup test printed output: $out"
   pid=$(cat "$pid_file")
-  i=0
-  while [ "$i" -lt 250 ] && ! grep -qx "$pid" "$cleanup_log" 2>/dev/null; do
-    sleep 0.02
-    i=$((i + 1))
-  done
+  identity=$(cat "$pid_file.$pid.identity")
+  wait_for_pi_arm_child_cleanup "$pid" "$identity" "$cleanup_log"
+  status=$?
+  [ "$status" -ne 2 ] || fail "Pi arm child $pid was replaced by an unrelated process identity"
   grep -qx "$pid" "$cleanup_log" 2>/dev/null || fail "Pi process-exit fallback did not deliver TERM to the replacement arm child"
   if kill -0 "$pid" 2>/dev/null; then
-    kill -TERM "$pid" 2>/dev/null || true
     fail "Pi arm child $pid survived process-exit cleanup"
   fi
   pass "Pi process-exit cleanup stops the attached arm child"
+}
+
+test_pi_process_exit_cleanup_rejects_live_child() {
+  local pid identity status log ready received=0 alive=0 i=0
+  log="$TMP_ROOT/pi-live-child-cleaned"
+  ready="$TMP_ROOT/pi-live-child-ready"
+  FM_CLEANUP_LOG="$log" FM_CHILD_READY="$ready" bash -c '
+    trap '\''printf "%s\n" "$$" >> "$FM_CLEANUP_LOG"'\'' TERM
+    : > "$FM_CHILD_READY"
+    deadline=$((SECONDS + 120))
+    while [ "$SECONDS" -lt "$deadline" ]; do sleep 0.02; done
+  ' &
+  pid=$!
+  identity=$(bash "$ARM_CHILD_IDENTITY_SCRIPT" "$pid") || fail "could not identify owned live child"
+  while [ "$i" -lt 250 ] && [ ! -f "$ready" ]; do
+    sleep 0.02
+    i=$((i + 1))
+  done
+  [ -f "$ready" ] || fail "owned live child did not become ready"
+  wait_for_pi_arm_child_cleanup "$pid" "$identity-replaced" "$log"
+  expect_code 2 "$?" "completion must reject a mismatched kernel start identity"
+  [ "$(bash "$ARM_CHILD_IDENTITY_SCRIPT" "$pid")" = "$identity" ] || fail "owned live child changed identity before TERM"
+  kill -TERM "$pid"
+  wait_for_pi_arm_child_cleanup "$pid" "$identity" "$log"
+  status=$?
+  grep -qx "$pid" "$log" && received=1
+  kill -0 "$pid" 2>/dev/null && alive=1
+  [ "$(bash "$ARM_CHILD_IDENTITY_SCRIPT" "$pid")" = "$identity" ] || fail "owned live child changed identity before cleanup"
+  kill -KILL "$pid"
+  wait "$pid" 2>/dev/null || true
+  kill -0 "$pid" 2>/dev/null && fail "owned negative cleanup fixture was not reaped"
+  expect_code 1 "$status" "completion must reject an owned child that receives TERM but stays alive"
+  [ "$received" -eq 1 ] || fail "negative cleanup fixture did not receive TERM"
+  [ "$alive" -eq 1 ] || fail "negative cleanup fixture exited instead of testing a live survivor"
+  pass "Pi cleanup completion rejects TERM receipt from an owned child that remains alive"
 }
 
 test_opencode_plugin_package_boundary_is_explicit_esm() {
@@ -4458,7 +4573,7 @@ test_opencode_primary_watch_plugin_runs_the_supervision_host() {  # [away|quiet]
     # Quiet mode's record is a present captain (bin/fm-afk-contract.sh AWAY OR
     # QUIET): the plugin asks the record owner, so the same handback carries no
     # away note.
-    for f in fm-afk-contract.sh fm-classify-lib.sh fm-timeout-lib.sh; do cp "$ROOT/bin/$f" "$repo/bin/$f"; done
+    for f in fm-afk-contract.sh fm-classify-lib.sh fm-status-event-lib.sh fm-timeout-lib.sh; do cp "$ROOT/bin/$f" "$repo/bin/$f"; done
     FM_HOME="$home" FM_AFK_MODE=quiet "$ROOT/bin/fm-afk-contract.sh" enter --words 'keep routine wakes off my main' >/dev/null 2>&1 \
       || fail "fixture: could not record quiet mode"
   else
@@ -5136,6 +5251,11 @@ printf 'watcher: healthy pid=1 (beacon 0s)\n'
 SH
   cat > "$repo/bin/fm-turnend-guard.sh" <<'SH'
 #!/usr/bin/env bash
+payload=$(cat)
+if [ "$payload" != '{"stop_hook_active":false}' ]; then
+  printf 'unexpected guard stdin payload\n' >&2
+  exit 3
+fi
 printf 'guard\n' >> "${FM_GUARD_LOG:?}"
 printf 'guard ran after external healthy watcher\n' >&2
 exit 2
@@ -5147,11 +5267,11 @@ import { pathToFileURL } from "node:url";
 
 const armMod = await import(pathToFileURL(process.env.ARM_PLUGIN).href);
 const guardMod = await import(pathToFileURL(process.env.GUARD_PLUGIN).href);
-let promptBody = "";
+const promptRequests = [];
 const client = {
   session: {
     promptAsync: async (request) => {
-      promptBody = request.body.parts[0].text;
+      promptRequests.push(request);
     },
   },
 };
@@ -5182,8 +5302,14 @@ if (!existsSync(process.env.FM_GUARD_LOG)) {
   console.error("turn-end guard was suppressed by an external healthy watcher");
   process.exit(1);
 }
-if (!promptBody.includes("TURN WOULD END BLIND")) {
-  console.error(`missing blind-turn prompt: ${promptBody}`);
+// Continuity retries may also deliver watcher failures while the guard prompt
+// settles. Verify the owned guard delivery rather than whichever prompt is last.
+if (!promptRequests.some((request) =>
+  request.path.id === "session-test" &&
+  request.body.parts[0].type === "text" &&
+  request.body.parts[0].text.startsWith("\u2063FIRSTMATE_OP: v1 turn-end-guard: TURN WOULD END BLIND")
+)) {
+  console.error(`missing blind-turn prompt: ${JSON.stringify(promptRequests)}`);
   process.exit(1);
 }
 EOF
@@ -5194,6 +5320,161 @@ EOF
   pass "OpenCode healthy arm output does not suppress the turn-end guard"
 }
 
+test_pi_primary_marker_authority_rejects_descendant_metadata_helpers() {
+  local repo home driver out status
+  repo="$TMP_ROOT/pi-primary-process-authority-root"
+  home="$TMP_ROOT/pi-primary-process-authority-home"
+  driver="$repo/metadata-helper.mjs"
+  mkdir -p "$repo/bin" "$home/state" "$home/config"
+  install_pi_watch_extension_fixture "$repo"
+  cp "$ROOT/.pi/extensions/fm-primary-turnend-guard.ts" "$repo/.pi/extensions/"
+  cp "$ROOT/.pi/extensions/lib/fm-sessionstart-supervisor.mjs" "$repo/.pi/extensions/lib/"
+  cat > "$repo/bin/fm-watch-arm.sh" <<'SH'
+#!/usr/bin/env bash
+printf 'unexpected arm\n' >> "${FM_ARM_LOG:?}"
+SH
+  chmod +x "$repo/bin/fm-watch-arm.sh"
+  for helper in fm-sessionstart-run.sh fm-turnend-guard.sh fm-cd-pretool-check.sh fm-arm-pretool-check.sh; do
+    cat > "$repo/bin/$helper" <<'SH'
+#!/usr/bin/env bash
+printf 'unexpected fleet helper\n' >> "${FM_FLEET_LOG:?}"
+exit 0
+SH
+    chmod +x "$repo/bin/$helper"
+  done
+  cat > "$driver" <<'JS'
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
+const home = process.env.FM_HOME;
+const mode = process.env.FM_MARKER_TEST_MODE;
+const lock = `${home}/state/.lock`;
+if (mode === "self" || mode === "task-self") writeFileSync(lock, `${process.pid}\n`);
+if (mode === "missing" || mode === "task-missing") unlinkSync(lock);
+const handlers = new Map();
+let tool;
+const pi = {
+  on(name, handler) { handlers.set(name, [...(handlers.get(name) ?? []), handler]); },
+  registerCommand() {},
+  registerTool(value) { if (value.name === "fm_watch_arm_pi") tool = value; },
+  sendUserMessage: async () => {},
+  events: { on() {} },
+};
+for (const name of ["fm-primary-turnend-guard.ts", "fm-primary-pi-watch.ts"]) {
+  const extension = await import(pathToFileURL(`${process.env.FM_ROOT_OVERRIDE}/.pi/extensions/${name}`).href);
+  extension.default(pi);
+}
+// Match metadata-command factory loading: no session_start is emitted.
+const publication = [".pi-turnend-extension-loaded", ".pi-watch-extension-loaded"]
+  .map((name) => readFileSync(`${home}/state/${name}`, "utf8").trim().split("\n")[1]);
+let activation;
+if (process.env.FM_MARKER_TEST_ACTIVATE === "1") {
+  activation = await tool.execute("helper-authority", {}, undefined, undefined, {});
+}
+if (process.env.FM_MARKER_TEST_EVENTS === "1") {
+  const ctx = { cwd: process.env.FM_ROOT_OVERRIDE,
+    sessionManager: { getSessionId: () => "synthetic-helper-session" } };
+  for (const [name, event] of [
+    ["session_start", { reason: "startup" }],
+    ["before_agent_start", { prompt: "synthetic helper" }],
+    ["session_compact", {}],
+    ["tool_call", { type: "tool_call", toolName: "bash", input: { command: "echo synthetic" } }],
+    ["agent_settled", {}],
+    ["session_shutdown", { reason: "quit" }],
+  ]) {
+    for (const handler of handlers.get(name) ?? []) await handler(event, ctx);
+  }
+}
+console.log(JSON.stringify({ pid: process.pid, publication,
+  activationAllowed: activation?.details?.ok,
+  armRequested: existsSync(process.env.FM_ARM_LOG),
+  fleetHelperRequested: existsSync(process.env.FM_FLEET_LOG) }));
+JS
+  out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$repo" FM_DRIVER="$driver" FM_ARM_LOG="$repo/arm.log" FM_FLEET_LOG="$repo/fleet.log" \
+    node --input-type=module 2>&1 <<'JS'
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
+import { once } from "node:events";
+import { pathToFileURL } from "node:url";
+const home = process.env.FM_HOME;
+const lock = `${home}/state/.lock`;
+const markers = [".pi-turnend-extension-loaded", ".pi-watch-extension-loaded"]
+  .map((name) => `${home}/state/${name}`);
+const handlers = new Map();
+const pi = { on(name, handler) { handlers.set(name, handler); }, registerCommand() {},
+  registerTool() {}, sendUserMessage: async () => {}, events: { on() {} } };
+writeFileSync(lock, `${process.pid}\n`);
+for (const name of ["fm-primary-turnend-guard.ts", "fm-primary-pi-watch.ts"]) {
+  (await import(pathToFileURL(`${process.env.FM_ROOT_OVERRIDE}/.pi/extensions/${name}`).href)).default(pi);
+}
+const primaryMarkers = markers.map((path) => readFileSync(path, "utf8"));
+if (primaryMarkers.some((text) => text.trim().split("\n")[1] !== String(process.pid))) {
+  throw new Error("exact primary process failed to publish its own extension markers");
+}
+function helper(mode, { lockPid = process.pid, activate = false, task = false, events = false } = {}) {
+  writeFileSync(lock, `${lockPid}\n`);
+  markers.forEach((path, index) => writeFileSync(path, primaryMarkers[index]));
+  const env = { ...process.env, FM_MARKER_TEST_MODE: mode,
+    FM_MARKER_TEST_ACTIVATE: activate ? "1" : "0", FM_MARKER_TEST_EVENTS: events ? "1" : "0" };
+  delete env.FM_TASK_ID;
+  if (task) env.FM_TASK_ID = "synthetic-worker";
+  const child = spawnSync(process.execPath, [process.env.FM_DRIVER, "--help"], {
+    env, encoding: "utf8", timeout: 5000,
+  });
+  if (child.status !== 0) throw new Error(`metadata helper failed: ${child.stderr}`);
+  return { ...JSON.parse(child.stdout), preserved: markers.every((path, index) => readFileSync(path, "utf8") === primaryMarkers[index]) };
+}
+const descendant = helper("descendant");
+if (!descendant.preserved || descendant.armRequested || readFileSync(lock, "utf8").trim() !== String(process.pid)) {
+  throw new Error(`descendant metadata helper overwrote primary markers without an arm: ${JSON.stringify(descendant)}`);
+}
+const descendantActivation = helper("descendant", { activate: true });
+if (!descendantActivation.preserved || descendantActivation.activationAllowed !== false || descendantActivation.armRequested) {
+  throw new Error("descendant helper gained primary watcher activation authority");
+}
+const descendantEvents = helper("descendant", { events: true });
+if (!descendantEvents.preserved || descendantEvents.armRequested || descendantEvents.fleetHelperRequested) {
+  throw new Error(`descendant session events reached primary fleet helpers: ${JSON.stringify(descendantEvents)}`);
+}
+const other = spawn(process.execPath, ["-e", "setInterval(() => {}, 1000)"], { stdio: "ignore" });
+try {
+  const unrelated = helper("unrelated", { lockPid: other.pid, activate: true });
+  if (!unrelated.preserved || unrelated.activationAllowed !== false || unrelated.armRequested) {
+    throw new Error("unrelated live lock did not deny helper publication and activation");
+  }
+} finally {
+  const exited = once(other, "exit");
+  other.kill("SIGTERM");
+  await exited;
+}
+const dead = helper("dead", { lockPid: other.pid, activate: true });
+const missing = helper("missing", { activate: true });
+for (const [name, result] of [["dead", dead], ["missing", missing]]) {
+  if (result.publication.some((pid) => pid !== String(result.pid)) || result.activationAllowed !== false || result.armRequested) {
+    throw new Error(`${name} lock did not preserve pre-lock publication and deny watcher activation`);
+  }
+}
+const self = helper("self");
+if (self.publication.some((pid) => pid !== String(self.pid)) || self.armRequested) {
+  throw new Error("exact primary self-lock factory publication failed");
+}
+for (const mode of ["task-self", "task-missing"]) {
+  const task = helper(mode, { task: true, activate: true, events: true });
+  if (!task.preserved || task.activationAllowed !== false || task.armRequested || task.fleetHelperRequested) {
+    throw new Error(`${mode} worker gained primary marker or activation authority`);
+  }
+}
+if (existsSync(process.env.FM_ARM_LOG)) throw new Error("factory/denied-activation controls launched an arm child");
+if (existsSync(process.env.FM_FLEET_LOG)) throw new Error("denied session events ran a fleet helper");
+JS
+  )
+  status=$?
+  if [ "$status" -ne 0 ]; then printf '%s\n' "$out" >&2; fi
+  expect_code 0 "$status" "Pi primary markers and watcher activation must belong to the exact primary process"
+  [ -z "$out" ] || fail "Pi primary process-authority regression printed output: $out"
+  pass "Pi primary marker publication and activation reject descendant metadata helpers and workers"
+}
+
+test_pi_primary_marker_authority_rejects_descendant_metadata_helpers
 test_pi_extension_reports_external_healthy_watcher
 test_pi_tool_returns_agent_tool_result
 test_pi_redundant_tool_call_is_owned_noop
@@ -5237,6 +5518,7 @@ test_pi_replacement_tokens_are_process_unique
 test_pi_replacement_persistence_failure_keeps_predecessor_until_successor
 test_pi_process_exit_cleanup_listener_lifecycle
 test_pi_process_exit_cleanup_stops_arm_child
+test_pi_process_exit_cleanup_rejects_live_child
 test_opencode_plugin_package_boundary_is_explicit_esm
 test_opencode_primary_watch_plugin_uses_effective_state_home
 test_opencode_primary_watch_plugin_sources_effective_config

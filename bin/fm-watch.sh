@@ -616,6 +616,84 @@ inbox_steer_check() {  # <window> <task>
   esac
 }
 
+# One broken channel must not end observation of the other task channels.
+# Queue failures before dedup, then let the ordinary wake hand supervision back.
+inbox_obligation_check_one() {  # <task> <tick|remote-tick>
+  local task=$1 operation=$2 result reason status=0
+  # Keep diagnostics on stderr: only stdout is the helper's JSON protocol.
+  result=$(FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" "$SCRIPT_DIR/fm-task-inbox.sh" "$operation" "$task") || status=$?
+  [ "$status" -ne 75 ] || return 0
+  if [ "$status" -eq 0 ] &&
+    reason=$(printf '%s' "$result" | python3 -c 'import json,sys; a=json.load(sys.stdin); print(a[0]["message"] if a else "")'); then
+    rm -f "$STATE/.instruction-error-$task" || return 1
+    [ -z "$reason" ] || INSTRUCTION_WAKE_REASON=$reason
+    return 0
+  fi
+  inbox_obligation_failure "$task" "helper status=$status; $result (see watcher stderr)"
+}
+
+inbox_obligation_failure() {  # <task> <failure>
+  local task=$1 result=$2 reason marker temporary
+  marker="$STATE/.instruction-error-$task"
+  reason="instruction obligation recovery failed for $task: $result; inspect its retained inbox"
+  if [ ! -L "$marker" ] && [ -f "$marker" ] && [ "$(cat "$marker")" = "$reason" ]; then
+    return 0
+  fi
+  fm_wake_append stale "$task" "$reason" || return 1
+  temporary=$(mktemp "$STATE/.instruction-error.XXXXXX") || return 1
+  if ! printf '%s\n' "$reason" > "$temporary" || ! mv "$temporary" "$marker"; then
+    rm -f "$temporary"
+    return 1
+  fi
+  INSTRUCTION_WAKE_REASON=$reason
+}
+
+# Dispositions outlive delivery acknowledgement and idle-pane exemptions.
+# Tick each existing channel even when its former endpoint is absent.
+inbox_obligation_tick() {
+  local dir task meta remote_host record invalid_record
+  INSTRUCTION_WAKE_REASON=
+  for meta in "$STATE"/*.meta; do
+    [ -f "$meta" ] || continue
+    remote_host=$(fm_meta_get "$meta" remote_host)
+    [ -n "$remote_host" ] || continue
+    task=${meta##*/}; task=${task%.meta}
+    [ -f "$STATE/.obligation-remote-$task.json" ] || continue
+    inbox_obligation_check_one "$task" remote-tick || return 1
+  done
+  for dir in "$STATE"/*.inbox; do
+    task=${dir##*/}; task=${task%.inbox}
+    # Reject channel indirection before directory traversal or record discovery,
+    # including dangling links that would otherwise look like absent inboxes.
+    if [ -L "$dir" ] || [ -L "$dir/handled" ] || [ -L "$dir/obligations" ]; then
+      inbox_obligation_failure "$task" 'symlink inbox, handled, or obligations path; record discovery refused' || return 1
+      continue
+    fi
+    [ -d "$dir" ] || continue
+    invalid_record=
+    for record in "$dir"/*.msg "$dir/handled"/*.msg; do
+      if [ -L "$record" ] || { [ -e "$record" ] && [ ! -f "$record" ]; }; then
+        invalid_record=1
+        break
+      fi
+    done
+    if [ -n "$invalid_record" ]; then
+      inbox_obligation_failure "$task" 'non-regular or symlink instruction record; record discovery refused' || return 1
+      continue
+    fi
+    # Historical records and passive notices have no new-format obligation.
+    if [ ! -d "$dir/obligations" ]; then
+      grep -q '^obligation=' "$dir"/*.msg "$dir/handled"/*.msg 2>/dev/null || continue
+    fi
+    meta="$STATE/$task.meta"
+    remote_host=$(fm_meta_get "$meta" remote_host)
+    [ -z "$remote_host" ] || continue
+    inbox_obligation_check_one "$task" tick || return 1
+  done
+  [ -z "$INSTRUCTION_WAKE_REASON" ] || wake "$INSTRUCTION_WAKE_REASON"
+  return 0
+}
+
 # 0 (benign/absorb) if EVERY task in a no-verb "signal:" wake has positive work
 # evidence; 1 otherwise. Each task may satisfy the authoritative working proof,
 # or an eligible bare turn-end may use the opt-in pane-churn proof below.
@@ -931,7 +1009,7 @@ secondmate_ring_to_drain() {  # <task> <window>
   [ "${#delivery_id}" -eq 16 ] || return 1
   rec=$(fm_task_inbox_write "$STATE" "$task" \
     "${FM_FROMFIRST_MARK}delivery=${delivery_id} Drain pending rows in this home's wake queue, then resume idle supervision." \
-    fire-and-forget) || return 1
+    fire-and-forget none) || return 1
   fm_task_inbox_ring "$backend" "$w" "$rec" "$(window_label "$w")"
 }
 
@@ -2741,6 +2819,17 @@ while :; do
   # repost after grace, and escalate once if the recovery turn is also missed.
   # No conversation scraping; unresolved records are never silently expired.
   fm_pending_reply_tick "$STATE" || true
+
+  inbox_obligation_tick || exit 1
+
+  # Dependency completion must not wait for idle heartbeat backoff. The shared
+  # owner coalesces an unconsumed review, including held-only graph changes.
+  # A broken review channel cannot prevent observing healthy worker siblings.
+  if ready_review_wake=$("$SCRIPT_DIR/fm-ready-review.sh" poll 2>/dev/null); then
+    [ -z "$ready_review_wake" ] || wake "$ready_review_wake"
+  else
+    triage_log "ready-work observation unavailable; heartbeat review remains required"
+  fi
 
   # Endpoint liveness runs before queue observation: a positively dead or
   # missing secondmate endpoint is relaunched here on a bounded cadence, which

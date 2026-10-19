@@ -459,11 +459,64 @@ SH
   chmod +x "$dir/bin/fm-watch-arm.sh"
 }
 
+# Real fixtures may be adopted by init or by a supervising subreaper. Prove
+# the actual non-harness boundary after the known launcher exits, and pin its
+# full process identity before using it as the recycled chain's boundary.
+install_orphan_boundary_probe() {
+  cat > "$1/orphan-boundary.sh" <<'SH'
+#!/usr/bin/env bash
+set -u
+FM_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
+# shellcheck source=bin/fm-wake-lib.sh
+. "$FM_HOME/bin/fm-wake-lib.sh" || exit 1
+# shellcheck source=bin/fm-session-lock-lib.sh
+. "$FM_HOME/bin/fm-session-lock-lib.sh" || exit 1
+mode=$1 child=$2 prefix=$3
+boundary_identity() {
+  local pid=$1 comm args
+  case "$pid" in ''|*[!0-9]*|0) return 1 ;; esac
+  comm=$(ps -o comm= -p "$pid" 2>/dev/null) || return 1
+  args=$(ps -o args= -p "$pid" 2>/dev/null) || return 1
+  [ -n "$comm" ] && [ -n "$args" ] || return 1
+  fm_harness_process_matches "$comm" "$args" && return 1
+  fm_pid_identity "$pid"
+}
+if [ "$mode" = record ]; then
+  launcher=$4
+  case "$launcher" in ''|*[!0-9]*|0) exit 1 ;; esac
+  i=0
+  while [ "$i" -lt 200 ]; do
+    parent=$(ps -o ppid= -p "$child" 2>/dev/null | tr -d ' ')
+    if [ "$parent" != "$launcher" ] && identity=$(boundary_identity "$parent"); then
+      [ "$(ps -o ppid= -p "$child" 2>/dev/null | tr -d ' ')" = "$parent" ] || exit 1
+      [ "$(boundary_identity "$parent")" = "$identity" ] || exit 1
+      printf '%s\n' "$identity" > "$prefix.identity"
+      ps -o comm= -p "$parent" > "$prefix.comm" || exit 1
+      ps -o args= -p "$parent" > "$prefix.args" || exit 1
+      printf '%s\n' "$parent" > "$prefix.pid"
+      exit 0
+    fi
+    sleep 0.05
+    i=$((i + 1))
+  done
+  printf 'fixture did not reach a proven non-harness orphan boundary\n' >&2
+  exit 1
+fi
+[ "$mode" = verify ] || exit 1
+parent=$(cat "$prefix.pid") || exit 1
+identity=$(cat "$prefix.identity") || exit 1
+[ -n "$identity" ] || exit 1
+[ "$(ps -o ppid= -p "$child" 2>/dev/null | tr -d ' ')" = "$parent" ] || exit 1
+[ "$(boundary_identity "$parent")" = "$identity" ] || exit 1
+SH
+}
+
 # A primary home with one task in flight, so the hook's scope and supervision-need
 # gates both pass and only identity decides the outcome.
 make_primary_home() {  # <dir>
   local dir=$1
   mkdir -p "$dir/state"
+  install_orphan_boundary_probe "$dir"
   git init -q "$dir"
   git -C "$dir" commit -q --allow-empty -m init
   : > "$dir/AGENTS.md"
@@ -474,11 +527,7 @@ make_primary_home() {  # <dir>
   cat > "$dir/session.sh" <<'SH'
 #!/usr/bin/env bash
 if [ "${FM_FIXTURE_ORPHAN_HERE:-0}" = 1 ]; then
-  i=0
-  while [ "$i" -lt 200 ] && [ "$(ps -o ppid= -p $$ 2>/dev/null | tr -d ' ')" != 1 ]; do
-    sleep 0.05
-    i=$((i + 1))
-  done
+  bash "$FM_HOME/orphan-boundary.sh" record "$$" "$FM_HOME/state/session-orphan" "${FM_FIXTURE_LAUNCHER_PID:?}" || exit 1
 fi
 printf '%s\n' "$$" > "$FM_HOME/state/session-pid"
 printf '%s\n' "$$" > "$FM_HOME/state/.lock"
@@ -487,11 +536,7 @@ printf '%s\n' "$?" > "$FM_HOME/state/hook.rc"
 SH
   cat > "$dir/daemon.sh" <<'SH'
 #!/usr/bin/env bash
-i=0
-while [ "$i" -lt 200 ] && [ "$(ps -o ppid= -p $$ 2>/dev/null | tr -d ' ')" != 1 ]; do
-  sleep 0.05
-  i=$((i + 1))
-done
+bash "$FM_HOME/orphan-boundary.sh" record "$$" "$FM_HOME/state/daemon-orphan" "${FM_FIXTURE_LAUNCHER_PID:?}" || exit 1
 printf '%s\n' "$$" > "$FM_HOME/state/daemon-pid"
 "$FM_SESSION_BIN" "$FM_HOME/session.sh"
 exit 0
@@ -500,7 +545,7 @@ SH
 }
 
 # Start the fixture tree detached from this suite's own process tree: the
-# launcher exits immediately, so the tree is reparented to init and the ancestry
+# launcher exits immediately; the proven non-harness orphan adopter ensures the ancestry
 # walk terminates inside the fixture. Returns once the hook has recorded its exit
 # code.
 run_fixture_tree() {  # <dir> <session-bin> [<daemon-bin>]
@@ -508,11 +553,11 @@ run_fixture_tree() {  # <dir> <session-bin> [<daemon-bin>]
   if [ -n "$daemon_bin" ]; then
     env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_PID \
       FM_HOME="$dir" FM_SESSION_BIN="$session_bin" FM_FIXTURE_ORPHAN_HERE=0 \
-      bash -c '"$0" "$1" &' "$daemon_bin" "$dir/daemon.sh"
+      bash -c 'FM_FIXTURE_LAUNCHER_PID=$$ "$0" "$1" &' "$daemon_bin" "$dir/daemon.sh"
   else
     env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_PID \
       FM_HOME="$dir" FM_FIXTURE_ORPHAN_HERE=1 \
-      bash -c '"$0" "$1" &' "$session_bin" "$dir/session.sh"
+      bash -c 'FM_FIXTURE_LAUNCHER_PID=$$ "$0" "$1" &' "$session_bin" "$dir/session.sh"
   fi
   i=0
   while [ "$i" -lt 400 ] && [ ! -s "$dir/state/hook.rc" ]; do
@@ -598,6 +643,7 @@ trap 'reap_background_fixture; fm_test_cleanup' EXIT
 make_background_session_home() {  # <dir>
   local dir=$1
   mkdir -p "$dir/state"
+  install_orphan_boundary_probe "$dir"
   git init -q "$dir"
   git -C "$dir" commit -q --allow-empty -m init
   : > "$dir/AGENTS.md"
@@ -611,11 +657,7 @@ make_background_session_home() {  # <dir>
   # chain the assertions depend on.
   cat > "$dir/frontend.sh" <<'SH'
 #!/usr/bin/env bash
-i=0
-while [ "$i" -lt 200 ] && [ "$(ps -o ppid= -p $$ 2>/dev/null | tr -d ' ')" != 1 ]; do
-  sleep 0.05
-  i=$((i + 1))
-done
+bash "$FM_HOME/orphan-boundary.sh" record "$$" "$FM_HOME/state/frontend-orphan" "${FM_FIXTURE_LAUNCHER_PID:?}" || exit 1
 printf '%s\n' "$$" > "$FM_HOME/state/frontend-pid"
 CLAUDE_CODE_SESSION_ID=S1 CLAUDE_PID=$$ "$FM_HOME/bin/fm-lock.sh" > "$FM_HOME/state/frontend-lock.out" 2>&1
 printf '%s\n' "$?" > "$FM_HOME/state/frontend-lock.rc"
@@ -745,7 +787,7 @@ test_e2e_background_session_keeps_its_lock_across_a_recycled_chain() {
   env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_PID \
     FM_HOME="$dir" FM_FIXTURE_CLAUDE="$NAMED_CLAUDE" FM_POLL=1 FM_HEARTBEAT=999999 \
     FM_CLAUDE_AUTOARM_SYNC_WAIT_MS=0 \
-    bash -c '"$0" "$1" &' "$NAMED_CLAUDE" "$dir/frontend.sh"
+    bash -c 'FM_FIXTURE_LAUNCHER_PID=$$ "$0" "$1" &' "$NAMED_CLAUDE" "$dir/frontend.sh"
   wait_for_file "$dir/state/frontend-lock.rc" "the front-end's lock result"
   wait_for_file "$dir/state/spare-pid" "the bg-spare"
   frontend=$(tr -d '[:space:]' < "$dir/state/frontend-pid")
@@ -765,15 +807,16 @@ test_e2e_background_session_keeps_its_lock_across_a_recycled_chain() {
   grep -qx "$frontend" "$dir/state/phase-1/ancestry" || fail "the healthy chain did not reach the front-end"
   expect_phase_owned "$dir" 1 2 "$frontend" "healthy chain"
 
-  # Recycle the bridge: the daemon ends, the pty-host is reparented to init, and
+  # Recycle the bridge: the daemon ends, the pty-host reaches the same proven orphan adopter, and
   # the front-end that holds the lock stays alive.
   kill -TERM "$daemon"
   i=0
-  while [ "$i" -lt 200 ] && { kill -0 "$daemon" 2>/dev/null || [ "$(ps -o ppid= -p "$ptyhost" 2>/dev/null | tr -d ' ')" != 1 ]; }; do
+  while [ "$i" -lt 200 ] && { kill -0 "$daemon" 2>/dev/null || ! bash "$dir/orphan-boundary.sh" verify "$ptyhost" "$dir/state/frontend-orphan"; }; do
     sleep 0.05
     i=$((i + 1))
   done
-  [ "$(ps -o ppid= -p "$ptyhost" 2>/dev/null | tr -d ' ')" = 1 ] || fail "the pty-host was not reparented to init after the daemon ended"
+  bash "$dir/orphan-boundary.sh" verify "$ptyhost" "$dir/state/frontend-orphan" \
+    || fail "the pty-host did not reach the exact original non-harness orphan boundary after the daemon ended"
   kill -0 "$frontend" 2>/dev/null || fail "the front-end died with the daemon, so the recycled case cannot be exercised"
 
   # Phase 2: the same session id over the broken chain - the reported drift.

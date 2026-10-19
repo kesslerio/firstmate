@@ -2599,7 +2599,7 @@ fm_wake_status_mark_current() {  # <state> <status-file>
 # size past the owned ranges and wakes as before: task identity alone can never
 # suppress new content.
 # Each line is stamped with its emission time on the way in (status_stamp_line,
-# bin/fm-classify-lib.sh), so the appended bytes are the stamped ones, not the
+# bin/fm-status-event-lib.sh), so the appended bytes are the stamped ones, not the
 # caller's: a caller that caps a line first must reserve status_stamp_width,
 # and one that suppresses a repeat must ask status_event_recorded rather than
 # compare exact bytes.

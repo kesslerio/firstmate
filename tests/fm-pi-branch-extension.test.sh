@@ -78,18 +78,9 @@ export function getMarkdownTheme() {
   return {};
 }
 
-export function keyHint(_keybinding, description) {
-  return `ctrl+o ${description}`;
-}
-
 export class ToolExecutionComponent {
-  updateResult(result) {
-    this.result = result;
-  }
-  render() {
-    return (this.result?.content ?? [])
-      .filter((item) => item.type === "text")
-      .flatMap((item) => item.text.split("\n"));
+  constructor() {
+    throw new Error("Stock component rendering must use the installed Pi package");
   }
 }
 
@@ -573,6 +564,7 @@ const pi = {
   registerTool(tool) {
     mainTools.push(tool);
   },
+  registerToolRenderer() {},
   registerCommand(name, options) {
     commands.set(name, options);
   },
@@ -798,64 +790,6 @@ if (outcomeScript(["unread"]) !== "") throw new Error("merged outcomes were not 
 // renderer.
 const outcomesTool = mainTools.find((tool) => tool.name === "fm_branch_outcomes");
 if (!outcomesTool) throw new Error("fm_branch_outcomes was not registered on main");
-const renderTheme = {
-  fg(_color, text) { return text; },
-  bg(_color, text) { return text; },
-  bold(text) { return text; },
-};
-const renderContext = { state: {}, isError: false, isPartial: false };
-const stockResult = { content: [{ type: "text", text: "OUTCOME_DUMP" }] };
-const calmOffCall = outcomesTool.renderCall({}, renderTheme, renderContext);
-const calmOffResult = outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext);
-if (calmOffCall.constructor.name !== "Box" || calmOffCall.paddingX !== 1 || calmOffCall.paddingY !== 1) {
-  throw new Error("fm_branch_outcomes changed its ordinary shell rendering");
-}
-if (calmOffResult.constructor.name !== "Container" || calmOffCall.children[0]?.text !== "fm_branch_outcomes" || calmOffCall.children[1]?.text !== "OUTCOME_DUMP") {
-  throw new Error("fm_branch_outcomes changed its ordinary call or result rendering");
-}
-const legacyStockResult = {
-  content: [{
-    type: "text",
-    text: Array.from({ length: 12 }, (_, index) => `LEGACY_OUTCOME_${String(index + 1).padStart(2, "0")}`).join("\n"),
-  }],
-};
-const legacyRenderContext = { state: {}, isError: false, isPartial: false };
-const legacyCall = outcomesTool.renderCall({}, renderTheme, legacyRenderContext);
-outcomesTool.renderResult(legacyStockResult, { expanded: false, isPartial: false }, renderTheme, legacyRenderContext);
-const collapsedLegacyText = legacyCall.children[1]?.text;
-if (!collapsedLegacyText?.includes("LEGACY_OUTCOME_12") || collapsedLegacyText.includes("more lines")) {
-  throw new Error("legacy all-line stock capability did not preserve collapsed Calm-off output");
-}
-outcomesTool.renderResult(legacyStockResult, { expanded: true, isPartial: false }, renderTheme, legacyRenderContext);
-if (legacyCall.children[1]?.text !== collapsedLegacyText) {
-  throw new Error("legacy all-line stock capability changed expanded Calm-off output");
-}
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: false });
-const calmOnCall = outcomesTool.renderCall({}, renderTheme, renderContext);
-const calmOnResult = outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext);
-if (calmOnCall.constructor.name !== "Container" || calmOnCall.render(100).length !== 0 || calmOnResult.constructor.name !== "Container" || calmOnResult.render(100).length !== 0) {
-  throw new Error("fm_branch_outcomes remained visible while Calm was on");
-}
-pi.events.emit("firstmate:calm-presentation", { active: false, stockExportRendering: false });
-if (outcomesTool.renderCall({}, renderTheme, renderContext).constructor.name !== "Box" || outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext).constructor.name !== "Container") {
-  throw new Error("fm_branch_outcomes did not restore ordinary rendering when Calm was turned off");
-}
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: true });
-let exportCallFellBack = false;
-let exportResultFellBack = false;
-try {
-  outcomesTool.renderCall({}, renderTheme, renderContext);
-} catch {
-  exportCallFellBack = true;
-}
-try {
-  outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext);
-} catch {
-  exportResultFellBack = true;
-}
-if (!exportCallFellBack || !exportResultFellBack) {
-  throw new Error("fm_branch_outcomes replaced Pi stock export rendering");
-}
 const listed = await outcomesTool.execute("call-4", { recent: 2 }, undefined, undefined, {});
 const listedText = listed.content[0].text;
 if (listedText.split("\n").length !== 2 || !listedText.includes("checks green")) {
@@ -895,6 +829,11 @@ const assertRenderedNote = (note, glyph) => {
   }
 };
 assertRenderedNote(sentToMain[0].message.content, "⛵");
+const renderTheme = {
+  fg(_color, text) { return text; },
+  bg(_color, text) { return text; },
+  bold(text) { return text; },
+};
 const captainRendered = entryRenderers.get("fm-branch-visible-outcome")(
   captainEntries[0],
   { expanded: false },
@@ -1059,15 +998,22 @@ const operational = spawnSync(
   { encoding: "utf8", input: "operational watcher injection" },
 );
 if (operational.status !== 0) throw new Error(`could not create operational input: ${operational.stderr}`);
-await fire("before_agent_start", { prompt: operational.stdout }, mainCtx);
+// Pi 1.2 starts custom-message runs without a user prompt. They must not
+// become captain dialog even when their content looks like a captain request.
+const customRequest = "Please give me a fresh mini system-resource report from this custom message.";
+await fire("before_agent_start", {
+  messageType: "custom",
+  message: { role: "custom", customType: "test-custom", content: customRequest, display: false },
+}, mainCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: operational.stdout }, mainCtx);
 entries.push({ type: "message", message: { role: "user", content: operational.stdout } });
 const unsolicitedPrompt = "Please keep responses concise while monitoring the fleet.";
-await fire("before_agent_start", { prompt: unsolicitedPrompt }, mainCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: unsolicitedPrompt }, mainCtx);
 entries.push({ type: "message", message: { role: "user", content: unsolicitedPrompt } });
 await fire("agent_start", {}, mainCtx);
 await fire("agent_end", {}, mainCtx);
 const legacyOperational = "⁣FIRSTMATE_OP: give me a fresh system-resource report.";
-await fire("before_agent_start", { prompt: legacyOperational }, mainCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: legacyOperational }, mainCtx);
 entries.push({ type: "message", message: { role: "user", content: legacyOperational } });
 await fire("agent_start", {}, mainCtx);
 const unsolicited = dispatch("signal: healthy resource result");
@@ -1095,7 +1041,7 @@ for (let index = 0; index < requestedPrompts.length; index += 1) {
   if (index < longRequests.length && content.length <= 4000) {
     throw new Error(`request fixture ${index} did not exceed the mirror bound`);
   }
-  await fire("before_agent_start", { prompt: content }, mainCtx);
+  await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: content }, mainCtx);
   // Pi persists this only after every before_agent_start handler has returned.
   entries.push({ type: "message", message: { role: "user", content } });
   await fire("agent_start", {}, mainCtx);
@@ -1121,7 +1067,7 @@ for (const content of [unsolicitedPrompt, ...requestedPrompts]) {
   if (copies !== 1) throw new Error(`current captain prompt was mirrored ${copies} times instead of once`);
 }
 if (mirroredCaptainText.some((text) =>
-  text.includes("operational watcher injection") || text.includes("FIRSTMATE_OP: give me a fresh system-resource report")
+  text.includes(customRequest) || text.includes("operational watcher injection") || text.includes("FIRSTMATE_OP: give me a fresh system-resource report")
 )) {
   throw new Error("canonical current or legacy operational input entered captain mirror context");
 }
@@ -1284,10 +1230,21 @@ const consumeRequest = async (userFirst = false) => {
   }
   await fire("message_start", { message: { role: "custom", ...pending.message } });
 };
-const runOf = async (fn) => {
+// A dedicated idle custom run prepares its trigger before Agent emits the
+// agent/turn/message events. Busy follow-ups below join an existing run and
+// intentionally do not prepare another run.
+const startRun = async () => {
+  const pending = consumedRequests < requests().length ? requests().at(-1) : undefined;
+  const trigger = pending?.options.triggerTurn === true
+    ? { messageType: "custom", message: { role: "custom", ...pending.message } }
+    : { messageType: "user", prompt: "A new question" };
+  await fire("before_agent_start", { type: "before_agent_start", systemPrompt: "", systemPromptOptions: {}, ...trigger }, defaultSessionCtx);
   await fire("agent_start", {});
   await fire("turn_start", {});
   await consumeRequest();
+};
+const runOf = async (fn) => {
+  await startRun();
   await fn?.();
   await fire("agent_end", {});
   await fire("agent_settled", {});
@@ -1428,9 +1385,7 @@ await runOf(async () => {
 });
 if (visibleFinals().at(-1) !== "Captain, task-d still needs your call.") throw new Error("the first presentation after replacement lost its final");
 if (requests().length !== 6 || requests()[5].options.triggerTurn !== true) throw new Error("the replacement did not retry the unacknowledged outcome");
-await fire("agent_start", {});
-await fire("turn_start", {});
-await consumeRequest();
+await startRun();
 await finish("stale after reload");
 if (visibleFinals().at(-1) !== "stale after reload") throw new Error("session replacement hid differing retry prose");
 const repeatedAfterReload = await finish("stale after reload");
@@ -1523,9 +1478,7 @@ await runOf();
 if (requests().length !== beforePairRepeat + 1 || requests().at(-1).options.triggerTurn !== true) {
   throw new Error("the second presentation of the widened sequence set did not open its own turn");
 }
-await fire("agent_start", {});
-await fire("turn_start", {});
-await consumeRequest();
+await startRun();
 const partial = await processed.execute("ack-partial", { through: seqE }, undefined, undefined, {});
 if (partial.isError) throw new Error(`partial acknowledgement failed: ${JSON.stringify(partial)}`);
 if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seqF])) throw new Error(`a partial acknowledgement did not keep the newer sequence open: ${unprocessedSeqs()}`);
@@ -1788,7 +1741,7 @@ test_branch_default_on_heartbeat_afk_and_fallback() {
   home="$TMP_ROOT/gating-home"
   mkdir -p "$home/state" "$home/config" "$broken/bin"
   install_pi_branch_extension_fixture "$repo"
-  cp "$ROOT/bin/fm-branch-outcome.sh" "$ROOT/bin/fm-classify-lib.sh" \
+  cp "$ROOT/bin/fm-branch-outcome.sh" "$ROOT/bin/fm-classify-lib.sh" "$ROOT/bin/fm-status-event-lib.sh" \
     "$ROOT/bin/fm-lease.sh" "$ROOT/bin/fm-lease-lib.sh" "$ROOT/bin/fm-timeout-lib.sh" \
     "$ROOT/bin/fm-wake-lib.sh" "$ROOT/bin/fm-path-lib.sh" "$ROOT/bin/fm-wake-grant.sh" "$broken/bin/"
   cat > "$broken/bin/fm-branch-prompt.sh" <<'SH'
@@ -2067,7 +2020,7 @@ if (!pending.message.content.includes(`[seq ${seq1}, recorded 0m ago] `)) {
   throw new Error(`the first queued request lost seq ${seq1}: ${pending.message.content}`);
 }
 contract(["enter", "--words", "merge task-d when green, then cut the prerelease\n\n"]);
-const processingMsg = { role: "custom", customType: pending.message.customType, content: pending.message.content, display: false };
+const processingMsg = { role: "custom", customType: pending.message.customType, content: pending.message.content, display: false, timestamp: 0 };
 let aborted = false;
 const abortCtx = { ...defaultSessionCtx, abort() { aborted = true; } };
 const streamingResult = await fire("context", {
@@ -2106,7 +2059,7 @@ if (openedByCaptain?.messages?.some((message) => message.customType === "fm-bran
   throw new Error(`captain-opened processing was not stripped: ${JSON.stringify(openedByCaptain)}`);
 }
 aborted = false;
-await fire("before_agent_start", { prompt: "captain typed this now" }, abortCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: "captain typed this now" }, abortCtx);
 const stolen = await fire("context", {
   messages: [{ role: "user", content: "captain typed this now" }, processingMsg],
 }, abortCtx);
@@ -2116,7 +2069,13 @@ if (stolen?.messages?.some((message) => message.customType === "fm-branch-proces
 }
 await fire("agent_end", {});
 aborted = false;
-await fire("before_agent_start", { prompt: pending.message.content }, abortCtx);
+await fire("before_agent_start", {
+  type: "before_agent_start", messageType: "custom", systemPrompt: "", systemPromptOptions: {},
+  message: { ...processingMsg, customType: "fixture-notice" },
+}, abortCtx);
+await fire("context", { messages: [...history, processingMsg] }, abortCtx);
+if (aborted) throw new Error("custom text resembling a processing request owned an unrelated run");
+await fire("before_agent_start", { type: "before_agent_start", messageType: "custom", systemPrompt: "", systemPromptOptions: {}, message: processingMsg }, abortCtx);
 await fire("agent_start", {}, defaultSessionCtx);
 const openedByRequest = await fire("context", { messages: [...history, processingMsg] }, abortCtx);
 if (!aborted) throw new Error("a dedicated processing turn with history was not aborted under the record");
@@ -3159,6 +3118,15 @@ const ctx = {
     getEntries: () => entries,
   },
 };
+
+// Custom-started runs have no prompt. They still collect persisted dialog,
+// but their own text must never be mirrored as a user request.
+for (const content of ["CUSTOM_ONLY_TEXT", "⁣FIRSTMATE_OP: v1 watcher: custom text"]) {
+  await fire("before_agent_start", {
+    type: "before_agent_start", messageType: "custom", systemPrompt: "", systemPromptOptions: {},
+    message: { role: "custom", customType: "fixture-notice", content, display: false, timestamp: 0 },
+  }, ctx);
+}
 
 // Dialog collected at main's turn_end, delivered into the branch BEFORE the
 // next wake, tagged and filtered: no tool traffic, no operational injections,
@@ -4514,10 +4482,14 @@ test_secondary_session_stays_inert() {
   PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
     FM_TEST_SKIP_LOCK=1 FM_TEST_LOCK_PID=$foreign_pid DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
 const prelude = process.env.DRIVER_PRELUDE;
-await eval(`(async () => { ${prelude}; globalThis.__t = { dispatch, home }; })()`);
-const { dispatch, home } = globalThis.__t;
+await eval(`(async () => { ${prelude}; globalThis.__t = { fire, dispatch, home }; })()`);
+const { fire, dispatch, home } = globalThis.__t;
 import { existsSync, writeFileSync } from "node:fs";
 writeFileSync(`${home}/state/.lock`, `${process.env.FM_TEST_LOCK_PID}\n`);
+const deniedCtx = { sessionManager: { getSessionFile: () => `${home}/denied.jsonl`, getEntries: () => [] } };
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: "DENIED_USER_PROMPT" }, deniedCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "custom", systemPrompt: "", systemPromptOptions: {}, message: { role: "custom", customType: "fixture-notice", content: "DENIED_CUSTOM_TEXT", display: false, timestamp: 0 } }, deniedCtx);
+if (existsSync(`${home}/state/.branch-mirror-cursor`)) throw new Error("denied starts wrote a mirror cursor");
 if (dispatch("signal: secondary probe").accepted) throw new Error("secondary session accepted a wake it does not own");
 if (existsSync(`${home}/state/.pi-branch-extension-loaded`)) {
   throw new Error("secondary session wrote the primary's marker");
@@ -4579,6 +4551,7 @@ const replacementPi = {
     replacementPiHandlers.set(event, [...(replacementPiHandlers.get(event) ?? []), handler]);
   },
   registerTool() {},
+  registerToolRenderer() {},
   registerCommand() {},
   registerMessageRenderer() {},
   sendMessage() {},
@@ -5147,83 +5120,20 @@ JS
   pass "the installed Pi still bounds the picker's list and ranks its search"
 }
 
-# Pi's stock call header gained arguments in 0.99: before it, the header is
-# the bold title alone; from 0.99 a collapsed call appends `key=json` and an
-# expanded call lists `key: value` under the title. Both supervision tools
-# must match the header of whichever Pi version loaded them.
-test_outcomes_tool_call_headers_follow_the_loaded_pi_version() {
-  local repo version status out
-  repo="$TMP_ROOT/call-header-versions"
-  install_pi_branch_extension_fixture "$repo"
-  for version in 0.87.0 0.99.0; do
-    FM_STUB_PI_VERSION="$version" EXT="$repo/.pi/extensions/fm-branch-supervision.ts" \
-      node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'JS'
-import { pathToFileURL } from "node:url";
-
-const version = process.env.FM_STUB_PI_VERSION;
-const tools = [];
-const pi = {
-  events: { on() {}, emit() {} },
-  on() {},
-  registerCommand() {},
-  registerMessageRenderer() {},
-  registerTool(tool) { tools.push(tool); },
-  sendMessage() {},
-  sendUserMessage() {},
-};
-const extension = await import(pathToFileURL(process.env.EXT).href);
-extension.default(pi);
-const theme = {
-  fg(color, text) { return `<${color}>${text}</${color}>`; },
-  bg(_color, text) { return text; },
-  bold(text) { return `**${text}**`; },
-};
-const showsArgs = version === "0.99.0";
-for (const [name, key, value] of [["fm_branch_outcomes", "recent", 2], ["fm_branch_processed", "through", 1]]) {
-  const tool = tools.find((candidate) => candidate.name === name);
-  if (!tool) throw new Error(`${name} was not registered`);
-  const title = `<toolTitle>**${name}**</toolTitle>`;
-  for (const expanded of [false, true]) {
-    const stock = !showsArgs
-      ? title
-      : expanded
-        ? `${title}\n<muted>  ${key}: ${value}</muted>`
-        : `${title} <muted>${key}=${value}</muted>`;
-    const shell = tool.renderCall({ [key]: value }, theme, { state: {}, expanded, isError: false, isPartial: false });
-    const header = shell.children[0]?.text;
-    if (header !== stock) {
-      throw new Error(`Pi ${version} ${expanded ? "expanded" : "collapsed"} ${name} header ${JSON.stringify(header)} is not stock ${JSON.stringify(stock)}`);
-    }
-  }
-}
-JS
-    status=$?
-    out=$(cat "$TMP_ROOT/node-output")
-    expect_code 0 "$status" "Pi $version supervision tool call headers must match that version's stock header: $out"
-    [ -z "$out" ] || fail "Pi $version call header test printed output: $out"
-  done
-  pass "fm_branch_outcomes and fm_branch_processed call headers match stock on Pi before and from 0.99"
-}
-
 test_outcomes_tool_uses_stock_execution_and_export_consumers() {
   if ! command -v node >/dev/null 2>&1; then
     echo "skip: node not found for Pi outcomes rendering test"
     return
   fi
-  local package_dir package_version fixture out status
+  local package_dir package_version fixture out status calm_lib
   package_dir=${FM_PI_PACKAGE_DIR:-"$(npm root -g 2>/dev/null)/@earendil-works/pi-coding-agent"}
   if [ ! -f "$package_dir/package.json" ]; then
     echo "skip: installed @earendil-works/pi-coding-agent package not found"
     return
   fi
-  # This case compares the extension's own renderers against Pi's stock
-  # rendering, so its verdict is only meaningful against the vendor contract
-  # those renderers target: since Pi 0.84.4 the stock renderer no longer
-  # supplies an implicit reset at multiline boundaries, and the extension
-  # emits that reset itself. An older installed Pi still supplies it, so the
-  # two legitimately differ there and a comparison would report a defect that
-  # is really a version skew. Name the version and skip rather than degrade
-  # quietly; a package whose version cannot be read at all is still a failure.
+  # Compare real registered renderers against the installed stock consumers.
+  # Retain the stock execution contract floor; unreadable versions fail, and
+  # newer versions run every comparison rather than becoming a support ceiling.
   package_version=$(node -p 'require(process.argv[1]).version || ""' "$package_dir/package.json" 2>/dev/null || printf '')
   [ -n "$package_version" ] \
     || fail "installed @earendil-works/pi-coding-agent has no readable version at $package_dir"
@@ -5238,6 +5148,10 @@ test_outcomes_tool_uses_stock_execution_and_export_consumers() {
   cp "$ROOT/.pi/extensions/lib/fm-native-contract.ts" "$fixture/.pi/extensions/lib/fm-native-contract.ts"
   cp "$ROOT/.pi/extensions/lib/fm-async-exec.ts" "$fixture/.pi/extensions/lib/fm-async-exec.ts"
   cp "$ROOT/.pi/extensions/lib/fm-branch-model-picker.ts" "$fixture/.pi/extensions/lib/fm-branch-model-picker.ts"
+  cp "$ROOT/.pi/extensions/fm-calm.ts" "$fixture/.pi/extensions/fm-calm.ts"
+  for calm_lib in fm-calm-pending-operational-layout fm-calm-assistant-layout fm-calm-preservation fm-calm-operational-user-layout fm-calm-working-ship fm-calm-working-ship-sprite; do
+    cp "$ROOT/.pi/extensions/lib/$calm_lib.ts" "$fixture/.pi/extensions/lib/$calm_lib.ts"
+  done
   cp "$ROOT/.pi/extensions/lib/fm-calm-visibility.ts" "$fixture/.pi/extensions/lib/fm-calm-visibility.ts"
   cp "$ROOT/.pi/extensions/lib/fm-operational-input.ts" "$fixture/.pi/extensions/lib/fm-operational-input.ts"
   ln -s "$package_dir" "$fixture/node_modules/@earendil-works/pi-coding-agent"
@@ -5245,7 +5159,7 @@ test_outcomes_tool_uses_stock_execution_and_export_consumers() {
   ln -s "$package_dir/node_modules/@earendil-works/pi-ai" "$fixture/node_modules/@earendil-works/pi-ai"
   ln -s "$package_dir/node_modules/typebox" "$fixture/node_modules/typebox"
 
-  out=$(cd "$fixture" && EXT="$fixture/.pi/extensions/fm-branch-supervision.ts" PI_PACKAGE_DIR="$package_dir" node --input-type=module 2>&1 <<'JS'
+  out=$(cd "$fixture" && EXT="$fixture/.pi/extensions/fm-branch-supervision.ts" CALM_EXT="$fixture/.pi/extensions/fm-calm.ts" FM_HOME="$fixture/home" PI_PACKAGE_DIR="$package_dir" node --input-type=module 2>&1 <<'JS'
 import { pathToFileURL } from "node:url";
 
 const packageRoot = process.env.PI_PACKAGE_DIR;
@@ -5258,6 +5172,7 @@ initTheme("dark");
 
 const listeners = new Map();
 const tools = [];
+const toolRenderers = [];
 const pi = {
   events: {
     on(name, listener) {
@@ -5271,18 +5186,53 @@ const pi = {
   registerCommand() {},
   registerMessageRenderer() {},
   registerTool(tool) { tools.push(tool); },
+  registerToolRenderer(resolver) { toolRenderers.push(resolver); },
   sendMessage() {},
   sendUserMessage() {},
 };
 const extension = await import(`${pathToFileURL(process.env.EXT).href}?consumer=${Date.now()}`);
 extension.default(pi);
-const actualDefinition = tools.find((tool) => tool.name === "fm_branch_outcomes");
+const { ExtensionRunner, SessionManager } = await import("@earendil-works/pi-coding-agent");
+const runner = new ExtensionRunner([{ toolRenderers }], {}, process.cwd(), SessionManager.inMemory(), {});
+const registeredDefinition = tools.find((tool) => tool.name === "fm_branch_outcomes");
+// Before Calm loads, outcomes has no resolver or custom renderer: Pi owns its row.
+if (runner.resolveToolRenderers("fm_branch_outcomes", () => registeredDefinition) !== registeredDefinition) throw new Error("branch-only outcomes replaced its stock definition");
+for (const slot of ["renderShell", "renderCall", "renderResult", "isVisible"]) {
+  if (registeredDefinition?.[slot] !== undefined) throw new Error(`branch-only outcomes claimed ${slot}`);
+}
+const calmHandlers = new Map();
+let calmCommand;
+const calmPi = {
+  ...pi,
+  on(name, handler) { calmHandlers.set(name, handler); },
+  registerCommand(name, command) { if (name === "calm") calmCommand = command; },
+  registerEntryRenderer() {},
+  registerTool(tool) { throw new Error(`Calm claimed executable tool ${tool.name}`); },
+};
+const calmExtension = await import(pathToFileURL(process.env.CALM_EXT).href);
+calmExtension.default(calmPi);
+const visibility = await import(pathToFileURL(`${process.cwd()}/.pi/extensions/lib/fm-calm-visibility.ts`).href);
+const calmContext = { ui: {
+  getEditorText: () => "", onTerminalInput: () => () => {},
+  setHiddenThinkingLabel() {}, setStatus() {}, setWorkingVisible() {},
+  setToolsExpanded() { throw new Error("Calm changed native expansion state to refresh rows"); },
+} };
+await calmHandlers.get("session_start")({ reason: "startup" }, calmContext);
+const setCalm = async (active, stockExportRendering = false) => {
+  if (visibility.calmPresentationIsActive() !== active) await calmCommand.handler("", calmContext);
+  // This independent export event still belongs to Firstmate's non-tool adapters.
+  pi.events.emit("firstmate:calm-presentation", { active, stockExportRendering });
+};
+const actualDefinition = runner.resolveToolRenderers("fm_branch_outcomes", () => registeredDefinition);
 if (!actualDefinition) throw new Error("fm_branch_outcomes was not registered");
-const stockDefinition = { ...actualDefinition };
+const stockDefinition = { ...registeredDefinition };
 delete stockDefinition.renderShell;
 delete stockDefinition.renderCall;
 delete stockDefinition.renderResult;
 
+const responseContract = (response) => response === undefined ? undefined : {
+  handled: response.handled, capture: response.capture, focus: response.focus, render: response.render,
+};
 const args = { recent: 2 };
 const result = {
   content: [{
@@ -5305,7 +5255,7 @@ const result = {
   details: { ok: true },
   isError: false,
 };
-const ui = { requestRender() {} };
+const ui = { redrawRequests: 0, requestRender() { this.redrawRequests += 1; } };
 const stockRow = new ToolExecutionComponent("fm_branch_outcomes", "stock", args, { showImages: false }, stockDefinition, ui, process.cwd());
 const actualRow = new ToolExecutionComponent("fm_branch_outcomes", "actual", args, { showImages: false }, actualDefinition, ui, process.cwd());
 for (const row of [stockRow, actualRow]) {
@@ -5316,7 +5266,9 @@ for (const row of [stockRow, actualRow]) {
 const collapsedStock = stockRow.render(100);
 const collapsedActual = actualRow.render(100);
 if (JSON.stringify(collapsedActual) !== JSON.stringify(collapsedStock)) {
-  throw new Error("Calm-off ToolExecutionComponent rendering differs from Pi stock");
+  stockRow.setExpanded(true);
+  actualRow.setExpanded(true);
+  throw new Error(`Calm-off ToolExecutionComponent rendering differs from Pi stock: ${JSON.stringify({ collapsedStock, collapsedActual, expandedStock: stockRow.render(100), expandedActual: actualRow.render(100) })}`);
 }
 const collapsedText = collapsedStock.join("\n");
 if (collapsedText.includes("OUTCOME_TWELVE") || !collapsedText.includes("more lines") || !collapsedText.includes("to expand")) {
@@ -5332,48 +5284,353 @@ if (JSON.stringify(expandedActual) !== JSON.stringify(expandedStock)) {
 if (!expandedStock.join("\n").includes("OUTCOME_TWELVE") || JSON.stringify(expandedStock) === JSON.stringify(collapsedStock)) {
   throw new Error("stock rendering fixture did not exercise expanded output");
 }
-const processedDefinition = tools.find((tool) => tool.name === "fm_branch_processed");
-if (!processedDefinition) throw new Error("fm_branch_processed was not registered");
-const stockProcessedDefinition = { ...processedDefinition };
-delete stockProcessedDefinition.renderShell;
-delete stockProcessedDefinition.renderCall;
-delete stockProcessedDefinition.renderResult;
-const processedArgs = { through: 1 };
-const processedResult = { content: [{ type: "text", text: "acknowledged through 1" }], details: undefined, isError: false };
-const stockProcessed = new ToolExecutionComponent("fm_branch_processed", "stock-processed", processedArgs, { showImages: false }, stockProcessedDefinition, ui, process.cwd());
-const actualProcessed = new ToolExecutionComponent("fm_branch_processed", "actual-processed", processedArgs, { showImages: false }, processedDefinition, ui, process.cwd());
-for (const row of [stockProcessed, actualProcessed]) {
-  row.markExecutionStarted();
-  row.setArgsComplete();
-  row.updateResult(processedResult);
-}
-for (const expanded of [false, true]) {
-  stockProcessed.setExpanded(expanded);
-  actualProcessed.setExpanded(expanded);
-  if (JSON.stringify(actualProcessed.render(100)) !== JSON.stringify(stockProcessed.render(100))) {
-    throw new Error(`${expanded ? "expanded" : "collapsed"} Calm-off fm_branch_processed rendering differs from Pi stock`);
-  }
-}
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: false });
+await setCalm(true);
 actualRow.invalidate();
 if (actualRow.render(100).length !== 0) {
   throw new Error("Calm-on ToolExecutionComponent row remained visible");
 }
-pi.events.emit("firstmate:calm-presentation", { active: false, stockExportRendering: false });
+await setCalm(false);
 actualRow.invalidate();
 if (JSON.stringify(actualRow.render(100)) !== JSON.stringify(stockRow.render(100))) {
   throw new Error("ToolExecutionComponent rendering did not restore after live toggle");
 }
 
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: true });
-const stockHtml = createToolHtmlRenderer({ getToolDefinition: () => stockDefinition, theme, cwd: process.cwd() });
-const actualHtml = createToolHtmlRenderer({ getToolDefinition: () => actualDefinition, theme, cwd: process.cwd() });
+await setCalm(true, true);
+const stockHtml = createToolHtmlRenderer({ getToolRenderers: () => stockDefinition, theme, cwd: process.cwd() });
+const actualHtml = createToolHtmlRenderer({ getToolRenderers: (name) => runner.resolveToolRenderers(name, () => tools.find((tool) => tool.name === name)), theme, cwd: process.cwd() });
 const stockCall = stockHtml.renderCall("stock-html", "fm_branch_outcomes", args);
 const actualCall = actualHtml.renderCall("actual-html", "fm_branch_outcomes", args);
 const stockResult = stockHtml.renderResult("stock-html", "fm_branch_outcomes", result.content, result.details, false);
 const actualResult = actualHtml.renderResult("actual-html", "fm_branch_outcomes", result.content, result.details, false);
 if (actualCall !== undefined || actualResult !== undefined || stockCall !== undefined || stockResult !== undefined) {
   throw new Error("stock export rendering did not delegate to Pi's structured fallback");
+}
+const { Text, visibleWidth } = await import("@earendil-works/pi-tui");
+const { readFileSync, writeFileSync, mkdirSync, cpSync } = await import("node:fs");
+const { exportSessionToHtml } = await import(pathToFileURL(`${packageRoot}/dist/core/export-html/index.js`).href);
+const cases = [
+  ["preview-controls", args, result],
+  ["empty", {}, { content: [], details: undefined, isError: false }],
+  ["empty-text", args, { content: [{ type: "text", text: "" }], details: undefined, isError: false }],
+  ["error", args, { content: [{ type: "text", text: "OUTCOME_ERROR\nCannot read the synthetic store." }], details: undefined, isError: true }],
+  ["multiblock", args, { content: [{ type: "text", text: "BLOCK_ONE\n界 e\u0301" }, { type: "text", text: "BLOCK_TWO\tend\x1b]8;;https://example.invalid\x07link\x1b]8;;\x07" }], details: undefined, isError: false }],
+];
+const snapshots = [];
+for (const [label, callArgs, callResult] of cases) {
+  for (const outputPad of [0, 1]) {
+    for (const initiallyHidden of [false, true]) {
+      await setCalm(initiallyHidden);
+      const stock = new ToolExecutionComponent("fm_branch_outcomes", `${label}-stock`, {}, { showImages: false, outputPad }, stockDefinition, ui, process.cwd());
+      const actual = new ToolExecutionComponent("fm_branch_outcomes", `${label}-actual`, {}, { showImages: false, outputPad }, runner.resolveToolRenderers("fm_branch_outcomes", () => registeredDefinition), ui, process.cwd());
+      const equalRows = (phase) => {
+        for (const width of [24, 40, 100, 160]) {
+          const expected = stock.render(width);
+          const observed = actual.render(width);
+          if (JSON.stringify(observed) !== JSON.stringify(expected)) {
+            throw new Error(`stock rows differ: ${JSON.stringify({ label, outputPad, initiallyHidden, phase, width, expected, observed })}`);
+          }
+          if (observed.some((line) => visibleWidth(line) > width)) throw new Error(`${label}/${phase} exceeds ${width} columns`);
+          if (process.env.FM_PI_RENDER_PROOF_DIR) {
+            snapshots.push({ label, outputPad, initiallyHidden, phase, width, stock: expected, actual: observed });
+          }
+        }
+      };
+      if (initiallyHidden) {
+        if (actual.render(100).length) throw new Error("a row created while Calm was on retained height");
+        await setCalm(false);
+        actual.invalidate();
+      }
+      equalRows("arguments-starting");
+      for (const row of [stock, actual]) {
+        row.updateArgs(callArgs);
+        row.markExecutionStarted();
+        row.setArgsComplete();
+      }
+      equalRows("arguments-complete");
+      for (const row of [stock, actual]) row.updateResult(callResult, true);
+      equalRows("partial-result");
+      for (const row of [stock, actual]) row.updateResult(callResult);
+      equalRows("collapsed-result");
+      for (const expanded of [false, true]) {
+        for (const width of [24, 100]) {
+          const lines = stock.render(width);
+          const outputY = lines.findIndex((line) => line.includes("OUTCOME_ONE") || line.includes("OUTCOME_ERROR") || line.includes("BLOCK_ONE"));
+          const points = [[0, 0], [width - 1, 0], [0, 1], [width - 1, 1], [Math.floor(width / 2), 1], [0, lines.length - 1], [width - 1, lines.length - 1], [Math.floor(width / 2), lines.length - 1]];
+          if (outputPad && outputY >= 0) points.push([0, outputY], [width - 1, outputY]);
+          for (const [x, y] of points) {
+            const responses = [];
+            for (const row of [stock, actual]) {
+              row.setExpanded(expanded);
+              const current = row.render(width);
+              const targetY = y === lines.length - 1 ? current.length - 1 : y;
+              responses.push(row.handleMouse({ type: "click", button: "left", x, y: targetY, width, height: current.length }));
+              row.invalidate();
+            }
+            if (JSON.stringify(responseContract(responses[0])) !== JSON.stringify(responseContract(responses[1]))) throw new Error(`padding mouse response differs from stock: ${JSON.stringify({ label, outputPad, expanded, width, x, y, responses: responses.map(responseContract) })}`);
+            equalRows(`padding-${expanded}-${width}-${x}-${y}`);
+          }
+        }
+      }
+      for (const row of [stock, actual]) row.setExpanded(false);
+      for (const expanded of [true, false]) {
+        for (const width of [24, 40, 100, 160]) {
+          for (const row of [stock, actual]) {
+            const lines = row.render(width);
+            const y = lines.findIndex((line) => line.includes("OUTCOME_ONE") || line.includes("OUTCOME_ERROR") || line.includes("BLOCK_ONE"));
+            if (y < 0) continue;
+            row.handleMouse({ type: "click", button: "left", x: outputPad + 1, y, width, height: lines.length });
+          }
+          equalRows(`mouse-${expanded}-${width}`);
+          for (const row of [stock, actual]) row.invalidate();
+          equalRows(`mouse-invalidated-${expanded}-${width}`);
+          initTheme("light");
+          for (const row of [stock, actual]) row.invalidate();
+          equalRows(`mouse-theme-${expanded}-${width}`);
+          initTheme("dark");
+          stock.invalidate();
+          await setCalm(true);
+          actual.invalidate();
+          if (actual.render(width).length) throw new Error("mouse-expanded row remained visible in Calm");
+          await setCalm(false);
+          actual.invalidate();
+          equalRows(`mouse-restored-${expanded}-${width}`);
+        }
+      }
+      for (const row of [stock, actual]) row.setExpanded(true);
+      equalRows("expanded-result");
+      for (const row of [stock, actual]) row.setOutputPad(1 - outputPad);
+      equalRows("padding-changed");
+      await setCalm(true);
+      actual.invalidate();
+      if (actual.render(40).length) throw new Error(`${label} left height after enabling Calm`);
+      // Updates and expansion while hidden must survive restoration.
+      for (const row of [stock, actual]) {
+        row.updateArgs({ recent: 3 });
+        row.setExpanded(false);
+        row.updateResult(callResult);
+      }
+      await setCalm(false);
+      actual.invalidate();
+      equalRows("restored-after-hidden-update");
+    }
+  }
+}
+if (!collapsedText.includes("recent=2") || !expandedStock.join("\n").includes("recent: 2")) {
+  throw new Error("stock argument fixture failed to exercise collapsed and expanded arguments");
+}
+
+// Exercise the real HTML document generator with the same registered resolver
+// consumer as AgentSession.exportToHtml. No model or provider is called.
+const session = SessionManager.create("/synthetic/pi-compat", `${process.cwd()}/synthetic-sessions`);
+const usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } };
+session.appendMessage({ role: "user", content: "Synthetic outcomes presentation fixture.", timestamp: 0 });
+for (const [label, callArgs, callResult] of cases) {
+  const id = `synthetic-${label}`;
+  session.appendMessage({ role: "assistant", content: [{ type: "toolCall", id, name: "fm_branch_outcomes", arguments: callArgs }], api: "synthetic", provider: "synthetic", model: "synthetic", usage, stopReason: "toolUse", timestamp: 0 });
+  session.appendMessage({ role: "toolResult", toolCallId: id, toolName: "fm_branch_outcomes", ...callResult, timestamp: 0 });
+}
+const state = { systemPrompt: "Synthetic presentation fixture; no model execution.", tools: [registeredDefinition] };
+let exportedStock;
+let exportedActual;
+for (const active of [false, true]) {
+  await setCalm(active);
+  exportedStock = await exportSessionToHtml(session, state, { outputPath: `${process.cwd()}/stock-${active}.html`, themeName: "dark", toolRenderer: stockHtml });
+  exportedActual = await exportSessionToHtml(session, state, { outputPath: `${process.cwd()}/actual-${active}.html`, themeName: "dark", toolRenderer: actualHtml });
+  if (readFileSync(exportedActual, "utf8") !== readFileSync(exportedStock, "utf8")) {
+    throw new Error(`actual HTML document differs from stock with Calm active=${active}`);
+  }
+  await setCalm(active);
+}
+
+// A downstream extension's renderers must remain the delegated presentation,
+// including actual custom HTML; unrelated tools pass through untouched.
+const downstreamContexts = new Map();
+const downstreamMouse = new Map();
+const downstream = {
+  renderCall: (callArgs) => new Text(`DOWNSTREAM_CALL recent=${callArgs.recent}`, 0, 0),
+  renderResult: (_result, _options, _theme, context) => {
+    const output = context.state.output ??= new Text("DOWNSTREAM_RESULT", 0, 0);
+    output.handleMouse = (event) => {
+      downstreamMouse.set(context.toolCallId, event);
+      return event.button === "right" ? { handled: true } : undefined;
+    };
+    downstreamContexts.set(context.toolCallId, { context, output });
+    return output;
+  },
+};
+pi.registerToolRenderer((name, next) => name === "fm_branch_outcomes" ? downstream : next());
+await setCalm(false);
+const unrelated = runner.resolveToolRenderers("unrelated", () => downstream);
+if (unrelated.renderCall !== downstream.renderCall || unrelated.renderResult !== downstream.renderResult) throw new Error("Calm changed unrelated custom presentation slots");
+const delegatedStock = new ToolExecutionComponent("fm_branch_outcomes", "delegated-stock", args, { showImages: false }, downstream, ui, process.cwd());
+const delegatedActual = new ToolExecutionComponent("fm_branch_outcomes", "delegated-actual", args, { showImages: false }, runner.resolveToolRenderers("fm_branch_outcomes", () => registeredDefinition), ui, process.cwd());
+for (const row of [delegatedStock, delegatedActual]) row.updateResult(result);
+if (JSON.stringify(delegatedStock.render(100)) !== JSON.stringify(delegatedActual.render(100))) throw new Error("next renderer delegation changed rows");
+const deferred = downstreamContexts.get("delegated-actual");
+if (!deferred) throw new Error("delegated result did not receive its actual render context");
+const redrawsBefore = ui.redrawRequests;
+deferred.output.setText("DOWNSTREAM_RESULT_CHANGED");
+deferred.context.invalidate();
+if (ui.redrawRequests <= redrawsBefore || !delegatedActual.render(100).join("\n").includes("DOWNSTREAM_RESULT_CHANGED")) {
+  throw new Error("downstream renderer invalidation did not redraw its owning row");
+}
+downstreamContexts.get("delegated-stock").output.setText("DOWNSTREAM_RESULT_CHANGED");
+downstreamContexts.get("delegated-stock").context.invalidate();
+for (const outputPad of [0, 1]) {
+  for (const width of [24, 100]) {
+    for (const row of [delegatedStock, delegatedActual]) row.setOutputPad(outputPad);
+    for (const button of ["right", "left", "left"]) {
+      const responses = [];
+      for (const [id, row] of [["delegated-stock", delegatedStock], ["delegated-actual", delegatedActual]]) {
+        downstreamMouse.delete(id);
+        const lines = row.render(width);
+        const y = lines.findIndex((line) => line.includes("DOWNSTREAM_RESULT"));
+        if (y < 0) throw new Error("missing downstream mouse target");
+        responses.push(row.handleMouse({ type: "click", button, x: outputPad + 2, y, width, height: lines.length }));
+      }
+      if (JSON.stringify(downstreamMouse.get("delegated-stock")) !== JSON.stringify(downstreamMouse.get("delegated-actual")) || !downstreamMouse.has("delegated-actual")) {
+        throw new Error("downstream mouse coordinates changed");
+      }
+      if (JSON.stringify(responseContract(responses[0])) !== JSON.stringify(responseContract(responses[1]))) throw new Error(`downstream mouse handling changed: ${JSON.stringify({button, responses: responses.map(responseContract)})}`);
+      for (const id of ["delegated-stock", "delegated-actual"]) downstreamContexts.get(id).context.invalidate();
+      if (JSON.stringify(delegatedStock.render(width)) !== JSON.stringify(delegatedActual.render(width))) throw new Error("mouse state lost after downstream invalidation");
+    }
+  }
+}
+await setCalm(true, true);
+const delegatedHtml = createToolHtmlRenderer({ getToolRenderers: () => downstream, theme, cwd: process.cwd() });
+const expectedCall = delegatedHtml.renderCall("delegated-html", "fm_branch_outcomes", args);
+const observedCall = actualHtml.renderCall("delegated-html", "fm_branch_outcomes", args);
+const expectedResult = delegatedHtml.renderResult("delegated-html", "fm_branch_outcomes", result.content, result.details, false);
+const observedResult = actualHtml.renderResult("delegated-html", "fm_branch_outcomes", result.content, result.details, false);
+if (!expectedCall?.includes("DOWNSTREAM_CALL") || !expectedResult?.expanded?.includes("DOWNSTREAM_RESULT") || expectedCall !== observedCall || JSON.stringify(expectedResult) !== JSON.stringify(observedResult)) {
+  throw new Error("actual custom HTML consumer lost downstream rendering");
+}
+await setCalm(false);
+
+const processed = tools.find((tool) => tool.name === "fm_branch_processed");
+if (!processed) throw new Error("fm_branch_processed was not registered");
+for (const slot of ["renderShell", "renderCall", "renderResult", "isVisible"]) {
+  if (processed[slot] !== undefined) throw new Error(`branch-only processed claimed ${slot}`);
+}
+await setCalm(false);
+const processedRow = new ToolExecutionComponent("fm_branch_processed", "processed", { through: 2 }, { showImages: false }, runner.resolveToolRenderers("fm_branch_processed", () => processed), ui, process.cwd());
+processedRow.updateResult({ content: [{ type: "text", text: "PROCESSED_CUSTOM_RESULT" }], details: {} });
+const processedStock = new ToolExecutionComponent("fm_branch_processed", "processed-stock", { through: 2 }, { showImages: false }, processed, ui, process.cwd());
+processedStock.updateResult({ content: [{ type: "text", text: "PROCESSED_CUSTOM_RESULT" }], details: {} });
+for (const expanded of [false, true]) {
+  processedStock.setExpanded(expanded);
+  processedRow.setExpanded(expanded);
+  if (JSON.stringify(processedRow.render(100)) !== JSON.stringify(processedStock.render(100))) {
+    throw new Error(`Calm-off processed differs from stock, expanded=${expanded}`);
+  }
+}
+const processedVisible = processedRow.render(100);
+if (!processedVisible.join("\n").includes("PROCESSED_CUSTOM_RESULT")) throw new Error("processed custom result did not render");
+await setCalm(true);
+if (processedRow.render(100).length) throw new Error("Calm retained processed custom row height");
+await setCalm(false);
+if (JSON.stringify(processedRow.render(100)) !== JSON.stringify(processedVisible)) throw new Error("processed custom presentation did not restore");
+
+// Exercise actual fullscreen dispatch and copy through its public terminal boundary.
+// Both controls use the same native stock outcomes row, with only actual Calm added.
+const { TuiAltScreen, stripTerminalSequences } = await import("@earendil-works/pi-tui");
+class RecordingTerminal {
+  columns = 100; rows = 40; kittyProtocolActive = false;
+  writes = [];
+  start(onInput) { this.onInput = onInput; }
+  stop() { this.onInput = undefined; }
+  write(data) { this.writes.push(data); }
+  sendInput(data) { this.onInput?.(data); }
+  async drainInput() {}
+  moveBy() {} hideCursor() {} showCursor() {} clearLine() {}
+  clearFromCursor() {} clearScreen() {} setTitle() {} setProgress() {} setProgramStatus() {}
+}
+const selectionProof = [];
+for (const width of [24, 100]) {
+  const observations = [];
+  for (const withCalm of [false, true]) {
+    const terminal = new RecordingTerminal();
+    terminal.columns = width;
+    const copied = [];
+    const tui = new TuiAltScreen(terminal, undefined, undefined, { copyOnSelect: false, copySelection: async (text) => { copied.push(text); return true; } });
+    const row = new ToolExecutionComponent("fm_branch_outcomes", `selection-${withCalm}`, args, { showImages: false, outputPad: 1 }, withCalm ? actualDefinition : stockDefinition, tui, process.cwd());
+    row.markExecutionStarted();
+    row.setArgsComplete();
+    row.updateResult(result);
+    row.setExpanded(true);
+    tui.addChild(new Text("SELECT_ANCHOR_TEXT", 0, 0));
+    tui.addChild(row);
+    tui.addChild(new Text("SELECT_TAIL_TEXT", 0, 0));
+    tui.start();
+    try {
+      tui.renderNow();
+      const screen = tui.getScreenLines().map(stripTerminalSequences);
+      const startY = screen.findIndex((line) => line.includes("SELECT_ANCHOR_TEXT")) + 1;
+      const endY = screen.findIndex((line) => line.includes("SELECT_TAIL_TEXT")) + 1;
+      if (!startY || !endY || endY <= startY) throw new Error("fullscreen selection fixture did not expose both anchors");
+      terminal.sendInput(`\x1b[<0;1;${startY}M`);
+      terminal.sendInput(`\x1b[<32;5;${endY}M`);
+      terminal.sendInput(`\x1b[<0;5;${endY}m`);
+      tui.renderNow();
+      if (!tui.hasActiveSelection() || !await tui.copyActiveSelectionToClipboard()) throw new Error("fullscreen row prevented native selection/copy");
+      if (!copied[0]?.includes("OUTCOME_TWELVE")) throw new Error("fullscreen selection did not cross stock output");
+      observations.push(copied[0]);
+      selectionProof.push({ width, withCalm, selected: copied[0], screen });
+    } finally { tui.stop(); }
+  }
+  if (observations[0] !== observations[1]) throw new Error(`Calm changed fullscreen selection/copy at width ${width}`);
+}
+
+// A downstream interactive child must lose capture and keyboard focus when the
+// real Calm command hides its owner, and require fresh input after restoration.
+await setCalm(false);
+const terminal = new RecordingTerminal();
+const tui = new TuiAltScreen(terminal);
+const mouseEvents = [];
+const keyEvents = [];
+const interactive = new Text("INTERACTIVE_OUTCOME_CHILD", 0, 0);
+interactive.handleInput = (data) => keyEvents.push(data);
+interactive.handleMouse = (event) => {
+  mouseEvents.push(event.type);
+  return event.type === "press" ? { handled: true, capture: true, focus: true } : { handled: true };
+};
+pi.registerToolRenderer((name, next) => name === "interactive_outcome" ? { renderShell: "self", renderResult: () => interactive } : next());
+const interactiveRow = new ToolExecutionComponent("interactive_outcome", "interactive", {}, { showImages: false }, runner.resolveToolRenderers("interactive_outcome", () => undefined), tui, process.cwd());
+interactiveRow.updateResult(result);
+tui.addChild(interactiveRow);
+tui.start();
+try {
+  tui.renderNow();
+  const targetY = tui.getScreenLines().findIndex((line) => line.includes("INTERACTIVE_OUTCOME_CHILD")) + 1;
+  if (!targetY) throw new Error("interactive child fixture did not render");
+  terminal.sendInput(`\x1b[<0;2;${targetY}M`);
+  terminal.sendInput("A");
+  if (!mouseEvents.includes("press") || keyEvents.join("") !== "A") throw new Error("visible interactive child did not acquire capture/focus");
+  await setCalm(true);
+  tui.renderNow();
+  terminal.sendInput("HIDDEN_KEY");
+  terminal.sendInput(`\x1b[<32;3;${targetY}M`);
+  if (interactiveRow.render(100).length || keyEvents.join("") !== "A") throw new Error("hidden outcomes child accepted input");
+  const afterHide = [...mouseEvents];
+  await setCalm(false);
+  tui.renderNow();
+  terminal.sendInput(`\x1b[<0;3;${targetY}m`);
+  terminal.sendInput("STALE_KEY");
+  if (JSON.stringify(mouseEvents) !== JSON.stringify(afterHide) || keyEvents.join("") !== "A") throw new Error("restoration revived stale capture or keyboard focus");
+  terminal.sendInput(`\x1b[<0;2;${targetY}M`);
+  terminal.sendInput("B");
+  if (keyEvents.join("") !== "AB") throw new Error("fresh visible interaction failed after Calm restoration");
+} finally { tui.stop(); }
+
+if (process.env.FM_PI_RENDER_PROOF_DIR) {
+  const proofDir = process.env.FM_PI_RENDER_PROOF_DIR;
+  mkdirSync(proofDir, { recursive: true });
+  writeFileSync(`${proofDir}/selection.json`, `${JSON.stringify(selectionProof, null, 2)}\n`);
+  writeFileSync(`${proofDir}/rows.json`, `${JSON.stringify(snapshots, null, 2)}\n`);
+  cpSync(exportedStock, `${proofDir}/stock.html`);
+  cpSync(exportedActual, `${proofDir}/actual.html`);
+  cpSync(session.getSessionFile(), `${proofDir}/synthetic-session.jsonl`);
 }
 JS
   )
@@ -5949,7 +6206,7 @@ EOF
   pass "an extension-registered provider resolves in the isolated branch runtime"
 }
 
-test_outcomes_tool_call_headers_follow_the_loaded_pi_version
+test_branch_mirror_filters_order_and_cursor
 test_outcomes_tool_uses_stock_execution_and_export_consumers
 test_real_pi_picker_primitives_stay_bounded_and_searchable
 test_branch_dispatch_two_stage_filter_and_prefix_contract
@@ -5976,7 +6233,6 @@ test_post_construction_provider_error_falls_back_latches_and_recovers_on_cooldow
 test_selection_change_does_not_corrupt_inflight_provider_state
 test_main_owned_grant_result_falls_back_to_main
 test_branch_predrain_recheck_noops_already_drained_wake
-test_branch_mirror_filters_order_and_cursor
 test_branch_mirror_reanchors_for_the_new_session_branch_conversation
 test_branch_session_is_new_at_every_main_session_start
 test_branch_model_pin_applies_and_absent_pin_keeps_the_default

@@ -443,6 +443,9 @@ jobs:
           export PATH
           command -v tasks-axi >/dev/null || { echo "::error::tasks-axi is required for the stock Bash regressions"; exit 1; }
 
+          FM_TEST_ONLY=test_ready_review_wrapper_backlog_modes FM_TEST_BASH=/bin/bash \
+            /bin/bash tests/fm-ready-review-sdk.test.sh
+
           snapshot_output=$(/bin/bash tests/fm-fleet-snapshot-view.test.sh)
           printf '%s\n' "$snapshot_output"
           snapshot_count=$(printf '%s\n' "$snapshot_output" | grep -c '^ok - ')

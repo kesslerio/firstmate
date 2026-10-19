@@ -120,12 +120,14 @@ SH
 watch_bg() {  # <state> <fakebin> <out> [extra env assignments...]
   local state=$1 fakebin=$2 out=$3
   shift 3
+  local command=("$WATCH")
+  [ "${FM_TEST_WATCH_XTRACE:-0}" != 1 ] || command=(bash -x "$WATCH")
   PATH="$fakebin:$PATH" FM_STATE_OVERRIDE="$state" \
     FM_CREW_STATE_BIN="$fakebin/fm-crew-state.sh" \
     FM_FAKE_CREW_STATE='state: working · source: run-step · validating (running)' \
     FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     FM_TASK_INBOX_GRACE_SECS=1 \
-    env "$@" "$WATCH" > "$out" 2>/dev/null &
+    env "$@" "${command[@]}" > "$out" 2>"$out.err" &
 }
 
 wait_watcher_gone() {  # <pid> [limit-ticks]
@@ -1181,6 +1183,102 @@ test_watcher_dead_pane_ignores_stale_busy_state() {
   pass "watcher: dead-pane recovery overrides stale busy state"
 }
 
+test_acknowledged_instruction_still_requires_execution() {
+  local kind=$1 dir state log out pid rec
+  dir=$(setup_watch_case "ack-execution-$kind")
+  state="$dir/state"; log="$dir/send.log"; out="$dir/watch.out"
+  mkdir -p "$dir/data" "$dir/config"
+  printf 'window=sess:fm-t1\nkind=%s\nharness=grok\nspawn_gen=obligation-g1\n' "$kind" > "$state/t1.meta"
+  printf 'project=fixture\nworktree=%s\n' "$dir" >> "$state/t1.meta"
+  : > "$log"
+  PATH="$dir/fakebin:$PATH" FM_HOME="$dir" FM_STATE_OVERRIDE="$state" \
+    FM_CONFIG_OVERRIDE="$dir/config" FM_DATA_OVERRIDE="$dir/data" FM_SEND_LOG="$log" \
+    FM_FAKE_TMUX_AGENT=grok "$ROOT/bin/fm-send.sh" t1 'Perform the requested operation' \
+    > "$dir/send.out" 2> "$dir/send.err" || fail "cross-layer enqueue failed: $(cat "$dir/send.err")"
+  rec="$state/t1.inbox/001.msg"
+  mv "$rec" "$state/t1.inbox/handled/"
+  # A promise and generic native activity must not settle this exact request.
+  printf 'working: acknowledged; I will start\n' > "$state/t1.status"
+  printf 'obligation-g1\n' > "$state/t1.progress"
+  watch_bg "$state" "$dir/fakebin" "$out" FM_HOME="$dir" \
+    FM_CONFIG_OVERRIDE="$dir/config" FM_DATA_OVERRIDE="$dir/data" \
+    FM_TASK_INBOX_OBLIGATION_GRACE_SECS=0 FM_SEND_LOG="$log" \
+    FM_FAKE_TMUX_AGENT=grok FM_FAKE_TMUX_CAPTURE="$(idle_capture "$dir")"
+  pid=$!
+  wait_watcher_gone "$pid" 200 || { kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null; fail "acknowledged instruction disappeared from watcher recovery: $(tail -n 90 "$out" "$out.err"); ledger: $(cat "$state/t1.inbox/obligations/001.msg.json" 2>/dev/null)"; }
+  wait "$pid" 2>/dev/null || true
+  [ "$(grep -c 'instruction execution unaccounted' "$state/.wake-queue" 2>/dev/null || true)" = 1 ] \
+    || fail "watcher lost the acknowledged obligation: $(cat "$out")"
+  [ "$(grep -c 'Firstmate disposition missing' "$log" || true)" = 1 ] \
+    || fail 'watcher must reconcile the existing instruction exactly once'
+  [ "$(find "$state/t1.inbox" -name '*.msg' | wc -l | tr -d ' ')" = 1 ] \
+    || fail 'execution recovery duplicated the original instruction'
+  pass "fm-send -> handled -> watcher: $kind promise/generic activity does not silence execution obligation"
+}
+
+test_obligation_failure_does_not_hide_sibling() {
+  local dir state rec out pid cycle channel real_grep
+  dir=$(setup_watch_case obligation-bad-sibling)
+  state="$dir/state"
+  mkdir -p "$dir/data" "$dir/config" "$state/bad.inbox/handled"
+  printf 'window=sess:fm-t1\nkind=ship\nharness=grok\nspawn_gen=g1\n' > "$state/t1.meta"
+  printf 'project=fixture\nworktree=%s\n' "$dir" >> "$state/t1.meta"
+  printf 'spawn_gen=bad1\n' > "$state/bad.meta"
+  printf 'schema=fm-task-inbox.v1\nobligation={broken\n--\nbad state' > "$state/bad.inbox/handled/001.msg"
+  mkdir -p "$dir/foreign" "$state/linked-handled.inbox" "$state/linked-ledger.inbox" "$state/linked-record.inbox"
+  printf 'foreign record must not be inspected\n' > "$dir/foreign/001.msg"
+  ln -s "$dir/missing" "$state/dangling.inbox"
+  ln -s "$dir/foreign" "$state/linked.inbox"
+  ln -s "$dir/foreign" "$state/linked-handled.inbox/handled"
+  ln -s "$dir/foreign" "$state/linked-ledger.inbox/obligations"
+  ln -s "$dir/foreign/001.msg" "$state/linked-record.inbox/001.msg"
+  mkdir -p "$state/fifo-record.inbox" "$state/directory-record.inbox/001.msg"
+  mkfifo "$state/fifo-record.inbox/001.msg"
+  for channel in dangling linked linked-handled linked-ledger linked-record fifo-record directory-record; do
+    printf 'spawn_gen=foreign1\n' > "$state/$channel.meta"
+  done
+  real_grep=$(command -v grep)
+  cat > "$dir/fakebin/grep" <<'SH'
+#!/usr/bin/env bash
+for arg in "$@"; do
+  case "$arg" in
+    "$FM_FORBIDDEN_DISCOVERY_STATE/linked.inbox/"*|"$FM_FORBIDDEN_DISCOVERY_STATE/linked-handled.inbox/"*|"$FM_FORBIDDEN_DISCOVERY_STATE/linked-ledger.inbox/"*|"$FM_FORBIDDEN_DISCOVERY_STATE/linked-record.inbox/"*|"$FM_FORBIDDEN_DISCOVERY_STATE/fifo-record.inbox/"*|"$FM_FORBIDDEN_DISCOVERY_STATE/directory-record.inbox/"*)
+      printf 'attempted foreign channel read\n' >> "$FM_FORBIDDEN_DISCOVERY_LOG"
+      exit 97 ;;
+  esac
+done
+exec "$FM_TEST_REAL_GREP" "$@"
+SH
+  chmod +x "$dir/fakebin/grep"
+  rec=$(FM_HOME="$dir" inbox_lib "$state" fm_task_inbox_write "$state" t1 'Account for this sibling instruction' '' disposition) || fail 'sibling enqueue failed'
+  mv "$rec" "$state/t1.inbox/handled/"
+  for cycle in 1 2 3; do
+    out="$dir/watch-$cycle.out"
+    watch_bg "$state" "$dir/fakebin" "$out" FM_HOME="$dir" \
+      FM_CONFIG_OVERRIDE="$dir/config" FM_DATA_OVERRIDE="$dir/data" \
+      FM_TASK_INBOX_OBLIGATION_GRACE_SECS=0 FM_SEND_LOG="$dir/send.log" \
+      FM_TEST_REAL_GREP="$real_grep" FM_FORBIDDEN_DISCOVERY_STATE="$state" FM_FORBIDDEN_DISCOVERY_LOG="$dir/foreign-read.log" \
+      FM_FAKE_TMUX_AGENT=grok FM_FAKE_TMUX_CAPTURE="$(idle_capture "$dir")"
+    pid=$!
+    wait_watcher_gone "$pid" 150 || { kill "$pid"; wait "$pid" || true; fail 'malformed channel left watcher silently stopped'; }
+    wait "$pid" || fail "watcher exited without durable recovery: $(cat "$out.err")"
+  done
+  [ "$(grep -c 'instruction obligation recovery failed for bad' "$state/.wake-queue")" = 1 ] || fail 'bad channel failure repeated instead of deduplicating'
+  [ "$(grep -c 'instruction execution unaccounted: t1' "$state/.wake-queue")" = 1 ] || fail 'bad channel hid the sibling obligation'
+  [ ! -s "$dir/foreign-read.log" ] || fail 'watcher attempted content reads in an unsafe record channel'
+  for channel in dangling linked linked-handled linked-ledger linked-record fifo-record directory-record; do
+    [ "$(grep -c "instruction obligation recovery failed for $channel:" "$state/.wake-queue")" = 1 ] || fail "$channel unsafe channel did not surface exactly once"
+  done
+  pass 'malformed and symlink channels surface once before foreign reads while healthy sibling reaches escalation'
+}
+
+if [ "${FM_TEST_OBLIGATION_CROSSLAYER_ONLY:-0}" = 1 ]; then
+  test_acknowledged_instruction_still_requires_execution ship
+  test_acknowledged_instruction_still_requires_execution secondmate
+  test_obligation_failure_does_not_hide_sibling
+  exit 0
+fi
+
 test_write_is_durable_and_exact
 test_doorbell_is_a_shell_noop
 test_doorbell_rejects_terminal_controls
@@ -1228,3 +1326,8 @@ test_watcher_retry_keeps_a_newer_mark
 test_watcher_escalates_once_after_budget
 test_watcher_dead_pane_escalates_once_without_ringing
 test_watcher_dead_pane_ignores_stale_busy_state
+
+test_acknowledged_instruction_still_requires_execution ship
+test_acknowledged_instruction_still_requires_execution secondmate
+
+test_obligation_failure_does_not_hide_sibling

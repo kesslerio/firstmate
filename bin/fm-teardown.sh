@@ -522,6 +522,22 @@ fm_backlog_record_present "$META" "task record" "$STATE" || {
   echo "error: teardown refused after locking: $FM_BACKLOG_TRANSITION_ERROR" >&2
   exit 1
 }
+# The task metadata lock excludes new sends and disposition writers until all
+# cleanup finishes. Acknowledgement alone cannot authorize deleting a steer.
+if [ -L "$STATE/$ID.inbox" ] || [ -d "$STATE/$ID.inbox/obligations" ] ||
+  [ -e "$STATE/.obligation-remote-$ID.json" ] ||
+  grep -q '^obligation=' "$STATE/$ID.inbox"/*.msg "$STATE/$ID.inbox/handled"/*.msg 2>/dev/null; then
+  TEARDOWN_INSTRUCTION_HOME=${FM_TASK_INBOX_OWNER_HOME:-$FM_HOME}
+  if [ -n "${FM_TASK_INBOX_OWNER_HOME:-}" ]; then
+    case "$TEARDOWN_INSTRUCTION_HOME" in /*) ;; *) echo 'error: invalid remote instruction owner' >&2; exit 1 ;; esac
+    if [ "$(cd "$TEARDOWN_INSTRUCTION_HOME" 2>/dev/null && pwd -P)" != "$TEARDOWN_INSTRUCTION_HOME" ] ||
+      [ "$STATE" != "$TEARDOWN_INSTRUCTION_HOME/state/parent-route" ]; then
+      echo 'error: remote instruction owner does not match its exact parent-route channel' >&2
+      exit 1
+    fi
+  fi
+  FM_HOME="$TEARDOWN_INSTRUCTION_HOME" python3 "$SCRIPT_DIR/fm-task-inbox-obligation.py" guard "$STATE" "$ID" || exit 1
+fi
 TEARDOWN_META_KIND=$(fm_meta_get "$META" kind)
 [ -n "$TEARDOWN_META_KIND" ] || TEARDOWN_META_KIND=ship
 # Retiring a persistent secondmate is main's alone in both postures; the kind
@@ -3784,6 +3800,7 @@ rm -f "$STATE/$ID.turn-ended" "$STATE/$ID.progress" \
   "$STATE/$ID.reconcile-nudged" "$STATE/$ID.gemini-settings.json" "$STATE/$ID.devin-config.json" \
   "$STATE/.$ID.branch-outcome-index" \
   "$STATE/.secondmate-relaunch-$ID" "$STATE/.secondmate-relaunch-bound-$ID"
+rm -f "$STATE/.obligation-remote-$ID.json" "$STATE/.instruction-error-$ID"
 # The steering inbox (bin/fm-task-inbox-lib.sh) is runtime state for the
 # retired endpoint; teardown only runs after landing is confirmed, so any
 # leftover unhandled steer here is moot rather than unlanded work.

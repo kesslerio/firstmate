@@ -44,6 +44,9 @@ These variables override individual operational directories for tests and specia
 | `FM_PROJECTS_OVERRIDE` | Local project clones |
 | `FM_CONFIG_OVERRIDE` | Local configuration |
 
+Instruction dispositions accept only the exact selected `FM_STATE_OVERRIDE` when explicit, including an alternate directory inside or outside `FM_HOME`, while retaining exact home, state, record, body, and generation bindings.
+Response artifacts for fulfilled dispositions remain confined to `FM_HOME`; execution and uncertain-attempt behavior is owned by `bin/fm-task-inbox.sh --help`.
+
 ### Relative paths and lifecycle safety
 
 Before `fm-brief.sh`, `fm-spawn.sh`, or `fm-afk-launch.sh` saves a path or passes it to another process, it handles each applicable `FM_HOME`, `FM_STATE_OVERRIDE`, or `FM_DATA_OVERRIDE` directory as follows:
@@ -89,8 +92,9 @@ Each effective `FM_HOME` contains private operational directories.
 - Parent-side remote ledger copies under `state/secondmate-summary-cache/`.
 - One-shot Bearings reconcile requests under `state/reconcile-notify/`.
 - Private secondmate config-reread generations with their retry and quarantine state.
-- Per-task steering-inbox records under `state/<id>.inbox/` (`bin/fm-task-inbox-lib.sh`).
+- Per-task steering-inbox records under `state/<id>.inbox/` (`bin/fm-task-inbox-lib.sh`), with execution dispositions exposed by `bin/fm-task-inbox.sh --help`.
 - Parent-owned secondmate pending-reply records under `state/pending-replies/` (`bin/fm-pending-reply-lib.sh`).
+- Owner-home ready-work review generations and current dispositions under `state/.ready-review.json`, with commands and acknowledgment rules owned by `bin/fm-ready-review.sh --help` and `bin/fm_ready_review.py`.
 
 `config/` holds local gitignored operating choices, including explicit extension bindings under `config/extensions.d/`.
 
@@ -104,7 +108,7 @@ Untracked files and directories whose names begin with `scratchpad` are also git
 
 - `bin/fm-contributions.sh` owns durable published-contribution records under each task, observation bounds, equivalent triage-label configuration, and the authenticated contribution check.
 
-- The producing PR and Relay helpers own the fields they append, [`bin/fm-classify-lib.sh`](../bin/fm-classify-lib.sh) owns status-event vocabulary, optional emission-time syntax, and legacy unknown-time handling, and `bin/fm-crew-state.sh` owns current-state reconciliation.
+- The producing PR and Relay helpers own the fields they append, [`bin/fm-classify-lib.sh`](../bin/fm-classify-lib.sh) owns status-event vocabulary, [`bin/fm-status-event-lib.sh`](../bin/fm-status-event-lib.sh) owns optional emission-time syntax and legacy unknown-time handling, and `bin/fm-crew-state.sh` owns current-state reconciliation.
 
 - The [`bin/fm-fleet-snapshot.sh` header](../bin/fm-fleet-snapshot.sh) owns the snapshot's event-time and age fields, including secondmate parent-event projections.
 
@@ -127,6 +131,15 @@ Untracked files and directories whose names begin with `scratchpad` are also git
 The shared orchestrator behavior lives in [`AGENTS.md`](../AGENTS.md).
 Edit it like any prompt when the fleet is empty.
 While tasks are in flight, dispatch shared-repo edits to a crewmate.
+
+## Worker accounting (config/worker-target)
+
+The local, gitignored `config/worker-target` setting supplies this home's reported worker target.
+[`bin/fm-liveness-lib.sh`](../bin/fm-liveness-lib.sh) owns its strict integer format, primary and secondmate defaults, live-worker definition, and read-only snapshot API.
+The away spend cap and return cost line use that shared live count.
+PR association survives replacement, while [`bin/fm-pr-check.sh`](../bin/fm-pr-check.sh) owns the incarnation-bound ready handoff that releases capacity.
+A capacity observation grants no launch, spend, merge, or acknowledgement authority; the target does not impose a new dispatch limit.
+`bin/fm-spawn.sh` records confirmed worker launches in `state/.last-launch` under the library's stamp contract.
 
 ## Calm preference (config/calm)
 
@@ -395,6 +408,7 @@ Bootstrap requires compatible `tasks-axi` on every profile; see "Toolchain" belo
 
 Set the local, gitignored `config/backlog-backend` file to `manual` to force manual backlog editing and suppress the verbose `BOOTSTRAP_INFO: tasks-axi available` fact, not missing-tool reporting.
 A `manual` home owns its backlog file outright: the lifecycle transitions above are skipped there, dispatch and completion never fail over the file's contents, and a completed teardown prints the hand edit that is owed instead.
+[`fm-ready-review.sh`](../bin/fm-ready-review.sh) owns pending launch accounting until the manual row transition and current processing are observed.
 
 Absent or `tasks-axi` selects the tasks-axi path.
 On the default markdown adapter, tasks-axi and manual edits produce the same `## In flight`, `## Queued`, and `## Done` sections.
@@ -2383,6 +2397,7 @@ FM_INACTIVE_RECONCILE_SECS=900  # 60..1800-second watcher cadence and inactivity
 FM_INACTIVE_RECONCILE_BUDGET_SECS=10  # 1..30-second scan deadline; wedged-scan kill backstop follows one second later
 FM_CHECK_INTERVAL=300   # seconds between slow checks (authenticated merge polls, custom checks, or Relay dispatch)
 FM_TASK_INBOX_GRACE_SECS=90   # seconds an unhandled steering-inbox message may sit before the watcher attempts doorbell delivery on an idle pane; also the minimum spacing between attempts
+FM_TASK_INBOX_OBLIGATION_GRACE_SECS=90  # acknowledged instruction disposition grace and remote observation spacing; policy: bin/fm-task-inbox-obligation.py
 FM_TASK_INBOX_RING_MAX=3      # watcher delivery attempts without an acknowledgement before the task surfaces as a stale wake for recovery
 FM_TASK_INBOX_BUSY_MAX=2      # consecutive busy-deferred due polls before a stuck-busy stale wake; 1..999999999, at most 9 decimal digits, otherwise 2; policy: bin/fm-task-inbox-lib.sh
 FM_CHECK_TIMEOUT=30     # seconds allowed per slow check script

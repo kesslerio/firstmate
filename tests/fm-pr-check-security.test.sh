@@ -28,15 +28,15 @@ REAL_CHMOD=$(command -v chmod)
 # depending on the host keeping jq in one of those four directories.
 REAL_JQ=$(command -v jq) || fail "these tests read glab's JSON with the real jq, which was not found"
 
-ack_watcher_cycle() {  # <state>
-  local state=$1 err sequence generation
+ack_watcher_cycle() {  # <home>
+  local home=$1 state=$1/state err sequence generation
   err="$state/.test-wake-drain.err"
-  FM_STATE_OVERRIDE="$state" "$ROOT/bin/fm-wake-drain.sh" >/dev/null 2> "$err" || return 1
+  FM_HOME="$home" FM_STATE_OVERRIDE="$state" "$ROOT/bin/fm-wake-drain.sh" >/dev/null 2> "$err" || return 1
   sequence=$(sed -n 's/^WAKE_ACK_REQUIRED:.*--ack-through \([0-9][0-9]*\) --recovery-generation [A-Za-z0-9._-][A-Za-z0-9._-]*$/\1/p' "$err")
   generation=$(sed -n 's/^WAKE_ACK_REQUIRED:.*--ack-through [0-9][0-9]* --recovery-generation \([A-Za-z0-9._-][A-Za-z0-9._-]*\)$/\1/p' "$err")
   rm -f "$err"
   [ -n "$sequence" ] && [ -n "$generation" ] || return 1
-  FM_STATE_OVERRIDE="$state" "$ROOT/bin/fm-wake-drain.sh" --ack-through "$sequence" \
+  FM_HOME="$home" FM_STATE_OVERRIDE="$state" "$ROOT/bin/fm-wake-drain.sh" --ack-through "$sequence" \
     --recovery-generation "$generation"
 }
 
@@ -778,7 +778,7 @@ test_valid_recording_and_merge_derivation() {
   # record before the watcher cycle below, which is what still retires the poll.
   assert_grep 'https://github.com/my-org/repo_name.with-dots/pull/37' "$dir/home/state/.wake-queue" \
     "a merge this home performed left no durable outcome"
-  ack_watcher_cycle "$dir/home/state" || fail "merge outcome acknowledgement failed"
+  ack_watcher_cycle "$dir/home" || fail "merge outcome acknowledgement failed"
   # With the merge already reported, the poll's own detection is a duplicate the
   # watcher absorbs, so this cycle needs its own reason to end.
   add_stop_custom_check "$dir"
@@ -2130,7 +2130,7 @@ poll_artifact_snapshot() {
 }
 
 test_merged_poll_retires_once() {
-  local dir state rc first second meta_before
+  local dir state rc first second meta_before ledger_before queue_before foreign_home
   dir=$(make_case merged-retirement-once)
   state="$dir/home/state"
   write_poll_meta "$state" task-a https://github.com/o/r/pull/1
@@ -2145,7 +2145,25 @@ test_merged_poll_retires_once() {
   [ "$rc" -eq 0 ] || fail "merged retirement watcher failed: $(cat "$dir/watch-1.err")"
   first=$(cat "$dir/watch-1.out")
   case "$first" in check:*task-a.check.sh:*merged) ;; *) fail "first merged notification was not preserved: $first" ;; esac
-  ack_watcher_cycle "$state" || fail "first merged notification handling acknowledgement failed"
+  # State paths do not grant ownership of another home's ready-work ledger.
+  # Keep the refusal intact, then prove the fixture helper selects the owner
+  # even when its caller carries a different ambient home.
+  foreign_home="$dir/foreign-home"
+  mkdir -p "$foreign_home/data" "$foreign_home/config" "$foreign_home/state"
+  ledger_before=$(fm_pr_sha256 "$state/.ready-review.json")
+  queue_before=$(fm_pr_sha256 "$state/.wake-queue")
+  if FM_HOME="$foreign_home" FM_STATE_OVERRIDE="$state" "$ROOT/bin/fm-ready-review.sh" guard main \
+    > "$dir/foreign-review.out" 2> "$dir/foreign-review.err"; then
+    fail "foreign home accepted the merged notification's ready-work ledger"
+  fi
+  grep -qF 'foreign or invalid ready review ledger' "$dir/foreign-review.err" \
+    || fail "foreign review failed for an unrelated reason"
+  [ "$(fm_pr_sha256 "$state/.ready-review.json")" = "$ledger_before" ] \
+    || fail "foreign review changed the owning-home ledger"
+  [ "$(fm_pr_sha256 "$state/.wake-queue")" = "$queue_before" ] \
+    || fail "foreign review changed the unhandled merge notification"
+  FM_HOME="$foreign_home" ack_watcher_cycle "$dir/home" \
+    || fail "first merged notification handling acknowledgement failed"
   assert_poll_absent "$state" task-a
   [ "$(cat "$state/task-a.meta")" = "$meta_before" ] || fail "merged retirement changed canonical metadata"
 
@@ -2186,7 +2204,7 @@ test_merged_poll_reregistration_after_notification_is_absorbed() {
   [ "$rc" -eq 0 ] || fail "first merged watcher cycle failed: $(cat "$dir/watch-1.err")"
   first=$(cat "$dir/watch-1.out")
   case "$first" in check:*task-a.check.sh:*merged) ;; *) fail "first merge confirmation was not delivered: $first" ;; esac
-  ack_watcher_cycle "$state" || fail "first merge confirmation acknowledgement failed"
+  ack_watcher_cycle "$dir/home" || fail "first merge confirmation acknowledgement failed"
   assert_poll_absent "$state" task-a
   [ -f "$state/task-a.pr-poll-merge-notified" ] || fail "the merge-notified marker was not recorded"
 
@@ -2259,7 +2277,7 @@ test_merged_poll_retries_a_failed_upward_report() {
   set -e
   [ "$rc" -eq 0 ] || fail "merged-poll-upward-retry: retry failed: $(cat "$dir/watch-2.err")"
   if [ ! -e "$replies" ]; then
-    ack_watcher_cycle "$state" \
+    ack_watcher_cycle "$dir/home" \
       || fail "merged-poll-upward-retry: recovery acknowledgement failed"
     rm -f "$state/.last-check"
     set +e
@@ -2331,7 +2349,7 @@ SH
     "merge-outcome-uncommitted: interrupted publication emitted no outcome"
   [ ! -e "$state/task-a.pr-poll-merge-notified" ] \
     || fail "merge-outcome-uncommitted: failed marker commit was treated as complete"
-  ack_watcher_cycle "$state" \
+  ack_watcher_cycle "$dir/home" \
     || fail "merge-outcome-uncommitted: could not drain the first outcome"
   assert_no_grep "$url" "$state/.wake-queue" \
     "merge-outcome-uncommitted: first outcome remained queued after its drain"
@@ -2380,7 +2398,7 @@ test_merged_poll_reports_upward_from_a_secondmate_home_once() {
     "merged-poll-upward: a merge this home did not perform was never reported upward"
   [ "$(grep -c -F "$url" "$replies")" -eq 1 ] \
     || fail "merged-poll-upward: one detected merge produced more than one upward line"
-  ack_watcher_cycle "$state" || fail "merged-poll-upward: acknowledgement failed"
+  ack_watcher_cycle "$dir/home" || fail "merged-poll-upward: acknowledgement failed"
 
   # Re-registered for the same, already-reported merge: the absorbed duplicate
   # must not tell the parent a second time either.
@@ -2412,7 +2430,7 @@ test_different_merged_pr_for_same_task_is_not_absorbed() {
     check:*task-a.check.sh:*merged) ;;
     *) fail "first PR merge confirmation was not delivered: $(cat "$dir/watch-1.out")" ;;
   esac
-  ack_watcher_cycle "$state" || fail "first PR merge confirmation acknowledgement failed"
+  ack_watcher_cycle "$dir/home" || fail "first PR merge confirmation acknowledgement failed"
   assert_poll_absent "$state" task-a
 
   write_poll_meta "$state" task-a https://github.com/o/r/pull/2
@@ -2507,7 +2525,7 @@ test_retirement_crash_recovery() {
     || fail "post-queue crash recovery wake failed: $(cat "$dir/recovery.err")"
   grep -F 'check: rearm-resurface' "$dir/recovery.out" >/dev/null \
     || fail "post-queue crash did not surface its durable recovery first"
-  ack_watcher_cycle "$state" || fail "post-queue crash recovery acknowledgement failed"
+  ack_watcher_cycle "$dir/home" || fail "post-queue crash recovery acknowledgement failed"
   set +e
   FM_TEST_GH_STATE=MERGED run_watcher_bounded "$dir/home" "$dir/fakebin" > "$dir/watch.out" 2> "$dir/watch.err"
   rc=$?
@@ -2606,7 +2624,7 @@ test_retirement_crash_recovery() {
     || fail "template-update recovery wake failed: $(cat "$dir/template-recovery.err")"
   grep -F 'check: rearm-resurface' "$dir/template-recovery.out" >/dev/null \
     || fail "template-update recovery did not surface its durable wake first"
-  ack_watcher_cycle "$state" || fail "template-update recovery acknowledgement failed"
+  ack_watcher_cycle "$dir/home" || fail "template-update recovery acknowledgement failed"
   set +e
   FM_TEST_GH_STATE=MERGED run_watcher_bounded "$dir/home" "$dir/fakebin" > "$dir/restart.out" 2> "$dir/restart.err"
   rc=$?
@@ -2651,7 +2669,7 @@ test_external_merge_transition_retires_only_terminal_poll() {
     [ "$rc" -eq 0 ] || fail "$label watcher cycle failed: $(cat "$dir/$label.err")"
     case "$(cat "$dir/$label.out")" in check:*z-stop.check.sh:*stop-cycle) ;; *) fail "$label did not reach the control check" ;; esac
     [ "$(poll_artifact_snapshot "$state" task-a)" = "$before" ] || fail "$label changed the armed poll"
-    ack_watcher_cycle "$state" || fail "$label control wake acknowledgement failed"
+    ack_watcher_cycle "$dir/home" || fail "$label control wake acknowledgement failed"
   done
 
   rm -f "$state/z-stop.check.sh" "$state/z-stop.check-trust" "$state/.last-check"
@@ -3114,7 +3132,7 @@ SH
     || fail "replacement: original poll retirement deleted the replacement authority"
   grep -qxF "pr=$url_b" "$state/task-a.meta" \
     || fail "replacement: replacement poll was not armed"
-  ack_watcher_cycle "$state" || fail "replacement: could not acknowledge the original wake"
+  ack_watcher_cycle "$dir/home" || fail "replacement: could not acknowledge the original wake"
   rm -f "$dir/fakebin/mv" "$state/.last-check"
   run_merged_poll_cycle "$dir"
   awk -F'\t' -v expected="check: merge landed: task-a $url_b" \

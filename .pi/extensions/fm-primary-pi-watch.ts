@@ -19,10 +19,12 @@
 // queued while main is streaming joins the running run without ever raising
 // before_agent_start, so waiting on that event stalls every later close.
 // Consumption is tracked only so a replacement can replay a follow-up Pi had
-// not consumed. An idle main consumes at before_agent_start; a streaming main
-// consumes at the user message_start carrying the exact wake text; either
-// event finishes the pending record, and a still-unconsumed record rides the
-// replacement handoff.
+// not consumed. Consumption requires the exact wake text in a prompt-bearing
+// user before_agent_start or a user message_start. Pi 1.2 custom-message runs
+// have no prompt and never consume a user wake, even with identical content.
+// Either user event finishes the pending record, and a still-unconsumed record
+// rides the replacement handoff (regression: tests/fm-pi-watch-extension.test.sh,
+// test_pi_streaming_time_delivery_keeps_the_successor_chain).
 //
 // Postures (stated once here; docs/pi-supervision-branch.md "Postures"):
 // the away-posture record state/.afk-contract is read as a file at every
@@ -227,12 +229,6 @@ function extensionLogKeepLines(): number {
   return value;
 }
 
-function parentPid(pid: string): string {
-  const result = spawnSync("ps", ["-o", "ppid=", "-p", pid], { encoding: "utf8" });
-  if (result.status !== 0) return "";
-  return result.stdout.trim();
-}
-
 function pidAlive(pid: string): boolean {
   try {
     process.kill(Number(pid), 0);
@@ -258,6 +254,8 @@ function liveArmChild(owner: SessionGeneration): ChildProcess | null {
 }
 
 function lockOwnership(): LockOwnership {
+  // Shell helpers inherit ancestry; a primary Pi extension owns only itself.
+  if (process.env.FM_TASK_ID) return "other";
   let lockPid = "";
   try {
     lockPid = readFileSync(`${state}/.lock`, "utf8").trim();
@@ -265,12 +263,7 @@ function lockOwnership(): LockOwnership {
     return "missing";
   }
   if (!/^[0-9]+$/.test(lockPid) || lockPid === "1") return "other";
-  let pid = String(process.pid);
-  for (let i = 0; i < 8; i += 1) {
-    if (pid === lockPid) return "owned";
-    pid = parentPid(pid);
-    if (!pid || pid === "1") break;
-  }
+  if (lockPid === String(process.pid)) return "owned";
   return pidAlive(lockPid) ? "other" : "missing";
 }
 
@@ -649,9 +642,9 @@ export default function (pi: ExtensionAPI) {
     return generationIsLive(owner);
   }
 
-  // Pi consumed a main follow-up: an idle main at before_agent_start, a
-  // streaming main at the user message_start that joins the running run.
+  // Consumption and replacement replay follow this file's header contract.
   function consumeWake(owner: SessionGeneration, text: string): void {
+    if (!generationIsLive(owner) || lockOwnership() !== "owned") return;
     for (const [token, wake] of owner.unconsumedWakes) {
       if (wake.content !== text) continue;
       owner.unconsumedWakes.delete(token);
@@ -1200,6 +1193,7 @@ export default function (pi: ExtensionAPI) {
   }
 
   pi.on?.("before_agent_start", (event) => {
+    if (event.messageType !== "user") return;
     consumeWake(generation, event.prompt);
   });
   pi.on?.("message_start", (event) => {

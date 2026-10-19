@@ -37,11 +37,6 @@ SH
 make_spawn_fakebin() {
   local dir=$1 fakebin
   fakebin=$(fm_test_make_spawn_fakebin "$dir")
-  cat > "$fakebin/timeout" <<'SH'
-#!/usr/bin/env bash
-shift
-exec "$@"
-SH
   cat > "$fakebin/cursor-agent" <<'SH'
 #!/usr/bin/env bash
 if [ "${1:-}" = --list-models ]; then
@@ -50,7 +45,7 @@ if [ "${1:-}" = --list-models ]; then
 fi
 exit 0
 SH
-  chmod +x "$fakebin/timeout" "$fakebin/cursor-agent"
+  chmod +x "$fakebin/cursor-agent"
   make_spawn_pi_probe "$fakebin" pi
   make_spawn_pi_probe "$fakebin" pi-signed
   printf '%s\n' "$fakebin"
@@ -283,7 +278,8 @@ test_relative_home_overrides_launch_with_absolute_cross_process_paths() {
 }
 
 test_home_defaults_preserve_absolute_or_resolve_relative_paths() {
-  local rec relative_id absolute_id out status launch home_real linked_home
+  local rec relative_id absolute_id out status launch home_real linked_home mode state
+  local -a override_env
   relative_id=profile-relative-home-defaults-z1c
   absolute_id=profile-absolute-home-defaults-z1d
   rec=$(make_spawn_case profile-home-defaults pi "$relative_id" "$absolute_id")
@@ -328,7 +324,86 @@ test_home_defaults_preserve_absolute_or_resolve_relative_paths() {
     "absolute FM_HOME spelling changed in Pi's default cross-process extension path"
   assert_contains "$launch" "< '$linked_home/data/$absolute_id/launch-brief.md'" \
     "absolute FM_HOME spelling changed in the default cross-process brief path"
+  mkdir -p "$CASE_DIR/explicit-state" "$CASE_DIR/foreign-state"
+  cp "$HOME_DIR/state/.ready-review.json" "$CASE_DIR/foreign-state/.ready-review.json"
+  ln -s "$HOME_DIR/state" "$CASE_DIR/unsafe-state"
+  for mode in unset empty explicit unsafe foreign; do
+    case "$mode" in
+      unset|empty) state= ;;
+      explicit) state="$CASE_DIR/explicit-state" ;;
+      unsafe) state="$CASE_DIR/unsafe-state" ;;
+      foreign) state="$CASE_DIR/foreign-state" ;;
+    esac
+    if [ "$mode" = unset ]; then
+      override_env=(-u FM_STATE_OVERRIDE)
+    else
+      override_env=("FM_STATE_OVERRIDE=$state")
+    fi
+    out=$(
+      cd "$CASE_DIR" || exit 1
+      env "${override_env[@]}" FM_HOME="$HOME_DIR" FM_DATA_OVERRIDE='' PATH="$FAKEBIN_DIR:$PATH" \
+        "$ROOT/bin/fm-ready-review.sh" scan 2>&1
+    )
+    status=$?
+    case "$mode" in
+      unsafe)
+        expect_code 2 "$status" "symlink state override must refuse: $out"
+        assert_contains "$out" 'unsafe review directory' "state symlink refusal was not explicit"
+        ;;
+      foreign)
+        expect_code 2 "$status" "foreign review state must refuse: $out"
+        assert_contains "$out" 'foreign or invalid ready review ledger' "foreign review refusal was not explicit"
+        ;;
+      *) expect_code 0 "$status" "$mode state override should review this home's state: $out" ;;
+    esac
+  done
+  [ ! -e "$CASE_DIR/.ready-review.json" ] || fail "empty state override wrote review state into the caller directory"
   pass "FM_HOME defaults resolve relative paths and preserve absolute spellings"
+  pass "ready-review state overrides default when unset or empty and reject unsafe or foreign review state"
+}
+
+test_ready_review_configuration_defaults() {
+  local rec mode out status value expected
+  local -a override_env
+  rec=$(make_spawn_case review-config-defaults pi)
+  read_case_record "$rec"
+  cat > "$FAKEBIN_DIR/tasks-axi" <<'SH'
+#!/usr/bin/env bash
+printf 'count: 0\ntasks[0]{id,state,kind,repo,title,deps,blocked,blocked_by,held,hold_kind,hold_reason,hold_until}:\n'
+SH
+  chmod +x "$FAKEBIN_DIR/tasks-axi"
+  for mode in unset empty explicit changed unsafe; do
+    case "$mode" in
+      changed) printf 'codex\n' > "$HOME_DIR/config/crew-harness" ;;
+      unsafe) ln -s "$HOME_DIR/config" "$CASE_DIR/unsafe-config" ;;
+    esac
+    case "$mode" in
+      unset) override_env=(-u FM_CONFIG_OVERRIDE) ;;
+      explicit) override_env=("FM_CONFIG_OVERRIDE=$HOME_DIR/config") ;;
+      unsafe) override_env=("FM_CONFIG_OVERRIDE=$CASE_DIR/unsafe-config") ;;
+      *) override_env=(FM_CONFIG_OVERRIDE=) ;;
+    esac
+    out=$(
+      cd "$CASE_DIR" || exit 1
+      env "${override_env[@]}" FM_HOME="$HOME_DIR" FM_STATE_OVERRIDE="$HOME_DIR/state" \
+        PATH="$FAKEBIN_DIR:$PATH" "$ROOT/bin/fm-ready-review.sh" poll 2>&1
+    )
+    status=$?
+    if [ "$mode" = unsafe ]; then
+      expect_code 2 "$status" "symlink configuration override must refuse: $out"
+      assert_contains "$out" 'unsafe review directory' "configuration symlink refusal was not explicit"
+      continue
+    fi
+    expect_code 0 "$status" "$mode configuration poll failed: $out"
+    value=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["observation"]["fingerprint"])' \
+      "$HOME_DIR/state/.ready-review.json")
+    case "$mode" in
+      unset) expected=$value ;;
+      changed) [ "$value" != "$expected" ] || fail "empty configuration override missed the home configuration change" ;;
+      *) [ "$value" = "$expected" ] || fail "$mode configuration override differs from the home default" ;;
+    esac
+  done
+  pass "ready-review empty configuration defaults observe home changes and preserve unsafe-path refusals"
 }
 
 test_absolute_override_spelling_is_preserved_in_launch_paths() {
@@ -907,6 +982,106 @@ test_pi_scout_launch_enters_recorded_worktree() {
   pass "Pi scout spawn enters the recorded worktree before launch"
 }
 
+# A backend pane can have a different PATH from the caller that selected Pi.
+# Execute the delivered launch to distinguish its absolute executable from the
+# executable a tool shell resolves, without running a real harness.
+test_pi_selected_launcher_directory_reaches_child_tool_path() {
+  local harness allowlist pin rec id out launch selected global_bin caller_bin probe
+  local pane_shell pane_path result expected account provider ambient system_bin backend_path
+  system_bin=$(dirname "$(command -v cat)")
+  for harness in pi pi-signed; do
+    for allowlist in absent enabled; do
+      for pin in absent enabled; do
+        id="pi-path-$harness-$allowlist-$pin"
+        rec=$(make_spawn_case "$id" "$harness" "$id")
+        read_case_record "$rec"
+        selected="$CASE_DIR/accepted ' SDK & space/bin"
+        global_bin="$CASE_DIR/backend-global/bin"
+        caller_bin="$CASE_DIR/caller-only/bin"
+        backend_path="$global_bin:$system_bin:/usr/bin:/bin"
+        mkdir -p "$selected" "$global_bin" "$caller_bin" "$CASE_DIR/pinned-root"
+        rm "$FAKEBIN_DIR/pi" "$FAKEBIN_DIR/pi-signed"
+        probe="$CASE_DIR/pi-probe"
+        cat > "$probe" <<'SH'
+#!/bin/sh
+case "${1:-}" in
+  --help) printf '%s\n' 'Pi synthetic' 'Options: --tui-mode <mode>'; exit 0 ;;
+  auth) printf '%s\n' '{"status":"ready","provider":"test-provider"}'; exit 0 ;;
+esac
+printf 'launcher=%s\nchild-pi=%s\nchild-pi-signed=%s\npath=%s\ncwd=%s\naccount=%s\nambient=%s\ncaller=%s\nidentity=%s\nargs=%s\n' \
+  "$0" "$(/bin/sh -c 'command -v pi')" "$(/bin/sh -c 'command -v pi-signed')" \
+  "$PATH" "$PWD" "${PI_CODING_AGENT_DIR-unset}" "${FM_TEST_PANE_SENTINEL-unset}" \
+  "${FM_TEST_CALLER_SENTINEL-unset}" "$FM_PI_HARNESS" "$*"
+SH
+        chmod +x "$probe"
+        cp "$probe" "$selected/pi"
+        cp "$probe" "$selected/pi-signed"
+        printf '#!/bin/sh\nexit 91\n' > "$global_bin/pi"
+        cp "$global_bin/pi" "$global_bin/pi-signed"
+        chmod +x "$global_bin/pi" "$global_bin/pi-signed"
+        git -C "$PROJ_DIR" worktree move "$WT_DIR" "$CASE_DIR/worker's isolated tree" \
+          || fail "could not prepare quoted worker cwd"
+        WT_DIR="$CASE_DIR/worker's isolated tree"
+        [ "$allowlist" = absent ] || : > "$HOME_DIR/config/launch-env-allowlist"
+        if [ "$pin" = enabled ]; then
+          printf '%s\ntest-provider\n' "$CASE_DIR/pinned-root" > "$HOME_DIR/config/pi-account"
+        fi
+        out=$(PATH="$caller_bin:$selected:$PATH" FM_TEST_CALLER_SENTINEL=caller-only \
+          run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" \
+          "$id" "$PROJ_DIR" --harness "$harness" --model test-provider/test-model --effort high)
+        expect_code 0 "$?" "$id spawn failed: $out"
+        launch=$(cat "$LAUNCH_LOG")
+        assert_not_contains "$launch" "$caller_bin" "Pi launch copied an unrelated caller PATH entry"
+        assert_meta_profile "$HOME_DIR/state/$id.meta" "$harness" test-provider/test-model high
+        for pane_shell in /bin/sh /bin/bash /bin/zsh; do
+          [ -x "$pane_shell" ] || continue
+          # shellcheck disable=SC2016 # Expand PATH in the destination shell.
+          pane_path=$(env -i HOME="$HOME_DIR/user-home" PATH="$backend_path" \
+            "$pane_shell" -c 'printf %s "$PATH"') || fail "cannot read synthetic pane PATH"
+          # shellcheck disable=SC2016 # Pass cwd and launch text as arguments.
+          result=$(env -i HOME="$HOME_DIR/user-home" PATH="$backend_path" \
+            PI_CODING_AGENT_DIR="$CASE_DIR/pane-root" FM_TEST_PANE_SENTINEL=pane-only \
+            "$pane_shell" -c 'cd -- "$1" && eval "$2"' pi-path-probe "$WT_DIR" "$launch") \
+            || fail "$id delivered launch failed in $pane_shell"
+          # Assert this separately: the original defect already launches the
+          # correct absolute Pi while child tool shells resolve the global Pi.
+          assert_contains "$result" "launcher=$selected/$harness"$'\n' "$id selected the wrong absolute launcher"
+          assert_contains "$result" "child-pi=$selected/pi"$'\n' "$id child tool PATH resolved the backend's Pi"
+          assert_contains "$result" "child-pi-signed=$selected/pi-signed"$'\n' "$id child tool PATH resolved the backend's pi-signed"
+          assert_contains "$result" "path=$selected:$pane_path"$'\n' "$id did not preserve the destination PATH after the selected bindir"
+          assert_contains "$result" "cwd=$WT_DIR"$'\n' "$id changed the recorded worker cwd"
+          account="$CASE_DIR/pane-root"; provider=
+          ambient='pane-only'
+          [ "$allowlist" = absent ] || { account='unset'; ambient='unset'; }
+          if [ "$pin" = enabled ]; then account="$CASE_DIR/pinned-root"; provider="--provider test-provider "; fi
+          assert_contains "$result" "account=$account"$'\n' "$id changed account selection"
+          assert_contains "$result" "ambient=$ambient"$'\n' "$id changed allowlist filtering"
+          assert_contains "$result" "caller=unset"$'\n' "$id copied a caller environment value"
+          assert_contains "$result" "identity=$harness"$'\n' "$id lost Pi harness identity"
+          expected="args=--tui-mode regular ${provider}--model test-provider/test-model --thinking high"
+          assert_contains "$result" "$expected" "$id changed provider, model, or effort"
+        done
+        pass "$id keeps the selected absolute launcher and child tool PATH across backend environment differences"
+      done
+    done
+    # Raw overrides keep resolving their own command in the destination pane.
+    # The canonical-only PATH repair must not replace that explicit contract.
+    id="pi-path-raw-$harness"
+    rec=$(make_spawn_case "$id" "$harness" "$id")
+    read_case_record "$rec"
+    cp "$probe" "$global_bin/pi"
+    cp "$probe" "$global_bin/pi-signed"
+    out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" \
+      "$id" "$PROJ_DIR" "$harness --offline")
+    expect_code 0 "$?" "$id raw spawn failed: $out"
+    result=$(env -i HOME="$HOME_DIR/user-home" PATH="$backend_path" \
+      /bin/sh -c "$(cat "$LAUNCH_LOG")") || fail "$id raw launch failed"
+    assert_contains "$result" "launcher=$global_bin/$harness"$'\n' "$id changed raw command resolution"
+    assert_contains "$result" "path=$backend_path"$'\n' "$id changed the raw destination PATH"
+    pass "$id preserves raw override PATH semantics"
+  done
+}
+
 test_pi_threads_model_and_max_effort() {
   local rec id out status launch
   id=profile-pi-z8
@@ -983,18 +1158,21 @@ test_pi_tui_mode_probe_is_safe_for_old_and_new_pi() {
 }
 
 test_pi_signed_missing_binary_refuses_before_endpoint_or_metadata() {
-  local rec id out status
+  local rec id out status base_path
   id=profile-pi-signed-missing-z8c
   rec=$(make_spawn_case profile-pi-signed-missing pi-signed "$id")
   read_case_record "$rec"
   rm -f "$FAKEBIN_DIR/pi-signed"
   : > "$LAUNCH_LOG"
+  base_path=$(fm_test_base_path_sans "$PATH" pi-signed) || fail "cannot isolate missing pi-signed PATH"
+  [ ! -e "$base_path/pi-signed" ] && [ ! -L "$base_path/pi-signed" ] \
+    || fail "missing pi-signed fixture still exposes pi-signed"
 
   out=$(FM_ROOT_OVERRIDE='' FM_HOME="$HOME_DIR" \
     FM_STATE_OVERRIDE="$HOME_DIR/state" FM_DATA_OVERRIDE="$HOME_DIR/data" \
     FM_PROJECTS_OVERRIDE="$HOME_DIR/projects" FM_CONFIG_OVERRIDE="$HOME_DIR/config" \
     FM_SPAWN_NO_GUARD=1 FM_FAKE_PANE_PATH="$WT_DIR" TMUX="fake,1,0" \
-    FM_FAKE_LAUNCH_LOG="$LAUNCH_LOG" PATH="$FAKEBIN_DIR:/usr/bin:/bin:/usr/sbin:/sbin" \
+    FM_FAKE_LAUNCH_LOG="$LAUNCH_LOG" PATH="$FAKEBIN_DIR:$base_path" \
     "$SPAWN" "$id" "$PROJ_DIR" --mode no-mistakes --yolo off 2>&1)
   status=$?
   expect_code 1 "$status" "a missing pi-signed executable should refuse the spawn"
@@ -1923,6 +2101,7 @@ SH
   done
 }
 
+test_pi_selected_launcher_directory_reaches_child_tool_path
 test_launch_environment_allowlist
 test_launch_environment_invalid_config_refuses
 test_launch_environment_inaccessible_config_refuses
@@ -2193,6 +2372,7 @@ test_claude_spawn_refuses_when_the_brief_record_cannot_publish
 test_non_cursor_launch_clears_inherited_cursor_markers
 test_relative_home_overrides_launch_with_absolute_cross_process_paths
 test_home_defaults_preserve_absolute_or_resolve_relative_paths
+test_ready_review_configuration_defaults
 test_absolute_override_spelling_is_preserved_in_launch_paths
 test_unresolvable_relative_overrides_fail_loudly
 test_active_dispatch_profile_requires_explicit_harness_for_ship

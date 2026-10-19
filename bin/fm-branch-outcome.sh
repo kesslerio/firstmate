@@ -240,7 +240,8 @@ last_seq() { # [<file> [<first expected seq, or null for a bounded suffix>]]
         keys == ["epoch", "seq", "summary", "task", "verdict", "wake"]
         or (keys == ["epoch", "seq", "silent", "summary", "task", "verdict", "wake"] and (.silent | type) == "boolean")
         or (
-          keys == ["epoch", "seq", "silent", "statusEndpoint", "statusIdent", "summary", "task", "verdict", "wake"]
+          (del(.readyReview) | keys) == ["epoch", "seq", "silent", "statusEndpoint", "statusIdent", "summary", "task", "verdict", "wake"]
+          and (.readyReview == null or (.readyReview | type) == "object")
           and (.silent | type) == "boolean"
           and ((.statusEndpoint | type) == "number" and .statusEndpoint >= 0 and .statusEndpoint <= 9007199254740991 and .statusEndpoint == (.statusEndpoint | floor))
           and ((.statusIdent | type) == "string" and (.statusIdent | test("[\\t\\n]") | not))
@@ -522,6 +523,14 @@ case "$CMD" in
       echo "error: silent outcomes must have the routine verdict" >&2
       exit 2
     fi
+    READY_REVIEW=$("$SCRIPT_DIR/fm-ready-review.sh" report-check "$VERDICT") || exit 1
+    READY_TASKS=$(printf '%s\n' "$READY_REVIEW" | jq -r '[.candidates[].task] | join(", ")') || exit 1
+    if [ -n "$READY_TASKS" ]; then
+      SUMMARY="$SUMMARY Ready-work handoff to MAIN: $READY_TASKS; dispatch each eligible unit or record its current stop with bin/fm-ready-review.sh."
+    fi
+    if printf '%s\n' "$READY_REVIEW" | jq -e '.uncertainty' >/dev/null; then
+      SUMMARY="$SUMMARY Ready-work graph is unavailable; MAIN must repair the owner-home observation before acknowledging."
+    fi
     fm_lock_acquire_wait "$LOCK"
     if ! LAST_SEQ=$(last_seq); then
       fm_lock_release "$LOCK"
@@ -536,10 +545,10 @@ case "$CMD" in
     SEQ=$(( LAST_SEQ + 1 ))
     capture_status_position "$TASK"
     rm -f -- "$OUTCOME_INDEX_READY" || { fm_lock_release "$LOCK"; exit 1; }
-    printf '{"seq":%s,"epoch":%s,"task":"%s","wake":"%s","verdict":"%s","summary":"%s","silent":%s,"statusEndpoint":%s,"statusIdent":"%s"}\n' \
+    printf '{"seq":%s,"epoch":%s,"task":"%s","wake":"%s","verdict":"%s","summary":"%s","silent":%s,"statusEndpoint":%s,"statusIdent":"%s","readyReview":%s}\n' \
       "$SEQ" "$(date +%s)" "$(json_escape "$TASK")" "$(json_escape "$WAKE")" \
       "$VERDICT" "$(json_escape "$SUMMARY")" "$SILENT" "$CAPTURED_STATUS_ENDPOINT" \
-      "$(json_escape "$CAPTURED_STATUS_IDENT")" >> "$STORE"
+      "$(json_escape "$CAPTURED_STATUS_IDENT")" "$READY_REVIEW" >> "$STORE" || { fm_lock_release "$LOCK"; exit 1; }
     write_outcome_tail || echo "warning: outcome $SEQ was stored but its display tail copy could not be refreshed" >&2
     # A task with neither a live meta nor a status log is retired: the branch
     # reports the teardown it just performed, and writing the index here would
@@ -636,6 +645,7 @@ case "$CMD" in
     THROUGH=${2:-}
     bounded_uint "$THROUGH" || usage
     [ "$#" -eq 2 ] || usage
+    "$SCRIPT_DIR/fm-ready-review.sh" guard main || exit 1
     fm_lock_acquire_wait "$LOCK"
     if ! CURSOR_SEQ=$(read_cursor) || ! PROCESSED_SEQ=$(read_processed); then
       fm_lock_release "$LOCK"

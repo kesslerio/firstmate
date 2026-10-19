@@ -37,6 +37,7 @@ install_autoarm_scripts() {
   cp "$ROOT/bin/fm-lock.sh" "$dir/bin/fm-lock.sh"
   cp "$ROOT/bin/fm-afk-contract.sh" "$dir/bin/fm-afk-contract.sh"
   cp "$ROOT/bin/fm-classify-lib.sh" "$dir/bin/fm-classify-lib.sh"
+  cp "$ROOT/bin/fm-status-event-lib.sh" "$dir/bin/fm-status-event-lib.sh"
   cp "$ROOT/bin/fm-timeout-lib.sh" "$dir/bin/fm-timeout-lib.sh"
   cp "$ROOT/bin/fm-supervision-engine-lib.sh" "$dir/bin/fm-supervision-engine-lib.sh"
   chmod +x "$dir/bin/fm-claude-stop-autoarm.sh" "$dir/bin/fm-lock.sh" "$dir/bin/fm-afk-contract.sh"
@@ -910,7 +911,8 @@ test_abandoned_owner_claim_is_reclaimed_and_rearms() {
 # owner. The next reclaim must reap it directly, never by nesting another
 # .steal.steal mutex around it.
 test_abandoned_claim_reclaim_reaps_dead_steal_without_nesting() {
-  local dir out status pid holder lnbin lnlog i
+  local dir out status pid holder lnbin lnlog i real_ln
+  real_ln=$(command -v ln)
   dir=$(make_primary_dir "$TMP_ROOT/abandoned-claim-dead-steal")
   : > "$dir/state/task1.meta"
   write_arm_fixture "$dir" actionable
@@ -935,13 +937,15 @@ test_abandoned_claim_reclaim_reaps_dead_steal_without_nesting() {
   lnbin="$dir/lnbin"
   lnlog="$dir/ln.log"
   mkdir -p "$lnbin"
-  cat > "$lnbin/ln" <<'SH'
+  {
+    cat <<'SH'
 #!/usr/bin/env bash
 last=
 for arg do last=$arg; done
 printf '%s\n' "$last" >> "$FM_TEST_LN_LOG"
-exec /bin/ln "$@"
 SH
+    printf 'exec %q "$@"\n' "$real_ln"
+  } > "$lnbin/ln"
   chmod +x "$lnbin/ln"
   : > "$lnlog"
   out=$(PATH="$lnbin:$PATH" FM_TEST_LN_LOG="$lnlog" run_autoarm "$dir" 2>/dev/null); status=$?

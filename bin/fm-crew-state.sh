@@ -93,7 +93,7 @@
 #      and ambiguity reporting. The selected run's id-addressed status must
 #      agree on id, branch, and live/terminal class before attribution;
 #      disagreement reports unknown with available candidate ids.
-#      The run-step is AUTHORITATIVE: running/fixing -> working, ci -> working
+#      The run-step maps running/fixing -> working, ci -> working
 #      (the id-addressed detail read carries step words the overview does not),
 #      awaiting_approval/fix_review -> parked (with gate findings), terminal
 #      passed/checks-passed/passed-with-override/passed-with-skips -> done,
@@ -107,7 +107,12 @@
 #      also a passing outcome (publication or CI verification was
 #      automatically skipped, no-mistakes' own vocabulary), read as done but
 #      with that skip kept visible in the detail, unlike a clean passed.
-#      EXCEPT: while
+#      Before emitting done/failed from an inactive full run or a terminal coarse row, current
+#      semantic busy state is checked: busy reports working, idle permits the
+#      terminal verdict, and an unverified harness reports unknown when the
+#      task has spawn_gen. Legacy records without spawn_gen retain the terminal
+#      fallback. This prevents a predecessor run from completing a working or
+#      unverified replacement at the same branch/head. EXCEPT: while
 #      the active step is ci, `axi status` alone cannot tell "still waiting on
 #      checks" from "checks green, waiting on merge" (see nm_ci_checks_state) -
 #      a check of the full ci-step log overrides working -> done once checks read
@@ -160,6 +165,7 @@
 #
 # Read-only and side-effect free. Always exits 0 on a successful read regardless
 # of state; exit 2 only on a usage error (no id).
+# Native busy readers use observation-only cache access (fm-busy-lib.sh).
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -175,6 +181,7 @@ STATE="${FM_STATE_OVERRIDE:-$FM_HOME/state}"
 . "$SCRIPT_DIR/fm-classify-lib.sh"
 # shellcheck source=bin/fm-busy-lib.sh
 . "$SCRIPT_DIR/fm-busy-lib.sh"
+FM_BUSY_CACHE_READ_ONLY=1
 # shellcheck source=bin/fm-nm-run-lib.sh
 . "$SCRIPT_DIR/fm-nm-run-lib.sh"
 # shellcheck source=bin/fm-pr-lib.sh
@@ -1217,6 +1224,24 @@ if [ "$HAVE_RUN" = 1 ]; then
         else
           RUN_DETAIL="$RUN_DETAIL${SEP}status-log superseded (run $RUN_STATE)"
         fi
+      fi
+      ;;
+  esac
+
+  case "$RUN_STATE:$RUN_DETAIL" in
+    done:*|failed:*|unknown:"run cancelled: no verdict")
+      if { [ "$RUN_SOURCE" = full ] && ! fm_nm_run_is_active "$RUN_OUT"; } \
+        || { [ "$RUN_SOURCE" = coarse ] && [ "$(fm_nm_run_status_class "$COARSE_STATUS")" = terminal ]; }; then
+        BUSY_VERDICT=$(crew_busy_verdict "$BACKEND_TARGET")
+        case "${BUSY_VERDICT%% *}" in
+          busy) emit working pane "harness busy (${BUSY_VERDICT#* })" ;;
+          idle) ;;
+          *)
+            if grep -q '^spawn_gen=' "$META"; then
+              emit unknown pane "current incarnation harness state unavailable ($BUSY_VERDICT); terminal run attribution unverified"
+            fi
+            ;;
+        esac
       fi
       ;;
   esac

@@ -2415,6 +2415,20 @@ ok - under the away-posture record the wake carries the verbatim read-back tail,
 
 The merge suite and the security suite dominate the wall time.
 
+## Pi primary observer-wait pre-tool guard
+
+Verified 2026-10-13 against installed Pi 1.2.0 without model calls or credentials.
+`bin/fm-test-run.sh tests/fm-pi-observer-wait-live.test.sh` loads the tracked extension through Pi's real loader and `ExtensionRunner`, then passes its hook result through agent-core's real tool execution pipeline.
+The bash tool uses an injectable execution operation that writes a harmless sentinel, so submitted polling commands never sleep or contact a backend even on failure.
+The denied call returns the `primary-observer-wait` reason before that operation runs; an immediate check and a missing-lock startup call both reach the operation.
+Observed output:
+
+```text
+ok - Pi 1.2.0: real loader/runner/tool pipeline blocks before sentinel; immediate check and missing-lock startup execute; no model calls
+```
+
+The current scope and deliberate classification limits are owned by [the Pi supervision protocol](../supervision-protocols/pi.md).
+
 ## Native Codex through Pi
 
 Verified on 2026-09-08 with Pi 0.85.1 and the installed `pi-codex-native` 0.2.1 adapter.

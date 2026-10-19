@@ -7,6 +7,8 @@
 #   fm-remote-secondmate-control.sh state <id>
 #   fm-remote-secondmate-control.sh route <id>
 #   fm-remote-secondmate-control.sh send <id> <message> [fire-and-forget]
+#   fm-remote-secondmate-control.sh obligations <id>
+#   fm-remote-secondmate-control.sh obligation-tick <id>
 #   fm-remote-secondmate-control.sh key <id> <key>
 #   fm-remote-secondmate-control.sh capture <id> [lines]
 #   fm-remote-secondmate-control.sh observe <id>
@@ -290,7 +292,7 @@ cmd_send() {
   # the parent may safely repeat this leg. Exit 0 once the record durably
   # exists; no ring outcome changes it, because the parent transport owns any
   # retry or reply-tracking policy from here.
-  if ! rec=$(fm_task_inbox_write_idempotent "$CONTROL_STATE" "$id" "$message" "$delivery_mode"); then
+  if ! rec=$(fm_task_inbox_write_idempotent "$CONTROL_STATE" "$id" "$message" "$delivery_mode" disposition); then
     fm_lock_release "$meta_lock"
     die "steering-inbox record could not be written under $CONTROL_STATE/$id.inbox"
   fi
@@ -298,7 +300,7 @@ cmd_send() {
   case "$rec" in
     */handled/*)
       # The dedup landed on a record the worker already acknowledged: the
-      # steer was delivered and acted on, so there is nothing to announce.
+      # steer was delivered and acknowledged; its execution obligation remains.
       printf 'notice: this steer was already delivered and acknowledged at %s; nothing re-rung\n' "$rec" >&2
       return 0
       ;;
@@ -318,6 +320,24 @@ cmd_key() {
   remote_endpoint_require "$id"
   FM_HOME="$TARGET_HOME" FM_ROOT_OVERRIDE="$FM_ROOT" FM_STATE_OVERRIDE="$TARGET_HOME/state" \
     "$SCRIPT_DIR/fm-send.sh" "$REMOTE_ENDPOINT_TARGET" --key "$key"
+}
+
+# Queries expose exact record/generation dispositions. The parent calls tick
+# independently of reply tracking; it owns wake-before-dedup for these alerts.
+cmd_obligations() {
+  local operation=$1 id=$2 result observations
+  validate_id "$id"
+  validate_home "$id"
+  if [ "$operation" = obligations ]; then
+    FM_HOME="$TARGET_HOME" FM_STATE_OVERRIDE="$CONTROL_STATE" \
+      "$SCRIPT_DIR/fm-task-inbox.sh" query "$id"
+  else
+    result=$(FM_HOME="$TARGET_HOME" FM_STATE_OVERRIDE="$CONTROL_STATE" \
+      "$SCRIPT_DIR/fm-task-inbox.sh" tick "$id" --report-only) || return 1
+    observations=$(FM_HOME="$TARGET_HOME" FM_STATE_OVERRIDE="$CONTROL_STATE" \
+      "$SCRIPT_DIR/fm-task-inbox.sh" query "$id") || return 1
+    printf '%s\n%s' "$result" "$observations" | python3 -c 'import json,sys; print(json.dumps(dict(schema="fm-instruction-observations.v1",task=sys.argv[1],alerts=json.loads(sys.stdin.readline()),obligations=json.load(sys.stdin))))' "$id"
+  fi
 }
 
 cmd_capture() {
@@ -424,12 +444,12 @@ cmd_retire() {
   if [ -n "$force" ]; then
     FM_HOME="$FM_ROOT" FM_ROOT_OVERRIDE="$FM_ROOT" \
       FM_STATE_OVERRIDE="$CONTROL_STATE" FM_DATA_OVERRIDE="$CONTROL_DATA" \
-      FM_CONFIG_OVERRIDE="$TARGET_HOME/config" FM_TEARDOWN_GUARD_DONE=1 \
+      FM_CONFIG_OVERRIDE="$TARGET_HOME/config" FM_TEARDOWN_GUARD_DONE=1 FM_TASK_INBOX_OWNER_HOME="$TARGET_HOME" \
       "$SCRIPT_DIR/fm-teardown.sh" "$id" --force
   else
     FM_HOME="$FM_ROOT" FM_ROOT_OVERRIDE="$FM_ROOT" \
       FM_STATE_OVERRIDE="$CONTROL_STATE" FM_DATA_OVERRIDE="$CONTROL_DATA" \
-      FM_CONFIG_OVERRIDE="$TARGET_HOME/config" FM_TEARDOWN_GUARD_DONE=1 \
+      FM_CONFIG_OVERRIDE="$TARGET_HOME/config" FM_TEARDOWN_GUARD_DONE=1 FM_TASK_INBOX_OWNER_HOME="$TARGET_HOME" \
       "$SCRIPT_DIR/fm-teardown.sh" "$id"
   fi
 }
@@ -440,6 +460,7 @@ case "${1:-}" in
   state) shift; [ "$#" -eq 1 ] || usage; validate_id "$1"; validate_home "$1"; state_value "$1" ;;
   route) shift; [ "$#" -eq 1 ] || usage; cmd_route "$1" ;;
   send) shift; [ "$#" -ge 2 ] && [ "$#" -le 3 ] || usage; cmd_send "$@" ;;
+  obligations|obligation-tick) operation=$1; shift; [ "$#" -eq 1 ] || usage; cmd_obligations "$operation" "$1" ;;
   key) shift; [ "$#" -eq 2 ] || usage; cmd_key "$@" ;;
   capture) shift; [ "$#" -ge 1 ] && [ "$#" -le 2 ] || usage; cmd_capture "$@" ;;
   observe) shift; [ "$#" -eq 1 ] || usage; cmd_observe "$@" ;;

@@ -1,6 +1,6 @@
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -22,12 +22,6 @@ const state = process.env.FM_STATE_OVERRIDE || `${fmHome}/state`;
 const marker = `${state}/.pi-turnend-extension-loaded`;
 const extensionVersion = `sha256:${createHash("sha256").update(readFileSync(extensionFile)).digest("hex")}`;
 
-function parentPid(pid: string): string {
-  const result = spawnSync("ps", ["-o", "ppid=", "-p", pid], { encoding: "utf8" });
-  if (result.status !== 0) return "";
-  return result.stdout.trim();
-}
-
 function pidAlive(pid: string): boolean {
   try {
     process.kill(Number(pid), 0);
@@ -38,6 +32,8 @@ function pidAlive(pid: string): boolean {
 }
 
 function lockOwnership(): LockOwnership {
+  // Shell helpers inherit ancestry; a primary Pi extension owns only itself.
+  if (process.env.FM_TASK_ID) return "other";
   let lockPid = "";
   try {
     lockPid = readFileSync(`${state}/.lock`, "utf8").trim();
@@ -45,12 +41,7 @@ function lockOwnership(): LockOwnership {
     return "missing";
   }
   if (!/^[0-9]+$/.test(lockPid) || lockPid === "1") return "other";
-  let pid = String(process.pid);
-  for (let i = 0; i < 8; i += 1) {
-    if (pid === lockPid) return "owned";
-    pid = parentPid(pid);
-    if (!pid || pid === "1") break;
-  }
+  if (lockPid === String(process.pid)) return "owned";
   return pidAlive(lockPid) ? "other" : "missing";
 }
 
@@ -243,6 +234,7 @@ function stopSessionstartGeneration(generation: SessionstartGeneration): Promise
 }
 
 function runSessionstartHook(generation: SessionstartGeneration): Promise<SessionstartResult> {
+  if (lockOwnership() === "other") return Promise.resolve({ kind: "ineligible" });
   return new Promise((resolveResult) => {
     let settled = false;
     let closeChild: () => void = () => {};
@@ -437,6 +429,7 @@ async function claimSessionstartMessage(
   ctx?: SessionStartContext,
 ): Promise<SessionstartMessage | undefined> {
   const result = await generation.result;
+  if (lockOwnership() === "other") return undefined;
   if (!sessionstartGenerationIsLive(generation) || generation.delivered) return undefined;
   const currentSessionId = ctx ? sessionIdFromContext(ctx) : "";
   if (generation.sessionId && currentSessionId && generation.sessionId !== currentSessionId) {
@@ -447,6 +440,7 @@ async function claimSessionstartMessage(
 }
 
 function runGuard(): Promise<{ code: number; stderr: string }> {
+  if (lockOwnership() === "other") return Promise.resolve({ code: 0, stderr: "" });
   return new Promise((resolveResult) => {
     const invocation = firstmateShellInvocation(`${root}/bin/fm-turnend-guard.sh`, []);
     let child: ChildProcess;
@@ -477,6 +471,7 @@ function runGuard(): Promise<{ code: number; stderr: string }> {
 // returning {block: true} prevents the bash command from running). Each owner
 // script owns its own decision and is inert outside the real primary checkout.
 function runChecker(script: string, command: string): Promise<{ code: number; stderr: string }> {
+  if (lockOwnership() === "other") return Promise.resolve({ code: 0, stderr: "" });
   return new Promise((resolveResult) => {
     const invocation = firstmateShellInvocation(
       `${root}/bin/${script}`,
@@ -506,6 +501,25 @@ function runPretoolCheck(command: string): Promise<{ code: number; stderr: strin
 
 function runCdCheck(command: string): Promise<{ code: number; stderr: string }> {
   return runChecker("fm-cd-pretool-check.sh", command);
+}
+
+// This Pi-only check requires positive session ownership AND primary checkout
+// placement. A worker descended from the lock owner must still remain inert.
+function observerWaitPrimary(cwd: string): boolean {
+  if (process.env.FM_TASK_ID) return false;
+  try {
+    if (existsSync(`${fmHome}/.fm-secondmate-home`) ||
+        !existsSync(`${fmHome}/AGENTS.md`) || !existsSync(`${fmHome}/bin`)) return false;
+    const resolvedHome = realpathSync(fmHome);
+    if (realpathSync(root) !== resolvedHome || lockOwnership() !== "owned") return false;
+    const git = spawnSync("git", ["-C", cwd, "rev-parse", "--show-toplevel", "--git-dir", "--git-common-dir"],
+      { encoding: "utf8", timeout: 1000 });
+    if (git.status !== 0) return false;
+    const [top, gitDir, commonDir] = git.stdout.trim().split("\n");
+    return realpathSync(top) === resolvedHome && gitDir === commonDir;
+  } catch {
+    return false;
+  }
 }
 
 export default function (pi: ExtensionAPI) {
@@ -587,7 +601,7 @@ export default function (pi: ExtensionAPI) {
     }
   });
 
-  pi.on("tool_call", async (event) => {
+  pi.on("tool_call", async (event, ctx) => {
     if (event.type !== "tool_call" || event.toolName !== "bash") return {};
     const command = String((event.input as { command?: unknown })?.command ?? "");
     if (!command) return {};
@@ -596,8 +610,21 @@ export default function (pi: ExtensionAPI) {
       return { block: true, reason: cdResult.stderr.trim() || "denied by the cd-guard PreToolUse seatbelt" };
     }
     const result = await runPretoolCheck(command);
-    if (result.code !== 2) return {};
-    return { block: true, reason: result.stderr.trim() || "denied by the watcher-arm PreToolUse seatbelt" };
+    if (result.code === 2) {
+      return { block: true, reason: result.stderr.trim() || "denied by the watcher-arm PreToolUse seatbelt" };
+    }
+    if (observerWaitPrimary(ctx.cwd)) {
+      // Lazy loading keeps non-primary/worker contexts inert even when this
+      // optional local policy is absent during startup or a partial update.
+      try {
+        const policyUrl = new URL("../../bin/fm-observer-wait-policy.mjs", import.meta.url);
+        const { isObserverWait, observerWaitReason } = await import(policyUrl.href);
+        if (isObserverWait(command, state)) return { block: true, reason: observerWaitReason };
+      } catch {
+        // Unsupported/unavailable classification cannot ban substantive work.
+      }
+    }
+    return {};
   });
 
   pi.on("agent_settled", async () => {

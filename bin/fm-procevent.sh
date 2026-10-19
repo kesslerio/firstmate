@@ -846,7 +846,7 @@ publish_result() {  # <result-file>
       inbox_dir=$(fm_task_inbox_dir "$STATE" "$owner_task")
       handled_dir=$(fm_task_inbox_handled_dir "$STATE" "$owner_task")
       pre_existing=$(printf '%s\n' "$inbox_dir"/*.msg "$handled_dir"/*.msg 2>/dev/null)
-      record=$(fm_task_inbox_write_idempotent "$STATE" "$owner_task" "$message" 2>/dev/null || true)
+      record=$(fm_task_inbox_write_idempotent "$STATE" "$owner_task" "$message" "" disposition 2>/dev/null || true)
       [ -n "$record" ] && status=0
       new_record=0
       if [ "$status" -eq 0 ]; then

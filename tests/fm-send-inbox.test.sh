@@ -38,6 +38,8 @@ set -u
 . "$ROOT/bin/fm-marker-lib.sh"
 
 SEND="$ROOT/bin/fm-send.sh"
+FM_TEST_REAL_MV=$(command -v mv)
+export FM_TEST_REAL_MV
 
 TMP_ROOT=$(fm_test_tmproot fm-send-inbox)
 TMP_ROOT=$(cd "$TMP_ROOT" && pwd)
@@ -345,7 +347,7 @@ test_secondmate_marker_and_enqueue_delivery() {
   err="$dir/send.err"
   fm_write_secondmate_meta "$dir/home/state/domain.meta" "$dir/home" "sess:fm-domain"
   run_send "$dir" "$err" -- fm-domain "please summarize fleet health" ||
-    fail "a secondmate steer should succeed"
+    fail "a secondmate steer should succeed: $(cat "$err")"
   body=$(record_body _ "$dir/home/state/domain.inbox/001.msg")
   case "$body" in
   "$FM_FROMFIRST_MARK"corr=*) : ;;
@@ -379,12 +381,13 @@ if [ "${FM_FAIL_DELIVERY_CONFIRM:-0}" = 1 ] \
   rm -f "$target_arg"
   exit 1
 fi
-exec /bin/mv "$@"
+exec "$FM_TEST_REAL_MV" "$@"
 SH
   chmod +x "$dir/fakebin/mv"
 
   run_send "$dir" "$err" FM_FAIL_DELIVERY_CONFIRM=1 -- domain "durable once"
   rc=$?
+  [ "$rc" -eq 0 ] || cat "$err" >&2
   # The durable record IS the delivery: even with the commit AND its recovery
   # marker both lost, the steer was delivered, so fm-send must not signal a
   # status that invites a resend (a nonzero would make automated callers

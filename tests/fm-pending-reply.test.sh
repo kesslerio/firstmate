@@ -2101,7 +2101,58 @@ test_same_kind_escalation_reopens_after_operator_close() {
   pass "a same-kind escalation after an operator close opens the decision again"
 }
 
+# Lazy imports must retain each public operation's state scope across homes.
+test_dependency_refresh_preserves_ambient_state() {
+  (
+    set -eu
+    local home state corr other other_state other_corr rec dependency_rc
+    home=$(setup_parent 'dependency scope one')
+    state="$home/state"
+    other=$(setup_parent 'dependency scope two')
+    other_state="$other/state"
+    STATE='ambient state must survive'
+    FM_WAKE_QUEUE='ambient queue must survive'
+    FM_WAKE_QUEUE_LOCK='ambient queue lock must survive'
+    corr=$(fm_pending_reply_create "$home" "$state" mate 'first isolated request')
+    other_corr=$(fm_pending_reply_create "$other" "$other_state" mate 'second isolated request')
+    # A public operation must refresh its dependency as it did before the move.
+    fm_lock_acquire_wait() { return 87; }
+    dependency_rc=0
+    fm_lock_acquire_wait "$state" || dependency_rc=$?
+    [ "$dependency_rc" = 87 ] || fail 'dependency control did not refuse'
+    fm_pending_reply_confirm_delivery "$state" "$corr" || fail 'first delivery lost dependency refresh'
+    fm_lock_acquire_wait() { return 87; }
+    dependency_rc=0
+    fm_lock_acquire_wait "$state" || dependency_rc=$?
+    [ "$dependency_rc" = 87 ] || fail 'dependency control did not refuse'
+    fm_pending_reply_confirm_delivery "$other_state" "$other_corr" || fail 'second delivery lost dependency refresh'
+    [ "$STATE" = 'ambient state must survive' ] || fail 'delivery leaked target state'
+    [ "$FM_WAKE_QUEUE" = 'ambient queue must survive' ] || fail 'delivery leaked queue'
+    [ "$FM_WAKE_QUEUE_LOCK" = 'ambient queue lock must survive' ] || fail 'delivery leaked queue lock'
+    if fm_pending_reply_reset_known_undelivered "$state" "$corr"; then
+      fail 'delivered request was reset'
+    fi
+    if fm_pending_reply_try_resolve "$state" "$corr"; then
+      fail 'missing report resolved request'
+    fi
+    printf 'done [corr=%s]: wrong request\n' "$other_corr" > "$state/mate.status"
+    if fm_pending_reply_try_resolve "$state" "$corr"; then
+      fail 'foreign correlation resolved request'
+    fi
+    printf 'done [corr=%s]: correct request\n' "$corr" >> "$state/mate.status"
+    fm_pending_reply_try_resolve "$state" "$corr" || fail 'matching report did not resolve'
+    rec=$(fm_pending_reply_path "$other_state" "$other_corr")
+    [ "$(fm_pending_reply_get "$rec" phase)" = awaiting_report ] || fail 'resolution crossed homes'
+    [ "$STATE" = 'ambient state must survive' ] || fail 'resolution leaked target state'
+    [ "$FM_WAKE_QUEUE" = 'ambient queue must survive' ] || fail 'resolution leaked queue'
+    [ "$FM_WAKE_QUEUE_LOCK" = 'ambient queue lock must survive' ] || fail 'resolution leaked queue lock'
+  ) || fail 'dependency refresh and ambient state regression'
+  pass 'lazy dependency refresh preserves state across homes and denied reports'
+}
+
 # --- run --------------------------------------------------------------------
+
+test_dependency_refresh_preserves_ambient_state
 
 test_normal_correlated_reply_resolves_once
 test_completed_turn_no_report_triggers_one_recovery

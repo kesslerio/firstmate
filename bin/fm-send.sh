@@ -46,8 +46,8 @@
 # because a resend-inviting status there would duplicate a delivered
 # instruction. There is no delivered-unconfirmed
 # outcome on this plane: "did the doorbell land" is no longer the question -
-# "was the message acted on" is, and that is answered asynchronously for an
-# ordinary record by the worker's acknowledgement move into handled/.
+# "was the message acted on" is, and that is tracked independently through the
+# explicit disposition obligation. Moving into handled/ only acknowledges reading.
 # bin/fm-task-inbox-lib.sh owns the record format, doorbell line, and retry and
 # escalation policy for ordinary and fire-and-forget records.
 # The composer pre-check before the ring is ADVISORY only: when
@@ -929,6 +929,11 @@ else
     fi
     remote_rc=0
     remote_completion_unknown=0
+    if ! python3 "$SCRIPT_DIR/fm-task-inbox-obligation.py" remote-track "$STATE" "$TARGET_REMOTE_ID"; then
+      fm_lock_release "$REMOTE_META_LOCK"
+      echo 'error: remote instruction monitoring could not be persisted; steer not sent' >&2
+      exit 1
+    fi
     REMOTE_SEND_ARGS=("$TARGET_REMOTE_ID" "$MESSAGE")
     [ -z "$FIRE_AND_FORGET_ID" ] || REMOTE_SEND_ARGS+=(fire-and-forget)
     # Each transport attempt is bounded by FM_SEND_REMOTE_BUDGET seconds.
@@ -1034,10 +1039,10 @@ else
     fi
     if [ "${FM_SEND_IDEMPOTENT:-0}" = 1 ]; then
       INBOX_RECORD=$(fm_task_inbox_write_idempotent "$STATE" "$INBOX_TASK_ID" "$MESSAGE" \
-        "${FIRE_AND_FORGET_ID:+fire-and-forget}") || inbox_write_rc=$?
+        "${FIRE_AND_FORGET_ID:+fire-and-forget}" disposition) || inbox_write_rc=$?
     else
       INBOX_RECORD=$(fm_task_inbox_write "$STATE" "$INBOX_TASK_ID" "$MESSAGE" \
-        "${FIRE_AND_FORGET_ID:+fire-and-forget}") || inbox_write_rc=$?
+        "${FIRE_AND_FORGET_ID:+fire-and-forget}" disposition) || inbox_write_rc=$?
     fi
     if [ "${inbox_write_rc:-0}" -ne 0 ]; then
       fm_lock_release "$INBOX_META_LOCK"

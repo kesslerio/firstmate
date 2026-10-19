@@ -2,7 +2,7 @@
 # fm-task-inbox-lib.sh - the per-task steering inbox: durable records plus a
 # constant doorbell.
 #
-# ONE owner of the steering-inbox contract: the record format, sequence
+# Owner of the steering-inbox delivery contract: the record format, sequence
 # allocation, the idempotent re-enqueue dedup, the handled/ acknowledgement,
 # the self-describing doorbell line, and the watcher's re-ring ladder policy.
 # bin/fm-send.sh writes and rings locally, the host-local remote steer leg
@@ -10,6 +10,14 @@
 # on the remote host, bin/fm-watch.sh polls and re-rings, and the brief
 # scaffold (bin/fm-brief.sh) tells the worker how to read and acknowledge;
 # none of them restates the format.
+# Explicit execution obligations are owned by fm-task-inbox-obligation.py;
+# fm-task-inbox.sh --help owns the receiver's disposition interface.
+# Accountable enqueue requires Python 3.9+ and atomically includes its binding
+# in the message. Ordinary fm-send and actionable process feedback opt in with
+# expectation=disposition, including fire-and-forget sends; internal transport
+# notices opt out with expectation=none. Existing records remain legacy.
+# Moving into handled/ only acknowledges delivery: it never settles an explicit
+# execution obligation. Generic activity and promises are not execution proof.
 #
 # Design (captain-adopted, data/fm-send-reliability-reframe-s1/report.md): the
 # payload moves to the filesystem, which is reliable; the terminal carries only
@@ -33,12 +41,15 @@
 #                              so later polls suppress another escalation
 #   <task>.inbox/.retry-ring   name of a fire-and-forget record still owed its
 #                              one retry ring (fm_task_inbox_mark_retry)
+#   <task>.inbox/obligations/  per-record dispositions and recovery budget
+#   <task>.inbox/.obligation.lock serializes receipts and recovery
 #
 # Record format (fm_task_inbox_write / fm_task_inbox_body):
 #   schema=fm-task-inbox.v1
 #   at=<utc timestamp>
 #   delivery=fire-and-forget   present only when the re-ring ladder must ignore it
 #                              (it still gets one retry ring; see below)
+#   obligation=<JSON>         explicit disposition binding; Python owner above
 #   --
 #   <exact message text; newlines are legal; a marked secondmate request keeps
 #    its from-firstmate marker and corr token verbatim in this body>
@@ -57,7 +68,7 @@
 # by a busy pane consume a separate durable consecutive-poll budget,
 # FM_TASK_INBOX_BUSY_MAX. At that bound the same escalation path surfaces a
 # stuck-busy reason without typing. A non-busy due check or acknowledgement resets
-# this budget. Fire-and-forget retries remain outside escalation. A positively
+# this budget. Fire-and-forget retries remain outside delivery escalation. A positively
 # dead or missing endpoint skips delivery and the ladder and escalates directly.
 # This library owns the schedule, durable budgets, and escalation marker.
 # If delivery-attempt or busy-deferral bookkeeping fails while the record remains unhandled,
@@ -77,8 +88,9 @@
 # escalates. A waiting worker does not poll its inbox (bin/fm-brief.sh), so
 # without this retry the record could sit unread until a checkpoint. A pending ordinary record's
 # ladder rings the same inbox, so the retry waits behind it, and an
-# acknowledged record drops its mark. The remote steer leg has no watcher
-# ladder and owes no retry.
+# acknowledged record drops its mark. The remote steer leg has no unread-message
+# delivery ladder; its execution obligations are observed by the parent's
+# independent bounded obligation query, even after reply tracking resolves.
 #
 # Inbox names containing bytes outside printable ASCII are unsupported. The
 # doorbell refuses them rather than sending terminal control bytes to a pane.
@@ -183,6 +195,31 @@ fm_task_inbox_next_seq() {  # <inbox-dir>
   printf '%03d' "$((max + 1))"
 }
 
+# Validate the lock's own representation before following it. Ordinary locks
+# link to a private sibling owner directory; legacy directory locks also work.
+fm_task_inbox_lock_validate() {  # <lock-path>
+  local lock=$1 owner pid absolute suffix
+  [ -e "$lock" ] || [ -L "$lock" ] || return 0
+  owner=$lock
+  if [ -L "$lock" ]; then
+    absolute=$(fm_lock_abs_path "$lock") || return 1
+    owner=$(fm_lock_link_owner "$lock") || return 1
+    case "$owner" in "$absolute".owner.*) ;; *) return 1 ;; esac
+    suffix=${owner#"$absolute".owner.}
+    case "$suffix" in ''|*/*) return 1 ;; esac
+  fi
+  [ -d "$owner" ] && [ ! -L "$owner" ] || return 1
+  [ ! -L "$owner/pid" ] || return 1
+  if [ -e "$owner/pid" ]; then
+    [ -f "$owner/pid" ] || return 1
+    pid=$(cat "$owner/pid") || return 1
+    case "$pid" in ''|*[!0-9]*|0) return 1 ;; esac
+    [ "$pid" -gt 0 ] 2>/dev/null || return 1
+  fi
+}
+
+# Returns 75 only at the deadline with a validated, still-live lock holder.
+# Invalid locks and storage failures remain ordinary errors, never contention.
 fm_task_inbox_lock_acquire() {  # <lock-path>
   local lock=$1 wait=${FM_TASK_INBOX_LOCK_WAIT_SECS:-$FM_TASK_INBOX_LOCK_WAIT_DEFAULT}
   local deadline probe
@@ -193,23 +230,54 @@ fm_task_inbox_lock_acquire() {  # <lock-path>
     fm_lock_try_create "$lock" && return 0
   fi
   deadline=$(( $(date +%s) + wait ))
-  while ! fm_lock_try_acquire "$lock"; do
-    [ "$(date +%s)" -lt "$deadline" ] || return 1
+  while :; do
+    if ! fm_task_inbox_lock_validate "$lock"; then
+      # A normal release can remove the owner between the validation reads.
+      [ ! -e "$lock" ] && [ ! -L "$lock" ] || return 1
+    fi
+    fm_lock_try_acquire "$lock" && return 0
+    if [ "$(date +%s)" -ge "$deadline" ]; then
+      # One final attempt covers a release after the failed claim. A steal
+      # mutex or storage failure can still prevent creation with no primary
+      # lock present; neither may restart the loop beyond its deadline.
+      if ! fm_task_inbox_lock_validate "$lock"; then
+        [ ! -e "$lock" ] && [ ! -L "$lock" ] || return 1
+      fi
+      fm_lock_try_acquire "$lock" && return 0
+      fm_task_inbox_lock_validate "$lock" || return 1
+      probe=$(cat "$lock/pid" 2>/dev/null) || return 1
+      [ "$probe" -gt 0 ] 2>/dev/null && fm_pid_alive "$probe" && return 75
+      return 1
+    fi
     sleep 0.1
   done
 }
 
 # Write one record into the next sequence slot: temp-write, then atomic
 # rename. Prints the record path. Caller must hold .seq.lock.
-_fm_task_inbox_write_record_locked() {  # <inbox-dir> <text> [delivery-mode]
-  local dir=$1 text=$2 delivery_mode=${3:-} seq tmp rec status=0
+_fm_task_inbox_write_record_locked() {  # <inbox-dir> <text> [delivery-mode] [none|disposition]
+  local dir=$1 text=$2 delivery_mode=${3:-} expectation=${4:-none} seq tmp rec status=0 obligation='' task
   seq=$(fm_task_inbox_next_seq "$dir")
   rec="$dir/$seq.msg"
+  case "$expectation" in
+    none) ;;
+    disposition)
+      command -v python3 >/dev/null 2>&1 || {
+        echo 'error: accountable steering requires Python 3.9+; no instruction was published' >&2
+        return 1
+      }
+      task=${dir##*/}
+      obligation=$(printf '%s' "$text" | python3 "$_FM_TASK_INBOX_LIB_DIR/fm-task-inbox-obligation.py" \
+        header "${dir%/*}" "${task%.inbox}" "$seq.msg") || return 1
+      ;;
+    *) echo 'error: invalid instruction expectation' >&2; return 1 ;;
+  esac
   tmp=$(mktemp "$dir/.staging.XXXXXX") || return 1
   {
     printf 'schema=%s\n' "$FM_TASK_INBOX_SCHEMA"
     printf 'at=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     [ "$delivery_mode" != fire-and-forget ] || printf 'delivery=fire-and-forget\n'
+    [ -z "$obligation" ] || printf '%s\n' "$obligation"
     printf -- '--\n'
     printf '%s' "$text"
   } > "$tmp" && mv "$tmp" "$rec" || status=1
@@ -219,13 +287,17 @@ _fm_task_inbox_write_record_locked() {  # <inbox-dir> <text> [delivery-mode]
 
 # Durably enqueue one steer: temp-write, then atomic rename into the next
 # sequence slot. Prints the record path. Fails without a partial record.
-fm_task_inbox_write() {  # <state-dir> <task-id> <text> [delivery-mode]
-  local state=$1 task=$2 text=$3 delivery_mode=${4:-} dir lock rec status=0
+fm_task_inbox_write() {  # <state-dir> <task-id> <text> [delivery-mode] [none|disposition]
+  local state=$1 task=$2 text=$3 delivery_mode=${4:-} expectation=${5:-none} dir lock rec status=0
   dir=$(fm_task_inbox_dir "$state" "$task")
+  if [ "$expectation" = disposition ]; then
+    command -v python3 >/dev/null 2>&1 || { echo 'error: accountable steering requires Python 3.9+; no instruction was published' >&2; return 1; }
+    python3 "$_FM_TASK_INBOX_LIB_DIR/fm-task-inbox-obligation.py" validate "$state" "$task" || return 1
+  fi
   mkdir -p "$dir/handled" || return 1
   lock="$dir/.seq.lock"
   fm_task_inbox_lock_acquire "$lock" || return 1
-  rec=$(_fm_task_inbox_write_record_locked "$dir" "$text" "$delivery_mode") || status=1
+  rec=$(_fm_task_inbox_write_record_locked "$dir" "$text" "$delivery_mode" "$expectation") || status=1
   fm_lock_release "$lock"
   [ "$status" -eq 0 ] || return 1
   printf '%s' "$rec"
@@ -242,9 +314,13 @@ fm_task_inbox_write() {  # <state-dir> <task-id> <text> [delivery-mode]
 # secondmate request embeds a per-request correlation token in its body. The
 # local plane keeps plain fm_task_inbox_write: its outcome is synchronous, so
 # a repeated identical local steer is a deliberate new instruction.
-fm_task_inbox_write_idempotent() {  # <state-dir> <task-id> <text> [delivery-mode]
-  local state=$1 task=$2 text=$3 delivery_mode=${4:-} dir lock want have f rec='' status=0
+fm_task_inbox_write_idempotent() {  # <state-dir> <task-id> <text> [delivery-mode] [none|disposition]
+  local state=$1 task=$2 text=$3 delivery_mode=${4:-} expectation=${5:-none} dir lock want have f rec='' status=0
   dir=$(fm_task_inbox_dir "$state" "$task")
+  if [ "$expectation" = disposition ]; then
+    command -v python3 >/dev/null 2>&1 || { echo 'error: accountable steering requires Python 3.9+; no instruction was published' >&2; return 1; }
+    python3 "$_FM_TASK_INBOX_LIB_DIR/fm-task-inbox-obligation.py" validate "$state" "$task" || return 1
+  fi
   mkdir -p "$dir/handled" || return 1
   lock="$dir/.seq.lock"
   fm_task_inbox_lock_acquire "$lock" || return 1
@@ -288,7 +364,9 @@ fm_task_inbox_write_idempotent() {  # <state-dir> <task-id> <text> [delivery-mod
     status=1
   fi
   if [ "$status" -eq 0 ] && [ -z "$rec" ]; then
-    rec=$(_fm_task_inbox_write_record_locked "$dir" "$text" "$delivery_mode") || status=1
+    rec=$(_fm_task_inbox_write_record_locked "$dir" "$text" "$delivery_mode" "$expectation") || status=1
+  elif [ "$status" -eq 0 ] && [ "$expectation" = disposition ]; then
+    python3 "$_FM_TASK_INBOX_LIB_DIR/fm-task-inbox-obligation.py" verify "$state" "$task" "$rec" || status=1
   fi
   fm_lock_release "$lock"
   [ "$status" -eq 0 ] || return 1
@@ -331,7 +409,7 @@ fm_task_inbox_doorbell_line() {  # <record-path>
     ''|*[![:print:]]*) return 1 ;;
   esac
   quoted=$(printf '%s' "$name" | sed "s/'/'\\\\''/g")
-  printf ": Firstmate instruction waiting: list \"\$FM_TASK_INBOX\"/*.msg in your '%s' steering inbox, read and act on each in numeric order, then mv each into its handled/." \
+  printf ": Firstmate instruction waiting: list \"\$FM_TASK_INBOX\"/*.msg in your '%s' steering inbox, read and act on each in numeric order, use any obligation helper, then mv each into handled/." \
     "$quoted"
 }
 
@@ -353,13 +431,18 @@ fm_task_inbox_doorbell_line() {  # <record-path>
 # whose Enter never landed, so on an agent not reported busy it is submitted
 # rather than skipped; skipping it would block every later ring. On both paths
 # a lost first Enter gets one confirmed retry.
-fm_task_inbox_ring() {  # <backend> <target> <record-path> [expected-label]
-  local backend=$1 target=$2 rec=$3 label=${4:-} line cstate verdict
+fm_task_inbox_ring() {  # <backend> <target> <record-path> [expected-label] [reconcile]
+  local backend=$1 target=$2 rec=$3 label=${4:-} line cstate verdict relative
   case "$(fm_backend_agent_state "$backend" "$target" 2>/dev/null || true)" in
     dead|missing) return 3 ;;
   esac
   if ! line=$(fm_task_inbox_doorbell_line "$rec"); then
     return 2
+  fi
+  if [ "${5:-}" = reconcile ]; then
+    relative=${rec##*/}
+    case "${rec%/*}" in */handled) relative="handled/$relative" ;; esac
+    line=": Firstmate disposition missing: inspect \"\$FM_TASK_INBOX\"/$relative; use its obligation helper to record execution, response, wait or refusal. Reconcile existing work; never blindly repeat it."
   fi
   cstate=$(fm_backend_composer_state "$backend" "$target" "$label" 2>/dev/null) || cstate=unknown
   case "$cstate" in

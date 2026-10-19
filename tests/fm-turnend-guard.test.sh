@@ -8,6 +8,8 @@
 #                scopes in-flight work to the PRIMARY checkout only and requires
 #                a live, identity-matched watcher lock plus a fresh beacon.
 # All hermetic over temp dirs; no real agent session is invoked.
+# FM_TURNEND_GUARD_PI_ONLY=1 selects the Pi hook checks independently of the
+# other harness fixtures; the default still runs the complete suite.
 set -u
 
 # shellcheck source=tests/lib.sh
@@ -1058,6 +1060,101 @@ EOF
   expect_code 0 "$status" "OpenCode plugin must run the guard from worktree even when directory is elsewhere"
   [ -z "$out" ] || fail "OpenCode plugin worktree-root test printed output: $out"
   pass ".opencode primary plugin: guard path is anchored to worktree, not directory"
+}
+
+test_pi_extension_observer_wait() {
+  local repo worker ext file out status
+  repo=$(make_primary_dir "$TMP_ROOT/pi-observer-primary")
+  worker="$TMP_ROOT/pi-observer-worker"
+  git -C "$repo" worktree add -q -b observer-worker "$worker"
+  ext="$repo/.pi/extensions/fm-primary-turnend-guard.ts"
+  mkdir -p "$repo/.pi/extensions/lib"
+  cp "$ROOT/.pi/extensions/fm-primary-turnend-guard.ts" "$ext"
+  cp "$ROOT/.pi/extensions/lib/fm-operational-input.ts" "$repo/.pi/extensions/lib/"
+  for file in fm-arm-pretool-check.sh fm-arm-command-policy.mjs fm-cd-pretool-check.sh fm-cd-command-policy.mjs fm-observer-wait-policy.mjs; do
+    [ ! -f "$ROOT/bin/$file" ] || cp "$ROOT/bin/$file" "$repo/bin/"
+  done
+  PLUGIN="$ext" FM_HOME="$repo" FM_ROOT_OVERRIDE="$repo" FM_STATE_OVERRIDE="$repo/state" \
+    WORKER="$worker" node --input-type=module > "$TMP_ROOT/pi-observer-output" 2>&1 <<'EOF'
+import assert from "node:assert/strict";
+import { writeFileSync, unlinkSync } from "node:fs";
+import { pathToFileURL } from "node:url";
+import { spawn } from "node:child_process";
+
+const home = process.env.FM_HOME;
+const lock = `${home}/state/.lock`;
+writeFileSync(lock, `${process.pid}\n`);
+const handlers = new Map();
+(await import(pathToFileURL(process.env.PLUGIN).href)).default({
+  on: (name, handler) => handlers.set(name, handler),
+});
+const hook = handlers.get("tool_call");
+const call = (command, cwd = home, toolName = "bash") =>
+  hook({ type: "tool_call", toolName, input: { command } }, { cwd });
+const captured = [
+  `sleep 50; tail -3 state/child.status | cut -c1-400; herdr pane list 2>/dev/null | python3 -c "import json,sys; d=json.load(sys.stdin); print([(p['pane_id'],p.get('agent_status')) for p in d['result']['panes'] if p['pane_id']=='w1:p2'])"`,
+  `sleep 55; tail -2 state/child.status | cut -c1-400; herdr pane list 2>/dev/null | python3 -c "import json,sys; d=json.load(sys.stdin); print([(p['pane_id'],p.get('agent_status')) for p in d['result']['panes'] if p['pane_id'] in ('w1:p2','w2:p2')])"`,
+  `sleep 40; tail -2 state/child.status | cut -c1-600; herdr pane list 2>/dev/null | python3 -c "import json,sys; d=json.load(sys.stdin); print([(p['pane_id'],p.get('agent_status')) for p in d['result']['panes'] if p['pane_id'] in ('w1:p2','w2:p2')])"`,
+];
+const results = await Promise.all(captured.map((command) => call(command)));
+console.log(`captured polling block results: ${results.map((result) => result?.block === true).join(", ")}`);
+for (const result of results) {
+  assert.equal(result?.block, true, "captured observer sleep must be denied before execution");
+  assert.match(result.reason, /\[primary-observer-wait\].*bounded.*yield.*watcher/);
+}
+writeFileSync(lock, `${process.ppid}\n`);
+assert.equal((await call(captured[0]))?.block, true, "ancestor-owned primary lock");
+writeFileSync(lock, `${process.pid}\n`);
+for (const command of [
+  ...captured.map((command) => command.replace(/^sleep \d+; /, "")),
+  "grep done state/child.status", "herdr pane list", "sleep 50",
+  "printf 'sleep 50; tail state/child.status'",
+  "sleep 1; npm test", "npm run build; sleep 1; tail state/child.status",
+  "sleep 1; gh run watch 123", "wait $build_pid; tail state/child.status",
+  "sleep 1; tail build.log", "bin/fm-session-start.sh", "bin/fm-wake-drain.sh",
+  "sleep 1; tail state/.startup-network.status",
+  "sleep 1; grep done state/.startup-network.status",
+  "sleep 1; rg done state/.startup-network.status",
+  "/tmp/sleep 1; tail state/child.status", "sleep 1; /tmp/tail state/child.status",
+  "PATH=/tmp sleep 1; tail state/child.status",
+  "sleep 1; env PATH=/tmp tail state/child.status",
+]) assert.notEqual((await call(command))?.block, true, command);
+assert.notEqual((await call(captured[0], process.env.WORKER))?.block, true, "worker cwd");
+assert.notEqual((await call(captured[0], home, "read"))?.block, true, "non-bash tool");
+process.env.FM_TASK_ID = "fixture-worker";
+assert.notEqual((await call(captured[0]))?.block, true, "explicit worker role");
+delete process.env.FM_TASK_ID;
+writeFileSync(`${home}/.fm-secondmate-home`, "fixture-secondmate\n");
+assert.notEqual((await call(captured[0]))?.block, true, "secondmate home");
+unlinkSync(`${home}/.fm-secondmate-home`);
+unlinkSync(`${home}/AGENTS.md`);
+assert.notEqual((await call(captured[0]))?.block, true, "non-firstmate checkout");
+writeFileSync(`${home}/AGENTS.md`, "");
+unlinkSync(lock);
+assert.notEqual((await call(captured[0]))?.block, true, "missing lock/startup");
+writeFileSync(lock, "invalid\n");
+assert.notEqual((await call(captured[0]))?.block, true, "invalid lock");
+const foreign = spawn(process.execPath, ["-e", "setInterval(() => {}, 1000)"]);
+try {
+  writeFileSync(lock, `${foreign.pid}\n`);
+  assert.notEqual((await call(captured[0]))?.block, true, "foreign live lock");
+} finally {
+  foreign.kill();
+  await new Promise((resolve) => foreign.once("close", resolve));
+}
+assert.notEqual((await call(captured[0]))?.block, true, "dead lock owner");
+writeFileSync(lock, `${process.pid}\n`);
+assert.equal((await call("bin/fm-watch-arm.sh &"))?.block, true, "existing arm guard");
+assert.equal((await call("cd projects/example"))?.block, true, "existing cd guard");
+assert.notEqual((await call("bin/fm-watch-arm.sh"))?.block, true, "existing arm recovery path");
+await handlers.get("session_shutdown")?.();
+console.log("observer hook allowed/denied and isolated ownership checks passed");
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/pi-observer-output")
+  printf '%s\n' "$out"
+  expect_code 0 "$status" "Pi observer-wait hook behavior"
+  pass ".pi primary extension: delayed observer polls yield; ordinary work and recovery remain allowed"
 }
 
 test_pi_extension_injects_once_per_logical_agent_run() {
@@ -2194,6 +2291,13 @@ test_hook_no_afk_ignores_poll_derived_grace() {
   pass "fm-turnend-guard: with away mode off, the poll-derived grace never applies"
 }
 
+if [ "${FM_TURNEND_GUARD_PI_ONLY:-0}" = 1 ]; then
+  test_pi_extension_observer_wait
+  test_pi_extension_injects_once_per_logical_agent_run
+  test_pi_extension_retries_after_followup_delivery_failure
+  exit 0
+fi
+
 test_predicate_healthy_no_inflight
 test_predicate_unhealthy_no_beacon
 test_predicate_unhealthy_stale_beacon
@@ -2244,6 +2348,7 @@ test_tracked_claude_entries_inert_under_grok
 test_codex_hook_uses_process_pwd_when_payload_cwd_is_outside_root
 test_codex_hook_ignores_nested_git_root_guard
 test_opencode_plugin_anchors_guard_to_worktree
+test_pi_extension_observer_wait
 test_pi_extension_injects_once_per_logical_agent_run
 test_pi_extension_retries_after_followup_delivery_failure
 test_hook_claude_mode_reblocks_stop_hook_active_when_unhealthy

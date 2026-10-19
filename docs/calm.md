@@ -62,24 +62,21 @@ A fresh Pi session or new Calm extension lifetime starts at the normal initial p
 
 ### What Calm hides on Pi
 
-Calm hides these rows:
-
-- Collapsed thinking labels.
-- The mid-turn assistant working-note blocks governed by the [shared preservation rule](#shared-preservation-rule-for-assistant-text) above.
-- The shells for the Pi built-in tool names Calm owns.
-- Firstmate-owned tool shells listed in the [Pi tool audit](calm-mode-feasibility.md#firstmate-pi-tool-audit).
-- Canonically classified Firstmate operational user rows.
-
-Pi applies the preservation rule independently to each text block.
-A short working note can therefore hide beside preserved substantive content in the same message.
-A working note is briefly visible while it streams, before its settled row collapses.
-
-The narration is hidden only from the live transcript presentation.
-It remains in the message, model context, session storage, and `/export` artifacts.
-
-The operational inputs Calm classifies remain ordinary user-role messages.
-Pi's transcript layout renders their complete rows at zero height.
+While Calm is off, Pi's stock working row is left exactly as Pi renders it.
+Calm hides collapsed thinking labels, the mid-turn assistant working-note blocks governed by the shared preservation rule above, complete tool rows including their images and spacing, and canonically classified Firstmate operational user rows.
+Pi applies that rule independently to each text block, so a short working note can hide beside preserved substantive content in the same message.
+A working note is briefly visible while it streams before its settled row collapses.
+The narration is hidden only from the live transcript presentation, and remains in the message, model context, session storage, and `/export` artifacts.
+The operational inputs Calm classifies remain ordinary user-role messages, while Pi's transcript layout renders their complete rows at zero height.
 The session-start nudge remains on its existing non-displayed custom-message path.
+
+Calm changes presentation only.
+Pi owns tool execution and rendering, and input delivery, ordering, model context, session storage, diagnostics, and `/export` and `/share` operation remain unchanged.
+Every hidden Firstmate input remains available to the model and in serialized session data and exported artifacts.
+Legacy operational custom messages remain in session data and Pi's sidebar tree, although the main HTML transcript may omit them.
+Toggling Calm applies to rows already on screen, including rows restored from a session and tools whose definitions are not currently registered.
+Toggling Calm off restores the latest arguments, results, images, padding, and expansion state, while preserving any other renderer's decision to hide a row.
+Hidden tool rows cannot receive input; hiding cancels their mouse capture and keyboard focus, so restored controls need a fresh interaction.
 
 ### Queued Firstmate inputs on Pi
 
@@ -91,27 +88,11 @@ When Escape, or navigating the session tree, stops a run with Firstmate inputs s
 When Calm starts that turn, it shows the one-line notice `Firstmate supervision continues in a new turn.`
 Inputs held behind a running compaction stay there until Pi sends them after compaction, so they start and announce no turn of their own.
 
-### What stays unchanged on Pi
-
-Outside Pi's same-name built-in override collision described in [Pi compatibility](#pi-compatibility) below, Calm changes presentation only.
-Calm's built-in wrappers preserve Pi's execution behavior.
-Input delivery, ordering, model context, session storage, diagnostics, and `/export` and `/share` operation remain unchanged.
-Every hidden Firstmate input remains available to the model and in serialized session data and exported artifacts.
-Legacy operational custom messages remain in session data and Pi's sidebar tree; depending on the Pi version, the main HTML transcript either omits them or includes them as rows hidden by default.
-Toggling Calm off restores ordinary rendering, and `Ctrl+O` expansion state is preserved.
 
 ### What stays visible on Pi
 
 Pi's supported presentation API does not expose a global transcript filter.
-These rows remain visible:
-
-- Expanded reasoning and its reserved spacing.
-- Built-in tool images.
-- User-bash rows.
-- Skill and summary rows.
-- Generic status notices.
-- Other arbitrary custom-tool or extension rows.
-
+Expanded reasoning and its reserved spacing, user-bash rows, skill and summary rows, generic status notices, and arbitrary extension rows outside tool rendering remain visible.
 These are supported-API boundaries rather than hidden-content failures.
 
 ## Pi compatibility
@@ -132,29 +113,17 @@ Calm checks them for each session on its first queued-listing draw, before hidin
 A session missing any of them keeps its queued rows and Escape exactly as stock, and shows one warning.
 In that case `tests/fm-calm-pi-queue-retention-live-e2e.test.sh` fails naming the installed Pi version.
 
-### Built-in tool override collisions
+### Tool visibility middleware
 
-Calm's built-in tool presentation (`bash`, `read`, `edit`, `write`, `grep`, `find`, `ls`) shares Pi's single, unmerged override slot per name with any other extension that overrides the same tool.
-How Calm handles that shared slot depends on whether Calm was already on when the session started or reloaded.
-
-**Session started with Calm off**
-
-- While the persisted Calm preference is off, Calm registers none of those overrides and therefore contests no built-in tool name.
-- The first time Calm turns on in a session that started off, it claims every built-in name no other extension already owns.
-- It leaves every contested tool intact and callable, and displays a prominent warning naming the tools it skipped.
-- Tool-call rows already on screen before that first toggle do not retroactively collapse.
-- Later rows for the names Calm claimed use Calm presentation.
-
-**Session started or reloaded with Calm already on**
-
-- Calm must instead register all seven overrides synchronously so Pi can render restored rows with them.
-- Pi provides no ownership check early enough for that load-time path, and the first registrant wins the complete tool definition.
-- If the other extension wins, a session-start console diagnostic names the tool and winning extension.
-- If Calm wins, Pi does not expose the losing registration, so the other extension's override is unavailable and cannot be named.
+Tool-row presentation requires Pi's public `registerToolRenderer` middleware and `ToolRenderers.isVisible(context)` API.
+Calm registers one visibility-only resolver synchronously and preserves the stock or custom renderers selected by the remaining resolver chain.
+It claims no executable tool names and composes another renderer's visibility predicate with its own.
+HTML export retains the tool content without evaluating TUI visibility.
+A package version alone does not establish availability of this API; use the focused extension tests below against the Pi package being used.
 
 ### Owning docs and files
 
-- [`calm-mode-feasibility.md`](calm-mode-feasibility.md) owns the version-scoped renderer taxonomy, built-in override constraints, and empirical evidence.
+- [`calm-mode-feasibility.md`](calm-mode-feasibility.md) owns historical harness evidence and current verification entry points.
 - [`configuration.md`](configuration.md#calm-preference-configcalm) owns the persisted preference file and resolution rules.
 - `.pi/extensions/lib/fm-calm-visibility.ts` owns the visibility policy.
 - `.claude/mods/firstmate-calm/lib/fm-calm-preservation.ts` owns the shared substantive mid-turn text rule, which Pi imports through its tracked symlink.

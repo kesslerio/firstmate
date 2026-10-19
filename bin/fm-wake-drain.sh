@@ -675,7 +675,7 @@ ROWS
     done
     [ "$held" -eq 0 ] || text="${text}BRANCH OUTCOMES: $held newer captain outcome(s) are held back (byte cap); they follow on the next drain once these are acknowledged
 "
-    text="${text}BRANCH OUTCOMES: after processing them run bin/fm-branch-outcome.sh mark-processed --through $target; until then every drain presents them again
+    text="${text}BRANCH OUTCOMES: run bin/fm-ready-review.sh scan for durable ready-work dispositions; after processing them run bin/fm-branch-outcome.sh mark-processed --through $target; until then every drain presents them again
 "
   fi
 
@@ -817,6 +817,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 if [ -n "$ACK_THROUGH" ]; then
+  "$SCRIPT_DIR/fm-ready-review.sh" guard "$ACTOR" || exit 1
   fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"
 elif fm_lock_acquire_wait_bounded "$FM_WAKE_QUEUE_LOCK" "$PRESENTATION_LOCK_TIMEOUT"; then
   :
