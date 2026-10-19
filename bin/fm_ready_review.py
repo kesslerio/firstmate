@@ -412,9 +412,28 @@ class Review:
             safe_dir(config)
         values = [read(config / name) for name in names]
         values += [read(self.state / name) for name in ('.afk-contract', '.afk', '.last-launch')]
-        # Endpoint replacements affect capacity and invalidate an old stop.
-        for path in sorted(self.state.glob('*.meta')):
-            values.append([path.name, read(path)])
+        topology = run(['bash', '-c',
+                        '. "$1/fm-wake-lib.sh"; . "$1/fm-secondmate-registry-lib.sh"; '
+                        'fm_firstmate_root_home "$2" || exit 1; '
+                        'fm_local_firstmate_state_dirs "$3" || exit 1; '
+                        'printf "%s\n" "${FM_LOCAL_FIRSTMATE_STATES[@]}"',
+                        'ready-review', str(BIN), str(self.home), str(self.state)]).splitlines()
+        root_config = Path(topology[0]) / 'config'
+        if root_config.exists() or root_config.is_symlink():
+            safe_dir(root_config)
+        values.append(read(root_config / 'project-capacity'))
+        for directory in sorted(set(topology[1:])):
+            state = Path(directory)
+            if state.exists() or state.is_symlink():
+                safe_dir(state)
+            values.append(directory)
+            for path in sorted(state.glob('*.meta')):
+                values.append([str(path), read(path)])
+        values.append(run(['bash', '-c',
+                           '. "$1/fm-liveness-lib.sh"; '
+                           'fm_liveness_snapshot "$2" "$3" || exit 1; '
+                           'printf "%s\n" "$FM_LIVENESS_TARGET" "$FM_LIVENESS_LIVE"',
+                           'ready-review', str(BIN), str(self.home), str(self.state)]))
         return digest(values)
 
     def poll(self):

@@ -318,6 +318,35 @@ ledger.write_text(json.dumps(saved))
 review(h, 'guard', 'main', ok=False)
 print('ok - explicit gate stops expire and gate configuration changes re-open review')
 
+shared = home('capacity-root')
+sibling = home('capacity-sibling')
+(h / '.fm-secondmate-parent').write_text(f'schema=fm-secondmate-parent.v1\nroute=local\nparent_home={shared}\n')
+(shared / 'data/secondmates.md').write_text(
+    f'- b - reviewer (home: {h}; scope: all; projects: all; added 2026-10-18)\n'
+    f'- a - worker (home: {sibling}; scope: all; projects: all; added 2026-10-18)\n')
+worker = sibling / 'state/worker.meta'
+worker.write_text('kind=ship\nspawn_gen=s1.2.3\nproject=/synthetic/project\n')
+stop(h, gate='capacity')
+review(h, 'guard', 'main')
+review(h, 'guard', 'main')
+worker.write_text(worker.read_text() + 'pr=https://github.com/owner/repo/pull/1\npr_spawn_gen=s1.2.3\n')
+review(h, 'guard', 'main', ok=False)
+review(h, 'poll')
+assert (h / 'state/.wake-queue').exists()
+stop(h, gate='capacity')
+review(h, 'guard', 'main')
+worker.unlink()
+review(h, 'guard', 'main', ok=False)
+stop(h, gate='capacity')
+(shared / 'config/project-capacity').write_text('project 2\n')
+review(h, 'guard', 'main', ok=False)
+stop(h, gate='capacity')
+worker.symlink_to(shared / 'config/project-capacity')
+review(h, 'guard', 'main', ok=False)
+worker.unlink()
+(h / '.fm-secondmate-parent').unlink()
+print('ok - shared ready handoff, worker removal, root capacity changes and unsafe records invalidate stops')
+
 # Starting a row, writing a plausible status, or directly invoking the hook is
 # deliberately insufficient; exact SDK + real fm-spawn proves the positive path.
 task(h, 'start', 'dependent')

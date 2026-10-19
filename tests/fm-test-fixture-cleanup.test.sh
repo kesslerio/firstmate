@@ -273,3 +273,69 @@ PYOWNED
   pass 'owned TERM-resistant leaders and descendants stop on success, assertion failure and interruption'
 }
 test_owned_children_stop_on_every_exit
+
+test_custom_cleanup_precedes_signal_tree_removal() {
+  local harness
+  harness=$(fm_test_tmproot fm-custom-signal-cleanup)
+  LIB="$LIB" HARNESS="$harness" python3 - <<'PY'
+import os, pathlib, signal, subprocess, time
+base = pathlib.Path(os.environ['HARNESS'])
+script = r'''
+. "$1"
+d=$(fm_test_tmproot fm-custom-signal-owner)
+FM_TEST_CHILD_REGISTRY="$d/children"
+cleanup() {
+  [ -s "$d/children" ] && printf owned > "$2/cleanup-$3"
+  fm_test_stop_children
+  fm_test_cleanup
+}
+trap 'cleanup "$@"' EXIT
+python3 - "$2/pids-$3" <<'OWNED' &
+import os, signal, sys, time
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
+child=os.fork()
+if child == 0:
+    time.sleep(45)
+    os._exit(0)
+open(sys.argv[1], 'w').write(f'{os.getpid()} {child}')
+time.sleep(45)
+OWNED
+fm_test_track_child "$!" kill
+printf '%s' "$d" > "$2/ready-$3"
+case "$3" in success) exit 0 ;; failure) exit 42 ;; esac
+deadline=$((SECONDS+30))
+while [ "$SECONDS" -lt "$deadline" ]; do sleep .1; done
+exit 4
+'''
+def reset_signals():
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    signal.signal(signal.SIGQUIT, signal.SIG_DFL)
+for mode, sig, expected in [('success', None, 0), ('failure', None, 42),
+                             ('INT', signal.SIGINT, 130), ('TERM', signal.SIGTERM, 143),
+                             ('HUP', signal.SIGHUP, 129), ('QUIT', signal.SIGQUIT, 131)]:
+    proc = subprocess.Popen(['bash', '-c', script, '_', os.environ['LIB'], str(base), mode],
+                            start_new_session=True, preexec_fn=reset_signals,
+                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    try:
+        deadline=time.monotonic()+8
+        while not ((base/f'ready-{mode}').exists() and (base/f'pids-{mode}').exists()):
+            assert time.monotonic()<deadline, mode
+            time.sleep(.02)
+        fixture=pathlib.Path((base/f'ready-{mode}').read_text())
+        if sig is not None:
+            proc.send_signal(sig)
+        _, err=proc.communicate(timeout=12)
+        assert proc.returncode==expected, (mode, proc.returncode, err)
+        assert (base/f'cleanup-{mode}').read_text()=='owned', mode
+        assert not fixture.exists(), mode
+        for pid in (base/f'pids-{mode}').read_text().split():
+            state=subprocess.run(['ps', '-p', pid, '-o', 'stat='], capture_output=True, text=True).stdout.strip()
+            assert not state or state.startswith('Z'), (mode, pid, state)
+    finally:
+        if proc.poll() is None:
+            os.killpg(proc.pid, signal.SIGKILL)
+            proc.wait()
+print('ok - custom ownership cleanup precedes tree removal on success, failure and every supported signal')
+PY
+}
+test_custom_cleanup_precedes_signal_tree_removal

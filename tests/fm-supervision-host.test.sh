@@ -1680,7 +1680,8 @@ test_a_park_stopped_mid_take_over_leaves_the_take_over_to_the_next_park() {
     . "$1"
     fm_lock_acquire_wait "$2" || exit 1
     : > "$3"
-    while [ ! -e "$4" ]; do sleep 0.1; done
+    deadline=$((SECONDS + 120))
+    while [ ! -e "$4" ] && [ "$SECONDS" -lt "$deadline" ]; do sleep 0.1; done
     fm_lock_release "$2"
   ' _ "$ROOT/bin/fm-wake-lib.sh" "$home/state/.watcher-down.lock" "$home/marker-lock-held" "$home/marker-lock-release" &
   holder=$!

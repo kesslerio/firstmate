@@ -281,10 +281,10 @@ fm_test_tmproot() {
 }
 
 trap fm_test_cleanup EXIT
-trap 'fm_test_cleanup; exit 130' INT
-trap 'fm_test_cleanup; exit 143' TERM
-trap 'fm_test_cleanup; exit 129' HUP
-trap 'fm_test_cleanup; exit 131' QUIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
+trap 'exit 131' QUIT
 
 # fm_test_reap_orphans: best-effort sweep for fixture roots left behind by a
 # prior run that was killed hard enough to skip the traps above (e.g. a
