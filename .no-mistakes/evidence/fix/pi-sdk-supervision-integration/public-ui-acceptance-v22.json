@@ -1,0 +1,63 @@
+{
+  "status": "CURRENT_CANDIDATE_FRESH_UI_ACCEPTANCE_PASS",
+  "head_sha": "bf0d2fd21cd901ed4fca2ec762cf844752dc66c9",
+  "tree_sha": "06b9edcd86c9948cdf636018e6dbf1b66c302c75",
+  "sdk_freeze_sha256": "4066bb0c53703900fa776ff94d7a6f707da8ca62d285ed66bf7960aae258fe50",
+  "fresh_batches": [
+    {
+      "batch": "probe",
+      "passed_groups": 2,
+      "png_captures": 1
+    },
+    {
+      "batch": "review",
+      "passed_groups": 40,
+      "png_captures": 68
+    },
+    {
+      "batch": "calm",
+      "passed_groups": 18,
+      "png_captures": 64
+    },
+    {
+      "batch": "browser-sdk",
+      "passed_groups": 16,
+      "png_captures": 14
+    },
+    {
+      "batch": "browser-calm",
+      "passed_groups": 16,
+      "png_captures": 14
+    }
+  ],
+  "fresh_groups": 92,
+  "fresh_png_captures": 161,
+  "independent_fresh_png_views": 98,
+  "independent_browser_png_views": 28,
+  "captured_owned_generations_absent": 1121,
+  "retained_unchanged_ten_batch_groups": 195,
+  "retained_unchanged_ten_batch_captures": 379,
+  "scope": "Five fresh selected batches supplement the unchanged retained ten-batch suite and quiet/away interaction evidence. The retained ten batches are not represented as newly executed.",
+  "interaction_coverage": [
+    "regular/fullscreen hide and show",
+    "keyboard and pointer input ownership",
+    "focus and hover",
+    "decoded images and image setters",
+    "compiled HTML exports with stock parity",
+    "legacy rows restored from hidden birth",
+    "zero-height spacing and retained row identity",
+    "desktop and mobile expansion, collapse and sidebar controls"
+  ],
+  "normal_browser_close_and_cleanup": "Both fresh browser batches exited normally with no new driver termination signals before all tracked browser generations were absent. Captured daemon, controller and reader generations and recorded sockets were absent after final cleanup.",
+  "privacy": "A generation-bound pre-exec guard verified the private environment before the pinned browser launched; postlaunch identity and physical profile checks matched. No real credentials or running Firstmate state changed.",
+  "limits": [
+    "Two unchanged stock-terminal image capture limitations were independently matched to baseline; no new visual regression was found.",
+    "Finite captured process/resource scope; unrelated inaccessible host descriptors were outside inspected scope.",
+    "No actual operating-system denied launcher invocation is claimed by the pure validator regression proof.",
+    "Earlier failed private-browser and diagnostic receipts remain failed; their observed causes were repaired and owned resources were cleaned.",
+    "GitHub screenshot attachment upload was unavailable."
+  ],
+  "private_acceptance_sha256": "fc2808f5cfca9b590f67bd1c27609705ffc5a7b768e74713b02ce14289990abe",
+  "independent_browser_review_sha256": "e9b0840e8e3125598d1a2184dc9faf375d1b7404531ca55cbedb398c58dcc39d",
+  "protected_custody_sha256": "50388c88e9632d5f1033f496f5513274b1f592baf458396b4f709f1e443a4b62"
+}

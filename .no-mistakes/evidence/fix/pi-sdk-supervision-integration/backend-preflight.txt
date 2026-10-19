@@ -1,0 +1,6 @@
+herdr: complete cursor dependency -> adapter loaded
+herdr: missing cursor dependency -> preflight refused before adapter load
+herdr: unreadable cursor dependency -> preflight refused before adapter load
+tmux: complete cursor dependency -> adapter loaded
+tmux: missing cursor dependency -> preflight refused before adapter load
+tmux: unreadable cursor dependency -> preflight refused before adapter load

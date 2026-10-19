@@ -1,0 +1,5 @@
+Blocked dependent seeded before dependency completion; no review was consumed.
+After dependency completion with explicit hold: {"dependent": {"dependencies": {"dependency": "done"}, "held": "yes", "hold_kind": "captain", "state": "queued"}}
+Current concrete stop permits acknowledgment; an unresolved candidate previously blocked it.
+After explicit hold release: {"dependent": {"dependencies": {"dependency": "done"}, "held": "no", "hold_kind": "-", "state": "queued"}}
+Hold release invalidates old stop; newly eligible work remains pending for dispatch.

@@ -1,0 +1,6 @@
+{
+  "captured_owned_fixture_generations_absent": 7,
+  "initial_timed_out_test_owners_absent": true,
+  "engine_fixture_directories_removed_by_cleanup": true,
+  "scope": "Partial independent post-exit generation capture plus each executed test mandatory descendant-reaping assertions; no claim of full kernel inventory."
+}

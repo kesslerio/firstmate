@@ -1,0 +1,35 @@
+{
+  "finding": "test-1",
+  "status": "resolved",
+  "tested_head_sha": "bf0d2fd21cd901ed4fca2ec762cf844752dc66c9",
+  "tested_tree_sha": "06b9edcd86c9948cdf636018e6dbf1b66c302c75",
+  "root_cause": "The earlier Test result lacked fresh UI execution evidence. Subsequent independently reviewed actual terminal and desktop/mobile browser execution now supplies that evidence; no product defect was demonstrated.",
+  "verification": {
+    "top_level_sha256_bindings": 5,
+    "current_source_entries_byte_mode_link_matched": 698,
+    "underlying_evidence_sha256_matched": 52,
+    "fresh_capture_sha256_matched": 161,
+    "batches_zero_exit_complete_cleanup_verified": 5,
+    "matrix_groups_passed": 92,
+    "matrix_groups_failed": 0,
+    "independently_reviewed_fresh_pngs": 98,
+    "independently_reviewed_browser_pngs": 28,
+    "recorded_captured_generations_absent": 1121
+  },
+  "scenario": {
+    "name": "Terminal and desktop/mobile UI behavior receives actual interaction and independent screenshot acceptance",
+    "result": "pass",
+    "live": true,
+    "evidence": "public-ui-acceptance-v22.json",
+    "reason": "Verified actual parent/reviewer executions for this exact candidate, with real terminal input, desktop/mobile browser clicks, decoded images and HTML export checks. This phase verified existing immutable execution artifacts and did not personally repeat the interactions."
+  },
+  "scope": "Five fresh selected batches supplement retained unchanged ten-batch and quiet/away evidence; retained workloads are not described as freshly executed. Earlier failed attempts remain failed. Two unchanged stock-terminal image-capture limitations remain disclosed.",
+  "source_changes": false,
+  "workloads_repeated": false,
+  "remaining_outer_executor_requirements": [
+    "Other configured phases",
+    "Actual Ubuntu and macOS CI",
+    "Own-fork publication and authorized merge after readiness"
+  ],
+  "public_summary_sha256": "f1628f096279f35128940cae635516bb4670189dd57bf09561bf413c695b5ac3"
+}

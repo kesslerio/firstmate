@@ -1,0 +1,10 @@
+{
+  "head": "bf0d2fd21cd901ed4fca2ec762cf844752dc66c9",
+  "regular_source_inputs_match_retained_runtime_binding": 537,
+  "symlink_inputs_match": 2,
+  "retained_lab_groups": 7,
+  "fresh_live_lab_claim": false,
+  "retained_UI_input_count": 30,
+  "fresh_UI_interaction_claim": false,
+  "scope": "Retained lifecycle, SDK and independent UI evidence reused only for unchanged recorded source closures. Platform CI remains outer-executor owned."
+}

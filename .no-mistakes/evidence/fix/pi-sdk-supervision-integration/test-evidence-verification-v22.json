@@ -1,0 +1,19 @@
+{
+  "status": "verified",
+  "head_sha": "bf0d2fd21cd901ed4fca2ec762cf844752dc66c9",
+  "tree_sha": "06b9edcd86c9948cdf636018e6dbf1b66c302c75",
+  "source_entries_matched": 698,
+  "ui_evidence_hashes_matched": 52,
+  "fresh_capture_hashes_matched": 161,
+  "fresh_ui_matrix_groups_passed": 92,
+  "lifecycle_result_readback_review_chains_matched": 7,
+  "exact_sdk_consumer_chains_matched": 2,
+  "scope": "Read-only verification of actual execution completed by parent and independent reviewers in this same active pipeline. No duplicate live workloads, exclusive cleanup readbacks or new personal interaction claimed. Retained ten-batch and quiet/away evidence remains separate.",
+  "public_summary_sha256": "f1628f096279f35128940cae635516bb4670189dd57bf09561bf413c695b5ac3",
+  "limitations": [
+    "Two unchanged stock-terminal image capture limitations remain disclosed.",
+    "Screenshots remain private under the publication decision; only the authorized sanitized summary is published.",
+    "Earlier failed packets remain failed. Ubuntu/macOS CI and publication belong to later phases."
+  ],
+  "source_changes": false
+}

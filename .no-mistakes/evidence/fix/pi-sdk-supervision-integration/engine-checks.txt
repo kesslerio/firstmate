@@ -1,0 +1,17 @@
+ok - successful engine exits survive delayed observations; unknown and failed registration retire only owned execution
+ok - engine registration cancellation retires perl execution on TERM
+ok - engine registration cancellation retires timeout execution on TERM
+ok - engine registration cancellation retires perl execution on HUP
+ok - engine registration cancellation retires timeout execution on INT
+ok - engine registration cancellation retires perl execution on QUIT
+ok - entered engine cancellation preserves ordinary identity ownership
+Terminated                 sleep 0.1
+
+Original combined driver exit: 124 (retained timeout).
+Only unfinished cases, separate invocation:
+ok - entered engine cancellation preserves ordinary identity ownership
+ok - entered engine cancellation preserves foreign identity ownership
+ok - entered engine cancellation preserves stale identity ownership
+ok - host: an engine turn is bounded, and tool processes outside its process group are reaped
+
+Remaining-case driver exit: 0.

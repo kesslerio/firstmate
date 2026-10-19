@@ -1,0 +1,4 @@
+Acknowledged instruction: query retains obligation; four observations produce one escalation and no duplicate instruction; cleanup guard refuses.
+Exact-generation run: result contains one execution after two requests; durable receipt reports helper-exec and returncode 0; cleanup guard permits.
+Concrete wait: guard permits the recorded condition; replacing the generation makes it outstanding again and denies stale disposition.
+Transport isolation: private empty tmux namespace; no model, credentials, shared services or live fleet used.

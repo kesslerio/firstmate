@@ -1,0 +1,186 @@
+{
+  "finding": "test-1",
+  "resolution": "validated",
+  "tested_head_sha": "bf0d2fd21cd901ed4fca2ec762cf844752dc66c9",
+  "tested_tree": "06b9edcd86c9948cdf636018e6dbf1b66c302c75",
+  "root_cause": "Prior scenario reporting conflated retained UI QA with fresh same-pipeline SDK and lab execution and omitted the latter from its live verdict. No product or test defect demonstrated.",
+  "verification": "Verified supplied acceptance hashes, full current 698-entry physical source inventory, all seven lab result/readback and retained evidence hashes, seven independent lab verdicts, both SDK result/readback packets and independent-review hashes, raw consumer stdout and current 30-entry UI bytes/modes/links.",
+  "scenarios": [
+    {
+      "name": "Frozen SDK types consumer",
+      "result": "pass",
+      "live": false,
+      "execution": "Fresh parent-driven execution in this same active pipeline; inspected here without rerun.",
+      "evidence": {
+        "result": "fix10-timeout-recovery/exact-sdk-types-v14-824ad06acd15dcd87f85310d0a21e2c5/result.json",
+        "result_sha256": "b43a02134f286a94bb465d9d08e63fa8dac67b2953346a204c06e75d429291d4",
+        "readback": "fix10-timeout-recovery/exact-sdk-types-v14-824ad06acd15dcd87f85310d0a21e2c5/independent-readback.json",
+        "readback_sha256": "3eae671632d2720c6b0b2802b5bc281b017376b6a268814d6904fd5879724e71"
+      },
+      "elapsed_seconds": 2.645069896010682,
+      "scope": "Strict no-emit typecheck against accepted Pi 1.2.0"
+    },
+    {
+      "name": "Frozen SDK branch consumer",
+      "result": "pass",
+      "live": true,
+      "execution": "Fresh parent-driven execution in this same active pipeline; inspected here without rerun.",
+      "evidence": {
+        "result": "fix10-timeout-recovery/exact-sdk-branch-v14-6c78d83a924a9e6f1a9275635875b6f9/result.json",
+        "result_sha256": "79e15154538ffc078ddd16cc633fea10136563847056a44771df1cfbc5147210",
+        "readback": "fix10-timeout-recovery/exact-sdk-branch-v14-6c78d83a924a9e6f1a9275635875b6f9/independent-readback.json",
+        "readback_sha256": "b8b5ea3fa41903fcc9b1c9b2a8d6e11e7652b3214f99a6abb593c7ef333bbfcf"
+      },
+      "elapsed_seconds": 74.27041378780268,
+      "scope": "50 actual public cases, zero skips; installed ToolExecutionComponent, stock Calm-off HTML export and installed picker executed."
+    },
+    {
+      "name": "retirement-boundary",
+      "result": "pass",
+      "live": true,
+      "execution": "Fresh parent-driven execution in this same active pipeline; inspected here without rerun.",
+      "elapsed_seconds": 64.41662313509732,
+      "evidence": {
+        "result": "fix10-timeout-recovery/runtime-checks/retirement-boundary-b7cfcc55a5e9ed4dbf999386a5b1af3f/result.json",
+        "result_sha256": "b9a4eb97f84f697c515de9cdd7eb523f976927960eba16d4889188a750224375",
+        "readback": "fix10-timeout-recovery/runtime-checks/retirement-boundary-b7cfcc55a5e9ed4dbf999386a5b1af3f/independent-readback.json",
+        "readback_sha256": "a1101a2e64fa345242b83ea4d4bf7d952501d170238e991d94c9eae87faf40cd"
+      }
+    },
+    {
+      "name": "guardian-observer",
+      "result": "pass",
+      "live": true,
+      "execution": "Fresh parent-driven execution in this same active pipeline; inspected here without rerun.",
+      "elapsed_seconds": 30.657869348069653,
+      "evidence": {
+        "result": "fix10-timeout-recovery/runtime-checks/guardian-observer-961289272294207413ce8dfd3c5ebbfd/result.json",
+        "result_sha256": "92d8fe140207a22ce9a896a9a4016bf9b96c3ef6539b59499b309f7d27b17d3a",
+        "readback": "fix10-timeout-recovery/runtime-checks/guardian-observer-961289272294207413ce8dfd3c5ebbfd/independent-readback.json",
+        "readback_sha256": "bd2c87b1b72e277fc52a70513d3dacb4ffed9ebc4f405de50f6c52ac1435b359"
+      }
+    },
+    {
+      "name": "full-live-lab",
+      "result": "pass",
+      "live": true,
+      "execution": "Fresh parent-driven execution in this same active pipeline; inspected here without rerun.",
+      "elapsed_seconds": 230.79134409618564,
+      "evidence": {
+        "result": "fix10-timeout-recovery/runtime-checks/full-live-lab-26c8130ad537d0e1c921b63019a01906/result.json",
+        "result_sha256": "eaa0be73084597075a3f19d38b75d0bfc5ca431848580f61dc87390e83d86708",
+        "readback": "fix10-timeout-recovery/runtime-checks/full-live-lab-26c8130ad537d0e1c921b63019a01906/independent-readback.json",
+        "readback_sha256": "1db18163a7b32ad2bcb02d2e63311a378e8065e6123898f2a97bcb937fd89cde"
+      }
+    },
+    {
+      "name": "initial-default-shells",
+      "result": "pass",
+      "live": true,
+      "execution": "Fresh parent-driven execution in this same active pipeline; inspected here without rerun.",
+      "elapsed_seconds": 27.194730086019263,
+      "evidence": {
+        "result": "fix10-timeout-recovery/runtime-checks/initial-default-shells-29f0a2764816f1656382b6c0b3cb85a6/result.json",
+        "result_sha256": "187b9190bc5ab402fbfd4f8e02d826126110a4b7a803f45f10beaa8c8ac2a9c6",
+        "readback": "fix10-timeout-recovery/runtime-checks/initial-default-shells-29f0a2764816f1656382b6c0b3cb85a6/independent-readback.json",
+        "readback_sha256": "417154f42b3c7360f73915b7282387322add64c52d10fffb36ac34067f28d898"
+      }
+    },
+    {
+      "name": "late-child-cleanup-failure",
+      "result": "pass",
+      "live": true,
+      "execution": "Fresh parent-driven execution in this same active pipeline; inspected here without rerun.",
+      "elapsed_seconds": 3.8631718799006194,
+      "evidence": {
+        "result": "fix10-timeout-recovery/runtime-checks/late-child-cleanup-failure-4d6da2c39c75e09ab1cb4bffe6a1782a/result.json",
+        "result_sha256": "b8c27c8ccc7864733db367db104e040d6873f2935d83aac4b2bfdaf51042f066",
+        "readback": "fix10-timeout-recovery/runtime-checks/late-child-cleanup-failure-4d6da2c39c75e09ab1cb4bffe6a1782a/independent-readback.json",
+        "readback_sha256": "93d7c4dfcad73ecb951cb597e60dd542ebdde710aefd7543a06a2140b9e35bbd"
+      }
+    },
+    {
+      "name": "mate-cleanup-failure",
+      "result": "pass",
+      "live": true,
+      "execution": "Fresh parent-driven execution in this same active pipeline; inspected here without rerun.",
+      "elapsed_seconds": 18.091930045979097,
+      "evidence": {
+        "result": "fix10-timeout-recovery/runtime-checks/mate-cleanup-failure-69f700b91cdd409f1537071da9ceb289/result.json",
+        "result_sha256": "e553426f0e733d3b4dbb7b02efa2a2afa0adff35ba7b54be1598fdc82d26d3f9",
+        "readback": "fix10-timeout-recovery/runtime-checks/mate-cleanup-failure-69f700b91cdd409f1537071da9ceb289/independent-readback.json",
+        "readback_sha256": "023778bac63021a98440d41aa2e936f333acbcd59182c0c2c101a87576db753b"
+      }
+    },
+    {
+      "name": "detached-workers",
+      "result": "pass",
+      "live": true,
+      "execution": "Fresh parent-driven execution in this same active pipeline; inspected here without rerun.",
+      "elapsed_seconds": 45.97533990396187,
+      "evidence": {
+        "result": "fix10-timeout-recovery/runtime-checks/detached-workers-c7176176a1267b8b669d41652ccca03b/result.json",
+        "result_sha256": "6e5241b50ed47c76c7b676f37437cc83616b42ba09f0bc5be4771e54e186ebda",
+        "readback": "fix10-timeout-recovery/runtime-checks/detached-workers-c7176176a1267b8b669d41652ccca03b/independent-readback.json",
+        "readback_sha256": "845138b3e489380dbffacf90463339e15778669992ee7c49e4dbcdf9baf8b109"
+      }
+    },
+    {
+      "name": "Unchanged terminal and desktop/mobile UI interaction and screenshot QA",
+      "result": "pass",
+      "live": false,
+      "execution": "Retained independently reviewed interaction and screenshot evidence, reused under explicit user decision; no fresh interaction or screenshot claim.",
+      "scope": "30 UI inputs rehashed in current worktree, including modes and links; prior dependency binding retained. Ten batches, 195 groups, 379 captures; quiet/away 14 scenes and 26 images. No lifecycle inference from UI QA.",
+      "evidence": [
+        "quiet-source-bf0d2fd2-equivalence-parent-v14.json",
+        "fix10-timeout-recovery/ui-unchanged-before-gate-approval-v14.json",
+        "quiet-routing-runtime-review-attempt07.json",
+        "ui-retained-independent-publication-review.json"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "reference": "fix10-timeout-recovery/pre-gate-final-acceptance-v14.json",
+      "sha256": "48ccf1c83359455e3e2a79985d43130e771fe1b42878af287ecf1c033444604e"
+    },
+    {
+      "reference": "fix10-timeout-recovery/gate-fix3-seven-groups-acceptance-v14c.json",
+      "sha256": "58049ec1089943e04fd5b23f6802024e11d84971f82abc195f9393b51af0a354"
+    },
+    {
+      "reference": "gate-fix3-sdk-types-runtime-independent-v14.json",
+      "sha256": "9c425fc93ba6c2c453aad58d26909cecb27063ba3c54001de8b4d301a397e145"
+    },
+    {
+      "reference": "gate-fix3-sdk-branch-runtime-independent-v14.json",
+      "sha256": "773b6cf70071c071e297b642148528567a2e4142c07ab360c94c704bb56d474f"
+    },
+    {
+      "reference": "fix10-timeout-recovery/ui-unchanged-before-gate-approval-v14.json",
+      "sha256": "25722adaf5915c833ade5946a395ca9f187e9f40330019a0b09dfaba327cfffa"
+    },
+    {
+      "reference": "quiet-source-bf0d2fd2-equivalence-parent-v14.json",
+      "sha256": "c568a814df573d7a5774b319aca00aee1e849a3ad55e7c5679b0a3189dbcf1ca"
+    },
+    {
+      "reference": "quiet-routing-runtime-review-attempt07.json",
+      "sha256": "76e4ae17f2c3c0b7d800029b2bbdf5192d7f266330990124d7aa5ec0ce71c0f4"
+    },
+    {
+      "reference": "ui-retained-independent-publication-review.json",
+      "sha256": "947bcce474cc3265dcabcb84b282eeba511cf04b4a82aeebd2ca4a97e3cbb9ae"
+    }
+  ],
+  "artifact_reference_scope": "References identify retained evidence by relative filename under the supplied private release evidence root; raw logs and operational identities are deliberately omitted here.",
+  "changes": "No source or test changes; only this sanitized evidence resolution.",
+  "not_run": "No duplicate workloads, exclusive readbacks, broad tests, lint or static analysis. Fresh completed same-pipeline evidence reused as explicitly authorized.",
+  "limitations": [
+    "Finite observed custody and cleanup evidence; no permanent all-host claim.",
+    "Successful detached fixture removes nested child logs; mandatory executed assertions and captured custody support that scope, without independent nested-log reconstruction.",
+    "Initial engine-driver timeout and all earlier failed evidence remain failed.",
+    "Actual Ubuntu and macOS CI and publication are outer-executor phases, not this result."
+  ],
+  "verdict": "pass_for_assigned_test_1_scope"
+}
