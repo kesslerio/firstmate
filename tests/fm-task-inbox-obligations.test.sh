@@ -228,7 +228,9 @@ try:
     try: inbox.disposition(args)
     except OSError: pass
     else: raise AssertionError('handoff fault did not occur')
-    assert len(children)==1 and children[0].instruction_start_identity
+    assert len(children)==1
+    if pathlib.Path("/proc/self/stat").exists():
+        assert children[0].instruction_start_identity
     assert children[0].poll() is not None, 'execution survived failed start handoff'
 finally:
     for child in children: module.stop_child(child)

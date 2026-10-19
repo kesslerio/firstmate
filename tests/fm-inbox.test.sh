@@ -544,3 +544,39 @@ run_inbox "$home" drain --ack "$did" >/dev/null || fail "drain --ack failed"
 assert_absent "$home/state/inbox/$did.note" "acked note leaves pending"
 assert_present "$home/state/inbox/handled/$did.note" "acked note is in handled"
 pass "drain --ack still moves the note to handled"
+
+
+home=$(make_home marker-failure)
+mkdir -p "$home/state/inbox"
+printf blocked > "$home/state/inbox/.announced"
+set +e
+result=$(run_inbox "$home" note --request-id marker-failure --json 'retry marker publication' 2>/dev/null)
+code=$?
+set -e
+expect_code 3 "$code" "marker publication failure must propagate"
+assert_equals 0 "$(count_wakes "$home")" "failed marker publication must not leave a consumable wake"
+rm "$home/state/inbox/.announced"
+result=$(run_inbox "$home" note --request-id marker-failure --json 'retry marker publication')
+id=$(printf '%s' "$result" | json_get id)
+assert_equals 1 "$(count_wakes "$home")" "retry publishes exactly one wake"
+run_inbox "$home" drain --ack "$id" >/dev/null
+for result in "$(run_inbox "$home" note --request-id marker-failure --json retry)" "$(run_inbox "$home" announce --json "$id")"; do
+  assert_equals True "$(printf '%s' "$result" | json_get acknowledged)" "handled notes report acknowledgement independently"
+done
+pass 'marker publication failures recover and handled replay reports acknowledgement'
+
+home=$(make_home concurrent-handoff)
+pids=()
+for n in 1 2 3 4 5 6 7 8; do
+  (run_inbox "$home" note --request-id concurrent --json "handoff $n" >"$home/result-$n") &
+  pids+=("$!")
+done
+while [ ! -f "$home/state/inbox/.requests/concurrent" ]; do sleep 0.01; done
+id=$(cat "$home/state/inbox/.requests/concurrent")
+while [ "$(count_wakes "$home")" = 0 ]; do sleep 0.01; done
+run_inbox "$home" drain --ack "$id" >/dev/null
+for pid in "${pids[@]}"; do wait "$pid"; done
+assert_absent "$home/state/inbox/$id.note" "concurrent retries cannot resurrect handled work"
+assert_present "$home/state/inbox/handled/$id.note" "acknowledgement retains the original note"
+assert_equals 1 "$(count_wakes "$home")" "concurrent handoff announces once"
+pass 'concurrent publication and acknowledgement retain one handled note'

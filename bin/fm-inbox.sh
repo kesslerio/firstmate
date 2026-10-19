@@ -334,7 +334,7 @@ PY
 # Returns 2 without waking when the note is no longer pending: firstmate has
 # already acknowledged it, so a wake would only spend a turn on an empty inbox.
 announce_note() {  # <id> <summary>
-  local id=$1 summary=$2 lib="$FM_ROOT/bin/fm-wake-lib.sh" status=0
+  local id=$1 summary=$2 lib="$FM_ROOT/bin/fm-wake-lib.sh" status=0 rollback
   if note_announced "$id"; then
     return 0
   fi
@@ -353,8 +353,16 @@ announce_note() {  # <id> <summary>
     fm_lock_release "$FM_WAKE_QUEUE_LOCK"
     return 2
   fi
-  if fm_wake_append_locked check "inbox:$id" "check: captain inbox note $id - $summary"; then
-    mark_announced "$id"
+  if fm_wake_queued_keys_locked check | grep -Fxq "inbox:$id" ||
+    fm_wake_append_locked check "inbox:$id" "check: captain inbox note $id - $summary"; then
+    if ! mark_announced "$id"; then
+      status=1
+      rollback=$(mktemp "$STATE/.inbox-wake-XXXXXX") || return 1
+      if awk -F '\t' -v key="inbox:$id" '!($3 == "check" && $4 == key)' "$FM_WAKE_QUEUE" >"$rollback"; then
+        mv "$rollback" "$FM_WAKE_QUEUE" || status=1
+      fi
+      rm -f "$rollback"
+    fi
   else
     status=1
   fi
@@ -370,7 +378,10 @@ finish_note_result() {  # <outcome> <id> <request-id> <json> <strict-exit> <summ
     0) announced=1 ;;
     2) acknowledged=1 ;;
   esac
-  [ -f "$INBOX/handled/$id.note" ] && path="$INBOX/handled/$id.note"
+  if [ -f "$INBOX/handled/$id.note" ]; then
+    path="$INBOX/handled/$id.note"
+    acknowledged=1
+  fi
   if [ "$json" -eq 1 ]; then
     emit_note_json "$outcome" "$id" "$request_id" 1 "$announced" "$path" "$acknowledged"
   else
@@ -434,11 +445,15 @@ queue_note() {
   local tmp id summary staging_name reserved
 
   if [ -n "$request_id" ]; then
+    if load_wake_lib; then
+      fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || die "could not lock request publication"
+    fi
     reserved="$REQUESTS/$request_id"
     if [ -f "$reserved" ]; then
       id=$(publish_from_reservation "$request_id" "$source" "$body" "$extra") \
         || die "request id $request_id is reserved but unreadable; retry the same request id"
       summary=$(note_summary_from_body "$(read_note_body "$(note_path "$id")")")
+      [ "${FM_INBOX_WAKE_LIB:-}" != 1 ] || fm_lock_release "$FM_WAKE_QUEUE_LOCK"
       finish_note_result replay "$id" "$request_id" "$json" "$strict" "$summary"
       return $?
     fi
@@ -451,11 +466,13 @@ queue_note() {
       id=$(publish_from_reservation "$request_id" "$source" "$body" "$extra") \
         || die "request id $request_id is reserved but unreadable; retry the same request id"
       summary=$(note_summary_from_body "$(read_note_body "$(note_path "$id")")")
+      [ "${FM_INBOX_WAKE_LIB:-}" != 1 ] || fm_lock_release "$FM_WAKE_QUEUE_LOCK"
       finish_note_result replay "$id" "$request_id" "$json" "$strict" "$summary"
       return $?
     fi
     mv "$tmp" "$INBOX/$id.note"
     summary=$(note_summary_from_body "$body")
+    [ "${FM_INBOX_WAKE_LIB:-}" != 1 ] || fm_lock_release "$FM_WAKE_QUEUE_LOCK"
     finish_note_result created "$id" "$request_id" "$json" "$strict" "$summary"
     return $?
   fi
@@ -499,7 +516,7 @@ cmd_note() {
 }
 
 cmd_announce() {
-  local json=0 id summary path state rc=0
+  local json=0 id summary path state rc=0 acknowledged=0
   if [ "${1:-}" = "--json" ]; then
     json=1
     shift
@@ -509,6 +526,7 @@ cmd_announce() {
   valid_note_id "$id" || die "invalid note id"
   path=$(note_path "$id") || die "no such note: $id"
   summary=$(note_summary_from_body "$(read_note_body "$path")")
+  [ "$path" != "$INBOX/handled/$id.note" ] || acknowledged=1
   state=$(note_announce_state "$id" "$path")
   if [ "$state" != true ] && [ "$path" = "$INBOX/handled/$id.note" ]; then
     state=acknowledged
@@ -516,7 +534,7 @@ cmd_announce() {
   case "$state" in
     true)
       if [ "$json" -eq 1 ]; then
-        emit_note_json replay "$id" "" 1 1 "$path"
+        emit_note_json replay "$id" "" 1 1 "$path" "$acknowledged"
       else
         printf 'already-announced %s\n' "$id"
       fi
@@ -1118,6 +1136,8 @@ cmd_drain() {
     shift
     [ "$#" -gt 0 ] || die "usage: fm-inbox.sh drain --ack <id>..."
     mkdir -p "$INBOX/handled"
+    load_wake_lib || die "acknowledgement needs $FM_ROOT/bin/fm-wake-lib.sh"
+    fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || die "could not lock acknowledgement"
     local id
     for id in "$@"; do
       if [ -f "$INBOX/$id.note" ]; then
@@ -1127,6 +1147,7 @@ cmd_drain() {
         printf 'already-acked %s\n' "$id"
       fi
     done
+    fm_lock_release "$FM_WAKE_QUEUE_LOCK"
     return 0
   fi
   cmd_list
