@@ -351,7 +351,7 @@ _fm_engine_reap() {
 # an engine its crashed predecessor left running.
 fm_supervision_engine_turn() {
   local engine=$1 model=$2 prompt=$3 message=$4 session=$5 mode=$6 timeout=$7 result=$8 errors=$9
-  local pid_file=${10:-} bin grace i ledger watched rc home_phys root_phys state_phys identity recorded
+  local pid_file=${10:-} bin grace i ledger watched rc home_phys root_phys state_phys identity recorded registration_failed=0
   local -a args
   bin=$(fm_supervision_engine_bin "$engine" 2>"$errors") || return 127
   case "$timeout" in ''|0*|*[!0-9]*) timeout=1200 ;; esac
@@ -397,14 +397,22 @@ fm_supervision_engine_turn() {
     # The bounded process is this shell's unreaped child, so its pid cannot
     # be recycled here; its identity is refreshed until the subshell's exec
     # into the watchdog has settled.
+    _fm_engine_snapshot_descendants "$watched" "$ledger"
     if [ -n "$pid_file" ]; then
-      identity=$(_fm_engine_identity "$watched" || true)
-      if [ -n "$identity" ] && [ "$identity" != "$recorded" ]; then
-        printf '%s\t%s\n' "$watched" "$identity" > "$pid_file" 2>/dev/null || true
-        recorded=$identity
+      if ! identity=$(_fm_engine_identity "$watched") || [ -z "$identity" ]; then
+        if jobs -pr | awk -v child="$watched" '$1 == child { found = 1 } END { exit !found }'; then
+          registration_failed=1
+          kill -TERM "$watched" 2>/dev/null || true
+        fi
+      elif [ "$identity" != "$recorded" ]; then
+        if printf '%s\t%s\n' "$watched" "$identity" > "$pid_file" 2>/dev/null; then
+          recorded=$identity
+        else
+          registration_failed=1
+          kill -TERM "$watched" 2>/dev/null || true
+        fi
       fi
     fi
-    _fm_engine_snapshot_descendants "$watched" "$ledger"
     # Between the one-second snapshots the engine's exit is probed at a tenth
     # of a second: the turn closes promptly when the engine dies while the
     # process-table scans keep their one-second cadence.
@@ -416,7 +424,11 @@ fm_supervision_engine_turn() {
   done
   wait "$watched"
   rc=$?
-  [ -z "$pid_file" ] || rm -f "$pid_file" 2>/dev/null || true
+  [ "$registration_failed" -eq 0 ] || rc=127
+  if [ -n "$pid_file" ] && [ -n "$recorded" ] \
+    && [ "$(cat "$pid_file" 2>/dev/null)" = "$(printf '%s\t%s' "$watched" "$recorded")" ]; then
+    rm -f "$pid_file" 2>/dev/null || true
+  fi
   _fm_engine_reap "$ledger"
   rm -f "$ledger" 2>/dev/null || true
   return "$rc"

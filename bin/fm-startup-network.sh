@@ -263,12 +263,33 @@ await_worker_start() {
       esac
     done <<< "$record"
     [ "$current_generation" = "$generation" ] && [ "$current_pid" = "$worker_pid" ] || return 1
-    case "$state" in done|failed|timeout) return 0 ;; esac
+    case "$state" in done|failed|timeout) [ "$entered" != 0 ]; return $? ;; esac
     [ "$entered" != 1 ] || return 0
     kill -0 "$worker_pid" 2>/dev/null || return 1
     [ "$(now)" -lt "$deadline" ] || return 1
     sleep .05
   done
+}
+
+retire_unentered_worker() {
+  local generation=$1 worker_pid=$2 worker_start=$3 registered
+  take_lock "$PUBLISH_LOCK" 1 || return 1
+  if [ "$(status_get generation)" = "$generation" ] && [ "$(status_get pid)" = "$worker_pid" ] \
+    && [ "$(status_get state)" = running ] && [ "$(status_get worker_started)" = 0 ] \
+    && registered=$(cat "$STATUS_FILE") && write_atomic "$STATUS_FILE" <<EOF
+$registered
+state=failed
+worker_started=0
+rc=1
+report_published=0
+EOF
+  then
+    if [ -n "$worker_start" ] && [ "$(LC_ALL=C TZ=UTC ps -o lstart= -p "$worker_pid" 2>/dev/null)" = "$worker_start" ]; then
+      kill "$worker_pid" 2>/dev/null || true
+      wait "$worker_pid" 2>/dev/null || true
+    fi
+  fi
+  fm_lock_release "$PUBLISH_LOCK"
 }
 
 cmd_start() {  # <locked> <harvest-pid>
@@ -305,6 +326,7 @@ cmd_start() {  # <locked> <harvest-pid>
   [ "$locked" != 1 ] || phases=probe,sweeps
   if ! write_atomic "$STATUS_FILE" <<EOF
 state=running
+worker_started=0
 pid=0
 started=$started
 locked=$locked
@@ -340,6 +362,7 @@ EOF
   worker_start=$(LC_ALL=C TZ=UTC ps -o lstart= -p "$worker_pid" 2>/dev/null || true)
   if ! write_atomic "$STATUS_FILE" <<EOF
 state=running
+worker_started=0
 pid=$worker_pid
 started=$started
 locked=$locked
@@ -360,10 +383,7 @@ EOF
   fm_lock_release "$PUBLISH_LOCK"
   [ "$monitor_was_on" -eq 1 ] || set +m 2>/dev/null || true
   if ! await_worker_start "$generation" "$worker_pid" "$deadline"; then
-    if [ -n "$worker_start" ] && [ "$(LC_ALL=C TZ=UTC ps -o lstart= -p "$worker_pid" 2>/dev/null)" = "$worker_start" ]; then
-      kill "$worker_pid" 2>/dev/null || true
-      wait "$worker_pid" 2>/dev/null || true
-    fi
+    retire_unentered_worker "$generation" "$worker_pid" "$worker_start" || true
     printf 'NETWORK_CHECKS: deferred worker did not confirm command entry; inspect %s/bin/fm-startup-network.sh report\n' "$FM_ROOT" >&2
     return 1
   fi
@@ -618,7 +638,8 @@ cmd_run() {  # <locked> <lock-pid> <generation>
       run_cleanup "$out" "$timings"
       return 1
     fi
-    if [ "$(status_get generation)" = "$generation" ] && [ "$(status_get pid)" = "$$" ]; then
+    if [ "$(status_get generation)" = "$generation" ] && [ "$(status_get pid)" = "$$" ] \
+      && [ "$(status_get state)" = running ]; then
       internal=1
       started=$(status_get started)
       if ! registered=$(cat "$STATUS_FILE") || ! write_atomic "$STATUS_FILE" <<EOF
@@ -661,6 +682,7 @@ EOF
     fi
     write_atomic "$STATUS_FILE" <<EOF || true
 state=running
+worker_started=1
 pid=$$
 started=$started
 locked=$sweep_locked

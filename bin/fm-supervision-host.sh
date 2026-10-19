@@ -262,8 +262,8 @@ ARM_PID=
 ARM_OUT=
 STARTED_ARM_PID=
 STARTED_ARM_OUT=
-ARM_STARTING=0
-ARM_CANCEL_STATUS=
+CHILD_STARTING=0
+CHILD_CANCEL_STATUS=
 ARM_TEXT=
 CLOSED_ARM_PID=
 HANDLE_WHY=
@@ -452,26 +452,32 @@ activate() {
 # it on and KILLs after its grace, then let the turn's own poller reap the
 # engine's descendants before giving up on it.
 stop_engine_turn() {
-  local pid='' identity='' i limit
-  [ -f "$ENGINE_PID_FILE" ] && IFS="$(printf '\t')" read -r pid identity < "$ENGINE_PID_FILE"
-  if [ -n "$pid" ] && fm_pid_alive "$pid" && [ "$(identity_of "$pid")" = "$identity" ]; then
-    kill -TERM "$pid" 2>/dev/null || true
-  fi
-  limit=$(( (ENGINE_GRACE + 10) * 10 ))
-  i=0
-  while [ -n "$ENGINE_SUBSHELL" ] && fm_pid_alive "$ENGINE_SUBSHELL" && [ "$i" -lt "$limit" ]; do
+  local pid='' identity='' parent deadline=$((SECONDS + ENGINE_GRACE + 10))
+  while [ -n "$ENGINE_SUBSHELL" ] && fm_pid_alive "$ENGINE_SUBSHELL" && [ "$SECONDS" -lt "$deadline" ]; do
+    pid='' identity=''
+    if [ -f "$ENGINE_PID_FILE" ]; then
+      IFS="$(printf '\t')" read -r pid identity < "$ENGINE_PID_FILE" || true
+    fi
+    if [ -n "$pid" ] && [ -n "$identity" ] && fm_pid_alive "$pid" \
+      && [ "$(identity_of "$pid")" = "$identity" ]; then
+      parent=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d '[:space:]')
+      [ "$parent" != "$ENGINE_SUBSHELL" ] || kill -TERM "$pid" 2>/dev/null || true
+    fi
     sleep 0.1
-    i=$((i + 1))
   done
-  [ -z "$ENGINE_SUBSHELL" ] || kill -KILL "$ENGINE_SUBSHELL" 2>/dev/null || true
+  [ -n "$ENGINE_SUBSHELL" ] || return 0
+  fm_pid_alive "$ENGINE_SUBSHELL" && return 1
+  wait "$ENGINE_SUBSHELL" 2>/dev/null || true
+  ENGINE_SUBSHELL=
+  ENGINE_RUNNING=0
 }
 
 # shellcheck disable=SC2329 # Invoked by the EXIT trap.
 cleanup() {
   local rc=$? f
-  trap - EXIT HUP TERM INT
+  trap - EXIT HUP TERM INT QUIT
   if [ "$ENGINE_RUNNING" -eq 1 ]; then
-    stop_engine_turn
+    stop_engine_turn || rc=1
   fi
   retire_arm "$STARTED_ARM_PID" "$STARTED_ARM_OUT"
   retire_arm "$SUCCESSOR_PID" "$SUCCESSOR_OUT"
@@ -481,14 +487,15 @@ cleanup() {
     "$SCRIPT_DIR/fm-wake-grant.sh" deactivate "$HOST_PID" "$GEN" >/dev/null 2>&1 || true
   fi
   release_branch_leases || true
-  if [ "$HOST_ACTIVE" -eq 1 ] && host_still_owner; then
-    rm -f "$TURN_FILE" 2>/dev/null || true
+  if [ "$ENGINE_RUNNING" -eq 0 ]; then
+    if [ "$HOST_ACTIVE" -eq 1 ] && host_still_owner; then
+      rm -f "$TURN_FILE" 2>/dev/null || true
+    fi
+    for f in "$TURN_RESULT" "$TURN_ERRORS"; do
+      case "$f" in "$STATE"/.supervision-host-*) rm -f "$f" 2>/dev/null || true ;; esac
+    done
   fi
-  rm -f "$ENGINE_PID_FILE" 2>/dev/null || true
-  for f in "$TURN_RESULT" "$TURN_ERRORS"; do
-    case "$f" in "$STATE"/.supervision-host-*) rm -f "$f" 2>/dev/null || true ;; esac
-  done
-  if host_still_owner && [ -f "$HOST_RECORD" ] && [ "$(awk -F '\t' '$1 == "host" { print $2; exit }' "$HOST_RECORD" 2>/dev/null)" = "$HOST_PID" ]; then
+  if [ "$ENGINE_RUNNING" -eq 0 ] && host_still_owner && [ -f "$HOST_RECORD" ] && [ "$(awk -F '\t' '$1 == "host" { print $2; exit }' "$HOST_RECORD" 2>/dev/null)" = "$HOST_PID" ]; then
     rm -f "$HOST_RECORD" 2>/dev/null || true
   fi
   exit "$rc"
@@ -540,8 +547,8 @@ turn_still_owner() {
 # Defer cancellation only across birth and the builtin ownership assignment.
 # The pending child stays visible to EXIT cleanup during blocking registration.
 cancel_host() {  # <signal exit status>
-  if [ "$ARM_STARTING" -eq 1 ]; then
-    ARM_CANCEL_STATUS=$1
+  if [ "$CHILD_STARTING" -eq 1 ]; then
+    CHILD_CANCEL_STATUS=$1
   else
     exit "$1"
   fi
@@ -560,14 +567,14 @@ start_arm() {  # <predecessor-arm-pid or empty> [--restart]; sets the started pi
   if [ "${ARM_OWN_GROUP:-0}" -eq 1 ] && [ -n "${FM_LAB_LAUNCH_ROOT:-}" ]; then
     command=(python3 "${FM_LAB_LAUNCH_HELPER:?lab launch helper binding is missing}" detached "$FM_LAB_LAUNCH_ROOT" "${command[@]}")
   fi
-  ARM_STARTING=1
+  CHILD_STARTING=1
   if [ -n "$predecessor" ]; then
     FM_WATCH_PREDECESSOR_ARM_PID=$predecessor FM_GUARD_GRACE="$GRACE" "${command[@]}" "$@" >"$out" 2>&1 </dev/null &
   else
     FM_GUARD_GRACE="$GRACE" "${command[@]}" "$@" >"$out" 2>&1 </dev/null &
   fi
-  STARTED_ARM_PID=$! STARTED_ARM_OUT=$out ARM_STARTING=0
-  [ -z "$ARM_CANCEL_STATUS" ] || exit "$ARM_CANCEL_STATUS"
+  STARTED_ARM_PID=$! STARTED_ARM_OUT=$out CHILD_STARTING=0
+  [ -z "$CHILD_CANCEL_STATUS" ] || exit "$CHILD_CANCEL_STATUS"
   [ "${ARM_OWN_GROUP:-0}" -ne 1 ] || set +m 2>/dev/null || true
   record_process arm "$STARTED_ARM_PID"
 }
@@ -1064,6 +1071,7 @@ handle_wake() {  # <reason-lines>
   errors=$(mktemp "$STATE/.supervision-host-errors.XXXXXX") || errors=/dev/null
   TURN_RESULT=$result
   TURN_ERRORS=$errors
+  CHILD_STARTING=1
   ENGINE_RUNNING=1
   # Backgrounded and waited, so a signal to the host is handled at once
   # instead of after the whole turn; the cleanup stops the engine.
@@ -1082,7 +1090,8 @@ handle_wake() {  # <reason-lines>
       "$PROMPT_FILE" "$WAKE_FILE" "$ENGINE_SESSION" "$ENGINE_MODE" "$TURN_TIMEOUT" \
       "$result" "$errors" "$ENGINE_PID_FILE"
   ) &
-  ENGINE_SUBSHELL=$!
+  ENGINE_SUBSHELL=$! CHILD_STARTING=0
+  [ -z "$CHILD_CANCEL_STATUS" ] || exit "$CHILD_CANCEL_STATUS"
   wait "$ENGINE_SUBSHELL"
   rc=$?
   ENGINE_SUBSHELL=
@@ -1176,6 +1185,7 @@ trap cleanup EXIT
 trap 'cancel_host 129' HUP
 trap 'cancel_host 143' TERM
 trap 'cancel_host 130' INT
+trap 'cancel_host 131' QUIT
 activate || { echo "supervision-host stood down: the host record could not be written"; exit 0; }
 log_line "start	gen=$GEN	primary=$PRIMARY"
 

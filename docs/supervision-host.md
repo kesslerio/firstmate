@@ -386,6 +386,8 @@ Today the only verified engine is Claude's print mode, measured on Claude Code 2
 
 Tool commands run in process groups of their own, which a bound's group signal cannot reach.
 The engine lib records the engine's descendants while it runs and reaps them by recorded identity after every turn; its [header](../bin/fm-supervision-engine-lib.sh) owns the snapshot cadence.
+Cancellation waits for the owned engine's identity registration and descendant retirement before releasing its poller.
+Failed registration stops the poller's unreaped child, and an unconfirmed retirement retains its cleanup owner and evidence.
 The reap is best-effort for what it observed, not a bound.
 A process escapes it when a tool detaches it into a process group of its own and it loses its ancestry to the engine between two snapshots.
 Such a process is never recorded and survives the turn, the same residual `bin/fm-timeout-lib.sh` names.

@@ -959,6 +959,8 @@ EOF
   printf 'LATE_PRIVATE_ACTIONABLE\n' > "$pending/report"
   printf 'failed\nprobe\n0\n%s\n124\n' "$started" > "$pending/metadata"
   real_cat=$(command -v cat)
+  FM_REAL_CAT=$real_cat
+  export FM_REAL_CAT
   cat > "$root/bin/cat" <<'SH'
 #!/usr/bin/env bash
 if [ "$#" -eq 1 ] && [ "$1" = "$FM_HOME/state/.startup-network.claim" ]; then
@@ -1079,7 +1081,100 @@ EOF
   pass 'startup wake queue and recovery locks share the remaining delivery deadline'
 }
 
+test_admission_observation_preserves_worker() {
+  local mode=$1 rec home root log starter worker i rc real_cat FM_REAL_CAT
+  rec=$(new_world "admission-$mode")
+  IFS='|' read -r home root log <<< "$rec"
+  real_cat=$(command -v cat)
+  cat > "$root/bin/cat" <<'SH'
+#!/usr/bin/env bash
+if [ "$#" = 1 ] && [ "$1" = "$FM_HOME/state/.startup-network.status" ] && [ -f "$FM_HOME/starter" ]; then
+  IFS= read -r starter < "$FM_HOME/starter"
+  if [ "$PPID" = "$starter" ] && mkdir "$FM_HOME/ack-read" 2>/dev/null; then
+    : > "$FM_HOME/ack-ready"
+    exec 9<> "$FM_HOME/ack-gate"
+    read -r -t 15 _ <&9 || exit 74
+    case "$FM_ACK_MODE" in unreadable|unknown) exit 74 ;; esac
+  fi
+fi
+exec "$FM_REAL_CAT" "$@"
+SH
+  chmod +x "$root/bin/cat"
+  cat > "$root/bin/fm-bootstrap.sh" <<'SH'
+#!/usr/bin/env bash
+kind=${FM_BOOTSTRAP_DETECT_ONLY:-0}
+printf '%s\n' "$$" > "$FM_HOME/bootstrap-$kind.pid"
+printf 'entered %s\n' "$kind" >> "$FM_FAKE_BOOTSTRAP_LOG"
+exec 9<> "$FM_HOME/bootstrap-$kind.gate"
+read -r -t 15 _ <&9 || exit 74
+: > "$FM_HOME/bootstrap-$kind.settled"
+SH
+  chmod +x "$root/bin/fm-bootstrap.sh"
+  mkfifo "$home/ack-gate" "$home/bootstrap-1.gate" "$home/bootstrap-0.gate"
+  FM_REAL_CAT="$real_cat" FM_ACK_MODE="$mode" FM_FAKE_BOOTSTRAP_LOG="$log" \
+    PATH="$root/bin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_SESSION_START_TIMEOUT=8 \
+    bash -c 'printf "%s\n" "$$" > "$FM_HOME/starter"; exec "$1" start --locked 0' _ "$root/bin/fm-startup-network.sh" > "$home/start.out" 2>&1 &
+  starter=$!
+  fm_test_track_child "$starter" kill
+  for ((i=0;i<150;i++)); do [ ! -s "$log" ] || break; sleep .02; done
+  [ -s "$log" ] || fail 'admission: bootstrap never entered'
+  worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+  fm_test_track_child "$worker" kill
+  fm_test_track_child "$(cat "$home/bootstrap-1.pid")" kill
+  [ -e "$home/ack-ready" ] || fail 'admission: caller did not reach acknowledgment barrier'
+  assert_grep 'worker_started=1' "$home/state/.startup-network.status" 'admission: worker entry was not recorded before acknowledgment failure'
+  if [ "$mode" = unknown ]; then
+    sed '/^worker_started=/d' "$home/state/.startup-network.status" > "$home/status-without-entry"
+    mv "$home/status-without-entry" "$home/state/.startup-network.status"
+  fi
+  if [ "$mode" = superseded ]; then
+    printf '%s\n' "$$" > "$home/state/.lock"
+    FM_REAL_CAT="$real_cat" FM_ACK_MODE="$mode" FM_FAKE_BOOTSTRAP_LOG="$log" run_stage "$home" "$root" start --locked 1 || fail 'admission: locked upgrade failed'
+  fi
+  exec 9<> "$home/ack-gate"
+  printf 'release\n' >&9
+  exec 9>&-
+  rc=0
+  wait "$starter" || rc=$?
+  [ "$rc" -ne 0 ] || fail 'admission: unconfirmed entry reported success'
+  kill -0 "$worker" 2>/dev/null || fail 'admission: failed acknowledgment killed an admitted cleanup owner'
+  exec 9<> "$home/bootstrap-1.gate"
+  printf 'release\n' >&9
+  exec 9>&-
+  if [ "$mode" = superseded ]; then
+    for ((i=0;i<150;i++)); do [ ! -s "$home/bootstrap-0.pid" ] || break; sleep .02; done
+    [ -s "$home/bootstrap-0.pid" ] || fail 'admission: upgraded bootstrap did not enter'
+    fm_test_track_child "$(cat "$home/bootstrap-0.pid")" kill
+    exec 9<> "$home/bootstrap-0.gate"
+    printf 'release\n' >&9
+    exec 9>&-
+  fi
+  for ((i=0;i<250;i++)); do
+    [ "$(ps -o stat= -p "$worker" 2>/dev/null | tr -d ' ')" != Z ] || break
+    kill -0 "$worker" 2>/dev/null || break
+    sleep .02
+  done
+  case "$(ps -o stat= -p "$worker" 2>/dev/null)" in ''|*Z*) ;; *) fail 'admission: worker did not settle its bounded checks' ;; esac
+  [ -e "$home/bootstrap-1.settled" ] || fail 'admission: probe checks were orphaned'
+  if [ "$mode" = superseded ]; then
+    run_stage "$home" "$root" wait 10 >/dev/null || fail 'admission: upgraded worker did not publish'
+    [ -e "$home/bootstrap-0.settled" ] || fail 'admission: upgraded checks were orphaned'
+  fi
+  pass "startup $mode acknowledgment preserves admitted execution custody"
+}
+
 case ${FM_STARTUP_NETWORK_TEST_GROUP:-all} in
+  admission-superseded|admission-unreadable|admission-unknown)
+    test_admission_observation_preserves_worker "${FM_STARTUP_NETWORK_TEST_GROUP#admission-}"
+    exit 0 ;;
+  admission-custody)
+    test_admission_observation_preserves_worker superseded
+    test_admission_observation_preserves_worker unreadable
+    test_admission_observation_preserves_worker unknown
+    test_start_is_single_flight
+    test_locked_start_is_not_satisfied_by_an_inflight_probe
+    test_lock_takeover_stays_read_only_while_a_sweep_holds_the_lease
+    exit 0 ;;
   nested-delivery)
     test_nested_wake_locks_share_delivery_deadline
     exit 0 ;;
@@ -1098,6 +1193,9 @@ case ${FM_STARTUP_NETWORK_TEST_GROUP:-all} in
     exit 0 ;;
 esac
 
+test_admission_observation_preserves_worker superseded
+test_admission_observation_preserves_worker unreadable
+test_admission_observation_preserves_worker unknown
 test_wait_fails_without_a_published_stage
 test_start_returns_without_holding_the_callers_stdout
 test_harvest_acknowledgement_suppresses_the_wake_and_no_claim_produces_it

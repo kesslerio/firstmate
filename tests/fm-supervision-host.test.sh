@@ -3399,9 +3399,203 @@ SH
   pass 'report publication refuses replacement turns and indexes only the observed status boundary'
 }
 
+test_engine_registration_cancellation() {
+  local mechanism=${1:-perl} signal=${2:-TERM} home owner host target orphan real_ps expected_mechanism
+  expected_mechanism=$mechanism
+  if [ "$mechanism" = timeout ] && ! command -v timeout >/dev/null 2>&1; then expected_mechanism=gtimeout; fi
+  home=$(make_home "engine-registration-$mechanism-$signal" away)
+  local FAKE_CLAUDE="$home/launch"
+  ln -s "$(command -v bash)" "$home/claude"
+  cat > "$FAKE_CLAUDE" <<'PYLAUNCH'
+#!/usr/bin/env python3
+import os, signal, sys
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+signal.signal(signal.SIGQUIT, signal.SIG_DFL)
+binary=os.path.join(os.environ['FM_HOME'],'claude')
+os.execv(binary,[binary,*sys.argv[1:]])
+PYLAUNCH
+  chmod +x "$FAKE_CLAUDE"
+  real_ps=$(command -v ps)
+  echo hang > "$home/stub-mode"
+  mkfifo "$home/registration-gate"
+  cat > "$home/registration-env" <<'SH'
+printf() {
+  local destination
+  if [ "$#" -eq 3 ] && [ "$1" = '%s\t%s\n' ]; then
+    for destination in "$FM_HOME/state"/.supervision-host.engine-pid.*; do
+      [ -f "$destination" ] && [ /dev/fd/1 -ef "$destination" ] || continue
+      if mkdir "$FM_HOME/engine-registration-claim" 2>/dev/null; then
+        builtin printf '%s\n' "$2" > "$FM_HOME/engine-registration-ready"
+        exec 8<> "$FM_HOME/registration-gate"
+        read -r -t 15 _ <&8 || return 74
+        exec 8>&-
+      fi
+      break
+    done
+  fi
+  builtin printf "$@"
+}
+SH
+  if [ "$mechanism" = timeout ]; then
+    printf 'command() { if [ "$*" = "-v perl" ]; then return 1; fi; builtin command "$@"; }\n' >> "$home/registration-env"
+  fi
+  cat > "$home/fakebin/ps" <<'SH'
+#!/usr/bin/env bash
+if [ "$*" = '-A -o pid= -o ppid=' ]; then
+  for ((i=0;i<200;i++)); do [ ! -s "$FM_HOME/orphan-pid" ] || break; sleep .02; done
+  [ -s "$FM_HOME/orphan-pid" ] || exit 74
+fi
+exec "$FM_TEST_ENGINE_REAL_PS" "$@"
+SH
+  chmod +x "$home/fakebin/ps"
+  BASH_ENV="$home/registration-env" FM_TEST_ENGINE_REAL_PS="$real_ps" \
+    FM_SUPERVISION_HOST_TURN_TIMEOUT=60 start_host "$home"
+  owner=$!
+  fm_test_track_child "$owner" kill
+  wait_until 150 watcher_live "$home" || fail 'engine registration: watcher never started'
+  append_status "$home" 'cancel engine registration'
+  wait_until 250 test -s "$home/engine-registration-ready" || fail 'engine registration barrier never reached'
+  host=$(awk -F '\t' '$1 == "host" {print $2; exit}' "$home/state/.supervision-host")
+  target=$(cat "$home/engine-registration-ready")
+  fm_test_track_child "$target" kill
+  if [ -s "$home/orphan-pid" ]; then
+    orphan=$(cat "$home/orphan-pid")
+    fm_test_track_child "$orphan" kill
+  fi
+  wait_until 100 test -s "$home/orphan-pid" || fail 'engine registration: independent tool never entered'
+  orphan=$(cat "$home/orphan-pid")
+  fm_test_track_child "$orphan" kill
+  assert_equals "$expected_mechanism" "$(basename "$(ps -p "$target" -o comm= | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')")" 'engine registration used a different bounding mechanism'
+  kill "-$signal" "$host"
+  exec 9<> "$home/registration-gate"
+  printf 'release\n' >&9
+  exec 9>&-
+  wait_until 180 host_exited "$home" || fail 'cancelled host did not settle engine registration'
+  if [ -s "$home/orphan-pid" ]; then
+    orphan=$(cat "$home/orphan-pid")
+    fm_test_track_child "$orphan" kill
+    wait_until 30 sh -c '! kill -0 "$1" 2>/dev/null' _ "$orphan" || fail "engine registration cancellation stranded an independent tool group: $(ps -p "$orphan" -o pid=,ppid=,stat=,args=); host: $(cat "$home/host.out")"
+  fi
+  wait_until 30 sh -c '! kill -0 "$1" 2>/dev/null' _ "$target" || fail 'engine registration cancellation stranded its execution owner'
+  pass "engine registration cancellation retires $mechanism execution on $signal"
+}
+
+test_engine_cancellation_after_entry() {
+  local mode=$1 mechanism=${2:-perl} home host file pid identity sentinel before orphan expected_mechanism
+  expected_mechanism=$mechanism
+  if [ "$mechanism" = timeout ] && ! command -v timeout >/dev/null 2>&1; then expected_mechanism=gtimeout; fi
+  home=$(make_home "engine-entry-$mode-$mechanism" away)
+  echo hang > "$home/stub-mode"
+  : > "$home/entry-env"
+  if [ "$mechanism" = timeout ]; then
+    printf 'command() { if [ "$*" = "-v perl" ]; then return 1; fi; builtin command "$@"; }\n' > "$home/entry-env"
+  fi
+  BASH_ENV="$home/entry-env" FM_SUPERVISION_HOST_TURN_TIMEOUT=5 start_host "$home"
+  fm_test_track_child "$!" kill
+  wait_until 150 watcher_live "$home" || fail 'engine entry: watcher never started'
+  append_status "$home" 'cancel an entered engine'
+  wait_until 200 test -s "$home/orphan-pid" || fail 'engine entry: tool did not enter'
+  orphan=$(cat "$home/orphan-pid")
+  fm_test_track_child "$orphan" kill
+  wait_until 100 sh -c '
+    for file in "$1/state"/.supervision-host.engine-pid.*; do [ ! -s "$file" ] || exit 0; done
+    exit 1
+  ' _ "$home" || fail 'engine entry: engine identity was not published'
+  for file in "$home/state"/.supervision-host.engine-pid.*; do [ ! -s "$file" ] || break; done
+  wait_until 100 grep -qs "$orphan" "$home"/state/.supervision-host-descendants.* || fail 'engine entry: tool was not recorded'
+  IFS="$(printf '\t')" read -r pid identity < "$file"
+  assert_equals "$expected_mechanism" "$(basename "$(ps -p "$pid" -o comm= | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')")" 'engine entry used a different bounding mechanism'
+  sleep 30 & sentinel=$!
+  fm_test_track_child "$sentinel" kill
+  case "$mode" in
+    foreign)
+      identity=$(bash -c '. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-supervision-engine-lib.sh"; _fm_engine_identity "$2"' _ "$ROOT" "$sentinel")
+      printf '%s\t%s\n' "$sentinel" "$identity" > "$file" ;;
+    stale)
+      IFS="$(printf '\t')" read -r pid identity < "$file"
+      printf '%s\tstale-identity\n' "$pid" > "$file" ;;
+  esac
+  before=$(cat "$file")
+  host=$(awk -F '\t' '$1 == "host" {print $2; exit}' "$home/state/.supervision-host")
+  kill -TERM "$host"
+  wait_until 180 host_exited "$home" || fail 'engine entry: cancelled host did not retire its execution'
+  kill -0 "$sentinel" 2>/dev/null || fail 'engine entry: cancellation signalled a foreign process'
+  wait_until 30 sh -c '! kill -0 "$1" 2>/dev/null' _ "$orphan" || fail 'engine entry: recorded tool survived cancellation'
+  if [ "$mode" != ordinary ]; then
+    assert_equals "$before" "$(cat "$file")" 'engine entry: cancellation removed a replacement identity record'
+  fi
+  kill -TERM "$sentinel" 2>/dev/null || true
+  wait "$sentinel" 2>/dev/null || true
+  pass "entered engine cancellation preserves $mode identity ownership"
+}
+
+test_engine_registration_failure_retires_own_execution() {
+  local mode home caller rc pid i
+  for mode in complete unknown unwritable; do
+    home="$TMP_ROOT/engine-failed-registration-$mode"
+    mkdir -p "$home/state"
+    printf 'prompt\n' > "$home/prompt"
+    printf 'wake\n' > "$home/wake"
+    cat > "$home/engine" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$$" > "$FM_HOME/entered"
+if [ "$FM_ENGINE_REGISTRATION_MODE" = complete ]; then printf 'complete\n'; exit 0; fi
+sleep 30
+SH
+    chmod +x "$home/engine"
+    [ "$mode" != unwritable ] || mkdir "$home/pid-file"
+    FM_HOME="$home" FM_SUPERVISION_ENGINE_CLAUDE_BIN="$home/engine" FM_SUPERVISION_ENGINE_GRACE=1 FM_ENGINE_REGISTRATION_MODE="$mode" \
+      bash -c '
+        . "$1/bin/fm-wake-lib.sh"
+        . "$1/bin/fm-timeout-lib.sh"
+        . "$1/bin/fm-supervision-engine-lib.sh"
+        FM_ROOT=$1 STATE="$FM_HOME/state"
+        if [ "$2" = unknown ]; then _fm_engine_identity() { return 1; }; fi
+        if [ "$2" = complete ]; then _fm_engine_snapshot_descendants() { wait "$1"; }; fi
+        fm_supervision_engine_turn claude sonnet "$FM_HOME/prompt" "$FM_HOME/wake" fixture new 10 "$FM_HOME/result" "$FM_HOME/errors" "$FM_HOME/pid-file"
+      ' _ "$ROOT" "$mode" > "$home/runner.out" 2>&1 &
+    caller=$!
+    fm_test_track_child "$caller" kill
+    rc=0
+    wait "$caller" || rc=$?
+    if [ "$mode" = complete ]; then
+      [ "$rc" -eq 0 ] || fail "completed engine was misreported as failed registration: $rc"
+      assert_equals complete "$(cat "$home/result")" 'completed engine output was lost'
+    else
+      [ "$rc" -eq 127 ] || fail "$mode registration did not report failure: $rc"
+    fi
+    if [ -s "$home/entered" ]; then
+      pid=$(cat "$home/entered")
+      for ((i=0;i<50;i++)); do kill -0 "$pid" 2>/dev/null || break; sleep .02; done
+      kill -0 "$pid" 2>/dev/null && fail "$mode registration left the engine alive"
+    fi
+  done
+  pass 'successful engine exits survive delayed observations; unknown and failed registration retire only owned execution'
+}
+
+test_engine_custody_cases() {
+test_engine_registration_failure_retires_own_execution
+test_engine_registration_cancellation perl TERM
+test_engine_registration_cancellation timeout TERM
+test_engine_registration_cancellation perl HUP
+test_engine_registration_cancellation timeout INT
+test_engine_registration_cancellation perl QUIT
+test_engine_cancellation_after_entry ordinary
+test_engine_cancellation_after_entry ordinary timeout
+test_engine_cancellation_after_entry foreign
+test_engine_cancellation_after_entry stale
+test_engine_turn_is_bounded_and_its_descendants_reaped
+}
+
 # Keep each serial CI runner below its job timeout without dropping assertions.
 # The companion script sources these fixtures and executes the second group.
 case ${FM_SUPERVISION_HOST_TEST_GROUP:-early} in
+engine-registration-perl|engine-registration-timeout)
+test_engine_registration_cancellation "${FM_SUPERVISION_HOST_TEST_GROUP#engine-registration-}"
+;;
+engine-custody)
+test_engine_custody_cases
+;;
 startup-custody)
 test_term_during_arm_registration_retires_the_owned_child
 test_activation_keeps_normal_park_and_owned_cleanup
@@ -3420,6 +3614,7 @@ test_unrecorded_successor_is_stopped_rather_than_left_for_main
 test_superseded_host_leaves_the_owner_untouched
 ;;
 early)
+test_engine_custody_cases
 test_term_during_arm_registration_retires_the_owned_child
 test_activation_keeps_normal_park_and_owned_cleanup
 test_activation_rechecks_ownership_after_reaping_predecessor

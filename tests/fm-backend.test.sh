@@ -577,6 +577,37 @@ test_backend_source_requires_adapter_file() {
   done
 }
 
+test_backend_source_requires_cursor_dependency() {
+  local name condition dir helper rc
+  for name in tmux herdr; do
+    dir="$TMP_ROOT/cursor-$name"
+    mkdir -p "$dir/backends"
+    for helper in "$ROOT"/bin/*.sh; do ln -s "$helper" "$dir/$(basename "$helper")"; done
+    cat > "$dir/backends/$name.sh" <<'SH'
+: > "$FM_BACKEND_EFFECT"
+SH
+    for condition in complete missing unreadable; do
+      rm -f "$dir/fm-cursor-lib.sh" "$dir/effect"
+      if [ "$condition" != missing ]; then
+        cp "$ROOT/bin/fm-cursor-lib.sh" "$dir/fm-cursor-lib.sh"
+        [ "$condition" != unreadable ] || chmod 000 "$dir/fm-cursor-lib.sh"
+      fi
+      rc=0
+      FM_BACKEND_EFFECT="$dir/effect" bash -c '
+        . "$1/bin/fm-backend.sh"
+        FM_BACKEND_LIB_DIR=$2
+        fm_backend_source "$3"
+      ' _ "$ROOT" "$dir" "$name" || rc=$?
+      if [ "$condition" = complete ]; then
+        [ "$rc" -eq 0 ] && [ -e "$dir/effect" ] || fail "$name refused complete source dependencies"
+      else
+        [ "$rc" -ne 0 ] && [ ! -e "$dir/effect" ] || fail "$name sourced an adapter with a $condition cursor dependency"
+      fi
+    done
+  done
+  pass 'tmux and Herdr refuse missing or unreadable cursor dependencies before sourcing'
+}
+
 test_backend_validate_spawn_accepts_orca() {
   local out
   fm_backend_validate_spawn tmux 2>/dev/null || fail "fm_backend_validate_spawn should accept tmux"
@@ -1225,6 +1256,7 @@ test_backend_name_explicit_beats_detection
 test_backend_validate_refuses_unknown
 test_backend_source_shell_portable
 test_backend_source_requires_adapter_file
+test_backend_source_requires_cursor_dependency
 test_backend_validate_spawn_accepts_orca
 test_meta_get_and_backend_of_meta
 test_resolve_selector_three_forms
