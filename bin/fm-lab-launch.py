@@ -42,8 +42,16 @@ def lock_root(root):
     if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1 or info.st_mode & 0o022:
         os.close(fd)
         raise ValueError('unsafe lab launch lock')
-    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    return fd
+    deadline = time.monotonic() + 5
+    while True:
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return fd
+        except BlockingIOError:
+            if time.monotonic() >= deadline:
+                os.close(fd)
+                raise ValueError('lab launch lock acquisition timed out')
+            time.sleep(.02)
 
 
 def started(pid):

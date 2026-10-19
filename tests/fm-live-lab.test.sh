@@ -30,7 +30,16 @@ LIVE_LAB="$ROOT/bin/fm-live-lab.sh"
 TRUST="$ROOT/bin/fm-claude-trust.sh"
 
 live_lab_cleanup() {
-  local exiting_status=${1:-$?} dir pid marker home
+  local exiting_status=${1:-$?} dir pid marker home custody lab
+  for custody in "$TMP_ROOT"/launch-custody/*.json; do
+    [ -f "$custody" ] || continue
+    if ! lab=$(python3 "$ROOT/tests/fixtures/live-lab-detached.py" recover "$custody") \
+      || ! python3 "$ROOT/bin/fm-lab-launch.py" seal "$lab" >/dev/null \
+      || ! capture_up_lab "$lab"; then
+      echo "lab fixture launch custody recovery failed; retained evidence: $TMP_ROOT" >&2
+      return 1
+    fi
+  done
   for marker in "$TMP_ROOT/orphan-child" "$TMP_ROOT/late-child" "$TMP_ROOT/reused-child"; do
     [ ! -s "$marker" ] || printf '%s\n' "$(<"$marker")" >> "$TMP_ROOT/pids"
   done
@@ -879,6 +888,7 @@ pass "down tracks descendants spawned during TERM"
 test_detached_startup_custody() {
   local lab wrapper worker bootstrap i out
   lab=$(make_lab detached-startup claude)
+  python3 "$ROOT/tests/fixtures/live-lab-detached.py" register "$lab" "$TMP_ROOT/launch-custody" || fail 'cannot register startup lab custody'
   cat > "$lab/home/bin/fm-bootstrap.sh" <<'SH'
 #!/usr/bin/env bash
 printf '%s\n' "$$" > "$FM_HOME/bootstrap-pid"
@@ -886,7 +896,8 @@ exec sleep 120
 SH
   chmod +x "$lab/home/bin/fm-bootstrap.sh"
   start_group "$LIVE_LAB" launch "$lab" -- env FM_HOME="$lab/home" FM_ROOT_OVERRIDE="$lab/home" \
-    FM_STARTUP_NETWORK_TIMEOUT=120 "$lab/home/bin/fm-startup-network.sh" start --locked 0 --harvest-pid 999999999
+    FM_STARTUP_NETWORK_TIMEOUT=120 python3 "$ROOT/tests/fixtures/live-lab-detached.py" original "$lab" \
+    "$lab/home/bin/fm-startup-network.sh" start --locked 0 --harvest-pid 999999999
   wrapper=$!
   for ((i=0;i<100;i++)); do
     [ ! -s "$lab/home/bootstrap-pid" ] || break
@@ -894,12 +905,21 @@ SH
   done
   worker=$(sed -n 's/^pid=//p' "$lab/home/state/.startup-network.status")
   bootstrap=$(cat "$lab/home/bootstrap-pid")
+  python3 "$ROOT/tests/fixtures/live-lab-detached.py" original-exited "$lab" "$ROOT/bin/fm-lab-launch.py" || fail 'original startup command did not exit'
+  if [ -n "${FM_LIVE_LAB_READINESS_PAUSE:-}" ]; then
+    mkfifo "$lab/readiness-pause"
+    exec 9<>"$lab/readiness-pause"
+    python3 "$ROOT/tests/fixtures/live-lab-detached.py" pause "$FM_LIVE_LAB_READINESS_PAUSE" "$lab"
+    read -r -t 10 out <&9 || fail 'startup readiness pause was not interrupted'
+    exec 9>&-
+  fi
   fm_test_track_child "$worker" kill
   fm_test_track_child "$bootstrap" kill
   capture_up_lab "$lab"
   [ -n "$worker" ] && [ -n "$bootstrap" ] || fail 'detached startup did not enter the controlled sweep'
   out=$("$LIVE_LAB" down "$lab" 2>&1)
   expect_code 0 "$?" "detached startup cleanup failed: $out"
+  rm "$TMP_ROOT/launch-custody/${lab##*/}.json"
   case "$(ps -o stat= -p "$worker" 2>/dev/null | awk '{$1=$1; print}')" in ''|Z*) ;; *) fail 'successful down left the detached startup worker live' ;; esac
   case "$(ps -o stat= -p "$bootstrap" 2>/dev/null | awk '{$1=$1; print}')" in ''|Z*) ;; *) fail 'successful down left the detached startup sweep live' ;; esac
   wait "$wrapper" 2>/dev/null || true
@@ -910,6 +930,7 @@ SH
 test_detached_successor_registration() {
   local lab wrapper worker i out
   lab=$(make_lab detached-successor claude)
+  python3 "$ROOT/tests/fixtures/live-lab-detached.py" register "$lab" "$TMP_ROOT/launch-custody" || fail 'cannot register successor lab custody'
   make_guardian_observer_bin
   cat > "$lab/successor.py" <<'PYSUCCESSOR'
 import json, os, pathlib, subprocess, sys, time
@@ -932,13 +953,21 @@ else:
     time.sleep(120)
 PYSUCCESSOR
   start_group env REAL_PS="$(command -v ps)" GUARDIAN_FAULT_ARM="$lab/observer-arm" GUARDIAN_FAULT_HIT="$lab/observer-hit" \
-    PATH="$TMP_ROOT/guardian-observer-bin:$PATH" "$LIVE_LAB" launch "$lab" -- python3 "$lab/successor.py" "$lab" parent
+    PATH="$TMP_ROOT/guardian-observer-bin:$PATH" "$LIVE_LAB" launch "$lab" -- python3 "$ROOT/tests/fixtures/live-lab-detached.py" original "$lab" python3 "$lab/successor.py" "$lab" parent
   wrapper=$!
   for ((i=0;i<100;i++)); do
     [ ! -s "$lab/successor-ready" ] || break
     sleep .05
   done
   worker=$(cat "$lab/worker-pid")
+  python3 "$ROOT/tests/fixtures/live-lab-detached.py" original-exited "$lab" "$ROOT/bin/fm-lab-launch.py" || fail 'original successor command did not exit'
+  if [ -n "${FM_LIVE_LAB_READINESS_PAUSE:-}" ]; then
+    mkfifo "$lab/readiness-pause"
+    exec 9<>"$lab/readiness-pause"
+    python3 "$ROOT/tests/fixtures/live-lab-detached.py" pause "$FM_LIVE_LAB_READINESS_PAUSE" "$lab"
+    read -r -t 10 out <&9 || fail 'successor readiness pause was not interrupted'
+    exec 9>&-
+  fi
   fm_test_track_child "$worker" kill
   capture_up_lab "$lab"
   if ! python3 - "$lab" "$ROOT/bin/fm-lab-launch.py" <<'PYREGISTRATION'
@@ -990,14 +1019,37 @@ PYREGISTRATION
   capture_up_lab "$lab"
   out=$("$LIVE_LAB" down "$lab" 2>&1)
   expect_code 0 "$?" "detached cleanup retry failed: $out"
+  rm "$TMP_ROOT/launch-custody/${lab##*/}.json"
   wait "$wrapper" 2>/dev/null || true
   case "$(ps -o stat= -p "$worker" 2>/dev/null | awk '{$1=$1; print}')" in ''|Z*) ;; *) fail 'detached successor survived verified cleanup' ;; esac
   assert_absent "$lab" 'detached cleanup retry retained the verified lab'
   pass 'separate-session successors preserve PID and custody; invalid registration denies effects and cleanup failure remains retryable'
 }
 
+test_detached_locking() {
+  local lab result=0 out
+  lab=$(make_lab detached-locking claude)
+  python3 "$ROOT/tests/fixtures/live-lab-detached.py" register "$lab" "$TMP_ROOT/launch-custody" || fail 'cannot register contended lab custody'
+  start_retirement_anchor "$lab"
+  python3 "$ROOT/tests/fixtures/live-lab-detached.py" locking "$ROOT" "$lab" || result=$?
+  capture_up_lab "$lab" || fail 'cannot capture contended launch custody'
+  [ "$result" -eq 0 ] || fail 'contended launches did not execute'
+  out=$("$LIVE_LAB" down "$lab" 2>&1)
+  expect_code 0 "$?" "contended launch cleanup failed: $out"
+  rm "$TMP_ROOT/launch-custody/${lab##*/}.json"
+}
+
 case ${FM_LIVE_LAB_TEST_GROUP:-all} in
-  detached) test_detached_startup_custody; test_detached_successor_registration; exit 0 ;;
+  detached-startup) test_detached_startup_custody; exit 0 ;;
+  detached-successor) test_detached_successor_registration; exit 0 ;;
+  detached-interruption) python3 "$ROOT/tests/fixtures/live-lab-detached.py" interrupt "$ROOT" "$TMP_ROOT"; exit $? ;;
+  detached-locking) test_detached_locking; exit 0 ;;
+  detached)
+    test_detached_startup_custody
+    test_detached_successor_registration
+    test_detached_locking
+    python3 "$ROOT/tests/fixtures/live-lab-detached.py" interrupt "$ROOT" "$TMP_ROOT"
+    exit $? ;;
   all) ;;
   late-child-cleanup-failure) test_late_child_cleanup; exit 0 ;;
   retirement)
