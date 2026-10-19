@@ -438,11 +438,12 @@ for sig in owned_signals:
 def launch_owned(*args, **kwargs):
     blocked = signal.pthread_sigmask(signal.SIG_BLOCK, owned_signals)
     try:
-        process = subprocess.Popen(*args, **kwargs)
+        process = subprocess.Popen(*args, preexec_fn=lambda: signal.pthread_sigmask(signal.SIG_SETMASK, blocked), **kwargs)
         owned_processes.append(process)
         registry = base / f'owner-{process.pid}'
         subprocess.run(['bash', '-c', 'fm_test_track_child "$1" kill', '_', str(process.pid)],
-                       env=dict(os.environ, FM_TEST_CHILD_REGISTRY=str(registry)), check=True)
+                       env=dict(os.environ, FM_TEST_CHILD_REGISTRY=str(registry)), check=True,
+                       preexec_fn=lambda: signal.pthread_sigmask(signal.SIG_SETMASK, blocked))
         return process
     finally:
         signal.pthread_sigmask(signal.SIG_SETMASK, blocked)

@@ -792,7 +792,16 @@ def enrich(note, acknowledged):
     note_id = note["id"]
     rec = dict(note)
     rec["acknowledged"] = acknowledged
-    if (Path(announced_dir) / note_id).is_file():
+    marker = Path(announced_dir) / note_id
+    valid_marker = False
+    if not Path(announced_dir).is_symlink() and not marker.is_symlink() and marker.is_file():
+        try:
+            import re
+            valid_marker = any(re.fullmatch(rb"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", line)
+                               for line in marker.read_bytes().split(b"\n"))
+        except (OSError, UnicodeError):
+            pass
+    if valid_marker:
         rec["announced"] = True
     elif note.get("announce_marker"):
         rec["announced"] = False

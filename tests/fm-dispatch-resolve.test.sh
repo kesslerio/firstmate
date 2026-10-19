@@ -1006,3 +1006,27 @@ assert_contains "$out" 'Usage:' "--help prints usage"
 pass "configuration errors exit 2 before any network call"
 
 printf '# all fm-dispatch-resolve tests passed\n'
+
+write_quota "$QUOTA" 0.7597
+for pair in anthropic:high anthropic:max openai:low openai:medium openai:high openai:xhigh anthropic:low openai:max unknown:high; do
+  provider=${pair%:*}; effort=${pair#*:}
+  for representation in rules default; do
+    jq -n --arg model "$provider/model" --arg effort "$effort" --arg representation "$representation" '
+      {harness:"opencode", model:$model, effort:$effort, provider:"codex"} as $p |
+      if $representation == "default" then {rules:[{when:"other",use:{harness:"claude"}}],default:$p} else {rules:[{when:"work",use:$p}]} end' > "$RULES"
+    choice=rule_1
+    [ "$representation" != default ] || choice=default
+    jq -n --arg choice "$choice" '{model:"jev-1.13.0",answers:{rule:{type:"choice",choice:$choice,confidence:0.99,probabilities: (if $choice == "default" then {rule_1:0.01,default:0.99} else {rule_1:0.99,default:0.01} end)}},usage:{input_tokens:1,output_tokens:1}}' > "$RESPONSE"
+    TYPESAFE_API_KEY=$KEY run code out err "$BRIEF"
+    case "$pair" in
+      anthropic:low|openai:max|unknown:high)
+        expect_code 2 "$code" "unsupported OpenCode $pair $representation denied"
+        assert_contains "$err" 'effort must be supported' 'denial must identify unsupported effort' ;;
+      *)
+        expect_code 0 "$code" "supported OpenCode $pair $representation exits successfully"
+        assert_contains "$out" '  status: clear' 'accepted effort must resolve successfully'
+        assert_contains "$out" "  profile: --harness 'opencode' --model '$provider/model' --effort '$effort'" 'resolved effort must reach the dispatch profile' ;;
+    esac
+  done
+done
+pass 'OpenCode configured dispatch validates provider-specific efforts for rules and defaults'

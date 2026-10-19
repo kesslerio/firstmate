@@ -125,7 +125,8 @@ def capture(argv,env,cwd,directory,label,seconds,owner=None,limit=16*1024*1024):
         blocked=signal.pthread_sigmask(signal.SIG_BLOCK, (signal.SIGINT,signal.SIGTERM,signal.SIGHUP,signal.SIGQUIT))
         try:
             process=subprocess.Popen([str(arg) for arg in argv],env=env,cwd=cwd,stdin=subprocess.DEVNULL,
-                stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+                stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True,
+                preexec_fn=lambda: signal.pthread_sigmask(signal.SIG_SETMASK,blocked))
             record=owner.register(process) if owner else identity(process.pid)
         finally:
             signal.pthread_sigmask(signal.SIG_SETMASK,blocked)

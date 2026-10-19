@@ -599,9 +599,10 @@ cmd_up() {
 # ---- down -------------------------------------------------------------------
 
 record_launch_pid() {
-  local start
+  local start observation
   case "${1:-}" in ''|*[!0-9]*) die "cannot record lab process: missing or invalid PID '${1:-}'" ;; esac
-  start=$(ps -o lstart= -p "$1" | awk '{$1=$1; print}')
+  observation=$(ps -o lstart= -p "$1") || die "cannot observe lab process $1"
+  start=$(awk '{$1=$1; print}' <<< "$observation")
   [ -n "$start" ] || die "cannot record start time for lab process $1"
   printf 'launch_pid=%s\nlaunch_start=%s\n' "$1" "$start" >> "$ROOT/$RECORD_NAME"
 }
@@ -609,7 +610,7 @@ record_launch_pid() {
 # Resolve recorded roots only while their start times match, before tmux
 # reparents their descendants.
 lab_pids() {
-  ps -axo pid=,ppid=,lstart= | awk -v record="$ROOT/$RECORD_NAME" '
+  awk -v record="$ROOT/$RECORD_NAME" '
     BEGIN {
       while ((getline line < record) > 0) {
         if (line ~ /^launch_pid=[0-9]+$/) { sub(/^launch_pid=/, "", line); root=line }
@@ -621,7 +622,7 @@ lab_pids() {
     }
     {
       pid[NR]=$1; ppid[$1]=$2
-      start=$3 " " $4 " " $5 " " $6 " " $7
+      start=$5 " " $6 " " $7 " " $8 " " $9
       if ($1 in starts && start == starts[$1]) roots[$1]=1
     }
     END {
@@ -631,7 +632,7 @@ lab_pids() {
           if (q in roots) { print p; break }
         }
       }
-    }'
+    }' <<< "$1"
 }
 
 # Extend the pre-kill snapshot with descendants of still-matching processes
@@ -674,7 +675,8 @@ prune_groups() {
 
 refresh_pairs() {
   local snapshot
-  snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=)
+  snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=) || return 1
+  awk -v pid="$$" '$1 == pid {found=1} END {exit !found}' <<< "$snapshot" || return 1
   groups=$(prune_groups "$groups" "$pairs" "$snapshot")
   pairs=$(expand_pairs "$pairs" "$groups" "$snapshot")
 }
@@ -682,15 +684,14 @@ refresh_pairs() {
 # <pid TAB lstart> pairs captured before tmux shutdown. Recheck identity even
 # after a root exits and its children are reparented or a PID is reused.
 live_pids() {
-  local pid start current
-  while IFS=$'\t' read -r pid start; do
-    [ -n "$pid" ] || continue
-    current=$(ps -o stat=,lstart= -p "$pid" 2>/dev/null | awk '{$1=$1; print}')
-    case "$current" in ''|Z*) ;; *)
-      [ "${current#* }" = "$start" ] && echo "$pid"
-      ;;
-    esac
-  done <<< "$1"
+  local snapshot
+  snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=) || return 1
+  awk -v pid="$$" '$1 == pid {found=1} END {exit !found}' <<< "$snapshot" || return 1
+  awk '
+    NR==FNR { split($0, f, "\t"); if (f[1] ~ /^[0-9]+$/) saved[f[1]]=f[2]; next }
+    { start=$5 " " $6 " " $7 " " $8 " " $9
+      if ($1 in saved && saved[$1] == start && $4 !~ /^Z/) print $1 }
+  ' <(printf '%s\n' "$1") <(printf '%s\n' "$snapshot")
 }
 
 forget_claude_entries() {  # remove every project entry at or under ROOT; prints the count
@@ -745,32 +746,35 @@ cmd_down() {
   load_lab "${1:-}"
   local rc=0 pids pairs pid start survivors n removed added id meta dir home_hash groups pgid own_group caller_group details
   local -a ids=()
-  pids=$(lab_pids)
   pairs='' groups=''
-  own_group=$(ps -o pgid= -p "$$" | awk '{$1=$1; print}')
-  caller_group=$(ps -o pgid= -p "$PPID" | awk '{$1=$1; print}')
+  local snapshot
+  snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=) || die "cleanup unverified: process identities unavailable"
+  pids=$(lab_pids "$snapshot") || die "cleanup unverified: process discovery failed"
+  own_group=$(awk -v pid="$$" '$1 == pid {print $3}' <<< "$snapshot")
+  caller_group=$(awk -v pid="$PPID" '$1 == pid {print $3}' <<< "$snapshot")
+  [ -n "$own_group" ] && [ -n "$caller_group" ] || die "cleanup unverified: controller identities unavailable"
   for pid in $pids; do
-    start=$(ps -o lstart= -p "$pid" 2>/dev/null | awk '{$1=$1; print}')
+    start=$(awk -v pid="$pid" '$1 == pid {print $5 " " $6 " " $7 " " $8 " " $9}' <<< "$snapshot")
     [ -n "$start" ] || continue
     pairs+="$pid"$'\t'"$start"$'\n'
-    pgid=$(ps -o pgid=,lstart= -p "$pid" 2>/dev/null | awk -v start="$start" '{ if ($2 " " $3 " " $4 " " $5 " " $6 == start) print $1 }')
+    pgid=$(awk -v pid="$pid" '$1 == pid {print $3}' <<< "$snapshot")
     case "$pgid" in ''|0|1|*[!0-9]*) continue ;; esac
     [ "$pgid" = "$own_group" ] || [ "$pgid" = "$caller_group" ] || groups+="$pgid "
   done
   lab_tmux kill-server 2>/dev/null || true
-  refresh_pairs
-  survivors=$(live_pids "$pairs")
+  refresh_pairs || die "cleanup unverified: process refresh failed"
+  survivors=$(live_pids "$pairs") || die "cleanup unverified: survivor observation failed"
   if [ -n "$survivors" ]; then
     # shellcheck disable=SC2086 # One identity-checked pid per word.
     kill $survivors 2>/dev/null || true
   fi
   for n in {1..40}; do
-    refresh_pairs
-    survivors=$(live_pids "$pairs")
+    refresh_pairs || die "cleanup unverified: process refresh failed"
+    survivors=$(live_pids "$pairs") || die "cleanup unverified: survivor observation failed"
     if [ -z "$survivors" ]; then
       sleep 0.5
-      refresh_pairs
-      survivors=$(live_pids "$pairs")
+      refresh_pairs || die "cleanup unverified: process refresh failed"
+      survivors=$(live_pids "$pairs") || die "cleanup unverified: survivor observation failed"
       [ -n "$survivors" ] || break
     fi
     if [ "$n" -ge 20 ]; then
@@ -779,8 +783,8 @@ cmd_down() {
     fi
     sleep 0.5
   done
-  refresh_pairs
-  survivors=$(live_pids "$pairs")
+  refresh_pairs || die "cleanup unverified: process refresh failed"
+  survivors=$(live_pids "$pairs") || die "cleanup unverified: survivor observation failed"
   if [ -n "$survivors" ]; then
     details=''
     for pid in $survivors; do
@@ -820,6 +824,8 @@ cmd_down() {
     echo "warning: ~/.treehouse gained entries during the lab; left as is: $(printf '%s' "$added" | tr '\n' ' ')" >&2
     rc=1
   fi
+  survivors=$(live_pids "$pairs") || die "cleanup unverified: final process observation failed"
+  [ -z "$survivors" ] || die "cleanup unverified: lab processes remain"
   chmod -R u+w "$ROOT" 2>/dev/null
   rm -rf "$ROOT" || die "cannot remove $ROOT"
   [ ! -e "$ROOT" ] || die "$ROOT is still present"

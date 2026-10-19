@@ -556,14 +556,14 @@ mkdir -p "$TMP_ROOT/ps-bin"
 printf '%s\n' "$REPLACED" > "$TMP_ROOT/replaced-pid"
 cat > "$TMP_ROOT/ps-bin/ps" <<'SH'
 #!/usr/bin/env bash
-if [ "${1:-}" = -o ] && [ "${2:-}" = 'stat=,lstart=' ] && [ "${4:-}" = "$(cat "$PS_TARGET")" ]; then
+if [ "${1:-}" = -axo ] && [ "${2:-}" = 'pid=,ppid=,pgid=,stat=,lstart=' ]; then
   count=$(cat "$PS_COUNT" 2>/dev/null || echo 0)
-  echo "$((count + 1))" > "$PS_COUNT"
-  if [ "$count" -gt 0 ]; then
-    echo 'S Mon Jan 1 00:00:00 1990'
-  else
-    "$REAL_PS" "$@"
-  fi
+  count=$((count + 1))
+  echo "$count" > "$PS_COUNT"
+  "$REAL_PS" "$@" | awk -v count="$count" -v target="$(cat "$PS_TARGET")" '
+    count >= 4 && $1 == target { $5="Mon"; $6="Jan"; $7="1"; $8="00:00:00"; $9="1990" }
+    {print}
+  '
 else
   "$REAL_PS" "$@"
 fi
@@ -573,6 +573,7 @@ start=$(date +%s)
 out=$(REAL_PS="$(command -v ps)" PS_COUNT="$TMP_ROOT/ps-count" PS_TARGET="$TMP_ROOT/replaced-pid" PATH="$TMP_ROOT/ps-bin:$PATH" "$LIVE_LAB" down "$Z" 2>&1)
 expect_code 0 "$?" "down must not treat the changed PID as a survivor: $out"
 [ "$(( $(date +%s) - start ))" -lt 8 ] || fail "down waited on a PID with a different start time"
+[ "$(cat "$TMP_ROOT/ps-count")" -ge 4 ] || fail "fixture never exposed replacement identity"
 kill -0 "$REPLACED" 2>/dev/null || fail "down killed a PID after its recorded identity changed"
 kill -KILL "$REPLACED" 2>/dev/null || true
 wait "$REPLACED" 2>/dev/null || true

@@ -44,6 +44,7 @@ case "${1:-}" in
       fm_lab_home_error "refusing '$dir': exists and is not a directory"
       exit 1
     fi
+    fm_gate_lab_directory "$dir" || { fm_lab_home_error "refusing unsafe lab directory '$dir'"; exit 1; }
     mkdir -p "$dir" || exit 1
     fm_gate_lab_mark "$dir" || {
       fm_lab_home_error "refusing '$dir': a lab marker is only ever stamped on a fresh empty dir"
@@ -55,7 +56,7 @@ case "${1:-}" in
   tmux-dir)
     dir=${2:-}
     [ -n "$dir" ] || { fm_lab_home_error "tmux-dir requires a marked lab home"; exit 2; }
-    [ -f "$dir/.fm-lab-home" ] && [ -d "$dir/state" ] \
+    fm_gate_lab_home "$dir" && [ -d "$dir/state" ] \
       || { fm_lab_home_error "refusing '$dir': not a marked lab home"; exit 1; }
     record=$(fm_lab_home_tmux_record "$dir")
     if [ -f "$record" ]; then
@@ -78,7 +79,7 @@ case "${1:-}" in
   teardown)
     dir=${2:-}
     [ -n "$dir" ] || { fm_lab_home_error "teardown requires a marked lab home"; exit 2; }
-    [ -f "$dir/.fm-lab-home" ] && [ -d "$dir/state" ] \
+    fm_gate_lab_home "$dir" && [ -d "$dir/state" ] \
       || { fm_lab_home_error "refusing '$dir': not a marked lab home"; exit 1; }
     record=$(fm_lab_home_tmux_record "$dir")
     [ -f "$record" ] || exit 0

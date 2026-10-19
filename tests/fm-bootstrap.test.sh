@@ -1132,6 +1132,21 @@ test_crew_dispatch_validation() {
         printf '%s\n' "$out" | grep -Fx "$expect" >/dev/null || fail "$label: missing '$expect' (got: $out)" ;;
     esac
   done <<'ROWS'
+OpenCode anthropic high rules accepted^{"rules":[{"when":"work","use":{"harness":"opencode","model":"anthropic/model","effort":"high","provider":"codex"}}]}^empty^
+OpenCode anthropic high default accepted^{"default":{"harness":"opencode","model":"anthropic/model","effort":"high","provider":"codex"}}^empty^
+OpenCode anthropic max rules accepted^{"rules":[{"when":"work","use":{"harness":"opencode","model":"anthropic/model","effort":"max","provider":"codex"}}]}^empty^
+OpenCode anthropic max default accepted^{"default":{"harness":"opencode","model":"anthropic/model","effort":"max","provider":"codex"}}^empty^
+OpenCode openai low rules accepted^{"rules":[{"when":"work","use":{"harness":"opencode","model":"openai/model","effort":"low","provider":"codex"}}]}^empty^
+OpenCode openai low default accepted^{"default":{"harness":"opencode","model":"openai/model","effort":"low","provider":"codex"}}^empty^
+OpenCode openai medium rules accepted^{"rules":[{"when":"work","use":{"harness":"opencode","model":"openai/model","effort":"medium","provider":"codex"}}]}^empty^
+OpenCode openai medium default accepted^{"default":{"harness":"opencode","model":"openai/model","effort":"medium","provider":"codex"}}^empty^
+OpenCode openai high rules accepted^{"rules":[{"when":"work","use":{"harness":"opencode","model":"openai/model","effort":"high","provider":"codex"}}]}^empty^
+OpenCode openai high default accepted^{"default":{"harness":"opencode","model":"openai/model","effort":"high","provider":"codex"}}^empty^
+OpenCode openai xhigh rules accepted^{"rules":[{"when":"work","use":{"harness":"opencode","model":"openai/model","effort":"xhigh","provider":"codex"}}]}^empty^
+OpenCode openai xhigh default accepted^{"default":{"harness":"opencode","model":"openai/model","effort":"xhigh","provider":"codex"}}^empty^
+OpenCode anthropic low denied^{"default":{"harness":"opencode","model":"anthropic/model","effort":"low","provider":"codex"}}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: opencode:low
+OpenCode openai max denied^{"default":{"harness":"opencode","model":"openai/model","effort":"max","provider":"codex"}}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: opencode:max
+OpenCode unknown high denied^{"default":{"harness":"opencode","model":"unknown/model","effort":"high","provider":"codex"}}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: opencode:high
 malformed dispatch config is flagged^{"rules":[^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - malformed JSON
 unverified dispatch harness is flagged^{"rules":[{"when":"anything","use":{"harness":"spaceship"}}],"default":{"harness":"codex"}}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - unverified harness: spaceship
 codex Luna max effort is accepted^{"rules":[{"when":"big feature","use":{"harness":"codex","model":"gpt-5.6-luna","effort":"max"}}]}^empty^
@@ -1153,7 +1168,7 @@ gemini profile with explicit provider is accepted^{"rules":[{"when":"gemini work
 agy low medium high efforts are accepted^{"rules":[{"when":"agy low","use":{"harness":"agy","effort":"low"}},{"when":"agy medium","use":{"harness":"agy","effort":"medium"}},{"when":"agy high","use":{"harness":"agy","effort":"high"}}]}^empty^
 unsupported agy xhigh effort is flagged^{"rules":[{"when":"agy xhigh","use":{"harness":"agy","effort":"xhigh"}}]}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: agy:xhigh
 unsupported agy max effort is flagged^{"rules":[{"when":"agy max","use":{"harness":"agy","effort":"max"}}]}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: agy:max
-unsupported opencode effort is flagged^{"rules":[{"when":"opencode work","use":{"harness":"opencode","model":"anthropic/claude-sonnet-4-5","effort":"high","provider":"claude"}}]}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: opencode:high
+unsupported opencode effort is flagged^{"rules":[{"when":"opencode work","use":{"harness":"opencode","model":"anthropic/claude-sonnet-4-5","effort":"low","provider":"claude"}}]}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: opencode:low
 kimi model profile is accepted^{"rules":[{"when":"kimi work","use":{"harness":"kimi","model":"kimi-code/k3"}}]}^empty^
 unsupported kimi effort is flagged^{"rules":[{"when":"kimi work","use":{"harness":"kimi","model":"kimi-code/k3","effort":"high"}}]}^exact^CREW_DISPATCH: invalid config/crew-dispatch.json - invalid effort: kimi:high
 cursor model profile is accepted^{"rules":[{"when":"cursor work","use":{"harness":"cursor","model":"cursor-grok-4.5-high"}}]}^empty^

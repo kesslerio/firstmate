@@ -627,7 +627,11 @@ for fault in ('partial', 'interrupted', 'rename', 'enqueue', 'empty', 'truncated
         result = run('announce', '--json', note_id)
         assert result.returncode != 0
         assert victim.read_text() == 'untouched'
+        receipt = json.loads(run('receipts').stdout)
+        assert next(n for n in receipt['pending'] if n['id'] == note_id)['announced'] is False
         marker.unlink()
+    receipt = json.loads(run('receipts').stdout)
+    assert next(n for n in receipt['pending'] if n['id'] == note_id)['announced'] is False, fault
     assert not marker.exists() or marker.read_text() in ('', '2026-'), fault
     result = run('announce', '--json', note_id)
     assert result.returncode == 0, (fault, result.stderr)

@@ -272,6 +272,20 @@ test_lab_home_helper() {
   out=$("$LABHOME" create "$newline" 2>&1); rc=$?
   [ "$rc" -ne 0 ] || fail "lab-home: create on a dir holding a newline-named entry must refuse"
   assert_absent "$newline/.fm-lab-home" "lab-home: newline-entry create must not write the marker"
+  ln -s "$populated" "$TMP/populated-alias"
+  out=$("$LABHOME" create "$TMP/populated-alias" 2>&1); rc=$?
+  [ "$rc" -ne 0 ] || fail "alias of populated home was marked disposable"
+  assert_absent "$populated/.fm-lab-home" "alias refusal mutated populated home"
+  out=$("$LABHOME" create "$TMP/populated-alias/new-lab" 2>&1); rc=$?
+  [ "$rc" -ne 0 ] || fail "alias ancestor must not gain a new lab"
+  assert_absent "$populated/new-lab" "alias ancestor refusal must precede directory creation"
+  assert_equals x "$(cat "$populated/state/x.meta")" "alias refusal modified existing data"
+  mkdir "$TMP/empty-physical"
+  ln -s "$TMP/empty-physical" "$TMP/empty-alias"
+  out=$("$LABHOME" create "$TMP/empty-alias" 2>&1); rc=$?
+  [ "$rc" -ne 0 ] || fail "directory alias must not acquire disposable authority"
+  assert_absent "$TMP/empty-physical/.fm-lab-home" "alias refusal wrote a marker"
+  "$LABHOME" create "$TMP/empty-physical" >/dev/null || fail "empty physical home must work"
   pass "fm-lab-home: create mints marked stock homes only on fresh empty dirs; anything else is refused"
 }
 
