@@ -212,7 +212,6 @@ render_export_dom() {
       --disable-dev-shm-usage \
       --disable-background-networking \
       --password-store=basic \
-      --user-data-dir="$profile" \
       --virtual-time-budget=2000 \
       --dump-dom \
       "file://$source_file" >"$out_file" 2>"$log" &

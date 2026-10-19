@@ -393,7 +393,7 @@ class ExecutionReservation(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.home=pathlib.Path(self.temp.name)/'home'
+        self.home=pathlib.Path(self.temp.name).resolve()/'home'
         self.state=self.home/'state'
         self.directory=self.state/'worker.inbox'
         self.directory.mkdir(parents=True)

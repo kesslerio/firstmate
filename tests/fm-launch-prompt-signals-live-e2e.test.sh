@@ -191,9 +191,11 @@ GEMINI_BIN=$(command -v gemini 2>/dev/null || true)
 if [ -x "${GEMINI_BIN:-}" ]; then
   VERSION_OUT=$("$GEMINI_BIN" --version 2>&1) || fail "gemini --version failed: $VERSION_OUT"
   note "live gemini version: $VERSION_OUT"
+  GEMINI_HOME_LAB=$(fm_test_tmproot fm-launch-prompt-gemini-home) || fail "gemini: could not isolate HOME"
+  LABS+=("$GEMINI_HOME_LAB")
   check_harness gemini fm-lp-gemini-$$ '' '' \
     'How would you like to authenticate for this project|Do you trust the files in this folder|Enter Gemini API Key' '' \
-    env GEMINI_CLI_TRUST_WORKSPACE=true GEMINI_API_KEY= "$GEMINI_BIN" -y hello
+    env -i PATH="$PATH" TERM="${TERM:-xterm-256color}" HOME="$GEMINI_HOME_LAB" XDG_CONFIG_HOME="$GEMINI_HOME_LAB/.config" XDG_CACHE_HOME="$GEMINI_HOME_LAB/.cache" GEMINI_CLI_TRUST_WORKSPACE=true "$GEMINI_BIN" -y hello
   pass "gemini: a real launch parked on its own rendered auth or trust dialog surfaces through the watcher gate"
 else
   note "gemini not installed - launch-prompt signature not checked"

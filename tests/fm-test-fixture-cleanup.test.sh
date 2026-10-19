@@ -16,6 +16,17 @@ set -u
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 LIB="$ROOT/tests/lib.sh"
+CHILDREN=()
+cleanup_children() {
+  local child
+  for child in "${CHILDREN[@]:-}"; do
+    [ -n "$child" ] || continue
+    kill -TERM "$child" 2>/dev/null || true
+    wait "$child" 2>/dev/null || true
+  done
+  fm_test_cleanup
+}
+trap cleanup_children EXIT
 
 test_fixture_root_gone_after_normal_exit() {
   local child_out child_dir
@@ -46,6 +57,7 @@ test_fixture_root_gone_after_sigterm() {
     while :; do sleep 0.1; done
   ' &
   pid=$!
+  CHILDREN+=("$pid")
   tries=0
   while [ "$tries" -lt 100 ]; do
     [ -s "$dirfile" ] && break
@@ -57,6 +69,7 @@ test_fixture_root_gone_after_sigterm() {
   assert_present "$child_dir" "the child's fixture root did not exist before it was signaled"
   kill -TERM "$pid"
   wait "$pid" 2>/dev/null
+  CHILDREN[${#CHILDREN[@]}-1]=''
   assert_absent "$child_dir" \
     "fm_test_tmproot's fixture root survived SIGTERM to its owning process"
   pass "fm_test_tmproot cleans up its fixture root on SIGTERM"
@@ -109,6 +122,7 @@ test_orphan_sweep_respects_fixture_ownership() {
     while :; do sleep 0.1; done
   ' &
   pid=$!
+  CHILDREN+=("$pid")
   tries=0
   while [ "$tries" -lt 100 ]; do
     [ -s "$dirfile" ] && break
@@ -138,6 +152,7 @@ test_orphan_sweep_respects_fixture_ownership() {
     "the orphan reaper removed a fresh marked fixture root it does not own yet"
   kill -TERM "$pid"
   wait "$pid" 2>/dev/null
+  CHILDREN[${#CHILDREN[@]}-1]=''
   assert_absent "$active_dir" \
     "the active fixture root survived its owning process's teardown"
   rm -rf "$fresh_dir"
@@ -185,6 +200,7 @@ test_registries_avoid_git_worktree_root() {
     while :; do sleep 0.1; done
   ' _ "$repo" "$LIB" "$dirfile" &
   pid=$!
+  CHILDREN+=("$pid")
   tries=0
   while [ "$tries" -lt 100 ]; do
     [ -s "$dirfile" ] && break
@@ -204,6 +220,7 @@ test_registries_avoid_git_worktree_root() {
   done
   kill -TERM "$pid"
   wait "$pid" 2>/dev/null || true
+  CHILDREN[${#CHILDREN[@]}-1]=''
   assert_absent "$child_dir" \
     "the git-root TMPDIR child's fixture root survived SIGTERM"
   pass "test registries and fixture roots stay out of a git worktree TMPDIR"

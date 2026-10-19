@@ -580,3 +580,60 @@ assert_absent "$home/state/inbox/$id.note" "concurrent retries cannot resurrect 
 assert_present "$home/state/inbox/handled/$id.note" "acknowledgement retains the original note"
 assert_equals 1 "$(count_wakes "$home")" "concurrent handoff announces once"
 pass 'concurrent publication and acknowledgement retain one handled note'
+
+python3 - "$INBOX_BIN" "$TMP_ROOT" <<'PY'
+import json, os, pathlib, resource, shutil, subprocess, sys
+binary, root = sys.argv[1], pathlib.Path(sys.argv[2])
+real_mv = shutil.which('mv')
+for fault in ('partial', 'interrupted', 'rename', 'enqueue', 'empty', 'truncated', 'symlink'):
+    home = root / ('atomic-' + fault)
+    home.mkdir()
+    env = dict(os.environ, FM_HOME=str(home), FM_STATE_OVERRIDE=str(home/'state'))
+    def run(*args, **kwargs):
+        return subprocess.run([binary, *args], env=env, text=True, capture_output=True, timeout=15, **kwargs)
+    first = run('note', '--request-id', 'atomic', '--json', 'atomic announcement')
+    assert first.returncode == 0, first.stderr
+    note_id = json.loads(first.stdout)['id']
+    marker = home/'state/inbox/.announced'/note_id
+    marker.unlink()
+    if fault == 'partial':
+        result = run('announce', '--json', note_id, preexec_fn=lambda: resource.setrlimit(resource.RLIMIT_FSIZE, (1, 1)))
+        assert result.returncode != 0
+    elif fault in ('interrupted', 'rename'):
+        tools = home/'tools'; tools.mkdir()
+        shim = tools/'mv'
+        shim.write_text('#!' + sys.executable + '\nimport os,signal,sys\n'
+            'if "/.announced/" in sys.argv[-1]:\n' +
+            (' os.kill(os.getppid(),signal.SIGKILL)\n' if fault == 'interrupted' else '') +
+            ' sys.exit(1)\nos.execv(' + repr(real_mv) + ', ["mv", *sys.argv[1:]])\n')
+        shim.chmod(0o755)
+        env['PATH'] = str(tools) + os.pathsep + os.environ['PATH']
+        result = run('announce', '--json', note_id)
+        assert result.returncode != 0
+        env['PATH'] = os.environ['PATH']
+    elif fault == 'enqueue':
+        queue = home/'state/.wake-queue'
+        queue.unlink(); queue.mkdir()
+        result = run('announce', '--json', note_id)
+        assert result.returncode != 0
+        queue.rmdir()
+    elif fault == 'empty':
+        marker.touch()
+    elif fault == 'truncated':
+        marker.write_text('2026-')
+    else:
+        victim = home/'victim'; victim.write_text('untouched')
+        marker.symlink_to(victim)
+        result = run('announce', '--json', note_id)
+        assert result.returncode != 0
+        assert victim.read_text() == 'untouched'
+        marker.unlink()
+    assert not marker.exists() or marker.read_text() in ('', '2026-'), fault
+    result = run('announce', '--json', note_id)
+    assert result.returncode == 0, (fault, result.stderr)
+    assert json.loads(result.stdout)['announced'] is True
+    rows = (home/'state/.wake-queue').read_text().splitlines()
+    assert sum(row.split('\t')[3] == 'inbox:' + note_id for row in rows) == 1, (fault, rows)
+    assert marker.stat().st_size > 0
+PY
+pass 'partial, interrupted, failed and unsafe marker publication remains recoverable without duplicate keyed wakes'

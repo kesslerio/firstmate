@@ -723,3 +723,52 @@ test_remote_poll_probe_maps_states
 test_remote_poll_probe_unreachable_preserves_route
 
 echo "# all fm-secondmate-liveness tests passed"
+
+(
+  export FM_HOME="$TMP_ROOT/bound-publication" FM_ROOT_OVERRIDE="$ROOT"
+  export FM_STATE_OVERRIDE="$FM_HOME/state"
+  mkdir -p "$FM_STATE_OVERRIDE"
+  . "$ROOT/bin/fm-watch.sh"
+  SECONDMATE_LIVENESS_SECS=0
+  SECONDMATE_LIVENESS_WINDOW_SECS=600
+  SECONDMATE_LIVENESS_MAX_ATTEMPTS=3
+  printf 'kind=secondmate\n' > "$STATE/sm.meta"
+  fm_secondmate_liveness_lock() { return 0; }
+  fm_secondmate_liveness_unlock() { return 0; }
+  fm_secondmate_liveness_probe() { FM_SM_LIVE_STATUS=relaunchable; FM_SM_LIVE_STATE=dead; }
+  fm_secondmate_liveness_recent_attempts() { printf '3\n'; }
+  wake() { return 0; }
+  marker="$STATE/.secondmate-relaunch-bound-sm"
+  mkdir "$FM_WAKE_QUEUE"
+  secondmate_liveness_tick && fail 'failed enqueue falsely committed relaunch suppression'
+  [ ! -e "$marker" ] || fail 'enqueue failure left a suppression marker'
+  rmdir "$FM_WAKE_QUEUE"
+  mv() {
+    case "${*: -1}" in
+      *secondmate-relaunch-bound-sm) return 1 ;;
+    esac
+    command mv "$@"
+  }
+  secondmate_liveness_tick && fail 'failed marker rename was not reported'
+  [ ! -e "$marker" ] || fail 'failed publication left a suppression marker'
+  [ "$(fm_wake_queued_keys check)" = secondmate-relaunch-bound-sm ] || fail 'failed marker lost its durable notification'
+  unset -f mv
+  secondmate_liveness_tick || fail 'queued bound notification could not recover its marker'
+  [ -s "$marker" ] || fail 'recovery did not commit its marker'
+  [ "$(wc -l < "$FM_WAKE_QUEUE" | tr -d ' ')" = 1 ] || fail 'recovery duplicated the keyed wake'
+  secondmate_liveness_tick || fail 'committed marker failed ordinary replay'
+  [ "$(wc -l < "$FM_WAKE_QUEUE" | tr -d ' ')" = 1 ] || fail 'committed marker duplicated the wake'
+  rm "$marker"
+  : > "$marker"
+  secondmate_liveness_tick || fail 'empty marker suppressed recovery'
+  [ -s "$marker" ] || fail 'empty marker was not replaced'
+  printf '123\t' > "$marker"
+  secondmate_liveness_tick || fail 'partial marker suppressed recovery'
+  grep -Eq '^[0-9]+[[:space:]]dead$' "$marker" || fail 'partial marker was not replaced'
+  rm "$marker"
+  printf untouched > "$STATE/victim"
+  ln -s "$STATE/victim" "$marker"
+  secondmate_liveness_tick && fail 'symlinked relaunch marker was accepted'
+  [ "$(cat "$STATE/victim")" = untouched ] || fail 'symlinked marker overwrote its target'
+) || fail 'relaunch bound publication regression'
+pass 'relaunch suppression follows durable keyed notification and recovers publication failure'

@@ -762,3 +762,16 @@ out=$(CLAUDE_CONFIG_DIR="$T/config" "$TRUST" --lab-home "$T/home" 2>&1)
 expect_code 1 "$?" "a symlinked marker is refused"
 assert_contains "$out" "is a symlink" "the refusal names the symlink"
 pass "fm-claude-trust.sh --lab-home trusts only a marked lab primary checkout"
+
+python3 - "$LIVE_LAB" "$TMP_ROOT" <<'PYTEST'
+import pathlib, subprocess, sys
+binary, root = sys.argv[1], pathlib.Path(sys.argv[2])
+lab=root/'operand-lab'; lab.mkdir()
+(lab/'.fm-live-lab').write_text('fm-live-lab v1\n')
+for command, options in [('up', ['--harness','--model','--effort','--supervision-host','--expect-host','--source','--ref','--timeout']), ('pane', ['--window','--lines']), ('say', ['--window'])]:
+    for option in options:
+        args=[binary, command] + ([] if command=='up' else [str(lab)]) + [option]
+        result=subprocess.run(args, text=True, capture_output=True, timeout=3)
+        assert result.returncode != 0 and option+' requires a value' in result.stderr, (args,result)
+PYTEST
+pass 'all valued lab options reject a missing operand promptly'

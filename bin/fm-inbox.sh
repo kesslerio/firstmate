@@ -248,12 +248,21 @@ note_path() {  # <id>
 }
 
 note_announced() {  # <id>
-  [ -f "$ANNOUNCED_DIR/$1" ]
+  [ ! -L "$ANNOUNCED_DIR" ] && [ ! -L "$ANNOUNCED_DIR/$1" ] && [ -f "$ANNOUNCED_DIR/$1" ] &&
+    LC_ALL=C grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' "$ANNOUNCED_DIR/$1"
 }
 
 mark_announced() {  # <id>
-  mkdir -p "$ANNOUNCED_DIR"
-  printf '%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >"$ANNOUNCED_DIR/$1"
+  local tmp at
+  [ ! -L "$ANNOUNCED_DIR" ] && [ ! -L "$ANNOUNCED_DIR/$1" ] || return 1
+  [ ! -e "$ANNOUNCED_DIR/$1" ] || [ -f "$ANNOUNCED_DIR/$1" ] || return 1
+  mkdir -p "$ANNOUNCED_DIR" || return 1
+  at=$(date -u +%Y-%m-%dT%H:%M:%SZ) || return 1
+  tmp=$(mktemp "$ANNOUNCED_DIR/.staging-XXXXXX") || return 1
+  if ! printf '%s\n' "$at" >"$tmp" || ! mv -f "$tmp" "$ANNOUNCED_DIR/$1"; then
+    rm -f "$tmp"
+    return 1
+  fi
 }
 
 # true | false | unknown, for the note recorded at <path>.

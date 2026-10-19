@@ -458,16 +458,16 @@ cmd_up() {
   local root=""
   while [ "$#" -gt 0 ]; do
     case "$1" in
-      --harness) harness=${2:-}; shift 2 ;;
+      --harness) [ "$#" -ge 2 ] || die "$1 requires a value"; harness=$2; shift 2 ;;
       --mate) mate=yes; shift ;;
       --worker) worker=yes; shift ;;
-      --model) model=${2:-}; shift 2 ;;
-      --effort) effort=${2:-}; shift 2 ;;
-      --supervision-host) host_line=${2:-}; shift 2 ;;
-      --expect-host) expect_host=${2:-}; shift 2 ;;
-      --source) source=${2:-}; shift 2 ;;
-      --ref) ref=${2:-}; shift 2 ;;
-      --timeout) timeout=${2:-}; shift 2 ;;
+      --model) [ "$#" -ge 2 ] || die "$1 requires a value"; model=$2; shift 2 ;;
+      --effort) [ "$#" -ge 2 ] || die "$1 requires a value"; effort=$2; shift 2 ;;
+      --supervision-host) [ "$#" -ge 2 ] || die "$1 requires a value"; host_line=$2; shift 2 ;;
+      --expect-host) [ "$#" -ge 2 ] || die "$1 requires a value"; expect_host=$2; shift 2 ;;
+      --source) [ "$#" -ge 2 ] || die "$1 requires a value"; source=$2; shift 2 ;;
+      --ref) [ "$#" -ge 2 ] || die "$1 requires a value"; ref=$2; shift 2 ;;
+      --timeout) [ "$#" -ge 2 ] || die "$1 requires a value"; timeout=$2; shift 2 ;;
       -h|--help) help_text; exit 0 ;;
       -*) die "unknown option '$1'" ;;
       *) [ -z "$root" ] || usage; root=$1; shift ;;
@@ -832,7 +832,7 @@ cmd_down() {
 cmd_say() {
   local window=main
   load_lab "${1:-}"; shift
-  [ "${1:-}" = --window ] && { window=${2:-}; shift 2; }
+  [ "${1:-}" = --window ] && { [ "$#" -ge 2 ] || die "$1 requires a value"; window=$2; shift 2; }
   [ "$#" -ge 1 ] || usage
   say_text "$window" "$*"
 }
@@ -842,8 +842,8 @@ cmd_pane() {
   load_lab "${1:-}"; shift
   while [ "$#" -gt 0 ]; do
     case "$1" in
-      --window) window=${2:-}; shift 2 ;;
-      --lines) lines=${2:-}; shift 2 ;;
+      --window) [ "$#" -ge 2 ] || die "$1 requires a value"; window=$2; shift 2 ;;
+      --lines) [ "$#" -ge 2 ] || die "$1 requires a value"; lines=$2; shift 2 ;;
       *) usage ;;
     esac
   done

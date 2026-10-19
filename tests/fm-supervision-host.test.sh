@@ -163,6 +163,10 @@ HOMES_FILE="$TMP_ROOT/homes"
 # Stop whatever a case left running, by the exact pids its home recorded.
 stop_home_processes() {  # <home>
   local home=$1 pid arms='' i=0
+  while IFS= read -r pid; do
+    kill -TERM "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+  done < <(cat "$home/lock-holder-pids" 2>/dev/null)
   if [ -f "$home/state/.supervision-host" ]; then
     arms=$(awk -F '\t' '$1 == "arm" { print $2 }' "$home/state/.supervision-host")
     pid=$(awk -F '\t' '$1 == "host" { print $2; exit }' "$home/state/.supervision-host")
@@ -1680,6 +1684,7 @@ test_a_park_stopped_mid_take_over_leaves_the_take_over_to_the_next_park() {
     fm_lock_release "$2"
   ' _ "$ROOT/bin/fm-wake-lib.sh" "$home/state/.watcher-down.lock" "$home/marker-lock-held" "$home/marker-lock-release" &
   holder=$!
+  printf '%s\n' "$holder" >> "$home/lock-holder-pids"
   wait_until 100 test -e "$home/marker-lock-held" || fail "fixture: could not hold the recovery-marker lock"
   turn_end "$home"
   wait_until 150 grep -q "	take-over	arm=$LEFT_ARM\$" "$home/state/.supervision-host.log" \
@@ -1690,6 +1695,7 @@ test_a_park_stopped_mid_take_over_leaves_the_take_over_to_the_next_park() {
   kill -TERM "$host" 2>/dev/null || fail "fixture: the park host $host was not running"
   wait_until 150 sh -c '! kill -0 "$1" 2>/dev/null' _ "$host" || fail "fixture: the park host did not stop"
   : > "$home/marker-lock-release"
+  : > "$home/lock-holder-pids"
   wait "$holder" 2>/dev/null || true
   # The Stop hook runs the next park in place of the one stopped by a signal.
   wait_until 150 host_owns_the_only_cycle "$home" \

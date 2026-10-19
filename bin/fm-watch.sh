@@ -1149,7 +1149,7 @@ secondmate_liveness_tick() {
   [ "$(age_of "$tick_marker")" -ge "$SECONDMATE_LIVENESS_SECS" ] || return 0
   touch "$tick_marker" || return 1
   local now=$(( $(date +%s) )) meta id kind
-  local bound_marker attempts notify_key reason queued err first_reason='' failed=0
+  local bound_marker attempts notify_key reason queued err marker_tmp first_reason='' failed=0
   for meta in "$STATE"/*.meta; do
     [ -e "$meta" ] || continue
     kind=$(fm_meta_get "$meta" kind 2>/dev/null || true)
@@ -1163,17 +1163,15 @@ secondmate_liveness_tick() {
     reason='' notify_key='' err=''
     case "$FM_SM_LIVE_STATUS" in
       relaunchable)
-        if [ -e "$bound_marker" ] || [ -L "$bound_marker" ]; then
+        if [ -L "$bound_marker" ] || { [ -e "$bound_marker" ] && [ ! -f "$bound_marker" ]; }; then
+          err="unsafe relaunch park marker; endpoint left $FM_SM_LIVE_STATE"
+        elif [ -f "$bound_marker" ] && awk -F '\t' 'NF == 2 && $1 ~ /^[0-9]+$/ && ($2 == "dead" || $2 == "missing") { valid=1 } END { exit !valid }' "$bound_marker"; then
           :
         elif ! attempts=$(fm_secondmate_liveness_recent_attempts "$id" "$SECONDMATE_LIVENESS_WINDOW_SECS"); then
           err="relaunch ledger is unreadable; endpoint left $FM_SM_LIVE_STATE"
         elif [ "$attempts" -ge "$SECONDMATE_LIVENESS_MAX_ATTEMPTS" ]; then
-          if printf '%s\t%s\n' "$now" "$FM_SM_LIVE_STATE" > "$bound_marker"; then
-            reason="check: secondmate $id auto-relaunch paused after $SECONDMATE_LIVENESS_MAX_ATTEMPTS attempts in ${SECONDMATE_LIVENESS_WINDOW_SECS}s; endpoint still $FM_SM_LIVE_STATE - relaunch it manually or retire the route"
-            notify_key="secondmate-relaunch-bound-$id"
-          else
-            err="relaunch park marker could not be written; endpoint left $FM_SM_LIVE_STATE"
-          fi
+          reason="check: secondmate $id auto-relaunch paused after $SECONDMATE_LIVENESS_MAX_ATTEMPTS attempts in ${SECONDMATE_LIVENESS_WINDOW_SECS}s; endpoint still $FM_SM_LIVE_STATE - relaunch it manually or retire the route"
+          notify_key="secondmate-relaunch-bound-$id"
         elif fm_secondmate_liveness_relaunch "$meta" "$id" "$SECONDMATE_LIVENESS_TIMEOUT"; then
           reason="check: secondmate $id auto-relaunched after $FM_SM_LIVE_CAUSE ($FM_SM_LIVE_WHERE)"
           notify_key="secondmate-relaunch-$id-$now"
@@ -1200,12 +1198,25 @@ secondmate_liveness_tick() {
         ;;
     esac
     if [ -n "$reason" ]; then
-      queued=$(fm_wake_queued_keys check)
-      if printf '%s\n' "$queued" | grep -Fx "$notify_key" >/dev/null 2>&1 \
-        || fm_wake_append check "$notify_key" "$reason"; then
-        [ -n "$first_reason" ] || first_reason=$reason
+      if fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"; then
+        queued=$(fm_wake_queued_keys_locked check)
+        if printf '%s\n' "$queued" | grep -Fx "$notify_key" >/dev/null 2>&1 \
+          || fm_wake_append_locked check "$notify_key" "$reason"; then
+          [ -n "$first_reason" ] || first_reason=$reason
+          if [ "$notify_key" = "secondmate-relaunch-bound-$id" ]; then
+            marker_tmp=$(mktemp "$STATE/.secondmate-relaunch-bound.XXXXXX")
+            if [ -z "$marker_tmp" ] || ! printf '%s\t%s\n' "$now" "$FM_SM_LIVE_STATE" > "$marker_tmp" \
+              || ! mv -f "$marker_tmp" "$bound_marker"; then
+              [ -z "$marker_tmp" ] || rm -f "$marker_tmp"
+              err="relaunch park marker could not be published; notification remains queued"
+            fi
+          fi
+        else
+          err="check wake row could not be queued: $reason"
+        fi
+        fm_lock_release "$FM_WAKE_QUEUE_LOCK"
       else
-        err="check wake row could not be queued: $reason"
+        err="check wake queue could not be locked: $reason"
       fi
     fi
     fm_secondmate_liveness_unlock "$id"
