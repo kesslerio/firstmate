@@ -181,6 +181,10 @@ fi
 
 MODE=$(grep '^mode=' "$META" | tail -1 | cut -d= -f2- || true)
 PROJECT=$(grep '^project=' "$META" | tail -1 | cut -d= -f2- || true)
+PR_LOCAL_TREE=
+if [ "$PROVIDER" = gerrit ]; then
+  PR_LOCAL_TREE=$(git -C "$WT" rev-parse --verify --quiet 'HEAD^{tree}') || exit 1
+fi
 # The gate is asked about the ready report this task's worker was told to give;
 # on a Gerrit change both publishing modes report the same published line.
 case "$PROVIDER:$MODE" in
@@ -212,6 +216,10 @@ if [ "$CURRENT_SPAWN_GEN" != "$EXPECTED_SPAWN_GEN" ]; then
   echo "error: PR readiness refused for task $ID: changed incarnation; obtain the current worker's handoff and run bin/fm-pr-check.sh again" >&2
   exit 1
 fi
+if [ -n "$PR_LOCAL_TREE" ] && [ "$(git -C "$WT" rev-parse --verify --quiet 'HEAD^{tree}')" != "$PR_LOCAL_TREE" ]; then
+  echo "error: PR readiness refused for task $ID: local content changed during verification" >&2
+  exit 1
+fi
 # Only a still-current invocation may finish the prior identity-bound receipt
 # or publish persistent poll bookkeeping; preparation above owns only temps.
 fm_pr_poll_retirement_recover_one "$STATE" "$ID" "$SCRIPT_DIR/fm-pr-poll.sh" || {
@@ -221,11 +229,12 @@ fm_pr_poll_retirement_recover_one "$STATE" "$ID" "$SCRIPT_DIR/fm-pr-poll.sh" || 
 META_TMP=$(mktemp "$STATE/.fm-pr-meta.XXXXXX") || exit 1
 while IFS= read -r line || [ -n "$line" ]; do
   case "$line" in
-    pr=*|pr_head=*|pr_spawn_gen=*) ;;
+    pr=*|pr_head=*|pr_spawn_gen=*|pr_local_tree=*) ;;
     *) printf '%s\n' "$line" >> "$META_TMP" || exit 1 ;;
   esac
 done < "$META"
 [ "$EXPECTED_SPAWN_GEN" = absent ] || printf 'pr_spawn_gen=%s\n' "$EXPECTED_SPAWN_GEN" >> "$META_TMP" || exit 1
+[ -z "$PR_LOCAL_TREE" ] || printf 'pr_local_tree=%s\n' "$PR_LOCAL_TREE" >> "$META_TMP" || exit 1
 printf 'pr=%s\n' "$URL" >> "$META_TMP" || exit 1
 [ -z "$PR_HEAD" ] || printf 'pr_head=%s\n' "$PR_HEAD" >> "$META_TMP" || exit 1
 chmod 0600 "$META_TMP" || exit 1

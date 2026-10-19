@@ -1818,6 +1818,7 @@ if [ "$count" -eq 2 ]; then
     printf 'watcher: started pid=%s (beacon fresh) recovery-generation=fixture-stale\n' "$dead"
     while [ ! -e "$FM_STOP_FILE" ]; do sleep 0.05; done
   ) &
+  fm_test_track_child "$!" kill
   exit 0
 fi
 printf 'watcher: started pid=%s (beacon fresh) recovery-generation=fixture-newer\n' "$$"
@@ -2197,7 +2198,8 @@ printf 'arm=%s predecessor=%s\n' "$$" "${FM_WATCH_PREDECESSOR_ARM_PID:-none}" >>
 count=$(grep -c '^arm=' "$FM_ARM_LOG")
 if [ "$count" -eq 1 ]; then
   printf 'watcher: started pid=%s (beacon fresh) recovery-generation=fixture-generation\n' "$$"
-  ("${FM_HOLDER:?}" "${FM_STOP_FILE:?}" >&1 2>/dev/null &)
+  "${FM_HOLDER:?}" "${FM_STOP_FILE:?}" >&1 2>/dev/null &
+  fm_test_track_child "$!" kill
   exit 0
 fi
 printf 'watcher: started pid=%s (beacon fresh) recovery-generation=fixture-generation\n' "$$"
@@ -2293,10 +2295,12 @@ count=$(grep -c '^arm=' "$FM_ARM_LOG")
 printf 'watcher: started pid=%s (beacon fresh)\n' "$$"
 if [ "$count" -eq 1 ]; then
   (while [ ! -e "${FM_RELEASE_FILE:?}" ]; do sleep 0.02; done) &
+  fm_test_track_child "$!" kill
   exit 0
 fi
 if [ "$count" -eq 2 ]; then
   (while [ ! -e "$FM_STOP_FILE" ]; do sleep 0.05; done) &
+  fm_test_track_child "$!" kill
   exit 0
 fi
 trap 'exit 0' TERM INT
@@ -2395,6 +2399,7 @@ fi
 printf 'watcher: started pid=%s (beacon fresh)\n' "$$"
 if [ "$count" -eq 3 ]; then
   (while [ ! -e "$FM_STOP_FILE" ]; do sleep 0.05; done) &
+  fm_test_track_child "$!" kill
   exit 0
 fi
 trap 'exit 0' TERM INT
@@ -4209,6 +4214,7 @@ test_pi_process_exit_cleanup_rejects_live_child() {
     while [ "$SECONDS" -lt "$deadline" ]; do sleep 0.02; done
   ' &
   pid=$!
+  fm_test_track_child "$pid" kill
   identity=$(bash "$ARM_CHILD_IDENTITY_SCRIPT" "$pid") || fail "could not identify owned live child"
   while [ "$i" -lt 250 ] && [ ! -f "$ready" ]; do
     sleep 0.02

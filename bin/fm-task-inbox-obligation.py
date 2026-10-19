@@ -271,16 +271,22 @@ class Inbox:
                                    at=int(time.time()))
             self.save(path, data)
             child_env = {key: value for key, value in os.environ.items() if key != 'FM_INSTRUCTION_READY_FILE'}
-            try:
-                child = subprocess.Popen(argv, start_new_session=True, env=child_env)
-            except OSError:
-                fail('requested executable could not be started; execution reservation retained for reconciliation')
+            signals = (signal.SIGTERM, signal.SIGINT, signal.SIGHUP)
+            previous_mask = signal.pthread_sigmask(signal.SIG_BLOCK, signals)
+            child = None
             try:
                 def interrupted(signum, _frame):
-                    stop_child(child)
+                    if child is not None:
+                        stop_child(child)
                     raise SystemExit(128 + signum)
-                for signum in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+                for signum in signals:
                     signal.signal(signum, interrupted)
+                try:
+                    child = subprocess.Popen(argv, start_new_session=True, env=child_env,
+                                             preexec_fn=lambda: signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask))
+                except OSError:
+                    fail('requested executable could not be started; execution reservation retained for reconciliation')
+                signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask)
                 identity = None
                 proc = Path(f'/proc/{child.pid}/stat')
                 if proc.exists():
@@ -304,8 +310,11 @@ class Inbox:
             except BaseException:
                 # Every post-exec handoff failure still owns the command group.
                 # Retain any durable start receipt: the operation did execute.
-                stop_child(child)
+                if child is not None:
+                    stop_child(child)
                 raise
+            finally:
+                signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask)
         if data.get('attempt') and not data.get('receipt'):
             fail('execution attempt is uncertain; a disposition cannot overwrite its reservation')
         if args.disposition not in ('waiting', 'refused', 'fulfilled'):

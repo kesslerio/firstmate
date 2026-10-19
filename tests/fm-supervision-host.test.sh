@@ -27,7 +27,7 @@ command -v perl >/dev/null 2>&1 || { printf 'skip: perl absent\n'; exit 0; }
 
 TMP_ROOT=$(fm_test_tmproot fm-supervision-host)
 FAKEBIN=$(fm_fakebin "$TMP_ROOT/fakebin")
-ln -s /bin/bash "$FAKEBIN/claude"
+ln -s "$(command -v bash)" "$FAKEBIN/claude"
 FAKE_CLAUDE="$FAKEBIN/claude"
 
 # The stub engine. It records its environment and arguments, then acts like a
@@ -209,7 +209,7 @@ suite_cleanup() {
   done < <(cat "$HOMES_FILE" 2>/dev/null)
   fm_test_cleanup
 }
-trap suite_cleanup EXIT
+trap 'suite_cleanup || exit $?' EXIT
 
 make_home() {  # <name> <attended|away|quiet> [config line]
   local home="$TMP_ROOT/$1"
@@ -3170,10 +3170,260 @@ test_post_engine_blocking_operations_revalidate_the_turn() {
   pass 'lease, grant, mirror commit and feed waits cannot retag old results or mutate replacement resources'
 }
 
+record_startup_custody() {  # <home> <phase> <host> <arm> <watcher> <sentinel>
+  [ "$FM_TEST_CHILD_REGISTRY" != "$FM_TEST_DEFAULT_CHILD_REGISTRY" ] || return 0
+  python3 - "$1" "$FM_TEST_CHILD_REGISTRY.host-startup.$2.json" "${@:3}" <<'PYCUSTODY'
+import json, os, pathlib, sys
+home, output = map(pathlib.Path, sys.argv[1:3])
+records = {}
+for role, pid in zip(('host', 'arm', 'watcher', 'sentinel'), sys.argv[3:]):
+    try:
+        fields = pathlib.Path('/proc', pid, 'stat').read_text().rsplit(')', 1)[1].split()
+        records[role] = dict(pid=int(pid), state=fields[0], ppid=int(fields[1]), start=int(fields[19]))
+    except FileNotFoundError:
+        records[role] = dict(pid=int(pid), absent=True)
+files = {}
+for name in ('state/.supervision-host', 'state/.supervision-host-left', 'state/.watch.lock/pid',
+             'state/.watch.lock/pid-identity', 'state/.supervision-host.log', 'host.out', 'host.rc'):
+    path = home/name
+    if path.is_file():
+        files[name] = path.read_text()
+with output.open('x') as stream:
+    os.fchmod(stream.fileno(), 0o600)
+    json.dump(dict(schema=1, processes=records, files=files), stream)
+PYCUSTODY
+}
+
+test_term_during_arm_registration_retires_the_owned_child() {
+  [ -r /proc/self/stat ] || { printf 'skip: interrupted arm registration needs Linux process ancestry\n'; return; }
+  local home owner host arm watcher sentinel real_cat
+  home=$(make_home interrupted-arm-registration away)
+  local FAKE_CLAUDE="$home/claude"
+  ln -s "$(command -v bash)" "$FAKE_CLAUDE"
+  real_cat=$(command -v cat)
+  cat > "$home/fakebin/cat" <<'PYCAT'
+#!/usr/bin/env python3
+import os, pathlib, sys, time
+home = pathlib.Path(os.environ['FM_TEST_HOST_REGISTRATION_HOME'])
+def process(pid):
+    fields = pathlib.Path('/proc', str(pid), 'stat').read_text().rsplit(')', 1)[1].split()
+    return int(fields[1]), int(fields[19])
+try:
+    path = pathlib.Path(sys.argv[1]) if len(sys.argv) == 2 else None
+    if path and path.parent.parent == pathlib.Path('/proc') and path.name == 'stat':
+        target = int(path.parent.name)
+        host = next(int(line.split('\t')[1]) for line in (home/'state/.supervision-host').read_text().splitlines()
+                    if line.startswith('host\t'))
+        parent, start = process(target)
+        ancestor = os.getppid()
+        for _ in range(16):
+            if ancestor in (target, host, 0, 1): break
+            ancestor = process(ancestor)[0]
+        if parent == host and ancestor == host:
+            try:
+                (home/'registration-claim').mkdir()
+            except FileExistsError:
+                pass
+            else:
+                (home/'registration-ready').write_text(str(target)+'\n')
+                deadline = time.monotonic()+15
+                while not (home/'registration-release').exists():
+                    if time.monotonic() >= deadline: sys.exit(74)
+                    time.sleep(.02)
+except (OSError, ValueError, StopIteration):
+    pass
+os.execv(os.environ['FM_TEST_HOST_REAL_CAT'], [os.environ['FM_TEST_HOST_REAL_CAT'], *sys.argv[1:]])
+PYCAT
+  chmod +x "$home/fakebin/cat"
+  FM_TEST_HOST_REGISTRATION_HOME="$home" FM_TEST_HOST_REAL_CAT="$real_cat" start_host "$home"
+  owner=$!
+  fm_test_track_child "$owner" kill
+  wait_until 150 test -s "$home/registration-ready" || fail 'host never reached the arm registration barrier'
+  wait_until 150 watcher_live "$home" || fail 'arm never started its watcher while registration was blocked'
+  host=$(awk -F '\t' '$1 == "host" {print $2; exit}' "$home/state/.supervision-host")
+  arm=$(cat "$home/registration-ready")
+  watcher=$(cat "$home/state/.watch.lock/pid")
+  fm_test_track_child "$host" kill
+  fm_test_track_child "$arm" kill
+  fm_test_track_child "$watcher" kill
+  sleep 60 & sentinel=$!
+  fm_test_track_child "$sentinel" kill
+  record_startup_custody "$home" before "$host" "$arm" "$watcher" "$sentinel"
+  kill -TERM "$host"
+  : > "$home/registration-release"
+  wait_until 200 host_exited "$home" || fail 'interrupted host never completed cleanup'
+  wait "$owner" || fail 'interrupted host owner failed'
+  record_startup_custody "$home" after "$host" "$arm" "$watcher" "$sentinel"
+  ! kill -0 "$arm" 2>/dev/null || fail 'interrupted registration left its owned arm running'
+  ! kill -0 "$watcher" 2>/dev/null || fail 'interrupted registration left its owned watcher running'
+  assert_absent "$home/state/.watch.lock" 'interrupted registration kept its owned watcher lock'
+  assert_absent "$home/state/.supervision-host-left" 'interrupted registration detached a successor'
+  kill -0 "$sentinel" 2>/dev/null || fail 'interrupted registration stopped an unrelated process'
+  kill -TERM "$sentinel"
+  wait "$sentinel" 2>/dev/null || true
+  pass 'TERM during arm registration retires the owned child and leaves unrelated processes untouched'
+}
+
+test_activation_keeps_normal_park_and_owned_cleanup() {
+  local home owner host
+  home=$(make_home normal-activation-owner away)
+  local FAKE_CLAUDE="$home/claude"
+  ln -s "$(command -v bash)" "$FAKE_CLAUDE"
+  start_host "$home"
+  owner=$!
+  fm_test_track_child "$owner" kill
+  wait_until 150 watcher_live "$home" || fail "normal activation never parked: $(cat "$home/host.out")"
+  wait_until 150 grep -Eq '^watcher: (started|attached) pid=[0-9]+' "$home/host.out" || fail 'normal activation never announced readiness'
+  grep -q '^arm'"$(printf '\t')" "$home/state/.supervision-host" || fail 'normal activation never registered its arm'
+  host=$(awk -F '\t' '$1 == "host" {print $2; exit}' "$home/state/.supervision-host")
+  fm_test_track_child "$host" kill
+  kill -TERM "$host"
+  wait_until 200 host_exited "$home" || fail 'owned host never completed its cleanup'
+  wait "$owner" || fail 'normal activation owner failed'
+  assert_absent "$home/state/.supervision-host" 'owned cleanup kept its host record'
+  assert_absent "$home/state/.watch.lock" 'owned cleanup kept its watcher'
+  pass 'normal activation parks and cleans only its owned host and watcher'
+}
+
+test_activation_rechecks_ownership_after_reaping_predecessor() {
+  local home child owner host replacement identity file before i mode
+  for mode in session host; do
+  home=$(make_home "activation-reap-owner-$mode" away)
+  ln -s "$(command -v bash)" "$home/claude"
+  python3 - "$home" <<'PYCHILD' &
+import os, pathlib, signal, sys, time
+home=pathlib.Path(sys.argv[1])
+def stop_host(*_):
+    os.kill(int((home/'activating-host').read_text()),signal.SIGSTOP)
+    (home/'reaping').touch()
+signal.signal(signal.SIGTERM,stop_host)
+(home/'descendant-ready').touch()
+time.sleep(30)
+PYCHILD
+  child=$!
+  fm_test_track_child "$child" kill
+  wait_until 100 test -e "$home/descendant-ready" || fail 'predecessor descendant never became ready'
+  identity=$(FM_STATE_OVERRIDE="$home/state" bash -c '. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-supervision-engine-lib.sh"; _fm_engine_identity "$2"' _ "$ROOT" "$child")
+  printf '%s\t%s\n' "$child" "$identity" > "$home/state/.supervision-host-descendants.fixture"
+  FM_HOME="$home" "$home/claude" -c '
+    printf "%s\n" "$$" > "$FM_HOME/state/.lock"
+    bash -c '\''printf "%s\n" "$$" > "$FM_HOME/activating-host"; exec "$1" park'\'' _ "$1" > "$FM_HOME/host.out" 2>&1
+    printf "%s\n" "$?" > "$FM_HOME/host.rc"
+  ' _ "$HOST" & owner=$!
+  fm_test_track_child "$owner" kill
+  wait_until 100 test -e "$home/reaping" || fail "activation never entered predecessor reaping: $(cat "$home/host.out")"
+  host=$(cat "$home/activating-host")
+  fm_test_track_child "$host" kill
+  case "$(ps -p "$host" -o stat=)" in *T*) ;; *) fail 'activation barrier did not stop the old host' ;; esac
+  sleep 30 & replacement=$!
+  fm_test_track_child "$replacement" kill
+  if [ "$mode" = session ]; then printf '%s\n' "$replacement" > "$home/state/.lock"; fi
+  printf 'host\t%s\treplacement\n' "$replacement" > "$home/state/.supervision-host"
+  for file in .supervision-host-turn .supervision-host-mirror .supervision-host-arm.replacement .supervision-host-descendants.replacement .supervision-host-result.replacement .supervision-host.engine-pid.replacement; do
+    printf replacement > "$home/state/$file"
+  done
+  before=$(cksum "$home/state/.supervision-host" "$home/state/.supervision-host-turn" "$home/state/.supervision-host-mirror" "$home/state/.supervision-host-arm.replacement" "$home/state/.supervision-host-descendants.replacement" "$home/state/.supervision-host-result.replacement" "$home/state/.supervision-host.engine-pid.replacement")
+  kill -CONT "$host"
+  wait_until 150 host_exited "$home" || fail 'superseded activation never returned'
+  wait "$owner" || fail 'activation owner failed'
+  assert_equals "$before" "$(cksum "$home/state/.supervision-host" "$home/state/.supervision-host-turn" "$home/state/.supervision-host-mirror" "$home/state/.supervision-host-arm.replacement" "$home/state/.supervision-host-descendants.replacement" "$home/state/.supervision-host-result.replacement" "$home/state/.supervision-host.engine-pid.replacement")" 'resumed activation changed replacement resources'
+  kill -0 "$replacement" || fail 'activation signalled the replacement'
+  kill -TERM "$replacement"
+  wait "$replacement" 2>/dev/null || true
+  wait "$child" 2>/dev/null || true
+  rm "$home/state/.supervision-host"
+  done
+  pass 'activation preserves replacement resources after primary-session and same-session host takeovers'
+}
+
+test_report_waits_preserve_turn_and_observed_status_boundary() {
+  local mode home root file holder reporter before rc i key
+  for mode in replaced newer ordinary; do
+    home="$TMP_ROOT/report-boundary-$mode"
+    root="$home/root"
+    mkdir -p "$root/bin" "$home/state"
+    for file in "$ROOT/bin/"*; do ln -s "$file" "$root/bin/${file##*/}"; done
+    rm "$root/bin/fm-ready-review.sh"
+    cat > "$root/bin/fm-ready-review.sh" <<'SH'
+#!/usr/bin/env bash
+: > "$FM_HOME/review-entered"
+printf '{"binding":"fixture","candidates":[]}\n'
+SH
+    chmod +x "$root/bin/fm-ready-review.sh"
+    printf 'turn=original\nunscoped=1\nposture=attended\n' > "$home/state/.supervision-host-turn"
+    printf '%s\n' "$$" > "$home/state/.lock"
+    printf 'host\t%s\tfixture\n' "$$" > "$home/state/.supervision-host"
+    key=$(FM_HOME="$home" bash -c '. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-supervision-engine-lib.sh"; fm_supervision_host_main_key "$FM_HOME/state"' _ "$ROOT")
+    printf 'working: observed event\n' > "$home/state/demo.status"
+    before=$(wc -c < "$home/state/demo.status" | tr -d ' ')
+    if [ "$mode" != ordinary ]; then
+      FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" bash -c '
+        . "$1/bin/fm-wake-lib.sh"
+        fm_lock_acquire_wait "$STATE/.branch-outcomes.lock" || exit 1
+        : > "$FM_HOME/locked"
+        for ((i=0;i<200;i++)); do [ ! -e "$FM_HOME/release" ] || exit 0; sleep .02; done
+        exit 1
+      ' _ "$ROOT" & holder=$!
+      fm_test_track_child "$holder" kill
+      wait_until 100 test -e "$home/locked" || fail 'report fixture never acquired the publication lock'
+    fi
+    FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_STATE_OVERRIDE="$home/state" \
+      FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=original \
+      FM_SUPERVISION_HOST_SESSION_KEY="$key" FM_SUPERVISION_HOST_PID="$$" \
+      "$root/bin/fm-branch-report.sh" --task demo --verdict routine --summary observed \
+      > "$home/report.out" 2>&1 & reporter=$!
+    fm_test_track_child "$reporter" kill
+    wait_until 100 test -e "$home/review-entered" || fail 'report never reached readiness observation'
+    if [ "$mode" = replaced ]; then
+      printf 'turn=replacement\nunscoped=1\nposture=attended\n' > "$home/state/.supervision-host-turn"
+      printf replacement > "$home/state/.supervision-host-receipts"
+    elif [ "$mode" = newer ]; then
+      printf 'done: newer event\n' >> "$home/state/demo.status"
+    fi
+    if [ "$mode" != ordinary ]; then
+      touch "$home/release"
+      wait "$holder" || fail 'report lock holder failed'
+    fi
+    rc=0
+    wait "$reporter" || rc=$?
+    if [ "$mode" = replaced ]; then
+      [ "$rc" -ne 0 ] || fail 'superseded report published an outcome'
+      assert_absent "$home/state/branch-outcomes.jsonl" 'superseded report changed the outcome store'
+      assert_equals replacement "$(cat "$home/state/.supervision-host-receipts")" 'superseded report changed replacement receipts'
+    else
+      [ "$rc" -eq 0 ] || fail "current report failed: $(cat "$home/report.out")"
+      assert_equals "$before" "$(jq -r .statusEndpoint "$home/state/branch-outcomes.jsonl")" 'old summary consumed a status line appended during publication waits'
+      assert_re '^original' "$home/state/.supervision-host-receipts" 'current report did not retain its turn receipt'
+    fi
+  done
+  pass 'report publication refuses replacement turns and indexes only the observed status boundary'
+}
+
 # Keep each serial CI runner below its job timeout without dropping assertions.
 # The companion script sources these fixtures and executes the second group.
 case ${FM_SUPERVISION_HOST_TEST_GROUP:-early} in
+startup-custody)
+test_term_during_arm_registration_retires_the_owned_child
+test_activation_keeps_normal_park_and_owned_cleanup
+;;
+report-ownership)
+test_term_during_arm_registration_retires_the_owned_child
+test_activation_keeps_normal_park_and_owned_cleanup
+test_activation_rechecks_ownership_after_reaping_predecessor
+test_report_waits_preserve_turn_and_observed_status_boundary
+;;
+handoff-custody)
+test_successor_left_at_the_turn_survives_the_hook_process_group_teardown
+test_pass_through_successor_survives_the_hook_process_group_teardown
+test_next_park_takes_over_the_cycle_a_pass_through_left_for_main
+test_unrecorded_successor_is_stopped_rather_than_left_for_main
+test_superseded_host_leaves_the_owner_untouched
+;;
 early)
+test_term_during_arm_registration_retires_the_owned_child
+test_activation_keeps_normal_park_and_owned_cleanup
+test_activation_rechecks_ownership_after_reaping_predecessor
+test_report_waits_preserve_turn_and_observed_status_boundary
 test_post_engine_blocking_operations_revalidate_the_turn
 test_host_rechecks_after_park_and_engine
 test_host_cleanup_rechecks_after_lease_contention

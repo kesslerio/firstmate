@@ -35,7 +35,10 @@
 # cycle only, for owners that start their own successor after every close
 # (OpenCode, omp).
 #
-# THE LOOP. It owns watcher cycles through bin/fm-watch-arm.sh. The posture is
+# THE LOOP. It owns watcher cycles through bin/fm-watch-arm.sh.
+# A newly spawned arm remains cleanup-owned throughout registration until
+# its cycle adopts it; only a verified successor handoff relinquishes it.
+# The posture is
 # the away-posture record state/.afk-contract, read at every close and again
 # when a turn starts: only an away record is away, and no record or quiet
 # mode's record (fm_afk_contract_away_present, bin/fm-afk-contract.sh AWAY OR
@@ -257,6 +260,10 @@ HEALTH_NOTE=
 GRANT_ACTIVE=0
 ARM_PID=
 ARM_OUT=
+STARTED_ARM_PID=
+STARTED_ARM_OUT=
+ARM_STARTING=0
+ARM_CANCEL_STATUS=
 ARM_TEXT=
 CLOSED_ARM_PID=
 HANDLE_WHY=
@@ -346,6 +353,7 @@ branch_env() {  # <command...>: run with the branch actor identity
 }
 
 release_branch_leases() {
+  [ "$HOST_ACTIVE" -eq 1 ] || return 1
   host_still_owner || return 1
   FM_SUPERVISION_HOST_SESSION_KEY=${ENGINE_KEY:-$HOST_MAIN_KEY} FM_SUPERVISION_HOST_TURN=${LAST_TURN:-} FM_SUPERVISION_HOST_PID=$HOST_PID FM_SUPERVISION_HOST_AUTOARM_GEN=$AUTOARM_GEN FM_SUPERVISION_HOST_OWNER_PID=$AUTOARM_OWNER branch_env "$SCRIPT_DIR/fm-lease.sh" release-actor --actor branch >/dev/null 2>&1 || return 1
   host_still_owner
@@ -355,53 +363,87 @@ release_branch_leases() {
 # auto-arm admits one generation at a time, so a predecessor still alive here
 # was superseded (its owner died or went stale) or crashed mid-cleanup.
 activate() {
-  local role pid identity
+  local role pid identity predecessor predecessor_host left_record engine_file ledger file host_identity
+  local -a engine_files=() engine_records=() ledgers=() cleanup_files=()
   mkdir -p "$STATE" || return 1
+  host_still_owner || return 1
+  predecessor=''
+  if [ -e "$HOST_RECORD" ] || [ -L "$HOST_RECORD" ]; then
+    [ -f "$HOST_RECORD" ] && [ ! -L "$HOST_RECORD" ] || return 1
+    predecessor=$(cat "$HOST_RECORD") || return 1
+  fi
+  predecessor_host=$(printf '%s\n' "$predecessor" | awk -F '\t' '$1 == "host" { print; exit }')
+  left_record=$(cat "$LEFT_RECORD" 2>/dev/null || true)
+  host_still_owner "$predecessor_host" || return 1
+  for engine_file in "$STATE"/.supervision-host.engine-pid*; do
+    [ -f "$engine_file" ] || continue
+    engine_files+=("$engine_file")
+    engine_records+=("$(cat "$engine_file")")
+  done
+  for file in "$STATE"/.supervision-host-arm.* "$STATE"/.supervision-host-descendants.* "$STATE"/.supervision-host-result.* \
+    "$STATE"/.supervision-host-errors.* "$STATE"/.supervision-host-readback.*; do
+    [ -f "$file" ] || continue
+    cleanup_files+=("$file")
+    case "$file" in
+      *.pids|*.next) ;;
+      "$STATE"/.supervision-host-descendants.*) ledgers+=("$file") ;;
+    esac
+  done
   if [ -f "$HOST_RECORD" ]; then
     # The predecessor host first, with room for its own cleanup (which stops
     # its engine and arms), before anything it left is stopped individually.
     while IFS="$(printf '\t')" read -r role pid identity; do
       [ "$role" = host ] || continue
       [ "$pid" != "$HOST_PID" ] || continue
+      host_still_owner "$predecessor_host" || return 1
       stop_recorded "$pid" "$identity" $((ENGINE_GRACE + 20))
-    done < "$HOST_RECORD"
+      host_still_owner "$predecessor_host" || return 1
+    done <<< "$predecessor"
   fi
-  local engine_file
-  for engine_file in "$STATE"/.supervision-host.engine-pid*; do
-    [ -f "$engine_file" ] || continue
-    IFS="$(printf '\t')" read -r pid identity < "$engine_file" || true
+  local i=0
+  for engine_file in "${engine_files[@]}"; do
+    host_still_owner "$predecessor_host" || return 1
+    IFS="$(printf '\t')" read -r pid identity <<< "${engine_records[i]}" || true
     stop_recorded "${pid:-}" "${identity:-}" $((ENGINE_GRACE + 5))
-    host_still_owner || return 1
+    host_still_owner "$predecessor_host" || return 1
     rm -f "$engine_file"
+    i=$((i + 1))
   done
   if [ -f "$HOST_RECORD" ]; then
     while IFS="$(printf '\t')" read -r role pid identity; do
-      [ "$role" = arm ] && stop_recorded "$pid" "$identity" 10
-    done < "$HOST_RECORD"
+      host_still_owner "$predecessor_host" || return 1
+      [ "$role" != arm ] || stop_recorded "$pid" "$identity" 10
+      host_still_owner "$predecessor_host" || return 1
+    done <<< "$predecessor"
   fi
-  host_still_owner || return 1
+  host_still_owner "$predecessor_host" || return 1
   # A predecessor killed outright ran no cleanup: reap the engine descendants
   # its turn recorded, then drop that turn's files.
-  local ledger
-  for ledger in "$STATE"/.supervision-host-descendants.*; do
-    case "$ledger" in *.pids|*.next) continue ;; esac
+  for ledger in "${ledgers[@]}"; do
+    host_still_owner "$predecessor_host" || return 1
     [ -f "$ledger" ] && _fm_engine_reap "$ledger"
+    host_still_owner "$predecessor_host" || return 1
   done
-  rm -f "$STATE"/.supervision-host-arm.* "$STATE"/.supervision-host-descendants.* "$STATE"/.supervision-host-result.* \
-    "$STATE"/.supervision-host-errors.* "$STATE"/.supervision-host-readback.* "$TURN_FILE" "$MIRROR_FEED" 2>/dev/null || true
+  host_still_owner "$predecessor_host" || return 1
+  rm -f "${cleanup_files[@]}" "$TURN_FILE" "$MIRROR_FEED" 2>/dev/null || true
   # The successor a pass-through left for main: the first cycle takes it over
   # while it still answers to its recorded identity, and its record goes only
   # once it does not.
   if [ -f "$LEFT_RECORD" ]; then
+    [ "$(cat "$LEFT_RECORD")" = "$left_record" ] || return 1
     pid='' identity=''
-    IFS="$(printf '\t')" read -r pid identity < "$LEFT_RECORD" || true
+    IFS="$(printf '\t')" read -r pid identity <<< "$left_record" || true
     if fm_pid_alive "$pid" && [ -n "$identity" ] && [ "$(identity_of "$pid")" = "$identity" ]; then
       LEFT_ARM=$pid
     else
+      host_still_owner "$predecessor_host" || return 1
+      [ "$(cat "$LEFT_RECORD")" = "$left_record" ] || return 1
       rm -f "$LEFT_RECORD"
     fi
   fi
-  printf 'host\t%s\t%s\n' "$HOST_PID" "$(identity_of "$HOST_PID")" > "$HOST_RECORD" || return 1
+  host_identity=$(identity_of "$HOST_PID") || return 1
+  host_still_owner "$predecessor_host" || return 1
+  printf 'host\t%s\t%s\n' "$HOST_PID" "$host_identity" > "$HOST_RECORD" || return 1
   HOST_ACTIVE=1
   release_branch_leases
 }
@@ -431,6 +473,7 @@ cleanup() {
   if [ "$ENGINE_RUNNING" -eq 1 ]; then
     stop_engine_turn
   fi
+  retire_arm "$STARTED_ARM_PID" "$STARTED_ARM_OUT"
   retire_arm "$SUCCESSOR_PID" "$SUCCESSOR_OUT"
   retire_arm "$ARM_PID" "$ARM_OUT"
   if [ "$GRANT_ACTIVE" -eq 1 ]; then
@@ -438,7 +481,7 @@ cleanup() {
     "$SCRIPT_DIR/fm-wake-grant.sh" deactivate "$HOST_PID" "$GEN" >/dev/null 2>&1 || true
   fi
   release_branch_leases || true
-  if host_still_owner; then
+  if [ "$HOST_ACTIVE" -eq 1 ] && host_still_owner; then
     rm -f "$TURN_FILE" 2>/dev/null || true
   fi
   rm -f "$ENGINE_PID_FILE" 2>/dev/null || true
@@ -473,6 +516,14 @@ host_still_owner() {
   [ -z "$HOST_MAIN_KEY" ] || [ "$(fm_supervision_host_main_key "$STATE")" = "$HOST_MAIN_KEY" ] || return 1
   if [ "$HOST_ACTIVE" -eq 1 ]; then
     [ "$(awk -F '\t' '$1 == "host" {print $2; exit}' "$HOST_RECORD" 2>/dev/null)" = "$HOST_PID" ] || return 1
+  elif [ "$#" -gt 0 ]; then
+    local current_host=''
+    if [ -e "$HOST_RECORD" ] || [ -L "$HOST_RECORD" ]; then
+      [ -f "$HOST_RECORD" ] && [ ! -L "$HOST_RECORD" ] || return 1
+      current_host=$(awk -F '\t' '$1 == "host" { print; exit }' "$HOST_RECORD") || return 1
+      [ -n "$current_host" ] || return 1
+    fi
+    [ -z "$current_host" ] || [ "$current_host" = "$1" ] || return 1
   fi
   [ -n "$AUTOARM_GEN" ] || return 0
   fm_autoarm_ledger_read "$STATE" || return 1
@@ -486,8 +537,18 @@ turn_still_owner() {
   [ "$(sed -n 's/^turn=//p' "$TURN_FILE")" = "$LAST_TURN" ]
 }
 
+# Defer cancellation only across birth and the builtin ownership assignment.
+# The pending child stays visible to EXIT cleanup during blocking registration.
+cancel_host() {  # <signal exit status>
+  if [ "$ARM_STARTING" -eq 1 ]; then
+    ARM_CANCEL_STATUS=$1
+  else
+    exit "$1"
+  fi
+}
+
 start_arm() {  # <predecessor-arm-pid or empty> [--restart]; sets the started pid/output
-  local predecessor=$1 out pid
+  local predecessor=$1 out
   host_still_owner || stand_down "this session no longer owns supervision"
   shift
   out=$(mktemp "$STATE/.supervision-host-arm.XXXXXX") || return 1
@@ -495,16 +556,16 @@ start_arm() {  # <predecessor-arm-pid or empty> [--restart]; sets the started pi
   # process group down after the exit-2 rewake, so it gets a group of its own
   # (the shape start_handling_successor in bin/fm-claude-stop-autoarm.sh uses).
   [ "${ARM_OWN_GROUP:-0}" -ne 1 ] || set -m 2>/dev/null || true
+  ARM_STARTING=1
   if [ -n "$predecessor" ]; then
     FM_WATCH_PREDECESSOR_ARM_PID=$predecessor FM_GUARD_GRACE="$GRACE" "$SCRIPT_DIR/fm-watch-arm.sh" "$@" >"$out" 2>&1 </dev/null &
   else
     FM_GUARD_GRACE="$GRACE" "$SCRIPT_DIR/fm-watch-arm.sh" "$@" >"$out" 2>&1 </dev/null &
   fi
-  pid=$!
+  STARTED_ARM_PID=$! STARTED_ARM_OUT=$out ARM_STARTING=0
+  [ -z "$ARM_CANCEL_STATUS" ] || exit "$ARM_CANCEL_STATUS"
   [ "${ARM_OWN_GROUP:-0}" -ne 1 ] || set +m 2>/dev/null || true
-  record_process arm "$pid"
-  STARTED_ARM_PID=$pid
-  STARTED_ARM_OUT=$out
+  record_process arm "$STARTED_ARM_PID"
 }
 
 park_elapsed() {  # Sets PARK_ELAPSED without a production clock/helper fork.
@@ -685,8 +746,7 @@ start_successor() {  # <predecessor-arm-pid>
   SUCCESSOR_WATCHER=
   SUCCESSOR_GENERATION=
   start_arm "$1" || return 1
-  SUCCESSOR_PID=$STARTED_ARM_PID
-  SUCCESSOR_OUT=$STARTED_ARM_OUT
+  SUCCESSOR_PID=$STARTED_ARM_PID SUCCESSOR_OUT=$STARTED_ARM_OUT STARTED_ARM_PID='' STARTED_ARM_OUT=''
   deadline=$(( $(date +%s) + READY_TIMEOUT ))
   while :; do
     line=$(grep -E '^watcher: (started|attached) pid=[0-9]+' "$SUCCESSOR_OUT" 2>/dev/null | head -n 1)
@@ -1012,6 +1072,8 @@ handle_wake() {  # <reason-lines>
     export FM_LEASE_HOLDER_PID
     export FM_SUPERVISION_PRIMARY_HARNESS="$PRIMARY"
     export FM_BRANCH_REPORT_TURN="$turn"
+    export FM_SUPERVISION_HOST_SESSION_KEY="$ENGINE_KEY" FM_SUPERVISION_HOST_PID="$HOST_PID"
+    export FM_SUPERVISION_HOST_AUTOARM_GEN="$AUTOARM_GEN" FM_SUPERVISION_HOST_OWNER_PID="$AUTOARM_OWNER"
     fm_supervision_engine_turn "$FM_SUPERVISION_ENGINE" "$FM_SUPERVISION_ENGINE_MODEL" \
       "$PROMPT_FILE" "$WAKE_FILE" "$ENGINE_SESSION" "$ENGINE_MODE" "$TURN_TIMEOUT" \
       "$result" "$errors" "$ENGINE_PID_FILE"
@@ -1107,9 +1169,9 @@ if ! host_still_owner; then
 fi
 HOST_MAIN_KEY=$(fm_supervision_host_main_key "$STATE") || HOST_MAIN_KEY=
 trap cleanup EXIT
-trap 'exit 129' HUP
-trap 'exit 143' TERM
-trap 'exit 130' INT
+trap 'cancel_host 129' HUP
+trap 'cancel_host 143' TERM
+trap 'cancel_host 130' INT
 activate || { echo "supervision-host stood down: the host record could not be written"; exit 0; }
 log_line "start	gen=$GEN	primary=$PRIMARY"
 
@@ -1122,8 +1184,7 @@ elif [ -n "$LEFT_ARM" ]; then
 else
   start_arm "$OWNER_PREDECESSOR"
 fi || { echo "watcher: FAILED - the supervision host could not start a watcher cycle"; exit 1; }
-ARM_PID=$STARTED_ARM_PID
-ARM_OUT=$STARTED_ARM_OUT
+ARM_PID=$STARTED_ARM_PID ARM_OUT=$STARTED_ARM_OUT STARTED_ARM_PID='' STARTED_ARM_OUT=''
 
 while :; do
   boundary_reached && boundary_exit

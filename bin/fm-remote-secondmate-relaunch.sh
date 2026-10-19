@@ -42,6 +42,18 @@ case "$ID" in ''|*[!A-Za-z0-9._-]*) die "invalid secondmate id: $ID" ;; esac
 
 META="$STATE/$ID.meta"
 [ -f "$META" ] && [ ! -L "$META" ] || die "no metadata for $ID at $META"
+CONTROL_LOCK="$STATE/.control-$ID.lock"
+CONTROL_LOCK_HELD=0
+control_owner=$(cat "$CONTROL_LOCK/pid" 2>/dev/null || true)
+control_ancestor=$PPID
+while [ "$control_ancestor" -gt 1 ] 2>/dev/null && [ "$control_ancestor" != "$control_owner" ]; do
+  control_ancestor=$(ps -o ppid= -p "$control_ancestor" 2>/dev/null | tr -d ' ') || break
+done
+if [ "$control_owner" != "$control_ancestor" ] || ! fm_pid_alive "$control_owner"; then
+  fm_lock_try_acquire "$CONTROL_LOCK" || die "another lifecycle action is already running for task $ID"
+  CONTROL_LOCK_HELD=1
+fi
+trap '[ "$CONTROL_LOCK_HELD" -eq 0 ] || fm_lock_release "$CONTROL_LOCK"' EXIT
 META_LOCK=$(fm_meta_lock_path "$META") || die "metadata lock path is invalid for $ID"
 if fm_lock_acquire_wait_bounded "$META_LOCK" 15; then
   :
@@ -52,7 +64,7 @@ else
 fi
 META_TMP=
 REGISTRY_LOCK=
-trap 'rm -f -- "${META_TMP:-}"; [ -z "$REGISTRY_LOCK" ] || fm_lock_release "$REGISTRY_LOCK"; fm_lock_release "$META_LOCK"' EXIT
+trap 'rm -f -- "${META_TMP:-}"; [ -z "$REGISTRY_LOCK" ] || fm_lock_release "$REGISTRY_LOCK"; fm_lock_release "$META_LOCK"; [ "$CONTROL_LOCK_HELD" -eq 0 ] || fm_lock_release "$CONTROL_LOCK"' EXIT
 [ -f "$META" ] && [ ! -L "$META" ] || die "metadata changed before relaunch"
 ORIGINAL_META=$(cksum "$META") || die "cannot observe the parent route"
 REMOTE_HOST=$(fm_meta_get "$META" remote_host)

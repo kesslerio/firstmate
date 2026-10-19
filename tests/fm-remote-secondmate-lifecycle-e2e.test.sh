@@ -385,6 +385,7 @@ PATH="$FAKEBIN:$PATH" FM_HOME="$TMP_ROOT/concurrent-home" FM_ROOT_OVERRIDE="$REM
   "$REMOTE_ROOT/bin/fm-remote-home-provision.sh" < "$TMP_ROOT/provision.manifest" \
   > "$TMP_ROOT/provision-one.out" 2>&1 &
 provision_one=$!
+fm_test_track_child "$provision_one" kill
 provision_wait=0
 while [ ! -f "$TMP_ROOT/provision.entered" ]; do
   kill -0 "$provision_one" 2>/dev/null || fail "first provisioning attempt exited before cloning"
@@ -396,6 +397,7 @@ PATH="$FAKEBIN:$PATH" FM_HOME="$TMP_ROOT/concurrent-home" FM_ROOT_OVERRIDE="$REM
   "$REMOTE_ROOT/bin/fm-remote-home-provision.sh" < "$TMP_ROOT/provision.manifest" \
   > "$TMP_ROOT/provision-two.out" 2>&1 &
 provision_two=$!
+fm_test_track_child "$provision_two" kill
 sleep 0.2
 [ "$(grep -cF clone "$TMP_ROOT/provision-clones")" -eq 1 ] \
   || fail "overlapping provisioning reached home classification concurrently"
@@ -420,6 +422,7 @@ PATH="$FAKEBIN:$PATH" FM_HOME="$TMP_ROOT/raced-home" FM_ROOT_OVERRIDE="$REMOTE_R
   "$REMOTE_ROOT/bin/fm-remote-home-provision.sh" < "$TMP_ROOT/race.manifest" \
   > "$TMP_ROOT/race-provision.out" 2>&1 &
 race_provision=$!
+fm_test_track_child "$race_provision" kill
 race_wait=0
 while [ ! -f "$TMP_ROOT/race-clone.held" ]; do
   kill -0 "$race_provision" 2>/dev/null || fail "provision exited before its clone could be held"
@@ -455,6 +458,7 @@ PATH="$FAKEBIN:$PATH" FM_HOME="$TMP_ROOT/appeared-home" FM_ROOT_OVERRIDE="$REMOT
   "$REMOTE_ROOT/bin/fm-remote-home-provision.sh" < "$TMP_ROOT/race.manifest" \
   > "$TMP_ROOT/appeared-provision.out" 2>&1 &
 appeared_provision=$!
+fm_test_track_child "$appeared_provision" kill
 race_wait=0
 while [ ! -f "$TMP_ROOT/race-clone.held" ]; do
   kill -0 "$appeared_provision" 2>/dev/null || fail "appeared-home provision exited before its clone could be held"
@@ -488,6 +492,7 @@ FM_SECONDMATE_CHARTER='Failing seed charter.' FM_SECONDMATE_SCOPE='failed seed' 
   seed-fail remote-mac "$REMOTE_ROOT" "$TMP_ROOT/seed-fail-home" --no-projects \
   > "$TMP_ROOT/seed-fail.out" 2>&1 &
 seed_fail_pid=$!
+fm_test_track_child "$seed_fail_pid" kill
 seed_wait=0
 while [ ! -f "$TMP_ROOT/seed.entered" ]; do
   kill -0 "$seed_fail_pid" 2>/dev/null || fail "failing seed exited before remote provisioning"
@@ -499,6 +504,7 @@ FM_SECONDMATE_CHARTER='Successful seed charter.' FM_SECONDMATE_SCOPE='successful
   seed_env "$ROOT/bin/fm-remote-home-seed.sh" seed-keep remote-mac "$REMOTE_ROOT" \
   "$TMP_ROOT/seed-keep-home" --no-projects > "$TMP_ROOT/seed-keep.out" 2>&1 &
 seed_keep_pid=$!
+fm_test_track_child "$seed_keep_pid" kill
 sleep 0.2
 kill -0 "$seed_keep_pid" 2>/dev/null || fail "competing seed bypassed the shared registry transaction"
 touch "$TMP_ROOT/seed.release"
@@ -965,6 +971,7 @@ EOF
 FM_FAKE_SSH_MODE=inherit-block remote_env "$ROOT/bin/fm-spawn.sh" ios --secondmate \
   > "$TMP_ROOT/spawn-concurrent.out" 2>&1 &
 spawn_concurrent=$!
+fm_test_track_child "$spawn_concurrent" kill
 spawn_inherit_wait=0
 # Earlier inherited files traverse the worker before captain-shared.md, so give
 # a loaded portable runner 30 seconds to reach this deliberately blocked write.
@@ -983,6 +990,7 @@ current post-spawn preference
 EOF
 remote_env "$ROOT/bin/fm-config-push.sh" > "$TMP_ROOT/spawn-concurrent-push.out" 2>&1 &
 spawn_config_push=$!
+fm_test_track_child "$spawn_config_push" kill
 sleep 0.2
 kill -0 "$spawn_config_push" 2>/dev/null \
   || fail "config push bypassed the active remote spawn inheritance transaction"
@@ -1076,6 +1084,7 @@ EOF
 FM_FAKE_SSH_MODE=inherit-block remote_env "$ROOT/bin/fm-config-push.sh" \
   > "$TMP_ROOT/config-concurrent-first.out" 2>&1 &
 config_first=$!
+fm_test_track_child "$config_first" kill
 inherit_wait=0
 while [ ! -f "$TMP_ROOT/inherit.entered" ]; do
   kill -0 "$config_first" 2>/dev/null || fail "first inheritance transaction exited before its blocked write"
@@ -1094,6 +1103,7 @@ current concurrent preference
 EOF
 remote_env "$ROOT/bin/fm-bootstrap.sh" > "$TMP_ROOT/config-concurrent-second.out" 2>&1 &
 config_second=$!
+fm_test_track_child "$config_second" kill
 sleep 0.2
 kill -0 "$config_second" 2>/dev/null \
   || fail "bootstrap bypassed the active remote inheritance transaction"
@@ -1284,6 +1294,7 @@ FM_STATE_OVERRIDE="$WATCH_STATE" FM_SECONDMATE_LIVENESS_SECS=1 FM_POLL=1 \
   remote_env exec "$ROOT/bin/fm-watch.sh" \
   > "$TMP_ROOT/watch-liveness.out" 2> "$TMP_ROOT/watch-liveness.err" &
 watch_pid=$!
+fm_test_track_child "$watch_pid" kill
 watch_wait=0
 while kill -0 "$watch_pid" 2>/dev/null && [ "$watch_wait" -lt 1500 ]; do
   sleep 0.02
@@ -1336,6 +1347,7 @@ FM_FAKE_SSH_MODE=unreachable FM_STATE_OVERRIDE="$WATCH_STATE_UNREACHABLE" \
   remote_env exec "$ROOT/bin/fm-watch.sh" \
   > "$TMP_ROOT/watch-unreachable.out" 2> "$TMP_ROOT/watch-unreachable.err" &
 watch_pid=$!
+fm_test_track_child "$watch_pid" kill
 sleep 4
 kill -0 "$watch_pid" 2>/dev/null \
   || fail "the watcher exited against an unreachable remote secondmate: $(cat "$TMP_ROOT/watch-unreachable.out" "$TMP_ROOT/watch-unreachable.err")"
@@ -1504,12 +1516,13 @@ FM_HOME="$PARENT" bash -c '
 printf 'confirmed:%s\n' "$retired_wake_corr" > "$PARENT/state/.backlog-handoff-ios.wake-pending"
 printf '%s\tattempt\n' "$(date +%s)" > "$PARENT/state/.secondmate-relaunch-ios"
 printf '%s\tdead\n' "$(date +%s)" > "$PARENT/state/.secondmate-relaunch-bound-ios"
-liveness_lock="$PARENT/state/.secondmate-liveness-ios.lock"
+liveness_lock="$PARENT/state/.control-ios.lock"
 # The link is published before the claim finishes; signal only after acquire.
 # shellcheck disable=SC2016 # Positional parameters expand in the child shell.
 ( STATE="$PARENT/state" exec bash -c '. "$1" && fm_lock_acquire_wait "$2" && touch "$3" && exec sleep 120' \
     _ "$ROOT/bin/fm-wake-lib.sh" "$liveness_lock" "$TMP_ROOT/liveness.entered" ) &
 liveness_holder_pid=$!
+fm_test_track_child "$liveness_holder_pid" kill
 liveness_wait=0
 while [ ! -f "$TMP_ROOT/liveness.entered" ]; do
   kill -0 "$liveness_holder_pid" 2>/dev/null || fail "liveness lock holder exited before acquiring the lock"
@@ -1523,7 +1536,7 @@ liveness_owner=$liveness_holder_pid
 if remote_env "$ROOT/bin/fm-teardown.sh" ios > "$TMP_ROOT/teardown-liveness-busy.out" 2>&1; then
   fail "remote retirement proceeded under an active liveness episode"
 fi
-assert_grep 'liveness check is in progress for ios' "$TMP_ROOT/teardown-liveness-busy.out" \
+assert_grep 'another lifecycle action is already running for task ios' "$TMP_ROOT/teardown-liveness-busy.out" \
   "a liveness-busy retirement did not ask for a retry"
 assert_present "$REMOTE_HOME" "a liveness-busy retirement removed the remote home"
 assert_present "$PARENT/state/ios.meta" "a liveness-busy retirement removed parent metadata"
@@ -1542,6 +1555,7 @@ FM_HOME="$PARENT" /bin/bash -c '
 ' _ "$ROOT/bin/fm-wake-lib.sh" "$handoff_lock" "$TMP_ROOT/handoff.entered" \
   "$TMP_ROOT/handoff.release" &
 handoff_holder_pid=$!
+fm_test_track_child "$handoff_holder_pid" kill
 handoff_wait=0
 while [ ! -f "$TMP_ROOT/handoff.entered" ]; do
   kill -0 "$handoff_holder_pid" 2>/dev/null || fail "handoff lock holder exited before acquiring the route lock"
@@ -1553,6 +1567,7 @@ rm -f "$TMUX_STATE" "$TMP_ROOT/launch.entered" "$TMP_ROOT/launch.release"
 FM_FAKE_SSH_MODE=launch-block remote_env "$ROOT/bin/fm-spawn.sh" ios --secondmate \
   > "$TMP_ROOT/spawn-retirement.out" 2>&1 &
 spawn_retirement_pid=$!
+fm_test_track_child "$spawn_retirement_pid" kill
 launch_wait=0
 # The respawn performs readiness and inheritance jobs before launch, so allow
 # the same 30-second loaded-runner bound as the earlier blocked worker path.
@@ -1564,6 +1579,7 @@ while [ ! -f "$TMP_ROOT/launch.entered" ]; do
 done
 remote_env "$ROOT/bin/fm-teardown.sh" ios > "$TMP_ROOT/teardown-serialized.out" 2>&1 &
 teardown_pid=$!
+fm_test_track_child "$teardown_pid" kill
 sleep 0.2
 kill -0 "$teardown_pid" 2>/dev/null || fail "remote retirement bypassed an active remote respawn"
 assert_present "$REMOTE_HOME" "remote retirement removed the home during an active remote respawn"

@@ -84,9 +84,15 @@ if [ "$operation" = run ]; then
   ready=$(mktemp "$STATE/.instruction-ready.XXXXXX")
   export FM_INSTRUCTION_READY_FILE=$ready
 fi
+engine='' cancelled=0
+trap 'cancelled=1; if [ -n "$engine" ]; then kill -TERM "$engine" 2>/dev/null || true; wait "$engine" 2>/dev/null || true; exit 143; fi' TERM HUP INT
 python3 "$SCRIPT_DIR/fm-task-inbox-obligation.py" "$operation" "$STATE" "$task" "$@" &
 engine=$!
-trap 'kill -TERM "$engine" 2>/dev/null || true; wait "$engine" 2>/dev/null || true; exit 143' TERM HUP INT
+if [ "$cancelled" -eq 1 ]; then
+  kill -TERM "$engine" 2>/dev/null || true
+  wait "$engine" 2>/dev/null || true
+  exit 143
+fi
 if [ -n "$ready" ]; then
   while kill -0 "$engine" 2>/dev/null && [ ! -s "$ready" ]; do sleep 0.05; done
   if [ -s "$ready" ]; then

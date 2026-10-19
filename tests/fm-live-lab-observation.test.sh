@@ -39,7 +39,7 @@ EOF
   if [ "$point" -le 3 ]; then
     sleep 30 & child=$!
     fm_test_track_child "$child"
-    printf 'launch_pid=%s\nlaunch_start=%s\n' "$child" "$(ps -p "$child" -o lstart= | awk '{$1=$1;print}')" >> "$lab/.fm-live-lab"
+    printf 'launch_pid=%s\nlaunch_start=%s\n' "$child" "$(LC_ALL=C TZ=UTC ps -p "$child" -o lstart= | awk '{$1=$1;print}')" >> "$lab/.fm-live-lab"
   fi
   before=$(sed '/^cleanup_/d' "$lab/.fm-live-lab" | cksum)
   rc=0
@@ -84,7 +84,7 @@ pi_trust_store=$HOME/absent-pi
 claude_store=$HOME/absent-claude
 treehouse_dir=$HOME/absent-treehouse
 launch_pid=$root_pid
-launch_start=$(ps -p "$root_pid" -o lstart= | awk '{$1=$1; print}')
+launch_start=$(LC_ALL=C TZ=UTC ps -p "$root_pid" -o lstart= | awk '{$1=$1; print}')
 EOF
 rc=0
 out=$(PS_COUNT="$TMP_ROOT/retry-count" PS_FAIL_AT=4 PATH="$TMP_ROOT/tools:$PATH" "$ROOT/bin/fm-live-lab.sh" down "$lab" 2>&1) || rc=$?

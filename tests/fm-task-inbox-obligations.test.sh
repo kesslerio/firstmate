@@ -384,7 +384,7 @@ pass 'remote alert results, dedup and outstanding facts survive queue and public
 
 # Faults surround actual durable writes and harmless command effects.
 python3 - "$ROOT/bin/fm-task-inbox-obligation.py" <<'PY'
-import contextlib, hashlib, importlib.util, io, json, os, pathlib, subprocess, sys, tempfile, time, types, unittest
+import contextlib, hashlib, importlib.util, io, json, os, pathlib, signal, subprocess, sys, tempfile, time, types, unittest
 
 spec=importlib.util.spec_from_file_location('review_inbox', sys.argv.pop(1))
 module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
@@ -530,6 +530,50 @@ class ExecutionReservation(unittest.TestCase):
         # readback refuses the retained reservation rather than guessing durability.
         with self.assertRaises(ValueError): self.invoke()
         self.assertTrue(self.inbox.query()[0]['outstanding'])
+
+    def test_cancellation_during_spawn_reaps_the_operation(self):
+        marker=self.home/'spawned'
+        program=r"""import importlib.util,json,os,pathlib,signal,sys,time,types
+spec=importlib.util.spec_from_file_location('owner',sys.argv[1]); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+original=m.subprocess.Popen
+marker=pathlib.Path(sys.argv[4])
+def started(*args,**kwargs):
+    child=original(*args,**kwargs)
+    deadline=time.monotonic()+5
+    while not marker.exists():
+        if time.monotonic()>deadline: raise RuntimeError('operation never became ready')
+        time.sleep(.01)
+    os.kill(os.getpid(),signal.SIGTERM)
+    return child
+m.subprocess.Popen=started
+m.Inbox(sys.argv[2],'worker').disposition(types.SimpleNamespace(command='run',record=sys.argv[3],gen='g1',argv=[sys.executable,'-I','-c','import json,os,pathlib,signal,subprocess,sys,time; pathlib.Path(sys.argv[1]).write_text(json.dumps([os.getpid(),list(signal.pthread_sigmask(signal.SIG_BLOCK,[])),subprocess.check_output(["ps","-p",str(os.getpid()),"-o","lstart="],text=True).strip()])); time.sleep(30)',str(marker)]))
+"""
+        owner=self.real_popen([sys.executable,'-I','-B','-c',program,str(module.__file__),str(self.state),str(self.record),str(marker)],start_new_session=True)
+        self.children.append(owner)
+        identity=None
+        operation=None
+        try:
+            result=owner.wait(timeout=10)
+            operation,mask,identity=json.loads(marker.read_text())
+            self.assertEqual(result,143)
+            self.assertNotIn(signal.SIGTERM,mask)
+            current=module.subprocess.run(['ps','-p',str(operation),'-o','stat='],capture_output=True,text=True).stdout.strip()
+            self.assertTrue(not current or current.startswith('Z'),current)
+            self.assertIsNone(self.inbox.query()[0]['receipt'])
+            with self.assertRaises(ValueError): self.invoke()
+        finally:
+            if marker.exists():
+                operation,_,identity=json.loads(marker.read_text())
+            if operation and identity:
+                current=module.subprocess.run(['ps','-p',str(operation),'-o','lstart='],capture_output=True,text=True).stdout.strip()
+                if current == identity:
+                    os.killpg(operation,signal.SIGKILL)
+                deadline=time.monotonic()+2
+                while time.monotonic()<deadline:
+                    state=module.subprocess.run(['ps','-p',str(operation),'-o','stat='],capture_output=True,text=True).stdout.strip()
+                    if not state or state.startswith('Z'): break
+                    time.sleep(.02)
+                else: self.fail('owned operation survived cleanup')
 
     def test_abrupt_owner_exit_after_reservation(self):
         program='''import importlib.util,os,sys,types

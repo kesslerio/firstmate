@@ -650,6 +650,22 @@ inbox_obligation_failure() {  # <task> <failure>
 
 # Dispositions outlive delivery acknowledgement and idle-pane exemptions.
 # Tick each existing channel even when its former endpoint is absent.
+# This is only a cheap launch gate; the publisher revalidates the generation
+# under its lock. Retained packets from superseded runs need no polling fork.
+startup_result_ready() {
+  local key value generation='' pending name
+  [ -f "$STATE/.startup-network.status" ] && [ ! -L "$STATE/.startup-network.status" ] || return 1
+  while IFS='=' read -r key value; do
+    [ "$key" != generation ] || generation=$value
+  done < "$STATE/.startup-network.status" 2>/dev/null || return 1
+  case "$generation" in ''|*[!A-Za-z0-9._-]*) return 1 ;; esac
+  pending="$STATE/.startup-network-unpublished-$generation"
+  [ -d "$pending" ] && [ ! -L "$pending" ] || return 1
+  for name in ready report metadata; do
+    [ -f "$pending/$name" ] && [ ! -L "$pending/$name" ] || return 1
+  done
+}
+
 inbox_obligation_tick() {
   local dir task meta remote_host record invalid_record
   INSTRUCTION_WAKE_REASON=
@@ -2832,6 +2848,14 @@ while :; do
   fm_pending_reply_tick "$STATE" || true
 
   inbox_obligation_tick || exit 1
+
+  if startup_result_ready; then
+    if startup_publication_wake=$("$SCRIPT_DIR/fm-startup-network.sh" reconcile 2>/dev/null); then
+      [ -z "$startup_publication_wake" ] || wake "$startup_publication_wake"
+    else
+      triage_log "startup result publication remains pending"
+    fi
+  fi
 
   # Dependency completion must not wait for idle heartbeat backoff. The shared
   # owner coalesces an unconsumed review, including held-only graph changes.

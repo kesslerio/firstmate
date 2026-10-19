@@ -73,12 +73,12 @@ fm_sm_live_require_locks() {
 
 fm_secondmate_liveness_lock() {  # <id>
   fm_sm_live_require_locks || return 1
-  fm_lock_try_acquire "$STATE/.secondmate-liveness-$1.lock"
+  fm_lock_try_acquire "$STATE/.control-$1.lock"
 }
 
 fm_secondmate_liveness_unlock() {  # <id>
   fm_sm_live_require_locks || return 0
-  fm_lock_release "$STATE/.secondmate-liveness-$1.lock" 2>/dev/null || true
+  fm_lock_release "$STATE/.control-$1.lock" 2>/dev/null || true
 }
 
 fm_sm_live_first_line() {
@@ -133,6 +133,8 @@ fm_secondmate_liveness_probe() {  # <meta> <id> <full|poll>
   local meta=$1 id=$2 mode=$3
   FM_SM_LIVE_STATUS=skipped FM_SM_LIVE_STATE=unknown FM_SM_LIVE_KILL=0
   FM_SM_LIVE_CAUSE='' FM_SM_LIVE_WHERE='' FM_SM_LIVE_REASON='' FM_SM_LIVE_LINE=''
+  FM_SM_LIVE_META=$(cat "$meta") || return 1
+  FM_SM_LIVE_BACKEND='' FM_SM_LIVE_TARGET=''
   local window harness remote_host remote_rc out agent_state readiness_reason route_out remote_backend
   window=$(fm_meta_get "$meta" window)
   [ -n "$window" ] || { FM_SM_LIVE_STATUS=silent; return 0; }
@@ -214,6 +216,7 @@ fm_secondmate_liveness_probe() {  # <meta> <id> <full|poll>
   backend=$(fm_backend_of_meta "$meta")
   target=$(fm_backend_target_of_meta "$meta")
   [ -n "$target" ] || target="$window"
+  FM_SM_LIVE_BACKEND=$backend FM_SM_LIVE_TARGET=$target
   agent_state=$(fm_backend_agent_state "$backend" "$target" 2>/dev/null) || agent_state=unreadable
   case "$harness" in
     claude|codex|opencode|pi|pi-signed|grok|kimi|omp) ;;
@@ -267,6 +270,12 @@ fm_secondmate_liveness_probe() {  # <meta> <id> <full|poll>
 fm_secondmate_liveness_relaunch() {  # <meta> <id> [timeout-secs]
   local meta=$1 id=$2 timeout=${3:-}
   FM_SM_LIVE_OUT='' FM_SM_LIVE_RC=0
+  if [ "$(cat "$meta" 2>/dev/null)" != "$FM_SM_LIVE_META" ]; then
+    FM_SM_LIVE_STATUS=skipped
+    FM_SM_LIVE_REASON="secondmate incarnation changed after observation"
+    FM_SM_LIVE_RC=1
+    return 1
+  fi
   if ! fm_secondmate_liveness_recent_attempts "$id" 0 >/dev/null; then
     FM_SM_LIVE_STATUS=skipped
     FM_SM_LIVE_REASON="relaunch ledger $STATE/.secondmate-relaunch-$id is unreadable; endpoint left $FM_SM_LIVE_STATE"
@@ -280,14 +289,7 @@ fm_secondmate_liveness_relaunch() {  # <meta> <id> [timeout-secs]
     return 1
   fi
   if [ "$FM_SM_LIVE_KILL" = 1 ]; then
-    local backend target window
-    backend=$(fm_backend_of_meta "$meta")
-    target=$(fm_backend_target_of_meta "$meta")
-    if [ -z "$target" ]; then
-      window=$(fm_meta_get "$meta" window)
-      target=$window
-    fi
-    [ -z "$target" ] || fm_backend_kill "$backend" "$target" 2>/dev/null || true
+    [ -z "$FM_SM_LIVE_TARGET" ] || fm_backend_kill "$FM_SM_LIVE_BACKEND" "$FM_SM_LIVE_TARGET" 2>/dev/null || true
   fi
   local rc=0
   if [ -n "$timeout" ]; then

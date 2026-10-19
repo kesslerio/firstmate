@@ -837,6 +837,7 @@ EOF
 
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   printf '%s\n' "$holder_pid" > "$home/state/.lock"
 
   status=0
@@ -925,6 +926,7 @@ EOF
 
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   printf '%s\n' "$holder_pid" > "$home/state/.lock"
   out=$(FM_TRACE_CONTEXT=off run_session_start "$home" "$root" "$fakebin:$BASE_PATH")
   kill "$holder_pid" 2>/dev/null || true
@@ -2528,6 +2530,7 @@ EOF
 
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   printf '%s\n%s\n' "$holder_pid" "$(hash_file_for_test "$root/AGENTS.md")" \
     > "$home/state/.session-start-agents-baseline"
   printf '%s\n' "$holder_pid" > "$home/state/.lock"
@@ -2640,6 +2643,7 @@ EOF
   rm -f "$home/state/.lock"
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   printf '%s\n' "$holder_pid" > "$home/state/.lock"
   readonly_out=$(FM_HOME="$home" FM_ROOT_OVERRIDE="$root" PATH="$fakebin:$BASE_PATH" \
     env -u CLAUDECODE -u PI_CODING_AGENT -u FM_PI_HARNESS -u GROK_AGENT \
@@ -2846,6 +2850,7 @@ EOF
 
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   make_fake_ps_pi_holder "$fakebin" "$holder_pid"
   install_pi_turnend_extension_fixture "$root"
   install_pi_watch_extension_fixture "$root"
@@ -2873,6 +2878,7 @@ EOF
 
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   make_fake_ps_pi_holder "$fakebin" "$holder_pid"
   install_pi_turnend_extension_fixture "$root"
   install_pi_watch_extension_fixture "$root"
@@ -2902,6 +2908,7 @@ EOF
 
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   make_fake_ps_pi_holder "$fakebin" "$holder_pid"
   install_pi_turnend_extension_fixture "$root"
   install_pi_watch_extension_fixture "$root"
@@ -2949,6 +2956,7 @@ EOF
 
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   make_fake_ps_pi_holder "$fakebin" "$holder_pid" omp
   install_omp_extension_fixtures "$root"
   write_omp_loaded_markers "$home" "$root" "$holder_pid"
@@ -2972,6 +2980,7 @@ EOF
 
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   make_fake_ps_pi_holder "$fakebin" "$holder_pid"
   install_pi_turnend_extension_fixture "$root"
   install_pi_watch_extension_fixture "$root"
@@ -2997,6 +3006,7 @@ EOF
 
   sleep 300 &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   make_fake_ps_pi_holder "$fakebin" "$holder_pid"
   install_pi_turnend_extension_fixture "$root"
   install_pi_watch_extension_fixture "$root"

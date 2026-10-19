@@ -89,7 +89,8 @@ pass() {
 # fm_test_tmproot <prefix> echoes a fresh temp dir and registers it for removal
 # on EXIT/INT/TERM. A test file that needs extra teardown (e.g. killing a
 # daemon) should define its own EXIT trap and call fm_test_cleanup from inside
-# it so registered dirs are still removed.
+# it and propagate a cleanup failure. Failed child cleanup retains registries
+# and fixture trees rather than deleting the remaining ownership evidence.
 #
 # The call site is almost always `TMP_ROOT=$(fm_test_tmproot prefix)`, which
 # forks a subshell to capture stdout. Anything that function does to the
@@ -137,6 +138,13 @@ FM_TEST_TMPDIR=$(fm_test_tmpdir) || return 1
 
 FM_TEST_CLEANUP_DIRS=()
 FM_TEST_CLEANUP_REGISTRY=$(mktemp "$FM_TEST_TMPDIR/.fm-test-cleanup.$$.XXXXXX") || return 1
+# Nested suites own separate defaults; an explicit caller registry stays shared.
+if [ "${FM_TEST_CHILD_REGISTRY:-}" = "${FM_TEST_DEFAULT_CHILD_REGISTRY:-}" ]; then
+  FM_TEST_CHILD_REGISTRY=
+fi
+FM_TEST_DEFAULT_CHILD_REGISTRY=$(mktemp "$FM_TEST_TMPDIR/.fm-test-children.$$.XXXXXX") || return 1
+FM_TEST_CHILD_REGISTRY=${FM_TEST_CHILD_REGISTRY:-$FM_TEST_DEFAULT_CHILD_REGISTRY}
+export FM_TEST_CHILD_REGISTRY FM_TEST_DEFAULT_CHILD_REGISTRY
 
 fm_test_pid_identity() {
   local pid=$1
@@ -251,8 +259,13 @@ fm_test_remove_tree() {
 }
 
 fm_test_cleanup() {
-  local d
-  fm_test_stop_children
+  local d child_status
+  fm_test_stop_children || {
+    child_status=$?
+    printf 'not ok - child cleanup failed; retaining child ownership and fixture evidence\n' >&2
+    return "$child_status"
+  }
+  rm -f "$FM_TEST_DEFAULT_CHILD_REGISTRY"
   fm_test_reap_watchers
   fm_test_reap_procevent_homes
   for d in "${FM_TEST_CLEANUP_DIRS[@]:-}"; do
@@ -280,7 +293,7 @@ fm_test_tmproot() {
   printf '%s\n' "$root"
 }
 
-trap fm_test_cleanup EXIT
+trap 'fm_test_cleanup || exit $?' EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 trap 'exit 129' HUP
@@ -859,16 +872,18 @@ fm_test_base_path_sans() {
 
 fm_test_track_child() {
   local pid=$1 identity
-  identity=$(ps -p "$pid" -o lstart= 2>/dev/null) || return 0
+  identity=$(LC_ALL=C TZ=UTC ps -p "$pid" -o lstart= 2>/dev/null) || return 0
   [ -n "$identity" ] || return 0
   printf '%s\t%s\t%s\n' "$pid" "$identity" "${2:-term}" >> "$FM_TEST_CHILD_REGISTRY"
 }
+export -f fm_test_track_child
 
 fm_test_stop_children() {
   local pid identity policy
   [ -f "${FM_TEST_CHILD_REGISTRY:-}" ] || return 0
   python3 - "$FM_TEST_CHILD_REGISTRY" <<'PYCHILD'
 import os, signal, subprocess, sys, time
+os.environ.update(LC_ALL='C', TZ='UTC')
 
 def snapshot():
     rows = subprocess.check_output(['ps', '-axo', 'pid=,ppid=,stat=,lstart='], text=True)
@@ -892,7 +907,10 @@ for line in open(sys.argv[1]):
         previous = len(owned); owned.update(children)
         if len(owned) == previous: break
     for p, identity in reversed(list(owned.items())):
-        try: signal_owned(p, identity, signal.SIGTERM)
+        try:
+            signal_owned(p, identity, signal.SIGTERM)
+            if rows[p][1].startswith(('T', 't')):
+                signal_owned(p, identity, signal.SIGCONT)
         except ProcessLookupError: pass
     deadline = time.monotonic() + 2
     while time.monotonic() < deadline:
@@ -916,5 +934,9 @@ PYCHILD
   while IFS=$'\t' read -r pid identity policy; do
     wait "$pid" 2>/dev/null || true
   done < "$FM_TEST_CHILD_REGISTRY"
-  : > "$FM_TEST_CHILD_REGISTRY"
+  if [ "$FM_TEST_CHILD_REGISTRY" = "$FM_TEST_DEFAULT_CHILD_REGISTRY" ]; then
+    rm -f "$FM_TEST_CHILD_REGISTRY"
+  else
+    : > "$FM_TEST_CHILD_REGISTRY"
+  fi
 }

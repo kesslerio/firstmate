@@ -180,6 +180,19 @@ fm_supervision_host_outcomes_drained() {
   fm_supervision_host_enabled "$1" "$primary"
 }
 
+fm_supervision_host_report_current() {
+  [ -n "${FM_BRANCH_REPORT_TURN:-}" ] || return 0
+  [ "$(sed -n 's/^turn=//p' "$STATE/.supervision-host-turn" 2>/dev/null)" = "$FM_BRANCH_REPORT_TURN" ] || return 1
+  [ -n "${FM_SUPERVISION_HOST_SESSION_KEY:-}" ] || return 0
+  [ "$(fm_supervision_host_main_key "$STATE")" = "$FM_SUPERVISION_HOST_SESSION_KEY" ] \
+    && [ "$(awk -F '\t' '$1 == "host" {print $2; exit}' "$STATE/.supervision-host" 2>/dev/null)" = "$FM_SUPERVISION_HOST_PID" ] || return 1
+  [ -n "${FM_SUPERVISION_HOST_AUTOARM_GEN:-}" ] || return 0
+  fm_autoarm_ledger_read "$STATE" || return 1
+  [ "$FM_AUTOARM_GEN" = "$FM_SUPERVISION_HOST_AUTOARM_GEN" ] \
+    && [ "$FM_AUTOARM_OWNER" = "$FM_SUPERVISION_HOST_OWNER_PID" ] \
+    && [ "$FM_AUTOARM_OUTCOME" = arming ]
+}
+
 # fm_supervision_host_main_key <state-dir>: print the key of the current main
 # session, which changes at every main session start: the session-lock holder,
 # a checksum of its process identity (bin/fm-wake-lib.sh fm_pid_identity), and

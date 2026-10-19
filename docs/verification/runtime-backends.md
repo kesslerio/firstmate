@@ -740,10 +740,11 @@ Claude 2.x draws its composer as a bare `❯` + U+00A0 row between two solid `�
 The statusLine's first glyph is `→` (U+2192), which is Cursor's own prompt glyph, so the cursorless "bottom-most shape wins" rule selected the statusLine as a bare composer at `kind=bare first=18 last=19` within the 20-row tail, read the statusLine and the hint row as wrapped typed input, and answered `pending` on a composer holding nothing.
 `fm_task_inbox_ring` (`bin/fm-task-inbox-lib.sh`) defers on exactly that verdict, and `bin/fm-watch.sh`'s re-ring calls the same function, so both the first doorbell and every retry were skipped and the worker never saw the steer.
 
+Pane identifiers in this excerpt are sanitized; original proof remains private.
 The capture is a read-only `herdr pane read <pane> --source recent --format ansi` of five live worker panes; each 20-row tail is fed to the shared classifier with the descriptor above, resolving the lazy identity sentinel with the pane's real `claude<TAB>idle` identity:
 
 ```sh
-herdr --session default pane read w83:p2 --source recent --lines 200 --format ansi > claude-2.1.236-idle-herdr.ansi
+herdr --session default pane read "$PANE_1" --source recent --lines 200 --format ansi > claude-2.1.236-idle-herdr.ansi
 bash -c '. bin/fm-composer-lib.sh
   caps=$(printf "styled=1\ncursor=0\nidentity=1\nrows=20")
   cap=$(tail -n 20 claude-2.1.236-idle-herdr.ansi)
@@ -752,7 +753,7 @@ bash -c '. bin/fm-composer-lib.sh
   printf "%s\n" "$v"'
 ```
 
-Observed output across the five live panes before the fix and then after it, in pane order `w83:p2`, `w84:p2`, `w87:p2`, `w7R:p2`, `w7W:p2`:
+Observed output across the five live panes before the fix and then after it, in pane order `<pane-1>`, `<pane-2>`, `<pane-3>`, `<pane-4>`, `<pane-5>`:
 
 ```text
 pending pending pending pending pending
@@ -760,7 +761,7 @@ empty   empty   empty   pending pending
 ```
 
 Three of the five composers were genuinely empty and every one of them was refused; the two that stayed `pending` after the fix really did hold text, and the extracted content names it exactly (`<65;77;27M` and `<65;77;27M5;77;27M`, stray SGR mouse reports left in the composer by a click in the pane).
-That extraction is the disconfirming measurement: before the fix the extracted "pending text" for an empty composer was the statusLine itself (`bloomandhuda26 git:(...)× | Opus 5 (1M context) | ctx [█░░░░░░] 15% | ... ⏵⏵ bypass permissions on (shift+tab to cycle) · ← 1 agent`), never anything from the composer row, so the pane was never the disagreement - the judgement of it was.
+That extraction is the disconfirming measurement: before the fix the extracted "pending text" for an empty composer was the statusLine itself (`<project> git:(...)× | Opus 5 (1M context) | ctx [█░░░░░░] 15% | ... ⏵⏵ bypass permissions on (shift+tab to cycle) · ← 1 agent`), never anything from the composer row, so the pane was never the disagreement - the judgement of it was.
 The same panes accepted `fm_backend_send_text_submit` at the same moment because herdr's submit core confirms delivery from native `agent get` state and only falls back to the composer verdict when that state stays idle, so the working path never asked the question the doorbell's pre-send gate asks.
 
 `test_matrix_claude_arrow_statusline_footer` in `tests/fm-composer-lib.test.sh` carries the shape with its statusLine and hint rows, and pins the two protections the fix must not remove: real unsubmitted text in that same composer under that same statusLine still reads `pending`, and so does the stray mouse report.
@@ -789,6 +790,7 @@ Verified on 2026-09-15 on macOS arm64 (Darwin 25.5.0) against codex-cli 0.154.0 
 Idle, codex 0.154 animates a braille starfield on the row above its bold `›` prompt row, on the `›` row behind the SGR-2 dim `Ask Codex to do anything` placeholder, and on the row below it, then draws a status footer reading `gpt-6-astra high fast · ~/Projects/purser · Launch Purser desk brief`.
 The starfield cells are truecolor greys whose luminance runs from roughly 66 to 165, so the cells above the 128 ghost ceiling survive ghost stripping, and the footer is bright, non-blank, and carries no structural edge.
 
+Pane identifiers in this excerpt are sanitized; original proof remains private.
 The capture is a read-only `herdr pane read <pane> --format ansi` of the live pane; its 20-row tail is fed to the shared classifier with the descriptor above:
 
 ```sh
@@ -1797,24 +1799,24 @@ Measured 2026-09-21 on Linux x86_64 against Herdr 0.9.1 (client protocol 22) and
 
 The stale registration above is not only a recovery-classification problem: it is the pane's status AUTHORITY, and it is bound to one agent session identity. Herdr applies a lifecycle/session report only when it matches what it bound, so an agent started FRESH in that pane - the shape `bin/fm-control.sh <id> relaunch` produced before this fix - reports a new session into a pane that ignores it. The pane then stays at whatever the previous agent last reported: working reads idle, indefinitely, because the registration outlives its process and nothing from outside repairs it.
 
-Reproduced with a real Pi under a nested shell, `/quit`, and a second fresh Pi in the same pane:
+Reproduced with a real Pi under a nested shell, `/quit`, and a second fresh Pi in the same pane (session paths sanitized; original proof remains private):
 
 ```sh
 # nested shell, then a real pi (a prompt is what makes the extension report;
 # session_start alone did not register on this version)
-herdr pane send-text w1:p1 'zsh' --session "$LAB"; herdr pane send-keys w1:p1 Enter --session "$LAB"
-herdr pane send-text w1:p1 "$PI --tui-mode regular 'say ready'" --session "$LAB"; herdr pane send-keys w1:p1 Enter --session "$LAB"
-herdr agent get w1:p1 --session "$LAB" | jq -c '.result.agent | {agent_status, session: .agent_session.value}'
-herdr pane send-text w1:p1 '/quit' --session "$LAB"; herdr pane send-keys w1:p1 Enter --session "$LAB"
+herdr pane send-text "$PANE" 'zsh' --session "$LAB"; herdr pane send-keys "$PANE" Enter --session "$LAB"
+herdr pane send-text "$PANE" "$PI --tui-mode regular 'say ready'" --session "$LAB"; herdr pane send-keys "$PANE" Enter --session "$LAB"
+herdr agent get "$PANE" --session "$LAB" | jq -c '.result.agent | {agent_status, session: .agent_session.value}'
+herdr pane send-text "$PANE" '/quit' --session "$LAB"; herdr pane send-keys "$PANE" Enter --session "$LAB"
 # then start a SECOND fresh pi in the same pane and re-read
 ```
 
 ```text
-{"agent_status":"idle","session":"/home/u/.pi/agent/sessions/--wt--/2026-09-21T14-10-08-776Z_01a0c44d.jsonl"}
+{"agent_status":"idle","session":"<bound-session-path>"}
 # after /quit: the registration and its session are still there, process gone
-{"agent_status":"idle","session":"/home/u/.pi/agent/sessions/--wt--/2026-09-21T14-10-08-776Z_01a0c44d.jsonl"}
+{"agent_status":"idle","session":"<bound-session-path>"}
 # after a FRESH second pi started working in that pane: unchanged
-{"agent_status":"idle","session":"/home/u/.pi/agent/sessions/--wt--/2026-09-21T14-10-08-776Z_01a0c44d.jsonl"}
+{"agent_status":"idle","session":"<bound-session-path>"}
 ```
 
 Two repair paths were measured and do not work, so the reference is preserved rather than cleared:
@@ -1826,7 +1828,7 @@ Resuming the bound session instead makes the replacement's reports land, which i
 
 ```text
 # C: quit the fresh second pi, then pi --session <the bound path> with a slow turn
-poll 8: {"agent_status":"working","session":".../2026-09-21T14-10-08-776Z_01a0c44d.jsonl"}
+poll 8: {"agent_status":"working","session":"<bound-session-path>"}
 ```
 
 The read that supplies the reference is `bin/backends/herdr.sh`'s `fm_backend_herdr_pane_agent_session_ref`, the per-harness rule is `bin/fm-control-lib.sh`'s `fm_control_relaunch_resume_flag`, and the launch argument is composed by `relaunch_resume_args` in `bin/fm-spawn.sh`; `docs/herdr-backend.md` "Agent status authority and relaunch" owns the contract. Nothing here changes `resume` as a control verb, and only a relaunch asks for it.

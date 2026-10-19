@@ -1098,3 +1098,33 @@ assert victim.read_text()=='untouched'
 PY
 }
 test_growing_ready_review_history
+
+
+test_ready_review_reuses_one_current_facts_snapshot() {
+  python3 - "$ROOT/bin/fm_ready_review.py" "$TMP_ROOT" <<'PYFACTS'
+import importlib.util, os, pathlib, sys, types
+spec=importlib.util.spec_from_file_location('ready_facts',sys.argv[1]); module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+home=pathlib.Path(sys.argv[2])/'one-facts-snapshot'
+(home/'state').mkdir(parents=True)
+(home/'data').mkdir()
+os.environ.update(FM_HOME=str(home),FM_STATE_OVERRIDE=str(home/'state'))
+args=types.SimpleNamespace(data=str(home/'data'),backend='markdown',manual_lifecycle=False)
+calls=[]
+def observe(argv, **kwargs):
+    calls.append(argv)
+    return str(home)+'\n'+str(home/'state') if len(calls)%2 else str(len(calls))+'\nlive\n'
+module.run=observe
+review=module.Review(args)
+review.rows=[]
+facts=review.retry_facts()
+for number in range(5):
+    item={'generation':str(number),'stop':{'generation':str(number),'binding':review.binding,'gate':'external','until':review.now+100,'facts':facts,'reason':'capacity full','retry':'capacity opens'}}
+    assert review.settled(str(number),item)
+assert len(calls)==2, ('one operation repeated its topology/liveness observation',len(calls))
+next_review=module.Review(args)
+assert next_review.retry_facts()!=facts, 'new operation reused old observation'
+assert len(calls)==4
+print('ok - stopped candidates reuse one current observation per operation')
+PYFACTS
+}
+test_ready_review_reuses_one_current_facts_snapshot

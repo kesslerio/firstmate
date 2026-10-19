@@ -466,3 +466,31 @@ test_worker_role_names_skill_and_fallback_file() {
 test_worker_role_names_skill_and_fallback_file
 
 echo "all fm-dod-lib tests passed"
+
+
+test_gerrit_cache_tracks_local_content_and_incarnation() {
+  local repo wt state meta url tree
+  repo="$TMP_ROOT/gerrit-cache-repo"
+  wt="$TMP_ROOT/gerrit-cache-wt"
+  state="$TMP_ROOT/gerrit-cache-state"
+  mkdir -p "$state"
+  fm_git_worktree "$repo" "$wt" fm/gerrit-cache
+  meta="$state/task.meta"
+  url=https://gerrit.example/c/group/project/+/42
+  tree=$(git -C "$wt" rev-parse 'HEAD^{tree}')
+  printf 'pr=%s\nspawn_gen=s1.2.3\npr_spawn_gen=s1.2.3\npr_local_tree=%s\n' "$url" "$tree" > "$meta"
+  fm_dod_recorded_pr_on_forge "$state" task "$meta" no-mistakes "$url" "$wt" || fail 'current accepted Gerrit content lost cached acceptance'
+  git -C "$wt" commit -q --allow-empty -m 'same content, new commit'
+  fm_dod_recorded_pr_on_forge "$state" task "$meta" no-mistakes "$url" "$wt" || fail 'unchanged tree lost cached acceptance'
+  printf new > "$wt/followup"
+  git -C "$wt" add followup
+  git -C "$wt" commit -q -m 'unpublished followup'
+  if fm_dod_recorded_pr_on_forge "$state" task "$meta" no-mistakes "$url" "$wt"; then fail 'unpublished content reused cached acceptance'; fi
+  tree=$(git -C "$wt" rev-parse 'HEAD^{tree}')
+  printf 'pr=%s\nspawn_gen=s2.3.4\npr_spawn_gen=s1.2.3\npr_local_tree=%s\n' "$url" "$tree" > "$meta"
+  if fm_dod_recorded_pr_on_forge "$state" task "$meta" no-mistakes "$url" "$wt"; then fail 'replacement incarnation reused cached acceptance'; fi
+  printf 'pr=%s\n' "$url" > "$meta"
+  if fm_dod_recorded_pr_on_forge "$state" task "$meta" no-mistakes "$url" "$wt"; then fail 'legacy unknown identity reused cached acceptance'; fi
+  pass 'Gerrit cached acceptance preserves unchanged content and rejects changed content, replacement and legacy identities'
+}
+test_gerrit_cache_tracks_local_content_and_incarnation

@@ -390,14 +390,14 @@ test_sweep_skips_mate_whose_liveness_lock_is_held() {
   # the sweep must skip rather than probe or relaunch a moving target.
   STATE="$w/home/state" bash -c \
       '. "$1" && fm_lock_acquire_wait "$2" && exec sleep 30' \
-      _ "$ROOT/bin/fm-wake-lib.sh" "$w/home/state/.secondmate-liveness-sm1.lock" &
+      _ "$ROOT/bin/fm-wake-lib.sh" "$w/home/state/.control-sm1.lock" &
   holder=$!
   fm_test_track_child "$holder"
-  while [ ! -d "$w/home/state/.secondmate-liveness-sm1.lock" ] && [ "$i" -lt 100 ]; do
+  while [ ! -d "$w/home/state/.control-sm1.lock" ] && [ "$i" -lt 100 ]; do
     sleep 0.05
     i=$((i + 1))
   done
-  [ -d "$w/home/state/.secondmate-liveness-sm1.lock" ] || fail "the fixture never acquired the liveness lock"
+  [ -d "$w/home/state/.control-sm1.lock" ] || fail "the fixture never acquired the liveness lock"
 
   out=$(run_bootstrap "$tmuxfb:$fb" "$w/home" zsh "$log")
 
@@ -627,6 +627,7 @@ window=remote:rsm1
 kind=secondmate
 harness=claude
 remote_host=lab-host
+remote_root=/remote/root
 remote_backend=herdr
 remote_herdr_session=fm-remote
 remote_target=fm-remote:w1:p1
@@ -776,3 +777,36 @@ echo "# all fm-secondmate-liveness tests passed"
   [ "$(cat "$STATE/victim")" = untouched ] || fail 'symlinked marker overwrote its target'
 ) || fail 'relaunch bound publication regression'
 pass 'relaunch suppression follows durable keyed notification and recovers publication failure'
+
+
+test_liveness_shares_control_ownership_and_rejects_changed_incarnations() {
+  local home meta
+  home="$TMP_ROOT/control-ownership"
+  mkdir -p "$home/state" "$home/bin"
+  meta="$home/state/mate.meta"
+  printf 'kind=secondmate\nwindow=fm-mate\nharness=pi\nspawn_gen=first\n' > "$meta"
+  # shellcheck disable=SC2016 # The fixture expands its home in the child shell.
+  printf '#!/usr/bin/env bash\nprintf launched >> "$FM_HOME/launches"\n' > "$home/bin/fm-spawn.sh"
+  chmod +x "$home/bin/fm-spawn.sh"
+  FM_HOME="$home" FM_ROOT_OVERRIDE="$home" FM_STATE_OVERRIDE="$home/state" bash -c '
+    . "$1/bin/fm-wake-lib.sh"
+    . "$1/bin/fm-secondmate-liveness-lib.sh"
+    fm_backend_of_meta() { printf tmux; }
+    fm_backend_target_of_meta() { printf fm-mate; }
+    fm_backend_agent_state() { printf dead; }
+    fm_backend_kill() { printf "%s\n" "$2" >> "$FM_HOME/kills"; }
+    fm_secondmate_liveness_lock mate || exit 1
+    if bash -c '\''. "$1/bin/fm-wake-lib.sh"; fm_lock_try_acquire "$2"'\'' _ "$1" "$STATE/.control-mate.lock"; then exit 2; fi
+    fm_secondmate_liveness_probe "$2" mate poll
+    printf "kind=secondmate\nwindow=fm-mate\nharness=pi\nspawn_gen=replacement\n" > "$2"
+    if fm_secondmate_liveness_relaunch "$2" mate; then exit 3; fi
+    [ ! -e "$FM_HOME/kills" ] && [ ! -e "$FM_HOME/launches" ] || exit 4
+    fm_secondmate_liveness_probe "$2" mate poll
+    fm_secondmate_liveness_relaunch "$2" mate || exit 5
+    [ "$(cat "$FM_HOME/kills")" = fm-mate ] && [ "$(cat "$FM_HOME/launches")" = launched ] || exit 6
+    fm_secondmate_liveness_unlock mate
+    [ ! -e "$STATE/.control-mate.lock" ] || exit 7
+  ' _ "$ROOT" "$meta" || fail 'liveness lifecycle ownership regression'
+  pass 'liveness shares the control lock, refuses stale incarnations and recovers a current dead endpoint'
+}
+test_liveness_shares_control_ownership_and_rejects_changed_incarnations

@@ -597,17 +597,23 @@ fm_dod_forge_head_is_named_head() {  # <mode>
 # this clone never fetched it or fleet sync pruned its branch after a squash
 # merge. A recorded Gerrit change needs neither: its pr= is written only after
 # the live published-tree check accepted it.
-fm_dod_recorded_pr_on_forge() {  # <state> <id> <meta> <mode> <url>
-  local state=$1 id=$2 meta=$3 mode=$4 url=$5
+fm_dod_recorded_pr_on_forge() {  # <state> <id> <meta> <mode> <url> <worktree>
+  local state=$1 id=$2 meta=$3 mode=$4 url=$5 wt=$6 generation tree
   [ -n "$meta" ] && [ -f "$meta" ] || return 1
   [ "$(fm_dod_meta_value "$meta" pr)" = "$url" ] || return 1
-  if fm_dod_forge_head_is_named_head "$mode" && [ -n "$(fm_dod_meta_value "$meta" pr_head)" ]; then
+  fm_pr_url_parse "$url" || return 1
+  if [ "$FM_PR_PROVIDER" != gerrit ] && fm_dod_forge_head_is_named_head "$mode" && [ -n "$(fm_dod_meta_value "$meta" pr_head)" ]; then
     return 0
   fi
-  ( fm_pr_url_parse "$url" \
-    && { [ "$FM_PR_PROVIDER" = gerrit ] \
-      || fm_pr_poll_merge_already_notified "$state" "$id" \
-        "$FM_PR_PROVIDER" "$FM_PR_HOST" "$FM_PR_PATH" "$FM_PR_NUMBER"; } )
+  if [ "$FM_PR_PROVIDER" = gerrit ]; then
+    generation=$(fm_dod_meta_value "$meta" spawn_gen)
+    [ -n "$generation" ] && [ "$generation" = "$(fm_dod_meta_value "$meta" pr_spawn_gen)" ] || return 1
+    tree=$(git -C "$wt" rev-parse --verify --quiet 'HEAD^{tree}' 2>/dev/null) || return 1
+    [ -n "$tree" ] && [ "$tree" = "$(fm_dod_meta_value "$meta" pr_local_tree)" ]
+  else
+    fm_pr_poll_merge_already_notified "$state" "$id" \
+      "$FM_PR_PROVIDER" "$FM_PR_HOST" "$FM_PR_PATH" "$FM_PR_NUMBER"
+  fi
 }
 
 # 0 when <url> names a Gerrit change whose current patch set carries the tree of
@@ -700,7 +706,7 @@ fm_dod_accept_ship_done() {  # <kind> <mode> <worktree> <project> <line> [<state
   local kind=$1 mode=$2 wt=$3 project=$4 line=$5 state=${6:-} id=${7:-} meta=${8:-} url sha gerrit
   fm_dod_should_gate_ship_done "$kind" "$mode" "$line" || return 0
   if url=$(fm_dod_pr_url_from_done_note "$(status_line_note "$line")") \
-    && fm_dod_recorded_pr_on_forge "$state" "$id" "$meta" "$mode" "$url"; then
+    && fm_dod_recorded_pr_on_forge "$state" "$id" "$meta" "$mode" "$url" "$wt"; then
     return 0
   fi
   if [ -z "$wt" ] || [ ! -d "$wt" ]; then

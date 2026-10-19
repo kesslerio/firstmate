@@ -141,6 +141,7 @@ SCRIPT_DIR="$(d=${BASH_SOURCE[0]%/*}; [ "$d" != "${BASH_SOURCE[0]}" ] || d=.; cd
 . "$SCRIPT_DIR/fm-wake-lib.sh"
 # shellcheck source=bin/fm-classify-lib.sh
 . "$SCRIPT_DIR/fm-classify-lib.sh"
+. "$SCRIPT_DIR/fm-supervision-engine-lib.sh"
 
 STORE="$STATE/branch-outcomes.jsonl"
 CURSOR="$STATE/.branch-outcomes-cursor"
@@ -523,6 +524,8 @@ case "$CMD" in
       echo "error: silent outcomes must have the routine verdict" >&2
       exit 2
     fi
+    capture_status_position "$TASK"
+    fm_supervision_host_report_current || exit 3
     READY_REVIEW=$("$SCRIPT_DIR/fm-ready-review.sh" report-check "$VERDICT") || exit 1
     READY_TASKS=$(printf '%s\n' "$READY_REVIEW" | jq -r '[.candidates[].task] | join(", ")') || exit 1
     if [ -n "$READY_TASKS" ]; then
@@ -532,6 +535,10 @@ case "$CMD" in
       SUMMARY="$SUMMARY Ready-work graph is unavailable; MAIN must repair the owner-home observation before acknowledging."
     fi
     fm_lock_acquire_wait "$LOCK"
+    if ! fm_supervision_host_report_current; then
+      fm_lock_release "$LOCK"
+      exit 3
+    fi
     if ! LAST_SEQ=$(last_seq); then
       fm_lock_release "$LOCK"
       echo "error: refusing append because the outcome store is malformed or non-sequential" >&2
@@ -543,7 +550,10 @@ case "$CMD" in
       exit 1
     fi
     SEQ=$(( LAST_SEQ + 1 ))
-    capture_status_position "$TASK"
+    if ! fm_supervision_host_report_current; then
+      fm_lock_release "$LOCK"
+      exit 3
+    fi
     rm -f -- "$OUTCOME_INDEX_READY" || { fm_lock_release "$LOCK"; exit 1; }
     printf '{"seq":%s,"epoch":%s,"task":"%s","wake":"%s","verdict":"%s","summary":"%s","silent":%s,"statusEndpoint":%s,"statusIdent":"%s","readyReview":%s}\n' \
       "$SEQ" "$(date +%s)" "$(json_escape "$TASK")" "$(json_escape "$WAKE")" \

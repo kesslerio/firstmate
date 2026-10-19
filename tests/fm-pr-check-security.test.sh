@@ -1786,6 +1786,7 @@ test_gerrit_ready_gate_reads_the_published_tree() {
 
   : > "$dir/gerrit-axi.log"
   write_task_meta "$dir" task-published
+  printf 'spawn_gen=s1.2.3\n' >> "$state/task-published.meta"
   FM_TEST_GERRIT_REVISION=$published run_check_entry "$dir" task-published \
     https://gerrit.example/c/group/apps/console/+/4201 >/dev/null \
     || fail "arming refused a change whose current patch set carries this copy's HEAD tree"

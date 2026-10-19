@@ -26,7 +26,104 @@ cleanup_children() {
   done
   fm_test_cleanup
 }
-trap cleanup_children EXIT
+trap 'cleanup_children || exit $?' EXIT
+
+test_nested_source_keeps_a_separate_default_child_registry() {
+  local parent_registry=$FM_TEST_DEFAULT_CHILD_REGISTRY nested_registry
+  nested_registry=$(FM_TEST_CHILD_REGISTRY="$parent_registry" bash -c '. "$1"; printf "%s\n" "$FM_TEST_CHILD_REGISTRY"' _ "$LIB")
+  [ "$nested_registry" != "$parent_registry" ] || fail 'nested source reused its parent default child registry'
+  assert_present "$parent_registry" 'nested cleanup removed its parent default child registry'
+  pass 'nested source owns a separate default child registry'
+}
+test_nested_source_keeps_a_separate_default_child_registry
+
+test_supplied_child_registry_survives_source_and_cleanup() {
+  local harness registry output
+  harness=$(fm_test_tmproot fm-external-child-registry)
+  registry="$harness/children"
+  (umask 077; : > "$registry")
+  if output=$(FM_TEST_CHILD_REGISTRY="$registry" bash -c '
+    . "$1"
+    [ "$FM_TEST_CHILD_REGISTRY" = "$2" ] || { echo "external child registry was redirected"; exit 61; }
+    sleep 30 &
+    child=$!
+    fm_test_track_child "$child" kill
+    fm_test_stop_children || exit 62
+    [ -f "$2" ] && [ ! -s "$2" ] || { echo "external child registry was removed or not drained"; exit 63; }
+    ! kill -0 "$child" 2>/dev/null || { echo "registered child remains live"; exit 64; }
+  ' _ "$LIB" "$registry" 2>&1); then
+    :
+  else
+    fail "supplied child registry contract failed: $output"
+  fi
+  assert_present "$registry" 'normal exit removed the supplied child registry'
+  [ ! -s "$registry" ] || fail 'normal exit left pending child records'
+  pass 'supplied child registry retains its path and empty artifact after owned cleanup'
+}
+test_supplied_child_registry_survives_source_and_cleanup
+
+test_failed_exit_cleanup_retains_child_and_fixture_evidence() {
+  local harness mode registry rc child fixture recorded_registry
+  harness=$(fm_test_tmproot fm-failed-exit-cleanup)
+  for mode in default supplied custom-default custom-supplied; do
+    mkdir "$harness/$mode"
+    registry=
+    if [ "$mode" = supplied ] || [ "$mode" = custom-supplied ]; then
+      registry="$harness/$mode/children"
+      : > "$registry"
+    fi
+    # shellcheck disable=SC2016 # The script expands arguments in its child Bash.
+    if FM_TEST_CHILD_REGISTRY="$registry" python3 -c '
+import os,signal,subprocess,sys
+child=subprocess.Popen(sys.argv[1:],start_new_session=True)
+try:
+    rc=child.wait(timeout=12)
+except subprocess.TimeoutExpired:
+    os.killpg(child.pid,signal.SIGKILL)
+    child.wait()
+    rc=124
+sys.exit(rc)
+' bash -c '
+      . "$1"
+      case "$3" in custom-*)
+        cleanup_children() { fm_test_cleanup; }
+        trap '\''cleanup_children || exit $?'\'' EXIT
+        ;;
+      esac
+      fixture=$(fm_test_tmproot fm-failed-child-evidence)
+      printf "%s\n" "$fixture" > "$2/fixture"
+      printf "%s\n" "$FM_TEST_CHILD_REGISTRY" > "$2/registry"
+      python3 -c '\''import pathlib,signal,sys,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); pathlib.Path(sys.argv[1]).touch(); time.sleep(30)'\'' "$2/ready" >/dev/null 2>&1 &
+      child=$!
+      printf "%s\n" "$child" > "$2/pid"
+      fm_test_track_child "$child" term
+      for ((i=0;i<100;i++)); do
+        [ ! -e "$2/ready" ] || break
+        sleep .02
+      done
+      [ -e "$2/ready" ] || exit 71
+      exit 0
+    ' _ "$LIB" "$harness/$mode" "$mode" > "$harness/$mode/stdout" 2> "$harness/$mode/stderr"; then
+      rc=0
+    else
+      rc=$?
+    fi
+    child=$(cat "$harness/$mode/pid")
+    fm_test_track_child "$child" kill
+    fixture=$(cat "$harness/$mode/fixture")
+    recorded_registry=$(cat "$harness/$mode/registry")
+    [ "$rc" -ne 0 ] && [ "$rc" -ne 124 ] && [ "$rc" -ne 137 ] || fail "$mode EXIT cleanup hid child cleanup failure (status $rc)"
+    assert_present "$fixture" "$mode EXIT cleanup removed the failed child's fixture evidence"
+    assert_present "$recorded_registry" "$mode EXIT cleanup removed child ownership evidence"
+    grep -q "^$child""$(printf '\t')" "$recorded_registry" || fail "$mode EXIT cleanup drained failed child ownership evidence"
+    kill -0 "$child" 2>/dev/null || fail "$mode failure fixture did not keep the TERM-ignoring child alive"
+    fm_test_stop_children || fail "$mode failed-child recovery did not stop the owned process"
+    fm_test_remove_tree "$fixture"
+    rm -f "$recorded_registry"
+  done
+  pass 'failed EXIT cleanup reports failure and retains default and supplied child ownership and fixture evidence'
+}
+test_failed_exit_cleanup_retains_child_and_fixture_evidence
 
 test_fixture_root_gone_after_normal_exit() {
   local child_out child_dir
@@ -339,3 +436,28 @@ print('ok - custom ownership cleanup precedes tree removal on success, failure a
 PY
 }
 test_custom_cleanup_precedes_signal_tree_removal
+
+
+test_cleanup_resumes_only_the_registered_stopped_identity() {
+  local child foreign i status
+  sleep 30 & child=$!
+  fm_test_track_child "$child" kill
+  sleep 30 & foreign=$!
+  fm_test_track_child "$foreign" kill
+  kill -STOP "$child" "$foreign"
+  for ((i=0;i<100;i++)); do
+    status=$(ps -p "$child" -o stat=)
+    case "$status" in *T*) break ;; esac
+    sleep .01
+  done
+  case "$status" in *T*) ;; *) fail 'owned child never stopped' ;; esac
+  local registry=$FM_TEST_CHILD_REGISTRY
+  FM_TEST_CHILD_REGISTRY="$(fm_test_tmproot fm-stopped-only)/children"
+  fm_test_track_child "$child" kill
+  fm_test_stop_children || fail 'registered stopped child survived cleanup'
+  case "$(ps -p "$foreign" -o stat=)" in *T*) ;; *) fail 'cleanup resumed an unregistered stopped child' ;; esac
+  FM_TEST_CHILD_REGISTRY=$registry
+  fm_test_stop_children || fail 'remaining fixture cleanup failed'
+  pass 'cleanup resumes verified stopped children and leaves unregistered stopped processes untouched'
+}
+test_cleanup_resumes_only_the_registered_stopped_identity

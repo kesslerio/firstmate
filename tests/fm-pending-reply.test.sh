@@ -1017,6 +1017,7 @@ test_delivery_confirmation_serializes_with_reconciliation() {
     # The background PID is consumed within this isolated test subshell.
     # shellcheck disable=SC2031
     confirm_pid=$!
+    fm_test_track_child "$confirm_pid" kill
     for i in $(seq 1 100); do
       [ -e "$entered" ] && break
       /bin/sleep 0.01
@@ -1026,6 +1027,7 @@ test_delivery_confirmation_serializes_with_reconciliation() {
     # The background PID is consumed within this isolated test subshell.
     # shellcheck disable=SC2031
     reconcile_pid=$!
+    fm_test_track_child "$reconcile_pid" kill
     /bin/sleep 0.1
     : > "$release"
     wait "$confirm_pid" || fail "delivery confirmation should commit"
@@ -1485,11 +1487,13 @@ test_tick_leaves_settled_records_alone() {
   bash -c '. "$1"; fm_lock_acquire_wait "$2" && : > "$3"; exec sleep 300' _ \
     "$lib" "$state/.pending-reply-00005e7700000000.lock" "$home/held" &
   holder=$!
+  fm_test_track_child "$holder" kill
   for _ in $(seq 1 100); do [ -e "$home/held" ] && break; sleep 0.1; done
   [ -e "$home/held" ] || { kill "$holder" 2>/dev/null; fail "foreign holder never took the lock"; }
 
   fm_pending_reply_tick "$state" &
   tick_pid=$!
+  fm_test_track_child "$tick_pid" kill
   for _ in $(seq 1 600); do
     case "$(ps -p "$tick_pid" -o stat= 2>/dev/null)" in ''|Z*) ticked=1; break ;; esac
     sleep 0.1

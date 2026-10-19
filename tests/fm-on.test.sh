@@ -12,6 +12,7 @@ TMP_ROOT=$(fm_test_tmproot fm-on)
 mkdir -p "$TMP_ROOT"
 TMP_ROOT=$(cd "$TMP_ROOT" && pwd -P)
 cleanup() {
+  fm_test_stop_children
   local pid
   if [ -f "$TMP_ROOT/remote-jobs/worker.pid" ]; then
     pid=$(cat "$TMP_ROOT/remote-jobs/worker.pid")
@@ -22,7 +23,7 @@ cleanup() {
     FM_REMOTE_JOB_STATE="$TMP_ROOT/remote-jobs"
     fm_remote_job_stop_worker_tree "$pid" 2>/dev/null || true
   fi
-  rm -rf -- "$TMP_ROOT"
+  fm_test_cleanup
 }
 trap cleanup EXIT
 LOCAL_HOME="$TMP_ROOT/local-home"
@@ -129,6 +130,36 @@ fm_on() {
   FM_REMOTE_JOB_STATE_ROOT="$TMP_ROOT/remote-jobs" \
   "$ROOT/bin/fm-on.sh" "$@"
 }
+
+test_transport_releases_registry_before_waiting_on_ssh() {
+  local holder i out
+  cat > "$FAKEBIN/held-ssh" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$*" > "$FM_TRANSPORT_HOLD/route"
+: > "$FM_TRANSPORT_HOLD/entered"
+for ((i=0;i<200;i++)); do [ ! -e "$FM_TRANSPORT_HOLD/release" ] || exit 0; sleep .02; done
+exit 1
+SH
+  chmod +x "$FAKEBIN/held-ssh"
+  FM_HOME="$LOCAL_HOME" FM_ROOT_OVERRIDE="$REMOTE_ROOT" FM_TRANSPORT_HOLD="$TMP_ROOT" \
+    FM_SSH_BIN="$FAKEBIN/held-ssh" "$ROOT/bin/fm-on.sh" ios fm-probe-two.sh & holder=$!
+  fm_test_track_child "$holder" kill
+  for ((i=0;i<100;i++)); do [ ! -e "$TMP_ROOT/entered" ] || break; sleep .02; done
+  [ -e "$TMP_ROOT/entered" ] || fail 'transport never entered SSH'
+  FM_HOME="$LOCAL_HOME" FM_STATE_OVERRIDE="$LOCAL_HOME/state" bash -c '
+    . "$1/bin/fm-wake-lib.sh"
+    . "$1/bin/fm-secondmate-registry-lib.sh"
+    lock=$(secondmate_registry_lock_path "$STATE")
+    fm_lock_try_acquire "$lock" || exit 1
+    fm_lock_release "$lock"
+  ' _ "$ROOT" || fail 'waiting transport retained the route registry lock'
+  out=$(cat "$TMP_ROOT/route")
+  assert_contains "$out" remote-mac 'transport lost its validated host'
+  touch "$TMP_ROOT/release"
+  wait "$holder" || fail 'held transport failed'
+  pass 'long-poll transport preserves its route and releases the registry for concurrent operations'
+}
+test_transport_releases_registry_before_waiting_on_ssh
 
 # The pre-feature user path had no executable transport at all. The regression
 # exercises the adopted public surface end to end through a deterministic SSH

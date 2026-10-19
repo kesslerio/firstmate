@@ -53,6 +53,7 @@ start_seed_watcher() {  # <state> <fakebin> <watch-out> [poll-seconds]
   PATH="$fakebin:$PATH" FM_STATE_OVERRIDE="$state" FM_POLL="$poll" FM_SIGNAL_GRACE=1 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$out" &
   SEED_PID=$!
+  fm_test_track_child "$SEED_PID" kill
   i=0
   while [ "$i" -lt 60 ]; do
     [ "$(cat "$state/.watch.lock/pid" 2>/dev/null || true)" = "$SEED_PID" ] \
@@ -70,6 +71,7 @@ start_attached_arm() {  # <state> <fakebin> <arm-out> <confirm-timeout>
   PATH="$fakebin:$PATH" FM_STATE_OVERRIDE="$state" FM_ARM_ATTACH_POLL=0.1 \
     FM_ARM_CONFIRM_TIMEOUT="$confirm" "$WATCH_ARM" > "$armout" &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   i=0
   while [ "$i" -lt 80 ]; do
     grep -qF "watcher: attached pid=$SEED_PID" "$armout" 2>/dev/null && break
@@ -167,6 +169,7 @@ start_rearm_arm() {  # <home> <state> <fakebin> <arm-out> [predecessor-arm-pid]
     FM_WATCH_PREDECESSOR_ARM_PID="$predecessor" \
     "$WATCH_ARM" --restart > "$armout" &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   # Wait for the arm to confirm its watcher or exit, within a ceiling that
   # outlasts its confirmation budget. A fixed short count let a slow start fall
   # through mid-confirmation, so the caller's next liveness check or exit wait
@@ -283,6 +286,7 @@ test_attached_arm_follows_a_slow_live_holder() {
   PATH="$fakebin:$PATH" FM_STATE_OVERRIDE="$state" FM_ARM_ATTACH_POLL=0.1 \
     FM_ARM_CONFIRM_TIMEOUT=1 FM_GUARD_GRACE=4 FM_WATCHER_STALL_BOUND=600 "$WATCH_ARM" > "$armout" &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   i=0
   while [ "$i" -lt 80 ]; do
     grep -qF "watcher: attached pid=$SEED_PID" "$armout" 2>/dev/null && break
@@ -343,6 +347,7 @@ test_attached_arm_hands_a_stalled_holder_to_its_replacement() {
   # the shape of a watcher wedged mid-cycle that still answers TERM.
   sleep 300 &
   holder=$!
+  fm_test_track_child "$holder" kill
   identity=$(FM_STATE_OVERRIDE="$state" bash -c '. "$1"; fm_pid_identity "$2"' _ "$ROOT/bin/fm-wake-lib.sh" "$holder") \
     || fail "could not identify the fake holder"
   mkdir -p "$state/.watch.lock"
@@ -355,6 +360,7 @@ test_attached_arm_hands_a_stalled_holder_to_its_replacement() {
   PATH="$fakebin:$PATH" FM_HOME="$dir" FM_STATE_OVERRIDE="$state" FM_ARM_ATTACH_POLL=0.1 \
     FM_ARM_CONFIRM_TIMEOUT=1 FM_GUARD_GRACE=5 FM_WATCHER_STALL_BOUND=12 "$WATCH_ARM" > "$armout" &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   wait_for_exit "$ARM_PID" 300
   status=$?
   grep -qF "watcher: attached pid=$holder" "$armout" \
@@ -376,6 +382,7 @@ test_attached_arm_hands_a_stalled_holder_to_its_replacement() {
     FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     FM_ARM_CONFIRM_TIMEOUT=10 FM_GUARD_GRACE=5 FM_WATCHER_STALL_BOUND=12 "$WATCH_ARM" > "$rearmout" 2>&1 &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   wait_for_exit "$ARM_PID" 300
   status=$?
   grep -qF "watcher: replaced stalled pid $holder " "$rearmout" \
@@ -797,6 +804,7 @@ test_restart_preserves_recovery_across_reused_pid_lock() {
 
   sleep 300 &
   unrelated=$!
+  fm_test_track_child "$unrelated" kill
   printf '%s\n' "$unrelated" > "$owner/pid"
   printf '%s\n' "$home" > "$owner/fm-home"
   printf '%s\n' "$WATCH" > "$owner/watcher-path"
@@ -1123,12 +1131,14 @@ test_take_over_attaches_to_a_cycle_the_named_arm_does_not_own() {
   FM_HOME="$dir" start_seed_watcher "$state" "$fakebin" "$dir/watch.out"
   sleep 60 &
   other=$!
+  fm_test_track_child "$other" kill
   PATH="$fakebin:$PATH" FM_HOME="$dir" FM_STATE_OVERRIDE="$state" "$WATCH_ARM" --take-over 2>/dev/null
   status=$?
   expect_code 2 "$status" "--take-over without an arm pid must be refused"
   PATH="$fakebin:$PATH" FM_HOME="$dir" FM_STATE_OVERRIDE="$state" FM_ARM_ATTACH_POLL=0.1 \
     "$WATCH_ARM" --take-over "$other" > "$armout" &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   wait_for_file_text "$armout" "watcher: attached pid=$SEED_PID" \
     || fail "--take-over of a cycle the named arm does not own did not attach: $(cat "$armout")"
   sleep 1
@@ -1162,6 +1172,7 @@ test_take_over_owns_a_fresh_cycle_and_keeps_queued_work_surfacing() {
     FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     "$WATCH_ARM" --take-over "$owner" > "$armout" &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   wait_for_file_text "$armout" 'watcher: started pid=' \
     || fail "--take-over did not own a fresh cycle: $(cat "$armout")"
   wait_for_exit "$SEED_PID" 50 >/dev/null 2>&1 || true
@@ -1187,6 +1198,7 @@ test_take_over_owns_a_fresh_cycle_and_keeps_queued_work_surfacing() {
     FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     FM_ARM_CONFIRM_TIMEOUT="$REARM_CONFIRM_SECONDS" "$WATCH_ARM" --take-over "$owner" > "$armout" &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   wait_for_exit "$ARM_PID" "$REARM_EXIT_POLLS"
   status=$?
   expect_code 0 "$status" "a takeover that resurfaces queued work closes cleanly"
@@ -1230,6 +1242,7 @@ test_take_over_preserves_downtime_from_watcher_self_exit() {
     FM_ARM_CONFIRM_TIMEOUT="$REARM_CONFIRM_SECONDS" \
     "$WATCH_ARM" --take-over "$owner" > "$armout" &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   i=0
   while [ "$i" -lt 200 ] && [ ! -e "$dir/snapshot-read" ]; do
     sleep 0.05
@@ -1311,6 +1324,7 @@ test_arm_refuses_an_unusable_launch_confirm_window() {
     FM_ARM_CONFIRM_TIMEOUT=5 FM_PROCEVENT_LAUNCH_CONFIRM_SECONDS=5s \
     "$WATCH_ARM" > "$armout" 2>&1 &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   wait_for_exit "$ARM_PID" 200
   status=$?
   [ "$status" -ne 124 ] || fail "arm with an unusable confirm window never stopped: $(cat "$armout")"
@@ -1352,6 +1366,7 @@ test_arm_refuses_a_disposable_validation_checkout() {
     FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     FM_ARM_CONFIRM_TIMEOUT=5 "$link/bin/fm-watch-arm.sh" > "$armout" 2>&1 &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   wait_for_exit "$ARM_PID" 200
   status=$?
   [ "$status" -ne 124 ] || fail "arm from a disposable checkout never stopped: $(cat "$armout")"
@@ -1379,6 +1394,7 @@ start_owned_watcher() {  # <home> <state> <fakebin> <arm-out>
     FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     FM_ARM_CONFIRM_TIMEOUT=2 "$WATCH_ARM" > "$armout" 2>&1 &
   ARM_PID=$!
+  fm_test_track_child "$ARM_PID" kill
   i=0
   while [ "$i" -lt 100 ]; do
     grep -q '^watcher: started pid=' "$armout" 2>/dev/null && break
@@ -1482,6 +1498,7 @@ test_handling_delivered_accepts_already_acked_generation() {
   mkdir -p "$home/data" "$state/.watch.lock"
   sleep 60 &
   pid=$!
+  fm_test_track_child "$pid" kill
   identity=$(bash -c '. "$1"; fm_pid_identity "$2"' _ "$ROOT/bin/fm-wake-lib.sh" "$pid") \
     || fail "could not read the fixture watcher identity"
   printf '%s' "$home" > "$state/.watch.lock/fm-home"
@@ -1509,6 +1526,7 @@ test_handling_delivered_accepts_already_acked_generation() {
   expect_code 3 "$?" "a superseded generation must stay rejected"
   sleep 0 &
   dead=$!
+  fm_test_track_child "$dead" kill
   wait "$dead" 2>/dev/null || true
   FM_HOME="$home" FM_STATE_OVERRIDE="$state" "$WATCH_ARM" --handling-delivered "$generation" \
     --watcher-pid "$dead" 2>/dev/null
@@ -1537,6 +1555,7 @@ test_handling_delivered_rejects_a_superseded_generation() {
   mkdir -p "$home/data" "$state/.watch.lock"
   sleep 60 &
   pid=$!
+  fm_test_track_child "$pid" kill
   identity=$(bash -c '. "$1"; fm_pid_identity "$2"' _ "$ROOT/bin/fm-wake-lib.sh" "$pid") \
     || fail "could not read the fixture watcher identity"
   printf '%s' "$home" > "$state/.watch.lock/fm-home"

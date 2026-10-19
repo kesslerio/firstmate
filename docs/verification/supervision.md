@@ -601,8 +601,9 @@ The opt-in live guard refreshes the engine evidence:
 
 ```text
 $ FM_SUPERVISION_HOST_LIVE_E2E=1 tests/fm-supervision-host-live-e2e.test.sh
-# first turn: handled	turn=host-66707-1790213279.1	rc=0	reports=1
-# second turn: handled	turn=host-66707-1790213279.2	rc=0	reports=1
+# Sanitized host turn identifiers; original proof remains private.
+# first turn: handled	turn=<host-turn-a>.1	rc=0	reports=1
+# second turn: handled	turn=<host-turn-a>.2	rc=0	reports=1
 ok - supervision host live (2.1.281 (Claude Code)): a real engine handles and resumes away wakes under the branch contract without waking main
 ```
 
@@ -757,8 +758,9 @@ A Pi primary without `config/supervision-host` ran the same gated-worker session
 
 ```text
 $ FM_SUPERVISION_HOST_LIVE_E2E=1 tests/fm-supervision-host-live-e2e.test.sh
-# first turn: handled	turn=host-85573-1790386456.1	posture=away	rc=0
-# second turn: handled	turn=host-85573-1790386456.2	posture=away	rc=0
+# Sanitized host turn identifiers; original proof remains private.
+# first turn: handled	turn=<host-turn-b>.1	posture=away	rc=0
+# second turn: handled	turn=<host-turn-b>.2	posture=away	rc=0
 ok - supervision host live (2.1.283 (Claude Code)): a real engine handles and resumes away wakes under the branch contract without waking main
 ```
 

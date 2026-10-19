@@ -320,7 +320,7 @@ phase_teardown() {
     "teardown left the relaunch ledger a same-id replacement would inherit"
   assert_absent "$HOME_DIR/state/.secondmate-relaunch-bound-design" \
     "teardown left the relaunch park marker a same-id replacement would inherit"
-  assert_absent "$HOME_DIR/state/.secondmate-liveness-design.lock" \
+  assert_absent "$HOME_DIR/state/.control-design.lock" \
     "teardown left the liveness lock it took to retire relaunch state"
   assert_absent "$leftover_rec" "teardown left a resolved pending-reply for the retired secondmate"
   assert_no_grep '- design ' "$HOME_DIR/data/secondmates.md" "teardown did not remove the registry route"

@@ -349,6 +349,7 @@ unit_fresh_vs_refresh() {
   # daemon_lock_held_by_live_daemon returns true (a refresh).
   sleep 600 &
   sleep_pid=$!
+  fm_test_track_child "$sleep_pid" kill
   lock="$st/state/.supervise-daemon.lock"
   mkdir -p "$lock"
   printf '%s' "$sleep_pid" > "$lock/pid"
@@ -415,6 +416,7 @@ unit_mode_refresh_preserves_quiet() {
   printf 'quiet\n%s\n' "$(date '+%s')" > "$st/state/.afk"
   sleep 600 &
   sleep_pid=$!
+  fm_test_track_child "$sleep_pid" kill
   lock="$st/state/.supervise-daemon.lock"
   mkdir -p "$lock"
   printf '%s' "$sleep_pid" > "$lock/pid"
@@ -447,6 +449,7 @@ unit_mode_quiet_daemon_to_away() {
     sleep 600 &
     # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
     sleep_pid=$!
+    fm_test_track_child "$sleep_pid" kill
     lock="$st/state/.supervise-daemon.lock"
     mkdir -p "$lock"
     printf '%s' "$sleep_pid" > "$lock/pid"
@@ -538,6 +541,7 @@ unit_stop_ordering() {
   ' _ "$st" "$marker" &
   # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
   daemon_pid=$!
+  fm_test_track_child "$daemon_pid" kill
   lock="$st/state/.supervise-daemon.lock"
   mkdir -p "$lock"
   printf '%s' "$daemon_pid" > "$lock/pid"
@@ -574,6 +578,7 @@ unit_stop_rejects_reused_pid() {
   sleep 600 &
   # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
   sleeper_pid=$!
+  fm_test_track_child "$sleeper_pid" kill
   lock="$st/state/.supervise-daemon.lock"
   mkdir -p "$lock"
   printf '%s' "$sleeper_pid" > "$lock/pid"
@@ -622,10 +627,12 @@ unit_concurrent_start_serialized() {
     FM_SUPERVISOR_BACKEND=tmux FM_AFK_LAUNCH_ENTRY="$SLEEPER" "$LAUNCH" start >/dev/null 2>&1 &
   # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
   first=$!
+  fm_test_track_child "$first" kill
   FM_HOME="$st" FM_STATE_OVERRIDE="$st/state" FM_SUPERVISOR_TARGET="$cap_pane" \
     FM_SUPERVISOR_BACKEND=tmux FM_AFK_LAUNCH_ENTRY="$SLEEPER" "$LAUNCH" start >/dev/null 2>&1 &
   # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
   second=$!
+  fm_test_track_child "$second" kill
   wait "$first"; wait "$second"
   rec=$(cut -f2 "$st/state/.afk-daemon-terminal" 2>/dev/null || true)
   count=$(tmux list-sessions -F '#{session_name}' 2>/dev/null | awk -v expected="$rec" '$0 == expected {n++} END{print n+0}')
@@ -659,6 +666,7 @@ unit_lock_initialization_grace() {
   ) &
   # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
   initializer=$!
+  fm_test_track_child "$initializer" kill
   # shellcheck disable=SC2031 # The initializer communicates through this shared file path.
   if FM_HOME="$st" FM_STATE_OVERRIDE="$st/state" bash -c '
     . "$1"
@@ -685,6 +693,7 @@ unit_signal_exits_with_lock_cleanup() {
   ' _ "$LAUNCH" "$marker" &
   # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
   child=$!
+  fm_test_track_child "$child" kill
   # Signal only once the lifecycle actually holds its lock. Killing before the
   # lock exists tests nothing, and on a loaded machine it used to race: the
   # lock could be created just after the kill and outlive the process.
@@ -1442,6 +1451,7 @@ unit_stop_validates_before_signal() {
   sleep 30 &
   # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
   sleeper_pid=$!
+  fm_test_track_child "$sleeper_pid" kill
   mkdir -p "$st/state/.supervise-daemon.lock"
   printf '%s' "$sleeper_pid" > "$st/state/.supervise-daemon.lock/pid"
   # shellcheck source=/dev/null
@@ -1499,6 +1509,7 @@ unit_stop_confirms_daemon_exit() {
   bash -c 'trap "" TERM; while :; do sleep 1; done' &
   # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
   daemon_pid=$!
+  fm_test_track_child "$daemon_pid" kill
   printf '%s' "$daemon_pid" > "$st/state/.supervise-daemon.lock/pid"
   # shellcheck source=/dev/null
   ( . "$ROOT/bin/fm-wake-lib.sh"; fm_pid_identity "$daemon_pid" > "$st/state/.supervise-daemon.lock/pid-identity" )
@@ -1533,6 +1544,7 @@ unit_refresh_validates_record() {
   sleep 30 &
   # shellcheck disable=SC2031 # The background PID is captured immediately in this shell.
   daemon_pid=$!
+  fm_test_track_child "$daemon_pid" kill
   printf '%s' "$daemon_pid" > "$st/state/.supervise-daemon.lock/pid"
   # shellcheck source=/dev/null
   ( . "$ROOT/bin/fm-wake-lib.sh"; fm_pid_identity "$daemon_pid" > "$st/state/.supervise-daemon.lock/pid-identity" )

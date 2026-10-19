@@ -1679,7 +1679,11 @@ if [ "$RELAUNCH" -eq 1 ]; then
   SPAWN_TASK_SET_LOCK_HELD=1
   SPAWN_CONTROL_LOCK="$STATE/.control-$ID.lock"
   control_owner=$(cat "$SPAWN_CONTROL_LOCK/pid" 2>/dev/null || true)
-  if [ "$control_owner" = "$PPID" ] && fm_pid_alive "$control_owner"; then
+  control_ancestor=$PPID
+  while [ "$control_ancestor" -gt 1 ] 2>/dev/null && [ "$control_ancestor" != "$control_owner" ]; do
+    control_ancestor=$(ps -o ppid= -p "$control_ancestor" 2>/dev/null | tr -d ' ') || break
+  done
+  if [ "$control_owner" = "$control_ancestor" ] && fm_pid_alive "$control_owner"; then
     SPAWN_CONTROL_PARENT=1
   elif [ "$(fm_lease_actor)" = branch ]; then
     # Role partition refinement: branch recovery relaunches only through the

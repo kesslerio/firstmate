@@ -245,6 +245,7 @@ class Review:
         self.path = self.state / '.ready-review.json'
         self.lock = None
         self.now = int(time.time())
+        self.retry_snapshot = None
 
     def __enter__(self):
         path = self.state / '.ready-review.lock'
@@ -405,6 +406,8 @@ class Review:
                 and fact.get('spawn_gen') == spawn_generation)
 
     def retry_facts(self):
+        if self.retry_snapshot is not None:
+            return self.retry_snapshot
         # Hash facts, never record account names, paths or configuration contents.
         names = ('crew-dispatch.json', 'project-capacity', 'worker-target', 'pi-account', 'claude-account', 'backend', 'crew-harness')
         config = Path(os.environ.get('FM_CONFIG_OVERRIDE') or str(self.home / 'config'))
@@ -434,7 +437,8 @@ class Review:
                            'fm_liveness_snapshot "$2" "$3" || exit 1; '
                            'printf "%s\n" "$FM_LIVENESS_TARGET" "$FM_LIVENESS_LIVE"',
                            'ready-review', str(BIN), str(self.home), str(self.state)]))
-        return digest(values)
+        self.retry_snapshot = digest(values)
+        return self.retry_snapshot
 
     def poll(self):
         # A local graph mutation bypasses idle-heartbeat backoff. Other backends

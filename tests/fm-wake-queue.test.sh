@@ -189,8 +189,10 @@ test_atomic_double_drain() {
   append_wake "$state" stale 's:fm-task' 'stale: s:fm-task' || fail "stale append failed"
   FM_STATE_OVERRIDE="$state" "$DRAIN" > "$out1" 2> "$dir/drain-one.err" &
   pid1=$!
+  fm_test_track_child "$pid1" kill
   FM_STATE_OVERRIDE="$state" "$DRAIN" > "$out2" 2> "$dir/drain-two.err" &
   pid2=$!
+  fm_test_track_child "$pid2" kill
   wait "$pid1" || fail "first drain failed"
   wait "$pid2" || fail "second drain failed"
   count1=$(awk -F '\t' 'NF == 5 { count++ } END { print count + 0 }' "$out1")
@@ -247,6 +249,7 @@ foreign_stall_watch_leg() {  # <dir> <leg> <now> [observation]
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     "$WATCH" > "$dir/watch-$leg.out" 2> "$dir/watch-$leg.err" &
   pid=$!
+  fm_test_track_child "$pid" kill
   if [ -n "$observation" ]; then
     while [ "$i" -lt 600 ] && is_live_non_zombie "$pid" \
       && { [ "$(cat "$marker" 2>/dev/null || true)" != "$observation" ] || [ -e "$stall" ]; }; do
@@ -451,6 +454,7 @@ secondmate_stall_watch_leg() { # <dir> <leg> <mode> [arg...]
   touch "$dir/state/.secondmate-liveness-tick"
   FM_SECONDMATE_LIVENESS_SECS=99999999 "$WATCH" >"$out" 2>"$err" &
   pid=$!
+  fm_test_track_child "$pid" kill
   case "$mode" in
     alert)
       while [ "$i" -lt "$limit" ]; do
@@ -461,6 +465,7 @@ secondmate_stall_watch_leg() { # <dir> <leg> <mode> [arg...]
           fi
           FM_SECONDMATE_LIVENESS_SECS=99999999 "$WATCH" >>"$out" 2>>"$err" &
           pid=$!
+          fm_test_track_child "$pid" kill
         fi
         sleep 0.1
         i=$((i + 1))
@@ -557,6 +562,7 @@ secondmate_stall_watch_leg() { # <dir> <leg> <mode> [arg...]
       rm -f "$beat"
       FM_SECONDMATE_LIVENESS_SECS=99999999 "$WATCH" >>"$out" 2>>"$err" &
       pid=$!
+      fm_test_track_child "$pid" kill
       first=0
       mark=0
     fi
@@ -960,9 +966,24 @@ exec "$(dirname "$0")/tmux-alive" "$@"
 SH
   chmod +x "$fakebin/tmux"
   mkfifo "$fifo"
-  ( exec 3> "$fifo"; : > "$dir/capture-blocked"; exec sleep 30 ) &
+  python3 - "$fifo" "$dir/capture-blocked" <<'PYHOLDER' &
+import errno, os, pathlib, sys, time
+end = time.monotonic() + 10
+while True:
+    try:
+        fd = os.open(sys.argv[1], os.O_WRONLY | os.O_NONBLOCK)
+        break
+    except OSError as error:
+        if error.errno != errno.ENXIO or time.monotonic() >= end:
+            raise
+        time.sleep(.02)
+pathlib.Path(sys.argv[2]).touch()
+time.sleep(30)
+os.close(fd)
+PYHOLDER
   holder=$!
 
+  fm_test_track_child "$holder" kill
   printf '1002\n' > "$dir/now"
   touch "$state/.secondmate-liveness-tick"
   PATH="$fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" \
@@ -972,13 +993,14 @@ SH
     FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     "$WATCH" > "$out" 2>&1 &
   pid=$!
+  fm_test_track_child "$pid" kill
   i=0
   while [ ! -e "$dir/capture-blocked" ] && [ "$i" -lt 300 ]; do
     sleep 0.1
     i=$((i + 1))
   done
   if [ ! -e "$dir/capture-blocked" ] || ! is_live_non_zombie "$pid"; then
-    kill "$holder" 2>/dev/null || true; kill "$pid" 2>/dev/null || true; wait "$pid" 2>/dev/null || true
+    kill "$holder" 2>/dev/null || true; kill "$pid" 2>/dev/null || true; wait "$holder" 2>/dev/null || true; wait "$pid" 2>/dev/null || true
     fail "the watcher never blocked inside the drain-ring idle capture: $(cat "$out")"
   fi
   kill "$pid" 2>/dev/null || true
@@ -1401,6 +1423,7 @@ test_slow_annotation_does_not_block_append_and_deleted_file_fails_open() {
 
   FM_STATE_OVERRIDE="$state" FM_WAKE_ENRICH_TEST_DELAY=3 "$DRAIN" > "$out1" &
   pid=$!
+  fm_test_track_child "$pid" kill
   wait_for_file_text "$out1" "$(printf '\tsignal\tslow.status\t')" \
     || { kill "$pid" 2>/dev/null || true; fail "slow drain did not commit its raw row"; }
   printf 'done: appended while first drain annotates\n' > "$state/next.status"
@@ -1815,6 +1838,7 @@ test_main_reclaims_a_grant_whose_branch_owner_exited() {
   append_wake "$state" signal "task-a.status" "signal: task-a" || fail "signal append failed"
   sleep 30 &
   owner=$!
+  fm_test_track_child "$owner" kill
   FM_STATE_OVERRIDE="$state" "$GRANT" activate "$owner" stale-owner || {
     kill "$owner" 2>/dev/null || true
     fail "branch owner activation failed"
@@ -2279,6 +2303,7 @@ test_interruption_before_and_after_raw_commit() {
 
   FM_STATE_OVERRIDE="$state" FM_WAKE_DRAIN_TEST_DELAY_BEFORE_COMMIT=5 "$DRAIN" > "$before_out" &
   pid=$!
+  fm_test_track_child "$pid" kill
   i=0
   while [ "$i" -lt 100 ]; do
     if [ "$(cat "$state/.wake-queue.lock/pid" 2>/dev/null || true)" = "$pid" ] \
@@ -2306,6 +2331,7 @@ test_interruption_before_and_after_raw_commit() {
   append_wake "$state" signal task.status "signal: task after commit" || fail "post-commit interruption wake append failed"
   FM_STATE_OVERRIDE="$state" FM_WAKE_ENRICH_TEST_DELAY=5 "$DRAIN" > "$after_out" &
   pid=$!
+  fm_test_track_child "$pid" kill
   wait_for_file_text "$after_out" "$(printf '\tsignal\ttask.status\t')" \
     || { kill "$pid" 2>/dev/null || true; fail "post-commit drain did not print its raw row"; }
   [ -s "$state/.wake-queue" ] \
@@ -2643,6 +2669,7 @@ SH
     fm_lock_release "$2"
   ' _ "$ROOT/bin/fm-wake-lib.sh" "$lock" "$dir/holder.ready" "$dir/release-holder" &
   holder_pid=$!
+  fm_test_track_child "$holder_pid" kill
   i=0
   while [ "$i" -lt 100 ] && [ ! -s "$dir/holder.ready" ]; do
     sleep 0.05
@@ -2662,6 +2689,7 @@ SH
     fm_lock_release "$2"
   ' _ "$ROOT/bin/fm-wake-lib.sh" "$lock" "$dir/waiter.ready" "$dir/release-waiter" &
   waiter_pid=$!
+  fm_test_track_child "$waiter_pid" kill
   i=0
   while [ "$i" -lt 100 ] && ! grep -Fx '0.1' "$sleep_log" >/dev/null 2>&1; do
     sleep 0.05
@@ -2720,6 +2748,7 @@ test_live_presentation_holder_is_deadlined_without_weakening_ack() {
     exec sleep 30
   ' _ "$ROOT/bin/fm-wake-lib.sh" "$state/.wake-queue.lock" "$dir/queue.ready" &
   queue_holder=$!
+  fm_test_track_child "$queue_holder" kill
   i=0
   while [ "$i" -lt 100 ] && [ ! -s "$dir/queue.ready" ]; do
     sleep 0.05
@@ -2760,6 +2789,7 @@ test_live_presentation_holder_is_deadlined_without_weakening_ack() {
     exec sleep 30
   ' _ "$ROOT/bin/fm-wake-lib.sh" "$state/.status-presentation-lock" "$dir/presentation.ready" &
   presentation_holder=$!
+  fm_test_track_child "$presentation_holder" kill
   i=0
   while [ "$i" -lt 100 ] && [ ! -s "$dir/presentation.ready" ]; do
     sleep 0.05
@@ -2805,6 +2835,7 @@ test_live_presentation_holder_is_deadlined_without_weakening_ack() {
     exec sleep 30
   ' _ "$ROOT/bin/fm-wake-lib.sh" "$state/.wake-queue.lock" "$dir/ack.ready" &
   ack_holder=$!
+  fm_test_track_child "$ack_holder" kill
   i=0
   while [ "$i" -lt 100 ] && [ ! -s "$dir/ack.ready" ]; do
     sleep 0.05
@@ -3093,6 +3124,7 @@ run_liveness_leg() {
     FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     "$@" "$WATCH" > "$dir/watch-$tag.out" 2> "$dir/watch-$tag.err" &
   LIVENESS_PID=$!
+  fm_test_track_child "$LIVENESS_PID" kill
 }
 
 # kill_liveness_leg <pid>: end a leg that must have stayed quiet.
@@ -3441,14 +3473,15 @@ test_secondmate_liveness_tick_skips_mate_whose_lock_is_held() {
   # per-mate lock; this tick must skip the mate entirely rather than probe a
   # moving target.
   ( STATE="$state" bash -c '. "$1" && fm_lock_acquire_wait "$2" && sleep 30' \
-      _ "$ROOT/bin/fm-wake-lib.sh" "$state/.secondmate-liveness-sm1.lock" ) &
+      _ "$ROOT/bin/fm-wake-lib.sh" "$state/.control-sm1.lock" ) &
   holder=$!
+  fm_test_track_child "$holder" kill
   local i=0
-  while [ ! -d "$state/.secondmate-liveness-sm1.lock" ] && [ "$i" -lt 100 ]; do
+  while [ ! -d "$state/.control-sm1.lock" ] && [ "$i" -lt 100 ]; do
     sleep 0.05
     i=$((i + 1))
   done
-  [ -d "$state/.secondmate-liveness-sm1.lock" ] || fail "the fixture never acquired the liveness lock"
+  [ -d "$state/.control-sm1.lock" ] || fail "the fixture never acquired the liveness lock"
 
   run_liveness_leg "$dir" locked FM_FAKE_TMUX_CURRENT_COMMAND=zsh; pid=$LIVENESS_PID
   sleep 4

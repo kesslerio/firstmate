@@ -130,6 +130,11 @@ if [ -e "$META" ] || [ -L "$META" ]; then
     || die "task metadata does not identify the configured remote secondmate route for $MATCH_ID"
 fi
 
+if [ "$REGISTRY_INHERITED" -eq 0 ]; then
+  fm_lock_release "$REGISTRY_LOCK"
+  trap - EXIT
+fi
+
 ROOT_B64=$(printf '%s' "$ROOT" | encode_base64)
 HOME_B64=$(printf '%s' "$HOME_PATH" | encode_base64)
 ARGV_B64=$(printf '%s\0' "$COMMAND" "$@" | encode_base64)

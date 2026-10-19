@@ -397,6 +397,7 @@ run_positive() {
   decide_at_handoff "$lab" "$lab/fm/state/demo2.status" \
     "needs-decision [at=$(date +%s)] [key=lab-e4]: pick a rollout window" > "$lab/handoff.out" &
   injector=$!
+  fm_test_track_child "$injector" kill
   e4=$(date +%s)
   printf 'working [at=%s]: rollout prep started\n' "$e4" >> "$lab/fm/state/demo2.status"
   evidence "positive step 5: event 4, a routine working line on task demo2, appended at $e4"
