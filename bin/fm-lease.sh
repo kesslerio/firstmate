@@ -171,6 +171,13 @@ case "$CMD" in
       [ "$(awk -F '\t' '$1 == "host" {print $2; exit}' "$STATE/.supervision-host" 2>/dev/null)" = "$FM_SUPERVISION_HOST_PID" ] || exit "$FM_LEASE_REFUSE_EXIT"
       . "$SCRIPT_DIR/fm-session-lock-lib.sh"
       fm_session_lock_owned_by_self "$STATE" || exit "$FM_LEASE_REFUSE_EXIT"
+      if [ -n "${FM_SUPERVISION_HOST_SESSION_KEY:-}" ]; then
+        . "$SCRIPT_DIR/fm-supervision-engine-lib.sh"
+        [ "$(fm_supervision_host_main_key "$STATE")" = "$FM_SUPERVISION_HOST_SESSION_KEY" ] || exit "$FM_LEASE_REFUSE_EXIT"
+      fi
+      if [ -n "${FM_SUPERVISION_HOST_TURN:-}" ]; then
+        [ "$(sed -n 's/^turn=//p' "$STATE/.supervision-host-turn")" = "$FM_SUPERVISION_HOST_TURN" ] || exit "$FM_LEASE_REFUSE_EXIT"
+      fi
       if [ -n "${FM_SUPERVISION_HOST_AUTOARM_GEN:-}" ]; then
         fm_autoarm_ledger_read "$STATE" || exit "$FM_LEASE_REFUSE_EXIT"
         [ "$FM_AUTOARM_GEN" = "$FM_SUPERVISION_HOST_AUTOARM_GEN" ] \

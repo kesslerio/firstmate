@@ -133,6 +133,18 @@ MIRROR="$STATE/.host-mirror.jsonl"
 CURSOR="$STATE/.host-mirror-cursor"
 STAGED="$CURSOR.next"
 LOCK="$STATE/.host-mirror.lock"
+expected_owner() {
+  [ -n "${FM_HOST_MIRROR_EXPECTED_KEY:-}" ] || return 0
+  [ "$(fm_supervision_host_main_key "$STATE")" = "$FM_HOST_MIRROR_EXPECTED_KEY" ] \
+    && [ "$(awk -F '\t' '$1 == "host" {print $2; exit}' "$STATE/.supervision-host")" = "$FM_SUPERVISION_HOST_PID" ] \
+    && [ "$(sed -n 's/^turn=//p' "$STATE/.supervision-host-turn")" = "$FM_BRANCH_REPORT_TURN" ] || return 1
+  [ -n "${FM_HOST_MIRROR_AUTOARM_GEN:-}" ] || return 0
+  fm_autoarm_ledger_read "$STATE" || return 1
+  [ "$FM_AUTOARM_GEN" = "$FM_HOST_MIRROR_AUTOARM_GEN" ] \
+    && [ "$FM_AUTOARM_OWNER" = "$FM_HOST_MIRROR_AUTOARM_OWNER" ] \
+    && [ "$FM_AUTOARM_OUTCOME" = arming ]
+}
+
 # Every entry must parse and carry its fields, with positive integral
 # sequence numbers rising in file order, and the file must end with a newline
 # (appends run under the lock, so a complete file always does): a feed that
@@ -258,6 +270,7 @@ case "$1" in
     [ "$#" -eq 1 ] || usage
     [ -f "$STAGED" ] || exit 0
     fm_lock_acquire_wait "$LOCK" || exit 0
+    expected_owner || { fm_lock_release "$LOCK"; exit 1; }
     mv -f "$STAGED" "$CURSOR" 2>/dev/null || true
     fm_lock_release "$LOCK"
     exit 0
@@ -277,10 +290,11 @@ esac
 SESSION=$2
 MODE=$3
 case "$MODE" in new|resume) ;; *) usage ;; esac
-rm -f "$STAGED"
-[ -f "$MIRROR" ] || exit 1
-KEY=$(fm_supervision_host_main_key "$STATE") || exit 1
 fm_lock_acquire_wait "$LOCK" || exit 1
+expected_owner || { fm_lock_release "$LOCK"; exit 1; }
+rm -f "$STAGED"
+[ -f "$MIRROR" ] || { fm_lock_release "$LOCK"; exit 1; }
+KEY=$(fm_supervision_host_main_key "$STATE") || { fm_lock_release "$LOCK"; exit 1; }
 CURSOR_SEQ=0
 CURSOR_SESSION=
 if [ -f "$CURSOR" ]; then
@@ -313,6 +327,7 @@ if ! LAST=$(jq -Rs "$ENTRIES"' | map(.seq) | max // 0' "$MIRROR" 2>/dev/null); t
   exit 1
 fi
 case "$LAST" in ''|*[!0-9]*) LAST=0 ;; esac
+expected_owner || { fm_lock_release "$LOCK"; exit 1; }
 printf '%s\t%s\n' "$LAST" "$SESSION" > "$STAGED" 2>/dev/null || true
 fm_lock_release "$LOCK"
 [ -z "$OUT" ] || printf '%s\n' "$OUT"

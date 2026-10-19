@@ -98,7 +98,7 @@ verdict=routine
 [ "$mode" != go-away ] || verdict=captain
 case "$mode" in
   fail) exit 3 ;;
-  handle|captain|captain-close-before-return|held|captain-held|hold-lease|return|return-silent|return-fail|return-fail-silent|return-many|return-lookup-fail|return-first|noack|emptyresult|go-away)
+  handle|post-held|captain|captain-close-before-return|held|captain-held|hold-lease|return|return-silent|return-fail|return-fail-silent|return-many|return-lookup-fail|return-first|noack|emptyresult|go-away)
     case "$mode" in held|captain-held) read -r _ < "$FM_HOME/stub-release" ;; esac
     [ "$mode" != return-first ] || "$FM_REPO/bin/fm-afk-contract.sh" archive >> "$FM_HOME/engine-return.log" 2>&1
     [ "$mode" != go-away ] || "$FM_REPO/bin/fm-afk-contract.sh" enter --words 'gone mid-turn' >> "$FM_HOME/engine-return.log" 2>&1
@@ -147,6 +147,10 @@ case "$mode" in
     case "$mode" in return-fail|return-fail-silent) exit 3 ;; esac
     [ "$mode" != return-first ] || sleep "$FM_TEST_STUB_MAX_BLOCK_SECONDS"
     [ "$mode" != emptyresult ] || { printf '{}\n'; exit 0; }
+    if [ "$mode" = post-held ]; then
+      touch "$FM_HOME/post-ready"
+      read -r _ < "$FM_HOME/stub-release"
+    fi
     result
     ;;
   noreport) result ;;
@@ -3106,10 +3110,71 @@ test_host_cleanup_rechecks_after_lease_contention() {
   pass 'cleanup revalidates replacement ownership at the lease mutation boundary and after waiting'
 }
 
+host_waiting_for() {
+  ps -axo ppid=,args= | awk -v parent="$1" -v operation="$2" '$1 == parent && index($0,operation) {found=1} END {exit !found}'
+}
+
+test_post_engine_blocking_operations_revalidate_the_turn() {
+  local home lock operation owner holder replacement before phase
+  for phase in lease grant mirror feed; do
+    home=$(make_home "post-engine-$phase" attended)
+    echo post-held > "$home/stub-mode"
+    mkfifo "$home/stub-release"
+    start_host "$home"
+    wait_until 150 watcher_live "$home" || fail 'post-engine: no watcher started'
+    if [ "$phase" != feed ]; then
+      append_status "$home" 'work to handle'
+      wait_until 200 test -e "$home/post-ready" || fail 'post-engine: engine did not finish its owned work'
+    fi
+    owner=$(awk -F '\t' '$1 == "host" {print $2; exit}' "$home/state/.supervision-host")
+    case "$phase" in
+      lease) lock=.fm-lease-command.lock; operation='fm-lease.sh release-actor' ;;
+      grant) lock=.wake-queue.lock; operation='fm-wake-grant.sh release' ;;
+      mirror) lock=.host-mirror.lock; operation='fm-host-mirror.sh commit' ;;
+      feed) lock=.host-mirror.lock; operation='fm-host-mirror.sh feed' ;;
+    esac
+    bash -c '
+      . "$1/bin/fm-wake-lib.sh"
+      fm_lock_acquire_wait "$2/state/$3" || exit 1
+      trap '"'"'fm_lock_release "$2/state/$3"'"'"' EXIT
+      touch "$2/holder-ready"
+      for ((i=0;i<200;i++)); do [ -e "$2/holder-release" ] && exit 0; sleep .05; done
+      exit 1
+    ' _ "$ROOT" "$home" "$lock" & holder=$!
+    printf '%s\n' "$holder" >> "$home/lock-holder-pids"
+    wait_until 100 test -e "$home/holder-ready" || fail 'post-engine: holder did not acquire its lock'
+    if [ "$phase" = feed ]; then
+      append_status "$home" 'work to handle'
+    else
+      printf 'release\n' > "$home/stub-release"
+    fi
+    wait_until 150 host_waiting_for "$owner" "$operation" || fail "post-engine: old host never blocked on $phase after its ownership check"
+    "$FAKE_CLAUDE" -c 'sleep 45' & replacement=$!
+    printf '%s\n' "$replacement" >> "$home/claude-pids"
+    printf '%s\n' "$replacement" > "$home/state/.lock"
+    printf 'host\t%s\tfixture\n' "$replacement" > "$home/state/.supervision-host"
+    for record in .supervision-host-turn .supervision-host-engine .supervision-host-health .host-mirror-cursor .host-mirror-cursor.next .branch-eligible-owner .branch-eligible-rows; do
+      printf 'replacement %s\n' "$record" > "$home/state/$record"
+    done
+    printf 'branch\t%s\t%s\n' "$replacement" "$(date +%s)" > "$home/state/.lease-replacement"
+    before=$(cksum "$home/state/.supervision-host" "$home/state/.supervision-host-turn" "$home/state/.supervision-host-engine" "$home/state/.supervision-host-health" "$home/state/.host-mirror-cursor" "$home/state/.host-mirror-cursor.next" "$home/state/.branch-eligible-owner" "$home/state/.branch-eligible-rows" "$home/state/.lease-replacement")
+    touch "$home/holder-release"
+    wait "$holder" || fail 'post-engine: lock holder failed'
+    wait_until 150 host_exited "$home" || fail 'post-engine: superseded host continued running'
+    assert_grep 'supervision-host stood down:' "$home/host.out" 'post-engine: stale host did not refuse its continuation'
+    assert_equals "$before" "$(cksum "$home/state/.supervision-host" "$home/state/.supervision-host-turn" "$home/state/.supervision-host-engine" "$home/state/.supervision-host-health" "$home/state/.host-mirror-cursor" "$home/state/.host-mirror-cursor.next" "$home/state/.branch-eligible-owner" "$home/state/.branch-eligible-rows" "$home/state/.lease-replacement")" "post-engine $phase changed replacement state"
+    kill -0 "$replacement" || fail 'post-engine: replacement session was signalled'
+    kill -TERM "$replacement" 2>/dev/null || true
+    wait "$replacement" 2>/dev/null || true
+  done
+  pass 'lease, grant, mirror commit and feed waits cannot retag old results or mutate replacement resources'
+}
+
 # Keep each serial CI runner below its job timeout without dropping assertions.
 # The companion script sources these fixtures and executes the second group.
 case ${FM_SUPERVISION_HOST_TEST_GROUP:-early} in
 early)
+test_post_engine_blocking_operations_revalidate_the_turn
 test_host_rechecks_after_park_and_engine
 test_host_cleanup_rechecks_after_lease_contention
 test_claude_stop_hook_restores_handoff_when_successor_closed_before_exit_to_main

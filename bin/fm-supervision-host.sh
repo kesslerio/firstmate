@@ -244,6 +244,8 @@ LEFT_RECORD="$STATE/.supervision-host-left"
 
 HOST_PID=$$
 HOST_ACTIVE=0
+HOST_MAIN_KEY=
+ENGINE_KEY=
 HOST_STARTED_SECONDS=$SECONDS
 HOST_STARTED=$(date +%s)
 GEN="host-$HOST_PID-$HOST_STARTED"
@@ -345,7 +347,8 @@ branch_env() {  # <command...>: run with the branch actor identity
 
 release_branch_leases() {
   host_still_owner || return 1
-  FM_SUPERVISION_HOST_PID=$HOST_PID FM_SUPERVISION_HOST_AUTOARM_GEN=$AUTOARM_GEN FM_SUPERVISION_HOST_OWNER_PID=$AUTOARM_OWNER branch_env "$SCRIPT_DIR/fm-lease.sh" release-actor --actor branch >/dev/null 2>&1 || true
+  FM_SUPERVISION_HOST_SESSION_KEY=${ENGINE_KEY:-$HOST_MAIN_KEY} FM_SUPERVISION_HOST_TURN=${LAST_TURN:-} FM_SUPERVISION_HOST_PID=$HOST_PID FM_SUPERVISION_HOST_AUTOARM_GEN=$AUTOARM_GEN FM_SUPERVISION_HOST_OWNER_PID=$AUTOARM_OWNER branch_env "$SCRIPT_DIR/fm-lease.sh" release-actor --actor branch >/dev/null 2>&1 || return 1
+  host_still_owner
 }
 
 # Stop whatever a predecessor host left running, then take the record. The
@@ -467,6 +470,7 @@ retire_arm() {  # <pid> <output-file>
 
 host_still_owner() {
   fm_session_lock_owned_by_self "$STATE" || return 1
+  [ -z "$HOST_MAIN_KEY" ] || [ "$(fm_supervision_host_main_key "$STATE")" = "$HOST_MAIN_KEY" ] || return 1
   if [ "$HOST_ACTIVE" -eq 1 ]; then
     [ "$(awk -F '\t' '$1 == "host" {print $2; exit}' "$HOST_RECORD" 2>/dev/null)" = "$HOST_PID" ] || return 1
   fi
@@ -474,6 +478,12 @@ host_still_owner() {
   fm_autoarm_ledger_read "$STATE" || return 1
   [ "$FM_AUTOARM_GEN" = "$AUTOARM_GEN" ] && [ "$FM_AUTOARM_OWNER" = "$AUTOARM_OWNER" ] \
     && [ "$FM_AUTOARM_OUTCOME" = arming ]
+}
+
+turn_still_owner() {
+  host_still_owner || return 1
+  [ -n "$ENGINE_KEY" ] && [ "$(fm_supervision_host_main_key "$STATE")" = "$ENGINE_KEY" ] || return 1
+  [ "$(sed -n 's/^turn=//p' "$TURN_FILE")" = "$LAST_TURN" ]
 }
 
 start_arm() {  # <predecessor-arm-pid or empty> [--restart]; sets the started pid/output
@@ -740,7 +750,7 @@ leave_successor_for_main() {
 # and ENGINE_MODE (new|resume).
 choose_conversation() {
   local key recorded_key recorded_session recorded_engine recorded_model turns
-  key=$(fm_supervision_host_main_key "$STATE") || key=
+  key=$(fm_supervision_host_main_key "$STATE") || return 1
   recorded_key=$(sed -n 's/^key=//p' "$ENGINE_RECORD" 2>/dev/null | head -n 1)
   recorded_session=$(sed -n 's/^session=//p' "$ENGINE_RECORD" 2>/dev/null | head -n 1)
   recorded_engine=$(sed -n 's/^engine=//p' "$ENGINE_RECORD" 2>/dev/null | head -n 1)
@@ -773,23 +783,29 @@ choose_conversation() {
     rm -f "$tmp"
     return 1
   fi
+  host_still_owner || { rm -f "$tmp"; return 1; }
   mv -f "$tmp" "$PROMPT_FILE" || return 1
   return 0
 }
 
 write_engine_record() {  # <turns> <conversation-cost>
   local tmp
+  turn_still_owner || return 1
   tmp=$(mktemp "$ENGINE_RECORD.tmp.XXXXXX") || return 1
   printf 'engine=%s\nmodel=%s\nsession=%s\nkey=%s\nturns=%s\nconversation_cost=%s\n' \
     "$FM_SUPERVISION_ENGINE" "$FM_SUPERVISION_ENGINE_MODEL" "$ENGINE_SESSION" "$ENGINE_KEY" "$1" "$2" > "$tmp" \
-    && mv -f "$tmp" "$ENGINE_RECORD"
+    && turn_still_owner && mv -f "$tmp" "$ENGINE_RECORD"
 }
 
 # Persist health between host parks; the main-session key prevents a recycled
 # lock pid from inheriting another session's conversation or latch.
 # docs/supervision-host.md "The broken-session latch" owns the policy.
 health_key() {
-  fm_supervision_host_health_key "$STATE"
+  if [ -n "${LAST_TURN:-}" ] && [ -n "${ENGINE_KEY:-}" ]; then
+    printf '%s|%s|%s\n' "$ENGINE_KEY" "$FM_SUPERVISION_ENGINE" "$FM_SUPERVISION_ENGINE_MODEL"
+  else
+    fm_supervision_host_health_key "$STATE"
+  fi
 }
 
 # Sets HEALTH_ERRORS, HEALTH_COOLDOWN, and HEALTH_RETRY for the current key.
@@ -807,11 +823,12 @@ health_load() {
 
 health_save() {
   local key tmp
+  turn_still_owner || return 0
   key=$(health_key) || return 0
   tmp=$(mktemp "$HEALTH_FILE.tmp.XXXXXX" 2>/dev/null) || return 0
   printf 'key=%s\nerrors=%s\ncooldown=%s\nretry_after=%s\n' \
     "$key" "$HEALTH_ERRORS" "$HEALTH_COOLDOWN" "$HEALTH_RETRY" > "$tmp" 2>/dev/null \
-    && mv -f "$tmp" "$HEALTH_FILE" 2>/dev/null
+    && turn_still_owner && mv -f "$tmp" "$HEALTH_FILE" 2>/dev/null
   rm -f "$tmp" 2>/dev/null || true
 }
 
@@ -898,6 +915,7 @@ handle_wake() {  # <reason-lines>
       HANDLE_WHY="the branch grant could not be activated"
       return 1
     fi
+    host_still_owner || stand_down "this session no longer owns supervision"
     GRANT_ACTIVE=1
   fi
   # shellcheck disable=SC2086 # rows is a space-separated list of sequence numbers.
@@ -910,14 +928,17 @@ handle_wake() {  # <reason-lines>
   esac
   if ! host_still_owner; then
     "$SCRIPT_DIR/fm-wake-grant.sh" release "$GEN" >/dev/null 2>&1 || true
+    host_still_owner || stand_down "this session no longer owns supervision"
     HANDLE_WHY="this session no longer owns supervision"
     return 1
   fi
   if ! choose_conversation; then
     "$SCRIPT_DIR/fm-wake-grant.sh" release "$GEN" >/dev/null 2>&1 || true
+    host_still_owner || stand_down "this session no longer owns supervision"
     HANDLE_WHY="the branch prompt or engine conversation could not be prepared"
     return 1
   fi
+  host_still_owner && [ "$(fm_supervision_host_main_key "$STATE")" = "$ENGINE_KEY" ] || stand_down "this session no longer owns supervision"
   TURN_SEQ=$((TURN_SEQ + 1))
   turn="$GEN.$TURN_SEQ"
   LAST_TURN=$turn
@@ -935,15 +956,19 @@ handle_wake() {  # <reason-lines>
   # attended wake. The engine never judges without the captain's words, so a
   # feed that cannot be read hands the wake to main. Away needs none, so an
   # away wake never reads the mirror or moves its cursor.
+  turn_still_owner || stand_down "this session no longer owns supervision"
   mirror=$MIRROR_FEED
   rm -f "$mirror"
   if [ "$TURN_POSTURE" = attended ] \
-    && ! (umask 077; exec "$SCRIPT_DIR/fm-host-mirror.sh" feed "$ENGINE_SESSION" "$ENGINE_MODE" > "$mirror" 2>/dev/null); then
+    && ! (umask 077; FM_HOST_MIRROR_EXPECTED_KEY="$ENGINE_KEY" FM_SUPERVISION_HOST_PID="$HOST_PID" FM_BRANCH_REPORT_TURN="$turn" FM_HOST_MIRROR_AUTOARM_GEN="$AUTOARM_GEN" FM_HOST_MIRROR_AUTOARM_OWNER="$AUTOARM_OWNER" exec "$SCRIPT_DIR/fm-host-mirror.sh" feed "$ENGINE_SESSION" "$ENGINE_MODE" > "$mirror" 2>/dev/null); then
+    turn_still_owner || stand_down "this session no longer owns supervision"
     rm -f "$TURN_FILE" "$mirror"
     "$SCRIPT_DIR/fm-wake-grant.sh" release "$GEN" >/dev/null 2>&1 || true
+    host_still_owner || stand_down "this session no longer owns supervision"
     HANDLE_WHY="the dialog mirror could not be read"
     return 1
   fi
+  turn_still_owner || stand_down "this session no longer owns supervision"
   set -- --report "the bin/fm-branch-report.sh command"
   if [ "$TURN_POSTURE" = away ]; then
     set -- "$@" --away ${readback:+--readback-file "$readback"}
@@ -954,10 +979,12 @@ handle_wake() {  # <reason-lines>
   rc=0
   printf '%s\n' "$reason" \
     | (umask 077; exec node "$SCRIPT_DIR/fm-branch-dispatch.mjs" wake-prompt "$@" > "$WAKE_FILE" 2>/dev/null) || rc=$?
+  turn_still_owner || stand_down "this session no longer owns supervision"
   if [ "$rc" -ne 0 ]; then
     [ -z "$readback" ] || rm -f "$readback"
     rm -f "$TURN_FILE" "$mirror"
     "$SCRIPT_DIR/fm-wake-grant.sh" release "$GEN" >/dev/null 2>&1 || true
+    host_still_owner || stand_down "this session no longer owns supervision"
     HANDLE_WHY="the wake prompt could not be rendered"
     [ "$rc" -ne 3 ] || HANDLE_WHY="the dialog mirror could not be read"
     return 1
@@ -981,7 +1008,7 @@ handle_wake() {  # <reason-lines>
     [ -z "${FM_STATE_OVERRIDE:-}" ] || export FM_STATE_OVERRIDE
     [ -z "${FM_CONFIG_OVERRIDE:-}" ] || export FM_CONFIG_OVERRIDE
     export FM_SUPERVISION_ACTOR=branch
-    FM_LEASE_HOLDER_PID=$(sed -n '1p' "$STATE/.lock" 2>/dev/null | tr -cd '0-9')
+    FM_LEASE_HOLDER_PID=${ENGINE_KEY%%:*}
     export FM_LEASE_HOLDER_PID
     export FM_SUPERVISION_PRIMARY_HARNESS="$PRIMARY"
     export FM_BRANCH_REPORT_TURN="$turn"
@@ -995,12 +1022,13 @@ handle_wake() {  # <reason-lines>
   ENGINE_SUBSHELL=
   ENGINE_RUNNING=0
   host_still_owner || stand_down "this session no longer owns supervision"
-  release_branch_leases
+  release_branch_leases || stand_down "this session no longer owns supervision"
+  turn_still_owner || stand_down "this session no longer owns supervision"
   # shellcheck disable=SC2086 # rows is a space-separated list of sequence numbers.
   unacked=$(fm_wake_rows_queued $rows) || unacked=$rows
   unacked=$(printf '%s\n' "$unacked" | awk 'NF { printf "%s%s", sep, $1; sep = " " }')
   "$SCRIPT_DIR/fm-wake-grant.sh" release "$GEN" >/dev/null 2>&1 || true
-  rm -f "$TURN_FILE"
+  turn_still_owner || stand_down "this session no longer owns supervision"
   receipts=$(awk -F '\t' -v turn="$turn" '$1 == turn { n++ } END { print n + 0 }' "$RECEIPTS" 2>/dev/null)
   usage=$(fm_supervision_engine_result "$FM_SUPERVISION_ENGINE" "$result" "${ENGINE_COST:-0}" 2>/dev/null || true)
   [ "$result" = /dev/null ] || rm -f "$result"
@@ -1008,11 +1036,15 @@ handle_wake() {  # <reason-lines>
   if [ "$rc" -ne 0 ] || [ -z "$usage" ] || [ "${usage#error=0}" = "$usage" ]; then
     ENGINE_ERROR=1
   fi
+  turn_still_owner || stand_down "this session no longer owns supervision"
   health_record "$ENGINE_ERROR" "${receipts:-0}"
+  turn_still_owner || stand_down "this session no longer owns supervision"
   if [ "$ENGINE_ERROR" -eq 0 ] && [ "${receipts:-0}" -gt 0 ] && [ -z "$unacked" ]; then
     write_engine_record $((ENGINE_TURNS + 1)) "$(printf '%s\n' "$usage" | sed -n 's/.* conversation_cost=\([^ ]*\).*/\1/p')" \
-      || rm -f "$ENGINE_RECORD"
-    [ "$TURN_POSTURE" != attended ] || "$SCRIPT_DIR/fm-host-mirror.sh" commit >/dev/null 2>&1 || true
+      || { turn_still_owner && rm -f "$ENGINE_RECORD"; }
+    [ "$TURN_POSTURE" != attended ] || FM_HOST_MIRROR_EXPECTED_KEY="$ENGINE_KEY" FM_SUPERVISION_HOST_PID="$HOST_PID" FM_BRANCH_REPORT_TURN="$turn" FM_HOST_MIRROR_AUTOARM_GEN="$AUTOARM_GEN" FM_HOST_MIRROR_AUTOARM_OWNER="$AUTOARM_OWNER" "$SCRIPT_DIR/fm-host-mirror.sh" commit >/dev/null 2>&1 || true
+    turn_still_owner || stand_down "this session no longer owns supervision"
+    rm -f "$TURN_FILE"
     [ "$errors" = /dev/null ] || rm -f "$errors"
     TURN_ERRORS=
     log_line "handled	turn=$turn	posture=$TURN_POSTURE	rc=$rc	reports=$receipts	$usage	$first"
@@ -1020,7 +1052,8 @@ handle_wake() {  # <reason-lines>
   fi
   # A turn that did not handle its wake starts the next one on a new
   # conversation, so whatever went wrong in this one is not carried forward.
-  rm -f "$ENGINE_RECORD"
+  turn_still_owner || stand_down "this session no longer owns supervision"
+  rm -f "$ENGINE_RECORD" "$TURN_FILE"
   log_line "failed	turn=$turn	posture=$TURN_POSTURE	rc=$rc	reports=${receipts:-0}	unacked=${unacked:-none}	${usage:-no-result}	$(head -c 300 "$errors" 2>/dev/null | tr '\t\n' '  ')	$first"
   [ "$errors" = /dev/null ] || rm -f "$errors"
   TURN_ERRORS=
@@ -1072,6 +1105,7 @@ attended_acceptor() {  # <first-reason-line>
 if ! host_still_owner; then
   stand_down "this session does not own supervision"
 fi
+HOST_MAIN_KEY=$(fm_supervision_host_main_key "$STATE") || HOST_MAIN_KEY=
 trap cleanup EXIT
 trap 'exit 129' HUP
 trap 'exit 143' TERM
