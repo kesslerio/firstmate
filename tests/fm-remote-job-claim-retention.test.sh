@@ -22,11 +22,12 @@ date() {
   if [ "$*" = '+%s' ]; then printf '%s\n' "$NOW"; else command date "$@"; fi
 }
 touch_frac() { # <epoch> <fraction> <path>
-  local stamp
-  stamp=$(TZ=UTC0 command date -d "@$1" +%Y-%m-%dT%H:%M:%S 2>/dev/null) \
-    || stamp=$(TZ=UTC0 command date -r "$1" +%Y-%m-%dT%H:%M:%S 2>/dev/null) \
-    || fail "touch_frac: date(1) accepted neither -d @<epoch> nor -r <epoch>"
-  touch -d "$stamp.$2Z" "$3" || fail "touch_frac: touch -d $stamp.$2Z failed"
+  python3 - "$1" "$2" "$3" <<'PYTIME' || fail "touch_frac: could not set fractional timestamp for $3"
+import os, sys
+seconds, fraction, path = sys.argv[1:]
+stamp = int(seconds) * 1_000_000_000 + int(fraction.ljust(9, '0'))
+os.utime(path, ns=(stamp, stamp))
+PYTIME
 }
 CUTOFF=$((NOW - FM_REMOTE_JOB_SEQ_CLAIM_REAP_SECONDS))
 for spec in 3:$CUTOFF:0 4:$CUTOFF:5 5:$((CUTOFF + 1)):0 6:$((CUTOFF + 1)):5; do

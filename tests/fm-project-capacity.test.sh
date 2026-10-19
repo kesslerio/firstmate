@@ -20,6 +20,18 @@ unset TASKS_AXI_BACKEND || :
 SPAWN="$ROOT/bin/fm-spawn.sh"
 TEARDOWN="$ROOT/bin/fm-teardown.sh"
 TMP_ROOT=$(fm_test_tmproot fm-project-capacity)
+CAPACITY_GROUPS=()
+stop_capacity_groups() {
+  local pid
+  for pid in "${CAPACITY_GROUPS[@]:-}"; do
+    [ -n "$pid" ] || continue
+    kill -TERM -- "-$pid" "$pid" 2>/dev/null || true
+    kill -KILL -- "-$pid" "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+  done
+  fm_test_cleanup
+}
+trap stop_capacity_groups EXIT
 DEFER_EXIT=75
 HAVE_TASKS_AXI=0
 command -v tasks-axi >/dev/null 2>&1 && HAVE_TASKS_AXI=1
@@ -469,13 +481,17 @@ test_unreadable_holders_refuse_admission() {
 # Two spawns racing for the last place: the one holding the project lock
 # publishes, the other cannot publish while it waits and is deferred afterwards.
 test_concurrent_spawns_cannot_both_take_the_last_place() {
-  local case_dir home out rc=0 hold i wt
+  local case_dir home out rc=0 hold i wt spawn_pid
   case_dir=$(make_case concurrent task-a task-b)
   home="$case_dir/home"
   declare_capacity "$home" "project 1"
   hold="$case_dir/hold"
   wt=$(new_worktree "$case_dir" task-a)
-  FM_FAKE_HOLD="$hold" spawn_ship "$case_dir" task-a "$wt" > "$case_dir/a.out" 2>&1 &
+  FM_FAKE_HOLD="$hold" SPAWN="$SPAWN" perl -MPOSIX=setsid -e 'setsid() >= 0 or exit 1; exec @ARGV' \
+    bash -c 'eval "$1"; shift; run_spawn "$@"' _ "$(declare -f run_spawn)" \
+    "$case_dir" "$home" "$wt" task-a "$case_dir/project" --mode no-mistakes --yolo off > "$case_dir/a.out" 2>&1 &
+  spawn_pid=$!
+  CAPACITY_GROUPS+=("$spawn_pid")
   i=0
   while [ ! -f "$hold.reached" ]; do
     i=$((i + 1))
@@ -486,7 +502,8 @@ test_concurrent_spawns_cannot_both_take_the_last_place() {
   [ "$rc" -ne 0 ] || fail "a concurrent spawn launched while the last place was being taken: $out"
   assert_absent "$home/state/task-b.meta" "a concurrent spawn published past the last place"
   : > "$hold.release"
-  wait || true
+  wait "$spawn_pid" || true
+  CAPACITY_GROUPS[${#CAPACITY_GROUPS[@]}-1]=''
   assert_contains "$(cat "$case_dir/a.out")" "spawned task-a" "the lock-holding spawn did not finish"
   rc=0
   out=$(spawn_ship "$case_dir" task-b "$case_dir/unused") || rc=$?
@@ -583,15 +600,19 @@ SH
   declare_capacity "$home" "project 1"
 
   # shellcheck disable=SC2016 # expanded by the holder's own shell
-  FM_HOME="$home" FM_STATE_OVERRIDE='' bash -c '
+  FM_HOME="$home" FM_STATE_OVERRIDE='' perl -MPOSIX=setsid -e 'setsid() >= 0 or exit 1; exec @ARGV' bash -c '
     . "$1/bin/fm-wake-lib.sh"
     lock=$(fm_treehouse_project_lock_path "$2") || exit 1
     fm_lock_try_acquire "$lock" || exit 1
     : > "$3.held"
-    while [ ! -f "$3.release" ]; do sleep 0.05; done
+    while [ ! -f "$3.release" ]; do
+      [ "$SECONDS" -lt 60 ] || exit 75
+      sleep 0.05
+    done
     fm_lock_release "$lock"
   ' _ "$ROOT" "$case_dir/project" "$case_dir/holder" &
   holder=$!
+  CAPACITY_GROUPS+=("$holder")
   i=0
   while [ ! -f "$case_dir/holder.held" ]; do
     i=$((i + 1))
@@ -605,6 +626,7 @@ SH
     --backend orca --mode no-mistakes --yolo off) || rc2=$?
   : > "$case_dir/holder.release"
   wait "$holder" || true
+  CAPACITY_GROUPS[${#CAPACITY_GROUPS[@]}-1]=''
   expect_code 1 "$rc" "an Orca spawn ignored a held project lock: $out"
   assert_contains "$out" "another spawn or cleanup holds the shared project lock for $case_dir/project; refusing to race its capacity admission" \
     "the Orca spawn did not refuse on the shared project lock"

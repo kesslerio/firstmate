@@ -393,7 +393,8 @@ class ExecutionReservation(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.home=pathlib.Path(self.temp.name).resolve()/'home'
+        self.root=pathlib.Path(self.temp.name).resolve()
+        self.home=self.root/'home'
         self.state=self.home/'state'
         self.directory=self.state/'worker.inbox'
         self.directory.mkdir(parents=True)
@@ -465,7 +466,7 @@ class ExecutionReservation(unittest.TestCase):
         self.assertFalse(self.inbox.query()[0]['outstanding'])
 
     def test_explicit_external_state(self):
-        external=pathlib.Path(self.temp.name)/'external-state'
+        external=self.root/'external-state'
         external.mkdir()
         os.environ['FM_STATE_OVERRIDE']=str(external)
         self.assertEqual(module.Inbox(external,'worker').state,external)
@@ -548,7 +549,7 @@ inbox.disposition(types.SimpleNamespace(command='run',record=sys.argv[3],gen='g1
         self.assertFalse(self.effects.exists())
 
     def test_state_and_home_boundaries(self):
-        foreign=pathlib.Path(self.temp.name)/'foreign'; foreign.mkdir()
+        foreign=self.root/'foreign'; foreign.mkdir()
         with self.assertRaises(ValueError): module.Inbox(foreign,'worker')
         link=self.home/'linked-state'; link.symlink_to(self.state,target_is_directory=True)
         os.environ['FM_STATE_OVERRIDE']=str(link)

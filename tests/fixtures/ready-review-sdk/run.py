@@ -115,7 +115,7 @@ def main():
     args=parser.parse_args();source=args.source.resolve(strict=True);package=args.sdk_package.resolve(strict=True)
     require(os.getuid()==1000,'Admitted SDK fixture requires UID1000')
     assets=Path(__file__).resolve().parent
-    root=Path(tempfile.mkdtemp(prefix='fm-ready-review-sdk.',dir=os.environ.get('TMPDIR','/tmp')))
+    root=Path(tempfile.mkdtemp(prefix='fm-ready-review-sdk.',dir=os.environ.get('TMPDIR','/tmp'))).resolve()
     root.chmod(0o700)
     output=root/'evidence';output.mkdir(mode=0o700)
     for name in ('user-home','tmp','xdg','agent','bin','worker-sessions'):(root/name).mkdir(mode=0o700)

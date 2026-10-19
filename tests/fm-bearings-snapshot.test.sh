@@ -1659,10 +1659,7 @@ test_landed_accepts_only_kind_owned_delivery_artifacts() {
   local home fakebin json main_backlog report_path report_pr
   local keyword_report shipping_report fleet_json created_kind failures=''
   [ -n "$TASKS_AXI_BIN" ] || fail "tasks-axi is required for the landed-selector regression"
-  fm_tasks_axi_compatible || {
-    echo "skip: installed tasks-axi predates ${FM_TASKS_AXI_MIN}, so the real backlog mutations this regression needs are refused"
-    return 0
-  }
+  fm_tasks_axi_compatible || fail "prerequisite: tasks-axi >= ${FM_TASKS_AXI_MIN} must be available on PATH; select a compatible isolated test toolchain"
   home=$(make_home kind-owned-landed)
   write_fixture "$home"
   fakebin=$(make_fakebin "$home")
@@ -1815,10 +1812,7 @@ EOF
 test_kind_fallback_matches_tasks_axi_word_boundaries() {
   local home fakebin id title kind producer_kind fleet_json json
   [ -n "$TASKS_AXI_BIN" ] || fail "tasks-axi is required for the kind-boundary regression"
-  fm_tasks_axi_compatible || {
-    echo "skip: installed tasks-axi predates ${FM_TASKS_AXI_MIN}, so the real backlog mutations this regression needs are refused"
-    return 0
-  }
+  fm_tasks_axi_compatible || fail "prerequisite: tasks-axi >= ${FM_TASKS_AXI_MIN} must be available on PATH; select a compatible isolated test toolchain"
   home=$(make_home kind-word-boundaries)
   fakebin=$(make_fakebin "$home")
   : > "$home/net.log"
