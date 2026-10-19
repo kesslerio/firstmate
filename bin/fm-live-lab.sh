@@ -492,7 +492,7 @@ cmd_up() {
   if [ -z "$root" ]; then
     root=$(mktemp -d /tmp/fmlab.XXXXXX) || die "cannot create a lab root"
   else
-    mkdir -p "$root" || die "cannot create '$root'"
+    (umask 077; mkdir -p "$(dirname "$root")" && mkdir "$root") || die "cannot create '$root'"
   fi
   ROOT=$(real_dir "$root")
   LAB="$ROOT/home"
@@ -502,6 +502,7 @@ cmd_up() {
   GATE="$LAB/data/$WORKER_ID/gate"
   PI_TRUST_BEFORE=$(digest "$PI_TRUST_STORE")
   treehouse_listing | sort > "$ROOT/.treehouse-before"
+  (umask 077
   {
     echo "$RECORD_TOKEN"
     echo "harness=$harness"
@@ -519,7 +520,7 @@ cmd_up() {
     echo "claude_store=$CLAUDE_STORE"
     echo "pi_trust_store=$PI_TRUST_STORE"
     echo "treehouse_dir=$TREEHOUSE_DIR"
-  } > "$ROOT/$RECORD_NAME"
+  } > "$ROOT/$RECORD_NAME")
   echo "lab: $ROOT (tear down with: $0 down $ROOT)"
 
   "$LAB_HOME_HELPER" create "$LAB" >/dev/null || die "cannot create the lab home"

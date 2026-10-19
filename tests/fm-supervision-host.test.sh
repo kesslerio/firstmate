@@ -83,6 +83,12 @@ if [ "$mode" = hang ]; then
   sleep "$FM_TEST_STUB_MAX_BLOCK_SECONDS"
   exit 0
 fi
+if [ "$mode" = supersede-held ]; then
+  printf 'ready\n' > "$FM_HOME/stub-ready"
+  read -r _ < "$FM_HOME/stub-release"
+  result
+  exit 0
+fi
 drain=$("$FM_REPO/bin/fm-wake-drain.sh" 2>&1)
 printf '%s\n' "$drain" > "$FM_HOME/engine-drain.$n"
 ack=$(printf '%s\n' "$drain" | sed -n 's/^WAKE_ACK_REQUIRED: after handling completes run bin\/fm-wake-drain.sh //p' | tail -1)
@@ -1525,6 +1531,7 @@ SH
   expect_code 2 "$(cat "$home/hook.rc")" "the Stop hook must notify main instead of dropping the close"
   assert_grep 'firstmate watcher auto-arm FAILED' "$home/hook.err" "main must receive the failure notification"
   assert_re 'outcome=failed ' "$home/state/.claude-autoarm-epoch" "the failure must be committed"
+  assert_re '^signal: .*demo.status' "$home/hook.err" "failed host hand-back must emit the original actionable wake"
   pass "host+hook: failed at-turn downtime write notifies main despite a healthy successor"
 }
 
@@ -2330,7 +2337,7 @@ test_next_host_clears_a_turn_its_killed_predecessor_left() {
   append_status "$home" 'mid-turn when its host is killed'
   wait_until 250 grep -qs 'supervision-host-return:1' "$home/state/.wake-queue" || fail "killed: the turn never reported"
   host=$(awk -F '\t' '$1 == "host" { print $2 }' "$home/state/.supervision-host")
-  engine=$(cut -f1 "$home/state/.supervision-host.engine-pid")
+  engine=$(cut -f1 "$home/state"/.supervision-host.engine-pid.*)
   kill -KILL "$host"
   wait_until 100 host_exited "$home" || fail "killed: the host did not die"
   ls "$home"/state/.supervision-host-result.* >/dev/null 2>&1 || fail "fixture: the killed turn left no result file, so this case proves nothing"
@@ -2420,11 +2427,15 @@ test_engine_turn_is_bounded_and_its_descendants_reaped() {
   pass "host: an engine turn is bounded, and tool processes outside its process group are reaped"
 }
 
+host_cycle_recorded() {
+  watcher_live "$1" && awk -F '\t' '$1 == "arm" && $2 ~ /^[0-9]+$/ {found=1} END {exit !found}' "$1/state/.supervision-host"
+}
+
 test_restarted_host_stops_what_a_killed_predecessor_left() {
   local home first_host arm watcher
   home=$(make_home away-crash away)
   start_host "$home"
-  wait_until 150 watcher_live "$home" || fail "crash: the host never started a watcher cycle"
+  wait_until 150 host_cycle_recorded "$home" || fail "crash: the host never recorded its started watcher cycle"
   first_host=$(awk -F '\t' '$1 == "host" { print $2 }' "$home/state/.supervision-host")
   arm=$(awk -F '\t' '$1 == "arm" { print $2 }' "$home/state/.supervision-host")
   watcher=$(cat "$home/state/.watch.lock/pid")
@@ -3023,10 +3034,84 @@ test_superseded_host_leaves_the_owner_untouched() {
   pass "host: a host under a superseded auto-arm generation stands down without touching the owner"
 }
 
+test_host_rechecks_after_park_and_engine() {
+  local home phase owner replacement before turn
+  for phase in park engine; do
+    home=$(make_home "lost-$phase" away)
+    if [ "$phase" = engine ]; then
+      echo supersede-held > "$home/stub-mode"
+      mkfifo "$home/stub-release"
+    fi
+    start_host "$home"
+    wait_until 150 watcher_live "$home" || fail "lost $phase: no initial watcher"
+    owner=$(awk -F '\t' '$1 == "host" {print $2; exit}' "$home/state/.supervision-host")
+    if [ "$phase" = engine ]; then
+      append_status "$home" 'work started'
+      wait_until 200 test -s "$home/stub-ready" || fail 'engine did not reach replacement barrier'
+    fi
+    "$FAKE_CLAUDE" -c 'sleep 45' & replacement=$!
+    printf '%s\n' "$replacement" >> "$home/claude-pids"
+    printf '%s\n' "$replacement" > "$home/state/.lock"
+    printf 'host\t%s\tfixture\n' "$replacement" > "$home/state/.supervision-host"
+    printf 'replacement turn\n' > "$home/state/.supervision-host-turn"
+    printf 'replacement engine\n' > "$home/state/.supervision-host-engine"
+    printf 'branch\t%s\t%s\n' "$replacement" "$(date +%s)" > "$home/state/.lease-replacement"
+    before=$(cksum "$home/state/.supervision-host" "$home/state/.supervision-host-turn" "$home/state/.supervision-host-engine" "$home/state/.lease-replacement")
+    if [ "$phase" = engine ]; then
+      printf 'release\n' > "$home/stub-release"
+    else
+      append_status "$home" 'which format?' needs-decision
+    fi
+    wait_until 200 host_exited "$home" || fail "lost $phase: stale host did not stand down"
+    assert_grep 'supervision-host stood down: this session no longer owns supervision' "$home/host.out" 'stale host must refuse after returning from its wait'
+    assert_equals "$before" "$(cksum "$home/state/.supervision-host" "$home/state/.supervision-host-turn" "$home/state/.supervision-host-engine" "$home/state/.lease-replacement")" 'stale cleanup mutated replacement records or leases'
+    kill -0 "$replacement" || fail 'stale host signalled replacement session'
+    ! kill -0 "$owner" 2>/dev/null || fail 'stale host remained alive'
+    kill -TERM "$replacement" 2>/dev/null || true
+    wait "$replacement" 2>/dev/null || true
+  done
+  pass 'host refuses after parked and engine ownership loss without removing replacement resources'
+}
+
+test_host_cleanup_rechecks_after_lease_contention() {
+  local home owner holder replacement before
+  home=$(make_home cleanup-replaced away)
+  start_host "$home"
+  wait_until 150 watcher_live "$home" || fail 'cleanup replacement: initial cycle absent'
+  owner=$(awk -F '\t' '$1 == "host" {print $2; exit}' "$home/state/.supervision-host")
+  bash -c '
+    . "$1/bin/fm-wake-lib.sh"
+    fm_lock_acquire_wait "$2/state/.fm-lease-command.lock" || exit 1
+    trap '"'"'fm_lock_release "$2/state/.fm-lease-command.lock"'"'"' EXIT
+    touch "$2/lease-ready"
+    for ((n=0; n<200; n++)); do [ -e "$2/lease-release" ] && exit 0; sleep .05; done
+    exit 1
+  ' _ "$ROOT" "$home" & holder=$!
+  printf '%s\n' "$holder" >> "$home/lock-holder-pids"
+  wait_until 100 test -e "$home/lease-ready" || fail 'cleanup holder did not acquire lease lock'
+  kill -TERM "$owner"
+  wait_until 100 no_home_arms "$home" || fail 'cleanup did not retire owned arms'
+  "$FAKE_CLAUDE" -c 'sleep 45' & replacement=$!
+  printf '%s\n' "$replacement" >> "$home/claude-pids"
+  printf 'host\t%s\tfixture\n' "$replacement" > "$home/state/.supervision-host"
+  printf 'replacement turn\n' > "$home/state/.supervision-host-turn"
+  printf 'branch\t%s\t%s\n' "$replacement" "$(date +%s)" > "$home/state/.lease-replacement"
+  before=$(cksum "$home/state/.supervision-host" "$home/state/.supervision-host-turn" "$home/state/.lease-replacement")
+  touch "$home/lease-release"
+  wait "$holder" || fail 'lease holder failed'
+  wait_until 150 host_exited "$home" || fail 'old cleanup did not complete'
+  assert_equals "$before" "$(cksum "$home/state/.supervision-host" "$home/state/.supervision-host-turn" "$home/state/.lease-replacement")" 'cleanup consumed replacement state after lease contention'
+  kill -TERM "$replacement" 2>/dev/null || true
+  wait "$replacement" 2>/dev/null || true
+  pass 'cleanup revalidates replacement ownership at the lease mutation boundary and after waiting'
+}
+
 # Keep each serial CI runner below its job timeout without dropping assertions.
 # The companion script sources these fixtures and executes the second group.
 case ${FM_SUPERVISION_HOST_TEST_GROUP:-early} in
 early)
+test_host_rechecks_after_park_and_engine
+test_host_cleanup_rechecks_after_lease_contention
 test_claude_stop_hook_restores_handoff_when_successor_closed_before_exit_to_main
 test_claude_stop_hook_restores_handoff_when_successor_closed_mid_engine_turn
 test_claude_stop_hook_notifies_when_closed_successor_downtime_restore_fails

@@ -651,3 +651,23 @@ test_failed_spawn_after_admission_holds_no_place
 test_unreadable_declaration_refuses_every_spawn
 test_batch_reports_a_deferred_pair
 test_orca_spawn_is_admitted_under_the_shared_project_lock
+
+test_recursive_home_inspection_failure() {
+  local home="$TMP_ROOT/topology" a b c rc
+  a="$home/a"; b="$home/b"; c="$home/c"
+  mkdir -p "$home/data" "$home/state" "$a/data" "$a/state" "$b/data" "$b/state" "$c/state"
+  printf -- '- a - A (home: %s; scope: A; projects: alpha; added 2026-01-01)\n- b - B (home: %s; scope: B; projects: alpha; added 2026-01-01)\n' "$a" "$b" > "$home/data/secondmates.md"
+  printf -- '- c - C (home: %s; scope: C; projects: alpha; added 2026-01-01)\n' "$c" > "$a/data/secondmates.md"
+  for target in "$a/data/secondmates.md" "$a/data"; do
+    chmod 000 "$target"
+    rc=0
+    FM_HOME="$home" bash -c '. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-secondmate-registry-lib.sh"; fm_local_firstmate_state_dirs "$FM_HOME/state" || { echo "$FM_LOCAL_FIRSTMATE_ERROR" >&2; exit 1; }' _ "$ROOT" > "$home/result" 2>&1 || rc=$?
+    chmod 700 "$target"
+    [ "$rc" -ne 0 ] || fail 'later sibling concealed an unreadable recursive registry'
+    assert_grep 'cannot be inspected' "$home/result" 'unknown topology must identify inspection failure'
+  done
+  FM_HOME="$home" bash -c '. "$1/bin/fm-wake-lib.sh"; . "$1/bin/fm-secondmate-registry-lib.sh"; fm_local_firstmate_state_dirs "$FM_HOME/state" || exit 1; printf "%s\n" "${FM_LOCAL_FIRSTMATE_STATES[@]}"' _ "$ROOT" > "$home/result" || fail 'valid topology with absent leaf registry was refused'
+  assert_grep "$c/state" "$home/result" 'recursive child disappeared from complete topology'
+  pass 'recursive registry and data read failures refuse complete topology; absent leaf registry remains empty'
+}
+test_recursive_home_inspection_failure

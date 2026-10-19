@@ -370,6 +370,9 @@ while [ "$attempt" -lt "$ARM_ATTEMPTS" ]; do
     # A host that died without a close may have left its cycle running with
     # no owner to deliver the close; retrying lets the next host stop what it
     # left and own a fresh cycle, which the healthy-watcher predicate cannot.
+    if [ "$HOST_RC" -ne 0 ] && [ "$HOST_RC" -le 128 ]; then
+      break
+    fi
     if [ "$HOST_RC" -gt 128 ] || [ -z "$ARM_OUT" ] || [ ! -s "$ARM_OUT" ]; then
       [ "$attempt" -lt "$ARM_ATTEMPTS" ] || break
       [ -z "$ARM_OUT" ] || rm -f "$ARM_OUT" 2>/dev/null

@@ -652,3 +652,44 @@ for mode in quiet away corrupt; do
   assert_equals "$expected" "$actual" "retained $mode contract posture"
 done
 pass "retained quiet contracts remain present while away and corrupt contracts remain away"
+
+home=$(make_home receipt-snapshot)
+first=$(run_inbox "$home" note --json first | json_get id)
+second=$(run_inbox "$home" note --json second | json_get id)
+run_inbox "$home" drain --ack "$second" >/dev/null
+mkdir "$home/probe"
+cat > "$home/probe/sitecustomize.py" <<'PY'
+import os, pathlib, time
+original = pathlib.Path.is_file
+paused = False
+def inspect(path):
+    global paused
+    if not paused and path.parent.name == '.replies' and path.name == os.environ.get('SNAPSHOT_ID'):
+        paused = True
+        barrier = pathlib.Path(os.environ['SNAPSHOT_BARRIER'])
+        (barrier / 'entered').touch()
+        deadline = time.monotonic() + 10
+        while not (barrier / 'release').exists():
+            if time.monotonic() >= deadline:
+                raise RuntimeError('snapshot barrier timed out')
+            time.sleep(.02)
+    return original(path)
+pathlib.Path.is_file = inspect
+PY
+FM_TEST_CHILD_REGISTRY="$TMP_ROOT/snapshot-children"
+export FM_TEST_CHILD_REGISTRY
+PYTHONPATH="$home/probe" SNAPSHOT_ID="$first" SNAPSHOT_BARRIER="$home/probe" run_inbox "$home" receipts --all-replies > "$home/snapshot" & reader=$!
+fm_test_track_child "$reader"
+for ((i=0; i<200; i++)); do [ -e "$home/probe/entered" ] && break; sleep .02; done
+assert_present "$home/probe/entered" 'receipt snapshot did not reach the reply read'
+(run_inbox "$home" reply "$first" one; run_inbox "$home" reply "$second" two; touch "$home/written") > "$home/writer.out" & writer=$!
+fm_test_track_child "$writer"
+sleep .2
+assert_absent "$home/written" 'reply publication passed an in-progress receipt snapshot'
+touch "$home/probe/release"
+wait "$reader" || fail 'receipt snapshot failed'
+wait "$writer" || fail 'reply writers failed'
+cursor=$(json_get reply_cursor < "$home/snapshot")
+assert_equals '' "$cursor" 'snapshot advanced past uncommitted replies'
+assert_equals 2 "$(run_inbox "$home" receipts --all-replies --after "$cursor" | json_len replies)" 'later cursor read lost a committed reply'
+pass 'receipts serialize pending and handled reply enrichment with committed publication'

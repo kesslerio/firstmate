@@ -199,6 +199,7 @@ setup_remote_parent_home() {  # <name> <remote-home> -> echoes home dir
     "yolo=off" \
     "remote_host=remote-mac" \
     "remote_root=/remote/root" \
+    "home=$2" \
     "remote_backend=herdr" \
     "remote_herdr_session=fm-remote" \
     "remote_target=fm-remote:p1"
@@ -891,3 +892,19 @@ test_local_secondmate_pending_keeps_expectation_armed
 echo "all fm-send-remote-delivery tests passed"
 
 test_remote_obligation_survives_ack_and_lost_reply
+
+test_remote_route_disagreement_refuses_send() {
+  local dir fb ssh_log home rhome rc
+  dir="$TMP_ROOT/route-disagreement"; mkdir -p "$dir"
+  fb=$(make_stubs "$dir"); ssh_log="$dir/ssh.log"; : > "$ssh_log"
+  rhome=$(setup_remote_secondmate_home route-disagreement)
+  home=$(setup_remote_parent_home route-disagreement "$rhome")
+  printf 'remote_root=/foreign/root\n' >> "$home/state/rsm.meta"
+  rc=0
+  send_env "$fb" "$home" "$ssh_log" "$SEND" rsm 'must not reach the other route' > "$dir/out" 2> "$dir/err" || rc=$?
+  [ "$rc" -ne 0 ] || fail 'send accepted disagreement between registry and task route'
+  [ ! -s "$ssh_log" ] || fail 'denied route reached remote transport'
+  [ -z "$(remote_inbox_records "$rhome")" ] || fail 'denied route enqueued a remote instruction'
+  pass 'remote send refuses registry/task route disagreement before either transport attempt'
+}
+test_remote_route_disagreement_refuses_send

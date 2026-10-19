@@ -624,6 +624,37 @@ out=$($LIVE_LAB down "$PARTIAL" 2>&1)
 expect_code 0 "$?" "down cleans a lab whose checkout failed: $out"
 assert_absent "$PARTIAL" "partial lab removed"
 pass "up gives both task IDs a long nonce and down cleans partial setup"
+real_mktemp=$(command -v mktemp)
+cat > "$TMP_ROOT/stub-bin/mktemp" <<SHMKTEMP
+#!/usr/bin/env bash
+if [ "\${2:-}" = /tmp/fmlab.XXXXXX ]; then
+  exec "$real_mktemp" -d "$TMP_ROOT/default-fmlab.XXXXXX"
+fi
+exec "$real_mktemp" "\$@"
+SHMKTEMP
+chmod +x "$TMP_ROOT/stub-bin/mktemp"
+for mask in 002 022; do
+  for placement in explicit default; do
+    partial="$TMP_ROOT/private-$mask-$placement"
+    args=()
+    [ "$placement" != explicit ] || args+=("$partial")
+    out=$(umask "$mask"; PATH="$TMP_ROOT/stub-bin:$PATH" "$LIVE_LAB" up --harness claude --source "$TMP_ROOT/missing-origin" "${args[@]}" 2>&1)
+    expect_code 1 "$?" 'unavailable source must stop private lab setup'
+    partial=$(printf '%s\n' "$out" | sed -n 's/^lab: \(.*\) (tear down with:.*$/\1/p')
+    [ -n "$partial" ] || fail 'private lab root was not reported'
+    python3 - "$partial" <<'PYPERM'
+import pathlib, stat, sys
+root = pathlib.Path(sys.argv[1])
+assert stat.S_IMODE(root.stat().st_mode) == 0o700
+assert stat.S_IMODE((root / '.fm-live-lab').stat().st_mode) == 0o600
+PYPERM
+    out=$("$LIVE_LAB" down "$partial" 2>&1)
+    expect_code 0 "$?" "private partial lab must remain cleanable: $out"
+    assert_absent "$partial" 'private partial lab removed'
+  done
+done
+pass 'explicit and default lab creation stays private and cleanable under umask 002 and 022'
+
 
 # A rival Claude writer drops the newly registered primary key once. The
 # stand-in primary checks the store on startup, while the readiness probe fails.

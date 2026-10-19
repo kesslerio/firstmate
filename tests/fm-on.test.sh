@@ -146,7 +146,7 @@ fm_on --stdin ios fm-probe-one.sh "$ARGV_ACTUAL" 23 \
   < "$TMP_ROOT/stdin" > "$TMP_ROOT/stdout" 2> "$TMP_ROOT/stderr"
 rc=$?
 set -e
-[ "$rc" -eq 23 ] || fail "remote exit status was not preserved (got $rc)"
+[ "$rc" -eq 23 ] || fail "remote exit status was not preserved (got $rc): $(cat "$TMP_ROOT/stderr")"
 cmp -s "$ARGV_EXPECTED" "$ARGV_ACTUAL" || fail "remote argv boundaries were not preserved byte-for-byte"
 assert_grep 'stdout: 5 args' "$TMP_ROOT/stdout" "remote stdout was not preserved"
 assert_grep 'stdin: payload one' "$TMP_ROOT/stdout" "remote stdin was not preserved"

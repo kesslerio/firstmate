@@ -231,3 +231,19 @@ FM_FAKE_RELAUNCH_MODE=change-route FM_FAKE_RELAUNCH_SYNC="$sync" run_relaunch io
 assert_grep 'harness=pi' "$HOME_DIR/state/ios.meta" 'stale confirmation changed original runtime'
 assert_grep 'remote_host=changed-host' "$HOME_DIR/state/ios.meta" 'route replacement was overwritten'
 pass 'parent task lock serializes remote operation and publication; changed routes refuse stale confirmation'
+
+for field in kind remote_host remote_root home; do
+  reset_meta
+  python3 - "$HOME_DIR/state/ios.meta" "$field" <<'PYROUTE'
+import pathlib, sys
+p=pathlib.Path(sys.argv[1]); field=sys.argv[2]
+p.write_text(''.join((field+'=foreign\n') if line.startswith(field+'=') else line for line in p.read_text().splitlines(keepends=True)))
+PYROUTE
+  before=$(cksum "$HOME_DIR/state/ios.meta")
+  rc=0
+  run_relaunch ios claude model high > "$sync/denied-$field" 2>&1 || rc=$?
+  [ "$rc" -ne 0 ] || fail "mismatched $field route was relaunched"
+  assert_grep 'does not identify the configured remote secondmate route' "$sync/denied-$field" 'route denial must precede remote effects'
+  assert_equals "$before" "$(cksum "$HOME_DIR/state/ios.meta")" 'denied route changed parent metadata'
+done
+pass 'remote relaunch rejects kind, host, root and home disagreement before transport'

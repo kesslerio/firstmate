@@ -51,13 +51,17 @@ else
   exit "$rc"
 fi
 META_TMP=
-trap 'rm -f -- "${META_TMP:-}"; fm_lock_release "$META_LOCK"' EXIT
+REGISTRY_LOCK=
+trap 'rm -f -- "${META_TMP:-}"; [ -z "$REGISTRY_LOCK" ] || fm_lock_release "$REGISTRY_LOCK"; fm_lock_release "$META_LOCK"' EXIT
 [ -f "$META" ] && [ ! -L "$META" ] || die "metadata changed before relaunch"
 ORIGINAL_META=$(cksum "$META") || die "cannot observe the parent route"
 REMOTE_HOST=$(fm_meta_get "$META" remote_host)
 [ -n "$REMOTE_HOST" ] \
   || die "task $ID is not a remotely placed secondmate; use bin/fm-control.sh $ID relaunch instead"
 
+. "$SCRIPT_DIR/fm-secondmate-registry-lib.sh"
+REGISTRY_LOCK=$(secondmate_registry_lock_path "$STATE")
+fm_lock_acquire_wait_bounded "$REGISTRY_LOCK" 15 || die "remote registry could not be locked"
 RELAUNCH_OUT=$("$SCRIPT_DIR/fm-on.sh" "$ID" fm-remote-secondmate-control.sh \
   relaunch "$ID" "$HARNESS" "$MODEL" "$EFFORT" </dev/null 2>&1) || {
   rc=$?

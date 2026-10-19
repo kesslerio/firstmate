@@ -237,12 +237,13 @@ RECEIPTS="$STATE/.supervision-host-receipts"
 PROMPT_FILE="$STATE/.supervision-host-prompt"
 WAKE_FILE="$STATE/.supervision-host-wake"
 HOST_LOG="$STATE/.supervision-host.log"
-ENGINE_PID_FILE="$STATE/.supervision-host.engine-pid"
+ENGINE_PID_FILE="$STATE/.supervision-host.engine-pid.$$"
 HEALTH_FILE="$STATE/.supervision-host-health"
 MIRROR_FEED="$STATE/.supervision-host-mirror"
 LEFT_RECORD="$STATE/.supervision-host-left"
 
 HOST_PID=$$
+HOST_ACTIVE=0
 HOST_STARTED_SECONDS=$SECONDS
 HOST_STARTED=$(date +%s)
 GEN="host-$HOST_PID-$HOST_STARTED"
@@ -292,6 +293,7 @@ identity_of() {  # <pid>
 
 # Record one process this host runs, so a successor host can stop exactly it.
 record_process() {  # <role> <pid>
+  host_still_owner || return 1
   printf '%s\t%s\t%s\n' "$1" "$2" "$(identity_of "$2")" >> "$HOST_RECORD" 2>/dev/null || true
 }
 
@@ -301,6 +303,7 @@ record_process() {  # <role> <pid>
 refresh_process() {  # <pid>
   local pid=$1 identity tmp
   [ -n "$pid" ] && [ -f "$HOST_RECORD" ] || return 0
+  host_still_owner || return 1
   identity=$(identity_of "$pid")
   [ -n "$identity" ] || return 0
   awk -F '\t' -v pid="$pid" -v id="$identity" '$2 == pid && $3 != id { found = 1 } END { exit !found }' "$HOST_RECORD" 2>/dev/null || return 0
@@ -312,6 +315,7 @@ refresh_process() {  # <pid>
 
 forget_process() {  # <pid>
   local tmp
+  host_still_owner || return 1
   [ -f "$HOST_RECORD" ] || return 0
   tmp=$(mktemp "$HOST_RECORD.tmp.XXXXXX" 2>/dev/null) || return 0
   awk -F '\t' -v pid="$1" '$2 != pid' "$HOST_RECORD" > "$tmp" 2>/dev/null && mv -f "$tmp" "$HOST_RECORD" 2>/dev/null
@@ -340,7 +344,8 @@ branch_env() {  # <command...>: run with the branch actor identity
 }
 
 release_branch_leases() {
-  branch_env "$SCRIPT_DIR/fm-lease.sh" release-actor --actor branch >/dev/null 2>&1 || true
+  host_still_owner || return 1
+  FM_SUPERVISION_HOST_PID=$HOST_PID FM_SUPERVISION_HOST_AUTOARM_GEN=$AUTOARM_GEN FM_SUPERVISION_HOST_OWNER_PID=$AUTOARM_OWNER branch_env "$SCRIPT_DIR/fm-lease.sh" release-actor --actor branch >/dev/null 2>&1 || true
 }
 
 # Stop whatever a predecessor host left running, then take the record. The
@@ -358,16 +363,20 @@ activate() {
       stop_recorded "$pid" "$identity" $((ENGINE_GRACE + 20))
     done < "$HOST_RECORD"
   fi
-  if [ -f "$ENGINE_PID_FILE" ]; then
-    IFS="$(printf '\t')" read -r pid identity < "$ENGINE_PID_FILE" || true
+  local engine_file
+  for engine_file in "$STATE"/.supervision-host.engine-pid*; do
+    [ -f "$engine_file" ] || continue
+    IFS="$(printf '\t')" read -r pid identity < "$engine_file" || true
     stop_recorded "${pid:-}" "${identity:-}" $((ENGINE_GRACE + 5))
-    rm -f "$ENGINE_PID_FILE"
-  fi
+    host_still_owner || return 1
+    rm -f "$engine_file"
+  done
   if [ -f "$HOST_RECORD" ]; then
     while IFS="$(printf '\t')" read -r role pid identity; do
       [ "$role" = arm ] && stop_recorded "$pid" "$identity" 10
     done < "$HOST_RECORD"
   fi
+  host_still_owner || return 1
   # A predecessor killed outright ran no cleanup: reap the engine descendants
   # its turn recorded, then drop that turn's files.
   local ledger
@@ -390,6 +399,7 @@ activate() {
     fi
   fi
   printf 'host\t%s\t%s\n' "$HOST_PID" "$(identity_of "$HOST_PID")" > "$HOST_RECORD" || return 1
+  HOST_ACTIVE=1
   release_branch_leases
 }
 
@@ -424,12 +434,15 @@ cleanup() {
     "$SCRIPT_DIR/fm-wake-grant.sh" release "$GEN" >/dev/null 2>&1 || true
     "$SCRIPT_DIR/fm-wake-grant.sh" deactivate "$HOST_PID" "$GEN" >/dev/null 2>&1 || true
   fi
-  release_branch_leases
-  rm -f "$TURN_FILE" "$ENGINE_PID_FILE" 2>/dev/null || true
+  release_branch_leases || true
+  if host_still_owner; then
+    rm -f "$TURN_FILE" 2>/dev/null || true
+  fi
+  rm -f "$ENGINE_PID_FILE" 2>/dev/null || true
   for f in "$TURN_RESULT" "$TURN_ERRORS"; do
     case "$f" in "$STATE"/.supervision-host-*) rm -f "$f" 2>/dev/null || true ;; esac
   done
-  if [ -f "$HOST_RECORD" ] && [ "$(awk -F '\t' '$1 == "host" { print $2; exit }' "$HOST_RECORD" 2>/dev/null)" = "$HOST_PID" ]; then
+  if host_still_owner && [ -f "$HOST_RECORD" ] && [ "$(awk -F '\t' '$1 == "host" { print $2; exit }' "$HOST_RECORD" 2>/dev/null)" = "$HOST_PID" ]; then
     rm -f "$HOST_RECORD" 2>/dev/null || true
   fi
   exit "$rc"
@@ -454,6 +467,9 @@ retire_arm() {  # <pid> <output-file>
 
 host_still_owner() {
   fm_session_lock_owned_by_self "$STATE" || return 1
+  if [ "$HOST_ACTIVE" -eq 1 ]; then
+    [ "$(awk -F '\t' '$1 == "host" {print $2; exit}' "$HOST_RECORD" 2>/dev/null)" = "$HOST_PID" ] || return 1
+  fi
   [ -n "$AUTOARM_GEN" ] || return 0
   fm_autoarm_ledger_read "$STATE" || return 1
   [ "$FM_AUTOARM_GEN" = "$AUTOARM_GEN" ] && [ "$FM_AUTOARM_OWNER" = "$AUTOARM_OWNER" ] \
@@ -462,6 +478,7 @@ host_still_owner() {
 
 start_arm() {  # <predecessor-arm-pid or empty> [--restart]; sets the started pid/output
   local predecessor=$1 out pid
+  host_still_owner || stand_down "this session no longer owns supervision"
   shift
   out=$(mktemp "$STATE/.supervision-host-arm.XXXXXX") || return 1
   # An arm left for main outlives this host, and Claude tears the hook's
@@ -504,13 +521,13 @@ turn_crosses_boundary() {
 # home's watcher, print any close already read so main drains it, then the
 # boundary line.
 boundary_exit() {
+  host_still_owner || stand_down "this session no longer owns supervision"
   retire_arm "$ARM_PID" "$ARM_OUT"
   retire_arm "$SUCCESSOR_PID" "$SUCCESSOR_OUT"
   ARM_PID=
   ARM_OUT=
   SUCCESSOR_PID=
   SUCCESSOR_OUT=
-  "$SCRIPT_DIR/fm-watch-arm.sh" --stop >/dev/null 2>&1 || true
   park_elapsed
   log_line "boundary	after ${PARK_ELAPSED}s"
   emit 'supervision-host: cycle boundary - the host ended its park at its bound; drain, acknowledge, and end the turn, and the next park starts on its own'
@@ -579,14 +596,15 @@ retire_successor() {
   retire_arm "$SUCCESSOR_PID" "$SUCCESSOR_OUT"
   SUCCESSOR_PID=
   SUCCESSOR_OUT=
-  "$SCRIPT_DIR/fm-watch-arm.sh" --stop >/dev/null 2>&1 || true
 }
 
 # Hand the close to main: stop the successor cycle, print the close, why, and
 # any further "supervision-host:" lines, and exit.
 exit_to_main() {  # <why> [further lines]
   local lines=${2:-} rc=0
+  host_still_owner || stand_down "this session no longer owns supervision"
   retire_successor
+  host_still_owner || stand_down "this session no longer owns supervision"
   if [ -n "$SUCCESSOR_GENERATION" ] \
     && ! fm_recovery_marker_publish "$STATE/.watcher-down" downtime >/dev/null 2>&1; then
     log_line "to-main	downtime-unrestored	$1"
@@ -667,6 +685,7 @@ start_successor() {  # <predecessor-arm-pid>
       case "$line" in
         *' recovery-generation='*) SUCCESSOR_GENERATION=${line##* recovery-generation=} ;;
       esac
+      host_still_owner || stand_down "this session no longer owns supervision"
       refresh_process "$SUCCESSOR_PID"
       return 0
     fi
@@ -686,6 +705,7 @@ start_successor() {  # <predecessor-arm-pid>
 # descriptor and keeps waiting on the watcher.
 detach_successor() {
   local identity tmp=
+  host_still_owner || stand_down "this session no longer owns supervision"
   [ -n "${SUCCESSOR_PID:-}" ] || return 0
   identity=$(identity_of "$SUCCESSOR_PID")
   if [ -z "$identity" ] || ! tmp=$(mktemp "$LEFT_RECORD.tmp.XXXXXX" 2>/dev/null) \
@@ -974,6 +994,7 @@ handle_wake() {  # <reason-lines>
   rc=$?
   ENGINE_SUBSHELL=
   ENGINE_RUNNING=0
+  host_still_owner || stand_down "this session no longer owns supervision"
   release_branch_leases
   # shellcheck disable=SC2086 # rows is a space-separated list of sequence numbers.
   unacked=$(fm_wake_rows_queued $rows) || unacked=$rows
@@ -1073,6 +1094,7 @@ ARM_OUT=$STARTED_ARM_OUT
 while :; do
   boundary_reached && boundary_exit
   await_close || boundary_exit
+  host_still_owner || stand_down "this session no longer owns supervision"
   REASON=$(printf '%s\n' "$ARM_TEXT" | grep -E '^(signal:|stale:|check:|heartbeat($|:))' || true)
 
   # The away daemon owns triage while its flag exists; the owner stands down.
@@ -1134,6 +1156,7 @@ while :; do
   # before its visible outcomes existed, so main relays them now, handled or not.
   handle_wake "$REASON"
   HANDLE_RC=$?
+  host_still_owner || stand_down "this session no longer owns supervision"
   if [ "$HANDLE_RC" -eq 2 ]; then
     log_line "pass-through	attended	$ATTENDED_WHY	$(printf '%s\n' "$REASON" | head -n 1)"
     # The successor this turn already started and confirmed stays up. Retiring
@@ -1145,6 +1168,7 @@ while :; do
     if [ -n "$SUCCESSOR_GENERATION" ] \
       && ! fm_recovery_marker_publish "$STATE/.watcher-down" downtime >/dev/null 2>&1; then
       log_line "pass-through	downtime-unrestored	$(printf '%s\n' "$REASON" | head -n 1)"
+      emit "supervision-host: watcher downtime could not be restored for the main hand-back"
       exit 1
     fi
     emit

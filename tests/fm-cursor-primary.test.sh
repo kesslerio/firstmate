@@ -492,6 +492,10 @@ write_host_fixture() {  # <dir> <kind>
       stood-down)
         printf 'printf "supervision-host stood down: this session no longer owns supervision\\n"\n'
         ;;
+      failed-ready)
+        printf 'printf "watcher: started pid=%%s (beacon fresh)\\n" "$$"\n'
+        printf 'exit 1\n'
+        ;;
       dies-once)
         printf '[ "$(wc -l < "$FM_HOME/state/host-ran")" -gt 1 ] || kill -KILL $$\n'
         printf 'printf "stale: fixture-win after a retry\\n"\n'
@@ -825,3 +829,25 @@ test_sessionstart_emits_additional_context
 test_sessionstart_silent_in_child_worktree
 test_tracked_registration_covers_the_primary_events
 test_default_ceiling_bites_before_the_registered_loop_limit
+
+test_park_failed_host_ignores_successor_health() {
+  local dir out
+  dir=$(make_primary_dir "$TMP_ROOT/park-host-failed-ready")
+  : > "$dir/state/task1.meta"
+  mkdir -p "$dir/config"
+  : > "$dir/config/supervision-host"
+  write_host_fixture "$dir" failed-ready
+  cat > "$dir/bin/fm-turnend-guard.sh" <<'SHGUARD'
+#!/usr/bin/env bash
+printf 'fixture supervision failure\n' >&2
+exit 2
+SHGUARD
+  cat >> "$dir/bin/fm-wake-lib.sh" <<'SHHEALTH'
+fm_watcher_healthy() { return 0; }
+SHHEALTH
+  out=$(run_park "$dir")
+  [ "$(kind_of_followup "$out")" = turn-end-guard ] || fail "failed ready host was silently accepted: $out"
+  [ "$(wc -l < "$dir/state/host-ran" | tr -d ' ')" = 1 ] || fail 'failed hand-back spawned duplicate parks'
+  pass 'Cursor sends failed host hand-back to bounded recovery despite successor health'
+}
+test_park_failed_host_ignores_successor_health
