@@ -1037,7 +1037,52 @@ PY
   pass 'watcher keeps obsolete packet evidence without promoting it or repeatedly starting a publisher'
 }
 
+test_nested_wake_locks_share_delivery_deadline() {
+  local lock rec home root log worker holder report generation pending before
+  for lock in .wake-queue.lock .watcher-down.lock; do
+    rec=$(new_world "nested-$lock")
+    IFS='|' read -r home root log <<EOF
+$rec
+EOF
+    hold_publish_lock "$home" "$lock"
+    holder=$HOLDER_PID
+    FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT=ACTIONABLE FM_STARTUP_NETWORK_TIMEOUT=10 FM_SESSION_START_TIMEOUT=2 \
+      run_stage "$home" "$root" start --locked 0 --harvest-pid 999999999
+    await_worker_record "$home"
+    worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+    generation=$(sed -n 's/^generation=//p' "$home/state/.startup-network.status")
+    await_pid_exit "$worker" 100 || fail "nested $lock exceeded delivery deadline"
+    report=$(run_stage "$home" "$root" report)
+    assert_contains "$report" ACTIONABLE "nested contention discarded pending output"
+    assert_absent "$home/state/.startup-network.delivered" "contention falsely acknowledged output"
+    pending="$home/state/.startup-network-unpublished-$generation"
+    assert_present "$pending/ready" "nested $lock lost the original generation's retry packet"
+    before=$(cksum "$log" "$home/state/.startup-network.report")
+    kill "$holder" 2>/dev/null || true
+    wait "$holder" 2>/dev/null || true
+    run_stage "$home" "$root" reconcile || fail "released $lock prevented original-generation reconciliation"
+    wait_for_startup_network_wake "$home" 100 || fail "released $lock prevented wake publication"
+    assert_equals "$generation" "$(sed -n 's/^generation=//p' "$home/state/.startup-network.status")" 'reconciliation replaced the original generation'
+    assert_equals "$before" "$(cksum "$log" "$home/state/.startup-network.report")" 'reconciliation reran the stage or changed its report'
+    assert_absent "$pending" 'successful retry retained a completed packet'
+    run_stage "$home" "$root" reconcile || fail 'idempotent reconciliation failed'
+    assert_equals 1 "$(awk -F '\t' '$3 == "check" && $4 == "startup-network" {n++} END {print n+0}' "$home/state/.wake-queue")" 'original result did not deliver exactly once'
+    mkdir -p "$pending"
+    printf 'done\nprobe\n0\n1\n0\n' > "$pending/metadata"
+    printf obsolete > "$pending/report"
+    : > "$pending/ready"
+    printf 'state=done\ngeneration=replacement\nreport_published=1\n' > "$home/state/.startup-network.status"
+    before=$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.wake-queue")
+    run_stage "$home" "$root" reconcile || fail 'stale-packet reconciliation failed'
+    assert_equals "$before" "$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.wake-queue")" 'obsolete packet changed the replacement or queued another wake'
+  done
+  pass 'startup wake queue and recovery locks share the remaining delivery deadline'
+}
+
 case ${FM_STARTUP_NETWORK_TEST_GROUP:-all} in
+  nested-delivery)
+    test_nested_wake_locks_share_delivery_deadline
+    exit 0 ;;
   inline-packet)
     test_harvest_does_not_inline_a_packet_completed_after_its_promotion_check
     test_watcher_ignores_superseded_private_packets
@@ -1079,31 +1124,7 @@ test_harvest_does_not_inline_a_packet_completed_after_its_promotion_check
 test_watcher_ignores_superseded_private_packets
 echo "# fm-startup-network.test.sh: all assertions passed"
 
-test_nested_wake_locks_share_delivery_deadline() {
-  local lock rec home root log worker holder report
-  for lock in .wake-queue.lock .watcher-down.lock; do
-    rec=$(new_world "nested-$lock")
-    IFS='|' read -r home root log <<EOF
-$rec
-EOF
-    hold_publish_lock "$home" "$lock"
-    holder=$HOLDER_PID
-    FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT=ACTIONABLE FM_STARTUP_NETWORK_TIMEOUT=10 FM_SESSION_START_TIMEOUT=2 \
-      run_stage "$home" "$root" start --locked 0 --harvest-pid 999999999
-    await_worker_record "$home"
-    worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
-    await_pid_exit "$worker" 100 || fail "nested $lock exceeded delivery deadline"
-    report=$(run_stage "$home" "$root" report)
-    assert_contains "$report" ACTIONABLE "nested contention discarded pending output"
-    assert_absent "$home/state/.startup-network.delivered" "contention falsely acknowledged output"
-    kill "$holder" 2>/dev/null || true
-    wait "$holder" 2>/dev/null || true
-    FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT=ACTIONABLE FM_STARTUP_NETWORK_TIMEOUT=10 FM_SESSION_START_TIMEOUT=2 \
-      run_stage "$home" "$root" run --locked 0
-    wait_for_startup_network_wake "$home" 100 || fail "released $lock prevented wake publication"
-  done
-  pass 'startup wake queue and recovery locks share the remaining delivery deadline'
-}
+
 test_nested_wake_locks_share_delivery_deadline
 
 

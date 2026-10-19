@@ -12,7 +12,7 @@ The shared no-mistakes gate lifecycle boundary is summarized in [architecture.md
 | `fm-sessionstart-run.sh` | Route a native session-open hook to the full digest, a context re-emit, or the nudge |
 | `fm-operational-input.sh` | Construct and parse the canonical cross-language operational-input protocol |
 | `fm-bootstrap.sh`        | Detect toolchain and fleet problems, run the locked session-start sweeps, and install approved tools |
-| `fm-startup-network.sh`  | Run session start's network checks and inactive-outcome scan off its blocking path, retaining reports and durable findings |
+| `fm-startup-network.sh`  | Run session start's network checks and inactive-outcome scan off its blocking path, retaining generation-owned results for reconcile after publication or wake-enqueue contention |
 | `fm-fleet-sync.sh`       | Refresh project clones with safe fast-forwards, self-heals, `STUCK:` reports, branch pruning, and bounded recovery from an orphaned `.git/packed-refs.lock` |
 | `fm-fleet-snapshot.sh`   | Print structured fleet snapshot JSON and refresh only its parent-side remote-ledger cache (schema `fm-fleet-snapshot.v1`) |
 | `fm-home-summary-refresh.sh` | Atomically publish this home's structured summary ledger                         |
@@ -40,6 +40,7 @@ The shared no-mistakes gate lifecycle boundary is summarized in [architecture.md
 | `fm-herdr-lab-viewer.py` | The pty engine behind `fm-herdr-lab.sh viewer`: one real foreground Herdr client on a non-zero window grid |
 | `fm-lab-home.sh`         | Mint disposable lab homes and manage their isolated tmux socket directories       |
 | `fm-live-lab.sh`         | Build and operate a disposable live supervision lab; see its header for usage and readiness contract |
+| `fm-lab-launch.py`       | Retain identity-bound guardians for ordinary and detached lab launches, registering custody before command execution |
 | `fm-install-herdr.sh`    | Install CI's exact-version Herdr pin with official asset URL, SHA-256, and protocol checks |
 | `fm-install-treehouse.sh`| Install CI's exact-version Treehouse pin for real-Herdr E2E that needs spawn worktrees |
 | `fm-herdr-ci-cleanup.sh` | Snapshot and tear down only job-owned `fm-lab-*` sessions in the Herdr CI lane       |

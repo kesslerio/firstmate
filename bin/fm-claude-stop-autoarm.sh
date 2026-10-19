@@ -365,6 +365,8 @@ run_arm() {  # <output file, or empty for none>
 SUCCESSOR_FAILURE=
 start_handling_successor() {  # <closed-arm-pid>
   local out pid deadline budget line monitor_was_on=0
+  local -a command=("$SCRIPT_DIR/fm-watch-arm.sh")
+  [ -z "${FM_LAB_LAUNCH_ROOT:-}" ] || command=(python3 "${FM_LAB_LAUNCH_HELPER:?lab launch helper binding is missing}" detached "$FM_LAB_LAUNCH_ROOT" "${command[@]}")
   budget=${FM_ARM_CONFIRM_TIMEOUT:-30}
   case "$budget" in ''|*[!0-9]*) budget=30 ;; esac
   if ! out=$(mktemp "$STATE/.claude-autoarm-successor.XXXXXX"); then
@@ -374,7 +376,7 @@ start_handling_successor() {  # <closed-arm-pid>
   case $- in *m*) monitor_was_on=1 ;; esac
   set -m 2>/dev/null || true
   FM_WATCH_PREDECESSOR_ARM_PID=$1 FM_GUARD_GRACE="$GRACE" \
-    nohup "$SCRIPT_DIR/fm-watch-arm.sh" >"$out" 2>&1 </dev/null &
+    nohup "${command[@]}" >"$out" 2>&1 </dev/null &
   pid=$!
   [ "$monitor_was_on" -eq 1 ] || set +m 2>/dev/null || true
   deadline=$(( $(date +%s) + budget + 2 ))

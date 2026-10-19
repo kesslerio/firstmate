@@ -39,7 +39,7 @@ live_lab_cleanup() {
     return 1
   fi
   while read -r pid; do [ -z "$pid" ] || wait "$pid" 2>/dev/null || true; done < "$TMP_ROOT/pids"
-  python3 - "$FM_TEST_CHILD_REGISTRY.sockets.jsonl" <<'PYSOCKETCHECK'
+  if ! python3 - "$FM_TEST_CHILD_REGISTRY.sockets.jsonl" <<'PYSOCKETCHECK'
 import json, pathlib, sys
 for line in open(sys.argv[1]):
     data = json.loads(line)
@@ -57,7 +57,7 @@ for line in open(sys.argv[1]):
             if data['sockets'].get(str(socket)) != [info.st_dev, info.st_ino]:
                 raise ValueError('lab fixture socket generation changed')
 PYSOCKETCHECK
-  if [ "$?" -ne 0 ]; then
+  then
     echo "lab fixture socket ownership unknown; retained evidence: $TMP_ROOT" >&2
     return 1
   fi
@@ -69,7 +69,7 @@ PYSOCKETCHECK
     [ -n "$dir" ] || continue
     [ ! -e "$dir" ] || { echo "lab fixture socket remains; retained evidence: $TMP_ROOT" >&2; return 1; }
   done < "$TMP_ROOT/tmux-dirs"
-  python3 - "$FM_TEST_CHILD_REGISTRY" <<'PYCLEANED'
+  if ! python3 - "$FM_TEST_CHILD_REGISTRY" <<'PYCLEANED'
 import hashlib, json, os, pathlib, subprocess, sys
 registry = pathlib.Path(sys.argv[1])
 history = pathlib.Path(str(registry) + '.history')
@@ -93,7 +93,10 @@ temporary.write_text(json.dumps(dict(schema=1, registry=str(registry), history=s
 temporary.chmod(0o600)
 os.replace(temporary, receipt)
 PYCLEANED
-  [ "$?" -eq 0 ] || { echo "lab fixture cleanup audit failed; retained evidence: $TMP_ROOT" >&2; return 1; }
+  then
+    echo "lab fixture cleanup audit failed; retained evidence: $TMP_ROOT" >&2
+    return 1
+  fi
   rm -rf "/tmp/fm-labt$$-mate" "/tmp/fm-labt$$-worker" "/tmp/fm-labt$$-other" /tmp/fm-labt"$$"-*+*
   if [ "$exiting_status" -ne 0 ]; then
     echo "lab test failed; owned processes and sockets retired; retained evidence: $TMP_ROOT" >&2
@@ -378,8 +381,9 @@ SHBOUNDARY
     start_retirement_anchor "$lab"
     guard_start=$(ps -o lstart= -p "$ANCHOR_PID" | awk '{$1=$1; print}')
     trust_before=$(digest "$HOME/.claude.json")
-    out=$(REAL_PS="$(command -v ps)" BOUNDARY_PID="$ANCHOR_PID" BOUNDARY_START="$guard_start" BOUNDARY_FAULT="$fault" BOUNDARY_PROVED="$lab/boundary-proved" PATH="$TMP_ROOT/retirement-boundary-bin:$PATH" "$LIVE_LAB" down "$lab" 2>&1)
-    [ "$?" -ne 0 ] || fail "$fault retirement boundary was accepted: $out"
+    if out=$(REAL_PS="$(command -v ps)" BOUNDARY_PID="$ANCHOR_PID" BOUNDARY_START="$guard_start" BOUNDARY_FAULT="$fault" BOUNDARY_PROVED="$lab/boundary-proved" PATH="$TMP_ROOT/retirement-boundary-bin:$PATH" "$LIVE_LAB" down "$lab" 2>&1); then
+      fail "$fault retirement boundary was accepted: $out"
+    fi
     assert_present "$lab/boundary-proved" 'fixture did not reach the retirement request boundary'
     assert_absent "$ANCHOR_RECORD.retire" 'denied retirement published an effect request'
     assert_retirement_preserved "$lab" "$ANCHOR_RECORD" "$trust_before"
@@ -570,8 +574,9 @@ test_guardian_observation_retry() {
   guard_start=$(ps -o lstart= -p "$ANCHOR_PID" | awk '{$1=$1; print}')
   trust_before=$(digest "$HOME/.claude.json")
   touch "$lab/observer-arm"
-  out=$("$LIVE_LAB" down "$lab" 2>&1)
-  [ "$?" -ne 0 ] || fail "guardian UNKNOWN was accepted: $out"
+  if out=$("$LIVE_LAB" down "$lab" 2>&1); then
+    fail "guardian UNKNOWN was accepted: $out"
+  fi
   assert_present "$lab/observer-hit" 'fixture did not fail the guardian three-field peer observer'
   assert_contains "$out" 'launch retirement observation unavailable' 'guardian UNKNOWN must reach the cleanup caller'
   assert_retirement_preserved "$lab" "$ANCHOR_RECORD" "$trust_before"
@@ -615,8 +620,9 @@ PYACKHOOK
   guard_start=$(ps -o lstart= -p "$ANCHOR_PID" | awk '{$1=$1; print}')
   trust_before=$(digest "$HOME/.claude.json")
   touch "$lab/ack-arm"
-  out=$("$LIVE_LAB" down "$lab" 2>&1)
-  [ "$?" -ne 0 ] || fail "failed acknowledgement was accepted: $out"
+  if out=$("$LIVE_LAB" down "$lab" 2>&1); then
+    fail "failed acknowledgement was accepted: $out"
+  fi
   assert_present "$lab/ack-hit" 'fixture did not fail the guardian acknowledgement publication'
   assert_contains "$out" 'launch retirement acknowledgement unavailable' 'publication failure must reach the cleanup caller'
   assert_retirement_preserved "$lab" "$ANCHOR_RECORD" "$trust_before"
@@ -637,14 +643,16 @@ test_guardian_request_replay() {
   guard_start=$(ps -o lstart= -p "$ANCHOR_PID" | awk '{$1=$1; print}')
   trust_before=$(digest "$HOME/.claude.json")
   touch "$lab/observer-arm"
-  out=$("$LIVE_LAB" down "$lab" 2>&1)
-  [ "$?" -ne 0 ] || fail "request A observation failure was accepted: $out"
+  if out=$("$LIVE_LAB" down "$lab" 2>&1); then
+    fail "request A observation failure was accepted: $out"
+  fi
   assert_contains "$out" 'launch retirement observation unavailable' 'request A must acknowledge UNKNOWN'
   cp "$ANCHOR_RECORD.retire" "$lab/request-A"
   first_request=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["request"])' "$lab/request-A")
   touch "$lab/observer-arm"
-  out=$("$LIVE_LAB" down "$lab" 2>&1)
-  [ "$?" -ne 0 ] || fail "request B observation failure was accepted: $out"
+  if out=$("$LIVE_LAB" down "$lab" 2>&1); then
+    fail "request B observation failure was accepted: $out"
+  fi
   assert_contains "$out" 'launch retirement observation unavailable' 'request B must acknowledge UNKNOWN'
   second_request=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["request"])' "$ANCHOR_RECORD.retire")
   [ "$first_request" != "$second_request" ] || fail 'fresh cleanup reused request A'
@@ -868,7 +876,128 @@ assert_equals "" "$lab_keys" "TERM-spawned child cannot re-add trust after down"
 pass "down tracks descendants spawned during TERM"
 }
 
+test_detached_startup_custody() {
+  local lab wrapper worker bootstrap i out
+  lab=$(make_lab detached-startup claude)
+  cat > "$lab/home/bin/fm-bootstrap.sh" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$$" > "$FM_HOME/bootstrap-pid"
+exec sleep 120
+SH
+  chmod +x "$lab/home/bin/fm-bootstrap.sh"
+  start_group "$LIVE_LAB" launch "$lab" -- env FM_HOME="$lab/home" FM_ROOT_OVERRIDE="$lab/home" \
+    FM_STARTUP_NETWORK_TIMEOUT=120 "$lab/home/bin/fm-startup-network.sh" start --locked 0 --harvest-pid 999999999
+  wrapper=$!
+  for ((i=0;i<100;i++)); do
+    [ ! -s "$lab/home/bootstrap-pid" ] || break
+    sleep .05
+  done
+  worker=$(sed -n 's/^pid=//p' "$lab/home/state/.startup-network.status")
+  bootstrap=$(cat "$lab/home/bootstrap-pid")
+  fm_test_track_child "$worker" kill
+  fm_test_track_child "$bootstrap" kill
+  capture_up_lab "$lab"
+  [ -n "$worker" ] && [ -n "$bootstrap" ] || fail 'detached startup did not enter the controlled sweep'
+  out=$("$LIVE_LAB" down "$lab" 2>&1)
+  expect_code 0 "$?" "detached startup cleanup failed: $out"
+  case "$(ps -o stat= -p "$worker" 2>/dev/null | awk '{$1=$1; print}')" in ''|Z*) ;; *) fail 'successful down left the detached startup worker live' ;; esac
+  case "$(ps -o stat= -p "$bootstrap" 2>/dev/null | awk '{$1=$1; print}')" in ''|Z*) ;; *) fail 'successful down left the detached startup sweep live' ;; esac
+  wait "$wrapper" 2>/dev/null || true
+  assert_absent "$lab" 'detached startup cleanup retained a verified lab'
+  pass 'startup workers remain in launch custody after their launching command exits'
+}
+
+test_detached_successor_registration() {
+  local lab wrapper worker i out
+  lab=$(make_lab detached-successor claude)
+  make_guardian_observer_bin
+  cat > "$lab/successor.py" <<'PYSUCCESSOR'
+import json, os, pathlib, subprocess, sys, time
+root = pathlib.Path(sys.argv[1])
+if sys.argv[2] == 'parent':
+    child = subprocess.Popen([sys.executable, os.environ['FM_LAB_LAUNCH_HELPER'], 'detached', str(root), sys.executable,
+                              __file__, str(root), 'child'], start_new_session=True)
+    (root / 'worker-pid').write_text(str(child.pid))
+    for _ in range(100):
+        if (root / 'successor-ready').exists():
+            break
+        time.sleep(.05)
+    else:
+        raise ValueError('successor never executed')
+else:
+    child = subprocess.Popen(['sleep', '120'])
+    data = dict(pid=os.getpid(), parent=os.getppid(), group=os.getpgrp(), session=os.getsid(0), child=child.pid,
+                record=os.environ['FM_LAB_LAUNCH_RECORD'], token=os.environ['FM_LAB_LAUNCH_TOKEN'])
+    (root / 'successor-ready').write_text(json.dumps(data))
+    time.sleep(120)
+PYSUCCESSOR
+  start_group env REAL_PS="$(command -v ps)" GUARDIAN_FAULT_ARM="$lab/observer-arm" GUARDIAN_FAULT_HIT="$lab/observer-hit" \
+    PATH="$TMP_ROOT/guardian-observer-bin:$PATH" "$LIVE_LAB" launch "$lab" -- python3 "$lab/successor.py" "$lab" parent
+  wrapper=$!
+  for ((i=0;i<100;i++)); do
+    [ ! -s "$lab/successor-ready" ] || break
+    sleep .05
+  done
+  worker=$(cat "$lab/worker-pid")
+  fm_test_track_child "$worker" kill
+  capture_up_lab "$lab"
+  if ! python3 - "$lab" "$ROOT/bin/fm-lab-launch.py" <<'PYREGISTRATION'
+import json, os, pathlib, subprocess, sys, time
+root = pathlib.Path(sys.argv[1])
+ready = json.loads((root / 'successor-ready').read_text())
+worker = int((root / 'worker-pid').read_text())
+assert ready['pid'] == ready['group'] == ready['session'] == worker
+record = root / ready['record']
+original = record.read_bytes()
+owner = json.loads(original)
+assert owner['child'] == worker and owner['group'] == worker and owner['pid'] != worker
+env = dict(os.environ, FM_LAB_LAUNCH_ROOT=str(root), FM_LAB_LAUNCH_RECORD=ready['record'],
+           FM_LAB_LAUNCH_TOKEN=ready['token'])
+for fault in ('missing', 'token', 'foreign', 'stale', 'retired', 'malformed', 'closed'):
+    candidate = dict(env)
+    data = dict(owner)
+    if fault == 'missing': candidate.pop('FM_LAB_LAUNCH_RECORD')
+    if fault == 'token': candidate['FM_LAB_LAUNCH_TOKEN'] = 'foreign'
+    if fault == 'foreign': data['nonce'] = ['foreign']
+    if fault == 'stale': data['start'] = 'Mon Jan 1 00:00:00 1990'
+    if fault == 'retired': data['retired'] = True
+    if fault == 'malformed': data = []
+    if fault == 'closed': (root / '.fm-lab-launch-closed').touch()
+    record.write_text(json.dumps(data))
+    result = subprocess.run([sys.executable, sys.argv[2], 'detached', str(root), 'touch', str(root / 'forbidden')], env=candidate,
+                            capture_output=True, text=True, timeout=5)
+    record.write_bytes(original)
+    if fault == 'closed': (root / '.fm-lab-launch-closed').unlink()
+    assert result.returncode != 0 and not (root / 'forbidden').exists(), fault
+assert len(list(root.glob('.fm-lab-anchor-*'))) == 2
+for _ in range(100):
+    if int(subprocess.check_output(['ps', '-o', 'ppid=', '-p', str(worker)], text=True)) != ready['parent']:
+        break
+    time.sleep(.05)
+else:
+    raise ValueError('successor did not outlive its original parent')
+PYREGISTRATION
+  then
+    fail 'detached registration accepted invalid custody or changed command identity'
+  fi
+  touch "$lab/observer-arm"
+  if out=$("$LIVE_LAB" down "$lab" 2>&1); then
+    fail 'detached cleanup ignored injected guardian observation failure'
+  fi
+  assert_present "$lab/observer-hit" 'detached failure did not exercise the injected observer'
+  assert_present "$lab/.fm-live-lab" 'detached failure discarded custody'
+  rm -f "$lab/observer-arm"
+  capture_up_lab "$lab"
+  out=$("$LIVE_LAB" down "$lab" 2>&1)
+  expect_code 0 "$?" "detached cleanup retry failed: $out"
+  wait "$wrapper" 2>/dev/null || true
+  case "$(ps -o stat= -p "$worker" 2>/dev/null | awk '{$1=$1; print}')" in ''|Z*) ;; *) fail 'detached successor survived verified cleanup' ;; esac
+  assert_absent "$lab" 'detached cleanup retry retained the verified lab'
+  pass 'separate-session successors preserve PID and custody; invalid registration denies effects and cleanup failure remains retryable'
+}
+
 case ${FM_LIVE_LAB_TEST_GROUP:-all} in
+  detached) test_detached_startup_custody; test_detached_successor_registration; exit 0 ;;
   all) ;;
   late-child-cleanup-failure) test_late_child_cleanup; exit 0 ;;
   retirement)
@@ -1232,8 +1361,9 @@ else:
     if fault=='stale': data['start']='Mon Jan 1 00:00:00 1990'
     p.write_text(json.dumps(data))
 PYFAULT
-  out=$("$LIVE_LAB" down "$ANCHORED" 2>&1)
-  [ "$?" -ne 0 ] || fail "$fault launch ownership was accepted"
+  if out=$("$LIVE_LAB" down "$ANCHORED" 2>&1); then
+    fail "$fault launch ownership was accepted"
+  fi
   assert_present "$ANCHORED/.fm-live-lab" 'denied launch ownership lost its lab evidence'
   kill -0 "$anchor" || fail 'denied launch record signalled its owner'
   kill -0 "$anchor_guard" || fail 'denied launch record lost its actual guardian'
@@ -1281,13 +1411,15 @@ if [ "${1:-}" = -axo ] && [ "${2:-}" = 'pid=,ppid=,pgid=,stat=,lstart=' ]; then
 fi
 SHRETRY
 chmod +x "$TMP_ROOT/retry-ps/ps"
-out=$(REAL_PS="$(command -v ps)" RETRY_COUNT="$TMP_ROOT/retry-count" PATH="$TMP_ROOT/retry-ps:$PATH" "$LIVE_LAB" down "$RETRY_ANCHOR" 2>&1)
-[ "$?" -ne 0 ] || fail 'anchored cleanup ignored failed post-TERM observation'
+if out=$(REAL_PS="$(command -v ps)" RETRY_COUNT="$TMP_ROOT/retry-count" PATH="$TMP_ROOT/retry-ps:$PATH" "$LIVE_LAB" down "$RETRY_ANCHOR" 2>&1); then
+  fail 'anchored cleanup ignored failed post-TERM observation'
+fi
 assert_present "$RETRY_ANCHOR/.fm-live-lab" 'anchored failure discarded its custody record'
 kill -0 "$retry_guard" || fail 'failed observation lost the continuous owner'
 kill -0 "$retry_child" || fail 'retry fixture child did not survive the failed observation'
-out=$("$LIVE_LAB" launch "$RETRY_ANCHOR" -- touch "$RETRY_ANCHOR/forbidden" 2>&1)
-[ "$?" -ne 0 ] || fail 'sealed cleanup accepted a new launch'
+if out=$("$LIVE_LAB" launch "$RETRY_ANCHOR" -- touch "$RETRY_ANCHOR/forbidden" 2>&1); then
+  fail 'sealed cleanup accepted a new launch'
+fi
 assert_absent "$RETRY_ANCHOR/forbidden" 'sealed launch ran its command'
 out=$("$LIVE_LAB" down "$RETRY_ANCHOR" 2>&1)
 expect_code 0 "$?" "fresh down lost its anchored descendant: $out"

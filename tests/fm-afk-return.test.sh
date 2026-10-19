@@ -616,7 +616,7 @@ test_return_brief_lists_landed_work_awaiting_cleanup() {
   # workers with recorded PRs: the merge outcome path marked the first merged
   # through its own marker writer, while nothing durable proves the second
   # landed, so the brief must list exactly the first.
-  printf 'window=synthetic:fm-landed\nbackend=tmux\nkind=ship\npr=https://github.com/example/landed/pull/7\n' > "$dir/home/state/landed.meta"
+  printf 'spawn_gen=s10.1.1\npr_spawn_gen=s10.1.1\nwindow=synthetic:fm-landed\nbackend=tmux\nkind=ship\npr=https://github.com/example/landed/pull/7\n' > "$dir/home/state/landed.meta"
   printf 'done [at=1]: PR https://github.com/example/landed/pull/7\n' > "$dir/home/state/landed.status"
   printf 'window=synthetic:fm-open\nbackend=tmux\nkind=ship\npr=https://github.com/example/open/pull/8\n' > "$dir/home/state/open.meta"
   printf 'done [at=1]: PR https://github.com/example/open/pull/8\n' > "$dir/home/state/open.status"
@@ -632,6 +632,20 @@ test_return_brief_lists_landed_work_awaiting_cleanup() {
     fm_pr_poll_merge_mark_notified "$dir/home/state" landed github github.com example/landed 7
     fm_pr_poll_merge_mark_notified "$dir/home/state" axi-mate github github.com example/child 7
   ) || fail "could not record the landed PR's merge notification through its owner"
+  local task
+  for task in replacement missing old; do
+    case "$task" in
+      replacement) printf 'spawn_gen=s11.1.1\npr_spawn_gen=s10.1.1\n' ;;
+      missing) printf 'pr_spawn_gen=s10.1.1\n' ;;
+      old) printf 'spawn_gen=s11.1.1\npr_spawn_gen=old\n' ;;
+    esac > "$dir/home/state/$task.meta"
+    printf 'window=synthetic:fm-%s\nbackend=tmux\nkind=ship\npr=https://github.com/example/landed/pull/7\n' "$task" >> "$dir/home/state/$task.meta"
+    printf 'working [at=2]: follow-up\n' > "$dir/home/state/$task.status"
+    (
+      . "$ROOT/bin/fm-pr-lib.sh"
+      fm_pr_poll_merge_mark_notified "$dir/home/state" "$task" github github.com example/landed 7
+    ) || fail 'could not record historical merge evidence'
+  done
   touch "$dir/home/state/.last-watcher-beat"
   : > "$dir/home/state/.fake-drain"
 
@@ -648,6 +662,9 @@ test_return_brief_lists_landed_work_awaiting_cleanup() {
   assert_not_contains "$out" 'bin/fm-teardown.sh axi-mate' "the brief offered a persistent secondmate for teardown"
   assert_not_contains "$out" 'example/child/pull/7' "a secondmate's recorded PR surfaced in the brief"
   assert_contains "$out" 'catch-up clear' "landed work must not hold the gate"
+  for task in replacement missing old; do
+    assert_not_contains "$out" "bin/fm-teardown.sh $task" 'historical merge evidence recommended teardown without a current handoff'
+  done
   pass "the return brief lists landed work whose worker is still up, from the durable merge marker only, without gating on it and never offering a secondmate for teardown"
 }
 
@@ -1354,6 +1371,11 @@ test_missing_final_archive_keeps_retained_contract_gated() {
   assert_contains "$out" 'catch-up clear' "a valid restored final archive did not clear catch-up"
   pass "the retained contract epoch requires its final archive on every check"
 }
+
+if [ "${FM_AFK_RETURN_TEST_GROUP:-all}" = landed ]; then
+  test_return_brief_lists_landed_work_awaiting_cleanup
+  exit 0
+fi
 
 test_return_gate_owns_remediation_and_reports_catchup_to_bearings
 test_explicit_reclassification_requires_durable_reason

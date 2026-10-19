@@ -549,6 +549,7 @@ cancel_host() {  # <signal exit status>
 
 start_arm() {  # <predecessor-arm-pid or empty> [--restart]; sets the started pid/output
   local predecessor=$1 out
+  local -a command=("$SCRIPT_DIR/fm-watch-arm.sh")
   host_still_owner || stand_down "this session no longer owns supervision"
   shift
   out=$(mktemp "$STATE/.supervision-host-arm.XXXXXX") || return 1
@@ -556,11 +557,14 @@ start_arm() {  # <predecessor-arm-pid or empty> [--restart]; sets the started pi
   # process group down after the exit-2 rewake, so it gets a group of its own
   # (the shape start_handling_successor in bin/fm-claude-stop-autoarm.sh uses).
   [ "${ARM_OWN_GROUP:-0}" -ne 1 ] || set -m 2>/dev/null || true
+  if [ "${ARM_OWN_GROUP:-0}" -eq 1 ] && [ -n "${FM_LAB_LAUNCH_ROOT:-}" ]; then
+    command=(python3 "${FM_LAB_LAUNCH_HELPER:?lab launch helper binding is missing}" detached "$FM_LAB_LAUNCH_ROOT" "${command[@]}")
+  fi
   ARM_STARTING=1
   if [ -n "$predecessor" ]; then
-    FM_WATCH_PREDECESSOR_ARM_PID=$predecessor FM_GUARD_GRACE="$GRACE" "$SCRIPT_DIR/fm-watch-arm.sh" "$@" >"$out" 2>&1 </dev/null &
+    FM_WATCH_PREDECESSOR_ARM_PID=$predecessor FM_GUARD_GRACE="$GRACE" "${command[@]}" "$@" >"$out" 2>&1 </dev/null &
   else
-    FM_GUARD_GRACE="$GRACE" "$SCRIPT_DIR/fm-watch-arm.sh" "$@" >"$out" 2>&1 </dev/null &
+    FM_GUARD_GRACE="$GRACE" "${command[@]}" "$@" >"$out" 2>&1 </dev/null &
   fi
   STARTED_ARM_PID=$! STARTED_ARM_OUT=$out ARM_STARTING=0
   [ -z "$ARM_CANCEL_STATUS" ] || exit "$ARM_CANCEL_STATUS"

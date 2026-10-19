@@ -339,7 +339,9 @@
 #   TMUX TMUX_PANE HERDR_ENV HERDR_SESSION HERDR_SOCKET_PATH HERDR_PANE_ID
 #   CMUX_WORKSPACE_ID CMUX_SURFACE_ID CMUX_TAB_ID CMUX_PANEL_ID CMUX_SOCKET_PATH
 #   ZELLIJ ZELLIJ_SESSION_NAME ZELLIJ_PANE_ID FM_ZELLIJ_SESSION, plus the task
-#   marker FM_TASK_ID that ship and scout panes receive above, plus the
+#   marker FM_TASK_ID that ship and scout panes receive above, the inherited lab
+#   binding FM_LAB_LAUNCH_ROOT FM_LAB_LAUNCH_HELPER FM_LAB_LAUNCH_RECORD
+#   FM_LAB_LAUNCH_TOKEN, plus the
 #   compact-adviser kill switch COMPACT_ADVISER_DISABLE, which the floor also
 #   pins to 1 with a literal assignment so it survives the cleared environment
 #   even on a host that never had it set.
@@ -5505,6 +5507,7 @@ if [ "$LAUNCH_ENV_ENABLED" = 1 ]; then
     HERDR_PANE_ID CMUX_WORKSPACE_ID CMUX_SURFACE_ID CMUX_TAB_ID CMUX_PANEL_ID \
     CMUX_SOCKET_PATH ZELLIJ ZELLIJ_SESSION_NAME ZELLIJ_PANE_ID FM_ZELLIJ_SESSION \
     FM_TASK_ID COMPACT_ADVISER_DISABLE LAVISH_AXI_HOST \
+    FM_LAB_LAUNCH_ROOT FM_LAB_LAUNCH_HELPER FM_LAB_LAUNCH_RECORD FM_LAB_LAUNCH_TOKEN \
     $LAUNCH_ENV_NAMES; do
     # Only validated names enter shell syntax. Values expand once, quoted, in
     # the pane shell and never become source text or spawn-process snapshots.

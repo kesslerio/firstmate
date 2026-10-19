@@ -167,6 +167,65 @@ def acknowledge_retirement(path, data, request, error=None, retired=False):
     return result
 
 
+def register(root, path, data):
+    save(path, data)
+    fd = os.open(root / '.fm-live-lab', os.O_WRONLY | os.O_APPEND | os.O_NOFOLLOW)
+    try:
+        os.write(fd, ('anchor_record=' + path.name + '\n').encode())
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def launch_environment(root, path, data):
+    return dict(os.environ, FM_LAB_LAUNCH_ROOT=str(root), FM_LAB_LAUNCH_HELPER=str(Path(__file__).resolve()), FM_LAB_LAUNCH_RECORD=path.name,
+                FM_LAB_LAUNCH_TOKEN=data['retirement_token'])
+
+
+def detached(root, command):
+    lock = lock_root(root)
+    fields = context(root)
+    if os.path.lexists(root / '.fm-lab-launch-closed') or fields.get('cleanup_started'):
+        raise ValueError('lab launch is closed for cleanup')
+    name = os.environ.get('FM_LAB_LAUNCH_RECORD', '')
+    if name not in fields.get('anchor_record', []) or Path(name).name != name:
+        raise ValueError('unregistered lab launch owner')
+    owner = json.loads(read_owned(root / name))
+    if (not isinstance(owner, dict) or owner.get('schema') != 1 or owner.get('root') != str(root) or owner.get('nonce') != fields.get('nonce')
+            or owner.get('retired') is True or not command
+            or not os.environ.get('FM_LAB_LAUNCH_TOKEN')
+            or owner.get('retirement_token') != os.environ['FM_LAB_LAUNCH_TOKEN']):
+        raise ValueError('foreign lab launch owner')
+    validate_owner(root, owner)
+    pid = os.getpid()
+    if os.getpgrp() != pid:
+        os.setpgid(0, 0)
+    receive, send = os.pipe()
+    guardian = os.fork()
+    if guardian:
+        os.close(send)
+        os.close(lock)
+        with os.fdopen(receive) as stream:
+            binding = json.load(stream)
+        os.execvpe(command[0], command, launch_environment(root, root / binding['record'], binding))
+    os.close(receive)
+    for signum in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT, signal.SIGQUIT):
+        signal.signal(signum, signal.SIG_IGN)
+    path = root / ('.fm-lab-anchor-' + str(pid))
+    data = dict(schema=1, root=str(root), nonce=fields['nonce'], pid=os.getpid(), group=pid,
+                child=pid, start=started(os.getpid()), retirement_token=secrets.token_hex(16))
+    try:
+        register(root, path, data)
+        try:
+            os.write(send, json.dumps(dict(record=path.name, retirement_token=data['retirement_token'])).encode())
+        except BrokenPipeError:
+            pass
+    finally:
+        os.close(send)
+        os.close(lock)
+    return supervise(root, fields, path, data)
+
+
 def launch(root, command):
     lock = lock_root(root)
     fields = context(root)
@@ -184,17 +243,11 @@ def launch(root, command):
     path = root / ('.fm-lab-anchor-' + str(os.getppid()))
     data = dict(schema=1, root=str(root), nonce=fields['nonce'], pid=pid, group=pid,
                 start=started(pid), retirement_token=secrets.token_hex(16))
-    save(path, data)
-    fd = os.open(root / '.fm-live-lab', os.O_WRONLY | os.O_APPEND | os.O_NOFOLLOW)
-    try:
-        os.write(fd, ('anchor_record=' + path.name + '\n').encode())
-        os.fsync(fd)
-    finally:
-        os.close(fd)
+    register(root, path, data)
     receive, send = os.pipe()
     try:
         child = subprocess.Popen([sys.executable, str(Path(__file__).resolve()), 'execute', str(receive), *command],
-                                 preexec_fn=restore, pass_fds=(receive,))
+                                 preexec_fn=restore, pass_fds=(receive,), env=launch_environment(root, path, data))
         os.close(receive)
         receive = None
         os.setpgid(0, child.pid)
@@ -207,15 +260,24 @@ def launch(root, command):
             finally:
                 signal.signal(signal.SIGTTOU, previous)
         save(path, data)
-        os.write(send, b'1')
+        try:
+            os.write(send, b'1')
+        except BrokenPipeError:
+            pass
     finally:
         if receive is not None:
             os.close(receive)
         os.close(send)
         os.close(lock)
+    return supervise(root, fields, path, data, child)
+
+
+def supervise(root, fields, path, data, child=None):
+    pid = data['pid']
     consumed_requests = set()
     while True:
-        child.poll()
+        if child is not None:
+            child.poll()
         try:
             request = json.loads(read_owned(root / (path.name + '.retire')))
             current = json.loads(read_owned(path))
@@ -229,7 +291,7 @@ def launch(root, command):
         if request and request['request'] in consumed_requests:
             if data.get('retirement_request') != request['request']:
                 data = acknowledge_retirement(path, data, request['request'], 'replayed lab launch retirement request')
-        elif request and child.returncode is not None:
+        elif request and (child is None or child.returncode is not None):
             error = None
             try:
                 validate_owner(root, data)
@@ -248,7 +310,7 @@ def launch(root, command):
             consumed_requests.add(request['request'])
             data = acknowledge_retirement(path, data, request['request'], error, retired=error is None)
             if data.get('retired') is True:
-                return child.returncode
+                return child.returncode if child is not None else 0
         time.sleep(.1)
 
 
@@ -284,6 +346,8 @@ try:
             _, status = os.waitpid(guardian, 0)
             sys.exit(os.waitstatus_to_exitcode(status))
         sys.exit(launch(root, sys.argv[3:]))
+    elif mode == 'detached':
+        sys.exit(detached(root, sys.argv[3:]))
     else:
         raise ValueError('invalid lab launch operation')
 except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:

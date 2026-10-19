@@ -1905,6 +1905,7 @@ test_launch_environment_allowlist() {
 #!/bin/sh
 printf '%s\n' "${FM_TEST_AMBIENT_SENTINEL-unset}" "${FM_TEST_ALLOWED-unset}" \
   "${FM_TEST_EMPTY-unset}" "${FM_TEST_UNSET-unset}" "$HOME" "$PATH" "$TERM" "$TMUX" "$GOTMPDIR"
+printf '%s\n' "$FM_LAB_LAUNCH_ROOT" "$FM_LAB_LAUNCH_HELPER" "$FM_LAB_LAUNCH_RECORD" "$FM_LAB_LAUNCH_TOKEN"
 SH
     out=$(FM_TEST_AMBIENT_SENTINEL=synthetic-unrelated \
       run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" \
@@ -1921,6 +1922,7 @@ SH
       result=$(env -i HOME="$HOME_DIR/user-home" PATH=/usr/bin:/bin TERM=xterm \
       TMUX=synthetic-pane GOTMPDIR=/synthetic/gotmp \
       FM_TEST_AMBIENT_SENTINEL=synthetic-unrelated FM_TEST_ALLOWED="$value" FM_TEST_EMPTY='' \
+      FM_LAB_LAUNCH_ROOT=/synthetic/lab FM_LAB_LAUNCH_HELPER=/synthetic/helper.py FM_LAB_LAUNCH_RECORD=.fm-lab-anchor-123 FM_LAB_LAUNCH_TOKEN=synthetic-token \
       "$pane_shell" -c "$launch") || fail "allowlist=$setting emitted launch failed in $pane_shell"
       case "$setting" in
         absent|missing-config) expected=$(printf '%s\n' synthetic-unrelated "$value" '' unset) ;;
@@ -1928,6 +1930,7 @@ SH
         empty) expected=$(printf '%s\n' unset unset unset unset) ;;
       esac
       expected="$expected"$'\n'"$HOME_DIR/user-home"$'\n'"$pane_path"$'\nxterm\nsynthetic-pane\n/synthetic/gotmp'
+      expected="$expected"$'\n/synthetic/lab\n/synthetic/helper.py\n.fm-lab-anchor-123\nsynthetic-token'
       [ "$result" = "$expected" ] || fail "allowlist=$setting worker environment mismatch: $result"
     done
     pass "allowlist=$setting preserves the operational floor and filters only when opted in"
@@ -2100,6 +2103,11 @@ SH
     pass "$route inheritance preserves the allowlist on source errors and mirrors proven absence"
   done
 }
+
+if [ "${FM_SPAWN_TEST_GROUP:-all}" = lab-environment ]; then
+  test_launch_environment_allowlist
+  exit 0
+fi
 
 test_pi_selected_launcher_directory_reaches_child_tool_path
 test_launch_environment_allowlist

@@ -111,8 +111,8 @@
 #   .startup-network.lock     serializes publication, harvest acknowledgement,
 #                             and the wake decision; every wait on it is bounded.
 #   .startup-network-unpublished-<generation>/
-#                             private report, timings and metadata retained when
-#                             publication cannot acquire its lock. Only the
+#                             private report, timings and metadata retained until
+#                             publication and wake delivery finish. Only the
 #                             still-current generation may later publish them.
 #
 # The whole stage is bounded by FM_STARTUP_NETWORK_TIMEOUT (default 120s), one
@@ -250,6 +250,8 @@ worker_covers_request() {  # <locked> <lock-pid>
 
 cmd_start() {  # <locked> <harvest-pid>
   local locked=$1 harvest_pid=$2 lock_pid generation worker_pid phases started
+  local -a command=("$SCRIPT_DIR/fm-startup-network.sh")
+  [ -z "${FM_LAB_LAUNCH_ROOT:-}" ] || command=(python3 "${FM_LAB_LAUNCH_HELPER:?lab launch helper binding is missing}" detached "$FM_LAB_LAUNCH_ROOT" "${command[@]}")
   mkdir -p "$STATE" 2>/dev/null || return 1
   # Captured HERE, at the moment the caller still holds the lock, and carried to
   # the worker: re-reading the lock later would only prove that SOME session
@@ -305,7 +307,7 @@ EOF
   local monitor_was_on=0
   case $- in *m*) monitor_was_on=1 ;; esac
   set -m 2>/dev/null || true
-  nohup "$SCRIPT_DIR/fm-startup-network.sh" run --locked "$locked" --lock-pid "$lock_pid" \
+  nohup "${command[@]}" run --locked "$locked" --lock-pid "$lock_pid" \
     --generation "$generation" \
     >/dev/null 2>&1 </dev/null &
   worker_pid=$!
@@ -408,6 +410,7 @@ EOF
     if [ "$claim_live" -eq 0 ]; then
       local delivery_status=0
       ! report_requires_wake "$state" || queue_result_wake "$state" || delivery_status=$?
+      [ "$delivery_status" -eq 0 ] || defer_result "$@" || delivery_status=$?
       fm_lock_release "$PUBLISH_LOCK"
       return "$delivery_status"
     fi
@@ -745,7 +748,7 @@ print_pending() {
 
 print_state() {
   if [ "${1:-1}" -eq 1 ] && pending_result; then
-    printf 'NETWORK_CHECKS: result publication is pending; the current run could not acquire its publication lock.\n'
+    printf 'NETWORK_CHECKS: result publication is pending; the current run could not finish publication or wake delivery.\n'
     cat "$PENDING_RESULT/report"
     return
   fi
