@@ -370,7 +370,8 @@ EOF
 }
 
 test_pi_actionable_close_starts_single_successor_before_delivery() {
-  local repo home plugin log stop out status
+  local repo home plugin log stop out status instruction_wake
+  instruction_wake=$("$ROOT/tests/fixtures/instruction-wake.sh") || fail "instruction wake fixture failed"
   repo="$TMP_ROOT/pi-continuous-rearm-root"
   home="$TMP_ROOT/pi-continuous-rearm-home"
   log="$TMP_ROOT/pi-continuous-rearm.log"
@@ -388,7 +389,7 @@ printf 'arm=%s predecessor=%s\n' "$$" "${FM_WATCH_PREDECESSOR_ARM_PID:-none}" >>
 count=$(grep -c '^arm=' "$FM_ARM_LOG")
 if [ "$count" -eq 1 ]; then
   printf 'watcher: started pid=%s (beacon fresh)\n' "$$"
-  printf 'signal: synthetic actionable close\n'
+  printf '%s\n' "$FM_TEST_OBLIGATION_WAKE"
   exit 0
 fi
 printf 'watcher: started pid=%s (beacon fresh) recovery-generation=fixture-generation\n' "$$"
@@ -396,7 +397,7 @@ trap 'exit 0' TERM INT
 while [ ! -e "$FM_STOP_FILE" ]; do sleep 0.02; done
 SH
   chmod +x "$repo/bin/fm-watch-arm.sh"
-  out=$(PLUGIN="$plugin" FM_HOME="$home" FM_ROOT_OVERRIDE="$repo" FM_ARM_LOG="$log" FM_STOP_FILE="$stop" node --input-type=module 2>&1 <<'EOF'
+  out=$(FM_TEST_OBLIGATION_WAKE="$instruction_wake" PLUGIN="$plugin" FM_HOME="$home" FM_ROOT_OVERRIDE="$repo" FM_ARM_LOG="$log" FM_STOP_FILE="$stop" node --input-type=module 2>&1 <<'EOF'
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
@@ -413,7 +414,8 @@ const pi = {
   registerTool(candidate) {
     if (candidate.name === "fm_watch_arm_pi") tool = candidate;
   },
-  sendUserMessage: async () => {
+  sendUserMessage: async (message) => {
+    if (!message.includes(process.env.FM_TEST_OBLIGATION_WAKE)) throw new Error(`instruction alert was not delivered: ${message}`);
     rowsAtDelivery = existsSync(process.env.FM_ARM_LOG)
       ? readFileSync(process.env.FM_ARM_LOG, "utf8").trim().split("\n").filter((row) => row.startsWith("arm=")).length
       : 0;
@@ -4461,7 +4463,8 @@ EOF
 }
 
 test_opencode_primary_watch_plugin_rearms_after_wake() {
-  local plugin repo home log stop out status
+  local plugin repo home log stop out status instruction_wake
+  instruction_wake=$("$ROOT/tests/fixtures/instruction-wake.sh") || fail "instruction wake fixture failed"
   plugin="$ROOT/.opencode/plugins/fm-primary-watch-arm.js"
   repo="$TMP_ROOT/opencode-rearm-root"
   home="$TMP_ROOT/opencode-rearm-home"
@@ -4482,7 +4485,7 @@ printf 'arm=%s predecessor=%s\n' "$$" "${FM_WATCH_PREDECESSOR_ARM_PID:-none}" >>
 count=$(grep -c '^arm=' "$FM_ARM_LOG")
 if [ "$count" -eq 1 ]; then
   printf 'watcher: started pid=%s (beacon fresh)\n' "$$"
-  printf 'signal: synthetic wake\n'
+  printf '%s\n' "$FM_TEST_OBLIGATION_WAKE"
   exit 0
 fi
 printf 'watcher: started pid=%s (beacon fresh) recovery-generation=fixture-generation\n' "$$"
@@ -4490,7 +4493,7 @@ trap 'exit 0' TERM INT
 while [ ! -e "$FM_STOP_FILE" ]; do sleep 0.02; done
 SH
   chmod +x "$repo/bin/fm-watch-arm.sh"
-  out=$(PLUGIN="$plugin" WORKTREE="$repo" FM_HOME="$home" FM_ARM_LOG="$log" FM_STOP_FILE="$stop" node 2>&1 <<'EOF'
+  out=$(FM_TEST_OBLIGATION_WAKE="$instruction_wake" PLUGIN="$plugin" WORKTREE="$repo" FM_HOME="$home" FM_ARM_LOG="$log" FM_STOP_FILE="$stop" node 2>&1 <<'EOF'
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
@@ -4503,7 +4506,8 @@ const promptBlocked = new Promise((resolve) => {
 });
 const client = {
   session: {
-    promptAsync: async () => {
+    promptAsync: async (input) => {
+      if (!JSON.stringify(input).includes(process.env.FM_TEST_OBLIGATION_WAKE)) throw new Error("instruction alert was not delivered to OpenCode");
       rowsAtPrompt = existsSync(process.env.FM_ARM_LOG)
         ? readFileSync(process.env.FM_ARM_LOG, "utf8").trim().split("\n").filter((row) => row.startsWith("arm=")).length
         : 0;

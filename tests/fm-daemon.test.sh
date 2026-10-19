@@ -3372,3 +3372,23 @@ test_inject_msg_herdr_pane_gone_defers
 test_inject_msg_herdr_submits_through_backend_dispatch
 test_inject_msg_defers_on_dead_shell_unknown
 test_inject_msg_defers_on_unrecognized_composer_state
+
+test_instruction_obligation_alert_reaches_supervisor() {
+  local dir state reason drain
+  reason=$("$ROOT/tests/fixtures/instruction-wake.sh") || fail 'instruction wake fixture failed'
+  dir=$(make_supercase obligation-alert); state="$dir/state"; drain="$dir/drain"
+  mkdir "$drain"
+  printf '%s\n' "$reason" > "$dir/reason"
+  cat > "$drain/fm-wake-drain.sh" <<EOF
+#!/usr/bin/env bash
+if [ "\${1:-}" = --ack-through ]; then touch "$dir/acked"; exit 0; fi
+printf '1\t1\tstale\towned\t%s\n' "\$(cat '$dir/reason')"
+printf 'WAKE_ACK_REQUIRED: inbox --ack-through 1 --recovery-generation gen\n' >&2
+EOF
+  chmod +x "$drain/fm-wake-drain.sh"
+  FM_DAEMON_DIR="$drain" FM_ESCALATE_BATCH_SECS=999999 handle_durable_wakes "$reason" "$state" || fail 'obligation wake was not handled'
+  assert_contains "$(cat "$state/.subsuper-escalations")" "$reason" 'daemon must retain the actionable instruction alert'
+  assert_present "$dir/acked" 'daemon did not acknowledge durable alert after buffering'
+  pass 'daemon consumes normalized instruction alert as an actionable check'
+}
+test_instruction_obligation_alert_reaches_supervisor

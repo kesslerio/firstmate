@@ -42,6 +42,18 @@ case "$ID" in ''|*[!A-Za-z0-9._-]*) die "invalid secondmate id: $ID" ;; esac
 
 META="$STATE/$ID.meta"
 [ -f "$META" ] && [ ! -L "$META" ] || die "no metadata for $ID at $META"
+META_LOCK=$(fm_meta_lock_path "$META") || die "metadata lock path is invalid for $ID"
+if fm_lock_acquire_wait_bounded "$META_LOCK" 15; then
+  :
+else
+  rc=$?
+  printf 'error: parent task lock unavailable for %s (status %s)\n' "$ID" "$rc" >&2
+  exit "$rc"
+fi
+META_TMP=
+trap 'rm -f -- "${META_TMP:-}"; fm_lock_release "$META_LOCK"' EXIT
+[ -f "$META" ] && [ ! -L "$META" ] || die "metadata changed before relaunch"
+ORIGINAL_META=$(cksum "$META") || die "cannot observe the parent route"
 REMOTE_HOST=$(fm_meta_get "$META" remote_host)
 [ -n "$REMOTE_HOST" ] \
   || die "task $ID is not a remotely placed secondmate; use bin/fm-control.sh $ID relaunch instead"
@@ -67,8 +79,8 @@ NEW_MODEL=$(printf '%s\n' "$RELAUNCH_OUT" | sed -n 's/^model=//p' | tail -1)
 NEW_EFFORT=$(printf '%s\n' "$RELAUNCH_OUT" | sed -n 's/^effort=//p' | tail -1)
 [ -n "$NEW_HARNESS" ] || die "the host's route confirmation carried no harness to record"
 
-META_LOCK=$(fm_meta_lock_path "$META") || die "metadata lock path is invalid for $ID"
-fm_lock_acquire_wait "$META_LOCK"
+[ -f "$META" ] && [ ! -L "$META" ] && [ "$(cksum "$META")" = "$ORIGINAL_META" ] \
+  || die "parent route or generation changed during remote relaunch; confirmation was not published"
 META_TMP=$(mktemp "$STATE/.fm-remote-relaunch-meta.XXXXXX") || {
   fm_lock_release "$META_LOCK"
   die "cannot stage the updated record"

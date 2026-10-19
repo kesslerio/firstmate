@@ -639,7 +639,7 @@ inbox_obligation_failure() {  # <task> <failure>
   if [ ! -L "$marker" ] && [ -f "$marker" ] && [ "$(cat "$marker")" = "$reason" ]; then
     return 0
   fi
-  fm_wake_append stale "$task" "$reason" || return 1
+  fm_wake_append stale "$task" "$(fm_task_inbox_alert_message "$reason")" || return 1
   temporary=$(mktemp "$STATE/.instruction-error.XXXXXX") || return 1
   if ! printf '%s\n' "$reason" > "$temporary" || ! mv "$temporary" "$marker"; then
     rm -f "$temporary"
@@ -690,7 +690,7 @@ inbox_obligation_tick() {
     [ -z "$remote_host" ] || continue
     inbox_obligation_check_one "$task" tick || return 1
   done
-  [ -z "$INSTRUCTION_WAKE_REASON" ] || wake "$INSTRUCTION_WAKE_REASON"
+  [ -z "$INSTRUCTION_WAKE_REASON" ] || wake "$(fm_task_inbox_alert_message "$INSTRUCTION_WAKE_REASON")"
   return 0
 }
 

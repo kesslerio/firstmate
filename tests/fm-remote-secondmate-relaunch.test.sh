@@ -23,6 +23,8 @@ set -u
 command -v perl >/dev/null 2>&1 || { echo "skip: perl not found"; exit 0; }
 
 TMP=$(fm_test_tmproot fm-remote-secondmate-relaunch)
+FM_TEST_CHILD_REGISTRY="$TMP/children"
+export FM_TEST_CHILD_REGISTRY
 HOME_DIR="$TMP/home"
 FAKEBIN=$(fm_fakebin "$TMP/fake")
 mkdir -p "$HOME_DIR/data" "$HOME_DIR/state" "$HOME_DIR/config"
@@ -73,6 +75,21 @@ EOF
 [ "$cmd" = fm-remote-secondmate-control.sh ] || exit 93
 [ "$action" = relaunch ] || exit 94
 case "$FM_FAKE_RELAUNCH_MODE" in
+  concurrent)
+    printf '%s\n' "$harness" >> "$FM_FAKE_RELAUNCH_SYNC/entered"
+    if [ "$harness" = claude ]; then
+      touch "$FM_FAKE_RELAUNCH_SYNC/a-ready"
+      deadline=$((SECONDS + 8))
+      while [ ! -e "$FM_FAKE_RELAUNCH_SYNC/release-a" ]; do
+        [ "$SECONDS" -lt "$deadline" ] || exit 95
+        sleep .02
+      done
+    fi
+    ;;
+  change-route)
+    printf 'remote_host=changed-host\nspawn_gen=replacement\n' >> "$FM_FAKE_RELAUNCH_SYNC/../home/state/ios.meta"
+    ;;
+
   refuse)
     printf 'error: unverified remote secondmate harness: %s\n' "$harness" >&2
     exit 1
@@ -97,7 +114,7 @@ chmod +x "$FAKEBIN/fake-ssh"
 
 run_relaunch() {  # <args...>
   env FM_HOME="$HOME_DIR" FM_SSH_BIN="$FAKEBIN/fake-ssh" \
-    FM_FAKE_RELAUNCH_MODE="${FM_FAKE_RELAUNCH_MODE:-}" \
+    FM_FAKE_RELAUNCH_MODE="${FM_FAKE_RELAUNCH_MODE:-}" FM_FAKE_RELAUNCH_SYNC="${FM_FAKE_RELAUNCH_SYNC:-}" \
     "$ROOT/bin/fm-remote-secondmate-relaunch.sh" "$@" 2>&1
 }
 
@@ -190,3 +207,27 @@ fm_pr_poll_artifacts_valid "$HOME_DIR/state" ios "$ROOT/bin/fm-pr-poll.sh" \
 pass "a remote relaunch keeps an already-armed PR poll authenticating"
 
 echo "ALL TESTS PASSED"
+
+reset_meta
+sync="$TMP/interleave"; mkdir "$sync"
+FM_FAKE_RELAUNCH_MODE=concurrent FM_FAKE_RELAUNCH_SYNC="$sync" run_relaunch ios claude model-a high > "$sync/a.out" & a=$!
+fm_test_track_child "$a"
+for ((i=0; i<200; i++)); do [ -e "$sync/a-ready" ] && break; sleep .02; done
+assert_present "$sync/a-ready" 'first remote operation did not reach confirmation barrier'
+FM_FAKE_RELAUNCH_MODE=concurrent FM_FAKE_RELAUNCH_SYNC="$sync" run_relaunch ios pi model-b medium > "$sync/b.out" & b=$!
+fm_test_track_child "$b"
+sleep .2
+assert_equals claude "$(cat "$sync/entered")" 'second operation bypassed parent task serialization'
+touch "$sync/release-a"
+wait "$a" || fail 'first serialized relaunch failed'
+wait "$b" || fail 'second serialized relaunch failed'
+assert_equals $'claude\npi' "$(cat "$sync/entered")" 'remote operations must preserve publication order'
+assert_grep 'harness=pi' "$HOME_DIR/state/ios.meta" 'parent must name last confirmed runtime'
+assert_grep 'model=model-b' "$HOME_DIR/state/ios.meta" 'stale confirmation overwrote newer runtime'
+reset_meta
+rc=0
+FM_FAKE_RELAUNCH_MODE=change-route FM_FAKE_RELAUNCH_SYNC="$sync" run_relaunch ios claude model-c high > "$sync/change.out" || rc=$?
+[ "$rc" -ne 0 ] || fail 'changed route/generation accepted stale confirmation'
+assert_grep 'harness=pi' "$HOME_DIR/state/ios.meta" 'stale confirmation changed original runtime'
+assert_grep 'remote_host=changed-host' "$HOME_DIR/state/ios.meta" 'route replacement was overwritten'
+pass 'parent task lock serializes remote operation and publication; changed routes refuse stale confirmation'

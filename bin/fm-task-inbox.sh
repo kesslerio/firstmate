@@ -57,7 +57,7 @@ case "$operation" in
       "$(printf '%s' "$2" | tr '\r\n' '  ')" "$(printf '%s' "$3" | tr '\r\n' '  ')" >> "$STATE/$task.status"
     exit ;;
   _wake)
-    fm_wake_append stale "$task" "$1"
+    fm_wake_append stale "$task" "$(fm_task_inbox_alert_message "$1")"
     exit ;;
   _ring)
     meta="$STATE/$task.meta"

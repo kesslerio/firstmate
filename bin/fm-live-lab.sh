@@ -673,12 +673,91 @@ prune_groups() {
   ' <(printf '%s\n' "$2") <(printf '%s\n' "$3")
 }
 
+lab_checkpoint() {
+  python3 - "$ROOT/$RECORD_NAME" "$1" "$pairs" "$groups" <<'PYCHECKPOINT'
+import hashlib, json, os, pathlib, re, stat, sys, tempfile
+path = pathlib.Path(sys.argv[1])
+temporary = None
+try:
+    parent = path.parent.stat()
+    if path.parent.resolve() != path.parent or parent.st_uid != os.getuid() or parent.st_mode & 0o022:
+        raise ValueError('unsafe disposable lab directory')
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    with os.fdopen(fd, 'rb') as stream:
+        info = os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1 or info.st_mode & 0o022:
+            raise ValueError('unsafe disposable lab record')
+        raw = stream.read(1024 * 1024 + 1)
+    if len(raw) > 1024 * 1024 or not raw.startswith(b'fm-live-lab v1\n') or not raw.endswith(b'\n'):
+        raise ValueError('invalid disposable lab record')
+    lines = raw.decode().splitlines(keepends=True)
+    states = [line for line in lines if line.startswith('cleanup_')]
+    base = ''.join(line for line in lines if not line.startswith('cleanup_'))
+    if [line.rstrip('\n') for line in lines if line.startswith('home=')] != ['home=' + str(path.parent / 'home')]:
+        raise ValueError('foreign disposable lab home')
+    binding = hashlib.sha256(base.encode()).hexdigest()
+    data = dict(schema=1, binding=binding, pairs=[], groups=[])
+    if states:
+        if len(states) != 2 or states[0] != 'cleanup_started=fm-live-lab-cleanup.v1\n' or not states[1].startswith('cleanup_checkpoint='):
+            raise ValueError('malformed cleanup checkpoint')
+        data = json.loads(states[1].split('=', 1)[1])
+        if not isinstance(data, dict) or set(data) != {'schema','binding','pairs','groups'} or data['schema'] != 1 or data['binding'] != binding:
+            raise ValueError('foreign or changed cleanup checkpoint')
+    def validate(value):
+        if not isinstance(value['pairs'], list) or not isinstance(value['groups'], list):
+            raise ValueError('invalid ownership lists')
+        for pair in value['pairs']:
+            if not isinstance(pair, list) or len(pair) != 2 or type(pair[0]) is not int or pair[0] <= 1 or not isinstance(pair[1], str) or not re.fullmatch(r'[A-Z][a-z]{2} [A-Z][a-z]{2} [0-9]{1,2} [0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}', pair[1]):
+                raise ValueError('invalid process identity')
+        if any(type(group) is not int or group <= 1 for group in value['groups']):
+            raise ValueError('invalid group identity')
+    validate(data)
+    if sys.argv[2] == 'load':
+        print('present=' + str(int(bool(states))))
+        print('groups=' + ' '.join(map(str, data['groups'])))
+        for pid, started in data['pairs']:
+            print(str(pid) + '\t' + started)
+    else:
+        fresh = []
+        for line in sys.argv[3].splitlines():
+            if line:
+                pid, started = line.split('\t', 1)
+                fresh.append([int(pid), started])
+        data['pairs'] = fresh
+        data['groups'] = [int(group) for group in sys.argv[4].split()]
+        validate(data)
+        content = (base + 'cleanup_started=fm-live-lab-cleanup.v1\ncleanup_checkpoint=' + json.dumps(data, separators=(',', ':')) + '\n').encode()
+        if len(content) > 1024 * 1024:
+            raise ValueError('cleanup checkpoint exceeds record bound')
+        fd, temporary = tempfile.mkstemp(prefix='.fm-live-lab-', dir=path.parent)
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write(content); stream.flush(); os.fsync(stream.fileno())
+        current = path.lstat()
+        if (current.st_dev, current.st_ino, current.st_mtime_ns, current.st_size) != (info.st_dev, info.st_ino, info.st_mtime_ns, info.st_size):
+            raise ValueError('lab ownership changed during checkpoint')
+        os.replace(temporary, path)
+        directory = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+except (OSError, ValueError, TypeError, KeyError) as error:
+    print('cleanup checkpoint refused: ' + str(error), file=sys.stderr)
+    sys.exit(1)
+finally:
+    if temporary is not None:
+        try: os.unlink(temporary)
+        except FileNotFoundError: pass
+PYCHECKPOINT
+}
+
 refresh_pairs() {
   local snapshot
   snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=) || return 1
   awk -v pid="$$" '$1 == pid {found=1} END {exit !found}' <<< "$snapshot" || return 1
   groups=$(prune_groups "$groups" "$pairs" "$snapshot")
   pairs=$(expand_pairs "$pairs" "$groups" "$snapshot")
+  lab_checkpoint save
 }
 
 # <pid TAB lstart> pairs captured before tmux shutdown. Recheck identity even
@@ -747,9 +826,17 @@ cmd_down() {
   local rc=0 pids pairs pid start survivors n removed added id meta dir home_hash groups pgid own_group caller_group details
   local -a ids=()
   pairs='' groups=''
-  local snapshot
+  local checkpoint saved_pairs saved_groups snapshot observed_start
+  checkpoint=$(lab_checkpoint load) || die "cleanup unverified: retained ownership is unsafe"
+  saved_pairs=$(printf '%s\n' "$checkpoint" | sed '/^present=/d; /^groups=/d')
+  saved_groups=$(printf '%s\n' "$checkpoint" | sed -n 's/^groups=//p')
   snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=) || die "cleanup unverified: process identities unavailable"
   pids=$(lab_pids "$snapshot") || die "cleanup unverified: process discovery failed"
+  while IFS=$'\t' read -r pid start; do
+    [ -n "$pid" ] || continue
+    observed_start=$(awk -v pid="$pid" '$1 == pid {print $5 " " $6 " " $7 " " $8 " " $9}' <<< "$snapshot")
+    [ -z "$observed_start" ] || [ "$observed_start" = "$start" ] || die "cleanup unverified: retained process identity changed"
+  done <<< "$saved_pairs"
   own_group=$(awk -v pid="$$" '$1 == pid {print $3}' <<< "$snapshot")
   caller_group=$(awk -v pid="$PPID" '$1 == pid {print $3}' <<< "$snapshot")
   [ -n "$own_group" ] && [ -n "$caller_group" ] || die "cleanup unverified: controller identities unavailable"
@@ -761,6 +848,14 @@ cmd_down() {
     case "$pgid" in ''|0|1|*[!0-9]*) continue ;; esac
     [ "$pgid" = "$own_group" ] || [ "$pgid" = "$caller_group" ] || groups+="$pgid "
   done
+  if [ -z "$pids" ] && ! printf '%s\n' "$checkpoint" | grep -qx 'present=1' && grep -q '^launch_pid=' "$ROOT/$RECORD_NAME"; then
+    die "cleanup unverified: roots exited without a retained ownership checkpoint"
+  fi
+  pairs=$(printf '%s\n%s\n' "$saved_pairs" "$pairs" | awk 'NF && !seen[$0]++')
+  groups="$saved_groups $groups"
+  groups=$(prune_groups "$groups" "$pairs" "$snapshot")
+  pairs=$(expand_pairs "$pairs" "$groups" "$snapshot")
+  lab_checkpoint save || die "cleanup unverified: cannot retain proven process ownership"
   lab_tmux kill-server 2>/dev/null || true
   refresh_pairs || die "cleanup unverified: process refresh failed"
   survivors=$(live_pids "$pairs") || die "cleanup unverified: survivor observation failed"
