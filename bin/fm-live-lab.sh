@@ -14,6 +14,7 @@
 #   fm-live-lab.sh say <lab-root> [--window <name>] <text>
 #   fm-live-lab.sh pane <lab-root> [--window <name>] [--lines <n>]
 #   fm-live-lab.sh down <lab-root>
+#   fm-live-lab.sh launch <lab-root> -- <command> [args...]
 #
 # up builds everything under <lab-root> (a fresh path; default a new
 # /tmp/fmlab.XXXXXX), verifies readiness itself, and prints one line per check.
@@ -192,8 +193,10 @@ window_id() {
   esac
   window=$(sed -n 's/^window=//p' "$LAB/state/$name.meta" 2>/dev/null)
   [ -z "$window" ] || name=${window#*:}
-  lab_tmux list-windows -t firstmate -F "#{window_name}$(printf '\t')#{window_id}" 2>/dev/null \
-    | awk -F '\t' -v n="$name" '$1 == n { print $2; exit }'
+  # tmux sanitizes control characters in format output, including a literal
+  # tab separator. Window ids contain no colon; names may contain further ones.
+  lab_tmux list-windows -t firstmate -F '#{window_id}:#{window_name}' 2>/dev/null \
+    | awk -v n="$name" 'index($0, ":") { p = index($0, ":"); if (substr($0, p + 1) == n) { print substr($0, 1, p - 1); exit } }'
 }
 
 window_field() {  # <name> <format>
@@ -542,8 +545,11 @@ cmd_up() {
 
   TMUX_DIR=$("$LAB_HOME_HELPER" tmux-dir "$LAB") || die "cannot create the private tmux directory"
   echo "tmux_dir=$TMUX_DIR" >> "$ROOT/$RECORD_NAME"
-  lab_run tmux -f /dev/null new-session -d -s firstmate -n lab -x 220 -y 60 -c "$ROOT" || die "cannot start the lab tmux server"
+  lab_run tmux -f /dev/null new-session -d -s firstmate -n lab -x 220 -y 60 -c "$ROOT" "$SCRIPT_DIR/fm-live-lab.sh" launch "$ROOT" -- bash --noprofile --norc -i +m || die "cannot start the lab tmux server"
   record_launch_pid "$(lab_tmux display-message -p '#{pid}')"
+  local anchored_shell
+  printf -v anchored_shell '%q ' "$SCRIPT_DIR/fm-live-lab.sh" launch "$ROOT" -- bash --noprofile --norc -i +m
+  lab_tmux set-option -g default-command "$anchored_shell" || die "cannot install lab launch ownership"
 
   if [ "$mate" = yes ]; then
     spawn_mate || die "cannot seed and launch the second mate"
@@ -573,7 +579,7 @@ cmd_up() {
     primary=(pi --approve --session-dir "$ROOT/pi-sessions" --model "$model" --thinking "$effort")
   fi
   lab_tmux new-window -d -t firstmate: -n main -c "$LAB" \
-    env FM_HOME="$LAB" CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false "${primary[@]}" \
+    "$SCRIPT_DIR/fm-live-lab.sh" launch "$ROOT" -- env FM_HOME="$LAB" CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false "${primary[@]}" \
     || die "cannot launch the lab primary"
   lab_tmux set-option -w -t "$(window_id main)" remain-on-exit on >/dev/null
   record_launch_pid "$(window_field main '#{pane_pid}')"
@@ -602,7 +608,7 @@ cmd_up() {
 record_launch_pid() {
   local start observation
   case "${1:-}" in ''|*[!0-9]*) die "cannot record lab process: missing or invalid PID '${1:-}'" ;; esac
-  observation=$(ps -o lstart= -p "$1") || die "cannot observe lab process $1"
+  observation=$(LC_ALL=C TZ=UTC ps -o lstart= -p "$1") || die "cannot observe lab process $1"
   start=$(awk '{$1=$1; print}' <<< "$observation")
   [ -n "$start" ] || die "cannot record start time for lab process $1"
   printf 'launch_pid=%s\nlaunch_start=%s\n' "$1" "$start" >> "$ROOT/$RECORD_NAME"
@@ -753,8 +759,10 @@ PYCHECKPOINT
 }
 
 refresh_pairs() {
-  local snapshot
-  snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=) || return 1
+  local snapshot current_anchors
+  current_anchors=$(python3 "$SCRIPT_DIR/fm-lab-launch.py" anchors "$ROOT") || return 1
+  [ "$current_anchors" = "$anchors" ] || return 1
+  snapshot=$(LC_ALL=C TZ=UTC ps -axo pid=,ppid=,pgid=,stat=,lstart=) || return 1
   awk -v pid="$$" '$1 == pid {found=1} END {exit !found}' <<< "$snapshot" || return 1
   groups=$(prune_groups "$groups" "$pairs" "$snapshot")
   pairs=$(expand_pairs "$pairs" "$groups" "$snapshot")
@@ -765,12 +773,13 @@ refresh_pairs() {
 # after a root exits and its children are reparented or a PID is reused.
 live_pids() {
   local snapshot
-  snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=) || return 1
+  snapshot=$(LC_ALL=C TZ=UTC ps -axo pid=,ppid=,pgid=,stat=,lstart=) || return 1
   awk -v pid="$$" '$1 == pid {found=1} END {exit !found}' <<< "$snapshot" || return 1
-  awk '
+  awk -v anchors="${anchor_ids:-}" '
+    BEGIN {n=split(anchors,a," "); for(i=1;i<=n;i++) anchor[a[i]]=1}
     NR==FNR { split($0, f, "\t"); if (f[1] ~ /^[0-9]+$/) saved[f[1]]=f[2]; next }
     { start=$5 " " $6 " " $7 " " $8 " " $9
-      if ($1 in saved && saved[$1] == start && $4 !~ /^Z/) print $1 }
+      if ($1 in saved && saved[$1] == start && $4 !~ /^Z/ && !($1 in anchor)) print $1 }
   ' <(printf '%s\n' "$1") <(printf '%s\n' "$snapshot")
 }
 
@@ -827,11 +836,13 @@ cmd_down() {
   local rc=0 pids pairs pid start survivors n removed added id meta dir home_hash groups pgid own_group caller_group details
   local -a ids=()
   pairs='' groups=''
-  local checkpoint saved_pairs saved_groups snapshot observed_start
+  local checkpoint saved_pairs saved_groups snapshot observed_start anchors anchor_ids anchor_groups retired_anchors retirement_requests retirement_pending
+  anchors=$(python3 "$SCRIPT_DIR/fm-lab-launch.py" seal "$ROOT") || die "cleanup unverified: launch ownership unavailable"
+  anchor_ids=$(printf '%s\n' "$anchors" | cut -f1 | tr '\n' ' ')
   checkpoint=$(lab_checkpoint load) || die "cleanup unverified: retained ownership is unsafe"
   saved_pairs=$(printf '%s\n' "$checkpoint" | sed '/^present=/d; /^groups=/d')
   saved_groups=$(printf '%s\n' "$checkpoint" | sed -n 's/^groups=//p')
-  snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=) || die "cleanup unverified: process identities unavailable"
+  snapshot=$(LC_ALL=C TZ=UTC ps -axo pid=,ppid=,pgid=,stat=,lstart=) || die "cleanup unverified: process identities unavailable"
   pids=$(lab_pids "$snapshot") || die "cleanup unverified: process discovery failed"
   while IFS=$'\t' read -r pid start; do
     [ -n "$pid" ] || continue
@@ -841,6 +852,18 @@ cmd_down() {
   own_group=$(awk -v pid="$$" '$1 == pid {print $3}' <<< "$snapshot")
   caller_group=$(awk -v pid="$PPID" '$1 == pid {print $3}' <<< "$snapshot")
   [ -n "$own_group" ] && [ -n "$caller_group" ] || die "cleanup unverified: controller identities unavailable"
+  anchor_groups=$(awk '
+    NR==FNR {split($0,a,"\t"); if (a[1] ~ /^[0-9]+$/) saved[a[1]]=a[2]; next}
+    $1 in saved {
+      start=$5 " " $6 " " $7 " " $8 " " $9
+      if (start != saved[$1] || $4 ~ /^Z/) exit 1
+      seen[$1]=1; print $3
+    }
+    END {for (pid in saved) if (!(pid in seen)) exit 1}
+  ' <(printf '%s\n' "$anchors") <(printf '%s\n' "$snapshot")) || die "cleanup unverified: launch group identity changed"
+  for pid in $anchor_groups; do
+    [ "$pid" != "$own_group" ] && [ "$pid" != "$caller_group" ] || die "cleanup unverified: run down outside the lab launch group"
+  done
   for pid in $pids; do
     start=$(awk -v pid="$pid" '$1 == pid {print $5 " " $6 " " $7 " " $8 " " $9}' <<< "$snapshot")
     [ -n "$start" ] || continue
@@ -849,11 +872,11 @@ cmd_down() {
     case "$pgid" in ''|0|1|*[!0-9]*) continue ;; esac
     [ "$pgid" = "$own_group" ] || [ "$pgid" = "$caller_group" ] || groups+="$pgid "
   done
-  if [ -z "$pids" ] && ! printf '%s\n' "$checkpoint" | grep -qx 'present=1' && grep -q '^launch_pid=' "$ROOT/$RECORD_NAME"; then
+  if [ -z "$pids" ] && [ -z "$anchors" ] && ! printf '%s\n' "$checkpoint" | grep -qx 'present=1' && grep -q '^launch_pid=' "$ROOT/$RECORD_NAME"; then
     die "cleanup unverified: roots exited without a retained ownership checkpoint"
   fi
-  pairs=$(printf '%s\n%s\n' "$saved_pairs" "$pairs" | awk 'NF && !seen[$0]++')
-  groups="$saved_groups $groups"
+  pairs=$(printf '%s\n%s\n%s\n' "$saved_pairs" "$pairs" "$anchors" | awk 'NF && !seen[$0]++')
+  groups="$saved_groups $groups $anchor_groups"
   groups=$(prune_groups "$groups" "$pairs" "$snapshot")
   pairs=$(expand_pairs "$pairs" "$groups" "$snapshot")
   lab_checkpoint save || die "cleanup unverified: cannot retain proven process ownership"
@@ -887,6 +910,18 @@ cmd_down() {
       details+="$(ps -o pid=,ppid=,pgid=,stat=,command= -p "$pid" 2>/dev/null)"$'\n'
     done
     die "refusing to remove the lab: its processes did not exit (pid ppid pgid state command): $details"
+  fi
+  if [ -n "${anchors:-}" ]; then
+    retirement_requests=$(printf '%s\n' "$anchors" | python3 "$SCRIPT_DIR/fm-lab-launch.py" request-retirement "$ROOT") || die "cleanup unverified: launch retirement request failed"
+    for ((; n<=40; n++)); do
+      retirement_pending=$(printf '%s\n' "$retirement_requests" | python3 "$SCRIPT_DIR/fm-lab-launch.py" retirement-status "$ROOT") || die "cleanup unverified: launch retirement refused"
+      survivors=$(anchor_ids='' live_pids "$anchors") || die "cleanup unverified: launch retirement observation failed"
+      [ -n "$survivors$retirement_pending" ] || break
+      sleep 0.5
+    done
+    [ -z "$survivors$retirement_pending" ] || die "cleanup unverified: launch owners remain"
+    retired_anchors=$(python3 "$SCRIPT_DIR/fm-lab-launch.py" anchors "$ROOT") || die "cleanup unverified: launch retirement could not be verified"
+    [ -z "$retired_anchors" ] || die "cleanup unverified: launch retirement is incomplete"
   fi
   echo "stopped: lab tmux server and lab processes"
   # A spawn keeps /tmp/fm-<id> and /tmp/fm-<id>+<sha256 of the spawning home>.
@@ -966,6 +1001,13 @@ case "${1:-}" in
   say) shift; cmd_say "$@" ;;
   pane) shift; cmd_pane "$@" ;;
   down) shift; cmd_down "$@" ;;
+  launch)
+    shift
+    load_lab "${1:-}"; shift
+    [ "${1:-}" = -- ] || usage
+    shift
+    exec python3 "$SCRIPT_DIR/fm-lab-launch.py" launch "$ROOT" "$@"
+    ;;
   -h|--help) help_text ;;
   *) usage ;;
 esac
