@@ -206,6 +206,7 @@ test_daemon_heartbeat() {
 
 
 test_ready_review_contract() {
+  export -f fm_test_track_child fm_test_stop_children
   ROOT="$ROOT" REVIEW_TMP="$TMP_ROOT/review-contract" python3 - <<'PYTEST'
 import json
 import os
@@ -425,6 +426,35 @@ print('ok - failed wake publication retries before deduplication and restart coa
 import shutil
 import signal
 import time
+import atexit
+owned_processes = []
+owned_signals = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP, signal.SIGQUIT)
+def interrupted(signum, frame):
+    for sig in owned_signals:
+        signal.signal(sig, signal.SIG_IGN)
+    raise SystemExit(128 + signum)
+for sig in owned_signals:
+    signal.signal(sig, interrupted)
+def launch_owned(*args, **kwargs):
+    blocked = signal.pthread_sigmask(signal.SIG_BLOCK, owned_signals)
+    try:
+        process = subprocess.Popen(*args, **kwargs)
+        owned_processes.append(process)
+        registry = base / f'owner-{process.pid}'
+        subprocess.run(['bash', '-c', 'fm_test_track_child "$1" kill', '_', str(process.pid)],
+                       env=dict(os.environ, FM_TEST_CHILD_REGISTRY=str(registry)), check=True)
+        return process
+    finally:
+        signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
+def stop_owned(process):
+    registry = base / f'owner-{process.pid}'
+    subprocess.run(['bash', '-c', 'fm_test_stop_children'],
+                   env=dict(os.environ, FM_TEST_CHILD_REGISTRY=str(registry)), check=True, timeout=8)
+    process.communicate(timeout=5)
+def cleanup_owned():
+    for process in reversed(owned_processes):
+        stop_owned(process)
+atexit.register(cleanup_owned)
 fixture = base / 'owner-protocol'
 shutil.copytree(root / 'bin', fixture / 'bin', symlinks=True)
 shutil.copy2(root / '.tasks.toml', fixture / '.tasks.toml')
@@ -466,7 +496,7 @@ task(process_home, 'unhold', 'dependent')
 original = generation(process_home)
 env = dict(os.environ, FM_HOME=str(process_home), FM_STATE_OVERRIDE=str(process_home / 'state'),
            FM_DATA_OVERRIDE=str(process_home / 'data'))
-child = subprocess.Popen(['bash', 'bin/fm-spawn.sh'], cwd=fixture, env=env, stdout=subprocess.PIPE,
+child = launch_owned(['bash', 'bin/fm-spawn.sh'], cwd=fixture, env=env, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, text=True, start_new_session=True)
 try:
     deadline = time.monotonic() + 10
@@ -487,8 +517,7 @@ try:
     assert generation(process_home) != original
     review(process_home, 'guard', 'main', ok=False)
 finally:
-    os.killpg(child.pid, signal.SIGTERM)
-    child.communicate(timeout=5)
+    stop_owned(child)
     worker = int((process_home / 'child.pid').read_text())
     state = subprocess.run(['ps', '-p', str(worker), '-o', 'lstart='], capture_output=True, text=True)
     assert state.returncode != 0 or state.stdout.strip() != (process_home / 'child.start').read_text().strip()
@@ -539,7 +568,7 @@ def protocol_launch(path, spawn='s1.2.3'):
         (path / name).unlink(missing_ok=True)
     env = dict(os.environ, FM_HOME=str(path), FM_STATE_OVERRIDE=str(path / 'state'),
                FM_DATA_OVERRIDE=str(path / 'data'), FM_CONFIG_OVERRIDE=str(path / 'config'))
-    process = subprocess.Popen(['bash', 'bin/fm-spawn.sh', spawn], cwd=fixture, env=env,
+    process = launch_owned(['bash', 'bin/fm-spawn.sh', spawn], cwd=fixture, env=env,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
                                start_new_session=True)
     try:
@@ -555,8 +584,7 @@ def protocol_launch(path, spawn='s1.2.3'):
         assert current.returncode == 0 and current.stdout.strip() == started
         return process, worker, started
     except BaseException:
-        os.killpg(process.pid, signal.SIGTERM)
-        process.communicate(timeout=5)
+        stop_owned(process)
         raise
 
 
@@ -565,8 +593,7 @@ def protocol_stop(owned):
     # Popen retains ownership of this unreaped direct child; the worker is
     # checked against its recorded start identity after the group exits.
     if process.poll() is None:
-        os.killpg(process.pid, signal.SIGTERM)
-    process.communicate(timeout=5)
+        stop_owned(process)
     current = subprocess.run(['ps', '-p', str(worker), '-o', 'lstart='],
                              capture_output=True, text=True, timeout=5)
     assert current.returncode != 0 or current.stdout.strip() != started, 'owned worker survived cleanup'

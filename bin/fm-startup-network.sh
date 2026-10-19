@@ -357,9 +357,8 @@ report_requires_wake() {  # <state>
 }
 
 queue_result_wake() {  # <state>
-  fm_wake_append check startup-network \
-    "check: startup-network: deferred startup network checks finished ($1); read them with $FM_ROOT/bin/fm-startup-network.sh report" \
-    || true
+  FM_WAKE_APPEND_DEADLINE="$DELIVERY_DEADLINE" fm_wake_append check startup-network \
+    "check: startup-network: deferred startup network checks finished ($1); read them with $FM_ROOT/bin/fm-startup-network.sh report"
 }
 
 # Bounded by DELIVERY_DEADLINE, which publish() sets from the delivery budget.
@@ -398,9 +397,10 @@ EOF
       [ "$claim_live" -eq 1 ] || rm -f "$CLAIM_FILE" 2>/dev/null || true
     fi
     if [ "$claim_live" -eq 0 ]; then
-      ! report_requires_wake "$state" || queue_result_wake "$state"
+      local delivery_status=0
+      ! report_requires_wake "$state" || queue_result_wake "$state" || delivery_status=$?
       fm_lock_release "$PUBLISH_LOCK"
-      return 0
+      return "$delivery_status"
     fi
     fm_lock_release "$PUBLISH_LOCK"
     sleep 0.1
@@ -478,13 +478,14 @@ publish_lock_held() {  # <generation> <phases> <locked> <started> <lockdir> <out
 }
 
 cmd_run() {  # <locked> <lock-pid> <generation>
-  local locked=$1 lock_pid=$2 generation=$3 phases started budget out rc sweep_locked=0 downgraded=0 internal=0 lease_held=0 timings stage_started stage_deadline
+  local locked=$1 lock_pid=$2 generation=$3 phases started budget out rc sweep_locked=0 downgraded=0 internal=0 lease_held=0 timings stage_started stage_deadline DELIVERY_DEADLINE
   mkdir -p "$STATE" 2>/dev/null || return 1
   started=$(now)
   budget=$(stage_budget)
   # One deadline for everything before publication: the lock waits below and
   # the sweeps share it, so the worker's stage never outlives its budget.
   stage_deadline=$(( started + budget ))
+  DELIVERY_DEADLINE=$stage_deadline
   phases=probe
   out=$(mktemp "${TMPDIR:-/tmp}/fm-startup-network.XXXXXX" 2>/dev/null) || return 1
   # Recorded into a temp file rather than straight into state/ so a run that is

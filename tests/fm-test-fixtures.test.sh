@@ -18,6 +18,8 @@ set -u
 . "$(dirname "${BASH_SOURCE[0]}")/fixtures.sh"
 
 TMP_ROOT=$(fm_test_tmproot fm-test-fixtures)
+FM_TEST_CHILD_REGISTRY="$TMP_ROOT/children"
+export FM_TEST_CHILD_REGISTRY
 
 test_git_config_isolation() (
   local dir="$TMP_ROOT/git-config" helper jobs timeout fakebin rc
@@ -316,6 +318,7 @@ SH
   ln -s "$standin" "$dir/cc/pi"
   "$dir/cc/pi" 60 &
   pid=$!
+  fm_test_track_child "$pid"
   sleep 0.3
   kill -0 "$pid" 2>/dev/null || fail "the stand-in must stay alive under a harness name"
   kill "$pid" 2>/dev/null || true

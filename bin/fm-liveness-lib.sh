@@ -75,6 +75,7 @@ fm_liveness_target() { # <home>
 # shellcheck disable=SC2034 # Public snapshot globals are consumed by callers.
 fm_liveness_snapshot() { # <home> [state-dir]
   local home=$1 state_dir=${2:-$1/state} meta id kind raw current stamp age now prior_handoff invalid_pr
+  local deadline=$((SECONDS + ${3:-10})) remaining
   FM_LIVENESS_LIVE=0
   FM_LIVENESS_FREE=0
   FM_LIVENESS_OVER_TARGET=0
@@ -113,7 +114,9 @@ fm_liveness_snapshot() { # <home> [state-dir]
         FM_LIVENESS_WARNINGS="${FM_LIVENESS_WARNINGS}${meta}: prior incarnation or invalid PR readiness binding; seat retained; renew the handoff with bin/fm-pr-check.sh"$'\n'
       fi
     fi
-    if [ "$invalid_pr" = 0 ] && raw=$(fm_run_timed 10 env FM_HOME="$home" FM_STATE_OVERRIDE="$state_dir" \
+    remaining=$((deadline - SECONDS))
+    [ "$remaining" -le 10 ] || remaining=10
+    if [ "$invalid_pr" = 0 ] && [ "$remaining" -gt 0 ] && raw=$(fm_run_timed "$remaining" env FM_HOME="$home" FM_STATE_OVERRIDE="$state_dir" \
       FM_CONFIG_OVERRIDE="$home/config" FM_DATA_OVERRIDE="$home/data" \
       FM_PROJECTS_OVERRIDE="$home/projects" FM_CREW_STATE_META_OVERRIDE="$meta" \
       FM_CREW_STATE_STATUS_OVERRIDE="$state_dir/$id.status" \

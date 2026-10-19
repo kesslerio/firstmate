@@ -848,14 +848,13 @@ fm_remote_job_reap_stale() { # <account-home>
       cutoff=$((now - FM_REMOTE_JOB_SEQ_CLAIM_REAP_SECONDS))
       ref=$(umask 077; mktemp "$FM_REMOTE_JOB_STATE/.seqreap-ref.XXXXXX") || ref=
       if [ -n "$ref" ]; then
-        # touch -d ISO-8601 is POSIX; date(1) needs a host-specific epoch
-        # conversion. The beacon sits at the last instant of the cutoff second
-        # so fractional claim mtimes keep the former whole-second expiry.
-        stamp=$(TZ=UTC0 date -d "@$cutoff" +%Y-%m-%dT%H:%M:%S 2>/dev/null) \
-          || stamp=$(TZ=UTC0 date -r "$cutoff" +%Y-%m-%dT%H:%M:%S 2>/dev/null) \
-          || stamp=
-        if [ -n "$stamp" ]; then
-          touch -d "$stamp.999999999Z" "$ref" 2>/dev/null || stamp=
+        if python3 - "$cutoff" "$ref" <<'PYTIME'
+import os, sys
+stamp = int(sys.argv[1]) * 1_000_000_000 + 999_999_999
+os.utime(sys.argv[2], ns=(stamp, stamp))
+PYTIME
+        then
+          stamp=1
         fi
       fi
     fi

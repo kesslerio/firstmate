@@ -32,6 +32,12 @@ class Owner:
         if not callable(getattr(os,'pidfd_open',None)) or not callable(getattr(signal,'pidfd_send_signal',None)):
             raise RuntimeError('Identity-bound pidfd signals required before fixture launch')
         if ctypes.CDLL(None,use_errno=True).prctl(36,1,0,0,0):raise OSError(ctypes.get_errno(),'PR_SET_CHILD_SUBREAPER')
+        def interrupted(signum, frame):
+            for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP, signal.SIGQUIT):
+                signal.signal(sig, signal.SIG_IGN)
+            raise SystemExit(128 + signum)
+        for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP, signal.SIGQUIT):
+            signal.signal(sig, interrupted)
         self.self_identity=identity(os.getpid());self.direct={};self.observed={};self.reaped=[];self.signals=[];self.captures=[]
 
     def register(self,process):
@@ -116,9 +122,13 @@ def capture(argv,env,cwd,directory,label,seconds,owner=None,limit=16*1024*1024):
     buffers=[bytearray(),bytearray()];signals=[];start=time.monotonic();streams=[]
     try:
         for path in paths:streams.append(path.open('xb'))
-        process=subprocess.Popen([str(arg) for arg in argv],env=env,cwd=cwd,stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
-        record=owner.register(process) if owner else identity(process.pid)
+        blocked=signal.pthread_sigmask(signal.SIG_BLOCK, (signal.SIGINT,signal.SIGTERM,signal.SIGHUP,signal.SIGQUIT))
+        try:
+            process=subprocess.Popen([str(arg) for arg in argv],env=env,cwd=cwd,stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+            record=owner.register(process) if owner else identity(process.pid)
+        finally:
+            signal.pthread_sigmask(signal.SIG_SETMASK,blocked)
         if not record:raise RuntimeError('Direct capture identity missing')
         selector.register(process.stdout,selectors.EVENT_READ,0);selector.register(process.stderr,selectors.EVENT_READ,1)
         next_cycle=start

@@ -508,9 +508,6 @@ kill -0 "$REUSED" 2>/dev/null || fail "down killed a reused PID"
 kill -0 "$REUSED_CHILD" 2>/dev/null || fail "down killed the reused PID's child"
 pass "down ignores roots with mismatched start times"
 
-# A group observed empty must not be admitted again if its id is later reused.
-# The ps shim hides the first group's only member on pass 2, then presents an
-# unrelated process under that pgid on pass 3 while another lab group waits.
 GROUP_REUSE=$(make_lab group-reuse claude)
 start_group python3 -c 'import signal,time; signal.signal(signal.SIGTERM, signal.SIG_IGN); time.sleep(600)'
 GROUP_ROOT=$!
@@ -534,7 +531,7 @@ if [ "${1:-}" = -axo ] && [ "${2:-}" = 'pid=,ppid=,pgid=,stat=,lstart=' ]; then
   echo "$count" > "$PS_SCAN_COUNT"
   "$REAL_PS" "$@" | awk -v scan="$count" -v root="$PS_GROUP_ROOT" -v outsider="$PS_OUTSIDER" -v group="$PS_GROUP_ID" '
     scan >= 2 && $1 == root { next }
-    scan >= 3 && $1 == outsider { $3=group }
+    scan >= 2 && $1 == outsider { $3=group }
     { print }
   '
 else
@@ -546,7 +543,7 @@ out=$(REAL_PS="$(command -v ps)" PS_SCAN_COUNT="$TMP_ROOT/group-scan-count" PS_G
 expect_code 0 "$?" "down ignores a reused group id: $out"
 [ "$(cat "$TMP_ROOT/group-scan-count")" -ge 3 ] || fail "fixture did not expose the reused group id"
 kill -0 "$GROUP_OUTSIDER" 2>/dev/null || fail "down signalled an unrelated process with a reused group id"
-pass "down drops empty groups permanently before their ids can be reused"
+pass "down rejects reused groups without an empty intermediate snapshot"
 
 # Simulate a recorded PID changing identity after TERM: the first process
 # snapshot matches its start time, subsequent snapshots describe a reused PID.
@@ -723,16 +720,19 @@ chmod +x "$FAKEBIN/claude"
 U="$TMP_ROOT/up-lab"
 (
   end=$(( $(date +%s) + 120 ))
-  until node -e 'const j=JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"));process.exit(j.projects?.[process.argv[2]]?1:0)' "$HOME/.claude.json" "$U/home" 2>/dev/null; do
+  until node -e 'const j=JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"));process.exit(j.projects?.[process.argv[2]]?0:1)' "$HOME/.claude.json" "$U/home" 2>/dev/null; do
     [ "$(date +%s)" -lt "$end" ] || exit 1
     sleep 0.05
   done
   sleep 0.5
   node -e 'const fs=require("node:fs");const [s,k]=process.argv.slice(1);const j=JSON.parse(fs.readFileSync(s,"utf8"));delete j.projects[k];fs.writeFileSync(s,JSON.stringify(j))' "$HOME/.claude.json" "$U/home"
+  node -e 'const j=JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"));process.exit(j.projects?.[process.argv[2]]?1:0)' "$HOME/.claude.json" "$U/home" || exit 1
   echo dropped > "$TMP_ROOT/rival-dropped"
 ) &
 RIVAL=$!
+fm_test_track_child "$RIVAL"
 printf '%s\n' "$RIVAL" >> "$TMP_ROOT/pids"
+sleep 1
 out=$(SHELL=/bin/sh PATH="$FAKEBIN:$PATH" "$LIVE_LAB" up --harness claude --source "$UPSRC" --ref HEAD --timeout 1 "$U" 2>&1)
 expect_code 1 "$?" "stand-in primary does not answer probe"
 wait "$RIVAL" 2>/dev/null || true

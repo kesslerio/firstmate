@@ -1103,7 +1103,7 @@ for (const result of results) {
   assert.match(result.reason, /\[primary-observer-wait\].*bounded.*yield.*watcher/);
 }
 writeFileSync(lock, `${process.ppid}\n`);
-assert.equal((await call(captured[0]))?.block, true, "ancestor-owned primary lock");
+assert.equal((await call(captured[0]))?.block, undefined, "parent-owned lock is outside current-process authority");
 writeFileSync(lock, `${process.pid}\n`);
 for (const command of [
   ...captured.map((command) => command.replace(/^sleep \d+; /, "")),

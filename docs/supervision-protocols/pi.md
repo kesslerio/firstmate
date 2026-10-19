@@ -39,7 +39,7 @@ Read the durable outcome store with the fm_branch_outcomes tool when the captain
 The turn-end guard extension lives at `__FM_PI_TURNEND_EXT__`.
 Its pre-tool observer-wait guard denies foreground sleeps combined only with bounded supervision reads in the lock-owning primary checkout: perform bounded current-state checks and required actions, then yield to the existing watcher.
 `bin/fm-observer-wait-policy.mjs` owns this Pi-only decision using the existing arm policy's structural shell parser; immediate checks, standalone sleeps, substantive build/test/pipeline waits, and startup or missing-watcher recovery remain available.
-The guard requires positive session-lock ancestry and a matching plain primary checkout, and is inert for task workers, linked worktrees, secondmate homes, and missing or foreign locks.
+The guard requires a session lock owned by the current process and a matching plain primary checkout, and is inert for task workers, linked worktrees, secondmate homes, and missing or foreign locks.
 Supported observer programs are straight-line lists of literal positive sleeps, `tail`/`grep`/`rg` reads of individual non-hidden `state/*.status` files, and `herdr pane list`, optionally piped through bounded line/column filters or the pane-status Python projection.
 Hidden startup/control records remain outside worker-status recognition.
 Bare executable names and paths in `/bin`, `/usr/bin`, or `/run/current-system/sw/bin` are recognized; other path-qualified executables and PATH-changing assignments or wrappers remain unknown.

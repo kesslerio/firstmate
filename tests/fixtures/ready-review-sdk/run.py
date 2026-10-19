@@ -153,7 +153,7 @@ def main():
     soft,hard=resource.getrlimit(resource.RLIMIT_FSIZE)
     file_limit=min(64*1024*1024,hard) if hard!=resource.RLIM_INFINITY else 64*1024*1024
     resource.setrlimit(resource.RLIMIT_FSIZE,(file_limit,file_limit))
-    owner=owned.Owner();owner.evidence=output;result=None;failure=None;started=time.monotonic();deadline=started+820
+    owner=owned.Owner();owner.evidence=output;result=None;failure=None;interrupted_status=None;started=time.monotonic();deadline=started+820
     def execute(argv,label,ceiling):
         seconds=min(ceiling,deadline-time.monotonic())
         require(seconds>0,'Fixture aggregate runtime budget exhausted')
@@ -165,6 +165,7 @@ def main():
         result=completion.verify(spec,owned.identity)
         (output/'verified-before-cleanup.json').write_text(json.dumps(result,indent=2)+'\n')
     except BaseException as error:
+        if isinstance(error, SystemExit):interrupted_status=error.code
         failure=repr(error)
         (output/'failure.txt').write_text(failure+'\n')
     finally:
@@ -173,7 +174,7 @@ def main():
     if failure:
         print('not ok - exact SDK dependency acceptance: '+failure,file=sys.stderr)
         print('private evidence: '+str(output),file=sys.stderr)
-        return 1
+        return interrupted_status or 1
     require(result is not None,'No actual completion proof')
     result.update(evidence=str(output),owned_survivors=receipt['survivors'],elapsed_seconds=time.monotonic()-started)
     (output/'result.json').write_text(json.dumps(result,indent=2)+'\n')

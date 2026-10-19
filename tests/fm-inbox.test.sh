@@ -637,3 +637,14 @@ for fault in ('partial', 'interrupted', 'rename', 'enqueue', 'empty', 'truncated
     assert marker.stat().st_size > 0
 PY
 pass 'partial, interrupted, failed and unsafe marker publication remains recoverable without duplicate keyed wakes'
+
+for mode in quiet away corrupt; do
+  home=$(make_home "ready-contract-$mode")
+  printf 'mode: %s\n' "$mode" > "$home/state/.afk-contract"
+  ready=$(run_inbox "$home" ready) || fail "contract readiness failed"
+  actual=$(printf '%s' "$ready" | python3 -c 'import json,sys; print(json.load(sys.stdin)["posture"]["state"])')
+  expected=away
+  [ "$mode" != quiet ] || expected=quiet
+  assert_equals "$expected" "$actual" "retained $mode contract posture"
+done
+pass "retained quiet contracts remain present while away and corrupt contracts remain away"

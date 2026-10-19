@@ -141,7 +141,7 @@ wait_for_startup_network_wake() {  # <home> [tenths]
 # holder's pid. The holder keeps the pid the lock records, so the lock's
 # stale-owner recovery never reclaims it while the test runs.
 hold_publish_lock() {  # <home>
-  local lock="$1/state/.startup-network.lock" holder waited=0
+  local lock="$1/state/${2:-.startup-network.lock}" holder waited=0
   FM_STATE_OVERRIDE="$1/state" FM_ROOT_OVERRIDE="$ROOT" bash -c '
     . "$1/fm-wake-lib.sh"
     fm_lock_try_acquire "$2" || exit 1
@@ -888,3 +888,30 @@ test_a_bounded_run_still_publishes_the_timings_it_managed_to_record
 test_the_timing_artifact_cannot_carry_a_command_line_or_forge_records
 test_a_held_publish_lock_cannot_keep_the_worker_alive_past_its_budget
 echo "# fm-startup-network.test.sh: all assertions passed"
+
+test_nested_wake_locks_share_delivery_deadline() {
+  local lock rec home root log worker holder report
+  for lock in .wake-queue.lock .watcher-down.lock; do
+    rec=$(new_world "nested-$lock")
+    IFS='|' read -r home root log <<EOF
+$rec
+EOF
+    hold_publish_lock "$home" "$lock"
+    holder=$HOLDER_PID
+    FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT=ACTIONABLE FM_STARTUP_NETWORK_TIMEOUT=10 FM_SESSION_START_TIMEOUT=2 \
+      run_stage "$home" "$root" start --locked 0 --harvest-pid 999999999
+    await_worker_record "$home"
+    worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+    await_pid_exit "$worker" 100 || fail "nested $lock exceeded delivery deadline"
+    report=$(run_stage "$home" "$root" report)
+    assert_contains "$report" ACTIONABLE "nested contention discarded pending output"
+    assert_absent "$home/state/.startup-network.delivered" "contention falsely acknowledged output"
+    kill "$holder" 2>/dev/null || true
+    wait "$holder" 2>/dev/null || true
+    FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT=ACTIONABLE FM_STARTUP_NETWORK_TIMEOUT=10 FM_SESSION_START_TIMEOUT=2 \
+      run_stage "$home" "$root" run --locked 0
+    wait_for_startup_network_wake "$home" 100 || fail "released $lock prevented wake publication"
+  done
+  pass 'startup wake queue and recovery locks share the remaining delivery deadline'
+}
+test_nested_wake_locks_share_delivery_deadline

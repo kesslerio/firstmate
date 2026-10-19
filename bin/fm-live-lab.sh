@@ -666,7 +666,7 @@ prune_groups() {
     {
       pid=$1; pgid=$3; state=$4
       start=$5 " " $6 " " $7 " " $8 " " $9
-      if (state !~ /^Z/ && (!(pid in saved) || saved[pid] == start)) live[pgid]=1
+      if (pid in saved && saved[pid] == start) live[pgid]=1
     }
     END { for (i=1; i<=n; i++) if (ids[i] in live) printf "%s ", ids[i] }
   ' <(printf '%s\n' "$2") <(printf '%s\n' "$3")
@@ -675,8 +675,8 @@ prune_groups() {
 refresh_pairs() {
   local snapshot
   snapshot=$(ps -axo pid=,ppid=,pgid=,stat=,lstart=)
-  pairs=$(expand_pairs "$pairs" "$groups" "$snapshot")
   groups=$(prune_groups "$groups" "$pairs" "$snapshot")
+  pairs=$(expand_pairs "$pairs" "$groups" "$snapshot")
 }
 
 # <pid TAB lstart> pairs captured before tmux shutdown. Recheck identity even
