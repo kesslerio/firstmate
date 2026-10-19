@@ -1,0 +1,12 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.shared-live-NULuEQ
+recorded
+recorded
+recorded
+reserved root-racer in /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.shared-live-NULuEQ
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task mate-racer (codex, gpt-6.1-sol) was refused. Active sessions: one (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.shared-live-NULuEQ/state; two (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.shared-live-NULuEQ/state; three (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.shared-live-NULuEQ/state; root-racer (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.shared-live-NULuEQ/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+root exit=0; mate exit=1
+one	gpt-6.1-sol	1792416729	0
+two	gpt-6.1-sol	1792416729	0
+three	gpt-6.1-sol	1792416729	0
+root-racer	gpt-6.1-sol	1792416729	0
+Exactly one local home took the remaining shared slot.

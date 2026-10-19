@@ -1,0 +1,9 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.spawn-live-Ujlcqa
+recorded
+recorded
+recorded
+recorded
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.spawn-live-Ujlcqa
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task fifth (codex, gpt-6.1-sol) was refused. Active sessions: one (gpt-6.1-sol, age 0s); two (gpt-6.1-sol, age 0s); three (gpt-6.1-sol, age 0s); four (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+spawn exit=1
+Refusal preserved all four claims and created no fifth metadata or launch file.

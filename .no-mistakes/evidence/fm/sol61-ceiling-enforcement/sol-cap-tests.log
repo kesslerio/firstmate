@@ -20,3 +20,4 @@ ok - a confirmed Sol report preserves an adopted uncertain claim's reconciliatio
 ok - a Sol report under an existing claim keeps the claim it already holds
 ok - a malformed registry row refuses every Sol dispatch and names the row
 ok - an unread ceiling or dispatch table refuses instead of counting nothing
+ok - non-Sol reports bypass admission only without owned Sol occupancy

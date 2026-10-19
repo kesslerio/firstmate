@@ -1,78 +1,159 @@
-$ bin/fm-lab-home.sh create /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home
-/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home
-exit=0
-SCENARIO derived model set including future default profile
-$ bash bin/fm-sol-cap-lib.sh models /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x
+SCENARIO derived Sol models and default ceiling
+$ fm-sol-cap-lib.sh models /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config
 gpt-6-sol|gpt-6.1-sol|gpt-9.9-sol
 exit=0
-RUN worker-0 model=gpt-6.1-sol live pid=1321710
-RUN worker-1 model=gpt-6-sol live pid=1321909
-RUN worker-2 model=gpt-9.9-sol live pid=1322133
-RUN worker-3 model=gpt-6.1-sol live pid=1322496
-SCENARIO fifth Sol refused with four live process workers
-$ bash bin/fm-sol-cap-lib.sh refuse-claim fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
-error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task fifth (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 1s); worker-1 (gpt-6-sol, age 1s); worker-2 (gpt-9.9-sol, age 0s); worker-3 (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
-exit=1
-worker-0	gpt-6.1-sol	1792193587	1321710
-worker-1	gpt-6-sol	1792193587	1321909
-worker-2	gpt-9.9-sol	1792193588	1322133
-worker-3	gpt-6.1-sol	1792193588	1322496
+$ fm-sol-cap-lib.sh ceiling /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config
+4
+exit=0
+SCENARIO four reservations admit; fifth and same-ID retry refuse
+reserved worker-0
+exit=0
+reserved worker-1
+exit=0
+reserved worker-2
+exit=0
+reserved worker-3
+exit=0
+Persisted registry:
+worker-0	gpt-6.1-sol	1792416641	0
+worker-1	gpt-6.1-sol	1792416641	0
+worker-2	gpt-6.1-sol	1792416641	0
+worker-3	gpt-6.1-sol	1792416641	0
 
-SCENARIO GLM, qwen and default bypass a full ceiling without registry mutation
-$ bash bin/fm-sol-cap-lib.sh refuse-claim lane-glm-5 ship codex glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
-claimed
-exit=0
-$ bash bin/fm-sol-cap-lib.sh refuse-claim lane-qwen3 ship codex qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
-claimed
-exit=0
-$ bash bin/fm-sol-cap-lib.sh refuse-claim lane-default ship codex default /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
-claimed
-exit=0
-SCENARIO dead positive PID frees a slot and is pruned
-RUN replacement model=gpt-6.1-sol live pid=1323088
-SCENARIO two homes compete for one remaining slot
-$ bin/fm-lab-home.sh create /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/mate
-/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/mate
-exit=0
-race loser: error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task race-mate (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; worker-1 (gpt-6-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; worker-2 (gpt-9.9-sol, age 0s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; race-root (gpt-6.1-sol, age 0s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+$ fm-sol-cap-lib.sh refuse-claim fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task fifth (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 0s); worker-1 (gpt-6.1-sol, age 0s); worker-2 (gpt-6.1-sol, age 0s); worker-3 (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+$ fm-sol-cap-lib.sh refuse-claim worker-0 ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+error: Sol ceiling: task worker-0 already holds a live or uncertain session; confirm its worker stopped through teardown before replacing it
+exit=1
+Persisted registry:
+worker-0	gpt-6.1-sol	1792416641	0
+worker-1	gpt-6.1-sol	1792416641	0
+worker-2	gpt-6.1-sol	1792416641	0
+worker-3	gpt-6.1-sol	1792416641	0
 
-exactly one racer remains live; other refused
-$ bash bin/fm-sol-cap-lib.sh refuse-claim cross-home-fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/mate/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/mate/state
-error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task cross-home-fifth (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 3s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; worker-1 (gpt-6-sol, age 3s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; worker-2 (gpt-9.9-sol, age 2s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state; race-root (gpt-6.1-sol, age 2s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
-exit=1
-SCENARIO lower-only cap and malformed configuration fail closed for Sol only
-$ bash bin/fm-sol-cap-lib.sh refuse-claim lowered ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
-error: Sol ceiling reached: 3 concurrent Sol session(s) already active and this ceiling is 2 (config/sol-cap may lower it); the dispatch of task lowered (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 3s); worker-1 (gpt-6-sol, age 3s); worker-2 (gpt-9.9-sol, age 2s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
-exit=1
-$ bash bin/fm-sol-cap-lib.sh refuse-claim raised ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
-error: Sol ceiling unavailable: /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config/sol-cap must be one integer from 1 through 4; task raised with model gpt-6.1-sol was not dispatched rather than launched against an unread ceiling
-exit=1
-$ bash bin/fm-sol-cap-lib.sh refuse-claim broken ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
-error: Sol ceiling unavailable: /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config/crew-dispatch.json exists but cannot be read; task broken with model gpt-6.1-sol was not dispatched rather than launched possibly uncounted
-exit=1
-$ bash bin/fm-sol-cap-lib.sh refuse-claim broken-glm-5 ship codex glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+SCENARIO non-Sol lanes bypass saturated and corrupt ceiling state
+$ fm-sol-cap-lib.sh refuse-claim glm-5 ship codex glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
 claimed
 exit=0
-$ bash bin/fm-sol-cap-lib.sh refuse-claim broken-qwen3 ship codex qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/home/state
+$ fm-sol-cap-lib.sh refuse-claim qwen3 ship codex qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
 claimed
 exit=0
-SCENARIO nested remote parent-route shares admission with host-local crew
-$ bin/fm-lab-home.sh create /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout
-/home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout
+$ fm-sol-cap-lib.sh refuse-claim default ship codex default /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+claimed
 exit=0
-RUN remote-self model=gpt-6.1-sol live pid=1327617
-RUN crew-0 model=gpt-6.1-sol live pid=1327699
-RUN crew-1 model=gpt-6.1-sol live pid=1327795
-RUN crew-2 model=gpt-6.1-sol live pid=1327967
-$ bash bin/fm-sol-cap-lib.sh refuse-claim crew-fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state
-error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task crew-fifth (codex, gpt-6.1-sol) was refused. Active sessions: crew-0 (gpt-6.1-sol, age 0s); crew-1 (gpt-6.1-sol, age 0s); crew-2 (gpt-6.1-sol, age 0s); remote-self (gpt-6.1-sol, age 0s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state/parent-route. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+Persisted registry:
+worker-0	gpt-6.1-sol	1792416641	0
+worker-1	gpt-6.1-sol	1792416641	0
+worker-2	gpt-6.1-sol	1792416641	0
+worker-3	gpt-6.1-sol	1792416641	0
+
+$ fm-sol-cap-lib.sh refuse-claim glm-5 ship codex glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+claimed
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim qwen3 ship codex qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+claimed
+exit=0
+SCENARIO lower-only override and malformed state fail closed
+reserved only
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim extra ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+error: Sol ceiling reached: 1 concurrent Sol session(s) already active and this ceiling is 1 (config/sol-cap may lower it); the dispatch of task extra (codex, gpt-6.1-sol) was refused. Active sessions: only (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
 exit=1
-$ bash bin/fm-sol-cap-lib.sh refuse-claim route-fifth ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state/parent-route
-error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task route-fifth (codex, gpt-6.1-sol) was refused. Active sessions: remote-self (gpt-6.1-sol, age 1s); crew-0 (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state; crew-1 (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state; crew-2 (gpt-6.1-sol, age 1s) in /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+$ fm-sol-cap-lib.sh refuse-claim invalid ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+error: Sol ceiling unavailable: /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config/sol-cap must be one integer from 1 through 4; task invalid with model gpt-6.1-sol was not dispatched rather than launched against an unread ceiling
 exit=1
-SCENARIO pid-zero uncertain delivery blocks replacement
-$ bash bin/fm-sol-cap-lib.sh refuse-claim uncertain ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M53EGCQXW2H51Q8EPQ12MT36/.test-sol-lab/remote-layout/state
-error: Sol ceiling: task uncertain already holds a live or uncertain session; confirm its worker stopped through teardown before replacing it
+$ fm-sol-cap-lib.sh refuse-claim malformed ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+error: Sol ceiling could not count its sessions: Sol registry /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state/sol-sessions.tsv has a malformed row: broken row <empty> <empty>; task malformed with model gpt-6.1-sol was not dispatched rather than launched possibly uncounted
 exit=1
-LIVE ADMISSION SCENARIOS PASSED
-Cleanup: all owned worker PIDs exited
+$ fm-sol-cap-lib.sh refuse-claim bad-config ship codex gpt-6.1-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+error: Sol ceiling unavailable: /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config/crew-dispatch.json exists but cannot be read; task bad-config with model gpt-6.1-sol was not dispatched rather than launched possibly uncounted
+exit=1
+$ fm-sol-cap-lib.sh refuse-claim glm ship codex glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+claimed
+exit=0
+SCENARIO simultaneous attempts at last slot allow exactly one
+reserved existing-0
+exit=0
+reserved existing-1
+exit=0
+reserved existing-2
+exit=0
+reserved racer-b
+exit=0
+error: Sol ceiling reached: 4 concurrent Sol session(s) already active and this ceiling is 4 (config/sol-cap may lower it); the dispatch of task racer-a (codex, gpt-6.1-sol) was refused. Active sessions: existing-0 (gpt-6.1-sol, age 0s); existing-1 (gpt-6.1-sol, age 0s); existing-2 (gpt-6.1-sol, age 0s); racer-b (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+Persisted registry:
+existing-0	gpt-6.1-sol	1792416642	0
+existing-1	gpt-6.1-sol	1792416642	0
+existing-2	gpt-6.1-sol	1792416642	0
+racer-b	gpt-6.1-sol	1792416642	0
+
+SCENARIO launch-process handoff and proven exit free capacity
+reserved probe
+exit=0
+Persisted registry:
+probe	gpt-6.1-sol	1792416642	1677553
+
+reserved after-exit
+exit=0
+Persisted registry:
+after-exit	gpt-6.1-sol	1792416642	0
+
+SCENARIO reported Sol preserves uncertain claim; confirmed non-Sol releases it
+reserved reuse
+exit=0
+Persisted registry:
+reuse	gpt-6.1-sol	1792416642	0
+
+$ fm-sol-cap-lib.sh record-actual reuse gpt-6-sol /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+recorded
+exit=0
+Persisted registry:
+reuse	gpt-6.1-sol	1792416642	0
+
+$ fm-sol-cap-lib.sh record-actual reuse glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+recorded
+exit=0
+Persisted registry:
+
+SCENARIO stopped and dead positive-PID records bypass held admission lock for GLM/qwen
+Persisted registry:
+retry	gpt-6.1-sol	1792416643	-1
+
+$ fm-sol-cap-lib.sh record-actual retry glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+recorded
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim fresh-glm-5 ship codex glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+claimed
+exit=0
+$ fm-sol-cap-lib.sh record-actual retry qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+recorded
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim fresh-qwen3 ship codex qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+claimed
+exit=0
+Persisted registry:
+retry	gpt-6.1-sol	1792416643	-1
+
+Persisted registry:
+retry	gpt-6.1-sol	1792416643	1678198
+
+$ fm-sol-cap-lib.sh record-actual retry glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+recorded
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim fresh-glm-5 ship codex glm-5 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+claimed
+exit=0
+$ fm-sol-cap-lib.sh record-actual retry qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+recorded
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim fresh-qwen3 ship codex qwen3 /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/config /home/art/.no-mistakes/worktrees/9f75ec418609/01M5A0WQ2ZM7C94Z0R7M8EDB3K/.ceiling-live-f2_8dc1x/state
+claimed
+exit=0
+Persisted registry:
+retry	gpt-6.1-sol	1792416643	1678198
+
+ALL LIVE ADMISSION SCENARIOS PASSED
+Disposable lab removed; owned probe processes stopped
