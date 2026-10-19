@@ -63,6 +63,8 @@ matrix_case R16 allow $'# bin/fm-watch-arm.sh &\necho ok'
 matrix_case R17 allow "printf '%s\\n' 'fm-watch.sh; a && b || c > out' | sed -n '1p'"
 matrix_case R18 allow "sh -c 'tmux send-keys -t lab \"bin/fm-watch-arm.sh &\" Enter'"
 matrix_case R19 allow "eval 'printf \"%s\\n\" \"bin/fm-watch-arm.sh &\"'"
+matrix_case R20 allow "bash -s sentinel <<< 'echo fm-watch.sh'"
+matrix_case R21 allow "bash -- -s sentinel <<< 'bin/fm-watch.sh'"
 
 matrix_case D01 deny 'bin/fm-watch-arm.sh &'
 matrix_case D02 deny 'nohup bin/fm-watch-arm.sh'
@@ -122,6 +124,13 @@ matrix_case D55 deny 'while true; do pkill -f fm-watch; done'
 matrix_case D56 deny 'for x in 1; do pkill -f fm-watch; done'
 matrix_case D57 deny 'case x in x) pkill -f fm-watch ;; esac'
 matrix_case D58 deny 'until false; do kill $(pgrep -f fm-watch); done'
+matrix_case D59 deny $'bash -s sentinel <<\'EOF\'\nbin/fm-watch.sh\nEOF'
+matrix_case D60 deny "bash -s sentinel <<< 'bin/fm-watch.sh'"
+matrix_case D61 deny "bash -s -- one two <<< 'bin/fm-watch-arm.sh &'"
+matrix_case D62 deny "bash -xs sentinel <<< 'bin/fm-watch.sh'"
+matrix_case D63 deny "sh -s sentinel <<< 'bin/fm-watch.sh'"
+matrix_case D64 deny 'bash -s bin/fm-watch.sh'
+matrix_case D65 deny "bash -s -- -c harmless <<< 'bin/fm-watch.sh'"
 
 matrix_case E01 allow "bin/fm-watch-checkpoint.sh --seconds '180;still-one-arg'"
 matrix_case E02 allow "bin/fm-watch-checkpoint.sh --label 'fm-watch-arm.sh; literal argument'"
@@ -454,6 +463,85 @@ test_shellcheck_clean() {
   pass "bin/fm-arm-pretool-check.sh is clean under bin/fm-lint.sh"
 }
 
+test_observer_wait_policy() {
+  local status
+  POLICY="$ROOT/bin/fm-observer-wait-policy.mjs" node --input-type=module <<'EOF'
+import assert from "node:assert/strict";
+import { pathToFileURL } from "node:url";
+const { isObserverWait } = await import(pathToFileURL(process.env.POLICY).href);
+const state = "/isolated/primary/state";
+const denied = [
+  "sleep 50; tail -3 state/child.status | cut -c1-400",
+  "sleep 55 && herdr pane list 2>/dev/null",
+  "tail -2 state/child.status; sleep 40",
+  "sleep .1; grep -n done state/child.status",
+  "sleep 1s; rg 'ready' /isolated/primary/state/child.status",
+  "/bin/sleep 1; /usr/bin/tail -n 2 ./state/child.status",
+  "command -p sl'ee'p 1; env MODE=read tail -2 state/child.status",
+  "env -- sleep 1; command tail -2 state/child.status",
+  "timeout 3 sleep 1; tail -2 state/child.status",
+  "slee\\p 1; tail -2 state/child.status",
+  "$'sl\\x65ep' 1; tail -2 state/child.status",
+  "sleep 1; tail -2 state/child.status | head -n 1",
+  "sleep 1; exec tail -2 state/child.status",
+  "sleep 1\nherdr pane list # current status",
+];
+const allowed = [
+  "tail -3 state/child.status | cut -c1-400; herdr pane list",
+  "grep done state/child.status", "sleep 50", "sleep 0; tail state/child.status",
+  "sleep 1; tail state/.startup-network.status",
+  "sleep 1; grep done state/.startup-network.status",
+  "sleep 1; rg done /isolated/primary/state/.startup-network.status",
+  "printf 'sleep 50; tail state/child.status'",
+  "echo sleep 50; tail state/child.status",
+  "sleep 1; printf 'tail state/child.status'",
+  "sleep 1; grep state/child.status README.md",
+  "sleep 1; tail state/child.status build.log",
+  "sleep 1; tail -f state/child.status", // Not a bounded read.
+  "sleep 1; tail build.log", "sleep 1; npm test",
+  "npm run build; sleep 1; tail state/child.status",
+  "sleep 1; tail state/child.status; make test",
+  "sleep 1; gh run watch 123", "wait $worker_pid; tail state/child.status",
+  "sleep 1; herdr pane wait fixture", "sleep 1; bin/fm-watch-checkpoint.sh",
+  "command -v sleep 50; tail state/child.status",
+  "env --help sleep 50; tail state/child.status",
+  "/tmp/sleep 1; tail state/child.status",
+  "sleep 1; /tmp/tail state/child.status",
+  "sleep 1; ./herdr pane list",
+  "/tmp/timeout 3 sleep 1; tail state/child.status",
+  "sleep 1; tail state/child.status | /tmp/cut -c1-400",
+  "PATH=/tmp sleep 1; tail state/child.status",
+  "env PATH=/tmp sleep 1; tail state/child.status",
+  "sleep 1; env PATH=/tmp tail state/child.status",
+  "env -i sleep 1; tail state/child.status",
+  "env --ignore-environment sleep 1; tail state/child.status",
+  "exec sleep 50; tail state/child.status", // exec never reaches the read.
+  "sleep 1; herdr 'pane list'", // One argument is not two subcommands.
+  "sleep 1; herdr pane list | python3 -c 'run_build()'",
+  "sleep 1; herdr pane list | jq '.result.panes'", // Unsupported filter.
+  "sleep 1; tail state/child.status > build.log",
+  "sleep 1; tail $(printf state/child.status)",
+  "sleep $delay; tail state/child.status",
+  "sleep 1; tail state/*.status", // Unexpanded glob, not guessed.
+  "sleep 1 & tail state/child.status",
+  "if ready; then sleep 1; tail state/child.status; fi",
+  "while build_pending; do sleep 1; tail state/child.status; done",
+  "(sleep 1; tail state/child.status)",
+  "bash -c 'sleep 1; tail state/child.status'",
+  "eval 'sleep 1; tail state/child.status'",
+  "cat <<'EOF'\nsleep 1; tail state/child.status\nEOF",
+  "sleep 1; tail 'state/child.status", "sleep 1; tail state/child.status |",
+];
+for (const command of denied) assert.equal(isObserverWait(command, state), true, command);
+for (const command of allowed) assert.equal(isObserverWait(command, state), false, command);
+console.log(`observer classifier: ${denied.length} denied, ${allowed.length} allowed`);
+EOF
+  status=$?
+  expect_code 0 "$status" "observer-wait structural classifier"
+  pass "Pi observer-wait classifier preserves data, substantive waits, and uncertain grammar"
+}
+
+test_observer_wait_policy
 test_full_acceptance_matrix
 test_direct_policy_contract
 test_command_equals_form

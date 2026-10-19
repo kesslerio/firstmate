@@ -28,12 +28,14 @@ set -u
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 RESTART="$ROOT/bin/fm-secondmate-restart.sh"
+FM_TEST_REAL_MV=$(command -v mv)
+export FM_TEST_REAL_MV
 
 fm_git_identity fmtest fmtest@example.com
 TMP_ROOT=$(fm_test_tmproot fm-secondmate-restart)
 mkdir -p "$TMP_ROOT"
 TMP_ROOT=$(cd "$TMP_ROOT" && pwd -P)
-trap 'rm -rf -- "$TMP_ROOT"' EXIT
+trap fm_test_cleanup EXIT
 
 # A session-provider stub that models the two things this pass depends on: the
 # harness exit command stops the agent, a launch brief starts the replacement,
@@ -77,7 +79,7 @@ case "${1:-}" in
           fi
           printf 'zsh' > "$D/command.$target"
           ;;
-        *'encode launch-brief'*) cat "$D/becomes" > "$D/command.$target" ;;
+        *'encode launch-brief'* | *'Firstmate operational input waiting: read'*) cat "$D/becomes" > "$D/command.$target" ;;
         ': Firstmate instruction waiting: list '*)
           printf 'doorbell\n' >> "$D/rings"
           if [ -x "$D/on-doorbell" ]; then
@@ -336,7 +338,7 @@ test_answer_between_resolution_and_timeout_wins() {
   cat > "$dir/fakebin/mv" <<'SH'
 #!/usr/bin/env bash
 set -u
-/bin/mv "$@" || exit $?
+"$FM_TEST_REAL_MV" "$@" || exit $?
 target=${!#}
 case "$target" in
   "${FM_FAKE_DIR%/fake}"/home/state/pending-replies/*)
@@ -446,11 +448,12 @@ setup_remote_case() {  # <case-dir> <id> <ssh-mode>
     echo "effort=default"
     echo "home=$dir/$id-home"
     echo "remote_host=remote-mac"
+    echo "remote_root=/srv/fm"
     echo "remote_backend=herdr"
     echo "remote_target=fm-remote:2ndmate-$id"
   } > "$dir/home/state/$id.meta"
-  printf -- '- %s - remote domain (host: remote-mac; root: /srv/fm; home: /srv/%s; scope: things; projects: p; added 2026-09-03)\n' \
-    "$id" "$id" > "$dir/home/data/secondmates.md"
+  printf -- '- %s - remote domain (host: remote-mac; root: /srv/fm; home: %s; scope: things; projects: p; added 2026-09-03)\n' \
+    "$id" "$dir/$id-home" > "$dir/home/data/secondmates.md"
   cat > "$fb/fake-ssh" <<'SH'
 #!/usr/bin/env bash
 set -u
@@ -485,7 +488,15 @@ case "${rargs[1]:-}" in
         : > "$FM_FAKE_DIR/remote-relaunch-end"
         ;;
     esac
-    printf 'relaunched %s\n' "${rargs[2]}"
+    printf 'relaunched %s harness=%s from=claude model=%s effort=%s backend=herdr endpoint=fm-remote:2ndmate-%s worktree=/srv/fm\n' \
+      "${rargs[2]}" "${rargs[3]}" "${rargs[4]}" "${rargs[5]}" "${rargs[2]}"
+    printf 'schema=fm-remote-secondmate-control.v1\n'
+    printf 'backend=herdr\n'
+    printf 'target=fm-remote:2ndmate-%s\n' "${rargs[2]}"
+    printf 'herdr_session=fm-remote\n'
+    printf 'harness=%s\n' "${rargs[3]}"
+    printf 'model=%s\n' "${rargs[4]}"
+    printf 'effort=%s\n' "${rargs[5]}"
     ;;
 esac
 exit 0

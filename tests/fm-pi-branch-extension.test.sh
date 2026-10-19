@@ -68,6 +68,8 @@ JSON
   cat > "$repo/node_modules/@earendil-works/pi-coding-agent/index.js" <<'JS'
 import { writeFileSync } from "node:fs";
 
+export const VERSION = process.env.FM_STUB_PI_VERSION || "0.99.0";
+
 export function getAgentDir() {
   return "/stub-agent-dir";
 }
@@ -76,18 +78,9 @@ export function getMarkdownTheme() {
   return {};
 }
 
-export function keyHint(_keybinding, description) {
-  return `ctrl+o ${description}`;
-}
-
 export class ToolExecutionComponent {
-  updateResult(result) {
-    this.result = result;
-  }
-  render() {
-    return (this.result?.content ?? [])
-      .filter((item) => item.type === "text")
-      .flatMap((item) => item.text.split("\n"));
+  constructor() {
+    throw new Error("Stock component rendering must use the installed Pi package");
   }
 }
 
@@ -555,6 +548,7 @@ const mainUserMessages = [];
 const mainTools = [];
 const renderers = new Map();
 const entryRenderers = new Map();
+const markdownTransformers = [];
 const mainEntries = [];
 const mainSessionManager = {
   getSessionFile: () => `${home}/main.jsonl`,
@@ -570,6 +564,7 @@ const pi = {
   registerTool(tool) {
     mainTools.push(tool);
   },
+  registerToolRenderer() {},
   registerCommand(name, options) {
     commands.set(name, options);
   },
@@ -578,6 +573,9 @@ const pi = {
   },
   registerEntryRenderer(customType, renderer) {
     entryRenderers.set(customType, renderer);
+  },
+  registerMarkdownTransformer(transformer) {
+    markdownTransformers.push(transformer);
   },
   appendEntry(customType, data) {
     activeMainSession.getEntries().push({ type: "custom", customType, data });
@@ -750,8 +748,8 @@ if (processingRequest.options.triggerTurn !== true || processingRequest.options.
   throw new Error(`the processing request must open one follow-up turn: ${JSON.stringify(processingRequest.options)}`);
 }
 if (processingRequest.message.display !== false) throw new Error("the processing request must stay hidden: the visible entry is the display");
-if (!processingRequest.message.content.includes("[seq 3] task-9: PR https://example.com/pr/9 checks green, ready for review")) {
-  throw new Error(`the processing request lost its sequence key or exact summary: ${processingRequest.message.content}`);
+if (!processingRequest.message.content.includes("[seq 3, recorded 0m ago] task-9: PR https://example.com/pr/9 checks green, ready for review")) {
+  throw new Error(`the processing request lost its sequence key, recorded age, or exact summary: ${processingRequest.message.content}`);
 }
 if (sentToMain.some((sent) => sent.options.triggerTurn && sent.message.customType !== "fm-branch-process")) {
   throw new Error("an unkeyed turn opened on main");
@@ -792,64 +790,6 @@ if (outcomeScript(["unread"]) !== "") throw new Error("merged outcomes were not 
 // renderer.
 const outcomesTool = mainTools.find((tool) => tool.name === "fm_branch_outcomes");
 if (!outcomesTool) throw new Error("fm_branch_outcomes was not registered on main");
-const renderTheme = {
-  fg(_color, text) { return text; },
-  bg(_color, text) { return text; },
-  bold(text) { return text; },
-};
-const renderContext = { state: {}, isError: false, isPartial: false };
-const stockResult = { content: [{ type: "text", text: "OUTCOME_DUMP" }] };
-const calmOffCall = outcomesTool.renderCall({}, renderTheme, renderContext);
-const calmOffResult = outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext);
-if (calmOffCall.constructor.name !== "Box" || calmOffCall.paddingX !== 1 || calmOffCall.paddingY !== 1) {
-  throw new Error("fm_branch_outcomes changed its ordinary shell rendering");
-}
-if (calmOffResult.constructor.name !== "Container" || calmOffCall.children[0]?.text !== "fm_branch_outcomes" || calmOffCall.children[1]?.text !== "OUTCOME_DUMP") {
-  throw new Error("fm_branch_outcomes changed its ordinary call or result rendering");
-}
-const legacyStockResult = {
-  content: [{
-    type: "text",
-    text: Array.from({ length: 12 }, (_, index) => `LEGACY_OUTCOME_${String(index + 1).padStart(2, "0")}`).join("\n"),
-  }],
-};
-const legacyRenderContext = { state: {}, isError: false, isPartial: false };
-const legacyCall = outcomesTool.renderCall({}, renderTheme, legacyRenderContext);
-outcomesTool.renderResult(legacyStockResult, { expanded: false, isPartial: false }, renderTheme, legacyRenderContext);
-const collapsedLegacyText = legacyCall.children[1]?.text;
-if (!collapsedLegacyText?.includes("LEGACY_OUTCOME_12") || collapsedLegacyText.includes("more lines")) {
-  throw new Error("legacy all-line stock capability did not preserve collapsed Calm-off output");
-}
-outcomesTool.renderResult(legacyStockResult, { expanded: true, isPartial: false }, renderTheme, legacyRenderContext);
-if (legacyCall.children[1]?.text !== collapsedLegacyText) {
-  throw new Error("legacy all-line stock capability changed expanded Calm-off output");
-}
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: false });
-const calmOnCall = outcomesTool.renderCall({}, renderTheme, renderContext);
-const calmOnResult = outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext);
-if (calmOnCall.constructor.name !== "Container" || calmOnCall.render(100).length !== 0 || calmOnResult.constructor.name !== "Container" || calmOnResult.render(100).length !== 0) {
-  throw new Error("fm_branch_outcomes remained visible while Calm was on");
-}
-pi.events.emit("firstmate:calm-presentation", { active: false, stockExportRendering: false });
-if (outcomesTool.renderCall({}, renderTheme, renderContext).constructor.name !== "Box" || outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext).constructor.name !== "Container") {
-  throw new Error("fm_branch_outcomes did not restore ordinary rendering when Calm was turned off");
-}
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: true });
-let exportCallFellBack = false;
-let exportResultFellBack = false;
-try {
-  outcomesTool.renderCall({}, renderTheme, renderContext);
-} catch {
-  exportCallFellBack = true;
-}
-try {
-  outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext);
-} catch {
-  exportResultFellBack = true;
-}
-if (!exportCallFellBack || !exportResultFellBack) {
-  throw new Error("fm_branch_outcomes replaced Pi stock export rendering");
-}
 const listed = await outcomesTool.execute("call-4", { recent: 2 }, undefined, undefined, {});
 const listedText = listed.content[0].text;
 if (listedText.split("\n").length !== 2 || !listedText.includes("checks green")) {
@@ -889,6 +829,11 @@ const assertRenderedNote = (note, glyph) => {
   }
 };
 assertRenderedNote(sentToMain[0].message.content, "⛵");
+const renderTheme = {
+  fg(_color, text) { return text; },
+  bg(_color, text) { return text; },
+  bold(text) { return text; },
+};
 const captainRendered = entryRenderers.get("fm-branch-visible-outcome")(
   captainEntries[0],
   { expanded: false },
@@ -920,8 +865,21 @@ EOF
   body=$(./bin/fm-operational-input.sh body < "$home/state/delivered-processing-request") \
     || fail "the processing request envelope carries no readable body"
   case "$body" in
-    *"delivered automatically by the supervision branch."*"It was not typed by the captain."*"[seq 3] task-9: PR https://example.com/pr/9 checks green, ready for review"*) ;;
+    *"delivered automatically by the supervision branch."*"It was not typed by the captain."*"[seq 3, recorded 0m ago] task-9: PR https://example.com/pr/9 checks green, ready for review"*) ;;
     *) fail "the processing request body lost its self-description or the outcome itself: $body" ;;
+  esac
+  case "$body" in
+    *"check the task's current state first."*"sort the outcomes by that current state into still open and already settled"*"Your reply to the captain covers only the still-open outcomes"*"as if the settled outcomes had never been listed"*) ;;
+    *) fail "the processing request body lost its check-first instruction for an outcome already settled: $body" ;;
+  esac
+  # An outcome carried over from before a restart or a switch of primary has
+  # no visible entry in this transcript, so the request must not claim one.
+  case "$body" in
+    *"was recorded earlier, possibly before a restart or a switch of primary"*"may already have been handled"*) ;;
+    *) fail "the processing request body does not say its outcomes were recorded earlier and may already be handled: $body" ;;
+  esac
+  case "$body" in
+    *"anchor entries in this transcript"*) fail "the processing request claims transcript entries a carried-over outcome does not have: $body" ;;
   esac
   case "$body" in
     *"do not re-drain, re-run, or acknowledge the wake."*"call fm_branch_processed with through=3 exactly once."*"never counts as processing."*) ;;
@@ -1040,15 +998,22 @@ const operational = spawnSync(
   { encoding: "utf8", input: "operational watcher injection" },
 );
 if (operational.status !== 0) throw new Error(`could not create operational input: ${operational.stderr}`);
-await fire("before_agent_start", { prompt: operational.stdout }, mainCtx);
+// Pi 1.2 starts custom-message runs without a user prompt. They must not
+// become captain dialog even when their content looks like a captain request.
+const customRequest = "Please give me a fresh mini system-resource report from this custom message.";
+await fire("before_agent_start", {
+  messageType: "custom",
+  message: { role: "custom", customType: "test-custom", content: customRequest, display: false },
+}, mainCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: operational.stdout }, mainCtx);
 entries.push({ type: "message", message: { role: "user", content: operational.stdout } });
 const unsolicitedPrompt = "Please keep responses concise while monitoring the fleet.";
-await fire("before_agent_start", { prompt: unsolicitedPrompt }, mainCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: unsolicitedPrompt }, mainCtx);
 entries.push({ type: "message", message: { role: "user", content: unsolicitedPrompt } });
 await fire("agent_start", {}, mainCtx);
 await fire("agent_end", {}, mainCtx);
 const legacyOperational = "⁣FIRSTMATE_OP: give me a fresh system-resource report.";
-await fire("before_agent_start", { prompt: legacyOperational }, mainCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: legacyOperational }, mainCtx);
 entries.push({ type: "message", message: { role: "user", content: legacyOperational } });
 await fire("agent_start", {}, mainCtx);
 const unsolicited = dispatch("signal: healthy resource result");
@@ -1076,7 +1041,7 @@ for (let index = 0; index < requestedPrompts.length; index += 1) {
   if (index < longRequests.length && content.length <= 4000) {
     throw new Error(`request fixture ${index} did not exceed the mirror bound`);
   }
-  await fire("before_agent_start", { prompt: content }, mainCtx);
+  await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: content }, mainCtx);
   // Pi persists this only after every before_agent_start handler has returned.
   entries.push({ type: "message", message: { role: "user", content } });
   await fire("agent_start", {}, mainCtx);
@@ -1102,7 +1067,7 @@ for (const content of [unsolicitedPrompt, ...requestedPrompts]) {
   if (copies !== 1) throw new Error(`current captain prompt was mirrored ${copies} times instead of once`);
 }
 if (mirroredCaptainText.some((text) =>
-  text.includes("operational watcher injection") || text.includes("FIRSTMATE_OP: give me a fresh system-resource report")
+  text.includes(customRequest) || text.includes("operational watcher injection") || text.includes("FIRSTMATE_OP: give me a fresh system-resource report")
 )) {
   throw new Error("canonical current or legacy operational input entered captain mirror context");
 }
@@ -1120,7 +1085,7 @@ if (processingRequests.length !== 2 || processingRequests[1].options.triggerTurn
   throw new Error(`the widened captain sequence set did not open one keyed turn at the run boundary: ${JSON.stringify(processingRequests)}`);
 }
 for (let seq = 2; seq <= 5; seq += 1) {
-  if (!processingRequests[1].message.content.includes(`[seq ${seq}] branch-driver: healthy resource report: CPU 12%, memory 41%`)) {
+  if (!processingRequests[1].message.content.includes(`[seq ${seq}, recorded 0m ago] branch-driver: healthy resource report: CPU 12%, memory 41%`)) {
     throw new Error(`the widened processing request lost seq ${seq}: ${processingRequests[1].message.content}`);
   }
 }
@@ -1197,7 +1162,7 @@ if (sentToMain.some((sent) => sent.message.customType !== "fm-branch-process")) 
 }
 // Recovery re-presents every still-unprocessed sequence in one keyed request.
 const recovered = sentToMain.at(-1)?.message.content ?? "";
-if (!recovered.includes(`[seq ${seq1}] email-intake: ${summary1}`) || !recovered.includes(`[seq ${seq2}] task-busy: ${summary2}`)) {
+if (!recovered.includes(`[seq ${seq1}, recorded 0m ago] email-intake: ${summary1}`) || !recovered.includes(`[seq ${seq2}, recorded 0m ago] task-busy: ${summary2}`)) {
   throw new Error(`reload did not re-present the unprocessed outcomes for processing: ${recovered}`);
 }
 
@@ -1248,25 +1213,74 @@ test_captain_outcome_processing_turn_is_sequence_keyed_and_re_presented() {
   PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
     DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
 const prelude = process.env.DRIVER_PRELUDE;
-await eval(`(async () => { ${prelude}; globalThis.__t = { fire, dispatch, settle, sentToMain, mainEntries, mainTools, outcomeScript, defaultSessionCtx, home, bus }; })()`);
-const { fire, dispatch, settle, sentToMain, mainEntries, mainTools, outcomeScript, defaultSessionCtx, home, bus } = globalThis.__t;
-import { readFileSync, writeFileSync } from "node:fs";
+await eval(`(async () => { ${prelude}; globalThis.__t = { fire, dispatch, settle, sentToMain, mainEntries, mainTools, outcomeScript, defaultSessionCtx, home, bus, markdownTransformers }; })()`);
+const { fire, dispatch, settle, sentToMain, mainEntries, mainTools, outcomeScript, defaultSessionCtx, home, bus, markdownTransformers } = globalThis.__t;
+import { writeFileSync } from "node:fs";
 
-const requests = () => sentToMain.filter((sent) => sent.message.customType === "fm-branch-process");
+let requestsFloor = 0;
+const requests = () => sentToMain.filter((sent) => sent.message.customType === "fm-branch-process").slice(requestsFloor);
 const unprocessedSeqs = () => outcomeScript(["unprocessed"]).split("\n").filter(Boolean).map((line) => JSON.parse(line).seq);
-const runOf = async (fn) => { await fire("agent_start", {}); await fn?.(); await fire("agent_end", {}); await fire("agent_settled", {}); };
+let consumedRequests = 0;
+const consumeRequest = async (userFirst = false) => {
+  const pending = requests().at(-1);
+  if (!pending || consumedRequests === requests().length) return;
+  consumedRequests = requests().length;
+  if (userFirst || pending.options.deliverAs === "nextTurn") {
+    await fire("message_start", { message: { role: "user", content: "A new question" } });
+  }
+  await fire("message_start", { message: { role: "custom", ...pending.message } });
+};
+// A dedicated idle custom run prepares its trigger before Agent emits the
+// agent/turn/message events. Busy follow-ups below join an existing run and
+// intentionally do not prepare another run.
+const startRun = async () => {
+  const pending = consumedRequests < requests().length ? requests().at(-1) : undefined;
+  const trigger = pending?.options.triggerTurn === true
+    ? { messageType: "custom", message: { role: "custom", ...pending.message } }
+    : { messageType: "user", prompt: "A new question" };
+  await fire("before_agent_start", { type: "before_agent_start", systemPrompt: "", systemPromptOptions: {}, ...trigger }, defaultSessionCtx);
+  await fire("agent_start", {});
+  await fire("turn_start", {});
+  await consumeRequest();
+};
+const runOf = async (fn) => {
+  await startRun();
+  await fn?.();
+  await fire("agent_end", {});
+  await fire("agent_settled", {});
+};
+const render = (text, isStreaming = true, messageType = "assistant") => markdownTransformers.reduce(
+  (value, transform) => transform(value, { messageType, isStreaming, availableWidth: 80 }), text,
+);
+const finish = async (text, extra = []) => {
+  const message = { role: "assistant", content: [...(text ? [{ type: "text", text }] : []), ...extra], usage: { totalTokens: 7 }, stopReason: "stop" };
+  await fire("message_start", { message });
+  const replacement = await fire("message_end", { message });
+  const stored = replacement?.message ?? message;
+  mainEntries.push({ type: "message", message: stored });
+  if (stored.usage !== message.usage) throw new Error("suppression lost usage accounting");
+  return stored;
+};
+const visibleFinals = () => mainEntries.filter((entry) => entry.type === "message" && entry.message.role === "assistant")
+  .flatMap((entry) => entry.message.content.filter((part) => part.type === "text").map((part) => part.text));
+const priorResult = "Completed the requested work. The checks passed and the result is ready for review.";
+await finish(priorResult);
 
-// A home upgraded with outcomes that were delivered before the processed
-// marker existed treats them as processed once, at the first reconciliation:
-// its history is not re-presented to the captain.
+// A home with a delivered captain row and no processed marker (upgraded from
+// before the marker existed, or switched from the supervision host, whose
+// drain advances the same read cursor) cannot tell a read row from an
+// acknowledged one, so the first reconciliation presents it again for
+// processing instead of adopting it as processed.
 const legacy = Number(outcomeScript(["append", "--task", "legacy", "--verdict", "captain", "--summary", "delivered before processing existed"]));
 outcomeScript(["mark-read", "--through", String(legacy)]);
 mainEntries.push({ type: "custom", customType: "fm-branch-visible-outcome", data: { version: 1, seq: legacy, task: "legacy", verdict: "captain", summary: "delivered before processing existed", silent: false } });
 await fire("session_start", {}, defaultSessionCtx);
-if (requests().length !== 0) throw new Error(`the upgrade migration re-presented already-delivered history: ${JSON.stringify(sentToMain)}`);
-if (readFileSync(`${home}/state/.branch-outcomes-processed`, "utf8").trim() !== String(legacy)) {
-  throw new Error("the processed marker was not initialized at the read cursor on first reconciliation");
+if (requests().length !== 1 || !requests()[0].message.content.includes(`[seq ${legacy}, recorded 0m ago] legacy: delivered before processing existed`)) {
+  throw new Error(`a delivered but unacknowledged row was not presented again for processing: ${JSON.stringify(sentToMain)}`);
 }
+if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([legacy])) throw new Error("the first reconciliation adopted a delivered row as processed");
+outcomeScript(["mark-processed", "--through", String(legacy)]);
+requestsFloor = sentToMain.filter((sent) => sent.message.customType === "fm-branch-process").length;
 
 // A routine outcome never opens a processing turn. Keep the scripted prompt
 // open through its report, as the real AgentSession does for tool execution.
@@ -1297,23 +1311,44 @@ const request = requests()[0];
 if (request.options.triggerTurn !== true || request.options.deliverAs !== "followUp" || request.message.display !== false) {
   throw new Error(`the processing request must be one hidden follow-up turn: ${JSON.stringify(request)}`);
 }
-if (!request.message.content.includes(`[seq ${seq}] task-d: ${decision}`)) throw new Error(`the request lost its key or summary: ${request.message.content}`);
+if (!request.message.content.includes(`[seq ${seq}, recorded 0m ago] task-d: ${decision}`)) throw new Error(`the request lost its key or summary: ${request.message.content}`);
 if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq])) throw new Error(`delivery did not leave seq ${seq} unprocessed: ${unprocessedSeqs()}`);
 
-// Case A (timeline report 2026-08-31): the turn returns an EMPTY assistant
-// message. The processed marker must not move, and the same sequence is
-// presented again at the run boundary.
-await runOf(() => mainEntries.push({ type: "message", message: { role: "assistant", content: [] } }));
-if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq])) throw new Error("an empty answer advanced the processed marker");
-if (requests().length !== 2) throw new Error(`an empty answer did not re-present the outcome: ${requests().length} requests`);
-if (requests()[1].options.triggerTurn !== true) throw new Error("the first re-presentation must open its own turn");
-if (!requests()[1].message.content.includes(`[seq ${seq}] task-d: ${decision}`)) throw new Error("the re-presentation changed the outcome");
-
-// Case B: the turn repeats an unrelated prior answer. Same result: the marker
-// holds, and the request is presented again - now riding the captain's next
-// prompt because the triggered budget for this sequence set is spent.
-await runOf(() => mainEntries.push({ type: "message", message: { role: "assistant", content: "The retry safe-stopped; diagnosis is underway." } }));
-if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq])) throw new Error("an unrelated answer advanced the processed marker");
+// The first presentation carries the one visible response for this outcome,
+// even when it forgets to acknowledge.
+await runOf(async () => {
+  if (render("Captain, task-d needs your call.") !== "Captain, task-d needs your call.") {
+    throw new Error("the first processing presentation hid its response while streaming");
+  }
+  await finish("Captain, task-d needs your call.");
+});
+if (visibleFinals().at(-1) !== "Captain, task-d needs your call.") throw new Error("the first processing presentation lost its final");
+if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq])) throw new Error("an unacknowledged answer advanced the processed marker");
+if (requests().length !== 2 || requests()[1].options.triggerTurn !== true) throw new Error("the first re-presentation must open its own turn");
+if (!requests()[1].message.content.includes(`[seq ${seq}, recorded 0m ago] task-d: ${decision}`)) throw new Error("the re-presentation changed the outcome");
+// The hidden retry repeats this set's prior reply instead of acknowledging.
+// Exercise Pi's public message replacement and Markdown transformer surfaces:
+// buffer streaming until the complete reply can be compared, then keep every
+// differing reply, even one already visible outside this processing set.
+await runOf(async () => {
+  if (render("Captain, task-d needs your call.") !== "" || render("prior reasoning", true, "assistant-thinking") !== "") {
+    throw new Error("a processing retry reply leaked while streaming");
+  }
+  if (render(priorResult, false) !== priorResult || render("A question", true, "user") !== "A question") {
+    throw new Error("silencing a retry hid an earlier final or a user message");
+  }
+  const repeated = await finish(" \nCaptain, task-d needs your call. \n");
+  if (repeated.content.length) throw new Error("the exact trimmed repeat retained visible content");
+  await finish(priorResult);
+  await finish("Captain, task-d needs your call!");
+  const empty = await finish("");
+  const whitespace = await finish(" \n\t");
+  if (empty.content.length || whitespace.content.length) throw new Error("an empty retry retained visible content");
+});
+if (JSON.stringify(visibleFinals()) !== JSON.stringify([priorResult, "Captain, task-d needs your call.", priorResult, "Captain, task-d needs your call!"])) {
+  throw new Error(`retry comparison hid new prose or exposed a repeat: ${JSON.stringify(visibleFinals())}`);
+}
+if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq])) throw new Error("a repeated or empty answer advanced the processed marker");
 if (requests().length !== 3) throw new Error(`an unrelated answer did not re-present the outcome: ${requests().length} requests`);
 if (requests()[2].options.deliverAs !== "nextTurn" || requests()[2].options.triggerTurn) {
   throw new Error(`after the triggered budget the request must ride the next prompt: ${JSON.stringify(requests()[2].options)}`);
@@ -1322,7 +1357,11 @@ if (requests()[2].options.deliverAs !== "nextTurn" || requests()[2].options.trig
 await fire("agent_settled", {});
 if (requests().length !== 3) throw new Error("a duplicate next-turn copy was queued");
 // The captain's next prompt consumes that copy; settling unacknowledged queues one more.
-await runOf(() => mainEntries.push({ type: "message", message: { role: "assistant", content: "Captain, shipshape." } }));
+await runOf(async () => {
+  if (render("The new answer") !== "The new answer") throw new Error("a nextTurn request hid the user response");
+  await finish("The new answer");
+});
+if (visibleFinals().at(-1) !== "The new answer") throw new Error("a nextTurn request removed the user final");
 if (requests().length !== 4 || requests()[3].options.deliverAs !== "nextTurn") throw new Error("the outcome stopped being re-presented on later prompts");
 if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq])) throw new Error("a paraphrase advanced the processed marker");
 
@@ -1333,6 +1372,30 @@ if (requests().length !== 5 || requests()[4].options.triggerTurn !== true) throw
 if (mainEntries.filter((entry) => entry.customType === "fm-branch-visible-outcome" && entry.data.seq === seq).length !== 1) {
   throw new Error("re-presentation duplicated the visible entry");
 }
+
+const call = { type: "toolCall", id: "ack-call", name: "fm_branch_processed", arguments: { through: seq } };
+const thinking = { type: "thinking", thinking: "reasoning for the tool", thinkingSignature: "provider-signature" };
+// The replacement's first presentation keeps prose sent alongside the
+// acknowledgement call; this run's call is left unexecuted.
+await runOf(async () => {
+  const firstWithTool = await finish("Captain, task-d still needs your call.", [thinking, call]);
+  if (firstWithTool.content.length !== 3 || firstWithTool.content[0].text !== "Captain, task-d still needs your call.") {
+    throw new Error("the first presentation dropped prose sent alongside its acknowledgement");
+  }
+});
+if (visibleFinals().at(-1) !== "Captain, task-d still needs your call.") throw new Error("the first presentation after replacement lost its final");
+if (requests().length !== 6 || requests()[5].options.triggerTurn !== true) throw new Error("the replacement did not retry the unacknowledged outcome");
+await startRun();
+await finish("stale after reload");
+if (visibleFinals().at(-1) !== "stale after reload") throw new Error("session replacement hid differing retry prose");
+const repeatedAfterReload = await finish("stale after reload");
+if (repeatedAfterReload.content.length) throw new Error("session replacement lost retry comparison");
+const withTool = await finish("stale after reload", [thinking, call]);
+if (withTool.content.length !== 3 || withTool.content[0].text !== "stale after reload" || withTool.content[1] !== thinking || withTool.content[2] !== call) {
+  throw new Error("retry comparison dropped prose, signed reasoning, or the acknowledgement call");
+}
+await fire("turn_start", {});
+if (render("still unacknowledged") !== "") throw new Error("a tool continuation released suppression before acknowledgement");
 
 // Only the sequence-bound acknowledgement closes it.
 const nativeTools = new Map();
@@ -1356,9 +1419,13 @@ if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq])) throw new Error
 const tooFar = await processed.execute("ack-too-far", { through: seq + 100 }, undefined, undefined, {});
 if (!tooFar.isError) throw new Error("an acknowledgement beyond the read cursor was accepted");
 if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq])) throw new Error("a refused acknowledgement moved the marker");
+if (render("still refused") !== "") throw new Error("a refused acknowledgement released suppression");
 const ack = await processed.execute("ack", { through: seq }, undefined, undefined, {});
 if (ack.isError) throw new Error(`acknowledgement failed: ${JSON.stringify(ack)}`);
 if (unprocessedSeqs().length !== 0) throw new Error("the acknowledgement did not close the sequence");
+if (render("A newly processed response") !== "A newly processed response") throw new Error("successful acknowledgement did not release the response");
+await finish("A newly processed response");
+if (visibleFinals().at(-1) !== "A newly processed response") throw new Error("the acknowledged outcome lost its response");
 const before = requests().length;
 await runOf();
 if (requests().length !== before) throw new Error("an acknowledged outcome was presented again");
@@ -1375,6 +1442,7 @@ globalThis.__fmOnBranchPrompt = () => new Promise((resolve) => { finishReplaceme
 const replacementOffer = dispatch("signal: after replacement");
 if (!replacementOffer.accepted) throw new Error("branch refused a wake after the replacement");
 await settle(() => (globalThis.__fmSessions ?? []).length === 2, "replacement branch session");
+await settle(() => (globalThis.__fmPrompts ?? []).length === 2, "replacement branch prompt");
 const report2 = globalThis.__fmSessions[1].options.customTools.find((tool) => tool.name === "fm_branch_report");
 const beforePair = requests().length;
 const second = await report2.execute("captain-2", { task: "branch-driver", verdict: "captain", summary: "PR https://example.com/pr/e is ready for review" }, undefined, undefined, {});
@@ -1386,7 +1454,7 @@ await replacementOffer.settlement;
 globalThis.__fmOnBranchPrompt = undefined;
 const seqE = seq + 1;
 const seqF = seq + 2;
-if (requests().length !== beforePair + 1 || !requests().at(-1).message.content.includes(`[seq ${seqE}] branch-driver:`)) {
+if (requests().length !== beforePair + 1 || !requests().at(-1).message.content.includes(`[seq ${seqE}, recorded 0m ago] branch-driver:`)) {
   throw new Error("the first newer captain outcome did not open its processing request");
 }
 const third = await report2.execute("captain-3", { task: "task-f", verdict: "captain", summary: "worker blocked on a missing credential" }, undefined, undefined, {});
@@ -1402,7 +1470,7 @@ if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seqE, seqF])) {
 await runOf();
 if (requests().length !== beforePair + 2) throw new Error("the widened sequence was not presented at the run boundary");
 const latest = requests().at(-1).message.content;
-if (!latest.includes(`[seq ${seqE}] branch-driver:`) || !latest.includes(`[seq ${seqF}] task-f:`) || !latest.includes(`through=${seqF}`)) {
+if (!latest.includes(`[seq ${seqE}, recorded 0m ago] branch-driver:`) || !latest.includes(`[seq ${seqF}, recorded 0m ago] task-f:`) || !latest.includes(`through=${seqF}`)) {
   throw new Error(`the widened request did not cover every unprocessed sequence with the highest key: ${latest}`);
 }
 const beforePairRepeat = requests().length;
@@ -1410,21 +1478,79 @@ await runOf();
 if (requests().length !== beforePairRepeat + 1 || requests().at(-1).options.triggerTurn !== true) {
   throw new Error("the second presentation of the widened sequence set did not open its own turn");
 }
+await startRun();
 const partial = await processed.execute("ack-partial", { through: seqE }, undefined, undefined, {});
 if (partial.isError) throw new Error(`partial acknowledgement failed: ${JSON.stringify(partial)}`);
 if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seqF])) throw new Error(`a partial acknowledgement did not keep the newer sequence open: ${unprocessedSeqs()}`);
+if (render("partial response") !== "") throw new Error("partial acknowledgement released the remaining outcome's retry");
 const beforeF = requests().length;
 await runOf();
 if (
   requests().length !== beforeF + 1 ||
   requests().at(-1).options.triggerTurn !== true ||
   requests().at(-1).options.deliverAs !== "followUp" ||
-  !requests().at(-1).message.content.includes(`[seq ${seqF}] task-f:`)
+  !requests().at(-1).message.content.includes(`[seq ${seqF}, recorded 0m ago] task-f:`)
 ) {
   throw new Error("the changed remaining sequence set did not restart its triggered presentation budget");
 }
 const done = await processed.execute("ack-final", { through: seqF }, undefined, undefined, {});
 if (done.isError || unprocessedSeqs().length !== 0) throw new Error("the final acknowledgement did not close the newer sequence");
+
+// A follow-up queued while main is busy must not hide the answer already
+// underway. Suppression starts only when Pi consumes the custom message.
+await fire("agent_start", {});
+await fire("turn_start", {});
+await fire("message_start", { message: { role: "user", content: "An active user request" } });
+await report2.execute("busy-report", { task: "task-g", verdict: "captain", summary: "A new decision" }, undefined, undefined, {});
+await finish("The busy user answer");
+if (visibleFinals().at(-1) !== "The busy user answer") throw new Error("queueing a retry hid an in-flight user answer");
+await fire("turn_start", {});
+await consumeRequest();
+await finish("Captain, task-g needs your call.");
+if (visibleFinals().at(-1) !== "Captain, task-g needs your call.") throw new Error("a consumed busy follow-up hid its first presentation");
+// User steering in that same turn must immediately recover ordinary output.
+await fire("message_start", { message: { role: "user", content: "A steering question" } });
+await finish("The steering answer");
+if (visibleFinals().at(-1) !== "The steering answer") throw new Error("processing suppression hid a steering response");
+await fire("agent_end", {});
+await fire("agent_settled", {});
+// Pi can also batch the user before the custom follow-up in one turn.
+await fire("agent_start", {});
+await fire("turn_start", {});
+await consumeRequest(true);
+await finish("The batched user answer");
+if (visibleFinals().at(-1) !== "The batched user answer") throw new Error("processing suppression hid a user batched before the custom message");
+const latestSeq = unprocessedSeqs().at(-1);
+await processed.execute("ack-busy", { through: latestSeq }, undefined, undefined, {});
+await fire("agent_end", {});
+await fire("agent_settled", {});
+
+// A first reply can be empty or unrelated: a retry that finally handles the
+// outcome must stay visible. Reusing the same response across new sequence
+// sets must not make it a duplicate, and only the tool closes each outcome.
+for (const initial of ["", "Unrelated prior acknowledgment"]) {
+  await report2.execute("new-set", { task: "task-new", verdict: "captain", summary: "Another decision" }, undefined, undefined, {});
+  const newSeq = unprocessedSeqs().at(-1);
+  const startCount = visibleFinals().length;
+  await runOf(async () => {
+    const firstReply = await finish(initial);
+    if ((firstReply.content[0]?.text ?? "") !== initial) throw new Error("first presentation changed its output");
+  });
+  const newAnswer = "Handled the new outcome.";
+  await runOf(async () => {
+    await finish(newAnswer);
+    if (visibleFinals().at(-1) !== newAnswer) throw new Error("the first real handling on a retry was hidden");
+    const repeat = await finish(newAnswer);
+    if (repeat.content.length) throw new Error("a repeated retry final was retained");
+  });
+  if (visibleFinals().length !== startCount + (initial ? 2 : 1)) throw new Error("sequence comparison lost or duplicated a final");
+  if (!unprocessedSeqs().includes(newSeq) || requests().at(-1).options.deliverAs !== "nextTurn") {
+    throw new Error("an empty, unrelated, or differing reply closed the durable obligation");
+  }
+  await processed.execute("ack-new-set", { through: newSeq }, undefined, undefined, {});
+  if (unprocessedSeqs().length) throw new Error("acknowledgement did not close the new set");
+  await fire("agent_settled", {});
+}
 
 // A session that does not own the fleet lock cannot acknowledge anything.
 writeFileSync(`${home}/state/.lock`, "1\n");
@@ -1436,6 +1562,143 @@ EOF
   out=$(cat "$TMP_ROOT/node-output")
   expect_code 0 "$status" "captain outcomes must be processed through a sequence-bound acknowledgement and re-presented until then: $out"
   pass "a captain outcome opens one sequence-keyed processing turn, survives empty and unrelated answers, is re-presented at run end and session start, and closes only on its acknowledgement"
+}
+
+test_abbreviated_processing_request_points_to_full_outcome() {
+  local repo home out status
+  repo="$TMP_ROOT/abbreviated-outcome-root"
+  home="$TMP_ROOT/abbreviated-outcome-home"
+  mkdir -p "$home/state" "$home/config"
+  install_pi_branch_extension_fixture "$repo"
+  PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
+    DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
+const prelude = process.env.DRIVER_PRELUDE;
+await eval(`(async () => { ${prelude}; globalThis.__t = { fire, sentToMain, mainEntries, outcomeScript, defaultSessionCtx }; })()`);
+const { fire, sentToMain, mainEntries, outcomeScript, defaultSessionCtx } = globalThis.__t;
+const summary = "begin " + "x".repeat(1100) + " decision: do not merge until approved";
+const seq = Number(outcomeScript(["append", "--task", "long-outcome", "--verdict", "captain", "--summary", summary]));
+outcomeScript(["mark-read", "--through", String(seq)]);
+mainEntries.push({ type: "custom", customType: "fm-branch-visible-outcome", data: { version: 1, seq, task: "long-outcome", verdict: "captain", summary, silent: false } });
+await fire("session_start", {}, defaultSessionCtx);
+const requests = sentToMain.filter((sent) => sent.message.customType === "fm-branch-process");
+if (requests.length !== 1) throw new Error(`expected one processing request: ${JSON.stringify(requests)}`);
+const delivered = requests[0].message.content;
+const abbreviated = JSON.parse(outcomeScript(["unprocessed"]));
+const pointer = `bin/fm-branch-outcome.sh lookup --seqs ${seq}`;
+if (abbreviated.summary.length > 1024 || !abbreviated.summary.startsWith("begin ") || !abbreviated.summary.includes(`… [summary abbreviated; read the full outcome with ${pointer}]`)) {
+  throw new Error(`unprocessed did not bound the summary with a row-specific lookup pointer: ${abbreviated.summary}`);
+}
+if (!delivered.includes(`[seq ${seq}, recorded ${abbreviated.recordedAgo} ago] long-outcome: ${abbreviated.summary}`)) throw new Error("processing request did not carry the bounded summary and its lookup pointer");
+if (!delivered.includes("abbreviated line is incomplete") || !delivered.includes("read the full outcome before acting on, relaying, or acknowledging it")) {
+  throw new Error("delivered instruction did not require reading the full outcome first");
+}
+const full = JSON.parse(outcomeScript(["lookup", "--seqs", String(seq)]));
+if (full.seq !== seq || full.summary !== summary || abbreviated.summary.includes("decision: do not merge until approved")) throw new Error("lookup did not recover the omitted outcome detail");
+process.exit(0);
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/node-output")
+  expect_code 0 "$status" "Pi must link every abbreviated processing line to the full durable outcome: $out"
+  pass "Pi: an abbreviated processing request points to the full outcome and instructs main to read it first"
+}
+
+test_large_unprocessed_backlog_replays_in_batches() {
+  local repo home out status
+  repo="$TMP_ROOT/large-backlog-root"
+  home="$TMP_ROOT/large-backlog-home"
+  mkdir -p "$home/state" "$home/config"
+  install_pi_branch_extension_fixture "$repo"
+  PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
+    DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
+const prelude = process.env.DRIVER_PRELUDE;
+await eval(`(async () => { ${prelude}; globalThis.__t = { fire, sentToMain, mainTools, outcomeScript, defaultSessionCtx, home }; })()`);
+const { fire, sentToMain, mainTools, outcomeScript, defaultSessionCtx, home } = globalThis.__t;
+import { writeFileSync, statSync, existsSync, readFileSync } from "node:fs";
+const summary = "a".repeat(4096);
+const rows = Array.from({ length: 320 }, (_, i) => JSON.stringify({ seq: i + 1, epoch: Math.floor(Date.now() / 1000), task: `backlog-${i + 1}`, wake: "", verdict: "captain", summary, silent: false, statusEndpoint: 0, statusIdent: "-" }));
+writeFileSync(`${home}/state/branch-outcomes.jsonl`, rows.join("\n") + "\n");
+writeFileSync(`${home}/state/.branch-outcomes-cursor`, "320\n");
+if (statSync(`${home}/state/branch-outcomes.jsonl`).size <= 1024 * 1024 || existsSync(`${home}/state/.branch-outcomes-processed`)) throw new Error("fixture is not a marker-less >1 MiB backlog");
+const requests = () => sentToMain.filter((sent) => sent.message.customType === "fm-branch-process");
+await fire("session_start", {}, defaultSessionCtx);
+const processed = mainTools.find((tool) => tool.name === "fm_branch_processed");
+for (let start = 1; start <= 320; start += 32) {
+  const through = start + 31;
+  const listing = outcomeScript(["unprocessed"]);
+  if (Buffer.byteLength(listing) >= 1024 * 1024 || listing.split("\n").filter(Boolean).length !== 32) throw new Error(`store did not bound the batch starting at ${start}`);
+  const request = requests().at(-1);
+  if (!request || !request.message.content.includes(`[seq ${start}, recorded`) || !request.message.content.includes(`through=${through}`) || request.message.content.includes(`[seq ${through + 1},`)) throw new Error(`request did not present the batch starting at ${start}`);
+  if (Buffer.byteLength(request.message.content) >= 1024 * 1024) throw new Error("encoded request exceeded runner limit");
+  const ack = await processed.execute(`batch-${through}`, { through }, undefined, undefined, {});
+  if (ack.isError || readFileSync(`${home}/state/.branch-outcomes-processed`, "utf8").trim() !== String(through)) throw new Error(`batch was not acknowledged through ${through}: ${JSON.stringify(ack)}`);
+  await fire("agent_start", {});
+  await fire("agent_end", {});
+  await fire("agent_settled", {});
+}
+if (outcomeScript(["unprocessed"]).trim() !== "") throw new Error("backlog was not fully processed");
+process.exit(0);
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/node-output")
+  expect_code 0 "$status" "Pi must replay a marker-less >1 MiB backlog in sequence-bound batches: $out"
+  pass "Pi: a marker-less >1 MiB backlog is presented oldest first in bounded requests and continues after batch acknowledgement"
+}
+
+test_undated_unprocessed_outcome_surfaces_and_stays_unprocessed() {
+  local repo home fake_root out status f
+  repo="$TMP_ROOT/undated-outcome-root"
+  home="$TMP_ROOT/undated-outcome-home"
+  fake_root="$TMP_ROOT/undated-outcome-fmroot"
+  mkdir -p "$home/state" "$home/config" "$fake_root/bin"
+  install_pi_branch_extension_fixture "$repo"
+  for f in "$ROOT"/bin/*; do ln -s "$f" "$fake_root/bin/${f##*/}"; done
+  rm "$fake_root/bin/fm-branch-outcome.sh"
+  # A store whose unprocessed listing breaks its contract by dropping the age
+  # while $FM_HOME/strip-age exists.
+  cat > "$fake_root/bin/fm-branch-outcome.sh" <<SH
+#!/usr/bin/env bash
+if [ "\${1:-}" = unprocessed ] && [ -e "\$FM_HOME/strip-age" ]; then
+  set -o pipefail
+  "$ROOT/bin/fm-branch-outcome.sh" "\$@" | jq -c 'del(.recordedAgo)'
+  exit
+fi
+exec "$ROOT/bin/fm-branch-outcome.sh" "\$@"
+SH
+  chmod +x "$fake_root/bin/fm-branch-outcome.sh"
+  PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$home" FM_ROOT_OVERRIDE="$fake_root" \
+    DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
+const prelude = process.env.DRIVER_PRELUDE;
+await eval(`(async () => { ${prelude}; globalThis.__t = { fire, sentToMain, mainEntries, outcomeScript, defaultSessionCtx, home }; })()`);
+const { fire, sentToMain, mainEntries, outcomeScript, defaultSessionCtx, home } = globalThis.__t;
+import { rmSync, writeFileSync } from "node:fs";
+
+const requests = () => sentToMain.filter((sent) => sent.message.customType === "fm-branch-process");
+const notes = () => sentToMain.filter((sent) => sent.message.customType === "fm-branch-merge" && sent.message.display === true);
+const unprocessedSeqs = () => outcomeScript(["unprocessed"]).split("\n").filter(Boolean).map((line) => JSON.parse(line).seq);
+
+const seq = Number(outcomeScript(["append", "--task", "undated", "--verdict", "captain", "--summary", "PR is ready to merge"]));
+outcomeScript(["mark-read", "--through", String(seq)]);
+mainEntries.push({ type: "custom", customType: "fm-branch-visible-outcome", data: { version: 1, seq, task: "undated", verdict: "captain", summary: "PR is ready to merge", silent: false } });
+writeFileSync(`${home}/strip-age`, "");
+await fire("session_start", {}, defaultSessionCtx);
+if (requests().length !== 0) throw new Error(`an undated outcome was formatted into a processing request: ${JSON.stringify(requests())}`);
+if (notes().length !== 1 || !notes()[0].message.content.includes("breaks its contract") || !notes()[0].message.content.includes('"task":"undated"')) {
+  throw new Error(`the store-contract error was not reported visibly to main: ${JSON.stringify(sentToMain)}`);
+}
+if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify([seq])) throw new Error("an undated outcome was dropped or treated as processed");
+
+rmSync(`${home}/strip-age`);
+await fire("session_shutdown", {});
+await fire("session_start", {}, defaultSessionCtx);
+if (requests().length !== 1 || !requests()[0].message.content.includes(`[seq ${seq}, recorded 0m ago] undated: PR is ready to merge`)) {
+  throw new Error(`the outcome was not presented, dated, once the store was healthy: ${JSON.stringify(sentToMain)}`);
+}
+process.exit(0);
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/node-output")
+  expect_code 0 "$status" "an unprocessed row without its age must be reported and stay unprocessed: $out"
+  pass "an unprocessed captain row the store lists without its age is reported to main, never formatted undated, and stays unprocessed until the store is healthy"
 }
 
 test_branch_cache_key_is_per_home_stable() {
@@ -1478,9 +1741,10 @@ test_branch_default_on_heartbeat_afk_and_fallback() {
   home="$TMP_ROOT/gating-home"
   mkdir -p "$home/state" "$home/config" "$broken/bin"
   install_pi_branch_extension_fixture "$repo"
-  cp "$ROOT/bin/fm-branch-outcome.sh" "$ROOT/bin/fm-classify-lib.sh" \
+  cp "$ROOT/bin/fm-branch-outcome.sh" "$ROOT/bin/fm-classify-lib.sh" "$ROOT/bin/fm-status-event-lib.sh" \
     "$ROOT/bin/fm-lease.sh" "$ROOT/bin/fm-lease-lib.sh" "$ROOT/bin/fm-timeout-lib.sh" \
-    "$ROOT/bin/fm-wake-lib.sh" "$ROOT/bin/fm-wake-grant.sh" "$broken/bin/"
+    "$ROOT/bin/fm-wake-lib.sh" "$ROOT/bin/fm-path-lib.sh" "$ROOT/bin/fm-wake-grant.sh" \
+    "$ROOT/bin/fm-supervision-engine-lib.sh" "$broken/bin/"
   cat > "$broken/bin/fm-branch-prompt.sh" <<'SH'
 #!/usr/bin/env bash
 echo "synthetic generator failure" >&2
@@ -1490,8 +1754,8 @@ SH
   PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
     DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
 const prelude = process.env.DRIVER_PRELUDE;
-await eval(`(async () => { ${prelude}; globalThis.__t = { dispatch, fire, settle, home, sentToMain, mainEntries, defaultSessionCtx }; })()`);
-const { dispatch, fire, settle, home, sentToMain, mainEntries, defaultSessionCtx } = globalThis.__t;
+await eval(`(async () => { ${prelude}; globalThis.__t = { dispatch, fire, settle, home, sentToMain, mainEntries, mainTools, outcomeScript, defaultSessionCtx }; })()`);
+const { dispatch, fire, settle, home, sentToMain, mainEntries, mainTools, outcomeScript, defaultSessionCtx } = globalThis.__t;
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 
 // Default-on: with no config/pi-supervision-branch grant file present at
@@ -1553,6 +1817,48 @@ const fleetRoutineMerge = sentToMain[sentToMain.length - 1];
 if (fleetRoutineMerge.message.display !== true) throw new Error("a fleet routine action must render");
 if (!fleetRoutineMerge.message.content.startsWith("⛵ fleet: reconciled the backlog after completed work")) {
   throw new Error(`fleet routine action note changed: ${fleetRoutineMerge.message.content}`);
+}
+writeFileSync(`${home}/state/task-9.status`, "working: check 1 worker still building\n");
+const taskNoChangeSummary = "The check 1 worker is still building. Nothing new has happened.";
+const sentBeforeSilentTask = sentToMain.length;
+const silentTaskResult = await heartbeatReport.execute(
+  "task-no-change",
+  { task: "task-9", verdict: "routine", summary: taskNoChangeSummary, silent: true },
+  undefined,
+  undefined,
+  {},
+);
+if (silentTaskResult.isError) throw new Error(`a silent task-level routine outcome was refused: ${JSON.stringify(silentTaskResult)}`);
+const taskNoChangeMerge = sentToMain[sentToMain.length - 1];
+if (sentToMain.length !== sentBeforeSilentTask + 1 || taskNoChangeMerge.message.display !== false) {
+  throw new Error("a silent task-level no-change outcome rendered a note or was not delivered");
+}
+const storedTaskNoChange = outcomeScript(["list", "--recent", "100"]).split("\n").filter(Boolean)
+  .map((line) => JSON.parse(line)).find((row) => row.task === "task-9" && row.summary === taskNoChangeSummary);
+if (!storedTaskNoChange || storedTaskNoChange.verdict !== "routine" || storedTaskNoChange.silent !== true) {
+  throw new Error("the silent task no-change outcome was not stored durably");
+}
+if (!existsSync(`${home}/state/.task-9.branch-outcome-index`)) {
+  throw new Error("the silent task outcome was omitted from the status-outcome backstop index");
+}
+const outcomesTool = mainTools.find((tool) => tool.name === "fm_branch_outcomes");
+const listedTaskNoChange = await outcomesTool.execute("read-silent-task", { recent: 100 }, undefined, undefined, {});
+if (listedTaskNoChange.isError || !listedTaskNoChange.content.some((item) => item.text.includes(taskNoChangeSummary))) {
+  throw new Error("fm_branch_outcomes did not expose the silent task no-change outcome");
+}
+const beforeCaptainSilent = outcomeScript(["list", "--recent", "100"]).trim();
+const captainSilent = await heartbeatReport.execute(
+  "captain-silent-refused",
+  { task: "fleet", verdict: "captain", summary: "captain outcomes stay visible", silent: true },
+  undefined,
+  undefined,
+  {},
+);
+if (!captainSilent.isError || !captainSilent.content.some((item) => item.text.includes("routine verdict"))) {
+  throw new Error("a captain outcome with silent=true was not refused");
+}
+if (outcomeScript(["list", "--recent", "100"]).trim() !== beforeCaptainSilent) {
+  throw new Error("refusing a silent captain outcome still stored it");
 }
 await heartbeatReport.execute(
   "task-routine",
@@ -1663,8 +1969,11 @@ const contract = (args) => {
     env: { ...process.env, FM_HOME: home, FM_STATE_OVERRIDE: `${home}/state` },
   });
   if (result.status !== 0) throw new Error(`fm-afk-contract.sh ${args.join(" ")} failed: ${result.stderr}`);
-  return (result.stdout || "").trim();
+  return result.stdout || "";
 };
+process.env.FM_AFK_MODE = "quiet";
+contract(["enter", "--words", "keep routine supervision quiet"]);
+delete process.env.FM_AFK_MODE;
 const requests = () => sentToMain.filter((sent) => sent.message.customType === "fm-branch-process");
 const unprocessedSeqs = () => outcomeScript(["unprocessed"]).split("\n").filter(Boolean).map((line) => JSON.parse(line).seq);
 const runOf = async (fn) => { await fire("agent_start", {}); await fn?.(); await fire("agent_end", {}); await fire("agent_settled", {}); };
@@ -1711,12 +2020,11 @@ if (pending.message.customType !== "fm-branch-process") {
 if (pending.options.triggerTurn !== true || pending.options.deliverAs !== "followUp") {
   throw new Error(`the first queued request was not a streaming followUp: ${JSON.stringify(pending.options)}`);
 }
-if (!pending.message.content.includes(`[seq ${seq1}]`)) {
+if (!pending.message.content.includes(`[seq ${seq1}, recorded 0m ago] `)) {
   throw new Error(`the first queued request lost seq ${seq1}: ${pending.message.content}`);
 }
-contract(["propose", "--grant", "task-d"]);
-contract(["confirm"]);
-const processingMsg = { role: "custom", customType: pending.message.customType, content: pending.message.content, display: false };
+contract(["enter", "--words", "merge task-d when green, then cut the prerelease\n\n"]);
+const processingMsg = { role: "custom", customType: pending.message.customType, content: pending.message.content, display: false, timestamp: 0 };
 let aborted = false;
 const abortCtx = { ...defaultSessionCtx, abort() { aborted = true; } };
 const streamingResult = await fire("context", {
@@ -1755,7 +2063,7 @@ if (openedByCaptain?.messages?.some((message) => message.customType === "fm-bran
   throw new Error(`captain-opened processing was not stripped: ${JSON.stringify(openedByCaptain)}`);
 }
 aborted = false;
-await fire("before_agent_start", { prompt: "captain typed this now" }, abortCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: "captain typed this now" }, abortCtx);
 const stolen = await fire("context", {
   messages: [{ role: "user", content: "captain typed this now" }, processingMsg],
 }, abortCtx);
@@ -1765,7 +2073,13 @@ if (stolen?.messages?.some((message) => message.customType === "fm-branch-proces
 }
 await fire("agent_end", {});
 aborted = false;
-await fire("before_agent_start", { prompt: pending.message.content }, abortCtx);
+await fire("before_agent_start", {
+  type: "before_agent_start", messageType: "custom", systemPrompt: "", systemPromptOptions: {},
+  message: { ...processingMsg, customType: "fixture-notice" },
+}, abortCtx);
+await fire("context", { messages: [...history, processingMsg] }, abortCtx);
+if (aborted) throw new Error("custom text resembling a processing request owned an unrelated run");
+await fire("before_agent_start", { type: "before_agent_start", messageType: "custom", systemPrompt: "", systemPromptOptions: {}, message: processingMsg }, abortCtx);
 await fire("agent_start", {}, defaultSessionCtx);
 const openedByRequest = await fire("context", { messages: [...history, processingMsg] }, abortCtx);
 if (!aborted) throw new Error("a dedicated processing turn with history was not aborted under the record");
@@ -1806,11 +2120,13 @@ const awayPrompt = globalThis.__fmPrompts[1];
 const head = "FIRSTMATE SUPERVISION WAKE: signal: away wake\n\nHandle this per your operating procedure and finish with fm_branch_report.\n\nPOSTURE: AWAY. ";
 if (!awayPrompt.startsWith(head)) throw new Error(`the away wake lost its shape or its tail: ${awayPrompt}`);
 const readback = contract(["readback"]);
-if (!readback.includes("merge when green (task ids): task-d")) throw new Error(`the read-back lost the grant: ${readback}`);
-if (!awayPrompt.endsWith(`The record, verbatim:\n${readback}`)) throw new Error(`the tail does not end with the record's read-back verbatim: ${awayPrompt}`);
+if (!readback.endsWith("    merge task-d when green, then cut the prerelease\n    \n")) throw new Error(`the read-back lost the captain's words or their trailing blank line: ${JSON.stringify(readback)}`);
+if (!awayPrompt.includes("act on them by your own judgment")) throw new Error(`the away tail lost the words-execution rule: ${awayPrompt}`);
+if (awayPrompt.includes("does not execute them")) throw new Error(`the away tail still calls the words inert: ${awayPrompt}`);
+if (!awayPrompt.endsWith(`The record, verbatim:\n${readback}`)) throw new Error(`the tail does not end with the record's read-back verbatim, trailing whitespace included: ${JSON.stringify(awayPrompt)}`);
 const snapshot = readFileSync(`${home}/state/.branch-eligible-rows`, "utf8").trim().split("\n").join(",");
 if (snapshot !== "1,2,3") throw new Error(`the away wake claimed rows ${snapshot}, not every row`);
-const fleet = await report.execute("c2", { task: "fleet", verdict: "captain", summary: "merged task-d's PR under its grant" }, undefined, undefined, {});
+const fleet = await report.execute("c2", { task: "fleet", verdict: "captain", summary: "per your away instructions: merged task-d's PR once green" }, undefined, undefined, {});
 if (fleet.isError) throw new Error(`a fleet report under a claimed check row was refused: ${JSON.stringify(fleet)}`);
 finishPrompt();
 await awayOffer.settlement;
@@ -1840,7 +2156,7 @@ const presented = requests()[1];
 if (presented.options.triggerTurn !== true || presented.options.deliverAs !== "followUp") {
   throw new Error(`the post-archive presentation did not open its own turn: ${JSON.stringify(presented.options)}`);
 }
-for (const needle of [`[seq ${seq1}] task-d:`, `[seq ${seq2}] fleet:`, `through=${seq2}`]) {
+for (const needle of [`[seq ${seq1}, recorded 0m ago] task-d:`, `[seq ${seq2}, recorded 0m ago] fleet:`, `through=${seq2}`]) {
   if (!presented.message.content.includes(needle)) throw new Error(`the post-archive request lost ${needle}: ${presented.message.content}`);
 }
 process.exit(0);
@@ -1849,6 +2165,140 @@ EOF
   out=$(cat "$TMP_ROOT/node-output")
   expect_code 0 "$status" "the away posture must park main and present after archive: $out"
   pass "under the away-posture record the wake carries the verbatim read-back tail, claims every row, opens no processing turn, cancels a pending request, and presents the accumulated rows after archive"
+}
+
+# The 2026-09-25 away-window flood on the Pi report path: a held, green PR on a
+# finished task was re-escalated on every inactive-outcome cadence, because
+# the branch acknowledgement consumed the check row but left its
+# terminal-outcome receipt pending, so each later scan re-queued the same
+# fingerprint. Through the real reconcile scan, extension dispatch and grant,
+# fm_branch_report, and drain, that unchanged situation now reaches the
+# captain exactly once, and a new event on the same task - a red check -
+# still reaches the captain path afterwards.
+test_away_unchanged_held_outcome_reaches_the_captain_once_until_a_new_event() {
+  local repo home out status old
+  repo="$TMP_ROOT/away-held-once-root"
+  home="$TMP_ROOT/away-held-once-home"
+  mkdir -p "$home/state" "$home/config" "$home/fakebin" "$home/projects/held"
+  install_pi_branch_extension_fixture "$repo"
+  git -C "$home/projects/held" init -q
+  git -C "$home/projects/held" -c user.name=fmtest -c user.email=fmtest@example.invalid \
+    commit -q --allow-empty -m init
+  fm_write_meta "$home/state/held.meta" \
+    'window=fm-held' "worktree=$home/projects/held" "project=$home/projects/held" \
+    'harness=pi' 'kind=ship' 'mode=no-mistakes' 'yolo=off' 'spawn_gen=g1' \
+    'pr=https://example.test/o/r/pull/153'
+  printf 'done: PR https://example.test/o/r/pull/153 open, green, mergeable\n' > "$home/state/held.status"
+  old=$(( $(date +%s) - 600 ))
+  perl -e 'my $t = shift; utime $t, $t, @ARGV or exit 1' "$old" "$home/state/held.meta" "$home/state/held.status" \
+    || fail "fixture: could not age the held task's records"
+  printf '#!/usr/bin/env bash\nprintf "state: done · source: fake\\n"\n' > "$home/fakebin/fm-crew-state.sh"
+  chmod +x "$home/fakebin/fm-crew-state.sh"
+  PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
+    DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
+const prelude = process.env.DRIVER_PRELUDE;
+await eval(`(async () => { ${prelude}; globalThis.__t = { fire, bus, makeOffer, outcomeScript, defaultSessionCtx, home, realRoot, approvedProject }; })()`);
+const { fire, bus, makeOffer, outcomeScript, defaultSessionCtx, home, realRoot, approvedProject } = globalThis.__t;
+import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync, utimesSync } from "node:fs";
+
+const state = `${home}/state`;
+const env = { ...process.env, FM_HOME: home, FM_STATE_OVERRIDE: state, FM_CONFIG_OVERRIDE: `${home}/config` };
+const run = (args, label, extra = {}) => {
+  const result = spawnSync("bash", args, { encoding: "utf8", env: { ...env, ...extra } });
+  if (result.status !== 0) throw new Error(`${label} failed: ${result.stderr}`);
+  return result.stdout || "";
+};
+const queued = () => (existsSync(`${state}/.wake-queue`) ? readFileSync(`${state}/.wake-queue`, "utf8") : "")
+  .split("\n").filter(Boolean);
+const outcomes = () => outcomeScript(["list", "--recent", "100"]).split("\n").filter(Boolean).map((line) => JSON.parse(line));
+const captains = () => outcomes().filter((row) => row.verdict === "captain");
+const unprocessedSeqs = () => outcomeScript(["unprocessed"]).split("\n").filter(Boolean).map((line) => JSON.parse(line).seq);
+
+run([`${realRoot}/bin/fm-afk-contract.sh`, "enter", "--words", "watch the fleet; merge nothing"], "away record");
+await fire("session_start", {}, defaultSessionCtx);
+
+globalThis.__fmExecuteBranchBash = async (context) => {
+  const result = spawnSync("bash", ["-c", context.command], { encoding: "utf8", cwd: context.cwd, env: context.env });
+  return {
+    content: [{ type: "text", text: `${result.stdout}${result.stderr}` }],
+    details: { stdout: result.stdout, stderr: result.stderr, exitCode: result.status },
+    isError: result.status !== 0,
+  };
+};
+let commands = 0;
+async function runFleetCommand(session, args) {
+  const bash = session.options.customTools.find((tool) => tool.name === "bash");
+  const result = await bash.execute(`fleet-${commands++}`, { command: ["bin/fm-wake-drain.sh", ...args].join(" ") }, undefined, undefined, {});
+  if (result.isError) throw new Error(`fleet command failed: ${JSON.stringify(result)}`);
+  return result.details;
+}
+// The branch's model: every presented wake is escalated to the captain, as
+// the flood's held-PR report was, then acknowledged exactly as printed.
+globalThis.__fmOnBranchPrompt = async ({ session }) => {
+  const drained = await runFleetCommand(session, []);
+  const ack = drained.stderr.match(/--ack-through ([0-9]+) --recovery-generation ([A-Za-z0-9._-]+)/);
+  if (!ack) throw new Error(`drain did not return its acknowledgement command: ${drained.stderr}`);
+  const report = session.options.customTools.find((tool) => tool.name === "fm_branch_report");
+  const result = await report.execute(
+    `held-${commands}`,
+    { task: "held", verdict: "captain", summary: `escalated: ${drained.stdout.trim().slice(0, 400)}` },
+    undefined,
+    undefined,
+    {},
+  );
+  if (result.isError) throw new Error(`branch report failed: ${JSON.stringify(result)}`);
+  await runFleetCommand(session, ["--ack-through", ack[1], "--recovery-generation", ack[2]]);
+};
+async function wakeBranch(message) {
+  const offer = makeOffer(message, [approvedProject]);
+  bus.emit("fm-branch-supervision:dispatch", offer);
+  if (!offer.accepted) throw new Error(`the away wake "${message}" was refused`);
+  await offer.settlement;
+  if (queued().length !== 0) throw new Error(`the branch left rows queued: ${queued()}`);
+}
+// One watcher cadence: the scan marker is past due, the real scan runs, and
+// whatever it queued wakes the branch as the watcher's close would.
+async function cadence(n) {
+  const marker = `${state}/.inactive-outcome-reconcile`;
+  if (existsSync(marker)) {
+    const past = Math.floor(Date.now() / 1000) - 120;
+    utimesSync(marker, past, past);
+  }
+  run([`${realRoot}/bin/fm-inactive-reconcile.sh`, "scan"], `cadence ${n}`, {
+    FM_INACTIVE_RECONCILE_SECS: "60",
+    FM_INACTIVE_CREW_STATE_BIN: `${home}/fakebin/fm-crew-state.sh`,
+  });
+  if (queued().length > 0) await wakeBranch("check: inactive-outcome");
+}
+
+await cadence(1);
+if (captains().length !== 1 || !captains()[0].summary.includes("child=held")) {
+  throw new Error(`the first cadence did not escalate the held outcome once: ${JSON.stringify(outcomes())}`);
+}
+for (let n = 2; n <= 5; n += 1) {
+  await cadence(n);
+  if (captains().length !== 1) {
+    throw new Error(`cadence ${n} re-escalated the unchanged held outcome: ${JSON.stringify(captains())}`);
+  }
+}
+
+run(["-c", '. "$1"; fm_wake_append check "$2" "$3"', "_", `${realRoot}/bin/fm-wake-lib.sh`,
+  "pr-check:held", "check: held PR https://example.test/o/r/pull/153 check ci/test turned red"], "red check row");
+await wakeBranch("check: held PR https://example.test/o/r/pull/153 check ci/test turned red");
+const escalated = captains();
+if (escalated.length !== 2 || !escalated[1].summary.includes("turned red")) {
+  throw new Error(`the red check did not reach the captain path: ${JSON.stringify(outcomes())}`);
+}
+if (JSON.stringify(unprocessedSeqs()) !== JSON.stringify(escalated.map((row) => row.seq))) {
+  throw new Error(`the captain rows are not both awaiting the captain: ${unprocessedSeqs()}`);
+}
+process.exit(0);
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/node-output")
+  expect_code 0 "$status" "an unchanged held outcome must reach the captain once, and a new event must still reach it: $out"
+  pass "Pi branch: an unchanged held outcome reaches the captain once across cadences, and a later red check on the task still does"
 }
 
 test_away_only_wake_rejects_when_record_is_archived_before_drain() {
@@ -1871,12 +2321,11 @@ const contract = (args) => {
     env: { ...process.env, FM_HOME: home, FM_STATE_OVERRIDE: `${home}/state` },
   });
   if (result.status !== 0) throw new Error(`fm-afk-contract.sh ${args.join(" ")} failed: ${result.stderr}`);
-  return (result.stdout || "").trim();
+  return result.stdout || "";
 };
 
 await fire("session_start", {});
-contract(["propose"]);
-contract(["confirm"]);
+contract(["enter"]);
 writeFileSync(`${home}/state/.wake-queue`, "1\t1\tcheck\tmain-only\tcheck: task-d.check.sh: PR merged\n");
 contract(["archive"]);
 const offer = makeOffer("check: task-d.check.sh: PR merged", [], false, true, true);
@@ -1893,8 +2342,7 @@ if (mainUserMessages.length !== 0) {
   throw new Error("the rejected settlement leaked a main user message from the branch");
 }
 
-contract(["propose"]);
-contract(["confirm"]);
+contract(["enter"]);
 writeFileSync(`${home}/state/.wake-queue`, "1\t1\tsignal\tbranch-driver.status\tsignal: branch-driver.status\n");
 const taskLocal = makeOffer("signal: branch-driver.status", [approvedProject], false, true);
 bus.emit("fm-branch-supervision:dispatch", taskLocal);
@@ -1938,12 +2386,11 @@ const contract = (args) => {
     env: { ...process.env, FM_HOME: home, FM_STATE_OVERRIDE: `${home}/state` },
   });
   if (result.status !== 0) throw new Error(`fm-afk-contract.sh ${args.join(" ")} failed: ${result.stderr}`);
-  return (result.stdout || "").trim();
+  return result.stdout || "";
 };
 
 await fire("session_start", {}, defaultSessionCtx);
-contract(["propose"]);
-contract(["confirm"]);
+contract(["enter"]);
 writeFileSync(
   `${home}/state/.wake-queue`,
   "1\t1\tsignal\tbranch-driver.status\tsignal: branch-driver.status\n2\t2\theartbeat\theartbeat\theartbeat\n",
@@ -2675,6 +3122,15 @@ const ctx = {
     getEntries: () => entries,
   },
 };
+
+// Custom-started runs have no prompt. They still collect persisted dialog,
+// but their own text must never be mirrored as a user request.
+for (const content of ["CUSTOM_ONLY_TEXT", "⁣FIRSTMATE_OP: v1 watcher: custom text"]) {
+  await fire("before_agent_start", {
+    type: "before_agent_start", messageType: "custom", systemPrompt: "", systemPromptOptions: {},
+    message: { role: "custom", customType: "fixture-notice", content, display: false, timestamp: 0 },
+  }, ctx);
+}
 
 // Dialog collected at main's turn_end, delivered into the branch BEFORE the
 // next wake, tagged and filtered: no tool traffic, no operational injections,
@@ -4030,10 +4486,14 @@ test_secondary_session_stays_inert() {
   PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
     FM_TEST_SKIP_LOCK=1 FM_TEST_LOCK_PID=$foreign_pid DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
 const prelude = process.env.DRIVER_PRELUDE;
-await eval(`(async () => { ${prelude}; globalThis.__t = { dispatch, home }; })()`);
-const { dispatch, home } = globalThis.__t;
+await eval(`(async () => { ${prelude}; globalThis.__t = { fire, dispatch, home }; })()`);
+const { fire, dispatch, home } = globalThis.__t;
 import { existsSync, writeFileSync } from "node:fs";
 writeFileSync(`${home}/state/.lock`, `${process.env.FM_TEST_LOCK_PID}\n`);
+const deniedCtx = { sessionManager: { getSessionFile: () => `${home}/denied.jsonl`, getEntries: () => [] } };
+await fire("before_agent_start", { type: "before_agent_start", messageType: "user", systemPrompt: "", systemPromptOptions: {}, prompt: "DENIED_USER_PROMPT" }, deniedCtx);
+await fire("before_agent_start", { type: "before_agent_start", messageType: "custom", systemPrompt: "", systemPromptOptions: {}, message: { role: "custom", customType: "fixture-notice", content: "DENIED_CUSTOM_TEXT", display: false, timestamp: 0 } }, deniedCtx);
+if (existsSync(`${home}/state/.branch-mirror-cursor`)) throw new Error("denied starts wrote a mirror cursor");
 if (dispatch("signal: secondary probe").accepted) throw new Error("secondary session accepted a wake it does not own");
 if (existsSync(`${home}/state/.pi-branch-extension-loaded`)) {
   throw new Error("secondary session wrote the primary's marker");
@@ -4095,6 +4555,7 @@ const replacementPi = {
     replacementPiHandlers.set(event, [...(replacementPiHandlers.get(event) ?? []), handler]);
   },
   registerTool() {},
+  registerToolRenderer() {},
   registerCommand() {},
   registerMessageRenderer() {},
   sendMessage() {},
@@ -4455,6 +4916,122 @@ EOF
   pass "scopeForUnreadWake excludes every main-only class without vetoing eligible task-local rows, and writes the eligible snapshot"
 }
 
+# A second mate's status log is one shared channel for many independently keyed
+# decisions, so its signal rows are judged by the span presented since the last
+# drain (bounded by bin/fm-classify-lib.sh's own presentation-cursor writer),
+# not by every decision still open anywhere in that log. Single-task crewmate
+# logs keep their previous rule on both the Pi and the attended-host path.
+test_branch_dispatch_routes_secondmate_signal_by_new_span() {
+  local repo home out status
+  repo="$TMP_ROOT/dispatch-span-root"
+  home="$TMP_ROOT/dispatch-span-home"
+  mkdir -p "$repo/.pi/extensions/lib" "$home/state" "$home/projects/approved"
+  cp "$ROOT/.pi/extensions/lib/fm-branch-dispatch.ts" "$repo/.pi/extensions/lib/fm-branch-dispatch.ts"
+  cp "$ROOT/.pi/extensions/lib/fm-native-contract.ts" "$repo/.pi/extensions/lib/fm-native-contract.ts"
+  cp "$ROOT/.pi/extensions/lib/fm-async-exec.ts" "$repo/.pi/extensions/lib/fm-async-exec.ts"
+  cp "$ROOT/.pi/extensions/lib/fm-branch-model-picker.ts" "$repo/.pi/extensions/lib/fm-branch-model-picker.ts"
+  printf 'project=%s/projects/approved\nwindow=mate-window\nkind=secondmate\n' "$home" > "$home/state/mate.meta"
+  printf 'project=%s/projects/approved\nwindow=crew-window\nkind=ship\n' "$home" > "$home/state/crew.meta"
+  LIB="$repo/.pi/extensions/lib/fm-branch-dispatch.ts" FM_HOME="$home" CLASSIFY_LIB="$ROOT/bin/fm-classify-lib.sh" \
+    node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
+import { pathToFileURL } from "node:url";
+import { execFileSync } from "node:child_process";
+import { appendFileSync, rmSync, writeFileSync } from "node:fs";
+
+const { branchOfferForWake, scopeForUnreadWake } = await import(pathToFileURL(process.env.LIB).href);
+const state = `${process.env.FM_HOME}/state`;
+const signalRow = (task) => `1\t1\tsignal\t${task}.status\tsignal: ${task}.status`;
+
+// Write the already-presented history, commit the presentation cursor at its
+// end through the real writer, then append the unread span a new wake covers.
+function stage(task, presented, span) {
+  const path = `${state}/${task}.status`;
+  writeFileSync(path, presented);
+  execFileSync("bash", ["-c",
+    'set -e; . "$1"; ident=$(_fm_open_decisions_file_ident "$2/$3.status"); ' +
+    'status_commit_presentation_snapshot "$2" "$(printf "%s\\t%s\\t%s" "$3" "$4" "$ident")"',
+    "_", process.env.CLASSIFY_LIB, state, task, String(Buffer.byteLength(presented))]);
+  appendFileSync(path, span);
+  writeFileSync(`${state}/.wake-queue`, signalRow(task));
+}
+
+// Both routing paths: the Pi dispatcher and the attended supervision host.
+function verdicts() {
+  return [false, true].map((attendedHost) => scopeForUnreadWake(state, false, false, attendedHost).eligibleSeqs.includes("1"));
+}
+
+function expectRoute(label, presented, span, toBranch) {
+  stage("mate", presented, span);
+  const [pi, host] = verdicts();
+  if (pi !== toBranch || host !== toBranch) {
+    throw new Error(`${label}: expected ${toBranch ? "branch" : "main"}, got pi=${pi} host=${host}`);
+  }
+}
+
+const hold = "needs-decision [at=1790000000] [key=old-hold]: deferred captain call\n";
+expectRoute("unrelated open hold plus a routine merged line", hold,
+  "done [at=1790000100]: sample-a PR merged\n", true);
+expectRoute("unrelated open hold stamped with a readable time", "needs-decision [at=10:00] [key=old-hold]: waiting\n",
+  "done: sample-a PR merged\n", true);
+expectRoute("routine note that only mentions an open key in prose", hold,
+  "done: sample-a merged, unrelated to [key=old-hold]\n", true);
+expectRoute("mixed routine and decision span", hold,
+  "done: sample-b PR merged\nneeds-decision [key=new-call]: pick an option\n", false);
+expectRoute("same-key update to an open decision", hold,
+  "working [key=old-hold]: still gathering evidence\n", false);
+expectRoute("same-key update behind a readable time stamp", hold,
+  "working [at=10:30] [key=old-hold]: still gathering evidence\n", false);
+expectRoute("key-less blocked line", hold, "blocked: cannot reach the forge\n", false);
+expectRoute("resolution of an open decision", hold, "resolved [key=old-hold]: answered\n", false);
+expectRoute("key-less resolution beside an unrelated open hold", hold, "resolved: routine follow-up\n", true);
+expectRoute("key-less resolution of an open unkeyed decision", "needs-decision: pick an option\n",
+  "resolved: answered\n", false);
+expectRoute("keyed resolution of a never-open key", hold, "resolved [key=never-open]: nothing to close\n", true);
+expectRoute("resolution after a bare resolved word left the unkeyed decision open",
+  "needs-decision: choose\nresolved\n", "resolved: answered\n", false);
+expectRoute("captain-held declaration", "working: history\n", "captain-held [key=parked]: deferred to Monday\n", false);
+
+// The host decides the whole close through the offer rule, which must agree.
+stage("mate", hold, "done: sample-c PR merged\n");
+if (!branchOfferForWake(state, `signal: ${state}/mate.status`, false, true).eligible) {
+  throw new Error("the attended-host offer kept a routine second-mate close on main behind an unrelated hold");
+}
+
+// Without a readable cursor the whole log is the span, so routing falls back
+// toward main rather than guessing.
+stage("mate", hold, "done: sample-d PR merged\n");
+rmSync(`${state}/.status-presentation-cursor`);
+if (verdicts().some(Boolean)) throw new Error("a missing presentation cursor did not fall back to the whole log");
+
+// A stale row stays a whole-log liveness check, and a co-queued signal row for
+// the same second mate keeps its own verdict in either order.
+for (const [order, queue, signalSeq, staleSeq] of [
+  ["stale first", "1\t1\tstale\tmate\tstale: mate\n1\t2\tsignal\tmate.status\tsignal: mate.status", "2", "1"],
+  ["signal first", "1\t1\tsignal\tmate.status\tsignal: mate.status\n1\t2\tstale\tmate\tstale: mate", "1", "2"],
+]) {
+  stage("mate", hold, "done: sample-e PR merged\n");
+  writeFileSync(`${state}/.wake-queue`, queue);
+  for (const attendedHost of [false, true]) {
+    const scope = scopeForUnreadWake(state, false, false, attendedHost);
+    if (!scope.eligibleSeqs.includes(signalSeq) || scope.eligibleSeqs.includes(staleSeq)) {
+      throw new Error(`${order}: signal and stale rows for one second mate shared a verdict: ${JSON.stringify(scope)}`);
+    }
+  }
+}
+
+// Single-task crewmate logs are unchanged: Pi judges only the row payload, and
+// the attended host keeps its whole-log rule.
+stage("crew", hold, "done: routine follow-up\n");
+const [crewPi, crewHost] = verdicts();
+if (!crewPi || crewHost) throw new Error(`crewmate signal routing changed: pi=${crewPi} host=${crewHost}`);
+process.exit(0);
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/node-output")
+  expect_code 0 "$status" "second-mate signal rows must be routed by their new span: $out"
+  pass "second-mate signal rows route by their new span while crewmate and stale routing stay unchanged"
+}
+
 # The model picker's bounded scrolling and its search ranking are Pi's own
 # SelectList and fuzzyFilter, so the guarantee only holds while the installed
 # Pi still exports them and still bounds what it renders. Stubs cannot answer
@@ -4552,20 +5129,15 @@ test_outcomes_tool_uses_stock_execution_and_export_consumers() {
     echo "skip: node not found for Pi outcomes rendering test"
     return
   fi
-  local package_dir package_version fixture out status
+  local package_dir package_version fixture out status calm_lib
   package_dir=${FM_PI_PACKAGE_DIR:-"$(npm root -g 2>/dev/null)/@earendil-works/pi-coding-agent"}
   if [ ! -f "$package_dir/package.json" ]; then
     echo "skip: installed @earendil-works/pi-coding-agent package not found"
     return
   fi
-  # This case compares the extension's own renderers against Pi's stock
-  # rendering, so its verdict is only meaningful against the vendor contract
-  # those renderers target: since Pi 0.84.4 the stock renderer no longer
-  # supplies an implicit reset at multiline boundaries, and the extension
-  # emits that reset itself. An older installed Pi still supplies it, so the
-  # two legitimately differ there and a comparison would report a defect that
-  # is really a version skew. Name the version and skip rather than degrade
-  # quietly; a package whose version cannot be read at all is still a failure.
+  # Compare real registered renderers against the installed stock consumers.
+  # Retain the stock execution contract floor; unreadable versions fail, and
+  # newer versions run every comparison rather than becoming a support ceiling.
   package_version=$(node -p 'require(process.argv[1]).version || ""' "$package_dir/package.json" 2>/dev/null || printf '')
   [ -n "$package_version" ] \
     || fail "installed @earendil-works/pi-coding-agent has no readable version at $package_dir"
@@ -4580,6 +5152,10 @@ test_outcomes_tool_uses_stock_execution_and_export_consumers() {
   cp "$ROOT/.pi/extensions/lib/fm-native-contract.ts" "$fixture/.pi/extensions/lib/fm-native-contract.ts"
   cp "$ROOT/.pi/extensions/lib/fm-async-exec.ts" "$fixture/.pi/extensions/lib/fm-async-exec.ts"
   cp "$ROOT/.pi/extensions/lib/fm-branch-model-picker.ts" "$fixture/.pi/extensions/lib/fm-branch-model-picker.ts"
+  cp "$ROOT/.pi/extensions/fm-calm.ts" "$fixture/.pi/extensions/fm-calm.ts"
+  for calm_lib in fm-calm-pending-operational-layout fm-calm-assistant-layout fm-calm-preservation fm-calm-operational-user-layout fm-calm-working-ship fm-calm-working-ship-sprite; do
+    cp "$ROOT/.pi/extensions/lib/$calm_lib.ts" "$fixture/.pi/extensions/lib/$calm_lib.ts"
+  done
   cp "$ROOT/.pi/extensions/lib/fm-calm-visibility.ts" "$fixture/.pi/extensions/lib/fm-calm-visibility.ts"
   cp "$ROOT/.pi/extensions/lib/fm-operational-input.ts" "$fixture/.pi/extensions/lib/fm-operational-input.ts"
   ln -s "$package_dir" "$fixture/node_modules/@earendil-works/pi-coding-agent"
@@ -4587,7 +5163,7 @@ test_outcomes_tool_uses_stock_execution_and_export_consumers() {
   ln -s "$package_dir/node_modules/@earendil-works/pi-ai" "$fixture/node_modules/@earendil-works/pi-ai"
   ln -s "$package_dir/node_modules/typebox" "$fixture/node_modules/typebox"
 
-  out=$(cd "$fixture" && EXT="$fixture/.pi/extensions/fm-branch-supervision.ts" PI_PACKAGE_DIR="$package_dir" node --input-type=module 2>&1 <<'JS'
+  out=$(cd "$fixture" && EXT="$fixture/.pi/extensions/fm-branch-supervision.ts" CALM_EXT="$fixture/.pi/extensions/fm-calm.ts" FM_HOME="$fixture/home" PI_PACKAGE_DIR="$package_dir" node --input-type=module 2>&1 <<'JS'
 import { pathToFileURL } from "node:url";
 
 const packageRoot = process.env.PI_PACKAGE_DIR;
@@ -4600,6 +5176,7 @@ initTheme("dark");
 
 const listeners = new Map();
 const tools = [];
+const toolRenderers = [];
 const pi = {
   events: {
     on(name, listener) {
@@ -4613,18 +5190,53 @@ const pi = {
   registerCommand() {},
   registerMessageRenderer() {},
   registerTool(tool) { tools.push(tool); },
+  registerToolRenderer(resolver) { toolRenderers.push(resolver); },
   sendMessage() {},
   sendUserMessage() {},
 };
 const extension = await import(`${pathToFileURL(process.env.EXT).href}?consumer=${Date.now()}`);
 extension.default(pi);
-const actualDefinition = tools.find((tool) => tool.name === "fm_branch_outcomes");
+const { ExtensionRunner, SessionManager } = await import("@earendil-works/pi-coding-agent");
+const runner = new ExtensionRunner([{ toolRenderers }], {}, process.cwd(), SessionManager.inMemory(), {});
+const registeredDefinition = tools.find((tool) => tool.name === "fm_branch_outcomes");
+// Before Calm loads, outcomes has no resolver or custom renderer: Pi owns its row.
+if (runner.resolveToolRenderers("fm_branch_outcomes", () => registeredDefinition) !== registeredDefinition) throw new Error("branch-only outcomes replaced its stock definition");
+for (const slot of ["renderShell", "renderCall", "renderResult", "isVisible"]) {
+  if (registeredDefinition?.[slot] !== undefined) throw new Error(`branch-only outcomes claimed ${slot}`);
+}
+const calmHandlers = new Map();
+let calmCommand;
+const calmPi = {
+  ...pi,
+  on(name, handler) { calmHandlers.set(name, handler); },
+  registerCommand(name, command) { if (name === "calm") calmCommand = command; },
+  registerEntryRenderer() {},
+  registerTool(tool) { throw new Error(`Calm claimed executable tool ${tool.name}`); },
+};
+const calmExtension = await import(pathToFileURL(process.env.CALM_EXT).href);
+calmExtension.default(calmPi);
+const visibility = await import(pathToFileURL(`${process.cwd()}/.pi/extensions/lib/fm-calm-visibility.ts`).href);
+const calmContext = { ui: {
+  getEditorText: () => "", onTerminalInput: () => () => {},
+  setHiddenThinkingLabel() {}, setStatus() {}, setWorkingVisible() {},
+  setToolsExpanded() { throw new Error("Calm changed native expansion state to refresh rows"); },
+} };
+await calmHandlers.get("session_start")({ reason: "startup" }, calmContext);
+const setCalm = async (active, stockExportRendering = false) => {
+  if (visibility.calmPresentationIsActive() !== active) await calmCommand.handler("", calmContext);
+  // This independent export event still belongs to Firstmate's non-tool adapters.
+  pi.events.emit("firstmate:calm-presentation", { active, stockExportRendering });
+};
+const actualDefinition = runner.resolveToolRenderers("fm_branch_outcomes", () => registeredDefinition);
 if (!actualDefinition) throw new Error("fm_branch_outcomes was not registered");
-const stockDefinition = { ...actualDefinition };
+const stockDefinition = { ...registeredDefinition };
 delete stockDefinition.renderShell;
 delete stockDefinition.renderCall;
 delete stockDefinition.renderResult;
 
+const responseContract = (response) => response === undefined ? undefined : {
+  handled: response.handled, capture: response.capture, focus: response.focus, render: response.render,
+};
 const args = { recent: 2 };
 const result = {
   content: [{
@@ -4647,7 +5259,7 @@ const result = {
   details: { ok: true },
   isError: false,
 };
-const ui = { requestRender() {} };
+const ui = { redrawRequests: 0, requestRender() { this.redrawRequests += 1; } };
 const stockRow = new ToolExecutionComponent("fm_branch_outcomes", "stock", args, { showImages: false }, stockDefinition, ui, process.cwd());
 const actualRow = new ToolExecutionComponent("fm_branch_outcomes", "actual", args, { showImages: false }, actualDefinition, ui, process.cwd());
 for (const row of [stockRow, actualRow]) {
@@ -4658,7 +5270,9 @@ for (const row of [stockRow, actualRow]) {
 const collapsedStock = stockRow.render(100);
 const collapsedActual = actualRow.render(100);
 if (JSON.stringify(collapsedActual) !== JSON.stringify(collapsedStock)) {
-  throw new Error("Calm-off ToolExecutionComponent rendering differs from Pi stock");
+  stockRow.setExpanded(true);
+  actualRow.setExpanded(true);
+  throw new Error(`Calm-off ToolExecutionComponent rendering differs from Pi stock: ${JSON.stringify({ collapsedStock, collapsedActual, expandedStock: stockRow.render(100), expandedActual: actualRow.render(100) })}`);
 }
 const collapsedText = collapsedStock.join("\n");
 if (collapsedText.includes("OUTCOME_TWELVE") || !collapsedText.includes("more lines") || !collapsedText.includes("to expand")) {
@@ -4674,26 +5288,353 @@ if (JSON.stringify(expandedActual) !== JSON.stringify(expandedStock)) {
 if (!expandedStock.join("\n").includes("OUTCOME_TWELVE") || JSON.stringify(expandedStock) === JSON.stringify(collapsedStock)) {
   throw new Error("stock rendering fixture did not exercise expanded output");
 }
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: false });
+await setCalm(true);
 actualRow.invalidate();
 if (actualRow.render(100).length !== 0) {
   throw new Error("Calm-on ToolExecutionComponent row remained visible");
 }
-pi.events.emit("firstmate:calm-presentation", { active: false, stockExportRendering: false });
+await setCalm(false);
 actualRow.invalidate();
 if (JSON.stringify(actualRow.render(100)) !== JSON.stringify(stockRow.render(100))) {
   throw new Error("ToolExecutionComponent rendering did not restore after live toggle");
 }
 
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: true });
-const stockHtml = createToolHtmlRenderer({ getToolDefinition: () => stockDefinition, theme, cwd: process.cwd() });
-const actualHtml = createToolHtmlRenderer({ getToolDefinition: () => actualDefinition, theme, cwd: process.cwd() });
+await setCalm(true, true);
+const stockHtml = createToolHtmlRenderer({ getToolRenderers: () => stockDefinition, theme, cwd: process.cwd() });
+const actualHtml = createToolHtmlRenderer({ getToolRenderers: (name) => runner.resolveToolRenderers(name, () => tools.find((tool) => tool.name === name)), theme, cwd: process.cwd() });
 const stockCall = stockHtml.renderCall("stock-html", "fm_branch_outcomes", args);
 const actualCall = actualHtml.renderCall("actual-html", "fm_branch_outcomes", args);
 const stockResult = stockHtml.renderResult("stock-html", "fm_branch_outcomes", result.content, result.details, false);
 const actualResult = actualHtml.renderResult("actual-html", "fm_branch_outcomes", result.content, result.details, false);
 if (actualCall !== undefined || actualResult !== undefined || stockCall !== undefined || stockResult !== undefined) {
   throw new Error("stock export rendering did not delegate to Pi's structured fallback");
+}
+const { Text, visibleWidth } = await import("@earendil-works/pi-tui");
+const { readFileSync, writeFileSync, mkdirSync, cpSync } = await import("node:fs");
+const { exportSessionToHtml } = await import(pathToFileURL(`${packageRoot}/dist/core/export-html/index.js`).href);
+const cases = [
+  ["preview-controls", args, result],
+  ["empty", {}, { content: [], details: undefined, isError: false }],
+  ["empty-text", args, { content: [{ type: "text", text: "" }], details: undefined, isError: false }],
+  ["error", args, { content: [{ type: "text", text: "OUTCOME_ERROR\nCannot read the synthetic store." }], details: undefined, isError: true }],
+  ["multiblock", args, { content: [{ type: "text", text: "BLOCK_ONE\n界 e\u0301" }, { type: "text", text: "BLOCK_TWO\tend\x1b]8;;https://example.invalid\x07link\x1b]8;;\x07" }], details: undefined, isError: false }],
+];
+const snapshots = [];
+for (const [label, callArgs, callResult] of cases) {
+  for (const outputPad of [0, 1]) {
+    for (const initiallyHidden of [false, true]) {
+      await setCalm(initiallyHidden);
+      const stock = new ToolExecutionComponent("fm_branch_outcomes", `${label}-stock`, {}, { showImages: false, outputPad }, stockDefinition, ui, process.cwd());
+      const actual = new ToolExecutionComponent("fm_branch_outcomes", `${label}-actual`, {}, { showImages: false, outputPad }, runner.resolveToolRenderers("fm_branch_outcomes", () => registeredDefinition), ui, process.cwd());
+      const equalRows = (phase) => {
+        for (const width of [24, 40, 100, 160]) {
+          const expected = stock.render(width);
+          const observed = actual.render(width);
+          if (JSON.stringify(observed) !== JSON.stringify(expected)) {
+            throw new Error(`stock rows differ: ${JSON.stringify({ label, outputPad, initiallyHidden, phase, width, expected, observed })}`);
+          }
+          if (observed.some((line) => visibleWidth(line) > width)) throw new Error(`${label}/${phase} exceeds ${width} columns`);
+          if (process.env.FM_PI_RENDER_PROOF_DIR) {
+            snapshots.push({ label, outputPad, initiallyHidden, phase, width, stock: expected, actual: observed });
+          }
+        }
+      };
+      if (initiallyHidden) {
+        if (actual.render(100).length) throw new Error("a row created while Calm was on retained height");
+        await setCalm(false);
+        actual.invalidate();
+      }
+      equalRows("arguments-starting");
+      for (const row of [stock, actual]) {
+        row.updateArgs(callArgs);
+        row.markExecutionStarted();
+        row.setArgsComplete();
+      }
+      equalRows("arguments-complete");
+      for (const row of [stock, actual]) row.updateResult(callResult, true);
+      equalRows("partial-result");
+      for (const row of [stock, actual]) row.updateResult(callResult);
+      equalRows("collapsed-result");
+      for (const expanded of [false, true]) {
+        for (const width of [24, 100]) {
+          const lines = stock.render(width);
+          const outputY = lines.findIndex((line) => line.includes("OUTCOME_ONE") || line.includes("OUTCOME_ERROR") || line.includes("BLOCK_ONE"));
+          const points = [[0, 0], [width - 1, 0], [0, 1], [width - 1, 1], [Math.floor(width / 2), 1], [0, lines.length - 1], [width - 1, lines.length - 1], [Math.floor(width / 2), lines.length - 1]];
+          if (outputPad && outputY >= 0) points.push([0, outputY], [width - 1, outputY]);
+          for (const [x, y] of points) {
+            const responses = [];
+            for (const row of [stock, actual]) {
+              row.setExpanded(expanded);
+              const current = row.render(width);
+              const targetY = y === lines.length - 1 ? current.length - 1 : y;
+              responses.push(row.handleMouse({ type: "click", button: "left", x, y: targetY, width, height: current.length }));
+              row.invalidate();
+            }
+            if (JSON.stringify(responseContract(responses[0])) !== JSON.stringify(responseContract(responses[1]))) throw new Error(`padding mouse response differs from stock: ${JSON.stringify({ label, outputPad, expanded, width, x, y, responses: responses.map(responseContract) })}`);
+            equalRows(`padding-${expanded}-${width}-${x}-${y}`);
+          }
+        }
+      }
+      for (const row of [stock, actual]) row.setExpanded(false);
+      for (const expanded of [true, false]) {
+        for (const width of [24, 40, 100, 160]) {
+          for (const row of [stock, actual]) {
+            const lines = row.render(width);
+            const y = lines.findIndex((line) => line.includes("OUTCOME_ONE") || line.includes("OUTCOME_ERROR") || line.includes("BLOCK_ONE"));
+            if (y < 0) continue;
+            row.handleMouse({ type: "click", button: "left", x: outputPad + 1, y, width, height: lines.length });
+          }
+          equalRows(`mouse-${expanded}-${width}`);
+          for (const row of [stock, actual]) row.invalidate();
+          equalRows(`mouse-invalidated-${expanded}-${width}`);
+          initTheme("light");
+          for (const row of [stock, actual]) row.invalidate();
+          equalRows(`mouse-theme-${expanded}-${width}`);
+          initTheme("dark");
+          stock.invalidate();
+          await setCalm(true);
+          actual.invalidate();
+          if (actual.render(width).length) throw new Error("mouse-expanded row remained visible in Calm");
+          await setCalm(false);
+          actual.invalidate();
+          equalRows(`mouse-restored-${expanded}-${width}`);
+        }
+      }
+      for (const row of [stock, actual]) row.setExpanded(true);
+      equalRows("expanded-result");
+      for (const row of [stock, actual]) row.setOutputPad(1 - outputPad);
+      equalRows("padding-changed");
+      await setCalm(true);
+      actual.invalidate();
+      if (actual.render(40).length) throw new Error(`${label} left height after enabling Calm`);
+      // Updates and expansion while hidden must survive restoration.
+      for (const row of [stock, actual]) {
+        row.updateArgs({ recent: 3 });
+        row.setExpanded(false);
+        row.updateResult(callResult);
+      }
+      await setCalm(false);
+      actual.invalidate();
+      equalRows("restored-after-hidden-update");
+    }
+  }
+}
+if (!collapsedText.includes("recent=2") || !expandedStock.join("\n").includes("recent: 2")) {
+  throw new Error("stock argument fixture failed to exercise collapsed and expanded arguments");
+}
+
+// Exercise the real HTML document generator with the same registered resolver
+// consumer as AgentSession.exportToHtml. No model or provider is called.
+const session = SessionManager.create("/synthetic/pi-compat", `${process.cwd()}/synthetic-sessions`);
+const usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } };
+session.appendMessage({ role: "user", content: "Synthetic outcomes presentation fixture.", timestamp: 0 });
+for (const [label, callArgs, callResult] of cases) {
+  const id = `synthetic-${label}`;
+  session.appendMessage({ role: "assistant", content: [{ type: "toolCall", id, name: "fm_branch_outcomes", arguments: callArgs }], api: "synthetic", provider: "synthetic", model: "synthetic", usage, stopReason: "toolUse", timestamp: 0 });
+  session.appendMessage({ role: "toolResult", toolCallId: id, toolName: "fm_branch_outcomes", ...callResult, timestamp: 0 });
+}
+const state = { systemPrompt: "Synthetic presentation fixture; no model execution.", tools: [registeredDefinition] };
+let exportedStock;
+let exportedActual;
+for (const active of [false, true]) {
+  await setCalm(active);
+  exportedStock = await exportSessionToHtml(session, state, { outputPath: `${process.cwd()}/stock-${active}.html`, themeName: "dark", toolRenderer: stockHtml });
+  exportedActual = await exportSessionToHtml(session, state, { outputPath: `${process.cwd()}/actual-${active}.html`, themeName: "dark", toolRenderer: actualHtml });
+  if (readFileSync(exportedActual, "utf8") !== readFileSync(exportedStock, "utf8")) {
+    throw new Error(`actual HTML document differs from stock with Calm active=${active}`);
+  }
+  await setCalm(active);
+}
+
+// A downstream extension's renderers must remain the delegated presentation,
+// including actual custom HTML; unrelated tools pass through untouched.
+const downstreamContexts = new Map();
+const downstreamMouse = new Map();
+const downstream = {
+  renderCall: (callArgs) => new Text(`DOWNSTREAM_CALL recent=${callArgs.recent}`, 0, 0),
+  renderResult: (_result, _options, _theme, context) => {
+    const output = context.state.output ??= new Text("DOWNSTREAM_RESULT", 0, 0);
+    output.handleMouse = (event) => {
+      downstreamMouse.set(context.toolCallId, event);
+      return event.button === "right" ? { handled: true } : undefined;
+    };
+    downstreamContexts.set(context.toolCallId, { context, output });
+    return output;
+  },
+};
+pi.registerToolRenderer((name, next) => name === "fm_branch_outcomes" ? downstream : next());
+await setCalm(false);
+const unrelated = runner.resolveToolRenderers("unrelated", () => downstream);
+if (unrelated.renderCall !== downstream.renderCall || unrelated.renderResult !== downstream.renderResult) throw new Error("Calm changed unrelated custom presentation slots");
+const delegatedStock = new ToolExecutionComponent("fm_branch_outcomes", "delegated-stock", args, { showImages: false }, downstream, ui, process.cwd());
+const delegatedActual = new ToolExecutionComponent("fm_branch_outcomes", "delegated-actual", args, { showImages: false }, runner.resolveToolRenderers("fm_branch_outcomes", () => registeredDefinition), ui, process.cwd());
+for (const row of [delegatedStock, delegatedActual]) row.updateResult(result);
+if (JSON.stringify(delegatedStock.render(100)) !== JSON.stringify(delegatedActual.render(100))) throw new Error("next renderer delegation changed rows");
+const deferred = downstreamContexts.get("delegated-actual");
+if (!deferred) throw new Error("delegated result did not receive its actual render context");
+const redrawsBefore = ui.redrawRequests;
+deferred.output.setText("DOWNSTREAM_RESULT_CHANGED");
+deferred.context.invalidate();
+if (ui.redrawRequests <= redrawsBefore || !delegatedActual.render(100).join("\n").includes("DOWNSTREAM_RESULT_CHANGED")) {
+  throw new Error("downstream renderer invalidation did not redraw its owning row");
+}
+downstreamContexts.get("delegated-stock").output.setText("DOWNSTREAM_RESULT_CHANGED");
+downstreamContexts.get("delegated-stock").context.invalidate();
+for (const outputPad of [0, 1]) {
+  for (const width of [24, 100]) {
+    for (const row of [delegatedStock, delegatedActual]) row.setOutputPad(outputPad);
+    for (const button of ["right", "left", "left"]) {
+      const responses = [];
+      for (const [id, row] of [["delegated-stock", delegatedStock], ["delegated-actual", delegatedActual]]) {
+        downstreamMouse.delete(id);
+        const lines = row.render(width);
+        const y = lines.findIndex((line) => line.includes("DOWNSTREAM_RESULT"));
+        if (y < 0) throw new Error("missing downstream mouse target");
+        responses.push(row.handleMouse({ type: "click", button, x: outputPad + 2, y, width, height: lines.length }));
+      }
+      if (JSON.stringify(downstreamMouse.get("delegated-stock")) !== JSON.stringify(downstreamMouse.get("delegated-actual")) || !downstreamMouse.has("delegated-actual")) {
+        throw new Error("downstream mouse coordinates changed");
+      }
+      if (JSON.stringify(responseContract(responses[0])) !== JSON.stringify(responseContract(responses[1]))) throw new Error(`downstream mouse handling changed: ${JSON.stringify({button, responses: responses.map(responseContract)})}`);
+      for (const id of ["delegated-stock", "delegated-actual"]) downstreamContexts.get(id).context.invalidate();
+      if (JSON.stringify(delegatedStock.render(width)) !== JSON.stringify(delegatedActual.render(width))) throw new Error("mouse state lost after downstream invalidation");
+    }
+  }
+}
+await setCalm(true, true);
+const delegatedHtml = createToolHtmlRenderer({ getToolRenderers: () => downstream, theme, cwd: process.cwd() });
+const expectedCall = delegatedHtml.renderCall("delegated-html", "fm_branch_outcomes", args);
+const observedCall = actualHtml.renderCall("delegated-html", "fm_branch_outcomes", args);
+const expectedResult = delegatedHtml.renderResult("delegated-html", "fm_branch_outcomes", result.content, result.details, false);
+const observedResult = actualHtml.renderResult("delegated-html", "fm_branch_outcomes", result.content, result.details, false);
+if (!expectedCall?.includes("DOWNSTREAM_CALL") || !expectedResult?.expanded?.includes("DOWNSTREAM_RESULT") || expectedCall !== observedCall || JSON.stringify(expectedResult) !== JSON.stringify(observedResult)) {
+  throw new Error("actual custom HTML consumer lost downstream rendering");
+}
+await setCalm(false);
+
+const processed = tools.find((tool) => tool.name === "fm_branch_processed");
+if (!processed) throw new Error("fm_branch_processed was not registered");
+for (const slot of ["renderShell", "renderCall", "renderResult", "isVisible"]) {
+  if (processed[slot] !== undefined) throw new Error(`branch-only processed claimed ${slot}`);
+}
+await setCalm(false);
+const processedRow = new ToolExecutionComponent("fm_branch_processed", "processed", { through: 2 }, { showImages: false }, runner.resolveToolRenderers("fm_branch_processed", () => processed), ui, process.cwd());
+processedRow.updateResult({ content: [{ type: "text", text: "PROCESSED_CUSTOM_RESULT" }], details: {} });
+const processedStock = new ToolExecutionComponent("fm_branch_processed", "processed-stock", { through: 2 }, { showImages: false }, processed, ui, process.cwd());
+processedStock.updateResult({ content: [{ type: "text", text: "PROCESSED_CUSTOM_RESULT" }], details: {} });
+for (const expanded of [false, true]) {
+  processedStock.setExpanded(expanded);
+  processedRow.setExpanded(expanded);
+  if (JSON.stringify(processedRow.render(100)) !== JSON.stringify(processedStock.render(100))) {
+    throw new Error(`Calm-off processed differs from stock, expanded=${expanded}`);
+  }
+}
+const processedVisible = processedRow.render(100);
+if (!processedVisible.join("\n").includes("PROCESSED_CUSTOM_RESULT")) throw new Error("processed custom result did not render");
+await setCalm(true);
+if (processedRow.render(100).length) throw new Error("Calm retained processed custom row height");
+await setCalm(false);
+if (JSON.stringify(processedRow.render(100)) !== JSON.stringify(processedVisible)) throw new Error("processed custom presentation did not restore");
+
+// Exercise actual fullscreen dispatch and copy through its public terminal boundary.
+// Both controls use the same native stock outcomes row, with only actual Calm added.
+const { TuiAltScreen, stripTerminalSequences } = await import("@earendil-works/pi-tui");
+class RecordingTerminal {
+  columns = 100; rows = 40; kittyProtocolActive = false;
+  writes = [];
+  start(onInput) { this.onInput = onInput; }
+  stop() { this.onInput = undefined; }
+  write(data) { this.writes.push(data); }
+  sendInput(data) { this.onInput?.(data); }
+  async drainInput() {}
+  moveBy() {} hideCursor() {} showCursor() {} clearLine() {}
+  clearFromCursor() {} clearScreen() {} setTitle() {} setProgress() {} setProgramStatus() {}
+}
+const selectionProof = [];
+for (const width of [24, 100]) {
+  const observations = [];
+  for (const withCalm of [false, true]) {
+    const terminal = new RecordingTerminal();
+    terminal.columns = width;
+    const copied = [];
+    const tui = new TuiAltScreen(terminal, undefined, undefined, { copyOnSelect: false, copySelection: async (text) => { copied.push(text); return true; } });
+    const row = new ToolExecutionComponent("fm_branch_outcomes", `selection-${withCalm}`, args, { showImages: false, outputPad: 1 }, withCalm ? actualDefinition : stockDefinition, tui, process.cwd());
+    row.markExecutionStarted();
+    row.setArgsComplete();
+    row.updateResult(result);
+    row.setExpanded(true);
+    tui.addChild(new Text("SELECT_ANCHOR_TEXT", 0, 0));
+    tui.addChild(row);
+    tui.addChild(new Text("SELECT_TAIL_TEXT", 0, 0));
+    tui.start();
+    try {
+      tui.renderNow();
+      const screen = tui.getScreenLines().map(stripTerminalSequences);
+      const startY = screen.findIndex((line) => line.includes("SELECT_ANCHOR_TEXT")) + 1;
+      const endY = screen.findIndex((line) => line.includes("SELECT_TAIL_TEXT")) + 1;
+      if (!startY || !endY || endY <= startY) throw new Error("fullscreen selection fixture did not expose both anchors");
+      terminal.sendInput(`\x1b[<0;1;${startY}M`);
+      terminal.sendInput(`\x1b[<32;5;${endY}M`);
+      terminal.sendInput(`\x1b[<0;5;${endY}m`);
+      tui.renderNow();
+      if (!tui.hasActiveSelection() || !await tui.copyActiveSelectionToClipboard()) throw new Error("fullscreen row prevented native selection/copy");
+      if (!copied[0]?.includes("OUTCOME_TWELVE")) throw new Error("fullscreen selection did not cross stock output");
+      observations.push(copied[0]);
+      selectionProof.push({ width, withCalm, selected: copied[0], screen });
+    } finally { tui.stop(); }
+  }
+  if (observations[0] !== observations[1]) throw new Error(`Calm changed fullscreen selection/copy at width ${width}`);
+}
+
+// A downstream interactive child must lose capture and keyboard focus when the
+// real Calm command hides its owner, and require fresh input after restoration.
+await setCalm(false);
+const terminal = new RecordingTerminal();
+const tui = new TuiAltScreen(terminal);
+const mouseEvents = [];
+const keyEvents = [];
+const interactive = new Text("INTERACTIVE_OUTCOME_CHILD", 0, 0);
+interactive.handleInput = (data) => keyEvents.push(data);
+interactive.handleMouse = (event) => {
+  mouseEvents.push(event.type);
+  return event.type === "press" ? { handled: true, capture: true, focus: true } : { handled: true };
+};
+pi.registerToolRenderer((name, next) => name === "interactive_outcome" ? { renderShell: "self", renderResult: () => interactive } : next());
+const interactiveRow = new ToolExecutionComponent("interactive_outcome", "interactive", {}, { showImages: false }, runner.resolveToolRenderers("interactive_outcome", () => undefined), tui, process.cwd());
+interactiveRow.updateResult(result);
+tui.addChild(interactiveRow);
+tui.start();
+try {
+  tui.renderNow();
+  const targetY = tui.getScreenLines().findIndex((line) => line.includes("INTERACTIVE_OUTCOME_CHILD")) + 1;
+  if (!targetY) throw new Error("interactive child fixture did not render");
+  terminal.sendInput(`\x1b[<0;2;${targetY}M`);
+  terminal.sendInput("A");
+  if (!mouseEvents.includes("press") || keyEvents.join("") !== "A") throw new Error("visible interactive child did not acquire capture/focus");
+  await setCalm(true);
+  tui.renderNow();
+  terminal.sendInput("HIDDEN_KEY");
+  terminal.sendInput(`\x1b[<32;3;${targetY}M`);
+  if (interactiveRow.render(100).length || keyEvents.join("") !== "A") throw new Error("hidden outcomes child accepted input");
+  const afterHide = [...mouseEvents];
+  await setCalm(false);
+  tui.renderNow();
+  terminal.sendInput(`\x1b[<0;3;${targetY}m`);
+  terminal.sendInput("STALE_KEY");
+  if (JSON.stringify(mouseEvents) !== JSON.stringify(afterHide) || keyEvents.join("") !== "A") throw new Error("restoration revived stale capture or keyboard focus");
+  terminal.sendInput(`\x1b[<0;2;${targetY}M`);
+  terminal.sendInput("B");
+  if (keyEvents.join("") !== "AB") throw new Error("fresh visible interaction failed after Calm restoration");
+} finally { tui.stop(); }
+
+if (process.env.FM_PI_RENDER_PROOF_DIR) {
+  const proofDir = process.env.FM_PI_RENDER_PROOF_DIR;
+  mkdirSync(proofDir, { recursive: true });
+  writeFileSync(`${proofDir}/selection.json`, `${JSON.stringify(selectionProof, null, 2)}\n`);
+  writeFileSync(`${proofDir}/rows.json`, `${JSON.stringify(snapshots, null, 2)}\n`);
+  cpSync(exportedStock, `${proofDir}/stock.html`);
+  cpSync(exportedActual, `${proofDir}/actual.html`);
+  cpSync(session.getSessionFile(), `${proofDir}/synthetic-session.jsonl`);
 }
 JS
   )
@@ -5269,16 +6210,22 @@ EOF
   pass "an extension-registered provider resolves in the isolated branch runtime"
 }
 
+test_branch_mirror_filters_order_and_cursor
 test_outcomes_tool_uses_stock_execution_and_export_consumers
 test_real_pi_picker_primitives_stay_bounded_and_searchable
 test_branch_dispatch_two_stage_filter_and_prefix_contract
 test_requested_healthy_outcome_and_unsolicited_routine_outcome_delivery
 test_captain_outcome_is_exactly_once_across_crash_reload_and_unrelated_response
 test_captain_outcome_processing_turn_is_sequence_keyed_and_re_presented
+test_abbreviated_processing_request_points_to_full_outcome
+test_large_unprocessed_backlog_replays_in_batches
+test_undated_unprocessed_outcome_surfaces_and_stays_unprocessed
 test_branch_dispatch_classifies_main_only_rows_and_writes_the_eligible_snapshot
+test_branch_dispatch_routes_secondmate_signal_by_new_span
 test_branch_cache_key_is_per_home_stable
 test_branch_default_on_heartbeat_afk_and_fallback
 test_away_record_parks_main_and_presents_after_archive
+test_away_unchanged_held_outcome_reaches_the_captain_once_until_a_new_event
 test_away_only_wake_rejects_when_record_is_archived_before_drain
 test_away_claimed_heartbeat_on_a_task_wake_lifts_task_scoping
 test_branch_predrain_recheck_keeps_a_heartbeat_a_co_present_check_arrives_under
@@ -5290,7 +6237,6 @@ test_post_construction_provider_error_falls_back_latches_and_recovers_on_cooldow
 test_selection_change_does_not_corrupt_inflight_provider_state
 test_main_owned_grant_result_falls_back_to_main
 test_branch_predrain_recheck_noops_already_drained_wake
-test_branch_mirror_filters_order_and_cursor
 test_branch_mirror_reanchors_for_the_new_session_branch_conversation
 test_branch_session_is_new_at_every_main_session_start
 test_branch_model_pin_applies_and_absent_pin_keeps_the_default
@@ -5313,3 +6259,21 @@ test_delivery_keeps_the_event_loop_live_and_ordered
 test_session_replacement_during_delivery_neither_loses_nor_duplicates
 test_store_failure_during_delivery_neither_loses_nor_duplicates
 test_mark_read_failure_keeps_routine_redelivery_and_captain_deduplication
+
+test_quiet_is_present_across_posture_transitions() {
+  node --experimental-strip-types --input-type=module - "$ROOT" "$TMP_ROOT" <<'JS'
+import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+const [root, temp]=process.argv.slice(2);
+const { afkPostureRecordPresent }=await import(pathToFileURL(`${root}/.pi/extensions/lib/fm-branch-dispatch.ts`));
+const state=`${temp}/mode-transitions`; mkdirSync(state);
+if (afkPostureRecordPresent(state)) throw Error('absent posture must be present');
+for (const [record, away] of [['version: 2\nmode: quiet\n',false],['version: 2\nmode: away\n',true],['version: 1\n',true],['version: 2\nmode: quiet\n',false]]) {
+  writeFileSync(`${state}/.afk-contract`,record);
+  if (afkPostureRecordPresent(state)!==away) throw Error(`wrong posture for ${record}`);
+}
+rmSync(`${state}/.afk-contract`);
+if (afkPostureRecordPresent(state)) throw Error('return must be present');
+JS
+}
+test_quiet_is_present_across_posture_transitions

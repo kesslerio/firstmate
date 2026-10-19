@@ -39,10 +39,13 @@ FM_ROOT="${FM_ROOT_OVERRIDE:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 FM_HOME="${FM_HOME:-${FM_ROOT_OVERRIDE:-$FM_ROOT}}"
 DATA="${FM_DATA_OVERRIDE:-$FM_HOME/data}"
 REG="$DATA/secondmates.md"
+STATE="${FM_STATE_OVERRIDE:-$FM_HOME/state}"
 PROTOCOL=1
 
 # shellcheck source=bin/fm-secondmate-registry-lib.sh
 . "$SCRIPT_DIR/fm-secondmate-registry-lib.sh"
+. "$SCRIPT_DIR/fm-wake-lib.sh"
+. "$SCRIPT_DIR/fm-backend.sh"
 
 die() { printf 'error: %s\n' "$1" >&2; exit 1; }
 usage() { sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'; exit 2; }
@@ -72,6 +75,22 @@ LOCAL_COMMAND="$FM_ROOT/bin/$COMMAND"
   || die "remote command is not a genuine tracked executable in this Firstmate checkout: $COMMAND"
 git -C "$FM_ROOT" ls-files --error-unmatch "bin/$COMMAND" >/dev/null 2>&1 \
   || die "remote command is not tracked by this Firstmate checkout: $COMMAND"
+REGISTRY_LOCK=$(secondmate_registry_lock_path "$STATE")
+REGISTRY_OWNER=$(cat "$REGISTRY_LOCK/pid" 2>/dev/null || true)
+REGISTRY_INHERITED=0
+ANCESTOR=$PPID
+while [ "$ANCESTOR" -gt 1 ] 2>/dev/null; do
+  if [ "$ANCESTOR" = "$REGISTRY_OWNER" ]; then
+    REGISTRY_INHERITED=1
+    break
+  fi
+  ANCESTOR=$(ps -o ppid= -p "$ANCESTOR" 2>/dev/null | tr -d ' ') || break
+done
+if [ "$REGISTRY_INHERITED" -eq 0 ]; then
+  mkdir -p "$STATE"
+  fm_lock_acquire_wait_bounded "$REGISTRY_LOCK" 15 || die "remote registry could not be locked"
+  trap 'fm_lock_release "$REGISTRY_LOCK"' EXIT
+fi
 [ -f "$REG" ] && [ ! -L "$REG" ] || die "no safe secondmate registry at $REG"
 
 MATCHES=0
@@ -84,6 +103,7 @@ while IFS= read -r line || [ -n "$line" ]; do
   [ "$SECONDMATE_REGISTRY_REMOTE" -eq 1 ] || continue
   if [ "$SECONDMATE_REGISTRY_ID" = "$ROUTE" ] || [ "$SECONDMATE_REGISTRY_HOST" = "$ROUTE" ]; then
     MATCHES=$((MATCHES + 1))
+    MATCH_ID=$SECONDMATE_REGISTRY_ID
     HOST=$SECONDMATE_REGISTRY_HOST
     ROOT=$SECONDMATE_REGISTRY_ROOT
     HOME_PATH=$SECONDMATE_REGISTRY_HOME
@@ -99,6 +119,21 @@ for configured_path in "$ROOT" "$HOME_PATH"; do
   case "/$configured_path/" in */../*|*/./*) die "configured remote root or home contains traversal components" ;; esac
   case "$configured_path" in *'//'*) die "configured remote root or home contains an empty path component" ;; esac
 done
+
+META="$STATE/$MATCH_ID.meta"
+if [ -e "$META" ] || [ -L "$META" ]; then
+  [ -f "$META" ] && [ ! -L "$META" ] \
+    && [ "$(fm_meta_get "$META" kind)" = secondmate ] \
+    && [ "$(fm_meta_get "$META" remote_host)" = "$HOST" ] \
+    && [ "$(fm_meta_get "$META" remote_root)" = "$ROOT" ] \
+    && [ "$(fm_meta_get "$META" home)" = "$HOME_PATH" ] \
+    || die "task metadata does not identify the configured remote secondmate route for $MATCH_ID"
+fi
+
+if [ "$REGISTRY_INHERITED" -eq 0 ]; then
+  fm_lock_release "$REGISTRY_LOCK"
+  trap - EXIT
+fi
 
 ROOT_B64=$(printf '%s' "$ROOT" | encode_base64)
 HOME_B64=$(printf '%s' "$HOME_PATH" | encode_base64)
@@ -120,6 +155,7 @@ SSH_ARGS=(
   -- "$HOST" fm-remote-entrypoint.sh "$PROTOCOL" "$ROOT_B64" "$HOME_B64" "$ARGV_B64"
 )
 if [ "$STDIN_MODE" = caller ]; then
-  exec "$SSH_BIN" "${SSH_ARGS[@]}"
+  "$SSH_BIN" "${SSH_ARGS[@]}"
+  exit $?
 fi
-exec "$SSH_BIN" "${SSH_ARGS[@]}" < /dev/null
+"$SSH_BIN" "${SSH_ARGS[@]}" < /dev/null

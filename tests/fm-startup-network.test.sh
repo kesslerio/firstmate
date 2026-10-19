@@ -17,14 +17,22 @@
 #     staying "in progress" forever
 #   - phase-aware single-flight: a covering worker is reused, while a later
 #     locked request supersedes an in-flight probe-only worker
+#   - a publish lock a live process holds past the budget ends the worker with a
+#     failed-rerun record instead of an unbounded wait
 set -u
 
 # shellcheck source=tests/lib.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+# shellcheck source=bin/fm-timeout-lib.sh
+. "$ROOT/bin/fm-timeout-lib.sh"
 
+FM_TEST_REAL_PS=$(command -v ps)
+export FM_TEST_REAL_PS
 TMP_ROOT=$(fm_test_tmproot fm-startup-network-tests)
 DRAIN="$ROOT/bin/fm-wake-drain.sh"
 FM_TEST_CLEANUP_DIRS+=("$TMP_ROOT")
+FM_TEST_CHILD_REGISTRY="$TMP_ROOT/children"
+export FM_TEST_CHILD_REGISTRY
 trap fm_test_cleanup EXIT
 
 # new_world <name>: an FM_HOME plus a fake code root whose bin/ is a real
@@ -77,10 +85,10 @@ if [ "$pid" = "${FM_FAKE_HARNESS_PID:-}" ]; then
   case "$*" in
     *comm=*) printf '/usr/local/bin/claude\n' ;;
     *args=*) printf 'claude\n' ;;
-    *ppid=*) /bin/ps -o ppid= -p "$pid" ;;
+    *ppid=*) "$FM_TEST_REAL_PS" -o ppid= -p "$pid" ;;
   esac
 else
-  /bin/ps "$@"
+  "$FM_TEST_REAL_PS" "$@"
 fi
 SH
   chmod +x "$root/bin/ps"
@@ -128,6 +136,37 @@ wait_for_startup_network_wake() {  # <home> [tenths]
     waited=$((waited + 1))
   done
   grep -Fq $'check\tstartup-network' "$home/state/.wake-queue" 2>/dev/null
+}
+
+# hold_publish_lock <home>: take the stage's publish lock from a separate live
+# process, the way a harvest wedged on a stalled stdout holds it, and print that
+# holder's pid. The holder keeps the pid the lock records, so the lock's
+# stale-owner recovery never reclaims it while the test runs.
+hold_publish_lock() {  # <home>
+  local lock="$1/state/${2:-.startup-network.lock}" holder waited=0
+  FM_STATE_OVERRIDE="$1/state" FM_ROOT_OVERRIDE="$ROOT" bash -c '
+    . "$1/fm-wake-lib.sh"
+    fm_lock_try_acquire "$2" || exit 1
+    exec sleep 120' _ "$ROOT/bin" "$lock" >/dev/null 2>&1 </dev/null &
+  holder=$!
+  fm_test_track_child "$holder"
+  while [ "$(cat "$lock/pid" 2>/dev/null || true)" != "$holder" ] && [ "$waited" -lt 50 ]; do
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+  [ "$(cat "$lock/pid" 2>/dev/null || true)" = "$holder" ] \
+    || fail "could not hold the publish lock from a second process"
+  HOLDER_PID=$holder
+}
+
+# await_pid_exit <pid> <tenths>: true when the process exits inside the bound.
+await_pid_exit() {  # <pid> <tenths>
+  local waited=0
+  while kill -0 "$1" 2>/dev/null && [ "$waited" -lt "$2" ]; do
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+  ! kill -0 "$1" 2>/dev/null
 }
 
 # --- tests -------------------------------------------------------------------
@@ -565,7 +604,7 @@ EOF
     run_stage "$home" "$root" start --locked 1 --harvest-pid $$
   generation_one=$(sed -n 's/^generation=//p' "$home/state/.startup-network.status")
 
-  next_owner=$(/bin/ps -o ppid= -p $$ | tr -d ' ')
+  next_owner=$("$FM_TEST_REAL_PS" -o ppid= -p $$ | tr -d ' ')
   printf '%s\n' "$next_owner" > "$home/state/.lock"
   FM_FAKE_HARNESS_PID_OVERRIDE="$next_owner" FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_SLEEP=1 \
     run_stage "$home" "$root" start --locked 1 --harvest-pid $$
@@ -591,7 +630,7 @@ EOF
   done
   [ -s "$log" ] || fail "the mutating sweep never started"
 
-  next_owner=$(/bin/ps -o ppid= -p $$ | tr -d ' ')
+  next_owner=$("$FM_TEST_REAL_PS" -o ppid= -p $$ | tr -d ' ')
   started=$(date +%s)
   rc=0
   out=$(PATH="$root/bin:$PATH" FM_FAKE_HARNESS_PID="$next_owner" \
@@ -759,6 +798,404 @@ GITHUB_TOKEN=ghp_supersecretvalue" \
   pass "fm-startup-network: the timing artifact cannot carry a command line or forge records"
 }
 
+# A live holder of the publish lock used to keep the worker spinning for as long
+# as the lock stayed held - hours, when a harvest wedged on a stalled stdout -
+# with every result discarded at the end. Both the wait before the sweeps and
+# the publication wait after them must give up inside the worker's own budget,
+# record the failure the way `report` already reads a failed stage, and wake.
+test_a_held_publish_lock_cannot_keep_the_worker_alive_past_its_budget() {
+  local rec home root log holder began took rc report worker waited before queued watcher
+  rec=$(new_world held-lock)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+
+  # Before the sweeps: the lock is held before the worker even registers.
+  hold_publish_lock "$home"
+  holder=$HOLDER_PID
+  began=$(date +%s)
+  rc=0
+  report=$(fm_run_timed 15 env PATH="$root/bin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$root" \
+    FM_STARTUP_NETWORK_TIMEOUT=2 FM_SESSION_START_TIMEOUT=2 FM_FAKE_BOOTSTRAP_LOG="$log" \
+    "$root/bin/fm-startup-network.sh" run --locked 0 2>&1) || rc=$?
+  took=$(( $(date +%s) - began ))
+  [ "$rc" -ne 124 ] || fail "the worker was still waiting on the held publish lock 15s past a 2s budget"
+  [ "$rc" -ne 0 ] || fail "the worker reported success without ever taking the publish lock"
+  [ "$took" -le 6 ] || fail "the worker took ${took}s to give up on a 2s budget"
+  [ ! -f "$log" ] || fail "the sweeps ran even though the worker could not register itself"
+  assert_absent "$home/state/.startup-network.status" "an unregistered worker published a generation it never owned"
+  assert_contains "$report" "still held by pid $holder" \
+    "the failed record did not name the process holding the lock: $report"
+  assert_contains "$report" "fm-startup-network.sh run --locked 0" \
+    "the failed record did not say how to rerun the stage"
+  assert_absent "$home/state/.wake-queue" "an unregistered worker queued an unowned result"
+  kill "$holder" 2>/dev/null || true
+  wait "$holder" 2>/dev/null || true
+  await_pid_exit "$holder" 50 || fail "could not release the first lock holder"
+
+  # After the sweeps: the worker registers and sweeps freely, then finds the
+  # lock held when it comes to publish. What the sweeps produced must survive.
+  rm -f "$home/state/.wake-queue" "$log"
+  FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_SLEEP=2 FM_FAKE_BOOTSTRAP_OUT='PROBE_RAN' \
+    FM_STARTUP_NETWORK_TIMEOUT=10 FM_SESSION_START_TIMEOUT=2 \
+    run_stage "$home" "$root" start --locked 0 --harvest-pid 999999999
+  await_worker_record "$home"
+  worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+  waited=0
+  while [ ! -f "$log" ] && [ "$waited" -lt 50 ]; do
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+  [ -f "$log" ] || fail "the detached worker never started its sweep"
+  hold_publish_lock "$home"
+  holder=$HOLDER_PID
+  before=$(cksum "$home/state/.startup-network.status")
+  await_pid_exit "$worker" 100 \
+    || fail "the worker was still alive 10s after its sweep finished against a held publish lock (2s delivery budget)"
+  assert_equals "$before" "$(cksum "$home/state/.startup-network.status")" 'publication timeout wrote shared status without its lock'
+  assert_absent "$home/state/.startup-network.report" 'publication timeout wrote a shared report without its lock'
+  assert_absent "$home/state/.wake-queue" 'publication timeout queued a result without its lock'
+  report=$(run_stage "$home" "$root" report)
+  assert_contains "$report" "PROBE_RAN" \
+    "the sweep output was discarded when publication found the lock held: $report"
+  assert_contains "$report" "still held by pid $holder" \
+    "the unpublished result did not name the process holding the lock"
+  assert_contains "$report" 'publication is pending' 'the retained failure did not explain its unpublished state'
+  run_stage "$home" "$root" reconcile || fail 'busy publication reconciliation failed'
+  assert_equals "$before" "$(cksum "$home/state/.startup-network.status")" 'busy reconciliation changed the current status'
+  kill "$holder" 2>/dev/null || true
+  wait "$holder" 2>/dev/null || true
+  printf '#!/usr/bin/env bash\nexit 1\n' > "$root/bin/tmux"
+  chmod +x "$root/bin/tmux"
+  fm_test_track_watcher_state "$home/state"
+  PATH="$root/bin:$PATH" FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" FM_BACKEND=tmux \
+    FM_WATCH_HANDLING_SUCCESSOR=1 FM_POLL=.1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+    "$ROOT/bin/fm-watch.sh" > "$home/watch.out" 2> "$home/watch.err" &
+  watcher=$!
+  fm_test_track_child "$watcher" kill
+  await_pid_exit "$watcher" 100 || fail "watcher did not reconcile the retained result: $(cat "$home/watch.err")"
+  wait "$watcher" || fail "watcher could not deliver the retained result: $(cat "$home/watch.err")"
+  assert_contains "$(cat "$home/watch.out")" 'check: startup-network' 'watcher did not deliver the retained startup failure'
+  [ "$(sed -n 's/^state=//p' "$home/state/.startup-network.status")" = failed ] \
+    || fail "a worker that could not publish did not record a failed stage"
+  assert_grep 'check	startup-network' "$home/state/.wake-queue" \
+    "a result that could not be published under the lock did not surface to the agent"
+  report=$(run_stage "$home" "$root" report)
+  assert_contains "$report" PROBE_RAN 'promotion lost the failed sweep output'
+  queued=$(cksum "$home/state/.wake-queue")
+  run_stage "$home" "$root" reconcile || fail 'completed reconciliation was not idempotent'
+  assert_equals "$queued" "$(cksum "$home/state/.wake-queue")" 'reconciliation duplicated its failure notification'
+  pass "fm-startup-network: a held publish lock bounds the worker, retains its failure, and delivers once after release"
+}
+
+test_publication_timeout_cannot_write_after_generation_observation() {
+  local rec home root log worker holder before real_sed i rc
+  rec=$(new_world publication-observation-race)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+  real_sed=$(command -v sed)
+  cat > "$root/bin/sed" <<'SH'
+#!/usr/bin/env bash
+if [ "$#" -eq 3 ] && [ "$2" = 's/^generation=//p' ] && [ -e "$FM_HOME/block-generation-read" ]; then
+  observed=$("$FM_TEST_REAL_SED" "$@")
+  if mkdir "$FM_HOME/generation-read-claimed" 2>/dev/null; then
+    : > "$FM_HOME/generation-read-ready"
+    for ((i=0;i<750;i++)); do
+      if [ -e "$FM_HOME/generation-read-release" ]; then
+        printf '%s\n' "$observed"
+        exit 0
+      fi
+      sleep .02
+    done
+    exit 74
+  fi
+fi
+exec "$FM_TEST_REAL_SED" "$@"
+SH
+  chmod +x "$root/bin/sed"
+  FM_TEST_REAL_SED="$real_sed" FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_SLEEP=1 \
+    FM_SESSION_START_TIMEOUT=1 run_stage "$home" "$root" run --locked 0 > "$home/old.out" 2>&1 &
+  worker=$!
+  fm_test_track_child "$worker" kill
+  for ((i=0;i<150;i++)); do [ ! -s "$log" ] || break; sleep .02; done
+  [ -s "$log" ] || fail 'old publication probe never entered its sweep'
+  hold_publish_lock "$home"
+  holder=$HOLDER_PID
+  : > "$home/block-generation-read"
+  for ((i=0;i<250;i++)); do [ ! -e "$home/generation-read-ready" ] || break; sleep .02; done
+  [ -e "$home/generation-read-ready" ] || fail 'old publication did not reach its generation observation barrier'
+  kill -TERM "$holder"
+  wait "$holder" 2>/dev/null || true
+  FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" bash -c '
+    . "$1/bin/fm-wake-lib.sh"
+    fm_lock_try_acquire "$STATE/.startup-network.lock" || exit 1
+    trap '\''fm_lock_release "$STATE/.startup-network.lock"'\'' EXIT
+    printf "state=done\ngeneration=replacement\npid=0\n" > "$STATE/.startup-network.status"
+    for name in report timings delivered; do printf "replacement-%s\n" "$name" > "$STATE/.startup-network.$name"; done
+  ' _ "$ROOT" || fail 'replacement could not publish under its lock'
+  before=$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.startup-network.timings" "$home/state/.startup-network.delivered")
+  : > "$home/generation-read-release"
+  rc=0
+  wait "$worker" || rc=$?
+  [ "$rc" -ne 0 ] || fail 'old blocked publication reported success'
+  assert_equals "$before" "$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.startup-network.timings" "$home/state/.startup-network.delivered")" 'old publication overwrote replacement after its generation observation'
+  assert_absent "$home/state/.wake-queue" 'old publication queued an obsolete failure after replacement'
+  pass 'publication timeout cannot mutate a replacement installed after its generation observation'
+}
+
+test_harvest_does_not_inline_a_packet_completed_after_its_promotion_check() {
+  local rec home root log generation started pending real_cat harvest i
+  rec=$(new_world late-inline-packet)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+  generation=late-inline-packet
+  started=$(date +%s)
+  printf 'state=running\ngeneration=%s\npid=%s\nstarted=%s\nphases=probe\nlocked=0\n' "$generation" "$$" "$started" > "$home/state/.startup-network.status"
+  printf '%s\t%s\n' "$generation" "$$" > "$home/state/.startup-network.claim"
+  pending="$home/state/.startup-network-unpublished-$generation"
+  mkdir -m 700 "$pending"
+  printf 'LATE_PRIVATE_ACTIONABLE\n' > "$pending/report"
+  printf 'failed\nprobe\n0\n%s\n124\n' "$started" > "$pending/metadata"
+  real_cat=$(command -v cat)
+  FM_REAL_CAT=$real_cat
+  export FM_REAL_CAT
+  cat > "$root/bin/cat" <<'SH'
+#!/usr/bin/env bash
+if [ "$#" -eq 1 ] && [ "$1" = "$FM_HOME/state/.startup-network.claim" ]; then
+  : > "$FM_HOME/harvest-claim-read"
+  for ((i=0;i<750;i++)); do
+    [ ! -e "$FM_HOME/harvest-claim-release" ] || exec "$FM_TEST_REAL_CAT" "$@"
+    sleep .02
+  done
+  exit 74
+fi
+exec "$FM_TEST_REAL_CAT" "$@"
+SH
+  chmod +x "$root/bin/cat"
+  FM_TEST_REAL_CAT="$real_cat" run_stage "$home" "$root" harvest --pid "$$" > "$home/harvest.out" 2> "$home/harvest.err" &
+  harvest=$!
+  fm_test_track_child "$harvest" kill
+  for ((i=0;i<150;i++)); do [ ! -e "$home/harvest-claim-read" ] || break; sleep .02; done
+  [ -e "$home/harvest-claim-read" ] || fail 'harvest never reached its locked claim-read barrier'
+  : > "$pending/ready"
+  : > "$home/harvest-claim-release"
+  wait "$harvest" || fail "harvest failed at the packet handoff: $(cat "$home/harvest.err")"
+  rm -f "$root/bin/cat"
+  assert_not_contains "$(cat "$home/harvest.out")" LATE_PRIVATE_ACTIONABLE 'harvest printed a private result it could not acknowledge'
+  assert_absent "$home/state/.startup-network.delivered" 'unfinished harvest acknowledged an unpromoted result'
+  run_stage "$home" "$root" reconcile || fail 'late completed packet did not reconcile'
+  [ -f "$home/state/.wake-queue" ] || fail "late packet missing wake: state=$(cat "$home/state/.startup-network.status"); packet=$(ls "$pending" 2>/dev/null); harvest=$(cat "$home/harvest.out")"
+  assert_grep $'check\tstartup-network' "$home/state/.wake-queue" 'late private result was not delivered after harvest'
+  assert_contains "$(run_stage "$home" "$root" report)" LATE_PRIVATE_ACTIONABLE 'late promotion lost the actionable private result'
+  pass 'harvest never prints an unpromoted private packet that completes after its locked check'
+}
+
+test_watcher_ignores_superseded_private_packets() {
+  local rec home root log pending started before watcher i count real_bash
+  rec=$(new_world obsolete-private-packet)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+  started=$(date +%s)
+  printf 'state=done\ngeneration=replacement\npid=0\n' > "$home/state/.startup-network.status"
+  for name in report timings delivered; do printf 'replacement-%s\n' "$name" > "$home/state/.startup-network.$name"; done
+  pending="$home/state/.startup-network-unpublished-obsolete"
+  mkdir -m 700 "$pending"
+  printf 'OBSOLETE_PRIVATE_FAILURE\n' > "$pending/report"
+  printf 'failed\nprobe\n0\n%s\n124\n' "$started" > "$pending/metadata"
+  : > "$pending/ready"
+  before=$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.startup-network.timings" "$home/state/.startup-network.delivered" "$pending/report" "$pending/metadata")
+  real_bash=$(command -v bash)
+  cat > "$root/bin/bash" <<'PY'
+#!/usr/bin/env python3
+import os,sys
+with open(os.environ['FM_TEST_SHELL_CALLS'],'a') as stream:
+    stream.write(os.path.basename(sys.argv[1])+'\n' if len(sys.argv)>1 else '\n')
+os.execv(os.environ['FM_TEST_REAL_BASH'],[os.environ['FM_TEST_REAL_BASH'],*sys.argv[1:]])
+PY
+  printf '#!/usr/bin/env bash\nexit 1\n' > "$root/bin/tmux"
+  chmod +x "$root/bin/bash" "$root/bin/tmux"
+  fm_test_track_watcher_state "$home/state"
+  PATH="$root/bin:$PATH" FM_TEST_REAL_BASH="$real_bash" FM_TEST_SHELL_CALLS="$home/shell-calls" \
+    FM_HOME="$home" FM_STATE_OVERRIDE="$home/state" FM_BACKEND=tmux FM_WATCH_HANDLING_SUCCESSOR=1 \
+    FM_POLL=.1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+    "$ROOT/bin/fm-watch.sh" > "$home/watch.out" 2> "$home/watch.err" &
+  watcher=$!
+  fm_test_track_child "$watcher" kill
+  count=0
+  for ((i=0;i<100;i++)); do
+    count=$(grep -c '^fm-ready-review.sh$' "$home/shell-calls" 2>/dev/null || true)
+    [ "${count:-0}" -lt 3 ] || break
+    sleep .1
+  done
+  [ "${count:-0}" -ge 3 ] || fail "watcher did not complete repeated observations: $(cat "$home/watch.err")"
+  kill -TERM "$watcher"
+  wait "$watcher" 2>/dev/null || true
+  assert_no_grep fm-startup-network.sh "$home/shell-calls" 'watcher repeatedly launched publication for a superseded private packet'
+  assert_equals "$before" "$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.startup-network.timings" "$home/state/.startup-network.delivered" "$pending/report" "$pending/metadata")" 'obsolete packet polling changed replacement results or retained evidence'
+  assert_absent "$home/state/.wake-queue" 'obsolete private failure queued a replacement wake'
+  pass 'watcher keeps obsolete packet evidence without promoting it or repeatedly starting a publisher'
+}
+
+test_nested_wake_locks_share_delivery_deadline() {
+  local lock rec home root log worker holder report generation pending before
+  for lock in .wake-queue.lock .watcher-down.lock; do
+    rec=$(new_world "nested-$lock")
+    IFS='|' read -r home root log <<EOF
+$rec
+EOF
+    hold_publish_lock "$home" "$lock"
+    holder=$HOLDER_PID
+    FM_FAKE_BOOTSTRAP_LOG="$log" FM_FAKE_BOOTSTRAP_OUT=ACTIONABLE FM_STARTUP_NETWORK_TIMEOUT=10 FM_SESSION_START_TIMEOUT=2 \
+      run_stage "$home" "$root" start --locked 0 --harvest-pid 999999999
+    await_worker_record "$home"
+    worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+    generation=$(sed -n 's/^generation=//p' "$home/state/.startup-network.status")
+    await_pid_exit "$worker" 100 || fail "nested $lock exceeded delivery deadline"
+    report=$(run_stage "$home" "$root" report)
+    assert_contains "$report" ACTIONABLE "nested contention discarded pending output"
+    assert_absent "$home/state/.startup-network.delivered" "contention falsely acknowledged output"
+    pending="$home/state/.startup-network-unpublished-$generation"
+    assert_present "$pending/ready" "nested $lock lost the original generation's retry packet"
+    before=$(cksum "$log" "$home/state/.startup-network.report")
+    kill "$holder" 2>/dev/null || true
+    wait "$holder" 2>/dev/null || true
+    run_stage "$home" "$root" reconcile || fail "released $lock prevented original-generation reconciliation"
+    wait_for_startup_network_wake "$home" 100 || fail "released $lock prevented wake publication"
+    assert_equals "$generation" "$(sed -n 's/^generation=//p' "$home/state/.startup-network.status")" 'reconciliation replaced the original generation'
+    assert_equals "$before" "$(cksum "$log" "$home/state/.startup-network.report")" 'reconciliation reran the stage or changed its report'
+    assert_absent "$pending" 'successful retry retained a completed packet'
+    run_stage "$home" "$root" reconcile || fail 'idempotent reconciliation failed'
+    assert_equals 1 "$(awk -F '\t' '$3 == "check" && $4 == "startup-network" {n++} END {print n+0}' "$home/state/.wake-queue")" 'original result did not deliver exactly once'
+    mkdir -p "$pending"
+    printf 'done\nprobe\n0\n1\n0\n' > "$pending/metadata"
+    printf obsolete > "$pending/report"
+    : > "$pending/ready"
+    printf 'state=done\ngeneration=replacement\nreport_published=1\n' > "$home/state/.startup-network.status"
+    before=$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.wake-queue")
+    run_stage "$home" "$root" reconcile || fail 'stale-packet reconciliation failed'
+    assert_equals "$before" "$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.wake-queue")" 'obsolete packet changed the replacement or queued another wake'
+  done
+  pass 'startup wake queue and recovery locks share the remaining delivery deadline'
+}
+
+test_admission_observation_preserves_worker() {
+  local mode=$1 rec home root log starter worker i rc real_cat FM_REAL_CAT
+  rec=$(new_world "admission-$mode")
+  IFS='|' read -r home root log <<< "$rec"
+  real_cat=$(command -v cat)
+  cat > "$root/bin/cat" <<'SH'
+#!/usr/bin/env bash
+if [ "$#" = 1 ] && [ "$1" = "$FM_HOME/state/.startup-network.status" ] && [ -f "$FM_HOME/starter" ]; then
+  IFS= read -r starter < "$FM_HOME/starter"
+  if [ "$PPID" = "$starter" ] && mkdir "$FM_HOME/ack-read" 2>/dev/null; then
+    : > "$FM_HOME/ack-ready"
+    exec 9<> "$FM_HOME/ack-gate"
+    read -r -t 15 _ <&9 || exit 74
+    case "$FM_ACK_MODE" in unreadable|unknown) exit 74 ;; esac
+  fi
+fi
+exec "$FM_REAL_CAT" "$@"
+SH
+  chmod +x "$root/bin/cat"
+  cat > "$root/bin/fm-bootstrap.sh" <<'SH'
+#!/usr/bin/env bash
+kind=${FM_BOOTSTRAP_DETECT_ONLY:-0}
+printf '%s\n' "$$" > "$FM_HOME/bootstrap-$kind.pid"
+printf 'entered %s\n' "$kind" >> "$FM_FAKE_BOOTSTRAP_LOG"
+exec 9<> "$FM_HOME/bootstrap-$kind.gate"
+read -r -t 15 _ <&9 || exit 74
+: > "$FM_HOME/bootstrap-$kind.settled"
+SH
+  chmod +x "$root/bin/fm-bootstrap.sh"
+  mkfifo "$home/ack-gate" "$home/bootstrap-1.gate" "$home/bootstrap-0.gate"
+  FM_REAL_CAT="$real_cat" FM_ACK_MODE="$mode" FM_FAKE_BOOTSTRAP_LOG="$log" \
+    PATH="$root/bin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$root" FM_SESSION_START_TIMEOUT=8 \
+    bash -c 'printf "%s\n" "$$" > "$FM_HOME/starter"; exec "$1" start --locked 0' _ "$root/bin/fm-startup-network.sh" > "$home/start.out" 2>&1 &
+  starter=$!
+  fm_test_track_child "$starter" kill
+  for ((i=0;i<150;i++)); do [ ! -s "$log" ] || break; sleep .02; done
+  [ -s "$log" ] || fail 'admission: bootstrap never entered'
+  worker=$(sed -n 's/^pid=//p' "$home/state/.startup-network.status")
+  fm_test_track_child "$worker" kill
+  fm_test_track_child "$(cat "$home/bootstrap-1.pid")" kill
+  [ -e "$home/ack-ready" ] || fail 'admission: caller did not reach acknowledgment barrier'
+  assert_grep 'worker_started=1' "$home/state/.startup-network.status" 'admission: worker entry was not recorded before acknowledgment failure'
+  if [ "$mode" = unknown ]; then
+    sed '/^worker_started=/d' "$home/state/.startup-network.status" > "$home/status-without-entry"
+    mv "$home/status-without-entry" "$home/state/.startup-network.status"
+  fi
+  if [ "$mode" = superseded ]; then
+    printf '%s\n' "$$" > "$home/state/.lock"
+    FM_REAL_CAT="$real_cat" FM_ACK_MODE="$mode" FM_FAKE_BOOTSTRAP_LOG="$log" run_stage "$home" "$root" start --locked 1 || fail 'admission: locked upgrade failed'
+  fi
+  exec 9<> "$home/ack-gate"
+  printf 'release\n' >&9
+  exec 9>&-
+  rc=0
+  wait "$starter" || rc=$?
+  [ "$rc" -ne 0 ] || fail 'admission: unconfirmed entry reported success'
+  kill -0 "$worker" 2>/dev/null || fail 'admission: failed acknowledgment killed an admitted cleanup owner'
+  exec 9<> "$home/bootstrap-1.gate"
+  printf 'release\n' >&9
+  exec 9>&-
+  if [ "$mode" = superseded ]; then
+    for ((i=0;i<150;i++)); do [ ! -s "$home/bootstrap-0.pid" ] || break; sleep .02; done
+    [ -s "$home/bootstrap-0.pid" ] || fail 'admission: upgraded bootstrap did not enter'
+    fm_test_track_child "$(cat "$home/bootstrap-0.pid")" kill
+    exec 9<> "$home/bootstrap-0.gate"
+    printf 'release\n' >&9
+    exec 9>&-
+  fi
+  for ((i=0;i<250;i++)); do
+    [ "$(ps -o stat= -p "$worker" 2>/dev/null | tr -d ' ')" != Z ] || break
+    kill -0 "$worker" 2>/dev/null || break
+    sleep .02
+  done
+  case "$(ps -o stat= -p "$worker" 2>/dev/null)" in ''|*Z*) ;; *) fail 'admission: worker did not settle its bounded checks' ;; esac
+  [ -e "$home/bootstrap-1.settled" ] || fail 'admission: probe checks were orphaned'
+  if [ "$mode" = superseded ]; then
+    run_stage "$home" "$root" wait 10 >/dev/null || fail 'admission: upgraded worker did not publish'
+    [ -e "$home/bootstrap-0.settled" ] || fail 'admission: upgraded checks were orphaned'
+  fi
+  pass "startup $mode acknowledgment preserves admitted execution custody"
+}
+
+case ${FM_STARTUP_NETWORK_TEST_GROUP:-all} in
+  admission-superseded|admission-unreadable|admission-unknown)
+    test_admission_observation_preserves_worker "${FM_STARTUP_NETWORK_TEST_GROUP#admission-}"
+    exit 0 ;;
+  admission-custody)
+    test_admission_observation_preserves_worker superseded
+    test_admission_observation_preserves_worker unreadable
+    test_admission_observation_preserves_worker unknown
+    test_start_is_single_flight
+    test_locked_start_is_not_satisfied_by_an_inflight_probe
+    test_lock_takeover_stays_read_only_while_a_sweep_holds_the_lease
+    exit 0 ;;
+  nested-delivery)
+    test_nested_wake_locks_share_delivery_deadline
+    exit 0 ;;
+  inline-packet)
+    test_harvest_does_not_inline_a_packet_completed_after_its_promotion_check
+    test_watcher_ignores_superseded_private_packets
+    exit 0 ;;
+  publication-race)
+    test_publication_timeout_cannot_write_after_generation_observation
+    exit 0 ;;
+  pending-publication)
+    test_a_held_publish_lock_cannot_keep_the_worker_alive_past_its_budget
+    test_publication_timeout_cannot_write_after_generation_observation
+    test_harvest_does_not_inline_a_packet_completed_after_its_promotion_check
+    test_watcher_ignores_superseded_private_packets
+    exit 0 ;;
+esac
+
+test_admission_observation_preserves_worker superseded
+test_admission_observation_preserves_worker unreadable
+test_admission_observation_preserves_worker unknown
 test_wait_fails_without_a_published_stage
 test_start_returns_without_holding_the_callers_stdout
 test_harvest_acknowledgement_suppresses_the_wake_and_no_claim_produces_it
@@ -779,4 +1216,43 @@ test_records_share_one_origin_so_offsets_form_a_timeline
 test_timings_are_published_and_only_the_on_demand_report_prints_them
 test_a_bounded_run_still_publishes_the_timings_it_managed_to_record
 test_the_timing_artifact_cannot_carry_a_command_line_or_forge_records
+test_a_held_publish_lock_cannot_keep_the_worker_alive_past_its_budget
+test_publication_timeout_cannot_write_after_generation_observation
+test_harvest_does_not_inline_a_packet_completed_after_its_promotion_check
+test_watcher_ignores_superseded_private_packets
 echo "# fm-startup-network.test.sh: all assertions passed"
+
+
+test_nested_wake_locks_share_delivery_deadline
+
+
+test_superseded_worker_cannot_replace_a_completed_result() {
+  local rec home root log worker holder i before rc
+  rec=$(new_world completed-replacement)
+  IFS='|' read -r home root log <<EOF
+$rec
+EOF
+  env PATH="$root/bin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$root" \
+    FM_STARTUP_NETWORK_TIMEOUT=5 FM_SESSION_START_TIMEOUT=1 FM_FAKE_BOOTSTRAP_SLEEP=1 \
+    FM_FAKE_BOOTSTRAP_LOG="$log" "$root/bin/fm-startup-network.sh" run --locked 0 > "$home/old.out" 2>&1 &
+  worker=$!
+  fm_test_track_child "$worker" kill
+  for ((i=0;i<100;i++)); do [ ! -s "$log" ] || break; sleep .02; done
+  [ -s "$log" ] || fail 'old probe never entered the sweep'
+  hold_publish_lock "$home"
+  holder=$HOLDER_PID
+  printf 'state=finished\ngeneration=replacement\npid=0\n' > "$home/state/.startup-network.status"
+  printf replacement-report > "$home/state/.startup-network.report"
+  printf replacement-timings > "$home/state/.startup-network.timings"
+  printf replacement-delivery > "$home/state/.startup-network.delivered"
+  before=$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.startup-network.timings" "$home/state/.startup-network.delivered")
+  rc=0
+  wait "$worker" || rc=$?
+  [ "$rc" -ne 0 ] || fail 'superseded probe reported successful publication'
+  assert_equals "$before" "$(cksum "$home/state/.startup-network.status" "$home/state/.startup-network.report" "$home/state/.startup-network.timings" "$home/state/.startup-network.delivered")" 'superseded probe changed completed replacement files'
+  assert_absent "$home/state/.wake-queue" 'superseded probe queued obsolete failure'
+  kill -TERM "$holder" 2>/dev/null || true
+  wait "$holder" 2>/dev/null || true
+  pass 'publication timeout preserves completed replacement generation, results and delivery'
+}
+test_superseded_worker_cannot_replace_a_completed_result

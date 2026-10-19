@@ -42,6 +42,8 @@ set -u
 
 SEND="$ROOT/bin/fm-send.sh"
 DRAIN="$ROOT/bin/fm-wake-drain.sh"
+FM_TEST_REAL_SLEEP=$(command -v sleep)
+export FM_TEST_REAL_SLEEP
 
 TMP_ROOT=$(fm_test_tmproot fm-send-remote-delivery)
 TMP_ROOT=$(cd "$TMP_ROOT" && pwd)
@@ -92,6 +94,10 @@ esac
 exit 0
 SH
   chmod +x "$fb/tmux"
+  # The remote endpoint is a fixture, not an installed Herdr session. A failed
+  # best-effort doorbell must not start a real host-local backend daemon.
+  printf '#!/usr/bin/env bash\nexit 1\n' > "$fb/herdr"
+  chmod +x "$fb/herdr"
   cat > "$fb/sleep" <<'SH'
 #!/usr/bin/env bash
 exit 0
@@ -108,7 +114,7 @@ printf '%s\n' "$*" >> "$FM_SSH_LOG"
 if [ -n "${FM_FAKE_SSH_HANG:-}" ]; then
   # A busy remote lane: the transport attempt never returns on its own. The
   # real sleep, because the stubbed one on PATH returns immediately.
-  /bin/sleep "$FM_FAKE_SSH_HANG"
+  "$FM_TEST_REAL_SLEEP" "$FM_FAKE_SSH_HANG"
   exit 255
 fi
 if [ "${FM_FAKE_SSH_AFTER_AMBIGUOUS_RC:-0}" -ne 0 ] && [ "$count" -gt 1 ]; then
@@ -129,6 +135,14 @@ rargs=()
 while IFS= read -r -d '' a; do rargs+=("$a"); done \
   < <(perl -MMIME::Base64=decode_base64 -e 'print decode_base64($ARGV[0])' "$argv_b64")
 cmd=${rargs[0]}
+if [ "${rargs[1]:-}" = obligation-tick ] && [ -n "${FM_FAKE_OBLIGATION_READY:-}" ]; then
+  touch "$FM_FAKE_OBLIGATION_READY"
+  for ((attempt=0; attempt<100; attempt++)); do
+    [ ! -e "$FM_FAKE_OBLIGATION_RELEASE" ] || break
+    "$FM_TEST_REAL_SLEEP" .05
+  done
+  [ -e "$FM_FAKE_OBLIGATION_RELEASE" ] || exit 124
+fi
 rc=0
 env FM_HOME="$remote_home" FM_ROOT_OVERRIDE="$FM_REMOTE_CODE_ROOT" \
   "$FM_REMOTE_CODE_ROOT/bin/$cmd" "${rargs[@]:1}" || rc=$?
@@ -185,6 +199,7 @@ setup_remote_parent_home() {  # <name> <remote-home> -> echoes home dir
     "yolo=off" \
     "remote_host=remote-mac" \
     "remote_root=/remote/root" \
+    "home=$2" \
     "remote_backend=herdr" \
     "remote_herdr_session=fm-remote" \
     "remote_target=fm-remote:p1"
@@ -785,6 +800,78 @@ test_local_pending_does_not_close_resolve_key() {
   pass "fm-send local: an unconfirmed submit still never closes a --resolve-key decision"
 }
 
+test_remote_obligation_survives_ack_and_lost_reply() {
+  local dir fb ssh_log home rhome rec first second rc tick
+  dir="$TMP_ROOT/remote-obligation"; mkdir -p "$dir"
+  fb=$(make_stubs "$dir"); ssh_log="$dir/ssh.log"; : > "$ssh_log"
+  rhome=$(setup_remote_secondmate_home remote-obligation)
+  home=$(setup_remote_parent_home remote-obligation "$rhome")
+  printf 'spawn_gen=remote-generation-1\n' >> "$rhome/state/parent-route/rsm.meta"
+  rc=0
+  send_env "$fb" "$home" "$ssh_log" FM_FAKE_SSH_AMBIGUOUS=1 \
+    "$SEND" rsm 'Perform one exact operation' > "$dir/send.out" 2> "$dir/send.err" || rc=$?
+  [ "$rc" -ne 0 ] || fail 'lost remote replies must remain completion-unknown'
+  rec="$rhome/state/parent-route/rsm.inbox/001.msg"
+  [ -f "$rec" ] || fail "ambiguous transport did not create its single record: $(cat "$dir/send.err")"
+  first=$(send_env "$fb" "$home" "$ssh_log" "$ROOT/bin/fm-on.sh" rsm fm-remote-secondmate-control.sh obligations rsm) || fail 'remote query failed'
+  mv "$rec" "$rhome/state/parent-route/rsm.inbox/handled/"
+  second=$(send_env "$fb" "$home" "$ssh_log" "$ROOT/bin/fm-on.sh" rsm fm-remote-secondmate-control.sh obligations rsm) || fail 'handled remote query failed'
+  printf '%s\n%s' "$first" "$second" | python3 -c 'import json,sys; a=json.loads(sys.stdin.readline()); b=json.load(sys.stdin); assert len(a)==len(b)==1; assert a[0]["obligation"]==b[0]["obligation"]; assert b[0]["handled"] and b[0]["outstanding"]; assert b[0]["generation"]=="remote-generation-1"' \
+    || fail 'remote query lost exact identity across acknowledgment'
+  # A reply promise cannot suppress the independent obligation monitor.
+  printf 'report: acknowledged, I will do it\n' > "$home/state/rsm.status"
+  for tick in 1 2 3 4; do
+    send_env "$fb" "$home" "$ssh_log" FM_TASK_INBOX_OBLIGATION_GRACE_SECS=0 \
+      "$ROOT/bin/fm-task-inbox.sh" remote-tick rsm > "$dir/tick-$tick" || fail 'remote obligation observation failed'
+  done
+  [ "$(grep -c 'instruction execution unaccounted' "$home/state/.wake-queue" || true)" = 1 ] \
+    || fail "remote acknowledged obligation did not escalate exactly once: $(cat "$home/state/.wake-queue" 2>/dev/null)"
+  [ "$(find "$rhome/state/parent-route/rsm.inbox" -name '*.msg' | wc -l | tr -d ' ')" = 1 ] \
+    || fail 'remote observation replayed the instruction'
+  pass 'remote lost reply and handled acknowledgment retain one exact obligation; parent escalates once'
+  local observer sender attempt
+  send_env "$fb" "$home" "$ssh_log" FM_TASK_INBOX_OBLIGATION_GRACE_SECS=0 \
+    FM_FAKE_OBLIGATION_READY="$dir/query-ready" FM_FAKE_OBLIGATION_RELEASE="$dir/query-release" \
+    "$ROOT/bin/fm-task-inbox.sh" remote-tick rsm > "$dir/query-concurrent.out" 2> "$dir/query-concurrent.err" &
+  observer=$!
+  for ((attempt=0; attempt<100; attempt++)); do
+    [ ! -e "$dir/query-ready" ] || break
+    "$FM_TEST_REAL_SLEEP" .05
+  done
+  [ -e "$dir/query-ready" ] || { kill "$observer"; wait "$observer" || true; fail 'remote query never entered the controlled transport'; }
+  send_env "$fb" "$home" "$ssh_log" "$SEND" rsm 'Second instruction while prior observation runs' > "$dir/second.out" 2> "$dir/second.err" &
+  sender=$!
+  "$FM_TEST_REAL_SLEEP" .2
+  [ "$(find "$rhome/state/parent-route/rsm.inbox" -name '*.msg' | wc -l | tr -d ' ')" = 1 ] \
+    || { touch "$dir/query-release"; wait "$observer" "$sender" || true; fail 'concurrent send bypassed the query metadata lock'; }
+  touch "$dir/query-release"
+  wait "$observer" || fail "remote query failed: $(cat "$dir/query-concurrent.err")"
+  wait "$sender" || fail "serialized send failed: $(cat "$dir/second.err")"
+  python3 - "$home/state/.obligation-remote-rsm.json" <<'PYTEST'
+import json,sys
+assert json.load(open(sys.argv[1]))['outstanding'] is None
+PYTEST
+  [ "$(find "$rhome/state/parent-route/rsm.inbox" -name '*.msg' | wc -l | tr -d ' ')" = 2 ] || fail 'serialized new instruction was lost'
+  pass 'remote observation and new send serialize; older query cannot erase the new unknown-completion marker'
+  local outage
+  for outage in 1 2; do
+    for tick in 1 2 3; do
+      send_env "$fb" "$home" "$ssh_log" FM_TASK_INBOX_OBLIGATION_GRACE_SECS=0 FM_FAKE_SSH_RC=255 \
+        "$ROOT/bin/fm-task-inbox.sh" remote-tick rsm > "$dir/outage-$outage-$tick" || fail 'remote unknown observation failed'
+    done
+    [ "$(grep -c 'instruction obligation observation unknown' "$home/state/.wake-queue" || true)" = "$outage" ] \
+      || fail 'a separate remote outage was suppressed or continuous outage repeated'
+    send_env "$fb" "$home" "$ssh_log" FM_TASK_INBOX_OBLIGATION_GRACE_SECS=0 \
+      "$ROOT/bin/fm-task-inbox.sh" remote-tick rsm > "$dir/recovered-$outage" || fail 'positive remote reconciliation failed'
+  done
+  pass 'continuous remote outage deduplicates; a positively recovered route can escalate a later outage'
+}
+
+if [ "${FM_TEST_OBLIGATION_REMOTE_ONLY:-0}" = 1 ]; then
+  test_remote_obligation_survives_ack_and_lost_reply
+  exit 0
+fi
+
 test_remote_steer_lands_in_remote_inbox
 test_remote_rerun_is_idempotent
 test_remote_retry_failure_preserves_ambiguous_expectation
@@ -803,3 +890,21 @@ test_local_pending_does_not_close_resolve_key
 test_local_secondmate_pending_keeps_expectation_armed
 
 echo "all fm-send-remote-delivery tests passed"
+
+test_remote_obligation_survives_ack_and_lost_reply
+
+test_remote_route_disagreement_refuses_send() {
+  local dir fb ssh_log home rhome rc
+  dir="$TMP_ROOT/route-disagreement"; mkdir -p "$dir"
+  fb=$(make_stubs "$dir"); ssh_log="$dir/ssh.log"; : > "$ssh_log"
+  rhome=$(setup_remote_secondmate_home route-disagreement)
+  home=$(setup_remote_parent_home route-disagreement "$rhome")
+  printf 'remote_root=/foreign/root\n' >> "$home/state/rsm.meta"
+  rc=0
+  send_env "$fb" "$home" "$ssh_log" "$SEND" rsm 'must not reach the other route' > "$dir/out" 2> "$dir/err" || rc=$?
+  [ "$rc" -ne 0 ] || fail 'send accepted disagreement between registry and task route'
+  [ ! -s "$ssh_log" ] || fail 'denied route reached remote transport'
+  [ -z "$(remote_inbox_records "$rhome")" ] || fail 'denied route enqueued a remote instruction'
+  pass 'remote send refuses registry/task route disagreement before either transport attempt'
+}
+test_remote_route_disagreement_refuses_send
