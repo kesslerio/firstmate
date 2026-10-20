@@ -1,0 +1,9 @@
+head=4ace472d7cf98ffb12c9481092396bbeb3822bbe
+idle tmux=empty backend=empty guard=allow
+draft tmux=pending backend=pending guard=defer
+cleared tmux=empty backend=empty guard=allow
+
+profile rereads of live captured panes (cursor row 35):
+idle tmux=empty herdr=empty cmux-orca=empty
+draft tmux=pending herdr=pending cmux-orca=pending
+cleared tmux=empty herdr=empty cmux-orca=empty
