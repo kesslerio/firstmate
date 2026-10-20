@@ -1402,6 +1402,22 @@ $(fm_control_harness_wiring_paths "$(meta_value "$META" harness)" "$wt" "$STATE"
 EOF
 }
 
+# The OpenCode model pin is a worktree file a spawn wrote and recorded per
+# task, so only that record makes it firstmate's to remove; a project's own
+# .opencode/opencode.jsonc is left untouched. Retiring it matters beyond
+# tidiness: a returned pool slot is reused, and a stale pin would silently
+# model-pin a later launch that names no model at all.
+retire_opencode_model_pin() {  # <id> <worktree> <state-dir>
+  local id=$1 wt=$2 state=$3 path
+  while IFS= read -r path; do
+    [ -n "$path" ] || continue
+    case "$path" in "$wt"/*) rm -f -- "$path" ;; esac
+  done <<EOF
+$(fm_control_harness_wiring_paths opencode "$wt" "$state" "$id")
+EOF
+  rm -f -- "$state/$id.opencode-model-config"
+}
+
 require_orca_worktree_id() {
   local meta=$1 id
   id=$(meta_value "$meta" orca_worktree_id)
@@ -3361,6 +3377,7 @@ cleanup_firstmate_home_children() {
         rm -f "$child_wt/.claude/settings.local.json" "$child_wt/.opencode/plugins/fm-turn-end.js" \
           "$child_wt/.opencode/plugins/fm-busy-state.js" \
           "$child_wt/.fm-grok-turnend" "$child_wt/.fm-kimi-turnend"
+        retire_opencode_model_pin "$child_id" "$child_wt" "$STATE"
         if [ -n "$child_proj" ] && [ -d "$child_proj" ] && command -v treehouse >/dev/null 2>&1; then
           teardown_scrub_scratch_copy "$child_wt" || return 1
           child_pool_slot=0
@@ -3681,6 +3698,7 @@ if [ "$BACKEND" = orca ] && [ "$KIND" != secondmate ]; then
     rm -f "$WT/.claude/settings.local.json" "$WT/.opencode/plugins/fm-turn-end.js" \
       "$WT/.opencode/plugins/fm-busy-state.js" \
       "$WT/.fm-grok-turnend" "$WT/.fm-kimi-turnend"
+    retire_opencode_model_pin "$ID" "$WT" "$STATE"
     remove_harness_worktree_wiring "$WT"
   fi
   if [ -n "$T_ORCA" ]; then
@@ -3700,6 +3718,7 @@ elif [ -d "$WT" ] && [ "$KIND" != secondmate ]; then
   # Remove our hook file so a reused pool worktree cannot fire signals for a dead task.
   rm -f "$WT/.claude/settings.local.json" "$WT/.opencode/plugins/fm-turn-end.js" \
     "$WT/.fm-grok-turnend" "$WT/.fm-kimi-turnend"
+  retire_opencode_model_pin "$ID" "$WT" "$STATE"
   remove_harness_worktree_wiring "$WT"
   # Kills remaining processes in the worktree (including the agent), resets, returns
   # to pool. treehouse resolves the pool from the working directory, so run it from

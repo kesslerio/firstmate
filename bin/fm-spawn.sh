@@ -98,10 +98,22 @@
 #   from that harness's launch rather than guessed. Ultra is the explicit
 #   exception: bin/fm-harness.sh validate-native-effort owns its model scope;
 #   supported Pi launches receive --codex-effort ultra, never --thinking ultra.
-#   OpenCode has no interactive effort flag, so its effort is written as the
-#   build agent's variant, keyed to the resolved model, inside the
-#   OPENCODE_CONFIG_CONTENT JSON its launch already carries (config schema
-#   verified on opencode 1.18.32); without a model the axis is recorded but omitted.
+#   OpenCode's model axis is resolved against the INSTALLED build, because the
+#   two major versions select it differently. 2.x dropped the top-level --model
+#   flag (2.0.26 answers "Unrecognized flag: --model in command opencode") and
+#   resolves a worker's model only from configuration its own background
+#   service reads for the worker's directory - the launch's
+#   OPENCODE_CONFIG_CONTENT never reaches an already-running service - so on
+#   that build the model rides .opencode/opencode.jsonc written into the
+#   worktree. 1.x keeps the --model flag this launcher already passed (verified
+#   1.15.7 through 1.19.0). A build exposing neither surface is refused with
+#   its version and the exact reason rather than launched on its own default
+#   model, and every model-pinned launch then asserts that the worker's first
+#   recorded message actually used the requested model. Reasoning effort rides
+#   the same native model selection as its variant, keyed to the provider
+#   families that expose one; without a model the axis is recorded but omitted.
+#   .agents/skills/harness-adapters/references/harness/opencode.md owns the
+#   verified facts and docs/verification/runtime-backends.md the dated evidence.
 #   --backend <name> is the explicit runtime session-provider backend for this
 #   exact task only (docs/configuration.md "Runtime backend" owns when that flag
 #   is authorized). Without it, the script resolves FM_BACKEND, then
@@ -787,6 +799,8 @@ fm_backlog_directory_present "$STATE" "state directory" || {
 . "$SCRIPT_DIR/fm-remote-readiness-lib.sh"
 # shellcheck source=bin/fm-timeout-lib.sh
 . "$SCRIPT_DIR/fm-timeout-lib.sh"
+# shellcheck source=bin/fm-timing-lib.sh
+. "$SCRIPT_DIR/fm-timing-lib.sh"
 # shellcheck source=bin/fm-project-capacity-lib.sh
 . "$SCRIPT_DIR/fm-project-capacity-lib.sh"
 # shellcheck source=bin/fm-worker-account-lib.sh
@@ -2340,6 +2354,189 @@ agy_model_validate() {  # <agy-bin> <model>
   return 1
 }
 
+# OpenCode's model axis is the one launch axis whose shape the installed build
+# decides, so this block owns resolving it and every refusal that follows from
+# an unreadable surface. bin/fm-spawn.sh's header owns the rationale; a build's
+# own CLI output is the only authority consulted, never a version guess.
+OPENCODE_BIN=
+OPENCODE_VERSION=
+OPENCODE_MODEL_MECHANISM=
+
+# The top-level command's own flag list is where a 1.x build advertises --model.
+# A 2.x build advertises it only under `opencode run`, which is a different,
+# non-interactive command, so only a list-entry shape counts here.
+opencode_top_level_model_flag() {  # <help-text>
+  printf '%s\n' "$1" | grep -Eq '^[[:space:]]*--model([[:space:]]|,|$)'
+}
+
+# Sets OPENCODE_VERSION and OPENCODE_MODEL_MECHANISM (flag|project-config), or
+# refuses with the build's own identity so a supervisor never reads a model
+# problem as a wedged worker.
+opencode_resolve_model_mechanism() {  # <bin> <model>
+  local bin=$1 model=$2 version help bound
+  bound=${FM_OPENCODE_PROBE_TIMEOUT:-20}
+  case "$bound" in '' | 0* | *[!0-9]*) bound=20 ;; esac
+  version=$(fm_run_timed "$bound" "$bin" --version 2>/dev/null </dev/null) || version=
+  version=${version%%$'\n'*}
+  if [ -z "$version" ]; then
+    echo "error: 'opencode --version' produced no readable version through '$bin'; refusing to launch model '$model' on a build whose model surface cannot be identified, because an unidentified build would run the worker on its own default model" >&2
+    return 1
+  fi
+  OPENCODE_VERSION=$version
+  help=$(fm_run_timed "$bound" "$bin" --help 2>/dev/null </dev/null) || help=
+  if [ -z "$help" ]; then
+    echo "error: 'opencode --help' produced no output on $OPENCODE_VERSION; refusing to launch model '$model', because this launcher cannot tell whether that build accepts --model or resolves the model from the worker's project configuration" >&2
+    return 1
+  fi
+  if opencode_top_level_model_flag "$help"; then
+    OPENCODE_MODEL_MECHANISM=flag
+    echo "notice: $OPENCODE_VERSION selects model '$model' through the top-level --model flag" >&2
+  else
+    OPENCODE_MODEL_MECHANISM='project-config'
+    echo "notice: $OPENCODE_VERSION has no top-level --model flag; model '$model' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies" >&2
+  fi
+}
+
+# The provider-scoped variant list a model family exposes for reasoning effort.
+# Only the two families whose lists were verified are mapped; any other
+# provider keeps its own default rather than being guessed at.
+opencode_effort_variant() {  # <provider> <effort>
+  local provider=$1 effort=$2
+  [ -n "$effort" ] && [ "$effort" != default ] || return 0
+  case "$provider:$effort" in
+  anthropic:high | anthropic:max) printf '%s' "$effort" ;;
+  openai:low | openai:medium | openai:high | openai:xhigh) printf '%s' "$effort" ;;
+  esac
+}
+
+# OpenCode 2.x's native model selection (config schema identifier
+# Config.ModelSelection) as a JSON object body: provider and model ids, plus the
+# variant when the requested effort maps onto the provider's list. The CLI's own
+# `provider/model#variant` spelling is accepted and split, so a profile naming
+# the variant inline keeps working on both mechanism shapes.
+opencode_model_selection_json() {  # <model> <effort>
+  local model=$1 effort=$2 provider id variant json
+  case "$model" in
+  */*) ;;
+  *)
+    echo "error: OpenCode model '$model' is not a provider/model id; name one listed by 'opencode models' (for example opencode/<model-id>) or omit --model" >&2
+    return 1
+    ;;
+  esac
+  provider=${model%%/*}
+  id=${model#*/}
+  variant=
+  case "$id" in
+  *'#'*)
+    variant=${id#*#}
+    id=${id%%#*}
+    ;;
+  esac
+  if [ -z "$provider" ] || [ -z "$id" ]; then
+    echo "error: OpenCode model '$model' does not name both a provider and a model id; name one listed by 'opencode models' or omit --model" >&2
+    return 1
+  fi
+  [ -n "$variant" ] || variant=$(opencode_effort_variant "$provider" "$effort")
+  json=$(printf '"providerID":"%s","model":"%s"' "$(json_escape "$provider")" "$(json_escape "$id")")
+  [ -z "$variant" ] || json="$json,\"variant\":\"$(json_escape "$variant")\""
+  printf '{%s}' "$json"
+}
+
+# Renders a model object in the CLI's own provider/model#variant spelling, so a
+# pin, a request, and a session record can be compared as strings. The two
+# surfaces name the model id differently - a config selection carries `model`,
+# a recorded message carries `id` - so both are read here rather than at each
+# call site.
+opencode_model_ref() {  # <json model object>
+  local json=$1
+  [ -n "$json" ] || return 0
+  printf '%s' "$json" | jq -r 'if type == "object" and (.providerID // "") != "" and ((.id // .model // "") != "") then (.providerID + "/" + (.id // .model) + (if (.variant // "") != "" then "#" + .variant else "" end)) else empty end' 2>/dev/null
+}
+
+# Reads back the model the installed build itself parsed out of the worker's
+# project configuration. That read is both the pin's verification and the
+# warm-up that puts the service's config discovery ahead of the pane's first
+# prompt, which is the race that otherwise leaves a fresh worktree on the
+# build's default model.
+opencode_project_config_model() {  # <worktree> <config-file>
+  local wt=$1 file=$2 bound=${FM_OPENCODE_PROBE_TIMEOUT:-20} json real
+  case "$bound" in '' | 0* | *[!0-9]*) bound=20 ;; esac
+  real=$file
+  if [ -d "${file%/*}" ]; then
+    real=$(cd "${file%/*}" && pwd -P)/${file##*/}
+  fi
+  json=$(cd "$wt" && fm_run_timed "$bound" "$OPENCODE_BIN" debug config 2>/dev/null </dev/null) || json=
+  [ -n "$json" ] || return 1
+  printf '%s' "$json" | jq -r --arg p "$real" '[.[]? | select((.path // "") == $p) | .info.model // empty] | .[0] // empty | if type == "object" then (.providerID + "/" + (.id // .model) + (if (.variant // "") != "" then "#" + .variant else "" end)) else empty end' 2>/dev/null
+}
+
+# Pins the requested model for a worker on a build that reads the model from the
+# worker's project configuration, and refuses rather than launching when the pin
+# cannot be proven. The file it writes is recorded per task so retirement removes
+# only firstmate's own pin, never a project's configuration that predates it.
+opencode_pin_worktree_model() {  # <worktree> <model> <effort> <state-dir> <id>
+  local wt=$1 model=$2 effort=$3 state=$4 id=$5 dir file record selection requested observed
+  [ "$OPENCODE_MODEL_MECHANISM" = project-config ] || return 0
+  dir="$wt/.opencode"
+  file="$dir/opencode.jsonc"
+  record="$state/$id.opencode-model-config"
+  selection=$(opencode_model_selection_json "$model" "$effort") || return 1
+  requested=$(opencode_model_ref "$selection") || requested=
+  if [ -z "$requested" ]; then
+    echo "error: could not compose the OpenCode model selection for '$model' (effort '${effort:-none}')" >&2
+    return 1
+  fi
+  if [ -e "$file" ] || [ -L "$file" ]; then
+    # Ours from this task's earlier launch, or a file the project owns. Ours is
+    # rewritten so a relaunch can change the pin; a project's is never touched.
+    if [ -f "$record" ] && [ "$(cat "$record" 2>/dev/null)" = "$file" ]; then
+      :
+    else
+      observed=$(opencode_project_config_model "$wt" "$file") || observed=
+      if [ "$observed" != "$requested" ]; then
+        echo "error: this local copy already carries an OpenCode project configuration at $file whose model is '${observed:-unreadable}', not the requested '$requested'; refusing to overwrite a project-owned file - remove that file or drop --model for this task" >&2
+        return 1
+      fi
+      echo "notice: the project's own $file already selects '$requested'; keeping it as it is" >&2
+      return 0
+    fi
+  else
+    (umask 022 && mkdir -p "$dir") || {
+      echo "error: could not create $dir for the OpenCode model pin" >&2
+      return 1
+    }
+  fi
+  if ! printf '{"model":%s}\n' "$selection" >"$file"; then
+    echo "error: could not write the OpenCode model pin at $file" >&2
+    return 1
+  fi
+  printf '%s\n' "$file" >"$record" || return 1
+  exclude_path '.opencode/opencode.jsonc'
+  observed=$(opencode_project_config_model "$wt" "$file") || observed=
+  if [ "$observed" != "$requested" ]; then
+    echo "error: $OPENCODE_VERSION did not report the pinned model back from $file: '$OPENCODE_BIN debug config' reported '${observed:-nothing}' for the requested '$requested'; refusing to launch a worker that would run on this build's default model instead" >&2
+    return 1
+  fi
+  echo "notice: $OPENCODE_VERSION confirmed the model pin: requested=$requested observed=$observed" >&2
+}
+
+# The model the worker's own session record shows it actually used, in the same
+# provider/model#variant spelling. An unreadable or ambiguous read is a failure
+# at the call site, never a pass.
+opencode_session_model() {  # <worktree> <since-epoch-ms>
+  local wt=$1 since=$2 bound=${FM_OPENCODE_READ_TIMEOUT:-20} sessions sid exported real
+  case "$bound" in '' | 0* | *[!0-9]*) bound=20 ;; esac
+  case "$since" in '' | *[!0-9]*) return 1 ;; esac
+  real=$(cd "$wt" 2>/dev/null && pwd -P) || real=$wt
+  sessions=$(cd "$wt" && fm_run_timed "$bound" "$OPENCODE_BIN" session list --format json 2>/dev/null </dev/null) || return 1
+  [ -n "$sessions" ] || return 1
+  sid=$(printf '%s' "$sessions" | jq -r --arg d "$real" '[.[]? | select((.directory // "") == $d)] | sort_by(.updated // 0) | reverse | .[0].id // empty' 2>/dev/null) || return 1
+  [ -n "$sid" ] || return 1
+  exported=$(cd "$wt" && fm_run_timed "$bound" "$OPENCODE_BIN" session export "$sid" 2>/dev/null </dev/null) || return 1
+  [ -n "$exported" ] || return 1
+  printf '%s' "$exported" | jq -r --argjson since "$since" '[.messages[]? | select(.type == "assistant" and .model != null and ((.time.created // 0) >= $since)) | .model] | .[0] // empty | if type == "object" then (.providerID + "/" + (.id // .model) + (if (.variant // "") != "" then "#" + .variant else "" end)) else empty end' 2>/dev/null
+}
+
 # The verified launch command per adapter. The knowledge half of each adapter
 # (busy-state source, exit command, dialogs, quirks) lives in the harness-adapters skill.
 launch_template() {
@@ -2436,7 +2633,13 @@ launch_template() {
       printf '%s' 'codex __MODELFLAG____EFFORTFLAG__--dangerously-bypass-approvals-and-sandbox --disable hooks -c "notify=[\"bash\",\"-c\",\"touch __TURNEND__\"]" "$(__OPINPUT__ encode launch-brief < __BRIEF__)"'
     fi
     ;;
-  opencode) printf '%s' 'OPENCODE_CONFIG_CONTENT='\''{"permission":{"*":"allow"}__EFFORTFLAG__}'\'' opencode __MODELFLAG__--prompt "$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
+  # The blanket permission grant is byte-identical to what this launcher has
+  # always sent, on the captain's standing ruling that it stays; only the model
+  # axis changed shape, and on a build without the top-level flag the model now
+  # rides the worktree's project configuration instead of this assignment. What
+  # this assignment reaches is the client process, not an already-running
+  # OpenCode service, so it is unchanged rather than extended.
+  opencode) printf '%s' 'OPENCODE_CONFIG_CONTENT='\''{"permission":{"*":"allow"}}'\'' opencode __MODELFLAG__--prompt "$(__OPINPUT__ encode launch-brief < __BRIEF__)"' ;;
   pi | pi-signed)
     printf '%s' '__PIBIN____PITUIMODE____PIAPPROVE____PIEXCLUDE____PIRESUME__'
     if [ "$kind" = secondmate ]; then
@@ -2818,6 +3021,20 @@ polytoken)
     exit 1
   }
   ;;
+opencode)
+  # Resolved before any worktree or endpoint exists, so a build whose model
+  # surface this launcher does not understand refuses here instead of producing
+  # a worker that looks busy on a model nobody selected. A launch with no model
+  # requested, and a raw launch command, both keep their existing shape.
+  if [ -n "$MODEL" ] && [ "$MODEL" != default ] && [ "$RAW_LAUNCH" -eq 0 ]; then
+    OPENCODE_BIN=$(command -v opencode 2>/dev/null) || OPENCODE_BIN=
+    if [ -z "$OPENCODE_BIN" ]; then
+      echo "error: opencode executable not found on PATH; the model '$MODEL' cannot be pinned or verified, so this launch would leave the worker on its own default model - install OpenCode or omit --model" >&2
+      exit 1
+    fi
+    opencode_resolve_model_mechanism "$OPENCODE_BIN" "$MODEL" || exit 1
+  fi
+  ;;
 esac
 
 # config/secondmate-harness may carry optional model/effort tokens alongside the
@@ -3051,7 +3268,15 @@ model_flag_for_harness() {
   local harness=$1 model=$2
   [ -n "$model" ] && [ "$model" != default ] || return 0
   case "$harness" in
-  claude | codex | opencode | pi | pi-signed | grok | kimi | cursor | gemini | muse | rovo | omp | agy | devin | commandcode)
+  # OpenCode's model rides the command line only on the builds whose own CLI
+  # advertises the top-level flag; a 2.x build resolves it from the worktree's
+  # project configuration instead (opencode_pin_worktree_model), so passing the
+  # flag there is exactly the launch that build rejects.
+  opencode)
+    [ "$OPENCODE_MODEL_MECHANISM" = flag ] || return 0
+    printf -- '--model %s ' "$(shell_quote "$model")"
+    ;;
+  claude | codex | pi | pi-signed | grok | kimi | cursor | gemini | muse | rovo | omp | agy | devin | commandcode)
     printf -- '--model %s ' "$(shell_quote "$model")"
     ;;
   # polytoken encodes reasoning effort inside the model reference, so the
@@ -3130,35 +3355,14 @@ effort_flag_for_harness() {
     low | medium | high | xhigh | max) printf -- '--thinking %s ' "$(shell_quote "$effort")" ;;
     esac
     ;;
-  opencode)
-    # opencode's interactive `opencode --prompt` launch has no effort flag
-    # (`opencode run --variant` is a different, non-interactive mode). Its
-    # config schema (opencode 1.18.32, `opencode debug config` / config.json)
-    # carries per-model reasoning effort as agent.<name>.variant, "Default model
-    # variant for this agent (applies only when using the agent's configured
-    # model)", so the effort rides the OPENCODE_CONFIG_CONTENT JSON the launch
-    # already writes: the default build agent is pinned to the resolved model
-    # and the effort named as its variant, which OpenCode resolves against that
-    # model's own variant list. Those lists are per-provider (anthropic/* expose
-    # high|max, openai/* expose low|medium|high|xhigh), so emit the variant only
-    # when the resolved model's provider is known to expose that effort; any
-    # other provider, or an effort outside its family's list, keeps the
-    # permission-only launch and omits the variant (record-and-omit, as codex
-    # and grok do). Without a resolved model the variant has nothing to key to
-    # and is likewise omitted. The fragment lands inside the launch's
-    # single-quoted assignment, so a literal quote in the model id must close and
-    # reopen that quoting.
-    [ -n "$model" ] && [ "$model" != default ] || return 0
-    case "${model%%/*}:$effort" in
-    anthropic:high | anthropic:max) ;;
-    openai:low | openai:medium | openai:high | openai:xhigh) ;;
-    *) return 0 ;;
-    esac
-    local model_json
-    model_json=$(json_escape "$model")
-    model_json=${model_json//\'/\'\\\'\'}
-    printf ',"agent":{"build":{"model":"%s","variant":"%s"}}' "$model_json" "$effort"
-    ;;
+  # opencode deliberately has no arm here: its interactive `opencode --prompt`
+  # launch has no effort flag, and the effort now rides the same native model
+  # selection as its variant (opencode_model_selection_json), which is also the
+  # only place a 2.x build reads a model from at all. Those variant lists are
+  # per-provider (anthropic/* expose high|max, openai/* expose
+  # low|medium|high|xhigh), so the variant is emitted only for a provider known
+  # to expose that effort, and every other provider keeps its own default
+  # (record-and-omit, as codex and grok do).
   muse)
     # muse 0.1.0-R708.1 --reasoning-effort accepts none|minimal|low|medium|
     # high|xhigh|ultra and defaults to high, so low..xhigh map straight across.
@@ -4735,6 +4939,14 @@ kimi_spawn_fail() { # <detail>
   echo "error: $1; inspect window $T" >&2
 }
 
+# The OpenCode model pin is verified before launch and again from the worker's
+# own session record; a failure reports through this one line so a supervisor
+# reads a wrong-model refusal as a refused launch, never as a wedged worker.
+opencode_spawn_fail() { # <detail>
+  printf '%s\n' "$(status_stamp_line "failed: $1")" >>"$STATE/$ID.status"
+  echo "error: $1; inspect window $T" >&2
+}
+
 # rovo mirrors kimi's launch-then-send shape exactly: a positional brief is
 # dead-on-arrival, so rovo launches bare and takes its brief pointer only after a
 # readiness gate, then a delivery-confirmation gate. Both route their
@@ -5979,6 +6191,13 @@ fi
 "$SCRIPT_DIR/fm-home-summary-refresh.sh" --best-effort || true
 [ "$BACKEND" = orca ] && ORCA_ABORT_CLEANUP=0
 
+# Pin a model request onto a build that reads the model from the worker's
+# project configuration. Done here, where the final worktree is known and
+# before the launch is staged, so an unprovable pin refuses the spawn instead
+# of launching a worker on the build's default model.
+if [ "$HARNESS" = opencode ] && [ "$RAW_LAUNCH" -eq 0 ] && [ -n "$MODEL" ] && [ "$MODEL" != default ]; then
+  opencode_pin_worktree_model "$WT" "$MODEL" "$EFFORT" "$STATE_REAL" "$ID" || exit 1
+fi
 sq_brief=$(shell_quote "$BRIEF")
 sq_turnend=$(shell_quote "$TURNEND")
 sq_piext=$(shell_quote "$STATE/$ID.pi-ext.ts")
@@ -6397,6 +6616,10 @@ if [ "$ORCA_LAUNCH_ENV_ENABLED" = 1 ]; then
   # keep an errexit pane shell open in both cases.
   LAUNCH_SOURCE_TEXT="if [ -e $(shell_quote "$LAUNCH_FILE") ]; then $LAUNCH_SOURCE_TEXT || true; else echo 'error: private launch file was already removed; refusing worker launch' >&2; fi"
 fi
+# The instant this launch starts the worker, used by the OpenCode model
+# assertion below to tell this incarnation's first message from any earlier one
+# in the same session, because a relaunch continues the previous session.
+OPENCODE_ASSERT_SINCE=$(fm_timing_now_ms 2>/dev/null) || OPENCODE_ASSERT_SINCE=
 if ! spawn_send_literal "$T" "$LAUNCH_SOURCE_TEXT"; then
   [ "$ORCA_LAUNCH_ENV_ENABLED" != 1 ] || spawn_orca_launch_send_fail
   exit 1
@@ -6479,6 +6702,38 @@ fi
 # off exactly like the arm above. The failure detail names the one known
 # first-start blocker (the license dialog) so a supervisor can tell a
 # blocked launch from a wedged one.
+# OpenCode's model pin is only as good as the model the worker actually runs.
+# The session record OpenCode itself publishes is the structural proof: the
+# model on the worker's first message after this launch is compared with the
+# requested one, and an absent, unreadable, or different observation refuses
+# the spawn. This is what stops a wrong-model lane from looking healthy, which
+# is the failure a flagless 2.x launch produced silently before the pin.
+if [ "$HARNESS" = opencode ] && [ "$RAW_LAUNCH" -eq 0 ] && [ -n "$MODEL" ] && [ "$MODEL" != default ] && [ -n "$OPENCODE_MODEL_MECHANISM" ]; then
+  OPENCODE_ASSERT_POLLS=${FM_OPENCODE_MODEL_ASSERT_POLLS:-60}
+  case "$OPENCODE_ASSERT_POLLS" in '' | 0* | *[!0-9]*) OPENCODE_ASSERT_POLLS=60 ;; esac
+  OPENCODE_ASSERT_INTERVAL=${FM_OPENCODE_MODEL_ASSERT_INTERVAL:-1}
+  case "$OPENCODE_ASSERT_INTERVAL" in '' | 0* | *[!0-9]*) OPENCODE_ASSERT_INTERVAL=1 ;; esac
+  OPENCODE_REQUESTED=$(opencode_model_selection_json "$MODEL" "$EFFORT") || OPENCODE_REQUESTED=
+  OPENCODE_REQUESTED_MODEL=$(opencode_model_ref "$OPENCODE_REQUESTED") || OPENCODE_REQUESTED_MODEL=
+  OPENCODE_REQUESTED_MODEL=${OPENCODE_REQUESTED_MODEL%%#*}
+  OPENCODE_OBSERVED=
+  OPENCODE_ASSERT_I=0
+  while [ "$OPENCODE_ASSERT_I" -lt "$OPENCODE_ASSERT_POLLS" ]; do
+    OPENCODE_OBSERVED=$(opencode_session_model "$WT" "${OPENCODE_ASSERT_SINCE:-0}") || OPENCODE_OBSERVED=
+    [ -z "$OPENCODE_OBSERVED" ] || break
+    OPENCODE_ASSERT_I=$((OPENCODE_ASSERT_I + 1))
+    sleep "$OPENCODE_ASSERT_INTERVAL"
+  done
+  if [ -z "$OPENCODE_OBSERVED" ]; then
+    opencode_spawn_fail "OpenCode recorded no model this launcher could read for $ID's first message within $((OPENCODE_ASSERT_POLLS * OPENCODE_ASSERT_INTERVAL))s (requested model '$OPENCODE_REQUESTED_MODEL', $OPENCODE_VERSION); an unread model assertion is a failure, so the worker is not reported as launched on the requested model"
+    exit 1
+  fi
+  if [ "${OPENCODE_OBSERVED%%#*}" != "$OPENCODE_REQUESTED_MODEL" ]; then
+    opencode_spawn_fail "OpenCode ran $ID's first message on model '$OPENCODE_OBSERVED', not the requested '$OPENCODE_REQUESTED_MODEL' ($OPENCODE_VERSION); refusing the launch rather than leaving a wrong-model worker running"
+    exit 1
+  fi
+  echo "notice: $OPENCODE_VERSION model assertion passed for $ID: requested=$OPENCODE_REQUESTED_MODEL observed=$OPENCODE_OBSERVED" >&2
+fi
 if [ "$HARNESS" = polytoken ] && [ "$RAW_LAUNCH" -eq 0 ]; then
   if ! polytoken_wait_for_ready; then
     polytoken_spawn_fail "polytoken did not start processing its brief in window $T (a first-start license dialog is the one known blocker; it is never auto-accepted)"
