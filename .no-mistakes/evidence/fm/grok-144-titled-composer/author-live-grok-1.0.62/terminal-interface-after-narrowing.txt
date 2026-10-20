@@ -1,0 +1,127 @@
+=====================================================================
+Terminal-interface transcript - PUBLISHED HEAD (after narrowing) 5564c308
+repo root : ~/projects/firstmate/.worktrees/pr-6132-t3-20261013
+tmux      : tmux 3.6a
+=====================================================================
+
+rounded idle  (Grok 4.7 (high) - always-approve)
+  tmux-interface verdict : empty
+  input-guard            : allow
+  dispatcher (tmux)      : empty
+  cursorless herdr       : empty
+  cursorless cmux/orca   : empty
+  expected               : empty / allow
+
+light idle  (same aligned approval title, unproven border family)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+heavy idle  (same aligned approval title, unproven border family)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+double idle  (same aligned approval title, unproven border family)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+ascii idle  (same aligned approval title, unproven border family)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+rounded draft  (typed text in the proven composer)
+  tmux-interface verdict : pending
+  input-guard            : defer
+  dispatcher (tmux)      : pending
+  cursorless herdr       : pending
+  cursorless cmux/orca   : pending
+  expected               : pending / defer
+
+malformed title  (Grok 4.7 (high) · auto-approve)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+malformed title  (Grok 4.7 (high) · always-approve now)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+malformed title  (Other 4.7 (high) · always-approve)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+malformed title  (Grok 4.7 (turbo) · always-approve)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+malformed title  (unknown surface · mode)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+malformed title  (Grok 4.7 (high) · always-approve · extra)
+  tmux-interface verdict : unknown
+  input-guard            : defer
+  dispatcher (tmux)      : unknown
+  cursorless herdr       : unknown
+  cursorless cmux/orca   : unknown
+  expected               : unknown / defer
+
+legacy grok 1.0.5 three-column overhang title (no approval suffix)
+  tmux-interface verdict : empty
+  input-guard            : allow
+  dispatcher (tmux)      : empty
+  cursorless herdr       : empty
+  cursorless cmux/orca   : empty
+  expected               : empty / allow
+
+legacy aligned typed title without the approval suffix
+  tmux-interface verdict : empty
+  input-guard            : allow
+  dispatcher (tmux)      : empty
+  cursorless herdr       : empty
+  cursorless cmux/orca   : empty
+  expected               : empty / allow
+
+rounded idle, cursor on the bottom border
+  tmux-interface verdict : empty
+  input-guard            : allow
+  dispatcher (tmux)      : empty
+  cursorless herdr       : empty
+  cursorless cmux/orca   : empty
+  expected               : empty / allow
+
+END OF TRANSCRIPT

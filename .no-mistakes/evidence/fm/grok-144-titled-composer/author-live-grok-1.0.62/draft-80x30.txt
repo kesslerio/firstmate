@@ -1,0 +1,30 @@
+
+  …omposer worktree ~/p/f/.worktrees/pr-6132-t3-202… 1.8K / 256K │ [Dashboard]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ╭──────────────────────────────────────────────────────────────────────────╮
+  │ ❯ draft for composer safety validation                                   │
+  ╰─────────────────────────────────────── Grok 4.7 (high) · always-approve ─╯
+
+  Enter:send  │  Alt+Enter:newline  │  Shift+Tab:mode  │  Ctrl+x:shortcuts
+

@@ -1,0 +1,72 @@
+Grok 1.0.62 live composer evidence for PR kunchenguid/firstmate#6132
+Captured 2026-10-20 on zeppola, tmux 3.6a, against the real grok CLI.
+
+Provenance:
+- grok 1.0.62 (1474f9cbdd91) [stable], the machine's existing login. No credential was copied,
+  requested, or synthesized; no sign-in, sign-out, or credential-store edit was performed.
+- Launch: grok --always-approve --reasoning-effort high, as the session command on the private
+  fm-lab tmux socket inside a marked disposable lab home (bin/fm-lab-home.sh), from the PR
+  worktree, at 120x40. No model prompt was ever submitted, so no model tokens were spent.
+- Every verdict below comes from the REAL Firstmate terminal interface (bin/fm-tmux-lib.sh:
+  fm_tmux_composer_state, fm_pane_input_pending) and the REAL dispatcher
+  (bin/fm-backend.sh: fm_backend_composer_state tmux) reading a real captured tmux pane.
+- The "cursorless" rows re-read the very same captured pane through the herdr (styled=1) and
+  cmux/orca (styled=0) capability profiles, which is how every non-tmux backend reads it.
+  Those are capability-profile re-reads of a real capture, not launches of Herdr/cmux/orca.
+- The controlled-terminal-input rows at the end are real tmux panes rendering a written fixture.
+  They exercise the runtime input path, not a Grok release's own rendering, and are labelled as
+  controlled inputs.
+
+--- LIVE GROK 1.0.62 (real process, real pane) ---
+grok version: grok 1.0.62 (1474f9cbdd91) [stable]
+launch: grok --always-approve --reasoning-effort high  (machine's existing login; no credential copied)
+pane: 120x40 on the private fm-lab socket inside a marked disposable lab home
+idle wait: 1s, verdict=empty
+idle-120x40: tmux=empty dispatcher=empty input-guard=allow cursor-row=35
+idle-120x40 cursorless styled=1 verdict=empty (capability-profile re-read)
+idle-120x40 cursorless styled=0 verdict=empty (capability-profile re-read)
+idle pre-change classifier (before narrowing): empty
+draft-120x40: tmux=pending dispatcher=pending input-guard=defer cursor-row=35
+draft-120x40 cursorless styled=1 verdict=pending (capability-profile re-read)
+draft-120x40 cursorless styled=0 verdict=pending (capability-profile re-read)
+cleared-120x40: tmux=empty dispatcher=empty input-guard=allow cursor-row=35
+cleared-120x40 cursorless styled=1 verdict=empty (capability-profile re-read)
+cleared-120x40 cursorless styled=0 verdict=empty (capability-profile re-read)
+idle-80x30: tmux=empty dispatcher=empty input-guard=allow cursor-row=25
+idle-80x30 cursorless styled=1 verdict=empty (capability-profile re-read)
+idle-80x30 cursorless styled=0 verdict=empty (capability-profile re-read)
+draft-80x30: tmux=pending dispatcher=pending input-guard=defer cursor-row=25
+draft-80x30 cursorless styled=1 verdict=pending (capability-profile re-read)
+draft-80x30 cursorless styled=0 verdict=pending (capability-profile re-read)
+idle-220x50: tmux=empty dispatcher=empty input-guard=allow cursor-row=45
+idle-220x50 cursorless styled=1 verdict=empty (capability-profile re-read)
+idle-220x50 cursorless styled=0 verdict=empty (capability-profile re-read)
+draft-220x50: tmux=pending dispatcher=pending input-guard=defer cursor-row=45
+draft-220x50 cursorless styled=1 verdict=pending (capability-profile re-read)
+draft-220x50 cursorless styled=0 verdict=pending (capability-profile re-read)
+cleared-220x50: tmux=empty dispatcher=empty input-guard=allow cursor-row=45
+cleared-220x50 cursorless styled=1 verdict=empty (capability-profile re-read)
+cleared-220x50 cursorless styled=0 verdict=empty (capability-profile re-read)
+
+--- CLASSIFIER REPLAY on the same live capture ---
+Note: "pre-change classifier (before narrowing)" is the previous PUBLISHED head's classifier
+(the content of 7a49c661, rebased onto current main). It already carries the Grok approval-title
+feature, so it already reads the live ROUNDED capture as empty; the narrowing commit does not
+change the rounded family. What the narrowing removes is the unproven light / heavy / double
+families that the previous published head still accepted as empty. That before/after difference is
+proven by the separate terminal-interface transcript in this directory
+(light/heavy/double: empty/allow -> unknown/defer).
+idle-120x40 pre-change classifier (before narrowing): empty
+idle-120x40 current  classifier (published head) : empty
+draft-120x40 pre-change classifier (before narrowing): pending
+draft-120x40 current  classifier (published head) : pending
+
+--- CONTROLLED TERMINAL INPUTS (real panes, written fixtures) ---
+Controlled terminal input approval-mode: tmux=unknown input-guard=defer
+Controlled terminal input brand: tmux=unknown input-guard=defer
+Controlled terminal input effort: tmux=unknown input-guard=defer
+Controlled terminal input extra-dot: tmux=unknown input-guard=defer
+Controlled terminal input trailing: tmux=unknown input-guard=defer
+Controlled terminal input overhang: tmux=unknown input-guard=defer
+Controlled terminal input legacy-aligned: tmux=empty input-guard=allow
+Controlled terminal input legacy-overhang: tmux=empty input-guard=allow

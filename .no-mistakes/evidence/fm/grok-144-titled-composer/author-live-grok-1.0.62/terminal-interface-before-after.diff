@@ -1,0 +1,42 @@
+2,3c2,3
+< Terminal-interface transcript - PREVIOUS PUBLISHED HEAD (before narrowing) 9bfb1400
+< repo root : ~/projects/firstmate/.worktrees/pr-6132-before-t3-20261020
+---
+> Terminal-interface transcript - PUBLISHED HEAD (after narrowing) 5564c308
+> repo root : ~/projects/firstmate/.worktrees/pr-6132-t3-20261013
+16,20c16,20
+<   tmux-interface verdict : empty
+<   input-guard            : allow
+<   dispatcher (tmux)      : empty
+<   cursorless herdr       : empty
+<   cursorless cmux/orca   : empty
+---
+>   tmux-interface verdict : unknown
+>   input-guard            : defer
+>   dispatcher (tmux)      : unknown
+>   cursorless herdr       : unknown
+>   cursorless cmux/orca   : unknown
+24,28c24,28
+<   tmux-interface verdict : empty
+<   input-guard            : allow
+<   dispatcher (tmux)      : empty
+<   cursorless herdr       : empty
+<   cursorless cmux/orca   : empty
+---
+>   tmux-interface verdict : unknown
+>   input-guard            : defer
+>   dispatcher (tmux)      : unknown
+>   cursorless herdr       : unknown
+>   cursorless cmux/orca   : unknown
+32,36c32,36
+<   tmux-interface verdict : empty
+<   input-guard            : allow
+<   dispatcher (tmux)      : empty
+<   cursorless herdr       : empty
+<   cursorless cmux/orca   : empty
+---
+>   tmux-interface verdict : unknown
+>   input-guard            : defer
+>   dispatcher (tmux)      : unknown
+>   cursorless herdr       : unknown
+>   cursorless cmux/orca   : unknown
