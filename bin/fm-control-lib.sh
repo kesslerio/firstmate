@@ -519,7 +519,21 @@ fm_control_harness_wiring_paths() {  # <harness> <worktree> <state-dir> <id> [ki
         printf '%s\n' "$wt/.claude/settings.local.json"
       fi
       ;;
-    opencode) printf '%s\n' "$wt/.opencode/plugins/fm-busy-state.js" ;;
+    opencode)
+      printf '%s\n' "$wt/.opencode/plugins/fm-busy-state.js"
+      # A build without the top-level --model flag is pinned through the
+      # worktree's project configuration, and that file is retired only while
+      # this task's own record names it: a project's own
+      # .opencode/opencode.jsonc predates firstmate and is never its to remove.
+      # A stale pin must not outlive the task either, because a returned pool
+      # slot is reused and a later launch that names no model would silently
+      # inherit it.
+      if [ -f "$state/$id.opencode-model-config" ] &&
+        [ "$(cat "$state/$id.opencode-model-config" 2>/dev/null)" = "$wt/.opencode/opencode.jsonc" ]; then
+        printf '%s\n' "$wt/.opencode/opencode.jsonc"
+        printf '%s\n' "$state/$id.opencode-model-config"
+      fi
+      ;;
     pi|pi-signed) printf '%s\n' "$state/$id.pi-ext.ts" ;;
     omp) printf '%s\n' "$state/$id.omp-ext.ts" ;;
     grok)
