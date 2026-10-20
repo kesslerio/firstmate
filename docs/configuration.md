@@ -906,7 +906,7 @@ When it is absent or contains `default`, crewmates mirror the firstmate's own ha
 
 ### Choose the secondmate harness
 
-`config/secondmate-harness` is a separate local, gitignored file containing the adapter the primary uses to launch secondmate agents, optionally followed by model and effort tokens on the same line.
+`config/secondmate-harness` is a separate local, gitignored file containing the adapter the primary uses to launch secondmate agents, optionally followed by model and effort tokens on the same line. The file belongs to the primary, is not inherited by secondmate homes, and secondmates do not launch secondmates.
 Without a `mate <secondmate-id>:` declaration, the first non-empty, non-comment line supplies the default, parsed as `<harness> [<model>] [<effort>]`; later lines and additional tokens retain their legacy ignored behavior.
 With an override declaration, at most one non-empty, non-comment line without that prefix supplies the default.
 Any number of override lines can pin named secondmates rather than the whole home:
@@ -939,7 +939,7 @@ The regression coverage is in [`fm-secondmate-harness.test.sh`](../tests/fm-seco
 
 An explicit harness argument to `fm-spawn.sh` still overrides either config file for that spawn only.
 An explicit `--model` or `--effort` overrides the matching token from `config/secondmate-harness`; for a local route, an explicit harness or raw launch command starts with clean model and effort defaults unless those flags are also passed.
-An explicit harness also bypasses reading the pin file during spawn or control-plane relaunch, so malformed unused pin configuration cannot block that override.
+An explicit harness also bypasses reading the pin file during spawn or control-plane relaunch, so malformed unused pin configuration cannot block that override. A relaunch supplying explicit `--harness`, `--model`, and `--effort` therefore does not read this configuration.
 
 Remote secondmate routes accept verified harness adapters only and reject raw launch commands.
 When `config/crew-dispatch.json` exists, crewmate and scout spawns require an explicit resolved harness instead of automatically falling back to `config/crew-harness`.
@@ -1270,7 +1270,7 @@ Firstmate resolves the rule's profile object or array under `AGENTS.md` section 
 
 - When the file exists, `fm-spawn.sh` enforces that contract by refusing crewmate and scout spawns that lack an explicit harness (`--harness`, a positional adapter, or a raw launch command).
 - Batch spawns satisfy the same requirement with a shared `--harness`.
-- Secondmate spawns are exempt and still resolve through `config/secondmate-harness` and its optional model and effort tokens.
+- Secondmate spawns are exempt and resolve through `config/secondmate-harness` using the registered mate's id; see [Choose the secondmate harness](#choose-the-secondmate-harness) for pin precedence and legacy parsing.
 
 **Contract owners**
 
