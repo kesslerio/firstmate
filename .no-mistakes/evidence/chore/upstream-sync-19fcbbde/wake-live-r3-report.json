@@ -1,0 +1,223 @@
+[
+  {
+    "label": "pi-1.2.0",
+    "argv": [
+      "node",
+      "[private-host-path]",
+      "--mode",
+      "rpc",
+      "--no-session",
+      "--no-extensions",
+      "--no-mcp",
+      "--no-skills",
+      "--no-context-files",
+      "--no-prompt-templates",
+      "--no-themes",
+      "--offline",
+      "--no-approve",
+      "--model",
+      "probe-local/echo",
+      "-e",
+      "[candidate-checkout]/.pi/extensions/fm-branch-supervision.ts",
+      "-e",
+      "[candidate-checkout]/.pi/extensions/fm-primary-pi-watch.ts",
+      "-e",
+      "[evidence-directory]/wake-live-r3-probe.ts"
+    ],
+    "watch_extension_sha256": "d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221",
+    "branch_extension_sha256": "372f0ce16592b2785ef885c797246bceb2894c91c42778369a5fcc71066ac9cd",
+    "token": "[redacted-lab-token]",
+    "lab_home": "[evidence-directory]/wake-live-r3/pi-1.2.0/home",
+    "lab_marker": "fm-lab-home v1",
+    "tmux_tmpdir": "[temporary-lab-path]",
+    "check_register_exit": 0,
+    "check_register_out": "registered: state/waker3.check.sh\n",
+    "pi_pid": 1388134,
+    "driver_pid": 1387924,
+    "pi_pgid": 1388134,
+    "initial_state_success": true,
+    "generation_unchanged_during_custom": true,
+    "generation_before_custom": "sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\n1388134\ngeneration=1 phase=active\n",
+    "generation_after_custom": "sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\n1388134\ngeneration=1 phase=active\n",
+    "delivered_source": "extension",
+    "custom_equals_delivered": true,
+    "custom_had_no_prompt": true,
+    "custom_turn_start": true,
+    "marker_after_custom": "sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\n1388134\ngeneration=1 phase=active\n",
+    "marker_matches_worktree_extension": true,
+    "marker_pid_is_pi": true,
+    "queue_after_custom": "1792479254\t1\tcheck\t[evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh\tcheck: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\n",
+    "queue_has_owner_check": true,
+    "processes_after_custom": [
+      {
+        "pid": 1388134,
+        "cmd": "pi                                                                                                                                                                                                                                                                                                                                                                                                              "
+      },
+      {
+        "pid": 1389609,
+        "cmd": "bash [candidate-checkout]/bin/fm-watch-arm.sh --restart "
+      },
+      {
+        "pid": 1389644,
+        "cmd": "bash [candidate-checkout]/bin/fm-watch.sh "
+      }
+    ],
+    "watcher_cmds": [
+      {
+        "pid": 1389609,
+        "cmd": "bash [candidate-checkout]/bin/fm-watch-arm.sh --restart "
+      },
+      {
+        "pid": 1389644,
+        "cmd": "bash [candidate-checkout]/bin/fm-watch.sh "
+      }
+    ],
+    "drain_after_custom_exit": 0,
+    "drain_after_custom": "1792479254\t1\tcheck\t[evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh\tcheck: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\nWAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1388615.1792479254.RFFrDo\nWARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.\n",
+    "queue_after_drain": "1792479254\t1\tcheck\t[evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh\tcheck: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\n",
+    "custom_did_not_ack": true,
+    "handoff_at_replay": {
+      "version": 2,
+      "pending": [
+        {
+          "version": 1,
+          "token": "[redacted-lab-token]",
+          "message": "check: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token",
+          "predecessorArmPid": "1388599"
+        }
+      ]
+    },
+    "replay_text_equals_held": true,
+    "generation_at_replay": "sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\n1388134\ngeneration=2 phase=active\n",
+    "user_prompt_equals_wake": true,
+    "user_turn_start_count": 2,
+    "handoff_pending_undelivered": true,
+    "generation_progressed": true,
+    "handoff_after_user": "",
+    "queue_after_user": "1792479254\t1\tcheck\t[evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh\tcheck: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\n",
+    "extension_log": "2026-10-20T06:54:15.063Z pid=1388134 restore attempt=0 predecessor=1388599 start=ok pid=1389609\n2026-10-20T06:54:15.401Z pid=1388134 confirm generation=1388615.1792479254.RFFrDo watcherPid=1389644 result=confirmed\n2026-10-20T06:54:16.972Z pid=1388134 restore attempt=0 predecessor=1388599 start=ok pid=1391458\n2026-10-20T06:54:17.400Z pid=1388134 confirm generation=1388615.1792479254.RFFrDo watcherPid=1391677 result=confirmed\n",
+    "user_consumed_handoff": true,
+    "queue_still_unacked_after_user": true,
+    "assertions_passed": true,
+    "status": "completed",
+    "exit": -15,
+    "stderr_has_typeerror": false,
+    "stderr_tail": "",
+    "probe_log": "{\"t\":1792479254038,\"event\":\"factory\",\"provider\":\"probe-local\",\"model\":\"echo\"}\n{\"t\":1792479255412,\"event\":\"input\",\"source\":\"extension\",\"matches\":true,\"heldDelivery\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\",\"text\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\"}\n{\"t\":1792479255413,\"event\":\"custom-hold-begin\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479255420,\"event\":\"custom-hold-accepted\",\"generationBefore\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\",\"generationAfter\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\",\"generationUnchanged\":true,\"handoff\":null}\n{\"t\":1792479255420,\"event\":\"custom-held-complete\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\",\"handoff\":null}\n{\"t\":1792479255447,\"event\":\"before_agent_start\",\"messageType\":\"custom\",\"hasPrompt\":false,\"prompt\":null,\"customType\":\"fm-probe\",\"customContent\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\",\"customEqualsHeld\":true,\"promptEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479255449,\"event\":\"turn_start\",\"turnIndex\":0,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479255450,\"event\":\"message_start\",\"role\":\"system\",\"customType\":null,\"content\":\"\",\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479255450,\"event\":\"message_start\",\"role\":\"custom\",\"customType\":\"fm-probe\",\"content\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\",\"contentEqualsHeld\":true,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479255453,\"event\":\"message_start\",\"role\":\"assistant\",\"customType\":null,\"content\":null,\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479255536,\"event\":\"agent_end\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=1 phase=active\\n\",\"handoff\":null}\n{\"t\":1792479256578,\"event\":\"factory\",\"provider\":\"probe-local\",\"model\":\"echo\"}\n{\"t\":1792479257407,\"event\":\"input\",\"source\":\"extension\",\"matches\":true,\"heldDelivery\":true,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=2 phase=active\\n\",\"text\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\"}\n{\"t\":1792479257407,\"event\":\"user-boundary-released\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=2 phase=active\\n\",\"handoff\":{\"version\":2,\"pending\":[{\"version\":1,\"token\":\"1388134-1792479255029-1\",\"message\":\"check: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\",\"predecessorArmPid\":\"1388599\"}]},\"textEqualsHeld\":true}\n{\"t\":1792479257444,\"event\":\"before_agent_start\",\"messageType\":\"user\",\"hasPrompt\":true,\"prompt\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.2.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\",\"customType\":null,\"customContent\":null,\"customEqualsHeld\":false,\"promptEqualsHeld\":true,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479257445,\"event\":\"turn_start\",\"turnIndex\":0,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479257445,\"event\":\"message_start\",\"role\":\"system\",\"customType\":null,\"content\":\"\",\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479257445,\"event\":\"message_start\",\"role\":\"user\",\"customType\":null,\"content\":null,\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479257446,\"event\":\"message_start\",\"role\":\"assistant\",\"customType\":null,\"content\":null,\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479257534,\"event\":\"agent_end\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1388134\\ngeneration=2 phase=active\\n\",\"handoff\":null}\n",
+    "remaining_lab_processes": [],
+    "socket_dir_removed": true,
+    "home_removed": true
+  },
+  {
+    "label": "pi-1.3.0",
+    "argv": [
+      "pi",
+      "--mode",
+      "rpc",
+      "--no-session",
+      "--no-extensions",
+      "--no-mcp",
+      "--no-skills",
+      "--no-context-files",
+      "--no-prompt-templates",
+      "--no-themes",
+      "--offline",
+      "--no-approve",
+      "--model",
+      "probe-local/echo",
+      "-e",
+      "[candidate-checkout]/.pi/extensions/fm-branch-supervision.ts",
+      "-e",
+      "[candidate-checkout]/.pi/extensions/fm-primary-pi-watch.ts",
+      "-e",
+      "[evidence-directory]/wake-live-r3-probe.ts"
+    ],
+    "watch_extension_sha256": "d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221",
+    "branch_extension_sha256": "372f0ce16592b2785ef885c797246bceb2894c91c42778369a5fcc71066ac9cd",
+    "token": "[redacted-lab-token]",
+    "lab_home": "[evidence-directory]/wake-live-r3/pi-1.3.0/home",
+    "lab_marker": "fm-lab-home v1",
+    "tmux_tmpdir": "[temporary-lab-path]",
+    "check_register_exit": 0,
+    "check_register_out": "registered: state/waker3.check.sh\n",
+    "pi_pid": 1393010,
+    "driver_pid": 1387924,
+    "pi_pgid": 1393010,
+    "initial_state_success": true,
+    "generation_unchanged_during_custom": true,
+    "generation_before_custom": "sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\n1393010\ngeneration=1 phase=active\n",
+    "generation_after_custom": "sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\n1393010\ngeneration=1 phase=active\n",
+    "delivered_source": "extension",
+    "custom_equals_delivered": true,
+    "custom_had_no_prompt": true,
+    "custom_turn_start": true,
+    "marker_after_custom": "sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\n1393010\ngeneration=1 phase=active\n",
+    "marker_matches_worktree_extension": true,
+    "marker_pid_is_pi": true,
+    "queue_after_custom": "1792479259\t1\tcheck\t[evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh\tcheck: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\n",
+    "queue_has_owner_check": true,
+    "processes_after_custom": [
+      {
+        "pid": 1393010,
+        "cmd": "pi                                                                                                                                                                                                                                                                                                                                                                                                              "
+      },
+      {
+        "pid": 1394657,
+        "cmd": "bash [candidate-checkout]/bin/fm-watch-arm.sh --restart "
+      },
+      {
+        "pid": 1394673,
+        "cmd": "bash [candidate-checkout]/bin/fm-watch.sh "
+      },
+      {
+        "pid": 1395126,
+        "cmd": "sleep 2 "
+      }
+    ],
+    "watcher_cmds": [
+      {
+        "pid": 1394657,
+        "cmd": "bash [candidate-checkout]/bin/fm-watch-arm.sh --restart "
+      },
+      {
+        "pid": 1394673,
+        "cmd": "bash [candidate-checkout]/bin/fm-watch.sh "
+      }
+    ],
+    "drain_after_custom_exit": 0,
+    "drain_after_custom": "1792479259\t1\tcheck\t[evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh\tcheck: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\nWAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1393470.1792479259.3DsVOf\nWARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.\n",
+    "queue_after_drain": "1792479259\t1\tcheck\t[evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh\tcheck: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\n",
+    "custom_did_not_ack": true,
+    "handoff_at_replay": {
+      "version": 2,
+      "pending": [
+        {
+          "version": 1,
+          "token": "[redacted-lab-token]",
+          "message": "check: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token",
+          "predecessorArmPid": "1393445"
+        }
+      ]
+    },
+    "replay_text_equals_held": true,
+    "generation_at_replay": "sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\n1393010\ngeneration=2 phase=active\n",
+    "user_prompt_equals_wake": true,
+    "user_turn_start_count": 2,
+    "handoff_pending_undelivered": true,
+    "generation_progressed": true,
+    "handoff_after_user": "",
+    "queue_after_user": "1792479259\t1\tcheck\t[evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh\tcheck: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\n",
+    "extension_log": "2026-10-20T06:54:19.671Z pid=1393010 restore attempt=0 predecessor=1393445 start=ok pid=1394657\n2026-10-20T06:54:20.006Z pid=1393010 confirm generation=1393470.1792479259.3DsVOf watcherPid=1394673 result=confirmed\n2026-10-20T06:54:21.542Z pid=1393010 restore attempt=0 predecessor=1393445 start=ok pid=1396270\n2026-10-20T06:54:21.980Z pid=1393010 confirm generation=1393470.1792479259.3DsVOf watcherPid=1396503 result=confirmed\n",
+    "user_consumed_handoff": true,
+    "queue_still_unacked_after_user": true,
+    "assertions_passed": true,
+    "status": "completed",
+    "exit": -15,
+    "stderr_has_typeerror": false,
+    "stderr_tail": "",
+    "probe_log": "{\"t\":1792479258570,\"event\":\"factory\",\"provider\":\"probe-local\",\"model\":\"echo\"}\n{\"t\":1792479260016,\"event\":\"input\",\"source\":\"extension\",\"matches\":true,\"heldDelivery\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\",\"text\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\"}\n{\"t\":1792479260016,\"event\":\"custom-hold-begin\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479260020,\"event\":\"custom-hold-accepted\",\"generationBefore\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\",\"generationAfter\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\",\"generationUnchanged\":true,\"handoff\":null}\n{\"t\":1792479260020,\"event\":\"custom-held-complete\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\",\"handoff\":null}\n{\"t\":1792479260049,\"event\":\"before_agent_start\",\"messageType\":\"custom\",\"hasPrompt\":false,\"prompt\":null,\"customType\":\"fm-probe\",\"customContent\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\",\"customEqualsHeld\":true,\"promptEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479260051,\"event\":\"turn_start\",\"turnIndex\":0,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479260051,\"event\":\"message_start\",\"role\":\"system\",\"customType\":null,\"content\":\"\",\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479260051,\"event\":\"message_start\",\"role\":\"custom\",\"customType\":\"fm-probe\",\"content\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\",\"contentEqualsHeld\":true,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479260054,\"event\":\"message_start\",\"role\":\"assistant\",\"customType\":null,\"content\":null,\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\"}\n{\"t\":1792479260134,\"event\":\"agent_end\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=1 phase=active\\n\",\"handoff\":null}\n{\"t\":1792479261161,\"event\":\"factory\",\"provider\":\"probe-local\",\"model\":\"echo\"}\n{\"t\":1792479261989,\"event\":\"input\",\"source\":\"extension\",\"matches\":true,\"heldDelivery\":true,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=2 phase=active\\n\",\"text\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\"}\n{\"t\":1792479261989,\"event\":\"user-boundary-released\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=2 phase=active\\n\",\"handoff\":{\"version\":2,\"pending\":[{\"version\":1,\"token\":\"1393010-1792479259633-1\",\"message\":\"check: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\",\"predecessorArmPid\":\"1393445\"}]},\"textEqualsHeld\":true}\n{\"t\":1792479262028,\"event\":\"before_agent_start\",\"messageType\":\"user\",\"hasPrompt\":true,\"prompt\":\"\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: [evidence-directory]/wake-live-r3/pi-1.3.0/home/state/waker3.check.sh: r3-controlled-wake-token\\n\\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.\",\"customType\":null,\"customContent\":null,\"customEqualsHeld\":false,\"promptEqualsHeld\":true,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479262029,\"event\":\"turn_start\",\"turnIndex\":0,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479262029,\"event\":\"message_start\",\"role\":\"system\",\"customType\":null,\"content\":\"\",\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479262029,\"event\":\"message_start\",\"role\":\"user\",\"customType\":null,\"content\":null,\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479262030,\"event\":\"message_start\",\"role\":\"assistant\",\"customType\":null,\"content\":null,\"contentEqualsHeld\":false,\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=2 phase=active\\n\"}\n{\"t\":1792479262126,\"event\":\"agent_end\",\"generation\":\"sha256:d2dc1574fe54dd462c7abb5f7f38ba99a5930d13ec967738157f5beb79b12221\\n1393010\\ngeneration=2 phase=active\\n\",\"handoff\":null}\n",
+    "remaining_lab_processes": [],
+    "socket_dir_removed": true,
+    "home_removed": true
+  }
+]

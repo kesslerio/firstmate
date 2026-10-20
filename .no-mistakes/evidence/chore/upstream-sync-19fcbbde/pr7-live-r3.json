@@ -1,0 +1,9 @@
+{
+  "baseRefName": "main",
+  "headRefName": "chore/upstream-sync-19fcbbde",
+  "headRefOid": "19fcbbde12c4e916e0d5faa60c399d2fd2845740",
+  "isDraft": false,
+  "number": 7,
+  "state": "OPEN",
+  "title": "chore: publish inherited upstream through 19fcbbde plus Pi compatibility and CI test split"
+}

@@ -1,0 +1,14 @@
+label=pi-1.2.0 state=True marker=2679058 pi_pid=2679058 typeerror=False
+  custom_event=True accepted=True rejected=False
+  user_event=True accepted=True
+  user_messages=['[{"type": "text", "text": "GENUINE_CAPTAIN_PROMPT please acknowledge"}]']
+  custom_messages=[{'customType': 'fm-probe', 'content': 'CUSTOM_CAPTAIN_LOOKALIKE do not mirror this'}]
+  probe custom hasPrompt=False prompt=None custom='CUSTOM_CAPTAIN_LOOKALIKE do not mirror this'
+  probe user hasPrompt=True prompt='GENUINE_CAPTAIN_PROMPT please acknowledge' custom=None
+label=pi-1.3.0 state=True marker=2682172 pi_pid=2682172 typeerror=False
+  custom_event=True accepted=True rejected=False
+  user_event=True accepted=True
+  user_messages=['[{"type": "text", "text": "GENUINE_CAPTAIN_PROMPT please acknowledge"}]']
+  custom_messages=[{'customType': 'fm-probe', 'content': 'CUSTOM_CAPTAIN_LOOKALIKE do not mirror this'}]
+  probe custom hasPrompt=False prompt=None custom='CUSTOM_CAPTAIN_LOOKALIKE do not mirror this'
+  probe user hasPrompt=True prompt='GENUINE_CAPTAIN_PROMPT please acknowledge' custom=None

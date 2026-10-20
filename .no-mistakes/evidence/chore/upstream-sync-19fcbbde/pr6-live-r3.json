@@ -1,0 +1,9 @@
+{
+  "baseRefName": "main",
+  "headRefName": "fix/pi-sdk-supervision-integration",
+  "headRefOid": "1ec5f837a1c5ba2de3ccab7f8b62a0a364ebbbd8",
+  "isDraft": true,
+  "number": 6,
+  "state": "OPEN",
+  "title": "fix: recover stalled fleet work and preserve tool interaction"
+}

@@ -1,0 +1,35 @@
+default_before={"default":true,"name":"default","running":true,"session_dir":"[private-host-path]","socket_path":"[private-host-path]"}
+running_before=[{"name":"default","socket_path":"[private-host-path]"},{"name":"w2F","socket_path":"[private-host-path]"},{"name":"w8","socket_path":"[private-host-path]"}]
+lab_name=fm-lab-testval-2969162-6966
+fm-herdr-lab: refusing session name 'default'
+prepare_default_rc=1
+fm-herdr-lab: refusing session name 'default'
+teardown_default_rc=1
+fm-herdr-lab: run forbids a leading option before the Herdr subcommand; it could shift a server or session lifecycle operation past the guard or subvert session isolation
+run_leading_option_rc=1
+fm-herdr-lab: run forbids server operations; use provision for the named lab server
+run_server_stop_rc=1
+fm-herdr-lab: missing fleet-state tripwire for 'fm-lab-testval-2969162-6966'; refusing destructive calls
+teardown_unowned_rc=1
+provision_rc=0
+status_rc=0
+status={"client":{"version":"0.9.3","channel":"stable","protocol":22,"endpoint_protocol_generation":1,"endpoint_capabilities":["surface_interest","presentation_effects_fence","health_check"],"remote_host_bridge":true,"remote_bridge_idle_timeout":true,"binary":"[pinned-tool-path]","session":"fm-lab-testval-2969162-6966"},"server":{"status":"running","running":true,"version":"0.9.3","protocol":22,"capabilities":{"live_handoff":true,"detached_server_daemon":false,"endpoint_protocol_generation":1,"surface_interest":true,"health_check":true,"ssh_agent_registration":true},"compatible":true,"endpoint_compatible":true,"socket":"[private-host-path]","session":"fm-lab-testval-2969162-6966","restart_needed":false,"server_binary_stale":false},"update":{"restart_needed":false,"server_binary_stale":false}}
+lab_listed={"name":"fm-lab-testval-2969162-6966","default":false,"running":true,"socket_path":"[private-host-path]"}
+namespace=[temporary-lab-path]
+namespace_mode_before=700 uid_before=1000
+namespace_existed_before=yes
+lock_path_rc=0
+lock_path=[temporary-lab-path]
+lock_path_in_account_namespace=yes
+namespace_mode_after=700 uid_after=1000
+wrong_mode_valid_rc=1
+wrong_mode_after=755
+real_namespace_mode_still=700
+right_mode_valid_rc=0
+account_namespace_left_as_found=yes
+teardown_rc=0
+lab_still_listed_rc=4
+default_after={"default":true,"name":"default","running":true,"session_dir":"[private-host-path]","socket_path":"[private-host-path]"}
+operator_default_unchanged=yes
+running_after=[{"name":"default","socket_path":"[private-host-path]"},{"name":"w2F","socket_path":"[private-host-path]"},{"name":"w8","socket_path":"[private-host-path]"}]
+running_sessions_unchanged=yes
