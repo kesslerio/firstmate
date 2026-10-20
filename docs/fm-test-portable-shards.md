@@ -21,8 +21,13 @@ A failed script's duration is excluded even when its lane uploaded an artifact.
 In particular, run 36664663190's serial 5 finished in 22m15s with an assertion failure, not a timeout; treating that as a healthy whole-lane sample would hide the failure.
 Collect successful per-script measurements for every member before calculating a split.
 
-`tests/fm-supervision-host.test.sh` uses 789123 ms from run 36669175457, after the merged [host runtime fix](https://github.com/kunchenguid/firstmate/pull/6179), rather than its pre-fix maximum of 1065298 ms.
-That post-fix value has only one sample in this baseline, so further green runs must establish its variance.
+`tests/fm-supervision-host.test.sh` carries 915025 ms and `tests/fm-supervision-host-latch-park.test.sh` carries 852175 ms.
+Those two weights are the pieces of one completed 1767200 ms run of the former single suite, job 118401907304 in run 39353189267, divided at the latch call.
+This one sample does not establish a P95 or a multi-run maximum.
+The retired single-file hint was 789123 ms from run 36669175457, after the merged [host runtime fix](https://github.com/kunchenguid/firstmate/pull/6179), and the pre-fix maximum recorded for that file was 1065298 ms.
+Further green runs of both files must establish their variance.
+The split only distributes that measured run under the packing target.
+It leaves the unprofiled slowdown on the pre-existing cases in place, and the fast final cases in that run do not exclude accumulated process or scan cost.
 The native-Windows-only `tests/fm-pi-windows-shell-invocation.test.sh` retains its separate 5121 ms measurement from 2026-09-06T21:02Z instead of a portable capability skip.
 The session-start hint retains its pre-optimization maximum until CI measures the shorter fixture-only home-summary bound; do not discount a local speedup from CI packing weights.
 
