@@ -1,0 +1,10 @@
+grok-current-live-idle.ansi herdr empty
+grok-current-live-idle.ansi cmux-orca empty
+grok-current-live-draft.ansi herdr pending
+grok-current-live-draft.ansi cmux-orca pending
+grok-current-live-cleared.ansi herdr empty
+grok-current-live-cleared.ansi cmux-orca empty
+grok-current-80x30-fresh.ansi herdr empty
+grok-current-80x30-fresh.ansi cmux-orca empty
+grok-current-220x50-fresh.ansi herdr empty
+grok-current-220x50-fresh.ansi cmux-orca empty
