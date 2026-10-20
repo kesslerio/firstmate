@@ -473,8 +473,12 @@ resolve_crew() {
 }
 
 # Preserve first-line-wins parsing unless the file declares a mate override.
-# Override files validate completely before selecting a mate, so an invalid
-# override cannot silently migrate that mate onto the default runtime.
+# A file that declares no "mate <secondmate-id>:" line is read exactly as it
+# was before this grammar existed: the first non-empty, non-comment line
+# supplies the default, later lines and extra tokens are ignored, and nothing
+# is refused. A file that does declare an override validates completely before
+# selecting a mate, so an invalid override cannot silently migrate that mate
+# onto the default runtime.
 # Fills SM_DEFAULT_LINE and the parallel SM_MATE_IDS, SM_MATE_VALS and
 # SM_MATE_LINES arrays for the reader below.
 secondmate_parse() {
@@ -485,21 +489,33 @@ secondmate_parse() {
   SM_MATE_VALS=()
   SM_MATE_LINES=()
   [ -f "$file" ] || return 0
-  local line num=0 id rest i ntok has_overrides=0
+  local line num=0 id rest i ntok
   local override_pattern='^mate[[:space:]]+([^:[:space:]]+)[[:space:]]*:[[:space:]]*(.*)$'
+  # First pass: the legacy default line, and whether the file declares any
+  # override at all. A file that declares none stops here, so a home that never
+  # wrote an override keeps the legacy parse byte for byte.
+  local legacy_line='' legacy_num=0 declares_override=0
   while IFS= read -r line || [ -n "$line" ]; do
+    num=$((num + 1))
     line="${line#"${line%%[![:space:]]*}"}"
     line="${line%"${line##*[![:space:]]}"}"
     [ -n "$line" ] || continue
     case "$line" in '#'*) continue ;; esac
-    [ -n "$SM_DEFAULT_LINE" ] || SM_DEFAULT_LINE=$line
+    if [ -z "$legacy_line" ]; then legacy_line=$line; legacy_num=$num; fi
     if [[ "$line" =~ $override_pattern ]]; then
-      has_overrides=1
+      declares_override=1
       break
     fi
   done < "$file"
-  [ "$has_overrides" -eq 1 ] || return 0
-  SM_DEFAULT_LINE=
+  if [ "$declares_override" -eq 0 ]; then
+    SM_DEFAULT_LINE=$legacy_line
+    SM_DEFAULT_LINE_NUM=$legacy_num
+    return 0
+  fi
+  # Second pass: a file that declares an override. Every line is validated
+  # before any mate is selected, so an invalid override is never skipped in
+  # favor of the default runtime.
+  num=0
   while IFS= read -r line || [ -n "$line" ]; do
     num=$((num + 1))
     line="${line#"${line%%[![:space:]]*}"}"
@@ -554,9 +570,10 @@ secondmate_parse() {
 
 # Echo the line that governs a secondmate id: its "mate <id>:" override when the
 # file names one, otherwise the file's default line. Nothing is echoed when the
-# file is absent or holds neither. A malformed override file errors on every read
-# path, whether or not an id was passed, so the refusal never depends on the
-# caller asking about the right mate.
+# file is absent or holds neither. A malformed override file errors on every
+# read path, whether or not an id was passed, so the refusal never depends on
+# the caller asking about the right mate. A file that declares no override is
+# never malformed here: it keeps the legacy first-line parse.
 secondmate_line() {
   local id=${1:-} i
   secondmate_parse || return 1

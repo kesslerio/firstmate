@@ -265,6 +265,45 @@ ROWS
   pass "D2 malformed config/secondmate-harness refuses with its line number on every read verb"
 }
 
+# The opt-in scope is the whole compatibility promise of this grammar: a file
+# that declares no "mate <id>:" line keeps the documented legacy rule - the
+# first non-empty, non-comment line is parsed and the rest is ignored. Nothing
+# in such a file may refuse, including content that the strict, declaring-file
+# rules would reject if it sat next to a mate line.
+test_secondmate_legacy_pin_file_is_never_refused() {
+  local label file case_dir cfg out err rc verb id n
+  n=0
+  while IFS='^' read -r label file; do
+    [ -n "$label" ] || continue
+    n=$((n + 1))
+    case_dir="$TMP_ROOT/legacypin-$n"
+    cfg="$case_dir/config"
+    mkdir -p "$cfg"
+    printf '%b\n' "$file" > "$cfg/secondmate-harness"
+    for id in alpha ''; do
+      for verb in secondmate secondmate-model secondmate-effort; do
+        out=$(PATH="$BLIND_BIN:$BASE_PATH" CLAUDECODE=1 FM_CONFIG_OVERRIDE="$cfg" \
+          "$ROOT/bin/fm-harness.sh" "$verb" "$id" 2>"$case_dir/err"); rc=$?
+        err=$(cat "$case_dir/err")
+        [ "$rc" -eq 0 ] \
+          || fail "$label: fm-harness.sh $verb refused a file that declares no mate line: $err"
+        [ -z "$err" ] \
+          || fail "$label: fm-harness.sh $verb complained about a legacy file: $err"
+      done
+    done
+  done <<'ROWS'
+legacy file with a second default line^pi model-a xhigh\ngrok model-b low
+legacy file with a fourth token^pi model-a xhigh extra
+legacy file with a second default line and a fourth token^pi model-a xhigh extra\ngrok model-b low
+legacy file with a mate keyword and no id^pi model-a xhigh\nmate: grok g1 max
+legacy file with a mate id containing a space^pi model-a xhigh\nmate an alpha: grok
+legacy file with a mate line that names no id^pi model-a xhigh\nmate : grok
+legacy file with comments and blank lines^# captain note\n\npi model-a xhigh\n\ngrok model-b low
+legacy file whose default line is the word default^default\npi model-a xhigh
+ROWS
+  pass "D3 a config/secondmate-harness that declares no mate line is never refused"
+}
+
 # ===========================================================================
 # A/C) pi-signed process identity and shared Pi marker behavior
 # ===========================================================================
@@ -1000,6 +1039,56 @@ test_spawn_secondmate_harness_model_and_effort_tokens() {
   assert_contains "$launch" "claude --dangerously-skip-permissions $(sm_claude_add_dir "$w" sm)--settings '$(sm_claude_settings "$w" sm)' --model 'opus' --effort 'high'" \
     "model-effort-tokens: launch did not carry both --model opus and --effort high"
   pass "C4 spawn: config/secondmate-harness's model+effort tokens thread into the launch and meta"
+}
+
+# A pin file the captain wrote before the override grammar existed - a second
+# default line, a fourth token, anything else after the first line - must still
+# launch a secondmate exactly as it did then: the first non-empty, non-comment
+# line supplies the runtime and the rest of the file is ignored, never a
+# refusal. This is the spawn half of the opt-in scope.
+test_spawn_secondmate_with_a_legacy_pin_file_uses_the_first_line() {
+  local w sm meta launchlog launch out status
+  w="$TMP_ROOT/spawn-legacy-pin"
+  sm="$w/sm"
+  launchlog="$w/launch.log"
+  mkdir -p "$w/home/config"
+  printf 'claude opus high extra\ngrok other-model low\n' > "$w/home/config/secondmate-harness"
+  make_seeded_home "$sm" sm
+
+  out=$(spawn_secondmate_capture "$w" sm "$sm" "$launchlog" 2>&1); status=$?
+  expect_code 0 "$status" "a legacy pin file must not refuse a secondmate spawn"$'\n'"$out"
+
+  meta="$w/home/state/sm.meta"
+  [ "$(meta_field "$meta" harness)" = claude ] || fail "legacy-pin: meta harness not claude"
+  [ "$(meta_field "$meta" model)" = opus ] || fail "legacy-pin: meta model not opus (got '$(meta_field "$meta" model)')"
+  [ "$(meta_field "$meta" effort)" = high ] || fail "legacy-pin: meta effort not high (got '$(meta_field "$meta" effort)')"
+  launch=$(cat "$launchlog")
+  assert_contains "$launch" "--model 'opus' --effort 'high'" \
+    "legacy-pin: the launch did not carry the first line's tokens"
+  assert_not_contains "$launch" "extra" \
+    "legacy-pin: the fourth token of the first line must not reach the launch"
+  pass "C10 spawn: a legacy secondmate-harness file still launches on its first line (opt-in scope)"
+}
+
+# The other half of the same scope: a file that DOES declare an override is
+# validated as a whole, so a malformed one refuses the spawn loudly instead of
+# quietly launching the mate onto the default runtime.
+test_spawn_secondmate_with_a_malformed_declared_pin_refuses() {
+  local w sm out status
+  w="$TMP_ROOT/spawn-bad-declared-pin"
+  sm="$w/sm"
+  mkdir -p "$w/home/config"
+  printf 'claude opus high\nmate sm: claude opus max\nmate sm: grok other-model low\n' \
+    > "$w/home/config/secondmate-harness"
+  make_seeded_home "$sm" sm
+
+  out=$(spawn_secondmate_capture "$w" sm "$sm" "$w/launch.log" 2>&1); status=$?
+  [ "$status" -ne 0 ] || fail "a malformed declared pin must refuse the spawn"$'\n'"$out"
+  assert_contains "$out" "config/secondmate-harness line 3" \
+    "the refusal must name the offending line of the pin file"
+  [ ! -f "$w/home/state/sm.meta" ] \
+    || fail "a refused spawn must not publish a mate record"
+  pass "C11 spawn: a declared pin file that is malformed refuses the spawn with its line number"
 }
 
 # Precedence: an explicit per-spawn --model overrides the file's model token.
@@ -2864,6 +2953,7 @@ test_cursor_marker_detection
 test_secondmate_model_effort_tokens
 test_secondmate_per_mate_override_lines
 test_secondmate_malformed_pin_refuses_with_line_number
+test_secondmate_legacy_pin_file_is_never_refused
 test_pi_signed_detection_and_session_lock_identity
 test_dash_leading_process_names_are_basename_operands
 test_propagate_lib
@@ -2878,6 +2968,8 @@ test_spawn_explicit_backend_precedence_over_env_and_inherited_config
 test_spawn_bare_harness_no_model_effort_flag
 test_spawn_secondmate_harness_model_token
 test_spawn_secondmate_harness_model_and_effort_tokens
+test_spawn_secondmate_with_a_legacy_pin_file_uses_the_first_line
+test_spawn_secondmate_with_a_malformed_declared_pin_refuses
 test_spawn_explicit_model_overrides_secondmate_harness_token
 test_spawn_explicit_effort_overrides_secondmate_harness_token
 test_spawn_explicit_harness_does_not_inherit_secondmate_harness_tokens

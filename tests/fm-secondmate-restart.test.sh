@@ -569,6 +569,27 @@ test_remote_restart_uses_the_default_for_an_unpinned_mate() {
   pass "T6b a remote mate with no override line still restarts onto the default pin"
 }
 
+# The restart half of the opt-in scope: a pin file that declares no
+# "mate <id>:" line is read exactly as it was before that grammar existed, so a
+# second default line and a fourth token must not stop the restart. The mate
+# still restarts onto the first line's runtime.
+test_remote_restart_with_a_legacy_pin_file_uses_the_first_line() {
+  local dir out rc relaunch_line
+  dir=$(new_case matelegacypin)
+  setup_remote_case "$dir" sm2 ok
+  export FM_FAKE_ANSWER_STATUS="$dir/home/state/sm2.status"
+  printf 'codex big-model high extra\ngrok other-model low\n' > "$dir/home/config/secondmate-harness"
+
+  out=$(run_restart "$dir" sm2); rc=$?
+  unset FM_FAKE_ANSWER_STATUS
+
+  expect_code 0 "$rc" "a legacy pin file must not refuse a restart"$'\n'"$out"
+  relaunch_line=$(grep '^fm-remote-secondmate-control.sh relaunch' "$dir/ssh.log" | head -1)
+  [ "$relaunch_line" = "fm-remote-secondmate-control.sh relaunch sm2 codex big-model high" ] \
+    || fail "the restart did not use the first line of the legacy pin: $relaunch_line\n$out"
+  pass "T6d a legacy pin file still restarts the mate onto its first line"
+}
+
 test_remote_restart_refuses_an_unreadable_per_mate_pin() {
   local dir out rc
   dir=$(new_case matebadpin)
@@ -917,6 +938,7 @@ test_native_ultra_restart_keeps_local_and_remote_profiles
 test_remote_mate_restarts_over_the_transport_hop
 test_remote_restart_lands_on_the_per_mate_pin
 test_remote_restart_uses_the_default_for_an_unpinned_mate
+test_remote_restart_with_a_legacy_pin_file_uses_the_first_line
 test_remote_restart_refuses_an_unreadable_per_mate_pin
 test_unreachable_host_is_reported_unknown
 test_concurrent_reply_cannot_release_persist_gate
