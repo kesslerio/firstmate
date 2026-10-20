@@ -1,0 +1,44 @@
+helper=bin/fm-herdr-lab.sh
+prepare_default_rc=1
+teardown_default_rc=1
+teardown_unowned_rc=1
+prepare_only_rc=0
+prepare_twice_rc=1
+prepare_only_teardown_rc=0
+provision_rc=0
+run_session_flag_rc=1
+run_server_stop_rc=1
+run_session_stop_rc=1
+status_rc=0
+viewer_start_rc=0
+viewer_stop_rc=0
+fixture_namespace_collision=no
+lock_happy_rc=0
+lock_path_in_fake_namespace=yes
+lock_wrong_mode_rc=1
+namespace_mode_before=700
+namespace_mode_after_wrong_mode_attempt=700
+lock_foreign_rc=1
+namespace_after_foreign_attempt=700 1000
+legacy_namespace_before=present
+legacy_namespace_after=present
+real_namespace_is_per_account=yes
+real_namespace_matches_account_uid=yes
+teardown_rc=0
+lab_session_removed=yes
+operator_sessions_unchanged=yes
+--- status ---
+{"running":true,"protocol":22}
+
+--- refusals ---
+
+--- refusal text ---
+prepare default: fm-herdr-lab: refusing session name 'default'
+teardown default: fm-herdr-lab: refusing session name 'default'
+teardown unowned: fm-herdr-lab: missing fleet-state tripwire for 'fm-lab-accounting-curre-214040-5567'; refusing destructive calls
+run leading option: fm-herdr-lab: run forbids a leading option before the Herdr subcommand; it could shift a server or session lifecycle operation past the guard or subvert session isolation
+run server stop: fm-herdr-lab: run forbids server operations; use provision for the named lab server
+run session stop: fm-herdr-lab: run forbids session lifecycle operations; use guarded teardown
+second prepare: tripwire already exists; refusing ambiguous ownership
+viewer_attached=yes
+viewer_detached=yes

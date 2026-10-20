@@ -1,0 +1,11 @@
+off_rc=0
+off_ledger_exists=no
+bad_rc=2
+bad_ledger_exists=no
+on_rc=0
+capture_rc=0
+disabled_rc=0
+bytes_before=251 bytes_after=251
+--- ledger ---
+{"v":1,"ts":1792458888,"event":"task.dispatched","task":"labtask","kind":"ship","project":"demoproj","harness":"pi","model":"xai/grok-4.7"}
+{"v":1,"ts":1792458888,"event":"task.status","task":"labtask","state":null,"key":null,"text":"worker started"}

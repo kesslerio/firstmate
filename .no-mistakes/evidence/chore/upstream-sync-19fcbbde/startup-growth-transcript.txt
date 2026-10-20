@@ -1,0 +1,17 @@
+arm_rc=0
+arm_stdout=armed: state/startup-growth.check.sh
+shim_exists=yes
+first_rc=0
+first_stdout=
+first_stderr=
+second_rc=0
+second_stdout=
+aged_last_eval=yes
+projects_bytes=4807
+growth_rc=0
+growth_stdout=startup-growth: printed-memory growth data/projects.md +1601 estimated_tokens (+4801 bytes, total 4807 bytes)
+growth_stderr=
+disarm_rc=0
+disarm_stdout=disarmed: state/startup-growth.check.sh
+shim_after=absent
+record_after=absent

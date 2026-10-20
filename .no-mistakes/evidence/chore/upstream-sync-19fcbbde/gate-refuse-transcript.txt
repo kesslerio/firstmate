@@ -1,0 +1,20 @@
+unmarked_spawn_rc=3
+unmarked_send_rc=3
+unmarked_control_rc=3
+override_spawn_rc=3
+override_dir_entries=0
+lab_spawn_rc=1
+lab_state_entries=
+--- unmarked spawn ---
+--- send ---
+--- control ---
+--- override ---
+--- lab stderr ---
+--- lab stdout ---
+
+--- messages ---
+unmarked spawn: error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+unmarked send: error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+unmarked control: error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+override split: error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+marked lab: permitted against the marked lab home, then stopped with ship spawns require --mode before any task state was written
