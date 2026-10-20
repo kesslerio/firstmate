@@ -5949,6 +5949,217 @@ EOF
   pass "an extension-registered provider resolves in the isolated branch runtime"
 }
 
+# Pi 1.2 fires before_agent_start for an idle custom triggerTurn run, which has
+# no prompt. The inherited 19fc handler reads event.prompt and throws. The
+# repaired handler must not throw, must not stage that message as captain
+# input, and must not make the custom message own the run. A real user event
+# still stages its prompt. Events that omit messageType stay on that user path,
+# but they are not this coverage.
+test_custom_before_agent_start_does_not_own_user_input() {
+  local repo original_home repaired_home out status
+  repo="$TMP_ROOT/custom-before-agent-root"
+  original_home="$TMP_ROOT/custom-before-agent-original-home"
+  repaired_home="$TMP_ROOT/custom-before-agent-repaired-home"
+  mkdir -p "$original_home/state" "$original_home/config" "$repaired_home/state" "$repaired_home/config"
+  install_pi_branch_extension_fixture "$repo"
+  git -C "$ROOT" show 19fcbbde:.pi/extensions/fm-branch-supervision.ts > "$repo/.pi/extensions/fm-branch-supervision.original.ts" || fail "could not read the original 19fc branch handler"
+
+  PLUGIN="$repo/.pi/extensions/fm-branch-supervision.original.ts" FM_HOME="$original_home" FM_ROOT_OVERRIDE="$ROOT" \
+    DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
+const prelude = process.env.DRIVER_PRELUDE;
+await eval(`(async () => { ${prelude}; globalThis.__t = { fire, dispatch, settle, mainEntries, defaultSessionCtx }; })()`);
+const { fire, dispatch, settle, mainEntries, defaultSessionCtx } = globalThis.__t;
+
+const mainCtx = defaultSessionCtx;
+const mirrors = () => (globalThis.__fmSessions?.[0]?.ops ?? [])
+  .filter((op) => op.kind === "custom" && op.message.customType === "fm-main-mirror")
+  .map((op) => op.message.content);
+const captainPrompt = "captain owns the original user run";
+const customContent = "original custom triggerTurn must not be read as a prompt";
+await fire("session_start", { type: "session_start", reason: "startup" }, mainCtx);
+await fire("before_agent_start", {
+  type: "before_agent_start",
+  messageType: "user",
+  prompt: captainPrompt,
+  systemPrompt: "",
+  systemPromptOptions: {},
+}, mainCtx);
+mainEntries.push({ type: "message", message: { role: "user", content: captainPrompt } });
+await fire("agent_start", {}, mainCtx);
+const offer = dispatch("signal: original custom event regression");
+if (!offer.accepted) throw new Error("original handler did not accept the user-run wake");
+// This fixture does not ack the wake. The mirror flush is the assertion.
+offer.settlement.catch(() => {});
+await settle(() => mirrors().includes(`[captain] ${captainPrompt}`), "original user prompt mirror");
+const sessionsBefore = (globalThis.__fmSessions ?? []).length;
+let thrown = null;
+try {
+  await fire("before_agent_start", {
+    type: "before_agent_start",
+    messageType: "custom",
+    message: { role: "custom", customType: "fm-branch-process", content: customContent, display: false },
+    systemPrompt: "",
+    systemPromptOptions: {},
+  }, mainCtx);
+} catch (error) {
+  thrown = error;
+}
+if (!(thrown instanceof TypeError)) {
+  throw new Error(`original 19fc handler did not throw TypeError on a custom message without prompt: ${String(thrown)}`);
+}
+if (mirrors().some((text) => text.includes(customContent))) {
+  throw new Error("original handler mirrored the custom message before throwing");
+}
+if ((globalThis.__fmSessions ?? []).length !== sessionsBefore) {
+  throw new Error("original custom event changed the branch session");
+}
+process.exit(0);
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/node-output")
+  expect_code 0 "$status" "original 19fc custom before_agent_start must throw before any captain mirror: $out"
+
+  PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$repaired_home" FM_ROOT_OVERRIDE="$ROOT" \
+    DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
+const prelude = process.env.DRIVER_PRELUDE;
+await eval(`(async () => { ${prelude}; globalThis.__t = { fire, dispatch, settle, sentToMain, mainEntries, mainUserMessages, outcomeScript, defaultSessionCtx, home }; })()`);
+const { fire, dispatch, settle, sentToMain, mainEntries, mainUserMessages, outcomeScript, defaultSessionCtx, home } = globalThis.__t;
+const { unlinkSync, writeFileSync } = await import("node:fs");
+
+const mainCtx = defaultSessionCtx;
+const mirrors = () => (globalThis.__fmSessions?.[0]?.ops ?? [])
+  .filter((op) => op.kind === "custom" && op.message.customType === "fm-main-mirror")
+  .map((op) => op.message.content);
+const userStart = (prompt) => ({
+  type: "before_agent_start",
+  messageType: "user",
+  prompt,
+  systemPrompt: "",
+  systemPromptOptions: {},
+});
+const customStart = (content) => {
+  const event = {
+    type: "before_agent_start",
+    messageType: "custom",
+    message: { role: "custom", customType: "fm-branch-process", content, display: false },
+    systemPrompt: "",
+    systemPromptOptions: {},
+  };
+  if (Object.hasOwn(event, "prompt")) throw new Error("custom fixture carried a prompt");
+  return event;
+};
+const processingMessages = () => sentToMain.filter((sent) => sent.message.customType === "fm-branch-process");
+
+const seq = Number(outcomeScript(["append", "--task", "custom-guard", "--verdict", "captain", "--summary", "custom must not own this input"]));
+outcomeScript(["mark-read", "--through", String(seq)]);
+mainEntries.push({
+  type: "custom",
+  customType: "fm-branch-visible-outcome",
+  data: { version: 1, seq, task: "custom-guard", verdict: "captain", summary: "custom must not own this input", silent: false },
+});
+await fire("session_start", { type: "session_start", reason: "startup" }, mainCtx);
+if (processingMessages().length !== 1) {
+  throw new Error(`session_start did not keep processing bookkeeping: ${JSON.stringify(sentToMain)}`);
+}
+const processingContent = processingMessages()[0].message.content;
+
+const captainPrompt = "captain owns this user run";
+const userResult = await fire("before_agent_start", userStart(captainPrompt), mainCtx);
+if (userResult !== undefined) throw new Error(`user before_agent_start changed run input: ${JSON.stringify(userResult)}`);
+mainEntries.push({ type: "message", message: { role: "user", content: captainPrompt } });
+await fire("agent_start", {}, mainCtx);
+const offer = dispatch("signal: repaired custom event regression");
+if (!offer.accepted) throw new Error("repaired handler did not accept the user-run wake");
+// This fixture does not ack the wake. The mirror flush is the assertion.
+offer.settlement.catch(() => {});
+await settle(() => mirrors().includes(`[captain] ${captainPrompt}`), "repaired user prompt mirror");
+
+const legacyPrompt = "legacy fixture event without messageType";
+await fire("before_agent_start", { prompt: legacyPrompt }, mainCtx);
+mainEntries.push({ type: "message", message: { role: "user", content: legacyPrompt } });
+await fire("turn_end", {}, mainCtx);
+await settle(() => mirrors().includes(`[captain] ${legacyPrompt}`), "legacy prompt mirror");
+
+const sessionsBefore = (globalThis.__fmSessions ?? []).length;
+const createsBefore = globalThis.__fmCreateCount ?? 0;
+const userMessagesBefore = mainUserMessages.length;
+const markerText = "custom-trigger-turn-not-captain-input";
+const customResult = await fire("before_agent_start", customStart(markerText), mainCtx);
+if (customResult !== undefined) throw new Error(`custom before_agent_start changed run input: ${JSON.stringify(customResult)}`);
+if ((globalThis.__fmSessions ?? []).length !== sessionsBefore || (globalThis.__fmCreateCount ?? 0) !== createsBefore) {
+  throw new Error("custom before_agent_start changed session or generation bookkeeping");
+}
+if (mainUserMessages.length !== userMessagesBefore) throw new Error("custom before_agent_start sent a user message");
+const sentinel = "sentinel captain prompt after custom event";
+await fire("before_agent_start", userStart(sentinel), mainCtx);
+await fire("turn_end", {}, mainCtx);
+await settle(() => mirrors().includes(`[captain] ${sentinel}`), "sentinel mirror after custom event");
+if (mirrors().some((text) => text.includes(markerText))) {
+  throw new Error(`custom message was mirrored as captain input: ${JSON.stringify(mirrors())}`);
+}
+if (mirrors().filter((text) => text === `[captain] ${captainPrompt}`).length !== 1) {
+  throw new Error("user prompt mirror changed after the custom event");
+}
+
+writeFileSync(`${home}/state/.afk-contract`, "watch the fleet\n");
+let aborted = false;
+const abortCtx = { ...mainCtx, abort() { aborted = true; } };
+const processingEvent = {
+  messages: [{ role: "custom", customType: "fm-branch-process", content: processingContent, display: false }],
+};
+await fire("before_agent_start", customStart(processingContent), abortCtx);
+const afterCustom = await fire("context", processingEvent, abortCtx);
+if (aborted) throw new Error("custom before_agent_start made the processing request own the run");
+if (afterCustom?.messages?.some((message) => message.customType === "fm-branch-process")) {
+  throw new Error("away context stopped stripping a processing message");
+}
+aborted = false;
+await fire("before_agent_start", userStart(processingContent), abortCtx);
+await fire("agent_start", {}, abortCtx);
+const owned = await fire("context", processingEvent, abortCtx);
+if (!aborted) throw new Error("user before_agent_start no longer marks a processing-opened run");
+if (owned?.messages?.some((message) => message.customType === "fm-branch-process")) {
+  throw new Error("user-owned processing run did not strip the processing message");
+}
+
+unlinkSync(`${home}/state/.afk-contract`);
+await fire("agent_end", {});
+await fire("agent_settled", {});
+if (processingMessages().length < 2) {
+  throw new Error("agent_settled did not keep custom processing presentation bookkeeping");
+}
+const represented = processingMessages().at(-1).message;
+await fire("turn_start", {});
+await fire("message_start", { message: { role: "custom", ...represented } });
+writeFileSync(`${home}/state/.afk-contract`, "watch the fleet\n");
+aborted = false;
+await fire("before_agent_start", userStart(represented.content), abortCtx);
+const afterMessageStart = await fire("context", {
+  messages: [{ role: "custom", customType: represented.customType, content: represented.content, display: false }],
+}, abortCtx);
+if (aborted) throw new Error("custom message_start no longer consumed the queued processing request");
+if (afterMessageStart?.messages?.some((message) => message.customType === "fm-branch-process")) {
+  throw new Error("custom message_start stopped away context from stripping the processing message");
+}
+
+unlinkSync(`${home}/state/.afk-contract`);
+await fire("agent_end", {});
+const sessionsMid = (globalThis.__fmSessions ?? []).length;
+await fire("session_shutdown", {});
+await fire("session_start", { type: "session_start", reason: "new" }, mainCtx);
+const next = dispatch("signal: generation bookkeeping");
+if (!next.accepted) throw new Error("session replacement did not keep wake acceptance for the new generation");
+// Session creation is the assertion. This fixture does not ack the wake.
+next.settlement.catch(() => {});
+await settle(() => (globalThis.__fmSessions ?? []).length === sessionsMid + 1, "new generation branch");
+process.exit(0);
+EOF
+  status=$?
+  out=$(cat "$TMP_ROOT/node-output")
+  expect_code 0 "$status" "repaired custom before_agent_start must not own user input: $out"
+  pass "custom before_agent_start does not throw, mirror captain input, or take user-input ownership"
+}
+
 test_outcomes_tool_call_headers_follow_the_loaded_pi_version
 test_outcomes_tool_uses_stock_execution_and_export_consumers
 test_real_pi_picker_primitives_stay_bounded_and_searchable
@@ -5999,3 +6210,4 @@ test_delivery_keeps_the_event_loop_live_and_ordered
 test_session_replacement_during_delivery_neither_loses_nor_duplicates
 test_store_failure_during_delivery_neither_loses_nor_duplicates
 test_mark_read_failure_keeps_routine_redelivery_and_captain_deduplication
+test_custom_before_agent_start_does_not_own_user_input

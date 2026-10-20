@@ -5194,6 +5194,133 @@ EOF
   pass "OpenCode healthy arm output does not suppress the turn-end guard"
 }
 
+# A custom triggerTurn run has no prompt. It must not consume a pending user
+# wake or change the generation marker. A user before_agent_start and a user
+# message_start still consume. The fixture events below name messageType, so a
+# legacy event that omits it cannot stand in for this coverage.
+test_pi_custom_before_agent_start_does_not_consume_user_wake() {
+  local repo home plugin log trigger out status
+  repo="$TMP_ROOT/pi-custom-before-agent-root"
+  home="$TMP_ROOT/pi-custom-before-agent-home"
+  log="$TMP_ROOT/pi-custom-before-agent.log"
+  trigger="$TMP_ROOT/pi-custom-before-agent.trigger"
+  mkdir -p "$repo/bin" "$home/state" "$home/config"
+  install_pi_watch_extension_fixture "$repo"
+  plugin="$repo/.pi/extensions/fm-primary-pi-watch.ts"
+  cat > "$repo/bin/fm-watch-arm.sh" <<'SH'
+#!/usr/bin/env bash
+if [ "${1:-}" = --handling-delivered ]; then
+  printf 'confirmed=%s\n' "$2" >> "${FM_ARM_LOG:?}"
+  exit 0
+fi
+printf 'arm=%s\n' "$$" >> "${FM_ARM_LOG:?}"
+count=$(grep -c '^arm=' "$FM_ARM_LOG")
+printf 'watcher: started pid=%s (beacon fresh) recovery-generation=custom-%s\n' "$$" "$count"
+trap 'exit 0' TERM INT
+while [ ! -e "$FM_TRIGGER_FILE.$count" ]; do sleep 0.02; done
+printf 'signal: custom event must not consume wake %s\n' "$count"
+exit 0
+SH
+  chmod +x "$repo/bin/fm-watch-arm.sh"
+  out=$(PLUGIN="$plugin" FM_HOME="$home" FM_ROOT_OVERRIDE="$repo" FM_ARM_LOG="$log" FM_TRIGGER_FILE="$trigger" node --input-type=module 2>&1 <<'EOF'
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
+
+const handlers = new Map();
+const prompts = [];
+const pi = {
+  on(event, handler) {
+    handlers.set(event, handler);
+  },
+  registerCommand() {},
+  registerTool() {},
+  sendUserMessage: async (message) => {
+    prompts.push(message);
+  },
+  events: { on() {}, emit() {} },
+};
+const markerPath = `${process.env.FM_HOME}/state/.pi-watch-extension-loaded`;
+const handoffPath = `${process.env.FM_HOME}/state/extensions/pi-primary-watch/session-replacement-actionable.json`;
+const beforeStart = () => {
+  const handler = handlers.get("before_agent_start");
+  if (!handler) throw new Error("before_agent_start was not registered");
+  return handler;
+};
+const customStart = (content) => ({
+  type: "before_agent_start",
+  messageType: "custom",
+  message: { role: "custom", customType: "note", content, display: false },
+  systemPrompt: "",
+  systemPromptOptions: {},
+});
+const userStart = (prompt) => ({
+  type: "before_agent_start",
+  messageType: "user",
+  prompt,
+  systemPrompt: "",
+  systemPromptOptions: {},
+});
+async function waitFor(pred, label) {
+  for (let i = 0; i < 500; i += 1) {
+    if (pred()) return;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  throw new Error(`timeout waiting for ${label}`);
+}
+const generationLine = () => readFileSync(markerPath, "utf8").split(/\r?\n/).find((line) => line.startsWith("generation=")) ?? "";
+
+writeFileSync(`${process.env.FM_HOME}/state/.lock`, `${process.pid}\n`);
+const mod = await import(pathToFileURL(process.env.PLUGIN).href);
+mod.default(pi);
+await handlers.get("session_start")?.({ type: "session_start", reason: "startup" }, {});
+await waitFor(() => existsSync(process.env.FM_ARM_LOG) && readFileSync(process.env.FM_ARM_LOG, "utf8").includes("arm="), "first arm");
+const markerAtStart = generationLine();
+if (!markerAtStart.includes("phase=active")) throw new Error(`session_start did not publish an active generation: ${markerAtStart}`);
+writeFileSync(`${process.env.FM_TRIGGER_FILE}.1`, "close\n");
+await waitFor(() => prompts.some((message) => message.includes("signal: custom event must not consume wake 1")), "first wake");
+writeFileSync(`${process.env.FM_TRIGGER_FILE}.2`, "close\n");
+await waitFor(() => prompts.some((message) => message.includes("signal: custom event must not consume wake 2")), "second wake");
+const wake1 = prompts.find((message) => message.includes("signal: custom event must not consume wake 1"));
+const wake2 = prompts.find((message) => message.includes("signal: custom event must not consume wake 2"));
+const promptsBefore = prompts.length;
+const markerBefore = readFileSync(markerPath, "utf8");
+const customResult = beforeStart()(customStart(wake1));
+if (customResult !== undefined) throw new Error(`custom before_agent_start changed run input: ${JSON.stringify(customResult)}`);
+handlers.get("message_start")?.({ message: { role: "custom", customType: "note", content: wake1, display: false } });
+if (prompts.length !== promptsBefore) throw new Error("custom before_agent_start sent a user message");
+if (readFileSync(markerPath, "utf8") !== markerBefore) throw new Error("custom before_agent_start changed generation bookkeeping");
+handlers.get("message_start")?.({ message: { role: "user", content: wake2 } });
+await handlers.get("session_shutdown")?.({ type: "session_shutdown", reason: "new" }, {});
+if (!generationLine().includes("phase=handoff")) throw new Error("shutdown did not keep generation handoff bookkeeping");
+if (!existsSync(handoffPath)) throw new Error("custom events consumed the unconsumed user wake");
+const handoff = JSON.parse(readFileSync(handoffPath, "utf8"));
+if (handoff.pending.length !== 1 || handoff.pending[0].delivered || !handoff.pending[0].message.includes("signal: custom event must not consume wake 1")) {
+  throw new Error(`custom events changed user-wake ownership: ${JSON.stringify(handoff)}`);
+}
+if (handoff.pending.some((item) => item.message.includes("signal: custom event must not consume wake 2"))) {
+  throw new Error("user message_start no longer consumed its wake");
+}
+
+const replacementMod = await import(`${pathToFileURL(process.env.PLUGIN).href}?custom-user-event`);
+replacementMod.default(pi);
+await handlers.get("session_start")?.({ type: "session_start", reason: "new" }, {});
+await waitFor(() => prompts.filter((message) => message.includes("signal: custom event must not consume wake 1")).length === 2, "replay of the unconsumed wake");
+if (!generationLine().includes("phase=active") || generationLine() === markerAtStart) {
+  throw new Error(`replacement session_start did not publish a new active generation: ${generationLine()}`);
+}
+const replay = prompts.filter((message) => message.includes("signal: custom event must not consume wake 1")).at(-1);
+const userResult = beforeStart()(userStart(replay));
+if (userResult !== undefined) throw new Error(`user before_agent_start changed run input: ${JSON.stringify(userResult)}`);
+await waitFor(() => !existsSync(handoffPath), "user before_agent_start consumes the replayed wake");
+process.exit(0);
+EOF
+)
+  status=$?
+  expect_code 0 "$status" "custom before_agent_start must not consume a user wake: $out"
+  [ -z "$out" ] || fail "Pi custom before_agent_start test printed output: $out"
+  pass "custom before_agent_start does not consume a user wake"
+}
+
 test_pi_extension_reports_external_healthy_watcher
 test_pi_tool_returns_agent_tool_result
 test_pi_redundant_tool_call_is_owned_noop
@@ -5254,3 +5381,4 @@ test_opencode_established_empty_close_honors_retry_limit
 test_opencode_actionable_close_rechecks_session_lock
 test_opencode_watch_arm_coordinates_with_turnend_guard
 test_opencode_healthy_arm_output_does_not_suppress_guard
+test_pi_custom_before_agent_start_does_not_consume_user_wake
