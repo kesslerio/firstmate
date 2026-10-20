@@ -1,0 +1,48 @@
+### fm-backend-orca
+not ok - Orca scout teardown should succeed once report exists
+fm-captain-hold: compatible tasks-axi is required
+REFUSED: scout task orcateardownz3 has not passed the captain-call completion gate.
+Inventory its report and any visual review through bin/fm-captain-hold.sh before teardown.: expected exit 0, got 1
+suite exit=1
+
+### fm-backend-zellij
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fm-captain-hold: compatible tasks-axi is required
+REFUSED: scout task zghost has not passed the captain-call completion gate.
+Inventory its report and any visual review through bin/fm-captain-hold.sh before teardown.: expected exit 0, got 1
+suite exit=1
+
+### fm-control-relaunch
+tests/fm-control-relaunch.test.sh: line 511: /bin/sleep: No such file or directory
+tests/fm-control-relaunch.test.sh: line 511: /bin/sleep: No such file or directory
+tests/fm-control-relaunch.test.sh: line 511: /bin/sleep: No such file or directory
+not ok - relaunch did not reach trace delivery
+suite exit=1
+
+### fm-teardown
+ok - a forced secondmate with a missing own adapter sibling refuses before child cleanup
+ok - present required sources still reach the ordinary teardown refusal
+ok - local-only worktree with HEAD on a fork remote is torn down and the home summary is refreshed
+tests/fm-teardown.test.sh: line 659: tasks-axi: command not found
+suite exit=127
+
+### fm-control
+ok - fm-control exit: every verified harness gets its own verified exit command
+ok - fm-control interrupt: every verified harness gets its own verified key and repeat count
+not ok - Devin's second Escape came 0.027s after the first; under 0.5s a turn ending between them pairs into the revert picker
+suite exit=1
+
+### fm-spawn-dispatch-profile
+/home/art/projects/firstmate/.worktrees/base-main-t3/bin/fm-git-strip-ai-trailers.sh: line 79: cd: null directory
+/home/art/projects/firstmate/.worktrees/base-main-t3/bin/fm-git-strip-ai-trailers.sh: line 79: basename: command not found
+/home/art/projects/firstmate/.worktrees/base-main-t3/bin/fm-git-strip-ai-trailers.sh: line 268: mktemp: command not found
+not ok - allowlist=absent emitted launch failed in /bin/sh
+suite exit=1
+
+### fm-remote-secondmate-lifecycle-e2e
+ok - overlapping remote home provisioning serializes through publication and rollback
+ok - competing cleanup of the public home cannot reach a live provisioning clone
+ok - a home that appears mid-provision makes the provision die without touching it
+not ok - serialized successful seed failed
+suite exit=1
+

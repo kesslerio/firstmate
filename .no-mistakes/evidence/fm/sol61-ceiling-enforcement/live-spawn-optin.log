@@ -1,0 +1,8 @@
+/home/art/projects/firstmate/.worktrees/evidence-run-t3/.spawn-live-ZBhyOa
+recorded
+recorded
+recorded
+recorded
+error: Sol ceiling reached: 4 concurrent capped session(s) already active and this ceiling is 4 (declared in config/sol-cap); the dispatch of task fifth (codex, gpt-6.1-sol) was refused. Active sessions: one (gpt-6.1-sol, age 1s); two (gpt-6.1-sol, age 1s); three (gpt-6.1-sol, age 1s); four (gpt-6.1-sol, age 1s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+spawn exit=1
+Refusal preserved all four claims and created no fifth metadata or launch file.

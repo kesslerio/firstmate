@@ -1,0 +1,171 @@
+/home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu
+SCENARIO a home that declared no ceiling is inert
+$ fm-sol-cap-lib.sh status /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config
+inert
+exit=0
+$ fm-sol-cap-lib.sh ceiling /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config
+inert
+exit=0
+$ fm-sol-cap-lib.sh models /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config
+
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim undeclared ship codex gpt-6.1-sol /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+not-capped
+exit=0
+No ceiling, no reservation, and no registry row without a declaration.
+SCENARIO the declared model set and effective ceiling are read from the captain's file
+$ fm-sol-cap-lib.sh status /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config
+active max=4 ceiling=4 models=gpt-6.1-sol|gpt-6-sol pattern=
+exit=0
+$ fm-sol-cap-lib.sh models /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config
+gpt-6.1-sol|gpt-6-sol
+exit=0
+$ fm-sol-cap-lib.sh ceiling /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config
+4
+exit=0
+SCENARIO four reservations admit; fifth and same-ID retry refuse
+reserved worker-0
+exit=0
+reserved worker-1
+exit=0
+reserved worker-2
+exit=0
+reserved worker-3
+exit=0
+Persisted registry:
+worker-0	gpt-6.1-sol	1792532779	0
+worker-1	gpt-6.1-sol	1792532779	0
+worker-2	gpt-6.1-sol	1792532780	0
+worker-3	gpt-6.1-sol	1792532780	0
+
+$ fm-sol-cap-lib.sh refuse-claim fifth ship codex gpt-6.1-sol /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+error: Sol ceiling reached: 4 concurrent capped session(s) already active and this ceiling is 4 (declared in config/sol-cap); the dispatch of task fifth (codex, gpt-6.1-sol) was refused. Active sessions: worker-0 (gpt-6.1-sol, age 1s); worker-1 (gpt-6.1-sol, age 1s); worker-2 (gpt-6.1-sol, age 0s); worker-3 (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+$ fm-sol-cap-lib.sh refuse-claim worker-0 ship codex gpt-6.1-sol /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+error: Sol ceiling: task worker-0 already holds a live or uncertain session; confirm its worker stopped through teardown before replacing it
+exit=1
+Persisted registry:
+worker-0	gpt-6.1-sol	1792532779	0
+worker-1	gpt-6.1-sol	1792532779	0
+worker-2	gpt-6.1-sol	1792532780	0
+worker-3	gpt-6.1-sol	1792532780	0
+
+SCENARIO a model the declaration does not name bypasses a saturated ceiling
+$ fm-sol-cap-lib.sh refuse-claim glm-5 ship codex glm-5 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+not-capped
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim qwen3 ship codex qwen3 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+not-capped
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim gpt-9.9-sol ship codex gpt-9.9-sol /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+not-capped
+exit=0
+Persisted registry:
+worker-0	gpt-6.1-sol	1792532779	0
+worker-1	gpt-6.1-sol	1792532779	0
+worker-2	gpt-6.1-sol	1792532780	0
+worker-3	gpt-6.1-sol	1792532780	0
+
+SCENARIO a malformed declaration refuses every dispatch loudly, naming the file and the problem
+$ fm-sol-cap-lib.sh refuse-claim bad-declaration ship codex gpt-6.1-sol /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+error: Sol ceiling unavailable: /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config/sol-cap must declare ceiling as an integer from 1 through 4; task bad-declaration with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+exit=1
+$ fm-sol-cap-lib.sh refuse-claim bad-declaration-uncapped ship codex glm-5 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+error: Sol ceiling unavailable: /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config/sol-cap must declare ceiling as an integer from 1 through 4; task bad-declaration-uncapped with model glm-5 was not dispatched rather than launched against an undeclared ceiling
+exit=1
+Persisted registry:
+worker-0	gpt-6.1-sol	1792532779	0
+worker-1	gpt-6.1-sol	1792532779	0
+worker-2	gpt-6.1-sol	1792532780	0
+worker-3	gpt-6.1-sol	1792532780	0
+
+SCENARIO a lower-only declaration refuses the excess
+reserved only
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim extra ship codex gpt-6.1-sol /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task extra (codex, gpt-6.1-sol) was refused. Active sessions: only (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+SCENARIO simultaneous attempts at the last slot allow exactly one
+reserved existing-0
+exit=0
+reserved existing-1
+exit=0
+reserved existing-2
+exit=0
+reserved racer-a
+exit=0
+error: Sol ceiling reached: 4 concurrent capped session(s) already active and this ceiling is 4 (declared in config/sol-cap); the dispatch of task racer-b (codex, gpt-6.1-sol) was refused. Active sessions: existing-0 (gpt-6.1-sol, age 0s); existing-1 (gpt-6.1-sol, age 0s); existing-2 (gpt-6.1-sol, age 0s); racer-a (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+Persisted registry:
+existing-0	gpt-6.1-sol	1792532780	0
+existing-1	gpt-6.1-sol	1792532780	0
+existing-2	gpt-6.1-sol	1792532780	0
+racer-a	gpt-6.1-sol	1792532780	0
+
+SCENARIO launch-process handoff and proven exit free capacity
+reserved probe
+exit=0
+Persisted registry:
+probe	gpt-6.1-sol	1792532781	3225759
+
+reserved after-exit
+exit=0
+Persisted registry:
+after-exit	gpt-6.1-sol	1792532781	0
+
+SCENARIO a capped report preserves the uncertain claim; an uncapped report releases it
+reserved reuse
+exit=0
+Persisted registry:
+reuse	gpt-6.1-sol	1792532781	0
+
+$ fm-sol-cap-lib.sh record-actual reuse gpt-6-sol /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+recorded
+exit=0
+Persisted registry:
+reuse	gpt-6.1-sol	1792532781	0
+
+$ fm-sol-cap-lib.sh record-actual reuse glm-5 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+recorded
+exit=0
+Persisted registry:
+
+SCENARIO stopped and dead positive-PID records bypass a held admission lock for uncapped models
+Persisted registry:
+retry	gpt-6.1-sol	1792532781	-1
+
+$ fm-sol-cap-lib.sh record-actual retry glm-5 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+recorded
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim fresh-glm-5 ship codex glm-5 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+not-capped
+exit=0
+$ fm-sol-cap-lib.sh record-actual retry qwen3 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+recorded
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim fresh-qwen3 ship codex qwen3 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+not-capped
+exit=0
+Persisted registry:
+retry	gpt-6.1-sol	1792532781	-1
+
+Persisted registry:
+retry	gpt-6.1-sol	1792532781	3226653
+
+$ fm-sol-cap-lib.sh record-actual retry glm-5 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+recorded
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim fresh-glm-5 ship codex glm-5 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+not-capped
+exit=0
+$ fm-sol-cap-lib.sh record-actual retry qwen3 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+recorded
+exit=0
+$ fm-sol-cap-lib.sh refuse-claim fresh-qwen3 ship codex qwen3 /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/config /home/art/projects/firstmate/.worktrees/evidence-run-t3/.ceiling-live-7ne9aucu/state
+not-capped
+exit=0
+Persisted registry:
+retry	gpt-6.1-sol	1792532781	3226653
+
+ALL LIVE ADMISSION SCENARIOS PASSED
+Disposable lab removed; owned probe processes stopped

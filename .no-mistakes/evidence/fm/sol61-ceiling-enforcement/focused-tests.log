@@ -1,0 +1,81 @@
+### fm-sol-cap
+ok - a Sol report under an existing claim keeps the claim it already holds
+ok - a malformed registry row refuses every Sol dispatch and names the row
+ok - a malformed declaration refuses loudly instead of falling back to a default
+ok - non-Sol reports bypass admission only without owned Sol occupancy
+suite exit=0
+
+### fm-backend-close
+ok - cmux proves absence across every window and refuses incomplete inventories
+ok - zellij distinguishes confirmed absence from failed reads, closes and identity checks
+ok - orca reports close command and protocol failures while accepting successful closes
+suite exit=0
+
+### fm-remote-secondmate-relaunch
+ok - a local secondmate is refused by the remote relaunch tool
+ok - a remote relaunch keeps an already-armed PR poll authenticating
+ALL TESTS PASSED
+ok - remote runtime switches enforce parent admission and retain uncertain occupancy
+suite exit=0
+
+### fm-backend-cmux
+ok - fm_backend_cmux_kill: never fails even when close-workspace fails
+ok - fm_backend_cmux_kill: recovers stale workspace/surface ids by expected label
+ok - fm_backend_cmux_list_live: lists only this home's scoped task workspaces using plain fm-<id> labels
+ok - fm-spawn.sh: refuses backend=cmux for --secondmate spawns (mirrors Orca's refusal; no secondmate launch design exists yet)
+suite exit=0
+
+### fm-backend-orca
+not ok - Orca scout teardown should succeed once report exists
+fm-captain-hold: compatible tasks-axi is required
+REFUSED: scout task orcateardownz3 has not passed the captain-call completion gate.
+Inventory its report and any visual review through bin/fm-captain-hold.sh before teardown.: expected exit 0, got 1
+suite exit=1
+
+### fm-backend-zellij
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fm-captain-hold: compatible tasks-axi is required
+REFUSED: scout task zghost has not passed the captain-call completion gate.
+Inventory its report and any visual review through bin/fm-captain-hold.sh before teardown.: expected exit 0, got 1
+suite exit=1
+
+### fm-gotmp
+ok - fm-teardown removes the dir pointed to by tasktmp= in meta
+ok - fm-teardown skips gracefully when tasktmp= is absent (backward compat)
+ok - fm-teardown skips gracefully when tasktmp= points to a nonexistent dir
+suite exit=0
+
+### fm-control-relaunch
+ok - tmux: a dead server on this socket refuses both verbs rather than proving absence
+ok - reclaim: an unclassifiable endpoint is still refused, so two agents cannot share one
+not ok - Herdr Pi relaunch should complete (pi registration)
+error: pi executable not found on PATH; install it or select a different verified harness: expected exit 0, got 1
+suite exit=1
+
+### fm-teardown
+ok - a forced secondmate with a missing own adapter sibling refuses before child cleanup
+ok - present required sources still reach the ordinary teardown refusal
+ok - local-only worktree with HEAD on a fork remote is torn down and the home summary is refreshed
+tests/fm-teardown.test.sh: line 659: tasks-axi: command not found
+suite exit=127
+
+### fm-control
+ok - fm-control exit: every verified harness gets its own verified exit command
+ok - fm-control interrupt: every verified harness gets its own verified key and repeat count
+not ok - Devin's second Escape came 0.025s after the first; under 0.5s a turn ending between them pairs into the revert picker
+suite exit=1
+
+### fm-spawn-dispatch-profile
+/home/art/projects/firstmate/.worktrees/evidence-run-t3/bin/fm-git-strip-ai-trailers.sh: line 79: cd: null directory
+/home/art/projects/firstmate/.worktrees/evidence-run-t3/bin/fm-git-strip-ai-trailers.sh: line 79: basename: command not found
+/home/art/projects/firstmate/.worktrees/evidence-run-t3/bin/fm-git-strip-ai-trailers.sh: line 268: mktemp: command not found
+not ok - allowlist=absent emitted launch failed in /bin/sh
+suite exit=1
+
+### fm-remote-secondmate-lifecycle-e2e
+ok - overlapping remote home provisioning serializes through publication and rollback
+ok - competing cleanup of the public home cannot reach a live provisioning clone
+ok - a home that appears mid-provision makes the provision die without touching it
+not ok - serialized successful seed failed
+suite exit=1
+
