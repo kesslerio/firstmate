@@ -1,12 +1,12 @@
-/home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-weUmYH
+/home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF
 recorded
 recorded
 recorded
-error: Sol ceiling reached: 4 concurrent capped session(s) already active and this ceiling is 4 (declared in config/sol-cap); the dispatch of task root-racer (codex, gpt-6.1-sol) was refused. Active sessions: one (gpt-6.1-sol, age 1s); two (gpt-6.1-sol, age 1s); three (gpt-6.1-sol, age 1s); mate-racer (gpt-6.1-sol, age 1s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-weUmYH/mate/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
-reserved mate-racer in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-weUmYH/mate
-root exit=1; mate exit=0
-one	gpt-6.1-sol	1792532782	0
-two	gpt-6.1-sol	1792532782	0
-three	gpt-6.1-sol	1792532782	0
-mate-racer	gpt-6.1-sol	1792532782	0
+reserved root-racer in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF
+error: Sol ceiling reached: 4 concurrent capped session(s) already active and this ceiling is 4 (declared in config/sol-cap); the dispatch of task mate-racer (codex, gpt-6.1-sol) was refused. Active sessions: one (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF/state; two (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF/state; three (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF/state; root-racer (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+root exit=0; mate exit=1
+one	gpt-6.1-sol	1792535403	0
+two	gpt-6.1-sol	1792535403	0
+three	gpt-6.1-sol	1792535403	0
+root-racer	gpt-6.1-sol	1792535403	0
 Exactly one local home took the remaining shared slot.

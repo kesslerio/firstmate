@@ -8,6 +8,7 @@ suite exit=0
 ### fm-backend-close
 ok - cmux proves absence across every window and refuses incomplete inventories
 ok - zellij distinguishes confirmed absence from failed reads, closes and identity checks
+ok - paseo proves its terminal absent from the live inventory and refuses a failed close
 ok - orca reports close command and protocol failures while accepting successful closes
 suite exit=0
 
@@ -62,7 +63,7 @@ suite exit=127
 ### fm-control
 ok - fm-control exit: every verified harness gets its own verified exit command
 ok - fm-control interrupt: every verified harness gets its own verified key and repeat count
-not ok - Devin's second Escape came 0.025s after the first; under 0.5s a turn ending between them pairs into the revert picker
+not ok - Devin's second Escape came 0.033s after the first; under 0.5s a turn ending between them pairs into the revert picker
 suite exit=1
 
 ### fm-spawn-dispatch-profile
