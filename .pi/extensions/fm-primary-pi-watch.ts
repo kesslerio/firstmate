@@ -1200,6 +1200,8 @@ export default function (pi: ExtensionAPI) {
   }
 
   pi.on?.("before_agent_start", (event) => {
+    // Wakes are user messages. An idle custom triggerTurn run has no prompt.
+    if (event.messageType === "custom") return;
     consumeWake(generation, event.prompt);
   });
   pi.on?.("message_start", (event) => {
