@@ -68,37 +68,6 @@ cat > "$TMP_ROOT/tsconfig.json" <<'JSON'
 }
 JSON
 
-mkdir -p "$TMP_ROOT/saved"
-cp "$TMP_ROOT/fm-branch-supervision.ts" "$TMP_ROOT/saved/fm-branch-supervision.ts"
-cp "$TMP_ROOT/fm-primary-pi-watch.ts" "$TMP_ROOT/saved/fm-primary-pi-watch.ts"
-git -C "$ROOT" show 19fcbbde:.pi/extensions/fm-branch-supervision.ts > "$TMP_ROOT/fm-branch-supervision.ts" || exit 1
-git -C "$ROOT" show 19fcbbde:.pi/extensions/fm-primary-pi-watch.ts > "$TMP_ROOT/fm-primary-pi-watch.ts" || exit 1
-set +e
-tsc -p "$TMP_ROOT/tsconfig.json" > "$TMP_ROOT/original-tsc.txt" 2>&1
-original_status=$?
-set -e
-if [ "$original_status" -eq 0 ]; then
-  echo "not ok - original 19fc before_agent_start handlers typechecked; the custom-event reproduction is vacuous" >&2
-  exit 1
-fi
-grep -F "fm-branch-supervision.ts" "$TMP_ROOT/original-tsc.txt" >/dev/null || {
-  echo "not ok - original branch handler diagnostic did not name fm-branch-supervision.ts" >&2
-  cat "$TMP_ROOT/original-tsc.txt" >&2
-  exit 1
-}
-grep -F "fm-primary-pi-watch.ts" "$TMP_ROOT/original-tsc.txt" >/dev/null || {
-  echo "not ok - original watch handler diagnostic did not name fm-primary-pi-watch.ts" >&2
-  cat "$TMP_ROOT/original-tsc.txt" >&2
-  exit 1
-}
-grep -F "Property 'prompt' does not exist" "$TMP_ROOT/original-tsc.txt" >/dev/null || {
-  echo "not ok - original handler diagnostic was not the missing prompt on a custom before_agent_start event" >&2
-  cat "$TMP_ROOT/original-tsc.txt" >&2
-  exit 1
-}
-cp "$TMP_ROOT/saved/fm-branch-supervision.ts" "$TMP_ROOT/fm-branch-supervision.ts"
-cp "$TMP_ROOT/saved/fm-primary-pi-watch.ts" "$TMP_ROOT/fm-primary-pi-watch.ts"
-
 tsc -p "$TMP_ROOT/tsconfig.json" || exit 1
 version=$(jq -r '.version' "$PI_PACKAGE_DIR/package.json" 2>/dev/null || printf 'unknown')
-printf 'ok - original 19fc handlers fail strict typecheck and the repaired handlers pass against Pi %s\n' "$version"
+printf 'ok - tracked Pi extensions pass strict no-emit typecheck against Pi %s\n' "$version"

@@ -5950,74 +5950,16 @@ EOF
 }
 
 # Pi 1.2 fires before_agent_start for an idle custom triggerTurn run, which has
-# no prompt. The inherited 19fc handler reads event.prompt and throws. The
-# repaired handler must not throw, must not stage that message as captain
+# no prompt. The handler must not throw, must not stage that message as captain
 # input, and must not make the custom message own the run. A real user event
 # still stages its prompt. Events that omit messageType stay on that user path,
 # but they are not this coverage.
 test_custom_before_agent_start_does_not_own_user_input() {
-  local repo original_home repaired_home out status
+  local repo repaired_home out status
   repo="$TMP_ROOT/custom-before-agent-root"
-  original_home="$TMP_ROOT/custom-before-agent-original-home"
   repaired_home="$TMP_ROOT/custom-before-agent-repaired-home"
-  mkdir -p "$original_home/state" "$original_home/config" "$repaired_home/state" "$repaired_home/config"
+  mkdir -p "$repaired_home/state" "$repaired_home/config"
   install_pi_branch_extension_fixture "$repo"
-  git -C "$ROOT" show 19fcbbde:.pi/extensions/fm-branch-supervision.ts > "$repo/.pi/extensions/fm-branch-supervision.original.ts" || fail "could not read the original 19fc branch handler"
-
-  PLUGIN="$repo/.pi/extensions/fm-branch-supervision.original.ts" FM_HOME="$original_home" FM_ROOT_OVERRIDE="$ROOT" \
-    DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
-const prelude = process.env.DRIVER_PRELUDE;
-await eval(`(async () => { ${prelude}; globalThis.__t = { fire, dispatch, settle, mainEntries, defaultSessionCtx }; })()`);
-const { fire, dispatch, settle, mainEntries, defaultSessionCtx } = globalThis.__t;
-
-const mainCtx = defaultSessionCtx;
-const mirrors = () => (globalThis.__fmSessions?.[0]?.ops ?? [])
-  .filter((op) => op.kind === "custom" && op.message.customType === "fm-main-mirror")
-  .map((op) => op.message.content);
-const captainPrompt = "captain owns the original user run";
-const customContent = "original custom triggerTurn must not be read as a prompt";
-await fire("session_start", { type: "session_start", reason: "startup" }, mainCtx);
-await fire("before_agent_start", {
-  type: "before_agent_start",
-  messageType: "user",
-  prompt: captainPrompt,
-  systemPrompt: "",
-  systemPromptOptions: {},
-}, mainCtx);
-mainEntries.push({ type: "message", message: { role: "user", content: captainPrompt } });
-await fire("agent_start", {}, mainCtx);
-const offer = dispatch("signal: original custom event regression");
-if (!offer.accepted) throw new Error("original handler did not accept the user-run wake");
-// This fixture does not ack the wake. The mirror flush is the assertion.
-offer.settlement.catch(() => {});
-await settle(() => mirrors().includes(`[captain] ${captainPrompt}`), "original user prompt mirror");
-const sessionsBefore = (globalThis.__fmSessions ?? []).length;
-let thrown = null;
-try {
-  await fire("before_agent_start", {
-    type: "before_agent_start",
-    messageType: "custom",
-    message: { role: "custom", customType: "fm-branch-process", content: customContent, display: false },
-    systemPrompt: "",
-    systemPromptOptions: {},
-  }, mainCtx);
-} catch (error) {
-  thrown = error;
-}
-if (!(thrown instanceof TypeError)) {
-  throw new Error(`original 19fc handler did not throw TypeError on a custom message without prompt: ${String(thrown)}`);
-}
-if (mirrors().some((text) => text.includes(customContent))) {
-  throw new Error("original handler mirrored the custom message before throwing");
-}
-if ((globalThis.__fmSessions ?? []).length !== sessionsBefore) {
-  throw new Error("original custom event changed the branch session");
-}
-process.exit(0);
-EOF
-  status=$?
-  out=$(cat "$TMP_ROOT/node-output")
-  expect_code 0 "$status" "original 19fc custom before_agent_start must throw before any captain mirror: $out"
 
   PLUGIN="$repo/.pi/extensions/fm-branch-supervision.ts" FM_HOME="$repaired_home" FM_ROOT_OVERRIDE="$ROOT" \
     DRIVER_PRELUDE="$DRIVER_PRELUDE" node --input-type=module > "$TMP_ROOT/node-output" 2>&1 <<'EOF'
