@@ -1,5 +1,5 @@
 ### fm-sol-cap
-ok - a Sol report under an existing claim keeps the claim it already holds
+ok - a Sol report under an existing claim keeps the claim and reconciles the model
 ok - a malformed registry row refuses every Sol dispatch and names the row
 ok - a malformed declaration refuses loudly instead of falling back to a default
 ok - non-Sol reports bypass admission only without owned Sol occupancy
@@ -63,7 +63,7 @@ suite exit=127
 ### fm-control
 ok - fm-control exit: every verified harness gets its own verified exit command
 ok - fm-control interrupt: every verified harness gets its own verified key and repeat count
-not ok - Devin's second Escape came 0.033s after the first; under 0.5s a turn ending between them pairs into the revert picker
+not ok - Devin's second Escape came 0.029s after the first; under 0.5s a turn ending between them pairs into the revert picker
 suite exit=1
 
 ### fm-spawn-dispatch-profile

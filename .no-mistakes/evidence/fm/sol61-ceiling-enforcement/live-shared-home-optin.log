@@ -1,12 +1,12 @@
-/home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF
+/home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-3sHbGe
 recorded
 recorded
 recorded
-reserved root-racer in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF
-error: Sol ceiling reached: 4 concurrent capped session(s) already active and this ceiling is 4 (declared in config/sol-cap); the dispatch of task mate-racer (codex, gpt-6.1-sol) was refused. Active sessions: one (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF/state; two (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF/state; three (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF/state; root-racer (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-hpIlFF/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+reserved root-racer in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-3sHbGe
+error: Sol ceiling reached: 4 concurrent capped session(s) already active and this ceiling is 4 (declared in config/sol-cap); the dispatch of task mate-racer (codex, gpt-6.1-sol) was refused. Active sessions: one (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-3sHbGe/state; two (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-3sHbGe/state; three (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-3sHbGe/state; root-racer (gpt-6.1-sol, age 0s) in /home/art/projects/firstmate/.worktrees/evidence-run-t3/.shared-live-3sHbGe/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
 root exit=0; mate exit=1
-one	gpt-6.1-sol	1792535403	0
-two	gpt-6.1-sol	1792535403	0
-three	gpt-6.1-sol	1792535403	0
-root-racer	gpt-6.1-sol	1792535403	0
+one	gpt-6.1-sol	1792539889	0
+two	gpt-6.1-sol	1792539889	0
+three	gpt-6.1-sol	1792539889	0
+root-racer	gpt-6.1-sol	1792539889	0
 Exactly one local home took the remaining shared slot.

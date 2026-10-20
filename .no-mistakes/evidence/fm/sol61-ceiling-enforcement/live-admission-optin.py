@@ -150,12 +150,15 @@ try:
     assert reserve('after-exit').returncode == 0
     assert 'probe\t' not in rows()
 
-    print('SCENARIO a capped report preserves the uncertain claim; an uncapped report releases it', flush=True)
+    print('SCENARIO a capped report keeps the uncertain claim and reconciles its model; an uncapped report releases it', flush=True)
     reset()
     assert reserve('reuse').returncode == 0
-    before = rows()
+    before = rows().strip().split('\t')
     call('record-actual', 'reuse', 'gpt-6-sol', state)
-    assert rows() == before
+    after = rows().strip().split('\t')
+    assert after[3] == before[3], "the claim's pid changed"
+    assert after[2] == before[2], "the claim's start epoch changed"
+    assert after[1] == 'gpt-6-sol', 'the reported model did not reconcile the row'
     call('record-actual', 'reuse', 'glm-5', state)
     assert 'reuse\t' not in rows()
 
