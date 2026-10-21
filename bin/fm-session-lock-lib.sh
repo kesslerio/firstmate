@@ -327,9 +327,19 @@ fm_proc_info() {  # <pid>
   # comm it does not recognise.
   comm=$out
   args=$(ps -o args= -p "$pid" 2>/dev/null) || return 1
-  ppid=$(ps -o ppid= -p "$pid" 2>/dev/null) || return 1
-  ppid=${ppid// /}
-  case "$ppid" in ''|*[!0-9]*) return 1 ;; esac
+  # The ppid is a walk input, not an identity field. The identity the
+  # matcher reads is comm and args, and both of those are fail-closed
+  # above; a ppid that cannot be read only ends the ancestry walk one
+  # hop early, which is the conservative direction - the walk finds no
+  # harness and the session refuses the lock rather than taking one it
+  # cannot prove.
+  #
+  # The base read the ppid the same tolerant way, and the repository's
+  # grok and kimi harness suites pin that: their stubbed ps answers
+  # comm= and args= and refuses every other question, so a ppid read
+  # that failed had to leave the identity intact.
+  ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
+  case "$ppid" in ''|*[!0-9]*) ppid='' ;; esac
   FM_PROC_COMM=$comm FM_PROC_ARGS=$args FM_PROC_PPID=$ppid
   return 0
 }
@@ -646,14 +656,19 @@ fm_session_lock_inspect() {  # <state>
   case "$FM_SESSION_LOCK_PID_VERDICT" in
     readable)
       if fm_harness_process_matches "$FM_PROC_COMM" "$FM_PROC_ARGS"; then
+        # shellcheck disable=SC2034 # Output globals, read by lock status and inbox ready.
         FM_LOCK_INSPECT_STATE=held
+        # shellcheck disable=SC2034 # Output globals, read by lock status and inbox ready.
         FM_LOCK_INSPECT_LIVE_HARNESS=true
       else
+        # shellcheck disable=SC2034 # Output globals, read by lock status and inbox ready.
         FM_LOCK_INSPECT_LIVE_HARNESS=false
       fi
       ;;
     dead)
+      # shellcheck disable=SC2034 # Output globals, read by lock status and inbox ready.
       FM_LOCK_INSPECT_STATE=stale
+      # shellcheck disable=SC2034 # Output globals, read by lock status and inbox ready.
       FM_LOCK_INSPECT_LIVE_HARNESS=false
       ;;
   esac
