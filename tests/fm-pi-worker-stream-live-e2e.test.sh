@@ -12,7 +12,6 @@ PI_PACKAGE_DIR=$(node -e 'const fs=require("node:fs"),p=require("node:path"); co
 PI_VERSION=$(jq -r '.version' "$PI_PACKAGE_DIR/package.json") || fail "Pi package version unavailable"
 [ "$PI_VERSION" = 1.2.0 ] || fail "Pi $PI_VERSION: worker stream contract verified only on 1.2.0"
 TMP_ROOT=$(fm_test_tmproot fm-pi-worker-stream-live)
-fakebin=$(make_spawn_fakebin "$TMP_ROOT/fake")
 sdk_env=(env -i)
 for name in NO_MISTAKES_GATE CODEX_MANAGED_BY_NPM CODEX_MANAGED_PACKAGE_ROOT; do
   [ "${!name+x}" != x ] || sdk_env+=("$name=${!name}")
@@ -27,6 +26,10 @@ for case_label in enabled disabled stalled; do
   fm_test_spawn_home "$home" pi
   fm_git_worktree "$project" "$wt" "stream-$case_label"
   fm_test_spawn_brief "$home" stream
+  # Each case gets its own spawn world, like every other spawn suite here. A
+  # shared fake tmux records the window it created, so the next case's spawn of
+  # the same task id would be refused as a duplicate window instead of running.
+  fakebin=$(make_spawn_fakebin "$TMP_ROOT/fake-$case_label")
   spawn_root=$ROOT fault_dir=''
   if [ "$case_label" = stalled ]; then
     fault_dir="$home/fault"
