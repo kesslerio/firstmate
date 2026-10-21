@@ -396,11 +396,34 @@ EOF
 }
 
 # True if $1 is a live process that looks like a verified harness.
+fm_session_lock_pid_verdict() {
+  local pid=$1 probe
+  FM_SESSION_LOCK_PID_VERDICT=unreadable
+  case "$pid" in ''|*[!0-9]*|0) return 0 ;; esac
+  if fm_proc_info "$pid"; then
+    FM_SESSION_LOCK_PID_VERDICT=readable
+  elif probe=$(LC_ALL=C kill -0 "$pid" 2>&1); then
+    return 0
+  else
+    case "$probe" in
+      *'No such process'*) FM_SESSION_LOCK_PID_VERDICT=dead ;;
+    esac
+  fi
+}
+
 fm_harness_pid_alive() {
-  local pid=$1
-  kill -0 "$pid" 2>/dev/null || return 1
-  fm_proc_info "$pid" || return 1
+  fm_session_lock_pid_verdict "$1"
+  [ "$FM_SESSION_LOCK_PID_VERDICT" = readable ] || return 1
   fm_harness_process_matches "$FM_PROC_COMM" "$FM_PROC_ARGS"
+}
+
+fm_session_lock_pid_blocks_reclaim() {
+  fm_session_lock_pid_verdict "$1"
+  case "$FM_SESSION_LOCK_PID_VERDICT" in
+    dead) return 1 ;;
+    unreadable) return 0 ;;
+    readable) fm_harness_process_matches "$FM_PROC_COMM" "$FM_PROC_ARGS" ;;
+  esac
 }
 
 # --- trusted same-session identity -------------------------------------------
@@ -530,7 +553,7 @@ fm_session_lock_foreign_owner_live() {
   case "$lock_pid" in
     ''|*[!0-9]*) return 1 ;;
   esac
-  fm_harness_pid_alive "$lock_pid" || return 1
+  fm_session_lock_pid_blocks_reclaim "$lock_pid" || return 1
   pids=$(fm_harness_ancestry_pids) || return 1
   fm_harness_pid_listed "$lock_pid" "$pids" && return 1
   fm_session_lock_same_session "$state" "$pids" && return 1
@@ -588,22 +611,19 @@ fm_session_lock_inspect() {  # <state>
       return 0
       ;;
   esac
-  if kill -0 "$pid" 2>/dev/null; then
-    if fm_harness_pid_alive "$pid"; then
-      FM_LOCK_INSPECT_STATE=held
-      FM_LOCK_INSPECT_LIVE_HARNESS=true
-    else
-      FM_LOCK_INSPECT_STATE=unknown
+  fm_session_lock_pid_verdict "$pid"
+  case "$FM_SESSION_LOCK_PID_VERDICT" in
+    readable)
+      if fm_harness_process_matches "$FM_PROC_COMM" "$FM_PROC_ARGS"; then
+        FM_LOCK_INSPECT_STATE=held
+        FM_LOCK_INSPECT_LIVE_HARNESS=true
+      else
+        FM_LOCK_INSPECT_LIVE_HARNESS=false
+      fi
+      ;;
+    dead)
+      FM_LOCK_INSPECT_STATE=stale
       FM_LOCK_INSPECT_LIVE_HARNESS=false
-    fi
-    return 0
-  fi
-  if fm_proc_info "$pid"; then
-    FM_LOCK_INSPECT_STATE=unknown
-    return 0
-  fi
-  # shellcheck disable=SC2034 # Output global, read by lock status and inbox ready.
-  FM_LOCK_INSPECT_STATE=stale
-  # shellcheck disable=SC2034 # Output global, read by lock status and inbox ready.
-  FM_LOCK_INSPECT_LIVE_HARNESS=false
+      ;;
+  esac
 }
