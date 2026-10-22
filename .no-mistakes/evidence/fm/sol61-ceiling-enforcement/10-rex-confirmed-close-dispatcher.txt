@@ -1,0 +1,10 @@
+$ bash -c ". ./bin/fm-backend.sh; fm_backend_kill_confirmed rex \"\"; fm_backend_kill_confirmed kafka host:1"
+error: refusing empty backend kill target
+empty-target exit=1
+error: unknown backend 'kafka' (known: tmux herdr zellij orca cmux paseo rex)
+unknown-backend exit=1
+
+Covered by tests/fm-backend-rex.test.sh (real bin/fm-backend.sh dispatcher, stateful fake rex CLI):
+ok - fm_backend_kill rex: closes exactly its tab, treats a gone block as done, retires the emptied per-home session
+ok - fm_backend_kill rex: never kills a session this home does not own, even when it is empty
+ok - fm_backend_kill rex: refuses success unless the block is proven gone

@@ -1,0 +1,80 @@
+fm-lab-home: refusing '/tmp/fm-lab.5Fgbmu': a lab marker is only ever stamped on a fresh empty dir
+lab home: /tmp/fm-lab.5Fgbmu
+project: /tmp/fm-proj.CAhQ55
+tmux socket: /tmp/fm-lab.5Fgbmu/tmux/tmux-1000/fm-lab
+
+=== scenario 1: Sol dispatch at the declared ceiling (max=1, one live Sol claim)
+/tmp/live-ceiling-driver.sh: line 91: /tmp/fm-lab.5Fgbmu/state/sol-sessions.tsv: No such file or directory
+$ bin/fm-spawn.sh task-refused <project> --harness "sleep 900" --model gpt-6.1-sol --mode no-mistakes --yolo off
+exit=3
+error: refusing fleet lifecycle from inside a no-mistakes gate worktree (/home/art/.no-mistakes/repos/9f75ec418609.git)
+registry after refusal:
+
+task record present: no / launch brief present: no / windows unchanged: yes
+FAIL: dispatch at the ceiling exits 1
+FAIL: refusal names the ceiling declaration
+FAIL: refusal names the active session and its age
+FAIL: refusal names the refused dispatch
+PASS: no task record created
+PASS: no launch brief rendered
+PASS: no endpoint opened
+PASS: registry unchanged
+
+=== scenario 2: GLM dispatch with the ceiling full AND the admission lock held
+$ bin/fm-spawn.sh task-glm <project> --harness "sleep 900" --model gpt-5.6-luna --mode no-mistakes --yolo off
+(cap lock held by pid 331939, ceiling 1 with one live Sol claim)
+exit=3 elapsed=0s
+error: refusing fleet lifecycle from inside a no-mistakes gate worktree (/home/art/.no-mistakes/repos/9f75ec418609.git)
+registry after the GLM dispatch:
+
+FAIL: non-Sol dispatch is admitted
+PASS: non-Sol dispatch is not refused by the ceiling
+PASS: non-Sol dispatch does not wait on the held lock
+PASS: non-Sol dispatch leaves the Sol registry untouched
+FAIL: non-Sol dispatch launched its worker
+PASS: the held lock is still held by the foreign process
+
+=== scenario 3: Sol dispatch below the ceiling claims its slot, and teardown releases it
+$ bin/fm-spawn.sh task-sol <project> --harness "sleep 900" --model gpt-6.1-sol --mode no-mistakes --yolo off
+exit=3
+error: refusing fleet lifecycle from inside a no-mistakes gate worktree (/home/art/.no-mistakes/repos/9f75ec418609.git)
+task record model line: 
+registry at publication: 
+FAIL: Sol dispatch under the ceiling is admitted
+sed: can't read /tmp/fm-lab.5Fgbmu/state/task-sol.meta: No such file or directory
+FAIL: the published task record carries the requested model
+awk: fatal: cannot open file `/tmp/fm-lab.5Fgbmu/state/sol-sessions.tsv' for reading: No such file or directory
+FAIL: the registry row names the same model
+awk: fatal: cannot open file `/tmp/fm-lab.5Fgbmu/state/sol-sessions.tsv' for reading: No such file or directory
+registry 3s after launch (reservation transferred to the worker pid): 
+/tmp/live-ceiling-driver.sh: line 35: kill: `': not a pid or valid job spec
+FAIL: the reservation transferred to a live worker pid
+
+$ bin/fm-teardown.sh task-sol --force
+exit=3
+error: refusing fleet lifecycle from inside a no-mistakes gate worktree (/home/art/.no-mistakes/repos/9f75ec418609.git)
+registry after teardown: 
+windows after teardown: bash 
+FAIL: teardown of a capped task completes
+awk: fatal: cannot open file `/tmp/fm-lab.5Fgbmu/state/sol-sessions.tsv' for reading: No such file or directory
+FAIL: the confirmed close leaves non-counting stop evidence (pid -1)
+PASS: the endpoint is gone
+PASS: teardown pruned the task record
+
+=== scenario 4: an endpoint that cannot be proven gone retains its occupancy
+FAIL: setup: the Sol dispatch under the ceiling is admitted
+awk: fatal: cannot open file `/tmp/fm-lab.5Fgbmu/state/sol-sessions.tsv' for reading: No such file or directory
+registry before the unreachable teardown: 
+
+$ (tmux server for the endpoint stopped first)
+$ bin/fm-teardown.sh task-uncertain --force
+exit=3
+error: refusing fleet lifecycle from inside a no-mistakes gate worktree (/home/art/.no-mistakes/repos/9f75ec418609.git)
+registry after: 
+awk: fatal: cannot open file `/tmp/fm-lab.5Fgbmu/state/sol-sessions.tsv' for reading: No such file or directory
+PASS: the claim is not released as a confirmed stop
+awk: cmd. line:1: /tmp/fm-lab.5Fgbmu/state/sol-sessions.tsv == id {print }
+awk: cmd. line:1:                                      ^ syntax error
+PASS: no stopped claim was recorded instead
+
+=== failures: 13

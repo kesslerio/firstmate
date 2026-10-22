@@ -1,0 +1,28 @@
+=== lab home: /tmp/fm-lab.zhEmJ9
+=== declaration: max=1 models=gpt-5.6-luna 
+
+--- 1. reserve the task's slot, then hold it with a live process
+claimed
+registry: model-probe	gpt-5.6-luna	1792665039	413309
+host process for that pid alive: yes
+
+--- 2. live end-user retry of the same capped task (real bin/fm-spawn.sh)
+error: Sol ceiling: task model-probe already holds a live or uncertain session; confirm its worker stopped through teardown before replacing it
+exit=1
+task record created: no
+
+--- 3. at the ceiling, a second capped task is refused while a non-Sol model passes
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task other-task (codex, gpt-5.6-luna) was refused. Active sessions: model-probe (gpt-5.6-luna, age 1s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+capped exit=1
+not-capped
+non-Sol exit=0
+
+--- 4. release the live session through the confirmed-stop path (teardown's release)
+promote exit=0
+registry: model-probe	gpt-5.6-luna	1792665039	-1
+
+--- 5. the same retry is admitted again on that stop evidence
+claimed
+retry exit=0
+registry after retry:
+model-probe	gpt-5.6-luna	1792665040	414402
