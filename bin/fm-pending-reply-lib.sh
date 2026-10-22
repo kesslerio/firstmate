@@ -49,6 +49,10 @@
 #                           undelivered escalation note below)
 #   turn_seen_busy=         0|1 after delivery for the original request turn
 #   request_turn_completed_epoch=
+#   held_escalated_epoch=      when the hold itself was escalated to the
+#                           parent's own status stream (empty until the hold
+#                           cap passed; the record keeps its recovery
+#                           eligibility, so the owed repost still runs)
 #   recovery_held_since_epoch=    when a wait-no-turns hold started (empty
 #                           until a recovery was held back behind the mate's own
 #                           open decision; recorded once, never rewritten)
@@ -1406,6 +1410,15 @@ _fm_pending_reply_maybe_escalate_locked() {  # <state-dir> <corr_id>
     printf '%s\n' "$(status_stamp_line "$line")" >> "$parent_status" 2>/dev/null || return 1
   fi
   now=$(fm_pending_reply_now)
+  if [ "$kind" = held ]; then
+    # A hold escalation is a NOTIFICATION, not a retirement. The record keeps
+    # its awaiting_report phase, so the one recovery repost it is still owed
+    # stays eligible and runs as soon as the mate's decision closes. Only the
+    # notification epoch is recorded, and the status line itself is written
+    # once: a later pass finds the same line already recorded.
+    fm_pending_reply_set "$rec" held_escalated_epoch "$now" || return 1
+    return 0
+  fi
   fm_pending_reply_set "$rec" escalated_epoch "$now" || return 1
   fm_pending_reply_set "$rec" phase escalated || return 1
   return 0

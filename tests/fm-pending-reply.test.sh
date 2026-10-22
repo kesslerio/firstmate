@@ -301,8 +301,10 @@ test_held_recovery_escalates_the_hold_once_after_the_cap() {
   # still no send to the mate.
   export FM_PENDING_REPLY_NOW=12000
   fm_pending_reply_maybe_escalate "$state" "$corr" 2>/dev/null || true
-  [ "$(phase_of "$state" "$corr")" = escalated ] \
-    || fail "a held record past the cap must escalate, got $(phase_of "$state" "$corr")"
+  [ "$(phase_of "$state" "$corr")" = awaiting_report ] \
+    || fail "a hold escalation must not retire the record, got $(phase_of "$state" "$corr")"
+  [ -n "$(fm_pending_reply_get "$rec" held_escalated_epoch)" ] \
+    || fail "a hold escalation must record its notification epoch"
   [ ! -s "$hook_log" ] || fail "the hold escalation must not send to the mate"
   lines=$(grep -c "blocked \[key=pending-reply-$corr\]" "$parent_status" 2>/dev/null || true)
   [ "$lines" = 1 ] || fail "expected exactly one hold escalation line, got $lines"
@@ -314,9 +316,15 @@ test_held_recovery_escalates_the_hold_once_after_the_cap() {
   lines=$(grep -c "blocked \[key=pending-reply-$corr\]" "$parent_status" 2>/dev/null || true)
   [ "$lines" = 1 ] || fail "the hold escalation must happen once, got $lines"
 
-  # The decision closes and the report lands: the record resolves and the
-  # escalation closes with it.
+  # The decision closes: the record keeps the one recovery repost it is owed,
+  # so the repost runs instead of being retired by the hold notification.
   printf 'resolved [key=scope]: answered: narrow\n' >> "$state/hibit.status"
+  export FM_PENDING_REPLY_NOW=13000
+  fm_pending_reply_send_recovery "$state" "$corr" \
+    || fail "the owed recovery must still run after a hold escalation"
+  [ "$(wc -l < "$hook_log" | tr -d ' ')" = 1 ] \
+    || fail "the recovery must send exactly once after the hold escalation"
+  # And a report that lands resolves the record and closes the escalation.
   printf 'done [corr=%s]: ledger clean\n' "$corr" >> "$parent_status"
   fm_pending_reply_try_resolve "$state" "$corr" || fail "the landed report should resolve the record"
   [ "$(phase_of "$state" "$corr")" = resolved ] \
