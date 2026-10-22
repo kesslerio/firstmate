@@ -1268,7 +1268,7 @@ fi
 
 spawn_remote_secondmate() {
   local id=$1 remote host root home harness positional model effort backend out rc meta tmp
-  local remote_sol_model='' cap_lock='' cap_scope=1 cap_scope_rc=0
+  local remote_sol_model='' cap_lock='' cap_scope=1 cap_scope_rc=0 cap_owned=0 recorded_model=''
   local remote_backend remote_target remote_harness remote_herdr_session registry_lock remote_lock remote_generation
   local remote_traceparent remote_recorded_traceparent sm_primary_head sync_out sync_rc account_config
   local -a launch_args
@@ -1520,15 +1520,41 @@ spawn_remote_secondmate() {
     echo "error: remote launch returned Herdr session '${remote_herdr_session:-missing}', expected 'fm-remote'; preserving the remote route for reconciliation" >&2
     return 1
   fi
-  # The launch result reports the model the endpoint actually runs, read from
-  # the endpoint's own record: a reused live endpoint answers with the model it
-  # already runs, which can differ from this dispatch's request. Publishing the
-  # route record and reconciling Sol occupancy must retain lifecycle ownership
-  # and, when Sol occupancy is involved, the shared admission lock across both
-  # operations. A reconciliation failure after publication preserves the
-  # confirmed route for the next admission to reconcile.
+  # Record what the remote endpoint ACTUALLY carries, read back from its own
+  # launch, rather than what this side hoped to deliver. That keeps the #995
+  # guarantee that the recorded carrier is the identity the child received even
+  # when the remote host already had a live agent and reused its endpoint. An
+  # off decision delivers no carrier, but an endpoint already holding one still
+  # reports it here so the parent does not deny the agent's actual identity.
   remote_recorded_traceparent=$(printf '%s\n' "$out" | sed -n 's/^traceparent=//p' | tail -1)
   fm_trace_context_valid "$remote_recorded_traceparent" || remote_recorded_traceparent=
+  # The ceiling's scope comes from the captain's own declaration, not from a
+  # model name the tracked code knows: a reported model the declaration
+  # covers, or a task that already owns capped occupancy, needs the shared
+  # admission boundary across publication and reconcile.
+  cap_scope=1
+  cap_scope_rc=0
+  fm_sol_cap_state_model_capped "$STATE" "$remote_model" || cap_scope_rc=$?
+  case "$cap_scope_rc" in
+    0)
+      cap_scope=0
+      recorded_model=$remote_model
+      ;;
+    2)
+      fm_lock_release "$remote_lock" || true
+      fm_lock_release "$registry_lock" || true
+      fm_lock_release "$SPAWN_TASK_LOCK" || true
+      echo "error: remote secondmate $id launched, but the Sol ceiling declaration could not be read; its task record and occupancy remain for the next admission to reconcile" >&2
+      return 1
+      ;;
+  esac
+  if [ "$cap_scope" = 1 ]; then
+    recorded_model=${model#-}
+    if fm_sol_cap_has_owned_occupancy "$id" "$STATE"; then
+      cap_owned=1
+      recorded_model=$remote_model
+    fi
+  fi
   tmp="$meta.tmp.$$"
   {
     echo "window=remote:$id"
@@ -1540,7 +1566,7 @@ spawn_remote_secondmate() {
     echo "mode=secondmate"
     echo "yolo=off"
     echo "tasktmp="
-    echo "model=$remote_model"
+    echo "model=$recorded_model"
     echo "effort=${effort#-}"
     echo "home=$home"
     echo "projects=$(secondmate_registry_field "$DATA/secondmates.md" "$id" projects)"
@@ -1552,24 +1578,7 @@ spawn_remote_secondmate() {
     [ -z "$remote_recorded_traceparent" ] || echo "traceparent=$remote_recorded_traceparent"
   } >"$tmp"
   cap_lock=
-  # The ceiling's scope comes from the captain's own declaration, not from a
-  # model name the tracked code knows: a reported model the declaration
-  # covers, or a task that already owns capped occupancy, needs the shared
-  # admission boundary across publication and reconcile.
-  cap_scope=1
-  cap_scope_rc=0
-  fm_sol_cap_state_model_capped "$STATE" "$remote_model" || cap_scope_rc=$?
-  case "$cap_scope_rc" in
-    0) cap_scope=0 ;;
-    2)
-      fm_lock_release "$remote_lock" || true
-      fm_lock_release "$registry_lock" || true
-      fm_lock_release "$SPAWN_TASK_LOCK" || true
-      echo "error: remote secondmate $id launched, but the Sol ceiling declaration could not be read; its task record and occupancy remain for the next admission to reconcile" >&2
-      return 1
-      ;;
-  esac
-  if [ "$cap_scope" = 0 ] || fm_sol_cap_has_owned_occupancy "$id" "$STATE"; then
+  if [ "$cap_scope" = 0 ] || [ "$cap_owned" = 1 ]; then
     cap_lock=$(fm_sol_cap_admission_lock_path "$STATE")
     if [ -z "$cap_lock" ]; then
       fm_lock_release "$remote_lock" || true
