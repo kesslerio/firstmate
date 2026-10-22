@@ -1248,7 +1248,10 @@ _fm_pending_reply_close_escalation_locked() {  # <state-dir> <corr_id>
   [ -f "$rec" ] || return 1
   [ "$(fm_pending_reply_get "$rec" phase)" = resolved ] || return 0
   escalated=$(fm_pending_reply_get "$rec" escalated_epoch)
-  [ -n "$escalated" ] || return 0
+  # A hold notification is an escalation the parent published, so it closes
+  # with the record even though it left the record's recovery eligibility
+  # intact.
+  [ -n "$escalated" ] || [ -n "$(fm_pending_reply_get "$rec" held_escalated_epoch)" ] || return 0
   closed=$(fm_pending_reply_get "$rec" escalation_closed_epoch)
   [ -z "$closed" ] || return 0
   parent_status=$(fm_pending_reply_get "$rec" parent_status)
@@ -1405,6 +1408,12 @@ _fm_pending_reply_maybe_escalate_locked() {  # <state-dir> <corr_id>
       *$'\n'"$key"$'\t'*) ;;
       *) new_episode=0 ;;
     esac
+  fi
+  if [ "$kind" = held ] && [ -n "$(fm_pending_reply_get "$rec" held_escalated_epoch)" ]; then
+    # The hold notification is published once. Its line names the decision
+    # keys, and those keys change as the mate's decisions come and go, so the
+    # publication is guarded by its own epoch rather than by the whole line.
+    return 0
   fi
   if [ "$new_episode" -eq 0 ] || ! status_event_recorded "$parent_status" "$line"; then
     printf '%s\n' "$(status_stamp_line "$line")" >> "$parent_status" 2>/dev/null || return 1
@@ -1604,14 +1613,15 @@ _fm_pending_reply_select_needing_work() {  # <record-path>...
   printf '%s\n' "$@" | LC_ALL=C awk '
     {
       path = $0
-      phase = ""; escalated = ""; closed = ""
+      phase = ""; escalated = ""; held = ""; closed = ""
       while ((rc = (getline line < path)) > 0) {
         if (index(line, "phase=") == 1) phase = substr(line, 7)
         else if (index(line, "escalated_epoch=") == 1) escalated = substr(line, 17)
+        else if (index(line, "held_escalated_epoch=") == 1) held = substr(line, 23)
         else if (index(line, "escalation_closed_epoch=") == 1) closed = substr(line, 25)
       }
       close(path)
-      if (rc < 0 || phase != "resolved" || (escalated != "" && closed == "")) print path
+      if (rc < 0 || phase != "resolved" || ((escalated != "" || held != "") && closed == "")) print path
     }
   '
 }
