@@ -49,6 +49,9 @@
 #                           undelivered escalation note below)
 #   turn_seen_busy=         0|1 after delivery for the original request turn
 #   request_turn_completed_epoch=
+#   recovery_held_since_epoch=    when a wait-no-turns hold started (empty
+#                           until a recovery was held back behind the mate's own
+#                           open decision; recorded once, never rewritten)
 #   recovery_attempted_epoch=
 #   recovery_sender_pid=
 #   recovery_sender_identity=
@@ -140,6 +143,10 @@ _FM_PENDING_REPLY_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd 2>/dev/n
 FM_PENDING_REPLY_SCHEMA='fm-pending-reply.v1'
 FM_PENDING_REPLY_CORR_RE='corr=[A-Fa-f0-9]{16}'
 FM_PENDING_REPLY_GRACE_DEFAULT=120
+# How long a reply-bearing request may stay held behind the mate's own open
+# decision before the parent escalates the HOLD itself. The wait-no-turns rule
+# still holds: the escalation names the decision keys and sends nothing.
+FM_PENDING_REPLY_HOLD_MAX_SECS_DEFAULT=7200
 
 fm_pending_reply_now() {
   if [ -n "${FM_PENDING_REPLY_NOW:-}" ]; then
@@ -155,6 +162,28 @@ fm_pending_reply_grace_secs() {
     ''|*[!0-9]*) g=$FM_PENDING_REPLY_GRACE_DEFAULT ;;
   esac
   printf '%s' "$g"
+}
+
+# The cap on a hold behind the mate's own open decision, in seconds.
+fm_pending_reply_hold_max_secs() {
+  local h=${FM_PENDING_REPLY_HOLD_MAX_SECS:-$FM_PENDING_REPLY_HOLD_MAX_SECS_DEFAULT}
+  case "$h" in
+    ''|*[!0-9]*) h=$FM_PENDING_REPLY_HOLD_MAX_SECS_DEFAULT ;;
+  esac
+  printf '%s' "$h"
+}
+
+# The decision keys a held record is waiting behind, comma separated. Only the
+# named task's own open decisions count: another task's decision is not this
+# request's blocker.
+fm_pending_reply_hold_decision_keys() {  # <state-dir> <task_id>
+  local state=$1 task_id=$2 keys
+  [ -n "$task_id" ] || return 1
+  # The shared reader returns the key as its first tab-separated field.
+  keys=$(status_own_open_decisions "$state/$task_id.status" 2>/dev/null \
+    | cut -f1 | tr '\n' ',' | sed 's/,$//')
+  [ -n "$keys" ] || return 1
+  printf '%s' "$keys"
 }
 
 # Directory holding durable pending-reply records for <state-dir>.
@@ -978,7 +1007,16 @@ fm_pending_reply_send_recovery() {  # <state-dir> <corr_id>
   # config/wait-no-turns: a mate waiting on its own open decision or blocker
   # is never poked. The recovery stays unattempted until the answer lands.
   if [ -e "${FM_CONFIG_OVERRIDE:-${FM_HOME:-}/config}/wait-no-turns" ]; then
-    [ -z "$(status_own_open_decisions "$state/$task_id.status")" ] || return 1
+    if [ -n "$(status_own_open_decisions "$state/$task_id.status")" ]; then
+      # The hold is bounded. Record when it started, once, so the parent can
+      # escalate the HOLD itself once the cap passes instead of waiting for a
+      # recovery that can never be sent. Nothing is sent to the mate here, so
+      # the no-turns rule still holds.
+      if [ -z "$(fm_pending_reply_get "$rec" recovery_held_since_epoch)" ]; then
+        fm_pending_reply_set "$rec" recovery_held_since_epoch "$(fm_pending_reply_now)" || true
+      fi
+      return 1
+    fi
   fi
   status_file=$(fm_pending_reply_get "$rec" parent_status)
   parent_home=$(fm_pending_reply_get "$rec" parent_home)
@@ -1142,6 +1180,9 @@ fm_pending_reply_escalation_payload() {  # <record-path> <kind>
       case "$outcome" in failed|unknown) ;; *) return 1 ;; esac
       token="pending-reply-recovery-delivery-$outcome"
       ;;
+    held)
+      token=pending-reply-held
+      ;;
     *) return 1 ;;
   esac
   printf '%s: task=%s pending-reply-id=%s request=%s' "$token" "$task_id" "$corr" "$summary"
@@ -1159,7 +1200,7 @@ fm_pending_reply_escalation_line() {  # <status-file> <record-path> <corr_id>
   while IFS= read -r line || [ -n "$line" ]; do
     [ "$(status_line_verb "$line")" = blocked ] || continue
     _fm_status_untimed "$line" untimed
-    for kind in missed delivery-unknown recovery-delivery; do
+    for kind in missed delivery-unknown recovery-delivery held; do
       payload=$(fm_pending_reply_escalation_payload "$rec" "$kind") || continue
       case "$untimed" in
         "blocked [key=$own_key]: $payload"|"blocked: $payload") found=$line; break ;;
@@ -1268,6 +1309,7 @@ _fm_pending_reply_maybe_escalate_locked() {  # <state-dir> <corr_id>
   local state=$1 corr=$2
   local rec phase completed now payload parent_status line kind first display
   local delivered task_id meta sm_home remote_host grace age key new_episode
+  local held_since hold_cap decisions
   rec=$(fm_pending_reply_path "$state" "$corr")
   [ -f "$rec" ] || return 1
   phase=$(fm_pending_reply_get "$rec" phase)
@@ -1293,6 +1335,18 @@ _fm_pending_reply_maybe_escalate_locked() {  # <state-dir> <corr_id>
         "$(fm_pending_reply_get "$rec" task_id)" "$completed" || return 1
       ;;
     delivery_unknown|recovery_failed|recovery_unknown) ;;
+    awaiting_report)
+      # A record held behind the mate's own open decision escalates the HOLD
+      # once the cap passes. A record that is not held never escalates here:
+      # an ordinary unanswered request escalates only after a recovery was
+      # sent, exactly as before.
+      held_since=$(fm_pending_reply_get "$rec" recovery_held_since_epoch)
+      [ -n "$held_since" ] || return 1
+      hold_cap=$(fm_pending_reply_hold_max_secs)
+      now=$(fm_pending_reply_now)
+      age=$((now - held_since))
+      [ "$age" -ge "$hold_cap" ] || return 1
+      ;;
     *) return 1 ;;
   esac
   delivered=$(fm_pending_reply_get "$rec" delivered_epoch)
@@ -1317,9 +1371,17 @@ _fm_pending_reply_maybe_escalate_locked() {  # <state-dir> <corr_id>
   case "$phase" in
     delivery_unknown) kind=delivery-unknown ;;
     recovery_failed|recovery_unknown) kind='recovery-delivery' ;;
+    awaiting_report) kind=held ;;
     *) kind=missed ;;
   esac
   payload=$(fm_pending_reply_escalation_payload "$rec" "$kind") || return 1
+  if [ "$kind" = held ]; then
+    # The decision keys ride at the end of the line, so the stable payload
+    # prefix still matches the line when the decision closes and the
+    # escalation is closed.
+    decisions=$(fm_pending_reply_hold_decision_keys "$state" "$task_id") || decisions=unknown
+    payload="$payload held-behind-decisions=$decisions"
+  fi
   if [ "$kind" = missed ]; then
     first=$(fm_pending_reply_get "$rec" wrong_home_first_sighting)
     if display=$(fm_pending_reply_sighting_display "$first"); then
@@ -1506,7 +1568,9 @@ fm_pending_reply_tick_one() {  # <state-dir> <corr_id> <busy_state> [secondmate-
   fi
   phase=$(fm_pending_reply_get "$rec" phase)
   case "$phase" in
-    recovery_sent|recovery_failed|recovery_unknown)
+    recovery_sent|recovery_failed|recovery_unknown|awaiting_report)
+      # awaiting_report reaches the escalation only for a record held behind
+      # the mate's own open decision, and only once the hold cap has passed.
       fm_pending_reply_maybe_escalate "$state" "$corr" 2>/dev/null || true
       ;;
   esac

@@ -1887,6 +1887,55 @@ test_mechanical_helper_writes_parent_channel() {
   pass "mechanical helper writes the parent channel from verb, corr, and note"
 }
 
+# One report answers ONE request. A made-up 'corr2=' token, or two 'corr='
+# tokens in one report, is not a supported format: the matcher only knows
+# 'corr=<16 hex>', so the extra token never correlates and the request it
+# names stays unanswered. The helper refuses that form and names the
+# supported one.
+test_mechanical_helper_refuses_an_unsupported_multi_corr_report() {
+  local home state sm_home corr other out rc
+  home=$(setup_parent multi-corr-helper)
+  state="$home/state"
+  sm_home=$(bind_local_mate "$home" mate)
+  export FM_PENDING_REPLY_NOW=11300
+  corr=$(fm_pending_reply_create "$home" "$state" mate "status of the audit")
+  other=$(fm_pending_reply_create "$home" "$state" mate "status of the follow-up")
+  fm_pending_reply_mark_delivered "$state" "$corr"
+  fm_pending_reply_mark_delivered "$state" "$other"
+
+  rc=0
+  out=$(FM_HOME="$sm_home" "$REPORT" "done" "corr2=$other" "answered both" 2>&1) || rc=$?
+  [ "$rc" -ne 0 ] || fail "the helper must refuse a made-up corr2= token"
+  case "$out" in
+    *"ONE request per line"*) : ;;
+    *) fail "the refusal must teach the supported one-request form: $out" ;;
+  esac
+  case "$out" in
+    *"corr=<16 hex>"*) : ;;
+    *) fail "the refusal must name the supported token form: $out" ;;
+  esac
+  if fm_pending_reply_try_resolve "$state" "$corr"; then
+    fail "a refused multi-corr report must not resolve an expectation"
+  fi
+  [ ! -s "$state/mate.status" ] || fail "a refused multi-corr report must not write the parent channel"
+
+  rc=0
+  out=$(FM_HOME="$sm_home" "$REPORT" "done" "$corr" "answered [corr=$other] as well" 2>&1) || rc=$?
+  [ "$rc" -ne 0 ] || fail "the helper must refuse a second correlation token in the note"
+  case "$out" in
+    *"ONE request per line"*) : ;;
+    *) fail "the note refusal must teach the supported one-request form: $out" ;;
+  esac
+
+  # A plain second token in the note is this request's own token repeated and
+  # stays allowed: the matcher takes the first one.
+  FM_HOME="$sm_home" "$REPORT" "done" "$corr" "audit clean" \
+    || fail "the helper must still accept a supported single-request report"
+  grep -Fq "corr=$corr" "$state/mate.status" \
+    || fail "the supported report must still reach the parent channel"
+  pass "the report helper refuses an unsupported multi-corr report and names the supported form"
+}
+
 test_remote_parent_replies_is_not_wrong_home() {
   local home state sm_home corr rec hits
   home=$(setup_parent remote-parent-replies)
@@ -2147,6 +2196,7 @@ test_same_basename_self_home_corr_resolves_on_tick
 test_same_basename_reply_resolves_after_recovery_failure
 test_child_status_wrong_home_is_not_copied
 test_mechanical_helper_writes_parent_channel
+test_mechanical_helper_refuses_an_unsupported_multi_corr_report
 test_remote_parent_replies_is_not_wrong_home
 test_local_parent_replies_is_wrong_home_evidence
 test_escalated_undelivered_correlation_stays_retryable
