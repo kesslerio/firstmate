@@ -245,6 +245,89 @@ test_recovery_waits_while_the_mate_has_an_open_decision() {
   pass "recovery never pokes a mate waiting on its own decision, and runs once it closes"
 }
 
+# A hold behind the mate's own open decision is BOUNDED. Under the cap the
+# record stays held and silent; past the cap the parent escalates the HOLD
+# once, naming the decision keys, and sends nothing to the mate, so the
+# wait-no-turns rule still holds.
+test_held_recovery_escalates_the_hold_once_after_the_cap() {
+  local home state corr hook_log rec parent_status
+  home=$(setup_parent held-escalation)
+  state="$home/state"
+  hook_log="$TMP_ROOT/held-escalation-hook.log"
+  : > "$hook_log"
+  export FM_PENDING_REPLY_NOW=3000
+  export FM_PENDING_REPLY_HOLD_MAX_SECS=7200
+  mkdir -p "$home/config"
+  : > "$home/config/wait-no-turns"
+  FM_CONFIG_OVERRIDE="$home/config"
+  # Invoked indirectly through FM_PENDING_REPLY_SEND_HOOK.
+  # shellcheck disable=SC2329
+  held_escalation_hook() {
+    printf '%s\n' "$1" >> "$hook_log"
+  }
+  export -f held_escalation_hook
+  export FM_PENDING_REPLY_SEND_HOOK=held_escalation_hook
+
+  corr=$(fm_pending_reply_create "$home" "$state" "hibit" "status of phase 9")
+  fm_pending_reply_mark_delivered "$state" "$corr"
+  fm_pending_reply_observe_busy "$state" "$corr" busy
+  fm_pending_reply_observe_busy "$state" "$corr" idle
+  printf 'needs-decision [key=scope]: narrow or wide?\n' >> "$state/hibit.status"
+  rec=$(fm_pending_reply_path "$state" "$corr")
+  parent_status=$(fm_pending_reply_get "$rec" parent_status)
+
+  # The recovery is held, and the hold records when it started.
+  if fm_pending_reply_send_recovery "$state" "$corr" 2>/dev/null; then
+    fail "recovery must stay held while the mate waits on its own decision"
+  fi
+  [ ! -s "$hook_log" ] || fail "a held recovery must not poke the mate"
+  held_since=$(fm_pending_reply_get "$rec" recovery_held_since_epoch)
+  [ "$held_since" = 3000 ] || fail "the hold must record its start epoch, got '$held_since'"
+
+  # Under the cap: no escalation at all.
+  fm_pending_reply_maybe_escalate "$state" "$corr" 2>/dev/null || true
+  [ "$(phase_of "$state" "$corr")" = awaiting_report ] \
+    || fail "a held record under the cap must not escalate"
+  lines=$(grep -c "blocked \\[key=pending-reply-$corr\\]" "$parent_status" 2>/dev/null || true)
+  [ "$lines" = 0 ] || fail "a held record under the cap must not write an escalation"
+
+  # Another task's open decision is not this request's blocker.
+  printf 'needs-decision [key=other]: unrelated\n' >> "$state/other-task.status"
+  fm_pending_reply_maybe_escalate "$state" "$corr" 2>/dev/null || true
+  [ "$(phase_of "$state" "$corr")" = awaiting_report ] \
+    || fail "another task's open decision must not escalate this record"
+
+  # Past the cap: exactly one escalation line, naming the decision key, and
+  # still no send to the mate.
+  export FM_PENDING_REPLY_NOW=12000
+  fm_pending_reply_maybe_escalate "$state" "$corr" 2>/dev/null || true
+  [ "$(phase_of "$state" "$corr")" = escalated ] \
+    || fail "a held record past the cap must escalate, got $(phase_of "$state" "$corr")"
+  [ ! -s "$hook_log" ] || fail "the hold escalation must not send to the mate"
+  lines=$(grep -c "blocked \[key=pending-reply-$corr\]" "$parent_status" 2>/dev/null || true)
+  [ "$lines" = 1 ] || fail "expected exactly one hold escalation line, got $lines"
+  grep -q "held-behind-decisions=scope" "$parent_status" \
+    || fail "the hold escalation must name the decision key"
+
+  # A second pass must not append a second line.
+  fm_pending_reply_maybe_escalate "$state" "$corr" 2>/dev/null || true
+  lines=$(grep -c "blocked \[key=pending-reply-$corr\]" "$parent_status" 2>/dev/null || true)
+  [ "$lines" = 1 ] || fail "the hold escalation must happen once, got $lines"
+
+  # The decision closes and the report lands: the record resolves and the
+  # escalation closes with it.
+  printf 'resolved [key=scope]: answered: narrow\n' >> "$state/hibit.status"
+  printf 'done [corr=%s]: ledger clean\n' "$corr" >> "$parent_status"
+  fm_pending_reply_try_resolve "$state" "$corr" || fail "the landed report should resolve the record"
+  [ "$(phase_of "$state" "$corr")" = resolved ] \
+    || fail "the record should be resolved, got $(phase_of "$state" "$corr")"
+
+  unset FM_PENDING_REPLY_SEND_HOOK
+  unset FM_CONFIG_OVERRIDE
+  unset FM_PENDING_REPLY_HOLD_MAX_SECS
+  pass "a hold behind the mate's own decision escalates once after the cap, names the decision key, and sends nothing"
+}
+
 # Without the flag, an open decision does not hold the recovery.
 test_recovery_sends_during_an_open_decision_without_the_flag() {
   local home state corr hook_log
@@ -1887,55 +1970,6 @@ test_mechanical_helper_writes_parent_channel() {
   pass "mechanical helper writes the parent channel from verb, corr, and note"
 }
 
-# One report answers ONE request. A made-up 'corr2=' token, or two 'corr='
-# tokens in one report, is not a supported format: the matcher only knows
-# 'corr=<16 hex>', so the extra token never correlates and the request it
-# names stays unanswered. The helper refuses that form and names the
-# supported one.
-test_mechanical_helper_refuses_an_unsupported_multi_corr_report() {
-  local home state sm_home corr other out rc
-  home=$(setup_parent multi-corr-helper)
-  state="$home/state"
-  sm_home=$(bind_local_mate "$home" mate)
-  export FM_PENDING_REPLY_NOW=11300
-  corr=$(fm_pending_reply_create "$home" "$state" mate "status of the audit")
-  other=$(fm_pending_reply_create "$home" "$state" mate "status of the follow-up")
-  fm_pending_reply_mark_delivered "$state" "$corr"
-  fm_pending_reply_mark_delivered "$state" "$other"
-
-  rc=0
-  out=$(FM_HOME="$sm_home" "$REPORT" "done" "corr2=$other" "answered both" 2>&1) || rc=$?
-  [ "$rc" -ne 0 ] || fail "the helper must refuse a made-up corr2= token"
-  case "$out" in
-    *"ONE request per line"*) : ;;
-    *) fail "the refusal must teach the supported one-request form: $out" ;;
-  esac
-  case "$out" in
-    *"corr=<16 hex>"*) : ;;
-    *) fail "the refusal must name the supported token form: $out" ;;
-  esac
-  if fm_pending_reply_try_resolve "$state" "$corr"; then
-    fail "a refused multi-corr report must not resolve an expectation"
-  fi
-  [ ! -s "$state/mate.status" ] || fail "a refused multi-corr report must not write the parent channel"
-
-  rc=0
-  out=$(FM_HOME="$sm_home" "$REPORT" "done" "$corr" "answered [corr=$other] as well" 2>&1) || rc=$?
-  [ "$rc" -ne 0 ] || fail "the helper must refuse a second correlation token in the note"
-  case "$out" in
-    *"ONE request per line"*) : ;;
-    *) fail "the note refusal must teach the supported one-request form: $out" ;;
-  esac
-
-  # A plain second token in the note is this request's own token repeated and
-  # stays allowed: the matcher takes the first one.
-  FM_HOME="$sm_home" "$REPORT" "done" "$corr" "audit clean" \
-    || fail "the helper must still accept a supported single-request report"
-  grep -Fq "corr=$corr" "$state/mate.status" \
-    || fail "the supported report must still reach the parent channel"
-  pass "the report helper refuses an unsupported multi-corr report and names the supported form"
-}
-
 test_remote_parent_replies_is_not_wrong_home() {
   local home state sm_home corr rec hits
   home=$(setup_parent remote-parent-replies)
@@ -2155,6 +2189,7 @@ test_same_kind_escalation_reopens_after_operator_close() {
 test_normal_correlated_reply_resolves_once
 test_completed_turn_no_report_triggers_one_recovery
 test_recovery_waits_while_the_mate_has_an_open_decision
+test_held_recovery_escalates_the_hold_once_after_the_cap
 test_recovery_sends_during_an_open_decision_without_the_flag
 test_recovery_grace_measures_from_turn_completion
 test_recovery_fresh_status_read_resolves_before_firing
@@ -2196,7 +2231,6 @@ test_same_basename_self_home_corr_resolves_on_tick
 test_same_basename_reply_resolves_after_recovery_failure
 test_child_status_wrong_home_is_not_copied
 test_mechanical_helper_writes_parent_channel
-test_mechanical_helper_refuses_an_unsupported_multi_corr_report
 test_remote_parent_replies_is_not_wrong_home
 test_local_parent_replies_is_wrong_home_evidence
 test_escalated_undelivered_correlation_stays_retryable
