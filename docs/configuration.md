@@ -2740,6 +2740,7 @@ FM_SEND_RETRIES=3       # fm-send typed-plane Enter-retry attempts after typing 
 FM_SEND_SLEEP=0.4       # seconds between fm-send typed-plane submit checks
 FM_SEND_SETTLE=1        # seconds fm-send waits after a successful typed-plane submit; 0 disables
 FM_PENDING_REPLY_GRACE_SECS=120   # seconds after the request turn completes without a correlated parent report before its one recovery repost is eligible, and after the recovery turn completes before the missed-report escalation is eligible; never counted from delivery
+FM_PENDING_REPLY_HOLD_MAX_SECS=7200   # seconds a reply-bearing request may stay held behind the mate's own open decision under config/wait-no-turns before the parent escalates the HOLD itself (one blocked line naming the decision keys, nothing sent to the mate, so the no-turns rule still holds)
 # sub-supervisor (bin/fm-supervise-daemon.sh); presence-gated via /afk
 FM_SUPERVISOR_BACKEND=             # optional supervisor pane backend override; tmux/herdr only, otherwise detects $TMUX_PANE then HERDR_ENV/HERDR_PANE_ID before tmux fallback
 FM_SUPERVISOR_TARGET=              # optional supervisor pane target override; tmux uses the exact forms owned by fm_backend_target_exists in bin/fm-backend.sh, herdr uses <session>:<pane-id>, otherwise auto-detected
