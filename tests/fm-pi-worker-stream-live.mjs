@@ -9,6 +9,7 @@ assert.equal(process.env.AI_GATEWAY_API_KEY, undefined, "ambient credential reac
 const sdk = await import(pathToFileURL(process.env.PI_PACKAGE_DIR + "/dist/index.js").href);
 const { DefaultResourceLoader, ModelRegistry, ModelRuntime, SessionManager, SettingsManager, createAgentSession } = sdk;
 const cwd = process.env.STREAM_CWD, agentDir = process.env.PI_CODING_AGENT_DIR;
+const piVersion = process.env.PI_VERSION || "installed";
 const state = process.env.STREAM_STATE, enabled = process.env.STREAM_ENABLED === "300";
 const marker = state + "/stream.model-stream";
 const progress = state + "/stream.model-progress";
@@ -17,7 +18,7 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const until = async (predicate, description) => {
   const deadline = Date.now() + 10000;
   while (!predicate()) {
-    if (Date.now() >= deadline) throw new Error("Pi 1.2.0: timeout waiting for " + description);
+    if (Date.now() >= deadline) throw new Error("Pi " + piVersion + ": timeout waiting for " + description);
     await delay(10);
   }
 };
@@ -109,7 +110,7 @@ try {
         }
         assert.equal(alive, false, "instrumentation deadline left owned descendant alive: " + pid);
       }
-      console.log("ok - real Pi 1.2.0 instrumentation deadline terminated writer and output-holding descendant");
+      console.log("ok - real Pi " + piVersion + " instrumentation deadline terminated writer and output-holding descendant");
     }
     await until(() => controller && existsSync(progress), "foreground progress");
     const first = record();
@@ -150,7 +151,7 @@ try {
   }).result();
   assert.ok(providers > before, "background provider callback did not execute");
   assert.equal(record(), "", "background provider callback reopened foreground evidence");
-  console.log("ok - real Pi 1.2.0 " + (enabled ? "stream, tool, completion, and background request phases" : "default-off worker"));
+  console.log("ok - real Pi " + piVersion + " " + (enabled ? "stream, tool, completion, and background request phases" : "default-off worker"));
 } finally {
   releaseTool();
   if (session.isStreaming) await session.abort();

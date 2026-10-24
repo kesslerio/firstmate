@@ -81,7 +81,7 @@ EOF
 
 test_pi_stream_extension_activation_and_lifecycle() {
   local rec id=stream-pi state ext out version option enabled label
-  for label in disabled zero negative malformed leading maximum overflow verified older; do
+  for label in disabled zero negative malformed leading maximum overflow verified newer malformed-version older; do
     version=1.2.0 option=300 enabled=1
     case "$label" in
       disabled) option='' enabled=0 ;;
@@ -91,6 +91,8 @@ test_pi_stream_extension_activation_and_lifecycle() {
       leading) option=00300 ;;
       maximum) option=999999999 ;;
       overflow) option=1000000000 enabled=0 ;;
+      newer) version=1.3.0 ;;
+      malformed-version) version=not-a-version enabled=0 ;;
       older) version=0.82.0 enabled=0 ;;
     esac
     rec=$(make_spawn_case "stream-$label" pi "$id")

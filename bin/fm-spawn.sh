@@ -6542,10 +6542,11 @@ EOF
     pi_stream_monitoring=false
     if [ "$(fm_busy_stream_seconds "${FM_STREAM_SILENT_MAX_SECS:-}")" -gt 0 ]; then
       pi_stream_version=$(fm_run_timed 5 "$PI_BIN" --version 2>/dev/null || true)
-      case "$pi_stream_version" in
-        1.2.0) pi_stream_monitoring=true ;;
-        *) echo "warning: $HARNESS model-stream observation unavailable for version ${pi_stream_version:-unknown}; verified version: 1.2.0; existing busy bound remains active" >&2 ;;
-      esac
+      if fm_busy_pi_stream_version_supported "$pi_stream_version"; then
+        pi_stream_monitoring=true
+      else
+        echo "warning: $HARNESS model-stream observation unavailable for version ${pi_stream_version:-unknown}; requires $FM_BUSY_PI_STREAM_VERSION_FLOOR or newer; existing busy bound remains active" >&2
+      fi
     fi
     cat >"$STATE/$ID.pi-ext.ts" <<EOF
 // Firstmate semantic busy-state events + turn-end notification; written by

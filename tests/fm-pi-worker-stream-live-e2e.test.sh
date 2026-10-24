@@ -10,7 +10,10 @@ fm_live_gate default-on FM_PI_WORKER_STREAM_LIVE node pi jq
 PI_EXECUTABLE=$(command -v pi)
 PI_PACKAGE_DIR=$(node -e 'const fs=require("node:fs"),p=require("node:path"); console.log(p.resolve(p.dirname(fs.realpathSync(process.argv[1])),"../.."));' "$PI_EXECUTABLE")
 PI_VERSION=$(jq -r '.version' "$PI_PACKAGE_DIR/package.json") || fail "Pi package version unavailable"
-[ "$PI_VERSION" = 1.2.0 ] || fail "Pi $PI_VERSION: worker stream contract verified only on 1.2.0"
+# shellcheck source=bin/fm-busy-lib.sh
+. "$ROOT/bin/fm-busy-lib.sh"
+fm_busy_pi_stream_version_supported "$PI_VERSION" \
+  || fail "Pi $PI_VERSION: worker stream contract requires $FM_BUSY_PI_STREAM_VERSION_FLOOR or newer"
 TMP_ROOT=$(fm_test_tmproot fm-pi-worker-stream-live)
 sdk_env=(env -i)
 for name in NO_MISTAKES_GATE CODEX_MANAGED_BY_NPM CODEX_MANAGED_PACKAGE_ROOT; do
@@ -64,6 +67,7 @@ JSON
   # Preserve gate identity while excluding ambient credentials and discovery.
   "${sdk_env[@]}" PATH="$PATH" HOME="$home/user-home" NODE_NO_WARNINGS=1 \
     PI_PACKAGE_DIR="$PI_PACKAGE_DIR" PI_CODING_AGENT_DIR="$home/agent" \
+    PI_VERSION="$PI_VERSION" \
     STREAM_STATE="$home/state" STREAM_EXTENSION="$home/state/stream.pi-ext.ts" \
     STREAM_CWD="$wt" STREAM_ENABLED="$enabled" STREAM_FAULT_DIR="$fault_dir" \
     node "$ROOT/tests/fm-pi-worker-stream-live.mjs" || fail "Pi $PI_VERSION: real worker stream guard failed ($case_label)"
@@ -71,4 +75,4 @@ done
 if ! command -v pi-signed >/dev/null 2>&1; then
   printf '# pi-signed unavailable: signed executable not exercised\n'
 fi
-pass "real Pi 1.2.0 worker stream lifecycle, background exclusion, and default-off behavior"
+pass "real Pi $PI_VERSION worker stream lifecycle, background exclusion, and default-off behavior"

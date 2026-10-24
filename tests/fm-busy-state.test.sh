@@ -465,6 +465,19 @@ test_kimi_unverified_gate() {
   pass "standalone kimi classifies unknown until the live verification gate opens"
 }
 
+test_pi_stream_version_floor_accepts_verified_and_newer() {
+  local version
+  for version in 1.2.0 1.2.1 1.3.0 1.10.0 2.0.0 1.4.0; do
+    fm_busy_pi_stream_version_supported "$version" \
+      || fail "Pi $version must pass the $FM_BUSY_PI_STREAM_VERSION_FLOOR stream floor"
+  done
+  for version in '' 1.1.9 0.82.0 1.2 1.x.0 1.2.0.1 1.2.0-beta.3 1.2.0+build .1.2.0 1.2.0. 1000000000.0.0 'pi 1.4.0'; do
+    fm_busy_pi_stream_version_supported "$version" \
+      && fail "Pi '${version:-<empty>}' must not pass the $FM_BUSY_PI_STREAM_VERSION_FLOOR stream floor"
+  done
+  pass "Pi stream gate accepts the verified release and newer, rejects older, prerelease, and malformed"
+}
+
 test_cursor_ignores_rendered_and_native_signals() {
   local state out
   state=$(new_state_dir cursor-gate)
@@ -728,6 +741,7 @@ test_launch_prompt_requires_a_captured_tail
 test_grok_regex_isolated
 test_codex_unverified_gate
 test_kimi_unverified_gate
+test_pi_stream_version_floor_accepts_verified_and_newer
 test_cursor_ignores_rendered_and_native_signals
 test_dead_endpoint_overrides
 test_herdr_native_busy_only
