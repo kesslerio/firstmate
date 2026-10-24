@@ -104,6 +104,11 @@
 #   from that harness's launch rather than guessed. Ultra is the explicit
 #   exception: bin/fm-harness.sh validate-native-effort owns its model scope;
 #   supported Pi launches receive --codex-effort ultra, never --thinking ultra.
+#   A Claude launch with a concrete model pin gets a new, collision-checked
+#   --session-id and must read back that session's model from its transcript
+#   before spawn reports success; a mismatch or unreadable model is a blocker.
+#   A Herdr-bound Pi relaunch keeps its runtime-owned session identity, but a
+#   concrete pin must match that session's reported model before resume.
 #   OpenCode 2 has no interactive model or effort flag, so its selected model
 #   and effort are written as the build agent's model and variant inside the
 #   OPENCODE_CONFIG_CONTENT JSON its launch already carries (config schema
@@ -2583,7 +2588,7 @@ launch_template() {
   # project and fetched content. A persistent secondmate receives its own
   # supervisor contract instead, so this task-worker statement does not apply.
   claude)
-    printf '%s' 'CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false CLAUDE_CODE_SEND_FEEDBACK=0 claude __CLAUDEPERMFLAG__ __CLAUDEADDDIRS__--settings __CLAUDESETTINGS__ '
+    printf '%s' 'CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false CLAUDE_CODE_SEND_FEEDBACK=0 claude __CLAUDESESSION____CLAUDEPERMFLAG__ __CLAUDEADDDIRS__--settings __CLAUDESETTINGS__ '
     if [ "$kind" != secondmate ]; then
       printf '%s' "--append-system-prompt '$(spawn_claude_task_channel_statement)' "
     fi
@@ -3227,6 +3232,109 @@ muse_credential_present() {
   [ -s "$auth" ] || muse_worker_meta_api_key_present
 }
 
+# A pin is not proven by the launch argument alone. Compare it with the model
+# written by the session that received the launch, and leave the result in the
+# task status so supervision sees a downgrade before it can look like success.
+spawn_model_pin_matches() {  # <harness> <pin> <actual>
+  local harness=$1 pin=$2 actual=$3
+  [ "$pin" = "$actual" ] && return 0
+  case "$harness:$pin:$actual" in
+    claude:opus:claude-opus-*|claude:sonnet:claude-sonnet-*|claude:haiku:claude-haiku-*) return 0 ;;
+    pi:*:*)
+      case "$pin" in
+        */*) return 1 ;;
+        *) [ "${actual##*/}" = "$pin" ] ;;
+      esac
+      ;;
+  esac
+  return 1
+}
+
+spawn_model_pin_blocker() {  # <message>
+  local message=$1
+  printf '%s\n' "$(status_stamp_line "blocked: $message")" >>"$STATE/$ID.status"
+  printf 'error: %s\n' "$message" >&2
+}
+
+pi_session_reported_model() {  # <session-path-or-id> [agent-dir]
+  local ref=$1 root=${2:-${PI_CODING_AGENT_DIR:-${HOME:-$PWD}/.pi/agent}} file candidate model
+  if [ -f "$ref" ]; then
+    file=$ref
+  else
+    [ -d "$root/sessions" ] || return 1
+    while IFS= read -r -d '' candidate; do
+      if jq -e --arg id "$ref" 'select(.type == "session" and .id == $id)' "$candidate" >/dev/null 2>&1; then
+        file=$candidate
+        break
+      fi
+    done < <(find "$root/sessions" -type f -name '*.jsonl' -print0 2>/dev/null)
+  fi
+  [ -n "$file" ] && [ -r "$file" ] || return 1
+  model=$(jq -r '
+    select(.type == "message" and .message.role == "assistant" and (.message.model | type == "string") and (.message.model | length > 0))
+    | if (.message.provider | type) == "string" and (.message.provider | length > 0)
+      then .message.provider + "/" + .message.model
+      else .message.model
+      end
+  ' "$file" 2>/dev/null | tail -n 1)
+  [ -n "$model" ] && [ "$model" != null ] || return 1
+  printf '%s' "$model"
+}
+
+claude_fresh_session_id() {  # <config-dir>
+  local config_dir=$1 projects="$1/projects" id attempt collision candidate
+  command -v uuidgen >/dev/null 2>&1 || return 1
+  for attempt in 1 2 3 4 5; do
+    id=$(uuidgen 2>/dev/null | tr '[:upper:]' '[:lower:]') || return 1
+    case "$id" in
+      ????????-????-????-????-????????????) ;;
+      *) return 1 ;;
+    esac
+    case "$id" in *[!0123456789abcdef-]*) return 1 ;; esac
+    collision=0
+    if [ -d "$projects" ]; then
+      while IFS= read -r -d '' candidate; do collision=1; break; done \
+        < <(find "$projects" -type f -name "$id.jsonl" -print0 2>/dev/null)
+    fi
+    [ "$collision" -eq 0 ] || continue
+    printf '%s' "$id"
+    return 0
+  done
+  return 1
+}
+
+claude_session_reported_model() {  # <config-dir> <session-id>
+  local config_dir=$1 session_id=$2 file model
+  [ -d "$config_dir/projects" ] || return 1
+  file=$(find "$config_dir/projects" -type f -name "$session_id.jsonl" -print -quit 2>/dev/null)
+  [ -n "$file" ] && [ -r "$file" ] || return 1
+  model=$(jq -r --arg session_id "$session_id" '
+    select(.sessionId == $session_id and .type == "assistant" and .message.role == "assistant" and (.message.model | type == "string") and (.message.model | length > 0))
+    | .message.model
+  ' "$file" 2>/dev/null | tail -n 1)
+  [ -n "$model" ] && [ "$model" != null ] || return 1
+  printf '%s' "$model"
+}
+
+spawn_assert_claude_model_pin() {  # <config-dir> <session-id> <pin>
+  local config_dir=$1 session_id=$2 pin=$3 actual='' i=0
+  while [ "$i" -lt 120 ]; do
+    actual=$(claude_session_reported_model "$config_dir" "$session_id") || actual=
+    [ -n "$actual" ] && break
+    i=$((i + 1))
+    [ "$i" -ge 120 ] || sleep 0.5
+  done
+  if [ -z "$actual" ]; then
+    spawn_model_pin_blocker "could not read the effective Claude model for pin '$pin' from session '$session_id'"
+    return 1
+  fi
+  if ! spawn_model_pin_matches claude "$pin" "$actual"; then
+    spawn_model_pin_blocker "Claude model pin '$pin' mismatched the session's reported model '$actual'"
+    return 1
+  fi
+  printf '%s\n' "$(status_stamp_line "working: model pin assertion passed: pin '$pin' actual '$actual'")" >>"$STATE/$ID.status"
+}
+
 # relaunch_resume_args: the launch arguments that keep a RELAUNCH bound to the
 # agent session this endpoint's runtime already reports, so the runtime's own
 # status authority survives the replacement.
@@ -3267,6 +3375,19 @@ relaunch_resume_args() {  # <harness> <backend> <target>
   ref=${identity#*$'\t'}
   flag=$(fm_control_relaunch_resume_flag "$harness" "$agent") || return 0
   [ -n "$flag" ] && [ -n "$ref" ] || return 0
+  if [ -n "$MODEL" ] && [ "$MODEL" != default ]; then
+    local actual pi_session_root=${PI_CODING_AGENT_DIR:-${HOME:-$PWD}/.pi/agent}
+    if [ -n "$WORKER_ACCOUNT_ROOT" ]; then pi_session_root=$WORKER_ACCOUNT_ROOT; fi
+    actual=$(pi_session_reported_model "$ref" "$pi_session_root") || {
+      spawn_model_pin_blocker "could not read the effective model for pin '$MODEL' from the Herdr-bound Pi session '$ref'"
+      return 2
+    }
+    if ! spawn_model_pin_matches pi "$MODEL" "$actual"; then
+      spawn_model_pin_blocker "refusing to resume Pi session: model pin '$MODEL' differs from the session's reported model '$actual'"
+      return 2
+    fi
+    printf '%s\n' "$(status_stamp_line "working: resumed-session model assertion passed: pin '$MODEL' actual '$actual'")" >>"$STATE/$ID.status"
+  fi
   printf -- ' %s %s' "$flag" "$(shell_quote "$ref")"
 }
 
@@ -6694,18 +6815,35 @@ sq_ompext=$(shell_quote "$STATE/$ID.omp-ext.ts")
 sq_ompcfg=$(shell_quote "${OMP_WORKER_CFG:-$FM_ROOT/.omp/fm-worker-overlay.yml}")
 sq_opinput=$(shell_quote "$FM_ROOT/bin/fm-operational-input.sh")
 sq_worktree=$(shell_quote "$WT")
+CLAUDE_SESSION_ID=
+CLAUDE_SESSION_ARGS=
+CLAUDE_SESSION_CONFIG_DIR=${CLAUDE_CONFIG_DIR:-${HOME:-$PWD}/.claude}
+if [ "$HARNESS" = claude ] && [ -n "$MODEL" ] && [ "$MODEL" != default ]; then
+  CLAUDE_SESSION_ID=$(claude_fresh_session_id "$CLAUDE_SESSION_CONFIG_DIR") || {
+    echo "error: could not allocate a fresh Claude session id for model pin '$MODEL'" >&2
+    exit 1
+  }
+  CLAUDE_SESSION_ARGS="--session-id $(shell_quote "$CLAUDE_SESSION_ID") "
+fi
 MODELFLAG=$(model_flag_for_harness "$HARNESS" "$MODEL" "$OPENCODE_MAJOR")
 # A pinned Pi launch confines Pi's model lookup to the declared provider.
 [ -z "$WORKER_ACCOUNT_PROVIDER" ] || MODELFLAG="--provider $(shell_quote "$WORKER_ACCOUNT_PROVIDER") $MODELFLAG"
 EFFORTFLAG=$(effort_flag_for_harness "$HARNESS" "$EFFORT" "$MODEL" "$OPENCODE_MAJOR") || exit 1
 LAUNCH=${LAUNCH//__MODELFLAG__/$MODELFLAG}
 LAUNCH=${LAUNCH//__EFFORTFLAG__/$EFFORTFLAG}
+LAUNCH=${LAUNCH//__CLAUDESESSION__/$CLAUDE_SESSION_ARGS}
 # Relaunch session continuity. Computed here, where the adopted endpoint (T) is
 # known, and substituted only into the Pi-family template's `__PIRESUME__`
 # placeholder; an empty value leaves every other launch byte-identical.
 RESUME_ARGS=
 if [ "$RELAUNCH" -eq 1 ]; then
-  RESUME_ARGS=$(relaunch_resume_args "$HARNESS" "$BACKEND" "$T") || RESUME_ARGS=
+  if RESUME_ARGS=$(relaunch_resume_args "$HARNESS" "$BACKEND" "$T"); then
+    :
+  else
+    resume_rc=$?
+    [ "$resume_rc" -ne 2 ] || exit 1
+    RESUME_ARGS=
+  fi
 fi
 LAUNCH=${LAUNCH//__PIRESUME__/$RESUME_ARGS}
 LAUNCH=${LAUNCH//__CLAUDEPERMFLAG__/$CLAUDE_PERM_FLAG}
@@ -7277,6 +7415,9 @@ if [ "$HARNESS" = polytoken ] && [ "$RAW_LAUNCH" -eq 0 ]; then
     polytoken_spawn_fail "polytoken session binding could not be recorded for $ID"
     exit 1
   fi
+fi
+if [ -n "$CLAUDE_SESSION_ID" ]; then
+  spawn_assert_claude_model_pin "$CLAUDE_SESSION_CONFIG_DIR" "$CLAUDE_SESSION_ID" "$MODEL" || exit 1
 fi
 
 if [ "$KIND" = secondmate ] && [ "${FM_SKIP_SECONDMATE_INHERIT:-0}" != 1 ]; then
