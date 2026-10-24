@@ -547,6 +547,7 @@ fm_backlog_directory_present "$STATE" "state directory" || {
 }
 # shellcheck source=bin/fm-wake-lib.sh
 . "$SCRIPT_DIR/fm-wake-lib.sh"
+# shellcheck source=bin/fm-sol-cap-lib.sh
 . "$SCRIPT_DIR/fm-sol-cap-lib.sh"
 # Supervision lease guard: post-landing cleanup is overlap territory between
 # the two Pi supervision actors; refuse while the OTHER actor holds this
@@ -3313,7 +3314,6 @@ teardown_herdr_require_prerequisites() {  # <task-id>
   if ! declare -F fm_lock_try_acquire >/dev/null 2>&1; then
     # shellcheck source=/dev/null
     . "$SCRIPT_DIR/fm-wake-lib.sh"
-. "$SCRIPT_DIR/fm-sol-cap-lib.sh"
   fi
   if ! declare -F fm_lock_try_acquire >/dev/null 2>&1 \
     || ! declare -F fm_lock_release >/dev/null 2>&1; then
