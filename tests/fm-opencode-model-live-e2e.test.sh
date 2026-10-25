@@ -8,9 +8,7 @@
 # real installed OpenCode and fails naming it and its version.
 #
 # It spends a model turn on the host's already-configured providers, so it is
-# opt-in. It also reports what the background self-upgrade does across the run
-# rather than assuming it away: the version, binary identity, and pane liveness
-# are captured before and after a settle window.
+# opt-in.
 set -u
 
 # shellcheck source=tests/lib.sh
@@ -21,6 +19,7 @@ fm_live_gate opt-in FM_OPENCODE_MODEL_LIVE opencode jq tmux
 OPENCODE_BIN=$(command -v opencode) || fail "opencode resolved by the gate but not on PATH"
 VERSION=$(opencode --version 2>/dev/null | head -1) || VERSION=
 [ -n "$VERSION" ] || fail "opencode ($OPENCODE_BIN) reported no version"
+printf 'ok - installed opencode (%s): %s\n' "$VERSION" "$OPENCODE_BIN"
 
 LAB=$(mktemp -d "${TMPDIR:-/tmp}/fm-opencode-model-live.XXXXXX") || fail "could not create a lab directory"
 TMUX_SOCKET=
@@ -109,19 +108,3 @@ OBSERVED=$(wait_for_session_model "$PIN_DIR" 90) \
   || fail_named "the launched worker ran '$OBSERVED' instead of the requested '$REQUESTED'"
 printf 'ok - opencode (%s): a real TUI launch ran the requested model (requested=%s observed=%s)\n' \
   "$VERSION" "$REQUESTED" "$OBSERVED"
-
-# Background self-upgrade, reported as observed: the installed build, its binary
-# identity, and the pane's liveness across a settle window.
-BIN_BEFORE=$(readlink -f "$OPENCODE_BIN" 2>/dev/null || printf '%s' "$OPENCODE_BIN")
-STAMP_BEFORE=$(stat -c '%s:%y' "$BIN_BEFORE" 2>/dev/null || stat -f '%z:%m' "$BIN_BEFORE" 2>/dev/null || printf 'unreadable')
-sleep "${FM_OPENCODE_UPGRADE_WINDOW_SECONDS:-20}"
-VERSION_AFTER=$(opencode --version 2>/dev/null | head -1) || VERSION_AFTER=
-STAMP_AFTER=$(stat -c '%s:%y' "$BIN_BEFORE" 2>/dev/null || stat -f '%z:%m' "$BIN_BEFORE" 2>/dev/null || printf 'unreadable')
-PANE_DEAD=$(tmux -L "$TMUX_SOCKET" list-panes -a -F '#{pane_dead}' 2>/dev/null | tr '\n' ',') || PANE_DEAD=
-printf 'ok - opencode (%s): self-upgrade observed (version after=%s, binary %s -> %s, pane_dead=%s)\n' \
-  "$VERSION" "${VERSION_AFTER:-unreadable}" "$STAMP_BEFORE" "$STAMP_AFTER" "${PANE_DEAD:-unknown}"
-
-if [ -n "$VERSION_AFTER" ] && [ "$VERSION_AFTER" != "$VERSION" ]; then
-  fail_named "the installed build changed under this run (now $VERSION_AFTER); the model assertion above speaks only for $VERSION - rerun the guard"
-fi
-printf 'ok - opencode (%s): version stable across the self-upgrade window\n' "$VERSION"

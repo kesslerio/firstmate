@@ -28,6 +28,16 @@ trap cleanup_opencode_model EXIT
 make_opencode_fakebin() {
   local dir=$1 fakebin
   fakebin=$(fm_test_make_spawn_fakebin "$dir")
+  mv "$fakebin/tmux" "$fakebin/tmux-fixture"
+  cat > "$fakebin/tmux" <<'SH'
+#!/usr/bin/env bash
+if [ "${1:-}" = kill-window ]; then
+  printf '%s\n' "$*" >>"$FM_FAKE_STOP_LOG"
+  [ "${FM_FAKE_STOP_FAIL:-0}" != 1 ] || exit 1
+fi
+exec "$(dirname "$0")/tmux-fixture" "$@"
+SH
+  chmod +x "$fakebin/tmux"
   cat > "$fakebin/timeout" <<'SH'
 #!/usr/bin/env bash
 # Match GNU timeout's option shape from bin/fm-timeout-lib.sh fm_run_timed.
@@ -131,6 +141,7 @@ run_spawn() {  # <rec> [extra args...]
   read_case "$rec"
   : > "$LAUNCH_LOG"
   FM_FAKE_LAUNCH_LOG="$LAUNCH_LOG" \
+    FM_FAKE_STOP_LOG="$CASE_DIR/stop.log" \
     FM_FAKE_OPENCODE_LOG="$CASE_DIR/opencode.log" \
     fm_test_run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" \
     "$ID" "$PROJ_DIR" --mode direct-PR --yolo off "$@"
@@ -260,6 +271,8 @@ test_mismatched_effective_model_refuses() {
     "the refusal must report both the observed and requested models"
   assert_grep 'failed ' "$HOME_DIR/state/$ID.status" \
     "the wrong-model refusal must be recorded as a failed launch"
+  assert_grep "kill-window -t =firstmate:=fm-$ID" "$CASE_DIR/stop.log" "must stop only the task endpoint"
+  assert_absent "$HOME_DIR/state/$ID.meta" "stopped fresh spawn must roll back its record"
   pass "a wrong-model lane surfaces at once instead of looking healthy"
 }
 
@@ -276,6 +289,8 @@ test_unreadable_session_record_refuses() {
     "the refusal must name the unreadable assertion"
   assert_contains "$out" 'an unread model assertion is a failure' \
     "the refusal must state that an unread result is never a pass"
+  assert_grep "kill-window -t =firstmate:=fm-$ID" "$CASE_DIR/stop.log" "unreadable model must stop its task endpoint"
+  assert_absent "$HOME_DIR/state/$ID.meta" "stopped fresh spawn must roll back its record"
   pass "an unread model assertion refuses rather than passing silently"
 }
 
@@ -386,6 +401,61 @@ test_pin_retirement_is_scoped_to_firstmate_owned_files() {
   pass "pin retirement removes only the file firstmate recorded as its own"
 }
 
+test_failed_stop_retains_recovery_records() {
+  local rec out status observed name
+  for name in wrong unreadable; do
+    rec=$(make_case "stop-fails-$name")
+    read_case "$rec"
+    observed=opencode/other
+    [ "$name" != unreadable ] || observed=
+    out=$(FM_FAKE_STOP_FAIL=1 FM_FAKE_OPENCODE_SESSION_MODEL="$observed" \
+      FM_OPENCODE_MODEL_ASSERT_POLLS=1 FM_OPENCODE_MODEL_ASSERT_INTERVAL=1 \
+      run_spawn "$rec" --model john-remote/qwen3.8-flash-next)
+    status=$?
+    expect_code 1 "$status" "unconfirmed stop must refuse launch"
+    assert_present "$HOME_DIR/state/$ID.meta" "unconfirmed stop must retain task metadata"
+    assert_present "$HOME_DIR/state/$ID.busy-gen" "unconfirmed stop must retain busy generation"
+    assert_present "$HOME_DIR/state/$ID.busy-state" "unconfirmed stop must retain busy ownership"
+    assert_contains "$out" 'stop this endpoint before retrying' "failure must provide recovery guidance"
+    assert_grep "kill-window -t =firstmate:=fm-$ID" "$CASE_DIR/stop.log" "stop must target only its worker"
+  done
+  pass "unconfirmed stops preserve supervision for wrong and unreadable models"
+}
+
+test_secondmate_config_resolves_before_model_probe() {
+  local rec sm out status shape pin
+  for shape in 1x 2x; do
+    rec=$(make_case "secondmate-$shape")
+    read_case "$rec"
+    sm="$CASE_DIR/secondmate-home"
+    mkdir -p "$sm/bin" "$sm/data"
+    printf '# Firstmate\n' >"$sm/AGENTS.md"
+    printf '%s\n' "$ID" >"$sm/.fm-secondmate-home"
+    printf 'charter\n' >"$sm/data/charter.md"
+    git -C "$sm" init -q -b main
+    printf 'opencode anthropic/claude-sonnet-4-5 high\n' >"$HOME_DIR/config/secondmate-harness"
+    out=$(FM_FAKE_OPENCODE_SHAPE="$shape" \
+      FM_FAKE_OPENCODE_SESSION_MODEL=anthropic/claude-sonnet-4-5 \
+      FM_FAKE_STOP_LOG="$CASE_DIR/stop.log" FM_FAKE_LAUNCH_LOG="$LAUNCH_LOG" \
+      fm_test_run_spawn "$HOME_DIR" "$sm" "$FAKEBIN_DIR" "$ID" "$sm" --secondmate)
+    status=$?
+    expect_code 0 "$status" "configured secondmate must launch: $out"
+    assert_contains "$out" 'model assertion passed' "configured model must be verified"
+    assert_absent "$CASE_DIR/stop.log" "successful launch must not stop its worker"
+    if [ "$shape" = 2x ]; then
+      pin="$sm/.opencode/opencode.jsonc"
+      [ "$(jq -c '.model' "$pin")" = '{"providerID":"anthropic","model":"claude-sonnet-4-5","variant":"high"}' ] \
+        || fail "configured secondmate model and effort were not pinned"
+    else
+      assert_grep "--model 'anthropic/claude-sonnet-4-5'" "$LAUNCH_LOG" "configured 1.x model must use the flag"
+      assert_grep '"variant":"high"' "$LAUNCH_LOG" "configured 1.x effort must use build-agent config"
+    fi
+  done
+  pass "secondmate configured model and effort resolve before either build probe"
+}
+
+test_failed_stop_retains_recovery_records
+test_secondmate_config_resolves_before_model_probe
 test_2x_pins_model_through_project_config
 test_1x_keeps_the_model_flag
 test_build_that_cannot_report_the_pin_refuses
