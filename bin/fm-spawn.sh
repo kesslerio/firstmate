@@ -2568,7 +2568,7 @@ OPENCODE_MODEL_MECHANISM=
 # A 2.x build advertises it only under `opencode run`, which is a different,
 # non-interactive command, so only a list-entry shape counts here.
 opencode_top_level_model_flag() {  # <help-text>
-  printf '%s\n' "$1" | grep -Eq '^[[:space:]]*--model([[:space:]]|,|$)'
+  printf '%s\n' "$1" | grep -Eq '^[[:space:]]*(-m,[[:space:]]*)?--model([[:space:]]|,|$)'
 }
 
 # Sets OPENCODE_VERSION and OPENCODE_MODEL_MECHANISM (flag|project-config), or
@@ -2736,9 +2736,14 @@ opencode_session_model() {  # <worktree> <since-epoch-ms>
   [ -n "$sessions" ] || return 1
   sid=$(printf '%s' "$sessions" | jq -r --arg d "$real" '[.[]? | select((.directory // "") == $d)] | sort_by(.updated // 0) | reverse | .[0].id // empty' 2>/dev/null) || return 1
   [ -n "$sid" ] || return 1
-  exported=$(cd "$wt" && fm_run_timed "$bound" "$OPENCODE_BIN" session export "$sid" ${standalone:+"$standalone"} 2>/dev/null </dev/null) || return 1
+  if [ "${OPENCODE_MAJOR:-1}" -lt 2 ]; then
+    exported=$(cd "$wt" && fm_run_timed "$bound" "$OPENCODE_BIN" export "$sid" 2>/dev/null </dev/null) || return 1
+    exported=$(printf '%s' "$exported" | jq -c '{messages: [.messages[]?.info | {type: .role, time: .time, model: {providerID: .providerID, id: .modelID}}]}') || return 1
+  else
+    exported=$(cd "$wt" && fm_run_timed "$bound" "$OPENCODE_BIN" session export "$sid" --standalone 2>/dev/null </dev/null) || return 1
+  fi
   [ -n "$exported" ] || return 1
-  printf '%s' "$exported" | jq -r --argjson since "$since" '[.messages[]? | select(.type == "assistant" and .model != null and ((.time.created // 0) >= $since)) | .model] | .[0] // empty | if type == "object" then (.providerID + "/" + (.id // .model) + (if (.variant // "") != "" then "#" + .variant else "" end)) else empty end' 2>/dev/null
+  printf '%s' "$exported" | jq -r --argjson since "$since" '[.messages[]? | select(.type == "assistant" and ((.model.providerID // "") != "") and ((.model.id // .model.model // "") != "") and ((.time.created // 0) >= $since)) | .model] | .[0] // empty | if type == "object" then (.providerID + "/" + (.id // .model) + (if (.variant // "") != "" then "#" + .variant else "" end)) else empty end' 2>/dev/null
 }
 
 # The verified launch command per adapter. The knowledge half of each adapter
@@ -5376,9 +5381,29 @@ kimi_spawn_fail() { # <detail>
 # reads a wrong-model refusal as a refused launch, never as a wedged worker.
 opencode_spawn_fail() { # <detail>
   printf '%s\n' "$(status_stamp_line "failed: $1")" >>"$STATE/$ID.status"
-  local tab_id=
+  local tab_id= gone=0 windows inventory_status
   [ "$BACKEND" != zellij ] || tab_id=${ZELLIJ_TAB_ID:-}
-  if fm_backend_kill "$BACKEND" "$T" "$tab_id" "fm-$ID"; then
+  if [ "$RELAUNCH" -eq 0 ] && ! fm_control_retire_opencode_model_pin "$ID" "$WT" "$STATE"; then
+    SPAWN_FRESH_COMMIT_PENDING=0
+    echo "error: $1; could not retire task-owned model pin; retained $STATE/$ID.meta and endpoint $T for recovery" >&2
+    return
+  fi
+  fm_backend_kill "$BACKEND" "$T" "$tab_id" "fm-$ID" || true
+  case "$BACKEND" in
+  tmux)
+    inventory_status=0
+    windows=$(fm_backend_tmux_window_inventory "=${T%%:*}") || inventory_status=$?
+    if [ "$inventory_status" -eq 2 ] ||
+      { [ "$inventory_status" -eq 0 ] && ! printf '%s\n' "$windows" | grep -qxF -- "${T#*:}"; }; then
+      gone=1
+    fi
+    ;;
+  herdr) fm_backend_herdr_endpoint_confirmed_gone "$T" && gone=1 ;;
+  rex)
+    [ "$(fm_control_endpoint_absence_verdict "$BACKEND" "$T" "$STATE/$ID.meta")" != $'gone\t' ] || gone=1
+    ;;
+  esac
+  if [ "$gone" -eq 1 ]; then
     SPAWN_ENDPOINT_CLOSED=1
     echo "error: $1; stopped task endpoint $T" >&2
   else

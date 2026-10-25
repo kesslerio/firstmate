@@ -34,6 +34,11 @@ make_opencode_fakebin() {
 if [ "${1:-}" = kill-window ]; then
   printf '%s\n' "$*" >>"$FM_FAKE_STOP_LOG"
   [ "${FM_FAKE_STOP_FAIL:-0}" != 1 ] || exit 1
+  [ "${FM_FAKE_STOP_SURVIVES:-0}" != 1 ] || exit 0
+fi
+if [ "${1:-}" = list-windows ] && [ -f "$FM_FAKE_STOP_LOG" ] && [ "${FM_FAKE_STOP_UNKNOWN:-0}" = 1 ]; then
+  echo 'inventory unavailable' >&2
+  exit 1
 fi
 exec "$(dirname "$0")/tmux-fixture" "$@"
 SH
@@ -65,7 +70,7 @@ case "${1:-}" in
   case "$shape" in
   1x)
     printf '%s\n' 'DESCRIPTION' '  OpenCode command line interface' '' 'FLAGS' \
-      '  --model string          Model to use' '  --prompt string         Prompt to use'
+      '  -m, --model string          Model to use' '  --prompt string         Prompt to use'
     ;;
   *)
     # 2.0.26 has no top-level --model; it advertises --standalone instead.
@@ -101,7 +106,22 @@ if [ "${1:-}" = session ] && [ "${2:-}" = list ]; then
   fi
   exit 0
 fi
+if [ "${1:-}" = export ]; then
+  [ "$shape" = 1x ] || exit 1
+  provider=${FM_FAKE_OPENCODE_SESSION_MODEL%%/*}
+  model=${FM_FAKE_OPENCODE_SESSION_MODEL#*/}
+  jq -cn --arg provider "$provider" --arg model "$model" \
+    --argjson created "${FM_FAKE_OPENCODE_ASSERT_TIME:-9999999999999}" \
+    '{messages:[{info:{role:"user",time:{created:1}}},{info:{role:"assistant",time:{created:$created},providerID:$provider,modelID:$model}}]}'
+  exit 0
+fi
 if [ "${1:-}" = session ] && [ "${2:-}" = export ]; then
+  [ "$shape" != 1x ] || exit 1
+  if [ "${FM_FAKE_PIN_CLEANUP_FAIL:-0}" = 1 ]; then
+    rm "$PWD/.opencode/opencode.jsonc"
+    mkdir "$PWD/.opencode/opencode.jsonc"
+    touch "$PWD/.opencode/opencode.jsonc/blocker"
+  fi
   provider=${FM_FAKE_OPENCODE_SESSION_MODEL%%/*}
   model=${FM_FAKE_OPENCODE_SESSION_MODEL#*/}
   printf '{"info":{},"messages":[{"type":"user","time":{"created":1}},{"type":"assistant","time":{"created":%s},"model":{"providerID":"%s","id":"%s"}}]}\n' \
@@ -273,6 +293,8 @@ test_mismatched_effective_model_refuses() {
     "the wrong-model refusal must be recorded as a failed launch"
   assert_grep "kill-window -t =firstmate:=fm-$ID" "$CASE_DIR/stop.log" "must stop only the task endpoint"
   assert_absent "$HOME_DIR/state/$ID.meta" "stopped fresh spawn must roll back its record"
+  assert_absent "$(pin_file)" "stopped fresh spawn must retire its pin before slot release"
+  assert_absent "$(pin_record)" "stopped fresh spawn must retire its pin ownership record"
   pass "a wrong-model lane surfaces at once instead of looking healthy"
 }
 
@@ -291,6 +313,8 @@ test_unreadable_session_record_refuses() {
     "the refusal must state that an unread result is never a pass"
   assert_grep "kill-window -t =firstmate:=fm-$ID" "$CASE_DIR/stop.log" "unreadable model must stop its task endpoint"
   assert_absent "$HOME_DIR/state/$ID.meta" "stopped fresh spawn must roll back its record"
+  assert_absent "$(pin_file)" "stopped fresh spawn must retire its pin before slot release"
+  assert_absent "$(pin_record)" "stopped fresh spawn must retire its pin ownership record"
   pass "an unread model assertion refuses rather than passing silently"
 }
 
@@ -454,6 +478,105 @@ test_secondmate_config_resolves_before_model_probe() {
   pass "secondmate configured model and effort resolve before either build probe"
 }
 
+test_successful_close_without_proven_absence_retains_records() {
+  local rec out status mode observed name
+  for mode in survives unknown; do
+    for name in wrong unreadable; do
+      rec=$(make_case "$mode-$name")
+      read_case "$rec"
+      observed=opencode/other
+      [ "$name" != unreadable ] || observed=
+      out=$(FM_FAKE_STOP_SURVIVES="$([ "$mode" != survives ] || printf 1)" \
+        FM_FAKE_STOP_UNKNOWN="$([ "$mode" != unknown ] || printf 1)" \
+        FM_FAKE_OPENCODE_SESSION_MODEL="$observed" \
+        FM_OPENCODE_MODEL_ASSERT_POLLS=1 FM_OPENCODE_MODEL_ASSERT_INTERVAL=1 \
+        run_spawn "$rec" --model john-remote/qwen3.8-flash-next)
+      status=$?
+      expect_code 1 "$status" "unproven absence must refuse launch"
+      assert_present "$HOME_DIR/state/$ID.meta" "$mode/$name unproven absence must preserve metadata: $out"
+      assert_present "$HOME_DIR/state/$ID.busy-gen" "unproven absence must preserve busy generation"
+      assert_contains "$out" 'could not confirm stopping task endpoint' "close success alone must not authorize rollback"
+    done
+  done
+  pass "surviving and unreadable endpoints preserve supervision after successful close commands"
+}
+
+test_pin_cleanup_failure_preserves_launch_recovery() {
+  local rec out status
+  rec=$(make_case pin-cleanup-fails)
+  read_case "$rec"
+  out=$(FM_FAKE_PIN_CLEANUP_FAIL=1 FM_FAKE_OPENCODE_SESSION_MODEL=opencode/other \
+    run_spawn "$rec" --model john-remote/qwen3.8-flash-next)
+  status=$?
+  expect_code 1 "$status" "pin cleanup failure must refuse"
+  assert_present "$(pin_record)" "cleanup failure must retain pin ownership"
+  assert_present "$HOME_DIR/state/$ID.meta" "cleanup failure must retain task metadata"
+  assert_present "$HOME_DIR/state/$ID.busy-gen" "cleanup failure must retain busy ownership"
+  assert_absent "$CASE_DIR/stop.log" "slot must not be released before pin retirement"
+  assert_contains "$out" 'could not retire task-owned model pin' "cleanup refusal needs recovery context"
+  pass "failed pin retirement preserves recovery and prevents slot release"
+}
+
+test_pin_retirement_uses_owning_home_and_preserves_project_config() {
+  local rec child_state pin record
+  rec=$(make_case child-pin-owner)
+  read_case "$rec"
+  child_state="$CASE_DIR/child-home/state"
+  mkdir -p "$child_state" "$WT_DIR/.opencode"
+  pin=$(pin_file)
+  record="$child_state/$ID.opencode-model-config"
+  printf 'project-owned\n' >"$pin"
+  . "$CONTROL_LIB"
+  fm_control_retire_opencode_model_pin "$ID" "$WT_DIR" "$child_state" || fail "project config cleanup refused"
+  [ "$(cat "$pin")" = project-owned ] || fail "unowned project config changed"
+  printf '%s\n' "$pin" >"$record"
+  fm_control_retire_opencode_model_pin "$ID" "$WT_DIR" "$HOME_DIR/state" || fail "parent state cleanup refused"
+  assert_present "$pin" "parent state must not claim a child's pin"
+  fm_control_retire_opencode_model_pin "$ID" "$WT_DIR" "$child_state" || fail "child pin retirement refused"
+  assert_absent "$pin" "child-owned stale pin must be retired"
+  assert_absent "$record" "successful retirement must remove child ownership record"
+  mkdir "$pin"
+  touch "$pin/blocker"
+  printf '%s\n' "$pin" >"$record"
+  if fm_control_retire_opencode_model_pin "$ID" "$WT_DIR" "$child_state" 2>/dev/null; then
+    fail "nonempty pin directory must refuse cleanup"
+  fi
+  assert_present "$record" "failed child pin retirement must preserve ownership"
+  pass "pin retirement uses the owning home and preserves project files and cleanup-failure records"
+}
+
+test_1x_rejects_wrong_unreadable_and_stale_models() {
+  local rec out status name observed stamp
+  for name in wrong unreadable stale; do
+    rec=$(make_case "one-x-$name")
+    read_case "$rec"
+    observed=john-remote/qwen3.8-flash-next
+    stamp=9999999999999
+    case "$name" in
+      wrong) observed=opencode/other ;;
+      unreadable) observed= ;;
+      stale) stamp=1 ;;
+    esac
+    out=$(FM_FAKE_OPENCODE_SHAPE=1x FM_FAKE_OPENCODE_SESSION_MODEL="$observed" \
+      FM_FAKE_OPENCODE_ASSERT_TIME="$stamp" \
+      FM_OPENCODE_MODEL_ASSERT_POLLS=1 FM_OPENCODE_MODEL_ASSERT_INTERVAL=1 \
+      run_spawn "$rec" --model john-remote/qwen3.8-flash-next)
+    status=$?
+    expect_code 1 "$status" "1.x $name model must refuse"
+    assert_contains "$out" 'stopped task endpoint' "1.x refusal must stop its worker"
+    assert_absent "$HOME_DIR/state/$ID.meta" "confirmed 1.x stop must roll back"
+    assert_no_grep 'session export' "$CASE_DIR/opencode.log" "1.x must never use 2.x export"
+    if [ "$name" != unreadable ]; then
+      assert_grep 'export ses_fixture' "$CASE_DIR/opencode.log" "1.x readback must use top-level export"
+    fi
+  done
+  pass "1.x rejects wrong, absent and stale observations through its native protocol"
+}
+
+test_1x_rejects_wrong_unreadable_and_stale_models
+test_successful_close_without_proven_absence_retains_records
+test_pin_cleanup_failure_preserves_launch_recovery
+test_pin_retirement_uses_owning_home_and_preserves_project_config
 test_failed_stop_retains_recovery_records
 test_secondmate_config_resolves_before_model_probe
 test_2x_pins_model_through_project_config

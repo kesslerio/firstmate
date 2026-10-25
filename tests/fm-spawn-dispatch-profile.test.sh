@@ -76,7 +76,7 @@ if [ "${1:-}" = --version ]; then
 fi
 if [ "${1:-}" = --help ]; then
   case "${FM_FAKE_OPENCODE_VERSION:-2.0.21}" in
-  1.*|dev-build) printf '  --model string  Model to use\n' ;;
+  1.*|dev-build) printf '  -m, --model string  Model to use\n' ;;
   *) printf '  --standalone  Run a private server\n' ;;
   esac
   exit 0
@@ -94,7 +94,17 @@ if [ "${1:-}" = session ] && [ "${2:-}" = list ]; then
   jq -cn --arg directory "$PWD" '[{id:"ses_profile",directory:$directory,updated:9999999999999}]'
   exit 0
 fi
+if [ "${1:-}" = export ]; then
+  case "${FM_FAKE_OPENCODE_VERSION:-2.0.21}" in
+  1.*|dev-build) ;;
+  *) exit 1 ;;
+  esac
+  jq -cn --arg model "${FM_FAKE_OPENCODE_MODEL_REQUEST:-}" \
+    '{messages:[{info:{role:"assistant",time:{created:9999999999999},providerID:($model|split("/")[0]),modelID:($model|split("/")[1])}}]}'
+  exit 0
+fi
 if [ "${1:-}" = session ] && [ "${2:-}" = export ]; then
+  case "${FM_FAKE_OPENCODE_VERSION:-2.0.21}" in 1.*|dev-build) exit 1 ;; esac
   jq -cn --arg model "${FM_FAKE_OPENCODE_MODEL_REQUEST:-}" \
     '{messages:[{type:"assistant",time:{created:9999999999999},model:{providerID:($model|split("/")[0]),id:($model|split("/")[1])}}]}'
 fi

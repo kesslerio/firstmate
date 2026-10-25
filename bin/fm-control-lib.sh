@@ -636,3 +636,12 @@ fm_control_harness_turnend_auth_path() {  # <harness> <token>
     *) return 0 ;;
   esac
 }
+
+fm_control_retire_opencode_model_pin() {
+  local id=$1 state=$3 record="$3/$1.opencode-model-config" pin="$2/.opencode/opencode.jsonc" owned
+  [ -e "$record" ] || [ -L "$record" ] || return 0
+  owned=$(cat "$record") || return 1
+  [ "$owned" = "$pin" ] || return 1
+  rm -f -- "$pin" || return 1
+  rm -f -- "$state/$id.opencode-model-config"
+}
