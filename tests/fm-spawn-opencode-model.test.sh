@@ -752,6 +752,89 @@ SH
   pass "final commit refusal retires owned pins and preserves recovery if retirement fails"
 }
 
+test_pin_publication_failures_keep_ownership() {
+  local rec out status mode reused exclude fault_env
+  for reused in fresh ignored; do
+    for mode in record-open record partial cleanup; do
+      rec=$(make_case "publish-$reused-$mode")
+      read_case "$rec"
+      if [ "$reused" = ignored ]; then
+        exclude=$(git -C "$WT_DIR" rev-parse --git-path info/exclude)
+        case "$exclude" in /*) ;; *) exclude="$WT_DIR/$exclude" ;; esac
+        printf '.opencode/opencode.jsonc\n' >>"$exclude"
+      fi
+      if [ "$mode" = record-open ]; then
+        mkdir "$(pin_record)"
+      fi
+      fault_env="$CASE_DIR/publication-fault.sh"
+      cat >"$fault_env" <<'SH'
+printf() {
+  if [ "$#" = 2 ] && [ "$1" = '%s\n' ] && [ "$2" = "$FM_PUBLICATION_PIN" ] && [ "$FM_PUBLICATION_MODE" = record ]; then
+    builtin printf 'record write refused\n' >"$FM_PUBLICATION_EVENT"
+    return 1
+  fi
+  if [ "${1:-}" = '{"model":%s}\n' ]; then
+    if [ -f "$FM_PUBLICATION_RECORD" ] && [ "$(cat "$FM_PUBLICATION_RECORD")" = "$FM_PUBLICATION_PIN" ]; then
+      builtin printf 'ownership established before partial pin write\n' >"$FM_PUBLICATION_EVENT"
+    else
+      builtin printf 'partial pin write without ownership\n' >"$FM_PUBLICATION_EVENT"
+    fi
+    builtin printf '{"model":'
+    return 1
+  fi
+  builtin printf "$@"
+}
+SH
+      cat >"$FAKEBIN_DIR/rm" <<'SH'
+#!/usr/bin/env bash
+if [ "$FM_PUBLICATION_MODE" = cleanup ]; then
+  for arg in "$@"; do
+    if [ "$arg" = "$FM_PUBLICATION_PIN" ]; then
+      echo 'fixture refused pin removal' >&2
+      exit 1
+    fi
+  done
+fi
+exec "$FM_PUBLICATION_REAL_RM" "$@"
+SH
+      chmod +x "$FAKEBIN_DIR/rm"
+      out=$(BASH_ENV="$fault_env" FM_PUBLICATION_MODE="$mode" \
+        FM_PUBLICATION_PIN="$(pin_file)" FM_PUBLICATION_RECORD="$(pin_record)" \
+        FM_PUBLICATION_EVENT="$CASE_DIR/publication-event" FM_PUBLICATION_REAL_RM="$(command -v rm)" \
+        FM_FAKE_OPENCODE_SESSION_MODEL=john-remote/qwen3.8-flash-next \
+        run_spawn "$rec" --model john-remote/qwen3.8-flash-next)
+      status=$?
+      expect_code 1 "$status" "$reused/$mode publication failure must refuse"
+      [ ! -s "$LAUNCH_LOG" ] || fail "publication failure launched a worker"
+      case "$mode" in
+        record-open|record)
+          assert_absent "$(pin_file)" "ownership failure must not create a pin"
+          if [ "$mode" = record ]; then
+            assert_grep 'record write refused' "$CASE_DIR/publication-event" "record failure injection was not reached"
+          fi
+          assert_contains "$out" 'could not record ownership' "record refusal needs actionable context"
+          ;;
+        partial|cleanup)
+          assert_grep 'ownership established before partial pin write' "$CASE_DIR/publication-event" "partial pin must already have valid ownership"
+          if [ "$mode" = partial ]; then
+            assert_absent "$(pin_file)" "partial pin must be removed on abort"
+            assert_absent "$(pin_record)" "successful partial-pin cleanup must retire ownership"
+            assert_absent "$HOME_DIR/state/$ID.meta" "successful cleanup must allow rollback"
+          else
+            [ "$(cat "$(pin_file)")" = '{"model":' ] || fail "fixture did not retain the partial write"
+            [ "$(cat "$(pin_record)")" = "$(pin_file)" ] || fail "cleanup refusal lost valid pin ownership"
+            assert_present "$HOME_DIR/state/$ID.meta" "cleanup refusal must retain recovery metadata"
+            assert_present "$HOME_DIR/state/$ID.busy-gen" "cleanup refusal must retain busy generation"
+            assert_contains "$out" 'retained' "cleanup refusal must explain recovery"
+          fi
+          ;;
+      esac
+    done
+  done
+  pass "fresh and reused ignored pin paths keep ownership across publication and cleanup failures"
+}
+
+test_pin_publication_failures_keep_ownership
 test_final_commit_failure_retires_pin_or_preserves_recovery
 test_failed_spawn_paths_retire_owned_pin
 test_inline_model_variants_are_refused

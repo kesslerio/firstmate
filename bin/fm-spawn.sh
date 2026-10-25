@@ -2717,12 +2717,15 @@ opencode_pin_worktree_model() {  # <worktree> <model> <effort> <state-dir> <id>
       echo "error: could not create $dir for the OpenCode model pin" >&2
       return 1
     }
+    if ! printf '%s\n' "$file" >"$record"; then
+      echo "error: could not record ownership of the OpenCode model pin at $record; refusing to write $file" >&2
+      return 1
+    fi
   fi
   if ! printf '{"model":%s}\n' "$selection" >"$file"; then
     echo "error: could not write the OpenCode model pin at $file" >&2
     return 1
   fi
-  printf '%s\n' "$file" >"$record" || return 1
   exclude_path '.opencode/opencode.jsonc'
   observed=$(opencode_project_config_model "$wt" "$file") || observed=
   if [ "$observed" != "$requested" ]; then
