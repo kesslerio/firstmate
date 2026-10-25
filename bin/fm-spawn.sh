@@ -5393,7 +5393,7 @@ kimi_spawn_fail() { # <detail>
 # reads a wrong-model refusal as a refused launch, never as a wedged worker.
 opencode_spawn_fail() { # <detail>
   printf '%s\n' "$(status_stamp_line "failed: $1")" >>"$STATE/$ID.status"
-  local tab_id= gone=0 windows inventory_status
+  local tab_id='' gone=0 windows inventory_status
   [ "$BACKEND" != zellij ] || tab_id=${ZELLIJ_TAB_ID:-}
   if [ "$RELAUNCH" -eq 0 ] && ! fm_control_retire_opencode_model_pin "$ID" "$WT" "$STATE"; then
     SPAWN_FRESH_COMMIT_PENDING=0
@@ -5510,7 +5510,7 @@ rovo_endpoint_cleanup() {
     fm_backend_kill orca "$T" 2>/dev/null && SPAWN_ENDPOINT_CLOSED=1 || true
     return 0
   fi
-  local tab_id=
+  local tab_id=''
   [ "$BACKEND" = zellij ] && tab_id=$ZELLIJ_TAB_ID
   fm_backend_kill "$BACKEND" "$T" "$tab_id" "fm-$ID" 2>/dev/null && SPAWN_ENDPOINT_CLOSED=1 || true
 }

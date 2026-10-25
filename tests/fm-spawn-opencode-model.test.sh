@@ -544,6 +544,7 @@ test_pin_retirement_uses_owning_home_and_preserves_project_config() {
   pin=$(pin_file)
   record="$child_state/$ID.opencode-model-config"
   printf 'project-owned\n' >"$pin"
+  # shellcheck source=bin/fm-control-lib.sh
   . "$CONTROL_LIB"
   fm_control_retire_opencode_model_pin "$ID" "$WT_DIR" "$child_state" || fail "project config cleanup refused"
   [ "$(cat "$pin")" = project-owned ] || fail "unowned project config changed"
@@ -596,7 +597,7 @@ test_failed_spawn_paths_retire_owned_pin() {
   for stage in debug literal enter delivery; do
     rec=$(make_case "abort-$stage")
     read_case "$rec"
-    shape=2x send= turn=auto
+    shape=2x send='' turn=auto
     case "$stage" in
       debug) shape=noreport ;;
       literal|enter) send=$stage ;;
