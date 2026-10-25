@@ -142,6 +142,19 @@ fake_opencode_launched() {
       ;;
   esac
 }
+fake_claude_model_report() {  # <staged-launch-command>
+  local launch=$1 session pin actual config_dir
+  case "$launch" in *' claude '*) ;; *) return 0 ;; esac
+  session=$(printf '%s\n' "$launch" | sed -n "s/.*--session-id '\([^']*\)'.*/\1/p")
+  pin=$(printf '%s\n' "$launch" | sed -n "s/.*--model '\([^']*\)'.*/\1/p")
+  [ -n "$session" ] && [ -n "$pin" ] && [ -n "${HOME:-}" ] || return 0
+  actual=${FM_FAKE_CLAUDE_MODEL:-$pin}
+  config_dir=${CLAUDE_CONFIG_DIR:-$HOME/.claude}
+  mkdir -p "$config_dir/projects/fm-test"
+  jq -cn --arg session "$session" --arg model "$actual" \
+    '{type:"assistant",sessionId:$session,message:{role:"assistant",model:$model,content:[]}}' \
+    > "$config_dir/projects/fm-test/$session.jsonl"
+}
 case "$*" in
   *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
@@ -206,8 +219,12 @@ case "${1:-}" in
           ". '"*"'")
             staged=${a#". '"}
             staged=${staged%"'"}
-            if [ -f "$staged" ] && grep -q -- 'opencode.* --standalone --prompt' "$staged"; then
-              fake_opencode_launched
+            if [ -f "$staged" ]; then
+              staged_launch=$(cat "$staged")
+              fake_claude_model_report "$staged_launch"
+              if grep -q -- 'opencode.* --standalone --prompt' "$staged"; then
+                fake_opencode_launched
+              fi
             fi
             ;;
         esac

@@ -217,6 +217,66 @@ test_claude_launch_brief_publishes_record_doorbell() {
   pass "a claude launch publishes the brief as an operational-inbox record and passes only the doorbell"
 }
 
+test_claude_model_pin_uses_a_fresh_session_and_records_a_match() {
+  local rec id out status launch stale_id fresh_id uuid_count
+  id=claude-model-match-z1
+  stale_id=11111111-1111-4111-8111-111111111111
+  fresh_id=22222222-2222-4222-8222-222222222222
+  rec=$(make_spawn_case claude-model-match claude "$id")
+  read_case_record "$rec"
+  mkdir -p "$HOME_DIR/user-home/.claude/projects/stale"
+  printf '%s\n' \
+    "{\"type\":\"assistant\",\"sessionId\":\"$stale_id\",\"message\":{\"role\":\"assistant\",\"model\":\"claude-opus-5\",\"content\":[]}}" \
+    > "$HOME_DIR/user-home/.claude/projects/stale/$stale_id.jsonl"
+  uuid_count="$HOME_DIR/user-home/.claude/.uuidgen-count"
+  cat > "$FAKEBIN_DIR/uuidgen" <<SH
+#!/usr/bin/env bash
+if [ ! -e '$uuid_count' ]; then
+  : > '$uuid_count'
+  printf '%s\\n' '$stale_id'
+else
+  printf '%s\\n' '$fresh_id'
+fi
+SH
+  chmod +x "$FAKEBIN_DIR/uuidgen"
+
+  out=$(run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" \
+    --model claude-opus-5-5)
+  status=$?
+  expect_code 0 "$status" "a matching Claude model pin should spawn successfully"$'\n'"$out"
+  launch=$(cat "$LAUNCH_LOG")
+  assert_contains "$launch" "--session-id '$fresh_id'" \
+    "a pinned Claude launch must avoid the existing stale session id"
+  assert_not_contains "$launch" "--session-id '$stale_id'" \
+    "a pinned Claude launch must never reuse the stale session id"
+  assert_contains "$(cat "$HOME_DIR/state/$id.status")" \
+    "model pin assertion passed: pin 'claude-opus-5-5' actual 'claude-opus-5-5'" \
+    "the matching effective model must be recorded in task status"
+  pass "Claude pin match: collision-checked fresh session and effective-model status"
+}
+
+test_claude_fresh_session_model_mismatch_blocks_spawn() {
+  local rec id out status
+  id=claude-model-mismatch-z1
+  rec=$(make_spawn_case claude-model-mismatch claude "$id")
+  read_case_record "$rec"
+
+  out=$(FM_FAKE_CLAUDE_MODEL=claude-opus-5 \
+    run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" \
+    --model claude-opus-5-5)
+  status=$?
+  expect_code 1 "$status" "a fresh Claude session that reports a different model must block"$'\n'"$out"
+  assert_contains "$(cat "$HOME_DIR/state/$id.status")" \
+    "blocked [at=" \
+    "the model mismatch must be visible as a task blocker"
+  assert_contains "$(cat "$HOME_DIR/state/$id.status")" \
+    "pin 'claude-opus-5-5' mismatched the session's reported model 'claude-opus-5'" \
+    "the blocker must name both the pin and the actual model"
+  assert_not_contains "$out" "spawned $id harness=claude" \
+    "a mismatched effective model must not be reported as a successful spawn"
+  pass "Claude pin mismatch: a fresh session records the actual model as a blocker and fails spawn"
+}
+
 # A secondmate's launch brief belongs to the secondmate home that pane runs in,
 # so its record must publish there rather than into the primary's state.
 test_claude_secondmate_launch_brief_publishes_into_its_own_home() {
@@ -2715,6 +2775,8 @@ test_launch_preserves_inherited_git_config
 test_worker_launch_delivers_role_scope
 test_no_profile_keeps_claude_profile_defaults
 test_claude_launch_brief_publishes_record_doorbell
+test_claude_model_pin_uses_a_fresh_session_and_records_a_match
+test_claude_fresh_session_model_mismatch_blocks_spawn
 test_claude_secondmate_launch_brief_publishes_into_its_own_home
 test_claude_spawn_refuses_when_the_brief_record_cannot_publish
 test_non_cursor_launch_clears_inherited_cursor_markers
