@@ -1575,6 +1575,12 @@ SPAWN_ENDPOINT_CLOSED=0
 SPAWN_STAGED_LAUNCH_FILE=
 
 spawn_fresh_commit_rollback() {
+  if [ "${HARNESS:-}" = opencode ] && [ -n "${WT:-}" ] &&
+    ! fm_control_retire_opencode_model_pin "$ID" "$WT" "$STATE"; then
+    SPAWN_FRESH_COMMIT_PENDING=0
+    echo "error: could not retire task-owned OpenCode model pin for $ID; retained $STATE/$ID.meta and ownership records for recovery before releasing $WT" >&2
+    return 1
+  fi
   if fm_backlog_atomic_transition rollback "$STATE/$ID.meta" \
     "$FM_ROOT/bin/fm-busy-event.sh" "$STATE" "$ID" "${BUSY_GEN:-}"; then
     SPAWN_FRESH_COMMIT_PENDING=0
@@ -1616,6 +1622,13 @@ spawn_orca_reclaim_launch_file() {
 
 spawn_abort_cleanup() {
   local status=$?
+  if [ "$status" -ne 0 ] && [ "${HARNESS:-}" = opencode ] &&
+    [ "$RELAUNCH" -eq 0 ] && [ "$SPAWN_FRESH_COMMIT_PENDING" = 1 ] && [ -n "${WT:-}" ] &&
+    ! fm_control_retire_opencode_model_pin "$ID" "$WT" "$STATE"; then
+    SPAWN_FRESH_COMMIT_PENDING=0
+    ORCA_ABORT_CLEANUP=0
+    echo "error: could not retire task-owned OpenCode model pin for $ID; retained $STATE/$ID.meta, ownership records and endpoint for recovery before releasing $WT" >&2
+  fi
   if [ "$RELAUNCH_REPLACEMENT_PENDING" = 1 ] &&
     [ "$SPAWN_META_PUBLISH_STARTED" = 1 ] &&
     [ -n "$SPAWN_META_TMP" ] &&
@@ -2576,6 +2589,7 @@ opencode_top_level_model_flag() {  # <help-text>
 # problem as a wedged worker.
 opencode_resolve_model_mechanism() {  # <bin> <model>
   local bin=$1 model=$2 version help bound
+  opencode_model_selection_json "$model" "" >/dev/null || return 1
   bound=${FM_OPENCODE_PROBE_TIMEOUT:-20}
   case "$bound" in '' | 0* | *[!0-9]*) bound=20 ;; esac
   version=$(fm_run_timed "$bound" "$bin" --version 2>/dev/null </dev/null) || version=
@@ -2614,12 +2628,14 @@ opencode_effort_variant() {  # <provider> <effort>
 
 # OpenCode 2.x's native model selection (config schema identifier
 # Config.ModelSelection) as a JSON object body: provider and model ids, plus the
-# variant when the requested effort maps onto the provider's list. The CLI's own
-# `provider/model#variant` spelling is accepted and split, so a profile naming
-# the variant inline keeps working on both mechanism shapes.
+# variant when the requested effort maps onto the provider's list.
 opencode_model_selection_json() {  # <model> <effort>
   local model=$1 effort=$2 provider id variant json
   case "$model" in
+  *'#'*)
+    echo "error: inline OpenCode model variants are unsupported: '$model'; use provider/model with --effort instead" >&2
+    return 1
+    ;;
   */*) ;;
   *)
     echo "error: OpenCode model '$model' is not a provider/model id; name one listed by 'opencode models' (for example opencode/<model-id>) or omit --model" >&2
@@ -2628,18 +2644,11 @@ opencode_model_selection_json() {  # <model> <effort>
   esac
   provider=${model%%/*}
   id=${model#*/}
-  variant=
-  case "$id" in
-  *'#'*)
-    variant=${id#*#}
-    id=${id%%#*}
-    ;;
-  esac
   if [ -z "$provider" ] || [ -z "$id" ]; then
     echo "error: OpenCode model '$model' does not name both a provider and a model id; name one listed by 'opencode models' or omit --model" >&2
     return 1
   fi
-  [ -n "$variant" ] || variant=$(opencode_effort_variant "$provider" "$effort")
+  variant=$(opencode_effort_variant "$provider" "$effort")
   json=$(printf '"providerID":"%s","model":"%s"' "$(json_escape "$provider")" "$(json_escape "$id")")
   [ -z "$variant" ] || json="$json,\"variant\":\"$(json_escape "$variant")\""
   printf '{%s}' "$json"
@@ -5490,6 +5499,10 @@ rovo_spawn_fail() { # <detail>
 # the exact terminal is closed: that stops the CLI while its worktree stays
 # for the record's own teardown, which owns worktree deletion.
 rovo_endpoint_cleanup() {
+  if [ "$HARNESS" = opencode ]; then
+    opencode_spawn_fail "OpenCode launch delivery failed in endpoint $T"
+    return
+  fi
   if [ "$BACKEND" = orca ]; then
     fm_backend_kill orca "$T" 2>/dev/null && SPAWN_ENDPOINT_CLOSED=1 || true
     return 0
@@ -7550,9 +7563,7 @@ if [ "$HARNESS" = rovo ]; then
 fi
 if [ "$HARNESS" = opencode ] && [ "$OPENCODE_MAJOR" -ge 2 ]; then
   if ! opencode2_wait_for_delivery; then
-    printf '%s\n' "$(status_stamp_line "failed: opencode $OPENCODE_VERSION did not start the brief turn in window $T")" >>"$STATE/$ID.status"
-    echo "error: opencode $OPENCODE_VERSION did not start the brief turn; inspect window $T" >&2
-    rovo_endpoint_cleanup
+    opencode_spawn_fail "opencode $OPENCODE_VERSION did not start the brief turn in window $T"
     exit 1
   fi
 fi

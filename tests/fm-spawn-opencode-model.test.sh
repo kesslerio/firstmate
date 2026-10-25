@@ -40,6 +40,17 @@ if [ "${1:-}" = list-windows ] && [ -f "$FM_FAKE_STOP_LOG" ] && [ "${FM_FAKE_STO
   echo 'inventory unavailable' >&2
   exit 1
 fi
+if [ "${1:-}" = send-keys ]; then
+  case "$*" in
+    *" -l . "*)
+      touch "$(dirname "$0")/launch-sent"
+      if [ "${FM_FAKE_SEND_FAILURE:-}" = literal ]; then exit 1; fi
+      ;;
+    *" Enter"*)
+      if [ -f "$(dirname "$0")/launch-sent" ] && [ "${FM_FAKE_SEND_FAILURE:-}" = enter ]; then exit 1; fi
+      ;;
+  esac
+fi
 exec "$(dirname "$0")/tmux-fixture" "$@"
 SH
   chmod +x "$fakebin/tmux"
@@ -84,7 +95,14 @@ case "${1:-}" in
 esac
 if [ "${1:-}" = debug ] && [ "${2:-}" = config ]; then
   case "$shape" in
-  noreport) printf '[]\n' ;;
+  noreport)
+    if [ "${FM_FAKE_PIN_CLEANUP_FAIL:-0}" = 1 ]; then
+      rm "$PWD/.opencode/opencode.jsonc"
+      mkdir "$PWD/.opencode/opencode.jsonc"
+      touch "$PWD/.opencode/opencode.jsonc/blocker"
+    fi
+    printf '[]\n'
+    ;;
   *)
     file="$PWD/.opencode/opencode.jsonc"
     if [ -f "$file" ] && model=$(jq -c '.model // empty' "$file" 2>/dev/null) && [ -n "$model" ]; then
@@ -573,6 +591,171 @@ test_1x_rejects_wrong_unreadable_and_stale_models() {
   pass "1.x rejects wrong, absent and stale observations through its native protocol"
 }
 
+test_failed_spawn_paths_retire_owned_pin() {
+  local rec out status stage shape send turn
+  for stage in debug literal enter delivery; do
+    rec=$(make_case "abort-$stage")
+    read_case "$rec"
+    shape=2x send= turn=auto
+    case "$stage" in
+      debug) shape=noreport ;;
+      literal|enter) send=$stage ;;
+      delivery) turn=never ;;
+    esac
+    out=$(FM_FAKE_OPENCODE_SHAPE="$shape" FM_FAKE_SEND_FAILURE="$send" \
+      FM_FAKE_OPENCODE_TURN="$turn" FM_OPENCODE_DELIVERY_POLLS=1 \
+      FM_FAKE_OPENCODE_SESSION_MODEL=john-remote/qwen3.8-flash-next \
+      run_spawn "$rec" --model john-remote/qwen3.8-flash-next)
+    status=$?
+    expect_code 1 "$status" "$stage refusal must fail"
+    assert_absent "$(pin_file)" "$stage refusal left a stale model pin"
+    assert_absent "$(pin_record)" "$stage refusal left a pin ownership record"
+    assert_absent "$HOME_DIR/state/$ID.meta" "$stage refusal must roll back after pin cleanup"
+  done
+  rec=$(make_case abort-debug-cleanup-fails)
+  read_case "$rec"
+  out=$(FM_FAKE_OPENCODE_SHAPE=noreport FM_FAKE_PIN_CLEANUP_FAIL=1 \
+    run_spawn "$rec" --model john-remote/qwen3.8-flash-next)
+  status=$?
+  expect_code 1 "$status" "failed abort cleanup must refuse"
+  assert_present "$(pin_record)" "abort cleanup failure must retain ownership"
+  assert_present "$HOME_DIR/state/$ID.meta" "abort cleanup failure must retain recovery metadata"
+  assert_present "$HOME_DIR/state/$ID.busy-gen" "abort cleanup failure must retain busy generation"
+  assert_contains "$out" 'retained' "abort cleanup failure must explain recovery"
+  pass "debug, send and delivery refusals retire pins and failed retirement preserves recovery"
+}
+
+test_inline_model_variants_are_refused() {
+  local rec out status shape
+  for shape in 1x 2x; do
+    rec=$(make_case "inline-$shape")
+    read_case "$rec"
+    out=$(FM_FAKE_OPENCODE_SHAPE="$shape" run_spawn "$rec" \
+      --model anthropic/claude-sonnet-4-5#max --effort high)
+    status=$?
+    expect_code 1 "$status" "inline variant must refuse on $shape"
+    assert_contains "$out" 'use provider/model with --effort instead' "inline refusal must explain the supported interface"
+    [ ! -s "$LAUNCH_LOG" ] || fail "inline variant launched a worker"
+    assert_absent "$(pin_file)" "inline variant must not write a pin"
+  done
+  pass "both generations refuse inline variants rather than overriding explicit effort"
+}
+
+test_live_guard_launches_the_probed_absolute_binary() {
+  local lab fakebin decoy out status
+  lab="$TMP_ROOT/live-identity"
+  fakebin="$lab/installed ' build"
+  decoy="$lab/pane-path"
+  mkdir -p "$fakebin" "$decoy"
+  cat >"$fakebin/opencode" <<'SH'
+#!/usr/bin/env bash
+case "${1:-}" in
+  --version) printf '2.0.26\n' ;;
+  models) printf 'fixture/model\n' ;;
+  debug) jq -c --arg path "$PWD/.opencode/opencode.jsonc" '[{path:$path,info:.}]' .opencode/opencode.jsonc ;;
+  session)
+    case "${2:-}" in
+      list) [ -f started ] && jq -cn --arg dir "$PWD" '[{id:"live",directory:$dir,updated:1}]' || printf '[]\n' ;;
+      export) printf '{"messages":[{"type":"assistant","model":{"providerID":"fixture","id":"model"}}]}\n' ;;
+    esac
+    ;;
+  --standalone) touch started; printf '%s\n' "$0" >"$FM_LIVE_IDENTITY_LOG" ;;
+esac
+SH
+  cat >"$decoy/opencode" <<'SH'
+#!/usr/bin/env bash
+printf 'wrong executable\n' >"$FM_LIVE_IDENTITY_LOG"
+exit 1
+SH
+  cat >"$fakebin/tmux" <<'SH'
+#!/usr/bin/env bash
+shift 2
+case "$1" in
+  new-session)
+    while [ "$#" -gt 0 ]; do
+      if [ "$1" = -c ]; then printf '%s\n' "$2" >"$FM_LIVE_PANE_DIR"; break; fi
+      shift
+    done
+    ;;
+  send-keys)
+    shift 3
+    cd "$(cat "$FM_LIVE_PANE_DIR")" || exit 1
+    PATH="$FM_LIVE_DECOY:$PATH" bash -c "$1"
+    ;;
+  kill-server) ;;
+esac
+SH
+  chmod +x "$fakebin/opencode" "$fakebin/tmux" "$decoy/opencode"
+  out=$(PATH="$fakebin:$PATH" FM_OPENCODE_MODEL_LIVE=1 \
+    FM_LIVE_IDENTITY_LOG="$lab/identity" FM_LIVE_PANE_DIR="$lab/pane-dir" \
+    FM_LIVE_DECOY="$decoy" bash "$ROOT/tests/fm-opencode-model-live-e2e.test.sh")
+  status=$?
+  expect_code 0 "$status" "isolated live-guard identity fixture failed: $out"
+  [ "$(cat "$lab/identity")" = "$fakebin/opencode" ] || fail "pane PATH changed the tested executable"
+  assert_contains "$out" 'requested=fixture/model observed=fixture/model' "identity fixture must retain model comparison"
+  pass "the live guard uses its probed executable despite pane PATH changes and quoted path characters"
+}
+
+test_final_commit_failure_retires_pin_or_preserves_recovery() {
+  local rec out status fail_cleanup real_tasks
+  real_tasks=$(command -v tasks-axi) || fail "tasks-axi is required to verify final commit rollback"
+  for fail_cleanup in 0 1 signal; do
+    rec=$(make_case "commit-refused-$fail_cleanup")
+    read_case "$rec"
+    printf 'backend = "markdown"\n[markdown]\npath = "data/backlog.md"\n' >"$HOME_DIR/.tasks.toml"
+    printf '# Backlog\n\n## In flight\n\n## Queued\n\n## Done\n' >"$HOME_DIR/data/backlog.md"
+    (cd "$HOME_DIR" && "$real_tasks" add "$ID" 'model commit rollback' --kind ship --file "$HOME_DIR/data/backlog.md") >/dev/null || fail "could not seed commit fixture"
+    cat >"$FAKEBIN_DIR/tasks-axi" <<'SH'
+#!/usr/bin/env bash
+if [ "${1:-}" = start ]; then
+  if [ "$FM_COMMIT_PIN_CLEANUP_FAIL" = signal ]; then
+    "$FM_REAL_TASKS_AXI" "$@" || exit 1
+    spawn_pid=$(ps -o ppid= -p "$PPID" | tr -d ' ')
+    case "$spawn_pid" in ''|*[!0-9]*) exit 1 ;; esac
+    kill -TERM "$spawn_pid"
+    exit 0
+  fi
+  if [ "$FM_COMMIT_PIN_CLEANUP_FAIL" = 1 ] && [ -f "$FM_COMMIT_PIN" ]; then
+    rm "$FM_COMMIT_PIN"
+    mkdir "$FM_COMMIT_PIN"
+    touch "$FM_COMMIT_PIN/blocker"
+  fi
+  echo 'fixture refused backlog commit' >&2
+  exit 1
+fi
+exec "$FM_REAL_TASKS_AXI" "$@"
+SH
+    chmod +x "$FAKEBIN_DIR/tasks-axi"
+    out=$(FM_REAL_TASKS_AXI="$real_tasks" FM_COMMIT_PIN_CLEANUP_FAIL="$fail_cleanup" \
+      FM_COMMIT_PIN="$(pin_file)" FM_FAKE_OPENCODE_SESSION_MODEL=john-remote/qwen3.8-flash-next \
+      run_spawn "$rec" --model john-remote/qwen3.8-flash-next)
+    status=$?
+    [ "$status" -ne 0 ] || fail "refused final commit must fail"
+    if [ "$fail_cleanup" = signal ]; then
+      assert_contains "$out" 'interrupted after launch delivery began' "fixture must reach committed signal preservation"
+      assert_present "$(pin_file)" "a committed worker must retain its pin after a signal"
+      assert_present "$(pin_record)" "a committed worker must retain pin ownership"
+      assert_present "$HOME_DIR/state/$ID.meta" "a committed worker must retain supervision"
+      continue
+    fi
+    assert_contains "$out" 'could not be moved to In flight' "fixture must reach final commit rollback"
+    if [ "$fail_cleanup" = 1 ]; then
+      assert_present "$(pin_record)" "failed final cleanup must preserve ownership"
+      assert_present "$HOME_DIR/state/$ID.meta" "failed final cleanup must preserve recovery metadata"
+      assert_present "$HOME_DIR/state/$ID.busy-gen" "failed final cleanup must preserve busy generation"
+    else
+      assert_absent "$(pin_file)" "final rollback must retire pin"
+      assert_absent "$(pin_record)" "final rollback must retire pin ownership"
+      assert_absent "$HOME_DIR/state/$ID.meta" "successful final cleanup must permit rollback"
+    fi
+  done
+  pass "final commit refusal retires owned pins and preserves recovery if retirement fails"
+}
+
+test_final_commit_failure_retires_pin_or_preserves_recovery
+test_failed_spawn_paths_retire_owned_pin
+test_inline_model_variants_are_refused
+test_live_guard_launches_the_probed_absolute_binary
 test_1x_rejects_wrong_unreadable_and_stale_models
 test_successful_close_without_proven_absence_retains_records
 test_pin_cleanup_failure_preserves_launch_recovery

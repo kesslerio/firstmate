@@ -17,7 +17,12 @@ set -u
 fm_live_gate opt-in FM_OPENCODE_MODEL_LIVE opencode jq tmux
 
 OPENCODE_BIN=$(command -v opencode) || fail "opencode resolved by the gate but not on PATH"
-VERSION=$(opencode --version 2>/dev/null | head -1) || VERSION=
+case "$OPENCODE_BIN" in
+  /*) ;;
+  *) OPENCODE_BIN="$(cd "$(dirname "$OPENCODE_BIN")" && pwd)/$(basename "$OPENCODE_BIN")" ;;
+esac
+QUOTED_OPENCODE_BIN="'${OPENCODE_BIN//\'/\'\\\'\'}'"
+VERSION=$("$OPENCODE_BIN" --version 2>/dev/null | head -1) || VERSION=
 [ -n "$VERSION" ] || fail "opencode ($OPENCODE_BIN) reported no version"
 printf 'ok - installed opencode (%s): %s\n' "$VERSION" "$OPENCODE_BIN"
 
@@ -38,10 +43,10 @@ fail_named() {
 # the same way bin/fm-spawn.sh's assertion reads it.
 session_model_for() {  # <dir>
   local dir=$1 sid
-  sid=$(cd "$dir" && opencode session list --standalone --format json 2>/dev/null \
+  sid=$(cd "$dir" && "$OPENCODE_BIN" session list --standalone --format json 2>/dev/null \
     | jq -r --arg d "$dir" '[.[] | select(.directory == $d)] | sort_by(.updated // 0) | reverse | .[0].id // empty') || return 1
   [ -n "$sid" ] || return 1
-  (cd "$dir" && opencode session export "$sid" --standalone 2>/dev/null) \
+  (cd "$dir" && "$OPENCODE_BIN" session export "$sid" --standalone 2>/dev/null) \
     | jq -r '[.messages[]? | select(.type == "assistant" and .model != null and ((.model.providerID // "") != "") and ((.model.id // "") != "")) | .model] | .[0] | if type == "object" then "\(.providerID)/\(.id)" else empty end' 2>/dev/null
 }
 
@@ -65,8 +70,8 @@ wait_for_session_model() {  # <dir> <seconds>
 # own, and a provider this host runs itself is preferred over a remote one.
 CANDIDATES=$(
   {
-    opencode models --standalone 2>/dev/null | grep -E '^(john-remote|qualitycorp-glm|ollama-cloud)/'
-    opencode models --standalone 2>/dev/null
+    "$OPENCODE_BIN" models --standalone 2>/dev/null | grep -E '^(john-remote|qualitycorp-glm|ollama-cloud)/'
+    "$OPENCODE_BIN" models --standalone 2>/dev/null
   } | awk '!seen[$0]++' | grep -v -E '^opencode/.*-free$'
 )
 [ -n "$CANDIDATES" ] || fail_named "'opencode models' listed no usable model, so the pin cannot be exercised"
@@ -79,7 +84,7 @@ while IFS= read -r candidate; do
   mkdir -p "$probe/.opencode"
   printf '{"model":{"providerID":"%s","model":"%s"}}\n' "${candidate%%/*}" "${candidate#*/}" \
     >"$probe/.opencode/opencode.jsonc"
-  parsed=$(cd "$probe" && opencode debug config 2>/dev/null \
+  parsed=$(cd "$probe" && "$OPENCODE_BIN" debug config 2>/dev/null \
     | jq -r --arg p "$probe/.opencode/opencode.jsonc" '[.[] | select(.path == $p) | .info.model] | .[0] | if type == "object" then "\(.providerID)/\(.model)" else empty end' 2>/dev/null)
   if [ "$parsed" = "$candidate" ]; then
     REQUESTED=$candidate
@@ -100,7 +105,7 @@ tmux -L "$TMUX_SOCKET" new-session -d -s pinned -x 160 -y 48 -c "$PIN_DIR" \
   || fail_named "could not start a tmux pane for the launch probe"
 sleep 1
 tmux -L "$TMUX_SOCKET" send-keys -t pinned \
-  "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"}}' opencode --standalone --prompt 'Reply with exactly: MODEL_PIN_PROBE'" Enter
+  "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"}}' $QUOTED_OPENCODE_BIN --standalone --prompt 'Reply with exactly: MODEL_PIN_PROBE'" Enter
 
 OBSERVED=$(wait_for_session_model "$PIN_DIR" 90) \
   || fail_named "the launched worker recorded no readable model within 90s (requested '$REQUESTED')"
