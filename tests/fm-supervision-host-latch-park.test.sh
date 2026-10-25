@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# Supervision-host behavior suite from the latch through the superseded host.
-# Case bodies, helpers, and process setup live in
-# tests/fm-supervision-host-fixture.sh. This process sources that
-# fixture once and owns the root and EXIT trap it creates.
+# Supervision-host behavior cases; shared setup and unchanged case bodies live
+# in fm-supervision-host-fixture.sh, sourced once per suite process.
 set -u
 # shellcheck source=tests/fm-supervision-host-fixture.sh
 . "$(dirname "${BASH_SOURCE[0]}")/fm-supervision-host-fixture.sh"
@@ -22,4 +20,5 @@ test_first_cycle_status_streams_and_owner_options_reach_it
 test_unchanged_held_outcome_reaches_the_captain_once_until_a_new_event
 test_unverified_engine_hands_every_away_wake_to_main
 test_host_outside_the_lock_owner_stands_down
+test_tagged_lock_holder_reaches_the_engine_whole
 test_superseded_host_leaves_the_owner_untouched
