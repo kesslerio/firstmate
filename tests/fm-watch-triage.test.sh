@@ -5001,6 +5001,101 @@ test_pi_stream_resume_restarts_capped_episode() {
   pass "a capped stream that resumes and stalls before rearming starts a fresh episode"
 }
 
+test_pi_stream_counter_write_failures() {
+  local mode dir state fakebin out capture_file window key gen pid cap status real_rm queue_before
+  for mode in uncapped post_append terminal truncation; do
+    dir=$(make_case "pi-counter-$mode"); state="$dir/state"; fakebin="$dir/fakebin"
+    out="$dir/watch.out"; capture_file="$dir/pane.txt"; window="test:fm-counter-$mode"
+    key=$(printf '%s' "$window" | tr ':/.' '___')
+    printf 'Working...' > "$capture_file"
+    printf 'window=%s\nkind=ship\nharness=pi\n' "$window" > "$state/stream.meta"
+    record_pi_busy "$state" stream
+    gen=$(cat "$state/stream.busy-gen")
+    "$ROOT/bin/fm-busy-event.sh" stream "$state" stream open --gen "$gen" --request 1
+    printf 'v1 gen=%s request=1 rev=1 ts=%s\n' "$gen" "$(( $(date +%s) - 600 ))" > "$state/stream.model-stream"
+    printf 'working: setup complete\n' > "$state/stream.status"
+    seen_sig "$state/stream.status" > "$state/.seen-stream_status"
+    cap=1
+    case "$mode" in uncapped) cap=0 ;; post_append) cap=2 ;; esac
+    PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+      FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS=300 FM_BUSY_TURN_MAX_SECS=99999 \
+      FM_WEDGE_MAX_ESCALATIONS="$cap" FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+      "$WATCH" > "$out" &
+    pid=$!
+    wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "$mode admission failed"; }
+    reap "$pid"
+    ack_stopped_cycle "$state" || fail "$mode admission acknowledgement failed"
+    if [ "$mode" = truncation ]; then
+      real_rm=$(command -v rm)
+      cat > "$fakebin/rm" <<SH
+#!/usr/bin/env bash
+for arg in "\$@"; do
+  if [ "\$arg" = "$state/.stale-since-$key" ] && [ -e "$state/.wedge-permanent-$key" ]; then
+    "$real_rm" -f "$state/.wedge-escalations-$key"
+    mkdir -p "$state/.wedge-escalations-$key"
+    touch "$dir/fault-fired"
+  fi
+done
+exec "$real_rm" "\$@"
+SH
+      chmod +x "$fakebin/rm"
+    else
+      mkdir "$state/.wedge-escalations-$key"
+    fi
+    echo $(( $(date +%s) - 500 )) > "$state/.stale-since-$key"
+    PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+      FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS=300 FM_BUSY_TURN_MAX_SECS=99999 \
+      FM_WEDGE_MAX_ESCALATIONS="$cap" FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+      "$WATCH" > "$out" &
+    pid=$!
+    status=0
+    wait_for_exit "$pid" 100 || status=$?
+    [ -d "$state/.wedge-escalations-$key" ] || fail "$mode counter write fault was not exercised"
+    [ "$(awk -F '\t' '$3 == "stale" { n++ } END { print n+0 }' "$state/.wake-queue")" -eq 1 ] || fail "$mode lost or duplicated its published notification"
+    grep -F 'model stream silent for' "$state/.wake-queue" >/dev/null || fail "$mode did not exercise the stream publication route"
+    case "$mode" in
+      terminal|truncation) grep -F PERMANENTLY-WEDGED "$state/.wake-queue" >/dev/null || fail "$mode did not publish the terminal row" ;;
+      *) grep -F 'possible wedge' "$state/.wake-queue" >/dev/null || fail "$mode did not publish the regular escalation" ;;
+    esac
+    if [ "$mode" = uncapped ]; then
+      [ "$status" -eq 0 ] || fail "uncapped write failure stopped delivery with status $status"
+      grep -F 'escalation 1' "$out" >/dev/null || fail "uncapped write failure suppressed escalation"
+      grep -F 'escalation counter write FAILED' "$state/.watch-triage.log" >/dev/null || fail "uncapped write failure was not reported"
+      [ ! -e "$state/.wedge-rollback-failed-$key" ] && [ ! -e "$state/.wedge-permanent-$key" ] || fail "uncapped write failure installed suppression"
+    else
+      [ "$status" -eq 1 ] || fail "$mode expected controlled exit 1, got $status"
+      [ -s "$state/.wedge-rollback-failed-$key" ] && [ -s "$state/.stale-since-$key" ] || fail "$mode did not roll back and publish its sentinel"
+      [ ! -s "$out" ] || fail "$mode delivered inline after its failed count write"
+      if [ "$mode" = truncation ]; then
+        [ -e "$dir/fault-fired" ] && [ -s "$state/.wedge-permanent-$key" ] || fail "cap-fire truncation was not reached"
+        grep -F 'reset FAILED AND rollback ALSO FAILED' "$state/.watch-triage.log" >/dev/null || fail "truncation failure missed rollback defense"
+      else
+        [ ! -e "$state/.wedge-permanent-$key" ] || fail "$mode committed a cap after its count write failed"
+        grep -F 'escalation counter write FAILED' "$state/.watch-triage.log" >/dev/null || fail "$mode failure missed count defense"
+      fi
+    fi
+    ack_stopped_cycle "$state" || fail "$mode fault acknowledgement failed"
+    queue_before=$(cat "$state/.wake-queue" 2>/dev/null || true)
+    if [ "$mode" = uncapped ]; then
+      "$ROOT/bin/fm-busy-event.sh" stream "$state" stream close --gen "$gen" --request 1
+    fi
+    echo $(( $(date +%s) - 500 )) > "$state/.stale-since-$key"
+    PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+      FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS=300 FM_BUSY_TURN_MAX_SECS=99999 \
+      FM_WEDGE_MAX_ESCALATIONS="$cap" FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+      "$WATCH" > "$out" &
+    pid=$!
+    wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "$mode failed to continue safely after count failure"; }
+    [ ! -s "$out" ] && [ "$(cat "$state/.wake-queue" 2>/dev/null || true)" = "$queue_before" ] || { reap "$pid"; fail "$mode republished a failed or obsolete episode"; }
+    if [ "$mode" != uncapped ]; then
+      [ -s "$state/.wedge-rollback-failed-$key" ] || { reap "$pid"; fail "$mode retry consumed its sentinel"; }
+      grep -F 'rollback-failed sentinel active' "$state/.watch-triage.log" >/dev/null || { reap "$pid"; fail "$mode retry did not exercise sentinel suppression"; }
+    fi
+    reap "$pid"
+  done
+  pass "stream count writes and cap truncation defend failures while uncapped delivery continues"
+}
+
 test_pi_stream_terminal_publication() {
   test_pi_stream_publication_lock_revalidation 0 1
 }
@@ -5207,6 +5302,7 @@ fm_test_run \
   test_pi_stream_publication_lock_revalidation \
   test_pi_stream_uninterrupted_publication \
   test_pi_stream_terminal_publication \
+  test_pi_stream_counter_write_failures \
   test_pi_stream_resume_restarts_capped_episode \
   test_status_span_actionable_classifier \
   test_status_span_survives_a_later_routine_append \
