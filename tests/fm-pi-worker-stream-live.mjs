@@ -40,6 +40,7 @@ globalThis.fetch = async (input) => {
   const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
   assert.ok(url.startsWith("https://fm-worker-stream.invalid/"), "unexpected network request: " + url);
   calls += 1;
+  if (calls === 1) assert.match(readFileSync(state + "/stream.busy-state", "utf8"), /state=busy source=pi-ext/);
   return new Response(new ReadableStream({
     start(target) {
       if (!enabled || calls > 2) {

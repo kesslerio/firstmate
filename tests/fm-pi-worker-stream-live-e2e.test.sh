@@ -12,15 +12,17 @@ PI_PACKAGE_DIR=$(node -e 'const fs=require("node:fs"),p=require("node:path"); co
 PI_VERSION=$(jq -r '.version' "$PI_PACKAGE_DIR/package.json") || fail "Pi package version unavailable"
 # shellcheck source=bin/fm-busy-lib.sh
 . "$ROOT/bin/fm-busy-lib.sh"
-fm_busy_pi_stream_version_supported "$PI_VERSION" \
-  || fail "Pi $PI_VERSION: worker stream contract requires $FM_BUSY_PI_STREAM_VERSION_FLOOR or newer"
+cases="enabled disabled stalled"
+if ! fm_busy_pi_stream_version_supported "$PI_VERSION"; then
+  cases=unverified
+fi
 TMP_ROOT=$(fm_test_tmproot fm-pi-worker-stream-live)
 sdk_env=(env -i)
 for name in NO_MISTAKES_GATE CODEX_MANAGED_BY_NPM CODEX_MANAGED_PACKAGE_ROOT; do
   [ "${!name+x}" != x ] || sdk_env+=("$name=${!name}")
 done
 
-for case_label in enabled disabled stalled; do
+for case_label in $cases; do
   enabled=300
   [ "$case_label" != disabled ] || enabled=0
   home="$TMP_ROOT/home-$case_label"
@@ -60,6 +62,18 @@ SH
   fi
   out=$(ROOT="$spawn_root" FM_STREAM_SILENT_MAX_SECS="$enabled" fm_test_run_spawn "$home" "$wt" "$fakebin" stream "$project" pi --mode no-mistakes --yolo off) \
     || fail "Pi $PI_VERSION: could not generate worker extension: $out"
+  if [ "$case_label" = unverified ]; then
+    printf '%s\n' "$out" | grep -Fx "warning: pi model-stream observation unavailable for version $PI_VERSION; verified version: 1.2.0; existing busy bound remains active" >/dev/null || fail "missing exact unverified-version warning"
+    enabled=0
+    STREAM_EXTENSION="$home/state/stream.pi-ext.ts" node --input-type=module <<'JS' || fail "unverified worker installed stream handlers"
+import assert from "node:assert/strict";
+import { pathToFileURL } from "node:url";
+const { default: extension } = await import(pathToFileURL(process.env.STREAM_EXTENSION).href);
+const handlers = {};
+extension({on: (name, fn) => { handlers[name] = fn; }, events: {on() {}}});
+for (const name of ["context", "message_update", "message_end", "tool_execution_start"]) assert.equal(handlers[name], undefined);
+JS
+  fi
   mkdir -p "$home/agent"
   cat > "$home/agent/models.json" <<'JSON'
 {"providers":{"fm-worker-stream":{"baseUrl":"https://fm-worker-stream.invalid/v1","api":"openai-completions","apiKey":"synthetic-local-only","models":[{"id":"stream","name":"stream","contextWindow":8192,"maxTokens":512}]}}}

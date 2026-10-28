@@ -91,7 +91,7 @@ test_pi_stream_extension_activation_and_lifecycle() {
       leading) option=00300 ;;
       maximum) option=999999999 ;;
       overflow) option=1000000000 enabled=0 ;;
-      newer) version=1.3.0 ;;
+      newer) version=1.3.0 enabled=0 ;;
       malformed-version) version=not-a-version enabled=0 ;;
       older) version=0.82.0 enabled=0 ;;
     esac
@@ -105,6 +105,11 @@ SH
     chmod +x "$FAKEBIN_DIR/pi"
     out=$(FM_STREAM_SILENT_MAX_SECS="$option" run_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$id" "$PROJ_DIR")
     expect_code 0 $? "stream spawn should succeed: $out"
+    case "$label" in
+      newer|older|malformed-version)
+        printf '%s\n' "$out" | grep -Fx "warning: pi model-stream observation unavailable for version $version; verified version: 1.2.0; existing busy bound remains active" >/dev/null || fail "missing exact version warning"
+        ;;
+    esac
     state="$HOME_DIR/state"
     ext="$state/$id.pi-ext.ts"
     STREAM_STATE="$state" STREAM_ID="$id" STREAM_ENABLED="$enabled" EXT_PATH="$ext" node --input-type=module <<'JS' || fail "generated stream lifecycle failed for $label"
@@ -125,6 +130,9 @@ await fire("agent_start");
 await fire("context", {messages: []});
 if (process.env.STREAM_ENABLED !== "1") {
   assert(!existsSync(marker), "disabled/unverified worker produced stream evidence");
+  for (const name of ["context", "message_update", "message_end", "tool_execution_start"]) {
+    assert(!handlers[name], "unverified worker installed stream handler " + name);
+  }
 } else {
   assert(existsSync(marker), "foreground context did not open stream evidence");
   const initial = readFileSync(marker, "utf8");

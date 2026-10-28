@@ -3223,7 +3223,7 @@ The merge suite and the security suite dominate the wall time.
 ## Pi worker model-stream observation
 
 Verified on 2026-10-13 with the installed Pi 1.2.0 SDK and Node v24.13.0.
-The guard asserts the installed release meets the 1.2.0 floor owned by `bin/fm-busy-lib.sh` and prints the release it exercised, so a Pi upgrade re-verifies the contract instead of failing on an exact version string.
+On an unverified Pi version, the guard exercises the spawn-time inert path with its exact warning, no stream handlers, and ordinary busy/idle classification; stream observation stays off until the version is verified.
 Refresh this token-free guard after a Pi upgrade:
 
 ```sh

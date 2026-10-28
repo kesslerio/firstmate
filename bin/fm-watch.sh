@@ -1430,19 +1430,20 @@ _wedge_cap_terminal_append() {  # <win> <wkey> <reason> [guard [guard args...]]
   else
     _created=1
   fi
+  if [ -n "$_guard" ] && ! "$_guard" "$@"; then
+    [ "$_created" -eq 0 ] || rm -f "$_queued"
+    fm_lock_release "$FM_WAKE_QUEUE_LOCK" || return 4
+    return 5
+  fi
   if [ "$_had" -eq 1 ] || [ "$_degraded" -eq 1 ]; then
     if fm_wake_queued_carries_locked stale "$_win" PERMANENTLY-WEDGED; then
       fm_lock_release "$FM_WAKE_QUEUE_LOCK" || return 4
       return 3
     fi
   fi
-  if [ -n "$_guard" ] && ! "$_guard" "$@"; then
-    [ "$_created" -eq 0 ] || rm -f "$_queued"
-    fm_lock_release "$FM_WAKE_QUEUE_LOCK" || return 4
-    return 5
-  fi
   if [ -n "$_guard" ]; then
     fm_wake_append_locked stale "$_win" "$_reason" "$_guard" "$@" || _status=$?
+    [ "$_status" -ne 3 ] || _status=5
   else
     fm_wake_append_locked stale "$_win" "$_reason" || _status=$?
   fi

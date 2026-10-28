@@ -226,37 +226,8 @@ fm_busy_gen_path() {  # <state-dir> <id>
 # model-progress is separate from native progress and is read ONLY by opted-in
 # watchers. Missing, malformed, locked, idle, foreign, or stale evidence conveys
 # no model-phase observation, leaving the general busy bound applicable.
-# fm_busy_pi_stream_version_supported: 0 when the installed Pi release carries
-# the verified model-stream contract. The generated extension was live-verified
-# on 1.2.0, and the real-SDK live guard re-verifies the contract on whatever
-# release is installed, so the gate is a floor rather than one exact string
-# (CI installs the latest published Pi, where pinning 1.2.0 disabled the
-# feature instead of testing it). Only a plain published major.minor.patch
-# release is accepted: a prerelease or build suffix can carry a contract that
-# has not shipped, and malformed or empty output keeps the gate closed, leaving
-# the general busy bound in force.
-FM_BUSY_PI_STREAM_VERSION_FLOOR="1.2.0"
-
-fm_busy_pi_stream_version_supported() {  # <version>; 0 when >= floor
-  local version=${1:-} floor=$FM_BUSY_PI_STREAM_VERSION_FLOOR
-  local major minor patch rest floor_major floor_minor floor_patch
-  case "$version" in ''|.*|*.|*..*|*[!0-9.]*) return 1 ;; esac
-  case "$version" in *.*.*.*) return 1 ;; esac
-  case "$version" in *.*.*) ;; *) return 1 ;; esac
-  major=${version%%.*}
-  rest=${version#*.}
-  minor=${rest%%.*}
-  patch=${rest#*.}
-  [ "${#major}" -le 9 ] && [ "${#minor}" -le 9 ] && [ "${#patch}" -le 9 ] || return 1
-  floor_major=${floor%%.*}
-  rest=${floor#*.}
-  floor_minor=${rest%%.*}
-  floor_patch=${rest#*.}
-  [ "$((10#$major))" -gt "$((10#$floor_major))" ] && return 0
-  [ "$((10#$major))" -lt "$((10#$floor_major))" ] && return 1
-  [ "$((10#$minor))" -gt "$((10#$floor_minor))" ] && return 0
-  [ "$((10#$minor))" -lt "$((10#$floor_minor))" ] && return 1
-  [ "$((10#$patch))" -ge "$((10#$floor_patch))" ]
+fm_busy_pi_stream_version_supported() {
+  [ "${1:-}" = 1.2.0 ]
 }
 
 fm_busy_stream_seconds() {  # <configured seconds>; off/invalid prints 0
