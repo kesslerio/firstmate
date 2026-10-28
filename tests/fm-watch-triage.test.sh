@@ -4770,6 +4770,8 @@ test_pi_stream_silence_uses_inspection_timer() {
         cat > "$fakebin/tmux" <<SH
 #!/usr/bin/env bash
 if [ "\${1:-}" = display-message ]; then
+  date +%s > "$state/.wedge-permanent-$key"
+  date +%s > "$state/.wedge-terminal-queued-$key"
   "$ROOT/bin/fm-busy-event.sh" stream "$state" stream close --gen "$gen" --request 1
   touch "$dir/race-fired"
   exit 1
@@ -4780,7 +4782,7 @@ SH
       fi
       PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
         FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS=300 FM_BUSY_TURN_MAX_SECS=99999 \
-        FM_WEDGE_MAX_ESCALATIONS="$terminal" FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+        FM_WEDGE_MAX_ESCALATIONS=0 FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
         "$WATCH" > "$out" &
       pid=$!
       if [ "$mode" = enabled ]; then
@@ -4794,6 +4796,7 @@ SH
         if [ "$mode" = racing ]; then
           [ -e "$dir/race-fired" ] && [ ! -e "$state/stream.model-stream" ] || { reap "$pid"; fail "notification-time close was not exercised"; }
         fi
+        [ ! -e "$state/.wedge-permanent-$key" ] && [ ! -e "$state/.wedge-terminal-queued-$key" ] || { reap "$pid"; fail "$mode retained old cap markers"; }
         reap "$pid"
       fi
     fi
@@ -4847,6 +4850,10 @@ test_pi_model_progress_and_legacy_fallback() {
     esac
     echo $(( $(date +%s) - 500 )) > "$state/.stale-since-$key"
     echo 7 > "$state/.wedge-escalations-$key"
+    if [ "$mode" = closed ] || [ "$mode" = replaced ]; then
+      date +%s > "$state/.wedge-permanent-$key"
+      date +%s > "$state/.wedge-terminal-queued-$key"
+    fi
     PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
       FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS="$enabled" FM_BUSY_TURN_MAX_SECS=60 \
       FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
@@ -4856,6 +4863,7 @@ test_pi_model_progress_and_legacy_fallback() {
       wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "$mode inherited obsolete stream timer: $(cat "$out")"; }
       [ "$(cat "$state/.stale-since-$key")" -gt "$(( $(date +%s) - 100 ))" ] || { reap "$pid"; fail "$mode timer not reset"; }
       [ ! -e "$state/.wedge-escalations-$key" ] || { reap "$pid"; fail "$mode inherited stream escalation count"; }
+      [ ! -e "$state/.wedge-permanent-$key" ] && [ ! -e "$state/.wedge-terminal-queued-$key" ] || { reap "$pid"; fail "$mode retained old stream cap markers"; }
       reap "$pid"
     else
       wait_for_exit "$pid" 100 || { reap "$pid"; fail "$mode legacy bound did not inspect"; }
@@ -4931,6 +4939,8 @@ SH
         pid=$!
       fi
       wait_numeric_file "$dir/append-blocked" 100 || { reap "$pid"; fail "$lock_kind publication wait not exercised"; }
+      date +%s > "$state/.wedge-permanent-$key"
+      date +%s > "$state/.wedge-terminal-queued-$key"
       case "$action" in
         close) "$ROOT/bin/fm-busy-event.sh" stream "$state" stream close --gen "$gen" --request 1 ;;
         progress) "$ROOT/bin/fm-busy-event.sh" stream "$state" stream progress --gen "$gen" --request 1 ;;
@@ -4942,11 +4952,53 @@ SH
       [ ! -s "$out" ] && [ ! -s "$state/.wake-queue" ] || { reap "$pid"; fail "obsolete publication survived lock wait"; }
       [ ! -e "$state/.stale-since-$key" ] && [ ! -e "$state/.wedge-escalations-$key" ] || { reap "$pid"; fail "rejected publication retained escalation"; }
       [ "$(cat "$state/.watcher-down" 2>/dev/null || true)" = "$(cat "$dir/prior-recovery")" ] || { reap "$pid"; fail "$lock_kind/$action rejected append changed prior recovery marker"; }
-      [ ! -e "$state/.wedge-permanent-$key" ] || { reap "$pid"; fail "obsolete terminal append retained cap"; }
+      [ ! -e "$state/.wedge-permanent-$key" ] && [ ! -e "$state/.wedge-terminal-queued-$key" ] || { reap "$pid"; fail "obsolete terminal append retained cap"; }
       reap "$pid"
     done
   done
   pass "stream close, progress, and replacement cancel publication after queue and recovery lock waits"
+}
+
+test_pi_stream_resume_restarts_capped_episode() {
+  local dir state fakebin out capture_file window key gen pid round snapshot
+  dir=$(make_case pi-stream-restall); state="$dir/state"; fakebin="$dir/fakebin"
+  out="$dir/watch.out"; capture_file="$dir/pane.txt"; window=test:fm-stream-restall
+  key=$(printf '%s' "$window" | tr ':/.' '___')
+  printf 'Working...' > "$capture_file"
+  printf 'window=%s\nkind=ship\nharness=pi\n' "$window" > "$state/stream.meta"
+  record_pi_busy "$state" stream
+  gen=$(cat "$state/stream.busy-gen")
+  "$ROOT/bin/fm-busy-event.sh" stream "$state" stream open --gen "$gen" --request 1
+  printf 'working: setup complete\n' > "$state/stream.status"
+  seen_sig "$state/stream.status" > "$state/.seen-stream_status"
+  for round in first resumed; do
+    if [ "$round" = resumed ]; then
+      "$ROOT/bin/fm-busy-event.sh" stream "$state" stream progress --gen "$gen" --request 1
+    fi
+    snapshot=$(cat "$state/stream.model-stream")
+    printf '%s ts=%s\n' "${snapshot% ts=*}" "$(( $(date +%s) - 600 ))" > "$state/stream.model-stream"
+    PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+      FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS=300 FM_BUSY_TURN_MAX_SECS=99999 \
+      FM_WEDGE_MAX_ESCALATIONS=1 FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+      "$WATCH" > "$out" &
+    pid=$!
+    wait_poll_cycle "$state" "$pid" || { reap "$pid"; fail "$round stream did not start a new inspection timer"; }
+    [ -s "$state/.stale-since-$key" ] || { reap "$pid"; fail "$round stream missing inspection timer"; }
+    [ ! -e "$state/.wedge-permanent-$key" ] && [ ! -e "$state/.wedge-terminal-queued-$key" ] || { reap "$pid"; fail "$round stream inherited prior cap"; }
+    reap "$pid"
+    ack_stopped_cycle "$state" || fail "$round admission acknowledgement failed"
+    echo $(( $(date +%s) - 500 )) > "$state/.stale-since-$key"
+    PATH="$fakebin:$PATH" FM_FAKE_TMUX_WINDOW="$window" FM_FAKE_TMUX_CAPTURE="$capture_file" \
+      FM_STATE_OVERRIDE="$state" FM_STREAM_SILENT_MAX_SECS=300 FM_BUSY_TURN_MAX_SECS=99999 \
+      FM_WEDGE_MAX_ESCALATIONS=1 FM_STALE_ESCALATE_SECS=240 FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
+      "$WATCH" > "$out" &
+    pid=$!
+    wait_for_exit "$pid" 100 || { reap "$pid"; fail "$round stream did not reach cap"; }
+    grep -F PERMANENTLY-WEDGED "$out" >/dev/null || fail "$round stream missing terminal notification"
+    [ -s "$state/.wedge-permanent-$key" ] && [ -s "$state/.wedge-terminal-queued-$key" ] || fail "$round stream missing cap markers"
+    ack_stopped_cycle "$state" || fail "$round cap acknowledgement failed"
+  done
+  pass "a capped stream that resumes and stalls before rearming starts a fresh episode"
 }
 
 test_pi_stream_terminal_publication() {
@@ -5155,6 +5207,7 @@ fm_test_run \
   test_pi_stream_publication_lock_revalidation \
   test_pi_stream_uninterrupted_publication \
   test_pi_stream_terminal_publication \
+  test_pi_stream_resume_restarts_capped_episode \
   test_status_span_actionable_classifier \
   test_status_span_survives_a_later_routine_append \
   test_status_span_respects_decision_closure \

@@ -2203,7 +2203,8 @@ wedge_timer_check() {  # <window> <since-file> <triage-label> <escalation-count-
           # Deferral and endpoint reads can outlive a request. Revalidate after
           # those reads, immediately before this observation authorizes a wake.
           if ! busy_stream_snapshot_current "$task" "$stream_snapshot"; then
-            rm -f "$since_file" "$escalation_file" "$STATE/.model-stream-episode-$_wkey"
+            wedge_episode_end "$_wkey"
+            rm -f "$STATE/.model-stream-episode-$_wkey"
             clear_write_tracking "$_wkey"
             return 0
           fi
@@ -2252,7 +2253,8 @@ wedge_timer_check() {  # <window> <since-file> <triage-label> <escalation-count-
             # The snapshot changed under the lock wait, so this terminal wake
             # belongs to an observation that no longer stands: discard it and
             # its count exactly like a rejected escalation append.
-            rm -f "$since_file" "$escalation_file" "$STATE/.model-stream-episode-$_wkey"
+            wedge_episode_end "$_wkey"
+            rm -f "$STATE/.model-stream-episode-$_wkey"
             clear_write_tracking "$_wkey"
             return 0
           fi
@@ -2306,7 +2308,8 @@ wedge_timer_check() {  # <window> <since-file> <triage-label> <escalation-count-
           append_status=0
           fm_wake_append_guarded busy_stream_snapshot_current stale "$win" "$reason" "$task" "$stream_snapshot" || append_status=$?
           if [ "$append_status" -eq 3 ]; then
-            rm -f "$since_file" "$escalation_file" "$STATE/.model-stream-episode-$_wkey"
+            wedge_episode_end "$_wkey"
+            rm -f "$STATE/.model-stream-episode-$_wkey"
             clear_write_tracking "$_wkey"
             return 0
           fi
@@ -2527,14 +2530,14 @@ busy_turn_bound_check() {  # <window> <task> <hash> <since-file> <escalation-fil
   stream_episode="$STATE/.model-stream-episode-$(window_key "$win")"
   if [ -n "$stream_snapshot" ]; then
     if [ "$(cat "$stream_episode" 2>/dev/null || true)" != "$stream_snapshot" ]; then
-      rm -f "$since_file" "$escalation_file"
+      wedge_episode_end "$(window_key "$win")"
       clear_write_tracking "$(window_key "$win")"
       printf '%s' "$stream_snapshot" > "$stream_episode"
     fi
     label="busy (model stream silent)"
   else
     if [ -e "$stream_episode" ]; then
-      rm -f "$since_file" "$escalation_file"
+      wedge_episode_end "$(window_key "$win")"
       clear_write_tracking "$(window_key "$win")"
     fi
     rm -f "$stream_episode"
