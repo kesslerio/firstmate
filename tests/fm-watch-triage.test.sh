@@ -4879,7 +4879,7 @@ test_pi_stream_publication_lock_revalidation() {
   local uninterrupted=${1:-0} terminal=${2:-0}
   for lock_kind in queue recovery; do
     for action in close progress replace; do
-      dir=$(make_case "pi-publication-$uninterrupted-$lock_kind-$action"); state="$dir/state"; fakebin="$dir/fakebin"
+      dir=$(make_case "pi-publication-$uninterrupted-terminal-$terminal-$lock_kind-$action"); state="$dir/state"; fakebin="$dir/fakebin"
       out="$dir/watch.out"; capture_file="$dir/pane.txt"; window="test:fm-publication-$lock_kind-$action"
       key=$(printf '%s' "$window" | tr ':/.' '___')
       printf 'Working...' > "$capture_file"
