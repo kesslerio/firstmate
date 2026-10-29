@@ -1,0 +1,3 @@
+ok - a forced secondmate teardown returns a child scout copy with a nested clone clean
+ok - a forced secondmate teardown warns about a dirty child return and still completes
+ok - initial clean and residue teardown adopt and preserve the waiting host episode
