@@ -519,7 +519,21 @@ fm_control_harness_wiring_paths() {  # <harness> <worktree> <state-dir> <id> [ki
         printf '%s\n' "$wt/.claude/settings.local.json"
       fi
       ;;
-    opencode) printf '%s\n' "$wt/.opencode/plugins/fm-busy-state.js" ;;
+    opencode)
+      printf '%s\n' "$wt/.opencode/plugins/fm-busy-state.js"
+      # A build without the top-level --model flag is pinned through the
+      # worktree's project configuration, and that file is retired only while
+      # this task's own record names it: a project's own
+      # .opencode/opencode.jsonc predates firstmate and is never its to remove.
+      # A stale pin must not outlive the task either, because a returned pool
+      # slot is reused and a later launch that names no model would silently
+      # inherit it.
+      if [ -f "$state/$id.opencode-model-config" ] &&
+        [ "$(cat "$state/$id.opencode-model-config" 2>/dev/null)" = "$wt/.opencode/opencode.jsonc" ]; then
+        printf '%s\n' "$wt/.opencode/opencode.jsonc"
+        printf '%s\n' "$state/$id.opencode-model-config"
+      fi
+      ;;
     pi|pi-signed) printf '%s\n' "$state/$id.pi-ext.ts" ;;
     omp) printf '%s\n' "$state/$id.omp-ext.ts" ;;
     grok)
@@ -621,4 +635,13 @@ fm_control_harness_turnend_auth_path() {  # <harness> <token>
     kimi) printf '%s\n' "$HOME/.kimi-code/fm-turn-end.d/$token" ;;
     *) return 0 ;;
   esac
+}
+
+fm_control_retire_opencode_model_pin() {
+  local id=$1 state=$3 record="$3/$1.opencode-model-config" pin="$2/.opencode/opencode.jsonc" owned
+  [ -e "$record" ] || [ -L "$record" ] || return 0
+  owned=$(cat "$record") || return 1
+  [ "$owned" = "$pin" ] || return 1
+  rm -f -- "$pin" || return 1
+  rm -f -- "$state/$id.opencode-model-config"
 }

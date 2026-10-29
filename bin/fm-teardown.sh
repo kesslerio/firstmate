@@ -3458,6 +3458,7 @@ cleanup_firstmate_home_children() {
     elif [ "$child_backend" = orca ]; then
       if [ -n "$child_wt" ] && [ -d "$child_wt" ]; then
         validate_child_worktree_for_removal "$child_wt" "$child_proj" >/dev/null || return 1
+        fm_control_retire_opencode_model_pin "$child_id" "$child_wt" "$sub_state" || return 1
         rm -f "$child_wt/.claude/settings.local.json" "$child_wt/.opencode/plugins/fm-turn-end.js" \
           "$child_wt/.fm-grok-turnend" "$child_wt/.fm-kimi-turnend"
       fi
@@ -3485,6 +3486,7 @@ cleanup_firstmate_home_children() {
           git -C "$child_wt" ls-files --error-unmatch CLAUDE.local.md >/dev/null 2>&1 \
             || rm -f "$child_wt/CLAUDE.local.md"
         fi
+        fm_control_retire_opencode_model_pin "$child_id" "$child_wt" "$sub_state" || return 1
         if [ -n "$child_proj" ] && [ -d "$child_proj" ] && command -v treehouse >/dev/null 2>&1; then
           teardown_scrub_scratch_copy "$child_wt" || return 1
           child_pool_slot=0
@@ -3822,6 +3824,7 @@ if [ "$BACKEND" = orca ] && [ "$KIND" != secondmate ]; then
     rm -f "$WT/.claude/settings.local.json" "$WT/.opencode/plugins/fm-turn-end.js" \
       "$WT/.opencode/plugins/fm-busy-state.js" \
       "$WT/.fm-grok-turnend" "$WT/.fm-kimi-turnend"
+    fm_control_retire_opencode_model_pin "$ID" "$WT" "$STATE" || exit 1
     remove_harness_worktree_wiring "$WT"
   fi
   if [ -n "$T_ORCA" ]; then
@@ -3843,6 +3846,7 @@ elif [ -d "$WT" ] && [ "$KIND" != secondmate ]; then
   # its next holder.
   rm -f "$WT/.claude/settings.local.json" "$WT/.opencode/plugins/fm-turn-end.js" \
     "$WT/.fm-grok-turnend" "$WT/.fm-kimi-turnend"
+  fm_control_retire_opencode_model_pin "$ID" "$WT" "$STATE" || exit 1
   remove_harness_worktree_wiring "$WT"
   if [ "$BACKEND" = t3code ]; then
     "$SCRIPT_DIR/fm-t3code-codex-env.sh" cleanup "$WT" || exit 1

@@ -65,15 +65,48 @@ exit 0
 SH
   cat > "$fakebin/opencode" <<'SH'
 #!/usr/bin/env bash
-# fm-spawn probes `opencode --version` to resolve the installed major. Report a
-# deterministic version so launch-shape assertions never depend on whatever
-# opencode (if any) sits on the developer's or CI runner's real PATH. Defaults
-# to the 2.x line; a test overrides via FM_FAKE_OPENCODE_VERSION.
+# Report the installed build's version, model flag capability, parsed project
+# config, and session model without starting a real agent.
 if [ "${1:-}" = --version ]; then
   # Record the exact path the probe executed, so a test can prove the launch
   # runs that same resolved executable. Opt-in; empty elsewhere, so no effect.
   [ -n "${FM_FAKE_OPENCODE_PROBE_LOG:-}" ] && printf '%s\n' "$0" >> "$FM_FAKE_OPENCODE_PROBE_LOG"
   printf '%s\n' "${FM_FAKE_OPENCODE_VERSION:-2.0.21}"
+  exit 0
+fi
+if [ "${1:-}" = --help ]; then
+  case "${FM_FAKE_OPENCODE_VERSION:-2.0.21}" in
+  1.*|dev-build) printf '  -m, --model string  Model to use\n' ;;
+  *) printf '  --standalone  Run a private server\n' ;;
+  esac
+  exit 0
+fi
+if [ "${1:-}" = debug ] && [ "${2:-}" = config ]; then
+  file="$PWD/.opencode/opencode.jsonc"
+  if [ -f "$file" ]; then
+    jq -c --arg path "$file" '[{path:$path,info:.}]' "$file"
+  else
+    printf '[]\n'
+  fi
+  exit 0
+fi
+if [ "${1:-}" = session ] && [ "${2:-}" = list ]; then
+  jq -cn --arg directory "$PWD" '[{id:"ses_profile",directory:$directory,updated:9999999999999}]'
+  exit 0
+fi
+if [ "${1:-}" = export ]; then
+  case "${FM_FAKE_OPENCODE_VERSION:-2.0.21}" in
+  1.*|dev-build) ;;
+  *) exit 1 ;;
+  esac
+  jq -cn --arg model "${FM_FAKE_OPENCODE_MODEL_REQUEST:-}" \
+    '{messages:[{info:{role:"assistant",time:{created:9999999999999},providerID:($model|split("/")[0]),modelID:($model|split("/")[1])}}]}'
+  exit 0
+fi
+if [ "${1:-}" = session ] && [ "${2:-}" = export ]; then
+  case "${FM_FAKE_OPENCODE_VERSION:-2.0.21}" in 1.*|dev-build) exit 1 ;; esac
+  jq -cn --arg model "${FM_FAKE_OPENCODE_MODEL_REQUEST:-}" \
+    '{messages:[{type:"assistant",time:{created:9999999999999},model:{providerID:($model|split("/")[0]),id:($model|split("/")[1])}}]}'
 fi
 exit 0
 SH
@@ -125,7 +158,16 @@ task_inbox_export() {  # <home> <id>
 
 run_spawn() {
   local home=$1 wt=$2 fakebin=$3 launchlog=$4
+  local arg model='' next_model=0
   shift 4
+  for arg in "$@"; do
+    if [ "$next_model" = 1 ]; then
+      model=$arg
+      next_model=0
+    elif [ "$arg" = --model ]; then
+      next_model=1
+    fi
+  done
   : > "$launchlog"
   # CLAUDE_CONFIG_DIR is forwarded onto claude launches by fm-spawn, so pin it
   # explicitly (empty by default) instead of leaking the invoking shell's value,
@@ -135,6 +177,7 @@ run_spawn() {
     FM_FAKE_LAUNCH_LOG="$launchlog" FM_FAKE_PANE_LOG="${FM_TEST_PANE_LOG:-}" \
     FM_FAKE_PI_VERSION="${FM_TEST_PI_VERSION:-0.84.0}" \
     FM_FAKE_OPENCODE_VERSION="${FM_TEST_OPENCODE_VERSION:-2.0.21}" \
+    FM_FAKE_OPENCODE_MODEL_REQUEST="$model" \
     FM_FAKE_OPENCODE_PROBE_LOG="${FM_TEST_OPENCODE_PROBE_LOG:-}" \
     FM_FAKE_OPENCODE_TURN="${FM_TEST_OPENCODE_TURN:-auto}" \
     FM_FAKE_ENTER_LOG="${FM_TEST_ENTER_LOG:-}" \
@@ -920,12 +963,14 @@ test_opencode_threads_model_and_effort_variant() {
   assert_grep "opencode_version=2.0.21" "$HOME_DIR/state/$id.meta" \
     "opencode 2.x spawn must record the detected version in meta"
   launch=$(cat "$LAUNCH_LOG")
-  # opencode 2.0.21 removed the interactive top-level --model flag. The
-  # selected model and per-model reasoning effort ride the OPENCODE_CONFIG_CONTENT
-  # JSON the launch already writes, keyed to the default build agent.
+  # Model and effort belong to the parsed worktree pin; standalone keeps the
+  # worker's environment and plugin ownership local to its process.
   assert_contains "$launch" \
-    "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"},\"model\":\"anthropic/claude-sonnet-4-5\",\"agent\":{\"build\":{\"model\":\"anthropic/claude-sonnet-4-5\",\"variant\":\"high\"}}}' '$FAKEBIN_DIR/opencode' --standalone --prompt" \
-    "opencode launch did not write the model and effort as the build agent's config"
+    "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"}}' '$FAKEBIN_DIR/opencode' --standalone --prompt" \
+    "opencode launch must retain its permission grant and standalone isolation"
+  [ "$(jq -c '.model' "$WT_DIR/.opencode/opencode.jsonc")" = \
+    '{"providerID":"anthropic","model":"claude-sonnet-4-5","variant":"high"}' ] \
+    || fail "opencode project config must pin the model and high effort variant"
   assert_not_contains "$launch" "--model" "opencode interactive launch must not pass removed --model"
   assert_not_contains "$launch" "--effort" "opencode launch must not pass unsupported --effort"
   assert_not_contains "$launch" "--variant" "opencode launch must not pass run-only --variant"
@@ -945,8 +990,11 @@ test_opencode_without_effort_keeps_launch_config_unchanged() {
   assert_meta_profile "$HOME_DIR/state/$id.meta" opencode anthropic/claude-sonnet-4-5 default
   launch=$(cat "$LAUNCH_LOG")
   assert_contains "$launch" \
-    "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"},\"model\":\"anthropic/claude-sonnet-4-5\",\"agent\":{\"build\":{\"model\":\"anthropic/claude-sonnet-4-5\"}}}' '$FAKEBIN_DIR/opencode' --standalone --prompt" \
-    "opencode launch without effort must still pin the model through config"
+    "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"}}' '$FAKEBIN_DIR/opencode' --standalone --prompt" \
+    "opencode launch must retain its permission grant and standalone isolation"
+  [ "$(jq -c '.model' "$WT_DIR/.opencode/opencode.jsonc")" = \
+    '{"providerID":"anthropic","model":"claude-sonnet-4-5"}' ] \
+    || fail "opencode without effort must pin the model and omit variant"
   assert_not_contains "$launch" '"variant"' "opencode launch without effort must not write a variant"
   assert_not_contains "$launch" "--model" "opencode interactive launch must not pass removed --model"
   pass "opencode without an effort keeps the model pin and omits variant"
@@ -964,8 +1012,11 @@ test_opencode_emits_variant_for_openai_family_effort() {
   assert_meta_profile "$HOME_DIR/state/$id.meta" opencode openai/gpt-5.6-sol xhigh
   launch=$(cat "$LAUNCH_LOG")
   assert_contains "$launch" \
-    "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"},\"model\":\"openai/gpt-5.6-sol\",\"agent\":{\"build\":{\"model\":\"openai/gpt-5.6-sol\",\"variant\":\"xhigh\"}}}' '$FAKEBIN_DIR/opencode' --standalone --prompt" \
-    "opencode launch did not write the openai family effort as the build agent's variant"
+    "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"}}' '$FAKEBIN_DIR/opencode' --standalone --prompt" \
+    "opencode launch must retain its permission grant and standalone isolation"
+  [ "$(jq -c '.model' "$WT_DIR/.opencode/opencode.jsonc")" = \
+    '{"providerID":"openai","model":"gpt-5.6-sol","variant":"xhigh"}' ] \
+    || fail "opencode project config must pin the openai family effort variant"
   assert_not_contains "$launch" "--model" "opencode interactive launch must not pass removed --model"
   pass "opencode emits the variant for an effort the openai family exposes"
 }
@@ -982,8 +1033,11 @@ test_opencode_omits_variant_when_model_family_lacks_effort() {
   assert_meta_profile "$HOME_DIR/state/$id.meta" opencode anthropic/claude-sonnet-4-5 medium
   launch=$(cat "$LAUNCH_LOG")
   assert_contains "$launch" \
-    "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"},\"model\":\"anthropic/claude-sonnet-4-5\",\"agent\":{\"build\":{\"model\":\"anthropic/claude-sonnet-4-5\"}}}' '$FAKEBIN_DIR/opencode' --standalone --prompt" \
-    "opencode must pin the model while omitting a variant the family lacks"
+    "OPENCODE_CONFIG_CONTENT='{\"permission\":{\"*\":\"allow\"}}' '$FAKEBIN_DIR/opencode' --standalone --prompt" \
+    "opencode launch must retain its permission grant and standalone isolation"
+  [ "$(jq -c '.model' "$WT_DIR/.opencode/opencode.jsonc")" = \
+    '{"providerID":"anthropic","model":"claude-sonnet-4-5"}' ] \
+    || fail "opencode must pin the model and omit unsupported effort"
   assert_not_contains "$launch" '"variant"' "opencode must omit the variant when the model family lacks the effort"
   assert_not_contains "$launch" "--model" "opencode interactive launch must not pass removed --model"
   pass "opencode omits the variant for an effort outside the model family's list"
@@ -1143,12 +1197,9 @@ test_opencode_unknown_version_takes_1x_launch_path() {
   rec=$(make_spawn_case profile-opencode-unknown opencode "$id")
   read_case_record "$rec"
 
-  # An opencode whose --version carries no parseable x.y.z (a dev build, a
-  # renamed binary, or an unresolvable executable) must fall back to the 1.x
-  # launch shape: the interactive --model flag and the variant-only 1.x config,
-  # never the 2.x OPENCODE_CONFIG_CONTENT global model pin. The exit side
-  # matches - with no version recorded in meta, fm-control uses the
-  # version-agnostic /exit.
+  # The dev build advertises --model in its own help, so its model surface is
+  # known even without a parseable major. Plugin and exit mechanics retain the
+  # upstream 1.x fallback; the model capability is proven rather than guessed.
   out=$(FM_TEST_OPENCODE_VERSION=dev-build \
     run_ship_spawn "$HOME_DIR" "$WT_DIR" "$FAKEBIN_DIR" "$LAUNCH_LOG" "$id" "$PROJ_DIR" \
     --model anthropic/claude-sonnet-4-5 --effort high)
