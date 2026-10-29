@@ -527,10 +527,15 @@ test_watcher_surfaces_one_wake() {
   rows=$(awk -F '\t' -v key="$home/state/pr-health.check.sh" '$3 == "check" && $4 == key && $5 ~ /pull\/8 conflicts with its base/ { n++ } END { print n + 0 }' \
     "$home/state/.wake-queue")
   [ "$rows" = 1 ] || fail "one conflict queued $rows wakes: $(cat "$home/state/.wake-queue")"
-  rc=0
   with_home "$home" env FM_WATCH_HANDLING_SUCCESSOR=1 FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=0 FM_HEARTBEAT=999999 \
-    "$ROOT/bin/fm-watch-checkpoint.sh" --seconds 3 > "$home/watcher-repeat.out" 2> "$home/watcher-repeat.err" || rc=$?
-  [ "$rc" -eq 124 ] || fail "an unchanged conflict woke the watcher again: $(cat "$home/watcher-repeat.out")"
+    "$ROOT/bin/fm-watch-checkpoint.sh" --seconds 12 > "$home/watcher-repeat.out" 2> "$home/watcher-repeat.err" || true
+  case "$(cat "$home/watcher-repeat.out")" in
+    *"checkpoint: no actionable wake"*) ;;
+    *) fail "the unchanged conflict was emitted again instead of remaining quiet: $(cat "$home/watcher-repeat.out")" ;;
+  esac
+  rows=$(awk -F '\t' -v key="$home/state/pr-health.check.sh" '$3 == "check" && $4 == key { n++ } END { print n + 0 }' \
+    "$home/state/.wake-queue")
+  [ "$rows" = 1 ] || fail "an unchanged conflict created $rows durable wakes"
   pass 'the watcher turns one conflict into one durable wake'
 }
 
