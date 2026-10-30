@@ -105,7 +105,7 @@ cleanup() {
   local status=$? log
   local worker_pid=''
   if [ "$status" -ne 0 ]; then
-    for log in spawn-concurrent.out watch-liveness.out watch-liveness.err watch-unreachable.err; do
+    for log in spawn-concurrent.out spawn-retirement.out watch-liveness.out watch-liveness.err watch-unreachable.err; do
       [ ! -f "$TMP_ROOT/$log" ] || { printf 'diagnostic: %s\n' "$log"; cat "$TMP_ROOT/$log"; }
     done
     if [ -n "${watch_pid:-}" ]; then
@@ -1946,12 +1946,12 @@ FM_FAKE_SSH_MODE=launch-block remote_env "$ROOT/bin/fm-spawn.sh" ios --secondmat
   > "$TMP_ROOT/spawn-retirement.out" 2>&1 &
 spawn_retirement_pid=$!
 launch_wait=0
-# The respawn performs readiness and inheritance jobs before launch, so allow
-# the same 30-second loaded-runner bound as the earlier blocked worker path.
+# The respawn performs readiness, inheritance, and fleet-seat reconciliation
+# before launch. Allow the remote seat wait bound under a loaded CI runner.
 while [ ! -f "$TMP_ROOT/launch.entered" ]; do
   kill -0 "$spawn_retirement_pid" 2>/dev/null || fail "remote respawn exited before its blocked launch"
   launch_wait=$((launch_wait + 1))
-  [ "$launch_wait" -le 1500 ] || fail "remote respawn never reached its blocked launch"
+  [ "$launch_wait" -le 4500 ] || fail "remote respawn never reached its blocked launch"
   sleep 0.02
 done
 # Both opt-in archives must cover the parent-side records on the real remote path.
