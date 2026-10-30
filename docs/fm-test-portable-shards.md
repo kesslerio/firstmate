@@ -152,3 +152,8 @@ A lane that reaches its tier bound needs investigation and a distribution or run
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) holds the executable values and names each job's tier beside its `timeout-minutes`.
 [`tests/fm-ci-workflow.test.sh`](../tests/fm-ci-workflow.test.sh) holds the policy against the parsed workflow: every job belongs to exactly one tier, the workflow carries exactly three distinct job-level values, the fast tier stays within 5-10 minutes, the normal jobs share one 30-minute budget, and the Herdr family-run step is the 20-minute tripwire below its job backstop with an `always()` teardown after it.
 A passing coverage guard does not establish a healthy job duration; refresh the healthy figures above from the lanes' uploaded timing artifacts.
+
+The fork retains its supervision-host split at the latch boundary while carrying current upstream case bodies and call order unchanged.
+`tests/fm-supervision-host.test.sh` and `tests/fm-supervision-host-latch-park.test.sh` retain the fork's conservative 915025 ms and 852175 ms packing weights from the completed 1767200 ms pre-split run.
+These inherited weights are not fresh measurements of the reconciled suites; subsequent green CI measurements must establish their current variance.
+The combined inventory uses ten serial shards to retain those conservative weights within the unchanged 1200000 ms packing target.
