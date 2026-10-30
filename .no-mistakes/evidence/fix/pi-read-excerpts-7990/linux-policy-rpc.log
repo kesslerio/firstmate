@@ -1,0 +1,103 @@
+{"scenario":"absent","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"disabled","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"repeat-limit","installedPiRPC":"passed","executions":2,"requests":3,"stopped":true}
+
+file:///home/art/.local/share/fm-7990-linux-validation-20261030-1/repo/tests/fixtures/.policy-rpc-window.mjs:97
+  throw new Error(`${error.message}\nPi stderr: ${stderr}`, { cause: error });
+        ^
+
+Error: Pi did not settle its owned turn
+Pi stderr: 
+    at file:///home/art/.local/share/fm-7990-linux-validation-20261030-1/repo/tests/fixtures/.policy-rpc-window.mjs:97:9 {
+  [cause]: Error: Pi did not settle its owned turn
+      at prompt (file:///home/art/.local/share/fm-7990-linux-validation-20261030-1/repo/tests/fixtures/.policy-rpc-window.mjs:83:9)
+      at async file:///home/art/.local/share/fm-7990-linux-validation-20261030-1/repo/tests/fixtures/.policy-rpc-window.mjs:87:3
+}
+
+Node.js v24.22.1
+
+Traceback (most recent call last):
+  File "<stdin>", line 46, in <module>
+AssertionError: ('window', 1)
+{"scenario":"absent","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"disabled","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"repeat-limit","installedPiRPC":"passed","executions":2,"requests":3,"stopped":true}
+
+{"scenario":"window","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"output-change","installedPiRPC":"passed","executions":5,"requests":6,"stopped":true}
+
+file:///home/art/.local/share/fm-7990-linux-validation-20261030-1/repo/tests/fixtures/.policy-rpc-error-reset.mjs:97
+  throw new Error(`${error.message}\nPi stderr: ${stderr}`, { cause: error });
+        ^
+
+Error: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
++   executions: 6,
++   requests: 7
+-   executions: 5,
+-   requests: 6
+  }
+
+Pi stderr: 
+    at file:///home/art/.local/share/fm-7990-linux-validation-20261030-1/repo/tests/fixtures/.policy-rpc-error-reset.mjs:97:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  [cause]: AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   executions: 6,
+  +   requests: 7
+  -   executions: 5,
+  -   requests: 6
+    }
+  
+      at file:///home/art/.local/share/fm-7990-linux-validation-20261030-1/repo/tests/fixtures/.policy-rpc-error-reset.mjs:88:10
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { requests: 7, executions: 6 },
+    expected: { requests: 6, executions: 5 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+}
+
+Node.js v24.22.1
+
+Traceback (most recent call last):
+  File "<stdin>", line 46, in <module>
+AssertionError: ('error-reset', 1)
+{"scenario":"absent","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"disabled","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"repeat-limit","installedPiRPC":"passed","executions":2,"requests":3,"stopped":true}
+
+{"scenario":"window","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"output-change","installedPiRPC":"passed","executions":5,"requests":6,"stopped":true}
+
+{"scenario":"error-reset","installedPiRPC":"passed","executions":6,"requests":7,"stopped":true}
+
+{"scenario":"nonzero-reset","installedPiRPC":"passed","executions":6,"requests":7,"stopped":true}
+
+{"scenario":"worker","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"foreign-owner","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"write","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"substitution","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"nested-shell","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+{"scenario":"unknown-option","installedPiRPC":"passed","executions":6,"requests":7,"stopped":false}
+
+All 13 installed-Pi policy scenarios passed; each fixture verified process-group cleanup.

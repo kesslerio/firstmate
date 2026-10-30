@@ -1,0 +1,35 @@
+ok - synthetic 85/65 alternating batches execute only three A/B pairs
+ok - only completed successful identical results count; fourth is vetoed and run aborted
+ok - same-batch duplicate veto never fabricates a completed success or abort
+ok - backlog line slicing with cut blocks the fourth identical read
+ok - observed outer read groups and multiline pipelines stop before a fourth execution
+ok - terminal continuation stops repeated read "(cat file\\\n)"
+ok - terminal continuation stops repeated read "(cat file;\\\n)"
+ok - terminal continuation stops repeated read "(cat file\\\n )"
+ok - terminal continuation stops repeated read "(cat file\\\n\n)"
+ok - group recognition refuses mutation, redirection, nested shells and unknown filter options
+ok - changes, errors, exit failures, empty results and volatile details
+ok - operational inputs, fresh turns and compaction cannot reset the budget
+ok - genuine interactive and RPC input resets, including an image; in-flight old results cannot count
+ok - bounded history expires, but a tripped latch requires real user input
+ok - reload/resume restore durable hashes, including a tripped latch
+ok - result IDs deduplicate and unknown adapter events never invent success
+ok - known read commands count; mutation, unknown syntax, and bounded polling stay uncounted
+ok - normal native reads are independent and argument order does not create a new budget
+ok - primary ownership requires exact root, primary PID marker, session namespace and lock ancestry
+ok - state memory and persisted payload are bounded and contain only hashes/labels
+ok - fresh captain reset survives temporary missing or stale ownership
+ok - operational input cannot defer a reset until ownership returns
+ok - foreign session input cannot defer a reset until ownership returns
+ok - results received during ownership loss retire pending reads without counting or clearing history
+ok - bounded operator configuration rejects invalid and unknown settings
+ok - missing/default/disabled configuration registers no interception handlers
+ok - load diagnostics refuse legacy collisions and unsupported activation without touching source/config
+ok - truncated Bash footers cannot disguise unchanged successful output
+ok - stopped primary vetoes compaction without affecting another owner
+ok - configured threshold and time window govern execution, disabled guard stays inert
+ok - Linux real parent ancestry is read through ps
+ok - numbered backlog excerpts stop before fourth identical read
+ok - grouped byte excerpts stop before fourth identical read
+ok - excerpt additions do not recognize writes, substitutions or unknown flags
+ok - pre-feature fast-forward preserves ignored legacy guard/helper and configuration

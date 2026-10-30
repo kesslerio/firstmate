@@ -1,0 +1,3 @@
+Host: darwin
+Missing configuration: {"enabled":false,"repeatLimit":3,"windowMs":900000}
+Enabled configuration: Read repetition guard currently supports Linux Pi only; disable enabled in read-repetition.json on this platform.

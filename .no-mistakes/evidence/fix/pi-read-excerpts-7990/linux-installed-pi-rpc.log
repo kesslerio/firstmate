@@ -1,0 +1,7 @@
+Pi version: 1.4.0
+8a21e6ff77846f2cbd1ce4eddf6320431d7fdf17
+{"installedPiRPC":"passed","executionsBeforeStop":3,"requestsBeforeStop":4,"operationalResetDenied":true,"userResetAllowed":true,"durableNotice":true}
+{"requests":6,"executions":4}{"installedPiRPC":"passed","executionsBeforeStop":3,"requestsBeforeStop":4,"operationalResetDenied":true,"userResetAllowed":true,"durableNotice":true}
+{"requests":6,"executions":4}
+Post-cleanup worktree:
+Owned fixture homes removed; fixture runners verified process-group exit.

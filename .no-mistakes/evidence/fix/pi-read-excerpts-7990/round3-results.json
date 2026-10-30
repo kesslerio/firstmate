@@ -1,0 +1,86 @@
+{
+  "head": "8a21e6ff77846f2cbd1ce4eddf6320431d7fdf17",
+  "results": [
+    {
+      "scenario": "numbered",
+      "exit": 0,
+      "output": "{\"scenario\":\"numbered\",\"observed\":{\"requests\":4,\"executions\":3},\"activated\":true,\"stopped\":1,\"installedPiRPC\":true}\n{\"operationalResetDenied\":true,\"userResetAllowed\":true}\n"
+    },
+    {
+      "scenario": "byte",
+      "exit": 0,
+      "output": "{\"scenario\":\"byte\",\"observed\":{\"requests\":4,\"executions\":3},\"activated\":true,\"stopped\":1,\"installedPiRPC\":true}\n{\"operationalResetDenied\":true,\"userResetAllowed\":true}\n"
+    },
+    {
+      "scenario": "absent",
+      "exit": 0,
+      "output": "{\"scenario\":\"absent\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":false,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "disabled",
+      "exit": 0,
+      "output": "{\"scenario\":\"disabled\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":false,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "repeat-limit",
+      "exit": 0,
+      "output": "{\"scenario\":\"repeat-limit\",\"observed\":{\"requests\":3,\"executions\":2},\"activated\":true,\"stopped\":1,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "window",
+      "exit": 0,
+      "output": "{\"scenario\":\"window\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":true,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "changed-output",
+      "exit": 0,
+      "output": "{\"scenario\":\"changed-output\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":true,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "error-result",
+      "exit": 0,
+      "output": "{\"scenario\":\"error-result\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":true,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "nonzero-result",
+      "exit": 0,
+      "output": "{\"scenario\":\"nonzero-result\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":true,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "worker",
+      "exit": 0,
+      "output": "{\"scenario\":\"worker\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":false,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "foreign-owner",
+      "exit": 0,
+      "output": "{\"scenario\":\"foreign-owner\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":false,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "write",
+      "exit": 0,
+      "output": "{\"scenario\":\"write\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":true,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "substitution",
+      "exit": 0,
+      "output": "{\"scenario\":\"substitution\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":true,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "nested-shell",
+      "exit": 0,
+      "output": "{\"scenario\":\"nested-shell\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":true,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "unsupported-nl",
+      "exit": 0,
+      "output": "{\"scenario\":\"unsupported-nl\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":true,\"stopped\":0,\"installedPiRPC\":true}\n"
+    },
+    {
+      "scenario": "unsupported-od",
+      "exit": 0,
+      "output": "{\"scenario\":\"unsupported-od\",\"observed\":{\"requests\":7,\"executions\":6},\"activated\":true,\"stopped\":0,\"installedPiRPC\":true}\n"
+    }
+  ],
+  "sourceStatus": ""
+}
