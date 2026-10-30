@@ -1,0 +1,2 @@
+Ambiguous-model bypass refused (exit 5); an explicitly unpooled model was recorded outside the configured pool.
+fleet-seats: no seat - harness pi launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)

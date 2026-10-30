@@ -1,0 +1,3 @@
+Fleet-wide live scenario: primary reservation used capacity; local secondmate reservation refused (exit 4).
+fleet-seats: pool shared is full (1 of 1 seats held); mate-task gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M675JVM16S7CH0N1JE14H2NK/.live-seat-fleet-fixture/root/state primary-task
