@@ -1,0 +1,11 @@
+Disposable primary + registered local secondmate; capacity=1, model=provider/model-x.
+$ primary reserve worker-a
+fleet-seats: reserved pool=shared id=worker-a generation=g-worker-a used=1 capacity=1
+$ secondmate attempts reserve worker-b while pool is full
+fleet-seats: pool shared is full (1 of 1 seats held); worker-b gets no seat for model provider/model-x - choose an overflow route or wait for a holder to finish
+  holder /home/art/.no-mistakes/worktrees/9f75ec418609/01M66QATJKKWH0SNG63FT0RD0Q/.live-seat.FWAxuO/primary/state worker-a
+secondmate_reserve_exit=4 (expected 4)
+$ primary releases worker-a generation
+fleet-seats: released id=worker-a generation=g-worker-a reason=teardown
+$ secondmate retries after release
+fleet-seats: reserved pool=shared id=worker-b generation=g-worker-b used=1 capacity=1
