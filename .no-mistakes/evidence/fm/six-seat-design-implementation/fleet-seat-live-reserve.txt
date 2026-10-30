@@ -1,0 +1,7 @@
+Scenario: valid single-document policy admits one holder and refuses over-capacity admission.
+fleet-seats: reserved pool=shared id=first generation=g-first used=1 capacity=1
+second reservation exit=4 output=fleet-seats: pool shared is full (1 of 1 seats held); second gets no seat for model model-x - choose an overflow route or wait for a holder to finish
+  holder /tmp/fleet-seat-live.2R2Zw0/home/state first
+Scenario: concatenated valid policy documents are refused before any holder is granted.
+multi-document reservation exit=5 output=fleet-seats: no seat - /tmp/fleet-seat-live.2R2Zw0/home/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+The attempted adversary reservation was refused.

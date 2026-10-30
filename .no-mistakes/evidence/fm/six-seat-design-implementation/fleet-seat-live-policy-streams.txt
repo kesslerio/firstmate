@@ -1,0 +1,3 @@
+Scenario: a nonempty policy followed by an empty document cannot silently disable admission.
+reservation exit=5 output=fleet-seats: no seat - /tmp/fleet-seat-stream-live.XfYa1j/home/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+The streamed policy was rejected; no uncapped reservation was granted.

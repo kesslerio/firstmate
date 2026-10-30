@@ -1,0 +1,6 @@
+Scenario: remote reservation rejects a delivered multi-document policy before creating a request.
+remote reservation exit=5 output=fleet-seats: no seat - /tmp/fleet-seat-remote-live.GNcQYk/remote/state/fleet-seats/policy.json is malformed or unreadable (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+No remote request directory was created.
+Scenario: remote serve rejects a multi-document input and publishes no certificate.
+remote serve exit=5 output=fleet-seats: no seat - the delivered policy is malformed (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+No remote serve certificate was published.
