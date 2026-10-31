@@ -1,0 +1,32 @@
+# Live: teardown of a capped task frees its slot for the next capped dispatch
+
+1. A capped Sol worker was admitted and its registry row promoted to a live pid:
+  task-g	gpt-6.1-sol	1793440135	803837
+
+2. Teardown ran against the real tmux endpoint:
+$ FM_HOME=<lab> FM_BACKEND=tmux bin/fm-teardown.sh task-g --force
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process group for task-g: 800731
+teardown: force-killing leaked worktree process group for task-g: 800731
+
+🌳 Worktree returned to pool.
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+/tmp/fmlive/fix/proj: already current
+teardown task-g complete (window firstmate:fm-task-g, worktree /home/art/.treehouse/proj-52d27e/5/proj)
+Backlog: task-g just finished (this home keeps no markdown backlog at /tmp/fmlive/fix/lab/data/backlog.md). Update /tmp/fmlive/fix/lab/data/backlog.md - move task-g to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit status: 0
+
+3. The window and task record are gone; the row is left as dead-pid evidence (non-counting):
+  task-g	gpt-6.1-sol	1793440135	803837
+
+4. The next capped dispatch is admitted, and the stale row is pruned during that passing spawn:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+warning: /tmp/fmlive/fix/lab/data/task-h/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-h
+spawned task-h harness=sleep kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-h worktree=/home/art/.treehouse/proj-52d27e/5/proj
+exit status: 0
+
+Registry after the next spawn:
+  task-a	gpt-6.1-sol	1793439934	497159
+  task-b	gpt-6.1-sol	1793440007	601341
+  task-h	gpt-6.1-sol	1793440174	842502   (0 at claim time, promoted at delivery)

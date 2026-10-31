@@ -1,0 +1,12 @@
+# Live: a malformed registry row refuses loudly instead of granting a free slot
+
+State: all earlier rows have dead pids; a malformed row is appended to the lab registry.
+  broken-row	gpt-6.1-sol	not-a-time	0
+
+$ FM_HOME=<lab> FM_BACKEND=tmux bin/fm-spawn.sh task-e <proj> --harness 'sleep 120' --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+error: Sol ceiling could not count its sessions: Sol registry /tmp/fmlive/fix/lab/state/sol-sessions.tsv has a malformed row: broken-row gpt-6.1-sol not-a-time 0; task task-e with model gpt-6.1-sol was not dispatched rather than launched possibly uncounted
+
+exit status: 1
+
+No task-e record and no fm-task-e window were created.

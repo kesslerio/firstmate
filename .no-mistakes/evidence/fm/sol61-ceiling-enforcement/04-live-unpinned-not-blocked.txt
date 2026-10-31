@@ -1,0 +1,18 @@
+# Live: an unpinned (--model default) dispatch is exempt while the Sol ceiling is full
+
+State before: ceiling max=1 with task-a (gpt-6.1-sol) occupying the only slot.
+
+$ FM_HOME=<lab> FM_BACKEND=tmux bin/fm-spawn.sh task-d <proj> --harness 'sleep 240' --model default --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+warning: /tmp/fmlive/fix/lab/data/task-d/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-d
+spawned task-d harness=sleep kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-d worktree=/home/art/.treehouse/proj-52d27e/3/proj
+
+exit status: 0
+
+Registry after (the default sentinel claims no capped slot):
+  task-a	gpt-6.1-sol	1793439934	497159
+
+Recorded task metadata:
+  model=default
+  harness=sleep
+  worktree=/home/art/.treehouse/proj-52d27e/3/proj

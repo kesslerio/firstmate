@@ -1,0 +1,42 @@
+# Live: Sol ceiling admission and confirmed-close release on the Herdr backend
+
+Lab session: fm-lab-solprobe-1115129-28902 (provisioned with bin/fm-herdr-lab.sh; the live default Herdr session was never touched).
+
+## 1. Below the ceiling, a capped Sol dispatch is admitted on Herdr
+$ FM_HOME=<lab> FM_BACKEND=herdr HERDR_SESSION=fm-lab-solprobe-1115129-28902 bin/fm-spawn.sh h-task-a <proj> --harness 'sleep 300' --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.prTfts
+spawned h-task-a harness=sleep kind=ship mode=no-mistakes yolo=off window=fm-lab-solprobe-1115129-28902:w1:p2 worktree=/home/art/.treehouse/proj-5b1586/1/proj
+exit status: 0
+
+Registry row after delivery (live worker pid):
+  h-task-a	gpt-6.1-sol	1793440416	1137797
+
+## 2. At the ceiling the dispatch is refused with the active session named
+$ FM_HOME=<lab> ... bin/fm-spawn.sh h-task-b ... --model gpt-6.1-sol
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.prTfts
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task h-task-b (sleep, gpt-6.1-sol) was refused. Active sessions: h-task-a (gpt-6.1-sol, age 13s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit status: 1
+
+## 3. Teardown closes the Herdr pane and releases the slot
+$ FM_HOME=<lab> FM_BACKEND=herdr HERDR_SESSION=fm-lab-solprobe-1115129-28902 bin/fm-teardown.sh h-task-a --force
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.prTfts
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warning: lsof is unavailable; cannot resolve a process-group fallback for herdr task h-task-a
+
+🌳 Terminated lingering processes: bash (1134275), sleep (1137797), no-mistakes (1148050)
+🌳 Worktree returned to pool.
+/tmp/fmlive-h/proj: already current
+teardown h-task-a complete (window fm-lab-solprobe-1115129-28902:w1:p2, worktree /home/art/.treehouse/proj-5b1586/1/proj)
+Backlog: h-task-a just finished (this home keeps no markdown backlog at /tmp/fm-lab.prTfts/data/backlog.md). Update /tmp/fm-lab.prTfts/data/backlog.md - move h-task-a to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit status: 0
+
+The worker process the claim named (1137797) was terminated by the confirmed pane close; the row remains as dead-pid evidence.
+
+## 4. The next capped dispatch is admitted and the stale row is pruned
+$ FM_HOME=<lab> ... bin/fm-spawn.sh h-task-b ... --model gpt-6.1-sol
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.prTfts
+spawned h-task-b harness=sleep kind=ship mode=no-mistakes yolo=off window=fm-lab-solprobe-1115129-28902:w2:p2 worktree=/home/art/.treehouse/proj-5b1586/1/proj
+exit status: 0
+
+Registry after (h-task-a's stale row gone, h-task-b claims the slot):
+  h-task-b	gpt-6.1-sol	1793440445	0

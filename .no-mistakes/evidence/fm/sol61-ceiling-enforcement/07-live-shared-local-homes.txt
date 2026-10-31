@@ -1,0 +1,17 @@
+# Live: the ceiling is shared across local Firstmate homes on this machine
+
+Setup: lab root home <lab> (ceiling max=1) with all its own rows dead, plus a registered local secondmate home <lab2> holding one live capped row. The second home is registered in <lab>/data/secondmates.md:
+  - mate-b - live probe secondmate (home: /tmp/fmlive/fix/lab2; scope: probe; projects: *; added 2026-06-17)
+
+  <lab2>/state/sol-sessions.tsv:
+  mate-worker	gpt-6.1-sol	1793440036	647174
+
+$ FM_HOME=<lab> FM_BACKEND=tmux bin/fm-spawn.sh task-e <proj> --harness 'sleep 120' --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-e (sleep, gpt-6.1-sol) was refused. Active sessions: mate-worker (gpt-6.1-sol, age 1m3s) in /tmp/fmlive/fix/lab2/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+
+exit status: 1
+
+The refusal names the sibling home's session and its state directory, and nothing was created:
+  no task-e record
+  no task-e window

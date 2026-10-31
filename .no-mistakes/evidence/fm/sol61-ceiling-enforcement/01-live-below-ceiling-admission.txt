@@ -1,0 +1,21 @@
+# Live: capped Sol dispatch below the ceiling is admitted (real tmux backend, raw harness launch)
+
+$ FM_HOME=<lab> FM_BACKEND=tmux bin/fm-spawn.sh task-a <proj> --harness 'sleep 240' --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+warning: /tmp/fmlive/fix/lab/data/task-a/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-a
+spawned task-a harness=sleep kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-a worktree=/home/art/.treehouse/proj-52d27e/1/proj
+
+Registry claim written by the guard (state/sol-sessions.tsv; pid is the live worker process):
+task-a	gpt-6.1-sol	1793439934	497159
+
+The worker process the row names was observed live in the real tmux pane:
+  PID COMMAND
+  497159 sleep 240
+
+Operator CLI:
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh status $LAB/config
+active max=1 ceiling=1 models=gpt-6.1-sol|gpt-6-sol pattern=
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh ceiling $LAB/config
+1
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh models $LAB/config
+gpt-6.1-sol|gpt-6-sol

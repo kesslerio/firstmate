@@ -1,0 +1,20 @@
+# Live: dispatch at the declared Sol ceiling is refused, names the active session and age, and creates nothing
+
+$ FM_HOME=<lab> FM_BACKEND=tmux bin/fm-spawn.sh task-b <proj> --harness 'sleep 240' --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-b (sleep, gpt-6.1-sol) was refused. Active sessions: task-a (gpt-6.1-sol, age 15s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+
+exit status: 1
+
+Task state observed immediately after the refusal (no task-b record, no task-b claim row):
+  home-summary.json
+  sol-sessions.tsv
+  task-a.git-hooks
+  task-a.meta
+
+Registry unchanged by the refusal (recorded copy diff was empty):
+  task-a	gpt-6.1-sol	1793439934	497159
+
+tmux windows observed immediately after the refusal (no fm-task-b window):
+  bash
+  fm-task-a

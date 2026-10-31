@@ -1,0 +1,18 @@
+# Live: a stale row whose worker exited does not consume the ceiling
+
+State before: registry still holds task-a with pid 497159 after that worker was killed; ceiling max=1.
+  task-a	gpt-6.1-sol	1793439934	497159   (pid dead)
+
+$ kill 497159   # the worker process behind task-a's row ends
+alive? no
+
+$ FM_HOME=<lab> FM_BACKEND=tmux bin/fm-spawn.sh task-b <proj> --harness 'sleep 240' --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+warning: /tmp/fmlive/fix/lab/data/task-b/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-b
+spawned task-b harness=sleep kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-b worktree=/home/art/.treehouse/proj-52d27e/4/proj
+
+exit status: 0
+
+Registry after the spawn (dead row retained as evidence, new claim promoted to the live worker pid once delivery started):
+  task-a	gpt-6.1-sol	1793439934	497159
+  task-b	gpt-6.1-sol	1793440007	601341   (601341 = live sleep 240 in firstmate:fm-task-b)

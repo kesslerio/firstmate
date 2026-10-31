@@ -1,0 +1,23 @@
+# Live: two simultaneous Sol dispatches at a free slot admit exactly one
+
+State before: ceiling max=1, every existing row dead, two spawns launched in parallel from the same lab home.
+
+$ bin/fm-spawn.sh task-i ... --model gpt-6.1-sol &
+$ bin/fm-spawn.sh task-j ... --model gpt-6.1-sol &
+
+task-i (admitted):
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+warning: /tmp/fmlive/fix/lab/data/task-i/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-i
+spawned task-i harness=sleep kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-i worktree=/home/art/.treehouse/proj-52d27e/6/proj
+exit status: 0
+
+task-j (refused rather than racing the in-flight spawn):
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+error: this home's task set is locked by another spawn; refusing to create task task-j rather than racing it
+exit status: 1
+
+Registry after: exactly one new claim row.
+  task-a	gpt-6.1-sol	1793439934	497159
+  task-b	gpt-6.1-sol	1793440007	601341
+  task-h	gpt-6.1-sol	1793440174	842502
+  task-i	gpt-6.1-sol	1793440256	978901

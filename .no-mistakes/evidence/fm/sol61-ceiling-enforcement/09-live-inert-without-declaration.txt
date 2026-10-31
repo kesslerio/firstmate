@@ -1,0 +1,20 @@
+# Live: without config/sol-cap the ceiling is inert and no occupancy is claimed
+
+State before: ceiling max=1 with task-i (gpt-6.1-sol) holding the only slot; config/sol-cap removed to model a home that never opted in.
+
+$ rm <lab>/config/sol-cap
+$ FM_HOME=<lab> FM_BACKEND=tmux bin/fm-spawn.sh task-j <proj> --harness 'sleep 300' --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive/fix/lab
+warning: /tmp/fmlive/fix/lab/data/task-j/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-j
+spawned task-j harness=sleep kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-j worktree=/home/art/.treehouse/proj-52d27e/7/proj
+
+exit status: 0
+
+Registry after: task-j did not claim any slot, and the home's own rows are untouched:
+  task-a	gpt-6.1-sol	1793439934	497159
+  task-b	gpt-6.1-sol	1793440007	601341
+  task-h	gpt-6.1-sol	1793440174	842502
+  task-i	gpt-6.1-sol	1793440256	978901
+
+After restoring the declaration the operator CLI reads it again:
+1
