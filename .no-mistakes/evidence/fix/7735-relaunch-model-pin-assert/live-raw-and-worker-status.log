@@ -1,0 +1,61 @@
+# lab=/tmp/fm-lab.gC1pYY secondmate-home=/tmp/fm-sm.2YJS0Z
+
+==============================================================
+F: raw pinned Claude launch -> immediate unverified, no session address
+
+### live-pin-raw-2 :: harness=[claude --version && sleep 300] args=[--model claude-haiku-4-5 ]
+--- spawn returned after 2518 ms
+--- stdout
+spawned live-pin-raw-2 harness=claude kind=secondmate mode=secondmate yolo=off window=primary:fm-live-pin-raw-2 worktree=/tmp/fm-sm.2YJS0Z
+--- stderr (last 6 lines)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.gC1pYY
+warning: secondmate live-pin-raw-2 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+fm-config-inherit: warning: skipped claude-permission-mode for /tmp/fm-sm.2YJS0Z/config: destination does not allow inherited item (not gitignored or guard failed)
+model pin unverified: pin 'claude-haiku-4-5' could not be addressed for this raw Claude launch (no session address exists for this path)
+--- state/live-pin-raw-2.status (model-pin lines: 0)
+(no status file)
+--- state/live-pin-raw-2.meta model/harness
+harness=claude
+model=claude-haiku-4-5
+--- live process for that raw launch (a --session-id must NOT appear)
+--- how many --session-id occurrences on the raw launch: 0
+
+==============================================================
+E: worker writes its own status while the launcher asserts the pin
+
+### live-worker-status-2 :: harness=[claude] args=[--model claude-haiku-4-5 ]
+--- spawn returned after 6041 ms
+--- stdout
+spawned live-worker-status-2 harness=claude kind=secondmate mode=secondmate yolo=off window=primary:fm-live-worker-status-2 worktree=/tmp/fm-sm.2YJS0Z
+--- stderr (last 6 lines)
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QGZB6QPX2YWXNQW6N3858/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QGZB6QPX2YWXNQW6N3858/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning: secondmate live-worker-status-2 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+fm-config-inherit: warning: skipped claude-permission-mode for /tmp/fm-sm.2YJS0Z/config: destination does not allow inherited item (not gitignored or guard failed)
+model pin asserted: pin 'claude-haiku-4-5' actual 'claude-haiku-4-5-20251001' (pinned Claude session d01048cd-04b2-4010-a376-bd77a7dd560d)
+--- state/live-worker-status-2.status (model-pin lines: 0)
+(no status file)
+--- state/live-worker-status-2.meta model/harness
+harness=claude
+model=claude-haiku-4-5
+--- status file immediately after the launcher returned
+(no status file)
+--- status file after the worker finished its turn
+(no status file)
+--- task pane
+ Bash command
+ Execute Firstmate operational command
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+ │ printf 'working: live worker owns this line\n' >>
+ │ '/tmp/fm-lab.gC1pYY/state/live-worker-status-2.status'
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+ Do you want to proceed?
+ ❯ 1. Yes
+   2. Yes, and always allow access to /tmp/fm-lab.gC1pYY/state from this project
+   3. No
+
+ Esc to cancel · Tab to amend
+--- any status file carrying a model-pin line?
+(none)
+rm: cannot remove '/tmp/fm-lab.gC1pYY/claude-config': Directory not empty

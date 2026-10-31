@@ -1,0 +1,49 @@
+--- launch live-pin-claude (--model claude-haiku-4-5) rc=rc=0 elapsed_ms=62329
+--- live-pin-claude stdout
+spawned live-pin-claude harness=claude kind=secondmate mode=secondmate yolo=off window=primary:fm-live-pin-claude worktree=/tmp/fm-sm.SBtHql
+--- live-pin-claude stderr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.yUAgUS
+warning: secondmate live-pin-claude sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin unverified: pin 'claude-haiku-4-5' was not confirmed by pinned Claude session d03e8f05-0a72-410c-8d11-a239c8c2ccd7 (no session-reported model)
+/tmp/fm-live-claude.sh: line 52: /tmp/fm-lab.yUAgUS/state/live-pin-claude.status: No such file or directory
+--- live-pin-claude status file (0 lines)
+--- live-pin-claude meta model/harness lines
+harness=claude
+kind=secondmate
+model=claude-haiku-4-5
+
+--- transcripts written under the isolated CLAUDE_CONFIG_DIR
+--- task window command line (does the launch carry --session-id?)
+bash
+fm-live-pin-claude
+
+[art@zeppola:/tmp/fm-sm.SBtHql]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-sm.SBtHql]$ . '/tmp/fm-live-pin-claude+5e46ea1934186bee9912
+f4b3ab44dd908b43cc8531493f332035277bb43e2c0a/launch.s1793442720.797794.14161.sh'
+
+
+--- launch live-unpinned-claude () rc=rc=0 elapsed_ms=3016
+--- live-unpinned-claude stdout
+spawned live-unpinned-claude harness=claude kind=secondmate mode=secondmate yolo=off window=primary:fm-live-unpinned-claude worktree=/tmp/fm-sm.SBtHql
+--- live-unpinned-claude stderr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.yUAgUS
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QGZB6QPX2YWXNQW6N3858/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QGZB6QPX2YWXNQW6N3858/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning: secondmate live-unpinned-claude sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+/tmp/fm-live-claude.sh: line 52: /tmp/fm-lab.yUAgUS/state/live-unpinned-claude.status: No such file or directory
+--- live-unpinned-claude status file (0 lines)
+--- live-unpinned-claude meta model/harness lines
+harness=claude
+kind=secondmate
+model=default
+
+--- final: window inventory
+bash
+fm-live-pin-claude
+fm-live-unpinned-claude

@@ -1,0 +1,215 @@
+# lab=/tmp/fm-lab.W9UDtv secondmate-home=/tmp/fm-sm.GBj0O5
+
+==============================================================
+A: pinned Claude launch (pin claude-haiku-4-5) -> asserted
+
+### live-pin-assert :: args=[--harness claude --model claude-haiku-4-5] rc=0 elapsed_ms=6542
+--- stdout
+spawned live-pin-assert harness=claude kind=secondmate mode=secondmate yolo=off window=primary:fm-live-pin-assert worktree=/tmp/fm-sm.GBj0O5
+--- stderr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.W9UDtv
+warning: secondmate live-pin-assert sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+fm-config-inherit: warning: skipped claude-permission-mode for /tmp/fm-sm.GBj0O5/config: destination does not allow inherited item (not gitignored or guard failed)
+model pin asserted: pin 'claude-haiku-4-5' actual 'claude-haiku-4-5-20251001' (pinned Claude session f5e6a93b-3263-440c-bab9-1318115c32d4)
+--- state/live-pin-assert.status (model-pin lines: 0)
+(no status file)
+--- state/live-pin-assert.meta model/harness/kind
+harness=claude
+approval_mode=auto
+kind=secondmate
+model=claude-haiku-4-5
+--- live claude process (launch carries --session-id?)
+875707 claude --session-id d73be387-d074-4ece-a1ed-bf19f37cf4ff --dangerously-skip-permissions --add-dir /tmp/fm-lab.mNHhNt/state/live-dbg.inbox --settings /tmp/fm-lab.mNHhNt/state/live-dbg.claude-settings.json --model claude-haiku-4-5 : Firstmate operational input waiting: read '/tmp/fm-sm.SGRA57/state/operational-inbox/1793442799-48a2802178ff0900.msg' and handle its contents as Firstmate operational input.
+998024 claude --session-id 8b742fc2-2b40-4aea-8a87-769997a6a6cc --permission-mode auto --add-dir /tmp/fm-lab.aY0Jaa/state/live-dbg.inbox --settings /tmp/fm-lab.aY0Jaa/state/live-dbg.claude-settings.json --model claude-haiku-4-5 : Firstmate operational input waiting: read '/tmp/fm-sm.BAhRSH/state/operational-inbox/1793442902-77d62d45db0f4237.msg' and handle its contents as Firstmate operational input.
+1308239 claude --session-id f5e6a93b-3263-440c-bab9-1318115c32d4 --permission-mode auto --add-dir /tmp/fm-lab.W9UDtv/state/live-pin-assert.inbox --settings /tmp/fm-lab.W9UDtv/state/live-pin-assert.claude-settings.json --model claude-haiku-4-5 : Firstmate operational input waiting: read '/tmp/fm-sm.GBj0O5/state/operational-inbox/1793443101-a73c0c8a78c4a7c6.msg' and handle its contents as Firstmate operational input.
+--- transcripts under the isolated CLAUDE_CONFIG_DIR
+/tmp/fm-lab.W9UDtv/claude-config/projects/-tmp-fm-sm-GBj0O5/f5e6a93b-3263-440c-bab9-1318115c32d4.jsonl
+    assistant model: claude-haiku-4-5-20251001
+--- task pane (worker answered its brief)
+
+
+✶ Crafting… (3s · ↓ 114 tokens · thinking)
+  tmux focus-events off · add 'set -g focus-events on' to ~/.tmux.conf and re…
+────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────
+  ⏸ manual mode on · esc to interrupt · ← for agents
+
+==============================================================
+B: vendor remap (pin claude-opus-4-1, Claude Code remaps to Opus 5.5) -> mismatch
+
+### live-pin-mismatch :: args=[--harness claude --model claude-opus-4-1] rc=0 elapsed_ms=9048
+--- stdout
+spawned live-pin-mismatch harness=claude kind=secondmate mode=secondmate yolo=off window=primary:fm-live-pin-mismatch worktree=/tmp/fm-sm.GBj0O5
+--- stderr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.W9UDtv
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QGZB6QPX2YWXNQW6N3858/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QGZB6QPX2YWXNQW6N3858/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning: secondmate live-pin-mismatch sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+fm-config-inherit: warning: skipped claude-permission-mode for /tmp/fm-sm.GBj0O5/config: destination does not allow inherited item (not gitignored or guard failed)
+model pin mismatch: pin 'claude-opus-4-1' but pinned Claude session 6404c777-88ee-4367-87fd-dfa0af9a0d1c reports 'claude-opus-5-5'
+--- state/live-pin-mismatch.status (model-pin lines: 0)
+(no status file)
+--- state/live-pin-mismatch.meta model/harness/kind
+harness=claude
+approval_mode=auto
+kind=secondmate
+model=claude-opus-4-1
+--- live claude process for the mismatched launch
+875707 claude --session-id d73be387-d074-4ece-a1ed-bf19f37cf4ff --dangerously-skip-permissions --add-dir /tmp/fm-lab.mNHhNt/state/live-dbg.inbox --settings /tmp/fm-lab.mNHhNt/state/live-dbg.claude-settings.json --model claude-haiku-4-5 : Firstmate operational input waiting: read '/tmp/fm-sm.SGRA57/state/operational-inbox/1793442799-48a2802178ff0900.msg' and handle its contents as Firstmate operational input.
+998024 claude --session-id 8b742fc2-2b40-4aea-8a87-769997a6a6cc --permission-mode auto --add-dir /tmp/fm-lab.aY0Jaa/state/live-dbg.inbox --settings /tmp/fm-lab.aY0Jaa/state/live-dbg.claude-settings.json --model claude-haiku-4-5 : Firstmate operational input waiting: read '/tmp/fm-sm.BAhRSH/state/operational-inbox/1793442902-77d62d45db0f4237.msg' and handle its contents as Firstmate operational input.
+1308239 claude --session-id f5e6a93b-3263-440c-bab9-1318115c32d4 --permission-mode auto --add-dir /tmp/fm-lab.W9UDtv/state/live-pin-assert.inbox --settings /tmp/fm-lab.W9UDtv/state/live-pin-assert.claude-settings.json --model claude-haiku-4-5 : Firstmate operational input waiting: read '/tmp/fm-sm.GBj0O5/state/operational-inbox/1793443101-a73c0c8a78c4a7c6.msg' and handle its contents as Firstmate operational input.
+1329805 claude --session-id 6404c777-88ee-4367-87fd-dfa0af9a0d1c --permission-mode auto --add-dir /tmp/fm-lab.W9UDtv/state/live-pin-mismatch.inbox --settings /tmp/fm-lab.W9UDtv/state/live-pin-mismatch.claude-settings.json --model claude-opus-4-1 : Firstmate operational input waiting: read '/tmp/fm-sm.GBj0O5/state/operational-inbox/1793443108-788bfe1e9d770d93.msg' and handle its contents as Firstmate operational input.
+--- transcripts under the isolated CLAUDE_CONFIG_DIR
+/tmp/fm-lab.W9UDtv/claude-config/projects/-tmp-fm-sm-GBj0O5/6404c777-88ee-4367-87fd-dfa0af9a0d1c.jsonl
+    assistant model: claude-opus-5-5
+/tmp/fm-lab.W9UDtv/claude-config/projects/-tmp-fm-sm-GBj0O5/f5e6a93b-3263-440c-bab9-1318115c32d4.jsonl
+    assistant model: claude-haiku-4-5-20251001
+--- task pane still live after the mismatch was reported
+  ⎿  20 skills available
+
+· Tomfoolering… (5s · ↓ 207 tokens)
+                                                            ◐ medium · /effort
+────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle) · esc to interrupt · ← for agents
+
+==============================================================
+C: unpinned Claude launch -> no model-pin verdict
+
+### live-unpinned :: args=[--harness claude] rc=0 elapsed_ms=3022
+--- stdout
+spawned live-unpinned harness=claude kind=secondmate mode=secondmate yolo=off window=primary:fm-live-unpinned worktree=/tmp/fm-sm.GBj0O5
+--- stderr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.W9UDtv
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warning: secondmate live-unpinned sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+fm-config-inherit: warning: skipped claude-permission-mode for /tmp/fm-sm.GBj0O5/config: destination does not allow inherited item (not gitignored or guard failed)
+--- state/live-unpinned.status (model-pin lines: 0)
+(no status file)
+--- state/live-unpinned.meta model/harness/kind
+harness=claude
+approval_mode=auto
+kind=secondmate
+model=default
+
+==============================================================
+D: retired model (pin claude-3-opus-latest, no model runs) -> unverified
+
+### live-retired :: args=[--harness claude --model claude-3-opus-latest] rc=0 elapsed_ms=6544
+--- stdout
+spawned live-retired harness=claude kind=secondmate mode=secondmate yolo=off window=primary:fm-live-retired worktree=/tmp/fm-sm.GBj0O5
+--- stderr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.W9UDtv
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warning: secondmate live-retired sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+fm-config-inherit: warning: skipped claude-permission-mode for /tmp/fm-sm.GBj0O5/config: destination does not allow inherited item (not gitignored or guard failed)
+model pin unverified: pin 'claude-3-opus-latest' was not confirmed by pinned Claude session e7ea99c4-f77a-456d-8be8-03e1eb32b414 (no session-reported model)
+--- state/live-retired.status (model-pin lines: 0)
+(no status file)
+--- state/live-retired.meta model/harness/kind
+harness=claude
+approval_mode=auto
+kind=secondmate
+model=claude-3-opus-latest
+
+==============================================================
+E: worker writes its own status during a pinned launch
+rc=0 elapsed_ms=6041
+--- stderr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.W9UDtv
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+warning: secondmate live-worker-status sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+fm-config-inherit: warning: skipped claude-permission-mode for /tmp/fm-sm.GBj0O5/config: destination does not allow inherited item (not gitignored or guard failed)
+model pin asserted: pin 'claude-haiku-4-5' actual 'claude-haiku-4-5-20251001' (pinned Claude session a4d3ff07-a918-4874-9bc1-acbb1af98d2c)
+--- state/live-worker-status.status (model-pin lines: 0)
+(no status file)
+--- status file again after the worker finished its turn
+(no status file)
+--- task pane
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+ │ printf 'working: live worker owns this line\n' >>
+ │ '/tmp/fm-lab.W9UDtv/state/live-worker-status.status'
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+ Do you want to proceed?
+ ❯ 1. Yes
+   2. Yes, and always allow access to /tmp/fm-lab.W9UDtv/state from this project
+   3. No
+
+ Esc to cancel · Tab to amend
+
+==============================================================
+F: raw pinned Claude launch -> immediate unverified, no session address
+
+### live-pin-raw :: args=[--harness claude --version && sleep 300 --model claude-haiku-4-5] rc=1 elapsed_ms=2523
+--- stdout
+--- stderr
+sleep: unrecognized option '--model'
+Try 'sleep --help' for more information.
+--- state/live-pin-raw.status (model-pin lines: 0)
+(no status file)
+--- state/live-pin-raw.meta model/harness/kind
+harness=claude
+approval_mode=auto
+kind=secondmate
+model=default
+--- live process for the raw launch (no --session-id must appear)
+--- pid-search for a session id on that raw launch: 0
+
+==============================================================
+G: full lab state (status files / no model-pin residue outside stderr)
+home-summary.json
+live-pin-assert.busy-gen
+live-pin-assert.busy-state
+live-pin-assert.claude-settings.json
+live-pin-assert.git-hooks
+live-pin-assert.inbox
+live-pin-assert.meta
+live-pin-mismatch.busy-gen
+live-pin-mismatch.busy-state
+live-pin-mismatch.claude-settings.json
+live-pin-mismatch.git-hooks
+live-pin-mismatch.inbox
+live-pin-mismatch.meta
+live-pin-raw.busy-gen
+live-pin-raw.busy-state
+live-pin-raw.claude-settings.json
+live-pin-raw.git-hooks
+live-pin-raw.inbox
+live-pin-raw.meta
+live-retired.busy-gen
+live-retired.busy-state
+live-retired.claude-settings.json
+live-retired.git-hooks
+live-retired.inbox
+live-retired.meta
+live-unpinned.busy-gen
+live-unpinned.busy-state
+live-unpinned.claude-settings.json
+live-unpinned.git-hooks
+live-unpinned.inbox
+live-unpinned.meta
+live-worker-status.busy-gen
+live-worker-status.busy-state
+live-worker-status.claude-settings.json
+live-worker-status.git-hooks
+live-worker-status.inbox
+live-worker-status.meta
+--- any status file carrying a model-pin line?
+(none)
+--- pane/window inventory
+bash
+fm-live-pin-assert
+fm-live-pin-mismatch
+fm-live-unpinned
+fm-live-retired
+fm-live-worker-status
+fm-live-pin-raw
+rm: cannot remove '/tmp/fm-lab.W9UDtv/claude-config': Directory not empty
+rm: cannot remove '/tmp/fm-lab.W9UDtv/state': Directory not empty

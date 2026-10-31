@@ -1,0 +1,54 @@
+# lab=/tmp/fm-lab.ekKGRw herdr-session=fm-lab-pipin-2176255-32475
+== provision
+== fresh Pi launch (pin openai-codex/gpt-5.6-luna)
+
+### fresh :: rc=0 elapsed_ms=2634
+--- stdout
+spawned live-pi-resume harness=pi kind=secondmate mode=secondmate yolo=off window=fm-lab-pipin-2176255-32475:w1:p2 worktree=/tmp/fm-sm.p8wv1W
+--- stderr (model pin lines only)
+model pin unverified: pin 'openai-codex/gpt-5.6-luna' has no session record this launcher can read back for a fresh pi launch
+--- task pane: w1:p2
+== wait for herdr to publish the pane agent SESSION identity
+--- published after ~4s
+{"id":"cli:agent:get","result":{"agent":{"agent":"pi","agent_session":{"agent":"pi","kind":"path","source":"herdr:pi","value":"/tmp/fm-lab.ekKGRw/pi-agent/sessions/--tmp-fm-sm.p8wv1W--/2026-10-31T10-46-11-588Z_01a19191-2784-7343-9178-bf015444756d.jsonl"},"agent_status":"working","cwd":"/tmp/fm-sm.p8wv1W","focused":true,"foreground_cwd":"/tmp/fm-sm.p8wv1W","pane_id":"w1:p2","revision":2,"screen_detection_skipped":true,"state_change_seq":2,"tab_id":"w1:t2","terminal_id":"term_65f209eed704e2","terminal_title":"π - fm-sm.p8wv1W","terminal_title_stripped":"π - fm-sm.p8wv1W","workspace_id":"w1"},"type":"agent_info"}}
+--- agent get now
+{"id":"cli:agent:get","result":{"agent":{"agent":"pi","agent_session":{"agent":"pi","kind":"path","source":"herdr:pi","value":"/tmp/fm-lab.ekKGRw/pi-agent/sessions/--tmp-fm-sm.p8wv1W--/2026-10-31T10-46-11-588Z_01a19191-2784-7343-9178-bf015444756d.jsonl"},"agent_status":"working","cwd":"/tmp/fm-sm.p8wv1W","focused":true,"foreground_cwd":"/tmp/fm-sm.p8wv1W","pane_id":"w1:p2","revision":2,"screen_detection_skipped":true,"state_change_seq":2,"tab_id":"w1:t2","terminal_id":"term_65f209eed704e2","terminal_title":"π - fm-sm.p8wv1W","terminal_title_stripped":"π - fm-sm.p8wv1W","workspace_id":"w1"},"type":"agent_info"}}
+--- pane read tail
+ Reply with exactly: OK
+
+
+── ⠴ Working ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/tmp/fm-sm.p8wv1W (main)
+$0.000 (sub) 1.2%/272k (auto)                                                       (openai-codex) gpt-5.6-luna • medium
+== stop the worker through the product (documented pre-relaunch step)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ekKGRw
+stopped live-pi-resume harness=pi backend=herdr endpoint=fm-lab-pipin-2176255-32475:w1:p2 worktree=/tmp/fm-sm.p8wv1W
+--- agent get after exit
+{"error":{"code":"agent_not_found","message":"agent target w1:p2 not found"},"id":"cli:agent:get"}
+== relaunch pinned to openai-codex/gpt-5.6-sol (resume readback)
+
+### relaunch :: rc=0 elapsed_ms=3465
+--- stdout
+spawned live-pi-resume harness=pi kind=secondmate mode=secondmate yolo=off window=fm-lab-pipin-2176255-32475:w1:p2 worktree=/tmp/fm-sm.p8wv1W
+--- stderr (model pin lines only)
+model pin unverified: pin 'openai-codex/gpt-5.6-sol' has no session record this launcher can read back for a fresh pi launch
+--- meta
+model=openai-codex/gpt-5.6-sol
+--- status
+(absent)
+--- pi session records under the isolated agent dir
+/tmp/fm-lab.ekKGRw/pi-agent/sessions/--tmp-fm-sm.p8wv1W--/2026-10-31T10-46-11-588Z_01a19191-2784-7343-9178-bf015444756d.jsonl
+    turn: openai-codex/gpt-5.6-luna stop=stop
+--- pane read tail after relaunch
+↑2.9k ↓31 $0.001 (sub) 1.1%/272k (auto)                                             (openai-codex) gpt-5.6-luna • medium
+
+To resume this session: pi --session 01a19191-2784-7343-9178-bf015444756d
+
+[art@zeppola:/tmp/fm-sm.p8wv1W]$ export GOTMPDIR=/tmp/fm-live-pi-resume/gotmp
+
+[art@zeppola:/tmp/fm-sm.p8wv1W]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-sm.p8wv1W]$ . '/tmp/fm-live-pi-resume+e270edd9a7e905d3067ec9f866ff68953c1839f712ac24f78f9dcadc98ff6
+380/launch.s1793443583.2193552.155.sh'

@@ -1,0 +1,597 @@
+FM_TEST_BEGIN 2026-10-31T10:46:48Z tests/fm-backend-t3code.test.sh family=backend-dispatch expected_gate_skip=none
+fm-afk-launch: away-posture record archived at /tmp/fm-test-run.Ap57Bx/w1/tmp/fm-backend-t3code-tests.wbGyQA/restart-unknown-completed/home/state/afk-contracts/1793443608.afk-contract
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+fm-afk-launch: away-posture record archived at /tmp/fm-test-run.Ap57Bx/w1/tmp/fm-backend-t3code-tests.wbGyQA/restart-unknown-failed/home/state/afk-contracts/1793443611.afk-contract
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+ok - native restart re-arms discarded T3 stale warnings exactly once and preserves delivered suppression
+ok - away housekeeping preserves unknown stale rechecks and reports possible wedges until work resumes
+ok - away daemon on T3: a stall reported while unknown is not reported again once T3 reads idle
+ok - T3 stale watcher: harness=codex status=failed turn=fresh -> dead
+ok - t3code: a failed thread read reports unknown busy state, submits no away-mode injection, and keeps stale rechecks uncertain
+ok - T3 stale lookup honors paused and captain-held declarations
+ok - T3 stale watcher: harness=codex status=running turn=fresh -> absorb
+ok - T3 stale watcher: harness=claude status=running turn=fresh -> absorb
+ok - T3 stale watcher: harness=codex status=waiting turn=fresh -> absorb
+ok - T3 stale watcher: harness=codex status=starting turn=fresh -> surface
+ok - T3 stale watcher: harness=codex status=completed turn=fresh -> surface
+ok - T3 stale watcher: harness=codex status=failed turn=fresh -> dead
+ok - T3 stale watcher: harness=codex status=running turn=hung -> surface
+ok - fm_backend_t3code_runtime_check: a missing credential names the sign-in
+ok - fm_backend_t3code_runtime_check: a 401 names the fresh sign-in
+warning: T3 telemetry at http://127.0.0.1:41629 is not confirmed off; run the server that hosts Firstmate workers with T3CODE_TELEMETRY_ENABLED=false (docs/t3code-backend.md)
+ok - fm_backend_t3code_runtime_check: the tools/list gate and environment pin refuse control and teardown without a mutation
+ok - fm_backend_t3code_project_ensure: matches by realpath, otherwise creates with the fm- title
+ok - fm_backend_t3code_model_selection: T3's catalog decides driver, model, and effort; overrides keep other options; default handling, instances file
+ok - fm_backend_t3code_thread_create/turn_start: verified t3_thread_launch and t3_thread_send payloads
+ok - fm_backend_t3code_thread_create: a lost reply is uncertain and never retried; a mis-bound thread is archived and refused
+ok - fm_backend_t3code_thread_for_home: zero, one, ambiguous, and unreachable
+ok - T3 requires explicit selection and does not query the server during runtime detection
+ok - fm_backend_t3code_capture: renders the activity tail and the thread's status line
+ok - fm_backend_t3code_send_key: Escape and C-c interrupt, Enter no-ops, others refuse
+ok - fm_backend_t3code_send_text_submit: empty on accept, send-failed on rejection
+ok - t3code send: a reply lost after commit is unconfirmed through the adapter and fm-send, and the resend lands once
+ok - t3code send: a held request id stays unconfirmed when the next attempt fails locally, and the retry lands once
+ok - t3code send: a lost reply to a secondmate names its armed correlation instead of advising a resend
+ok - t3code status table: every V2 thread status, a pending request, archived, archived-but-draining, missing, unreachable, and unreadable rows
+ok - t3code push wait: a pending question wakes the supervisor once with how to answer it, approvals are named apart, and answering clears it
+ok - fm-t3-answer.sh: lists a T3 worker's pending questions and answers one by request id
+ok - secondmate liveness backend=t3code: a failed run is resumed on its own thread, never archived and replaced
+ok - secondmate liveness backend=t3code: a missing thread re-proves its archive before replacement, and an unproved close spawns nothing
+ok - away daemon on T3: an unconfirmed digest is frozen and retried verbatim; a later event goes in the next digest, each event once
+ok - away daemon on T3: a delivered frozen digest leaves the items behind it with the first one's undelivered age
+ok - away daemon on T3: a supervisor thread waiting on a pending request defers digests until it is answered
+ok - t3code helper: runs through a symlinked Firstmate root, and a kill that cannot read the thread fails closed
+ok - secondmate liveness backend=t3code: an archived thread whose run still drains is left in place, not replaced
+ok - fm_backend_t3code_kill: interrupt then archive with a proven close, idempotent on archived and missing, loud on failure
+ok - fm-backend dispatcher: routes every t3code primitive, validates and resolves t3_thread_id records, and joins the push wait
+ok - T3 harness admission refuses every non-T3 adapter and launch-time typing refuses without a thread read
+ok - fm_busy_classify: t3code native busy, idle, and unknown are trusted without a record
+ok - fm-control-lib: t3code key set, state-verified, no-exit, and no-replacement membership
+ok - fm-control.sh backend=t3code: exit refuses before any call (V2 has no session stop); interrupt ends the turn natively
+ok - fm-control.sh relaunch backend=t3code: refused before anything is stopped, by the control plane and by the launch owner
+ok - fm-spawn.sh --backend t3code: leases the slot, launches the thread on it, records metadata, sends the launch brief
+ok - t3code Claude PR-tool clause: dropped only at or past the verified T3 build, kept for older or unreadable servers
+Traceback (most recent call last):
+  File "<stdin>", line 27, in <module>
+  File "<stdin>", line 20, in request
+AssertionError: ('codex-cli 0.164.0', {'error': {'code': -32603, 'message': 'failed to spawn command: No such file or directory (os error 2)'}, 'id': 3})
+not ok - installed Codex failed the tracked configuration guard
+FM_TEST_END 2026-10-31T10:48:14Z tests/fm-backend-t3code.test.sh exit=1 duration_ms=86165 gate_skip=false
+FM_TEST_BEGIN 2026-10-31T10:48:14Z tests/fm-wake-queue.test.sh family=watcher-wake-lock expected_gate_skip=none
+ok - branch grant release lock acquisition: failure
+ok - branch grant deactivate lock acquisition: failure
+ok - branch grant activate lock acquisition: failure
+ok - branch grant publish lock acquisition: failure
+ok - branch grant release lock acquisition: success
+ok - branch grant deactivate lock acquisition: success
+ok - branch grant activate lock acquisition: success
+ok - branch grant publish lock acquisition: success
+ok - an abandoned same-process lock hold is reclaimed; a parent's live hold is not
+ok - a lock wait returns within its bound once its directory is removed
+ok - without BASHPID a subshell cannot release or reclaim its parent lock and owns its own hold
+ok - bounded acquire hands ownership to the waiting caller after contention
+ok - presentation lock waits are bounded and retriable without weakening acknowledgement atomicity
+ok - malformed presentation locks report acquire failure instead of contention
+tests/wake-helpers.sh: line 333: 2412498 Killed                     PATH="$dir/fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" FM_STATE_OVERRIDE="$dir/state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' FM_SECONDMATE_WAKE_STALL_SECS=1 FM_SECONDMATE_LIVENESS_SECS=99999999 FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$dir/watch-$leg.out" 2> "$dir/watch-$leg.err"
+tests/wake-helpers.sh: line 333: 2414166 Killed                     PATH="$dir/fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" FM_STATE_OVERRIDE="$dir/state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' FM_SECONDMATE_WAKE_STALL_SECS=1 FM_SECONDMATE_LIVENESS_SECS=99999999 FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$dir/watch-$leg.out" 2> "$dir/watch-$leg.err"
+tests/wake-helpers.sh: line 333: 2421766 Killed                     PATH="$dir/fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" FM_STATE_OVERRIDE="$dir/state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' FM_SECONDMATE_WAKE_STALL_SECS=1 FM_SECONDMATE_LIVENESS_SECS=99999999 FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 "$WATCH" > "$dir/watch-$leg.out" 2> "$dir/watch-$leg.err"
+ok - foreign secondmate queue alerts once per no-progress episode without age-only or cascade noise
+ok - declared external-wait pause rows do not feed secondmate wake-loop escalation
+ok - a reprovisioned queue generation starts a fresh no-progress interval
+ok - an active turn defers the secondmate stall escalation without cancelling it
+ok - a long-lived mate mid-turn is not a stall, but a queue frozen past the busy bound still alarms
+ok - a proven-idle leftover row is rung so the child home can drain without a parent alarm
+ok - TERM stops a watcher blocked in the drain-ring idle capture and runs its cleanup
+ok - busy panes defer without a ring and unknown panes keep the parent alarm
+ok - a leftover row that survives a proven-idle ring still surfaces as a genuine stall
+ok - secondmate stall markers reject symlinks without touching their targets
+ok - stall publication acknowledgement closes the pre-marker crash window
+ok - empty prefix mate cleanup preserves another mate's stall receipt
+ok - self-announced appends suppress only their own bytes and fail toward waking
+ok - separate self-announced answers after a fold stay owned; worker decisions and later lines still wake
+ok - an unreadable status still reads as unreported, with or without owned growth
+ok - a worker resolved in fold lag still wakes after this home's close
+ok - owned growth suppresses the wake without hiding the turn-ended annotation
+ok - historical annotations replay nothing already announced and keep everything new
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 36 --recovery-generation 2516175.1793443748.6hZbVZ
+ok - concurrent append plus drain preserves durable records through acknowledgement
+ok - signal written while no watcher runs is caught on next run
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 2544829.1793443758.ojLiLL
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 1s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-test-run.Ap57Bx/w2/tmp/fm-wake-tangle-root.YwTsYo/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-test-run.Ap57Bx/w2/tmp/fm-wake-tangle-root.YwTsYo/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+ok - stale wake is queued before suppressor state is advanced
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 2548669.1793443761.uRS07g
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 2s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-test-run.Ap57Bx/w2/tmp/fm-wake-tangle-root.YwTsYo/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-test-run.Ap57Bx/w2/tmp/fm-wake-tangle-root.YwTsYo/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+ok - a not-provably-working stale wake is queued before its suppressor is advanced
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 2552957.1793443763.DzkmeK
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 registered custom check(s), but no live watcher process holds this home lock (last beat: 1s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-test-run.Ap57Bx/w2/tmp/fm-wake-tangle-root.YwTsYo/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-test-run.Ap57Bx/w2/tmp/fm-wake-tangle-root.YwTsYo/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+ok - registered custom check output is queued before cadence suppression
+ok - concurrent drains replay until one post-handling acknowledgement consumes records
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 4 --recovery-generation 2562324.1793443768.Qyryye
+ok - drain collapses obvious duplicate heartbeat and signal records
+ok - drain asserts watcher liveness: warns on a lapse, stays silent for a live watcher with a fresh beacon
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 8 --recovery-generation 2569751.1793443771.hs2EB2
+ok - structural signal enrichment is separate, deduped, home-local, and tier-zero for other wakes
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 13 --recovery-generation 2573151.1793443773.Bo9RH7
+ok - every readable unread status line is annotated in full while invalid status files preserve their raw wakes
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 2579086.1793443775.LacdmT
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 2579086.1793443775.LacdmT
+ok - slow annotation releases the append lock and a deleted status file fails open
+ok - a branch-actor scoped ack never swallows an unacked main-owned row, and main's later drain sees exactly what remains
+ok - main drain and acknowledgement exclude an active branch grant
+ok - a branch-actor acknowledgement commits secondmate stall receipts for exactly its granted rows
+ok - a branch-held row raises no queued-wake warning for main, and the same row is presented and acknowledged once the grant clears
+ok - a queue that cannot be counted keeps the queued-wake alarm up
+ok - structurally unusable rows are retired by main alone, leaving every remaining row presentable and acknowledgeable
+ok - branch grant cannot take a row already claimed by main
+ok - main's acknowledgement leaves a row that arrived after its drain for whichever actor takes it next
+ok - actor ownership filtering precedes same-key deduplication
+ok - main reclaims rows granted to an exited branch owner
+ok - a branch-actor drain with no eligible-row snapshot refuses loudly instead of draining nothing
+ok - a repeat branch acknowledgement after its own ack consumed the grant says the grant was already consumed
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation existing
+ok - wake append publishes atomic recovery evidence before durable rows
+ok - recovery mint and delivery log avoid sibling $()
+ok - wake queue: large sequences advance and acknowledge as exact digit-only decimals
+ok - wake drain: generation-less legacy wakes are adopted and acknowledged
+ok - a handover undoes only the downtime its own stop published over an acknowledged episode
+ok - wake drain: a stale acknowledgement cannot retire or consume a newer recovery episode
+ok - wake drain: an acknowledgement that consumes nothing says so and names the exact command for the current wake
+ok - wake drain: a branch acknowledgement that consumes nothing names the exact command for its granted wake
+ok - wake drain: recovery acknowledgement failures are explicit and retryable
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 2718952.1793443833.l7ZZTV
+ok - interruptions preserve durable rows until post-handling acknowledgement
+ok - fm_wake_queue_prune_task: prunes wakes for target task without touching other tasks
+ok - drain rotates scratch files an interrupted drain left under the queue lock
+ok - watch liveness: a dead secondmate is relaunched once, ledgered, and quiet afterwards
+ok - watch liveness: a missing secondmate endpoint is relaunched without a pre-kill
+ok - watch liveness: one tick relaunches every dead mate, queues a row each, and wakes once
+ok - watch liveness: alive and ambiguous endpoints are probed, logged, and never touched
+ok - watch liveness: the cadence marker gates probing and survives across legs
+ok - watch liveness: the attempt bound parks a flapping mate once and a live probe rearms a full budget
+ok - watch liveness: a failed auto-relaunch wakes once with its cause and is ledgered
+ok - watch liveness: an unwritable or unreadable relaunch ledger refuses to kill or spawn
+ok - watch liveness: a per-mate error keeps scanning, recovers later mates, and still wakes
+ok - watch liveness: an outcome that could not be queued surfaces as an error, not a wake
+ok - watch liveness: a mate mid-episode under the shared liveness lock is skipped entirely
+ok - watch liveness: an unreachable remote secondmate is probed, preserved, and never failed over
+FM_TEST_END 2026-10-31T10:51:43Z tests/fm-wake-queue.test.sh exit=0 duration_ms=208839 gate_skip=false
+FM_TEST_BEGIN 2026-10-31T10:51:43Z tests/fm-remote-secondmate-trace-context.test.sh family=secondmate expected_gate_skip=none
+FM_TEST_BEGIN 2026-10-31T10:51:43Z tests/fm-secondmate-restart.test.sh family=secondmate expected_gate_skip=none
+FM_TEST_BEGIN 2026-10-31T10:51:43Z tests/fm-secondmate-liveness.test.sh family=secondmate expected_gate_skip=none
+FM_TEST_BEGIN 2026-10-31T10:51:43Z tests/fm-remote-secondmate-relaunch.test.sh family=secondmate expected_gate_skip=none
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M68QGZB6QPX2YWXNQW6N3858/bin/backends/tmux.sh: line 440: grep: command not found
+not ok - a live claude foreground process should classify as alive, got 'missing'
+FM_TEST_END 2026-10-31T10:51:43Z tests/fm-secondmate-liveness.test.sh exit=1 duration_ms=222 gate_skip=false
+ok - a successful remote relaunch republishes the parent's harness, model, and effort
+ok - a remote relaunch records the identity the host confirmed
+ok - a refused remote relaunch leaves the parent's record untouched
+ok - a local secondmate is refused by the remote relaunch tool
+ok - a remote relaunch keeps an already-armed PR poll authenticating
+ALL TESTS PASSED
+FM_TEST_END 2026-10-31T10:51:44Z tests/fm-remote-secondmate-relaunch.test.sh exit=0 duration_ms=1039 gate_skip=false
+ok - T1 persist is a gate, and asks for open records and task status only
+ok - T2 the mate persists before anything is stopped
+ok - T2b an arrived persist answer is resolved before timeout
+ok - T2c a reply between the preliminary scan and timeout decision wins
+ok - T3 a runtime that cannot prove a restart falls back to the re-read message
+ok - T4 every named mate is accounted for, including one this home does not know
+ok - T5 a refused restart leaves the mate running and reports an unknown outcome
+ok - T8 a local restart re-resolves this home's pin and reports the runtime that came up
+ok - native Ultra survives local restart and the remote restart transport
+ok - T6 a remote mate restarts through the host-local control plane over the fm-on hop
+ok - T6a a remote mate with a per-mate override restarts onto that override, not the default pin
+ok - T6b a remote mate with no override line still restarts onto the default pin
+ok - T6d a legacy pin file still restarts the mate onto its first line
+ok - T6c an unreadable per-mate pin falls back to the re-read path with its agent left running
+ok - T6e a successful restart reports the model verdict its relaunch observed
+ok - T7 an unreachable host is reported honestly instead of claimed as reloaded
+ok - T9 the persist gate retains its explicitly allocated correlation
+ok - T10 pending persist answers are polled as one fleet
+ok - T11 post-stop restart failure is never misreported as a nudge
+ok - T12 relaunch waits do not block fleet persistence polling
+ok - T13 a dead restart worker cannot hang the parent
+ok - T14 a result published during reaping is honored
+ok - T15 an already-current live mate is named by the update pass and genuinely restarted
+ok - T16 an already-current mate with an unprovable runtime keeps the honest nudge path
+ok - T17 a T3 mate is routed to the re-read message by both passes, never restarted
+# all fm-secondmate-restart tests passed
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/commit-msg': Permission denied
+FM_TEST_END 2026-10-31T10:52:50Z tests/fm-secondmate-restart.test.sh exit=0 duration_ms=67192 gate_skip=false
+ok - disabled: a remote-routed second mate records and receives no carrier and stays enabled-off end to end
+ok - enabled: a remote-routed second mate receives one carrier in its pane, identical to the parent's recorded identity, before launch
+ok - relaunch: a remote-routed second mate keeps one stable identity across restarts
+ok - boundary: each remote-routed second mate roots its own trace and never adopts the spawning environment's carrier
+ok - allowlist: the remote receiver accepts exactly the declared inherited-material set, including the enablement flag
+ok - delivery: a parent-supplied carrier is accepted only for a secondmate launch and only as a strict W3C value
+ALL TESTS PASSED
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/commit-msg': Permission denied
+FM_TEST_END 2026-10-31T10:54:05Z tests/fm-remote-secondmate-trace-context.test.sh exit=0 duration_ms=142029 gate_skip=false
+FM_TEST_SUMMARY total=6 failed=2 skipped_gate=0 duration_ms=437360
+FM_TEST_SUMMARY_FAMILY family=backend-dispatch count=1 duration_ms=86165 failed=1
+FM_TEST_SUMMARY_FAMILY family=secondmate count=4 duration_ms=210482 failed=1
+FM_TEST_SUMMARY_FAMILY family=watcher-wake-lock count=1 duration_ms=208839 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-wake-queue.test.sh duration_ms=208839
+FM_TEST_SLOWEST rank=2 script=tests/fm-remote-secondmate-trace-context.test.sh duration_ms=142029
+FM_TEST_SLOWEST rank=3 script=tests/fm-backend-t3code.test.sh duration_ms=86165
+FM_TEST_SLOWEST rank=4 script=tests/fm-secondmate-restart.test.sh duration_ms=67192
+FM_TEST_SLOWEST rank=5 script=tests/fm-remote-secondmate-relaunch.test.sh duration_ms=1039
+FM_TEST_SLOWEST rank=6 script=tests/fm-secondmate-liveness.test.sh duration_ms=222
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home/state/parent-route/ios.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w3/tmp/fm-remote-trace-context.JVy9yw/remote-home-2/state/parent-route/ios2.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/concurrent-waits-12276/home/state/sm2.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/order-30724/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/relaunch-polling-1626/home/state/sm2.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/unknown-18925/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/post-stop-23358/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/already-current-28594/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/arrived-at-bound-18048/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/answer-at-timeout-decision-14995/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/pin-18894/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-test-run.Ap57Bx/w4/tmp/fm-secondmate-restart.fzTdfG/native-local-21734/home/state/sm1.git-hooks/commit-msg': Permission denied

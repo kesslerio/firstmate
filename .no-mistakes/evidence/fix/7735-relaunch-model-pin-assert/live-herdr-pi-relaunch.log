@@ -1,0 +1,95 @@
+# lab=/tmp/fm-lab.anRO9h herdr-session=fm-lab-pipin-2100400-26769
+== provision (owns the prepare step for a new session)
+== session status
+{"client":{"version":"0.9.3","channel":"stable","protocol":22,"endpoint_protocol_generation":1,"endpoint_capabilities":["surface_interest","presentation_effects_fence","health_check"],"remote_host_bridge":true,"remote_bridge_idle_timeout":true,"binary":"/nix/store/0lvaqskfb075qxmcxfg471n9w4rkjld3-herdr-0.9.3/bin/herdr","session":"fm-lab-pipin-2100400-26769"},"server":{"status":"running","running":true,"version":"0.9.3","protocol":22,"capabilities":{"live_handoff":true,"detached_server_daemon":false,"endpoint_protocol_generation":1,"surface_interest":true,"health_check":true,"ssh_agent_registration":true},"compatible":true,"endpoint_compatible":true,"socket":"/home/art/.config/herdr/sessions/fm-lab-pipin-2100400-26769/herdr.sock","session":"fm-lab-pipin-2100400-26769","restart_needed":false,"server_binary_stale":false},"update":{"restart_needed":false,"server_binary_stale":false}}
+
+== fresh Pi secondmate launch on the Herdr lab session
+
+### fresh :: rc=0 elapsed_ms=2564
+--- stdout
+spawned live-pi-relaunch harness=pi kind=secondmate mode=secondmate yolo=off window=fm-lab-pipin-2100400-26769:w1:p2 worktree=/tmp/fm-sm.tjmK2L
+--- stderr (tail)
+warning: secondmate live-pi-relaunch sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+fm-config-inherit: warning: skipped claude-permission-mode for /tmp/fm-sm.tjmK2L/config: destination does not allow inherited item (not gitignored or guard failed)
+model pin unverified: pin 'openai-codex/gpt-5.6-luna' has no session record this launcher can read back for a fresh pi launch
+--- state/live-pi-relaunch.meta
+window=fm-lab-pipin-2100400-26769:w1:p2
+endpoint_task_id=live-pi-relaunch
+worktree=/tmp/fm-sm.tjmK2L
+project=/tmp/fm-sm.tjmK2L
+harness=pi
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-live-pi-relaunch
+model=openai-codex/gpt-5.6-luna
+effort=default
+busy_gen=g1793443524.2102020.22651
+spawn_gen=s1793443524.2100466.1609
+backend=herdr
+herdr_session=fm-lab-pipin-2100400-26769
+herdr_workspace_id=w1
+herdr_tab_id=w1:t2
+herdr_pane_id=w1:p2
+home=/tmp/fm-sm.tjmK2L
+projects=
+--- state/live-pi-relaunch.status
+(absent)
+--- waiting for Herdr to register the launched Pi agent on the task pane
+--- registered after ~4s: {"id":"cli:agent:get","result":{"agent":{"agent":"pi","agent_status":"unknown","cwd":"/tmp/fm-sm.tjmK2L","focused":true,"foreground_cwd":"/tmp/fm-sm.tjmK2L","pane_id":"w1:p2","revision":2,"state_change_seq":0,"tab_id":"w1:t2","terminal_id":"term_65f209c2b49242","terminal_title":"π - fm-sm.tjmK2L","terminal_title_stripped":"π - fm-sm.tjmK2L","workspace_id":"w1"},"type":"agent_info"}}
+--- agent list
+{"id":"cli:agent:list","result":{"agents":[{"agent":"pi","agent_status":"unknown","cwd":"/tmp/fm-sm.tjmK2L","focused":true,"foreground_cwd":"/tmp/fm-sm.tjmK2L","pane_id":"w1:p2","revision":2,"state_change_seq":0,"tab_id":"w1:t2","terminal_id":"term_65f209c2b49242","terminal_title":"π - fm-sm.tjmK2L","terminal_title_stripped":"π - fm-sm.tjmK2L","workspace_id":"w1"}],"type":"agent_list"}}
+--- agent get w1:p2
+{"id":"cli:agent:get","result":{"agent":{"agent":"pi","agent_status":"unknown","cwd":"/tmp/fm-sm.tjmK2L","focused":true,"foreground_cwd":"/tmp/fm-sm.tjmK2L","pane_id":"w1:p2","revision":2,"state_change_seq":0,"tab_id":"w1:t2","terminal_id":"term_65f209c2b49242","terminal_title":"π - fm-sm.tjmK2L","terminal_title_stripped":"π - fm-sm.tjmK2L","workspace_id":"w1"},"type":"agent_info"}}
+--- pane read tail
+ FIRSTMATE_OP: v1 launch-brief: # Task
+
+ Captain's intent
+
+ Reply with exactly: OK
+
+
+── ⠦ Working ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/tmp/fm-sm.tjmK2L (main)
+$0.000 (sub) 1.2%/272k (auto)                                                       (openai-codex) gpt-5.6-luna • medium
+
+== relaunch that Pi worker pinned to a different model (the resume readback)
+
+### relaunch :: rc=1 elapsed_ms=1137
+--- stdout
+--- stderr (tail)
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QGZB6QPX2YWXNQW6N3858/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QGZB6QPX2YWXNQW6N3858/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: task live-pi-relaunch's endpoint reads 'unreadable'; a relaunch requires a positively agent-free endpoint (stop the agent first with bin/fm-control.sh live-pi-relaunch exit)
+--- state/live-pi-relaunch.meta
+window=fm-lab-pipin-2100400-26769:w1:p2
+endpoint_task_id=live-pi-relaunch
+worktree=/tmp/fm-sm.tjmK2L
+project=/tmp/fm-sm.tjmK2L
+harness=pi
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-live-pi-relaunch
+model=openai-codex/gpt-5.6-luna
+effort=default
+busy_gen=g1793443524.2102020.22651
+spawn_gen=s1793443524.2100466.1609
+backend=herdr
+herdr_session=fm-lab-pipin-2100400-26769
+herdr_workspace_id=w1
+herdr_tab_id=w1:t2
+herdr_pane_id=w1:p2
+home=/tmp/fm-sm.tjmK2L
+projects=
+--- state/live-pi-relaunch.status
+(absent)
+--- herdr agents after relaunch
+{"id":"cli:agent:list","result":{"agents":[{"agent":"pi","agent_status":"unknown","cwd":"/tmp/fm-sm.tjmK2L","focused":true,"foreground_cwd":"/tmp/fm-sm.tjmK2L","pane_id":"w1:p2","revision":2,"state_change_seq":0,"tab_id":"w1:t2","terminal_id":"term_65f209c2b49242","terminal_title":"π - fm-sm.tjmK2L","terminal_title_stripped":"π - fm-sm.tjmK2L","workspace_id":"w1"}],"type":"agent_list"}}
