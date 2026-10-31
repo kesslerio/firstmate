@@ -1,0 +1,144 @@
+
+========================================================================
+ENVIRONMENT
+========================================================================
+repo worktree : /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QSX8W69YTZ4XBZ50043J3
+repo HEAD     : dd3f8857 (HEAD)
+base commit   : 58eb59fa63d8d9b9e151ed43d3e89c52dffeb267
+host          : Linux 6.18.7 x86_64
+real ps       : /run/current-system/sw/bin/ps
+disposable    : /tmp/fm-live-driver.4xqKFd (removed on exit; lab homes minted by bin/fm-lab-home.sh)
+
+========================================================================
+S1  A session whose ps cannot execute acquires and holds its lock
+========================================================================
+shape: a real 'claude'-named process (symlink) runs the real bin/fm-lock.sh
+       with PATH's ps shadowed by a stub that exits 126 for every call.
+       $ PATH=/tmp/fm-live-driver.4xqKFd/fakebin:$PATH FM_HOME=/tmp/fm-lab.QNncXQ bin/fm-lock.sh
+PASS - 1a ps-denied session acquires the lock (exit 0)
+PASS - 1b lock names the live harness pid
+     acquire output: lock acquired: harness pid 3204354
+PASS - 1c same live session re-acquires its own lock (holds, exit 0)
+PASS - 1d re-acquire reports the same harness pid
+PASS - 1e lock still names that pid
+     status (ps denied): lock: held by live harness pid 3204354
+PASS - 1f lock status reports held by the live harness
+     inbox ready (ps denied): {"schema":"fm-primary-ready.v1","home":"tmp/fm-lab.QNncXQ","observed_at":"2026-10-31T10:54:02Z","lock":{"state":"held","pid":3204354,"live_harness":true},"wake_consumer":{"state":"unknown","reason":"supervision-model-unknown-for-home","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":"unknown"}
+PASS - 1g inbox ready reports held/live_harness=true
+     ps route   : 3204257|claude|/tmp/fm-live-driver.4xqKFd/named/claude /tmp/fm-live-driver.4xqKFd/holder.sh /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QSX8W69YTZ4XBZ50043J3 /tmp/fm-lab.QNncXQ /tmp/fm-live-driver.4xqKFd/fakebin /tmp/fm-live-driver.4xqKFd/logs /tmp/fm-live-driver.4xqKFd/keep-holder /tmp/fm-live-driver.4xqKFd/logs/holder-acquire.rc /tmp/fm-live-driver.4xqKFd/trigger-reacquire
+     /proc route: 3204257|claude|/tmp/fm-live-driver.4xqKFd/named/claude /tmp/fm-live-driver.4xqKFd/holder.sh /home/art/.no-mistakes/worktrees/9f75ec418609/01M68QSX8W69YTZ4XBZ50043J3 /tmp/fm-lab.QNncXQ /tmp/fm-live-driver.4xqKFd/fakebin /tmp/fm-live-driver.4xqKFd/logs /tmp/fm-live-driver.4xqKFd/keep-holder /tmp/fm-live-driver.4xqKFd/logs/holder-acquire.rc /tmp/fm-live-driver.4xqKFd/trigger-reacquire
+PASS - 1h denied-ps /proc route reproduces the ps identity exactly
+
+========================================================================
+S2  A live lock owner is never taken over (adversarial, both routes)
+========================================================================
+     denied-ps foreign attempt: rc=1 error: another live firstmate session holds the lock (pid 3204354); operate read-only until resolved
+PASS - 2a denied-ps second session is refused (exit 1)
+PASS - 2b refusal names the live owner
+PASS - 2c denied-ps second session did not rewrite the lock
+     ps-route foreign attempt: rc=1 error: another live firstmate session holds the lock (pid 3204354); operate read-only until resolved
+PASS - 2d ps-route second session is refused identically (route parity)
+PASS - 2e ps-route second session did not rewrite the lock
+
+========================================================================
+S3  An unreadable live owner blocks reclaim; a proven-dead owner is reclaimed
+========================================================================
+shape: ps runs normally except for the owner pid, which it refuses with 126
+       (an EDR acting on one process), and the ps-free provider tree is empty,
+       so the owner's liveness is provable (kill -0) but its identity is not.
+     unreadable-owner attempt: rc=1 error: another live firstmate session holds the lock (pid 3204354); operate read-only until resolved
+PASS - 3a live owner with unreadable identity is refused (exit 1)
+PASS - 3b refusal names the live owner
+PASS - 3c unreadable live owner's lock was not replaced
+     proven-dead owner attempt: rc=0 lock acquired: harness pid 3206620
+PASS - 3d proven-dead owner record is reclaimed (exit 0)
+PASS - 3e dead record was replaced with the live session anchor
+
+========================================================================
+S4  Malformed, empty, zero-valued, dead and reused records stay reclaimable
+========================================================================
+PASS - 4 record '' reclaimed by a ps-denied session (lock -> 3207190)
+PASS - 4 record '   ' reclaimed by a ps-denied session (lock -> 3207381)
+PASS - 4 record 'not-a-pid' reclaimed by a ps-denied session (lock -> 3207588)
+PASS - 4 record '0' reclaimed by a ps-denied session (lock -> 3207902)
+PASS - 4 record '00' reclaimed by a ps-denied session (lock -> 3208414)
+PASS - 4 record '000' reclaimed by a ps-denied session (lock -> 3208826)
+PASS - 4 record '0000' reclaimed by a ps-denied session (lock -> 3209068)
+PASS - 4 record 'win:' reclaimed by a ps-denied session (lock -> 3209267)
+PASS - 4 record 'win:7abc' reclaimed by a ps-denied session (lock -> 3209390)
+PASS - 4j a reused pid naming a live non-harness is reclaimed (exit 0)
+PASS - 4k reused non-harness record was replaced
+
+========================================================================
+S5  One shared verdict drives Stop auto-arm, both turn-end guards and inspection
+========================================================================
+     autoarm, live foreign owner: rc=0 output=[] lock=3204354
+PASS - 5a Stop auto-arm stands down for a live foreign owner (exit 0)
+PASS - 5b Stop auto-arm left the live owner's lock untouched
+     claude guard, live foreign owner: rc=0
+       {"systemMessage":"FIRSTMATE SUPERVISION IS OWNED BY ANOTHER LIVE SESSION: this read-only session cannot and should not arm or repair the watcher (lock owner pid 3204354). Allowing this turn to end safely; the owning session must restore supervision."}
+PASS - 5c Claude turn-end guard ends the turn safely (exit 0)
+PASS - 5d guard reports the shared foreign-owner verdict naming the owner pid
+PASS - 5e guard names the live lock owner pid 3204354
+PASS - 5f Claude guard did not rewrite the lock
+PASS - 5g Cursor turn-end guard stands down for the live owner (exit 0)
+PASS - 5h Cursor guard emits no repair nag for a live owner
+PASS - 5i Cursor guard left the live owner's lock untouched
+     cursor guard, dead owner record: rc=0 lock=3210103
+PASS - 5j dead-owner contrast: the same guard reclaims the lock
+     autoarm, dead owner record: rc=2 lock=3212412
+PASS - 5k dead-owner contrast: auto-arm recovers the lock
+
+========================================================================
+S6  UTF-8 Cursor owner identity survives the denied-ps route (regression fix)
+========================================================================
+     live Cursor alias: pid=3214192 comm=agent argv0=/tmp/fm-live-driver.4xqKFd/José/.local/bin/agent
+     ps route   : agent|/tmp/fm-live-driver.4xqKFd/José/.local/bin/agent /tmp/fm-live-driver.4xqKFd/cursor-owner.sh /tmp/fm-live-driver.4xqKFd/logs/cursor.pid /tmp/fm-live-driver.4xqKFd/keep-cursor
+     /proc route: agent|/tmp/fm-live-driver.4xqKFd/José/.local/bin/agent /tmp/fm-live-driver.4xqKFd/cursor-owner.sh /tmp/fm-live-driver.4xqKFd/logs/cursor.pid /tmp/fm-live-driver.4xqKFd/keep-cursor
+PASS - 6a UTF-8 Cursor identity is byte-identical on both routes
+PASS - 6b /proc route kept the UTF-8 path bytes (no '?')
+     HEAD takeover attempt: rc=1 error: another live firstmate session holds the lock (pid 3214192, session S1); operate read-only until resolved
+PASS - 6c HEAD: live UTF-8 Cursor owner is not taken over (exit 1)
+PASS - 6d HEAD: the Cursor owner's lock is unchanged
+     pre-fix sanitizer in the disposable checkout:
+       325:  comm=$(printf '%s' "$comm" | LC_ALL=C tr '\012' ' ' | LC_ALL=C tr -c '\040-\176' '?')
+       365:          printf '%s' "${argv[*]}" | LC_ALL=C tr '\012' ' ' | LC_ALL=C tr -c '\040-\176' '?'
+     pre-fix sanitizer attempt: rc=0 lock acquired: harness pid 3215176
+PASS - 6e pre-fix sanitizer: the same live Cursor owner IS taken over (defect reproduced)
+PASS - 6f pre-fix: lock was replaced by a competing session
+
+========================================================================
+S7  Whole session start on a ps-denied host (user story vs base commit)
+========================================================================
+     HEAD session start: rc=0 lock=[3215982]
+       LOCK
+       --------------------------------------------------------------------------------
+       lock acquired: harness pid 3215982
+       
+       HOME ROLE
+PASS - 7a HEAD session start acquires the fleet lock under a denied ps
+PASS - 7b HEAD session start wrote the live harness pid to state/.lock
+PASS - 7c HEAD session start did not take the read-only path
+     base session start: rc=0 lock=[]
+       LOCK
+       --------------------------------------------------------------------------------
+       error: cannot locate harness process in ancestry
+       ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       ●  READ-ONLY SESSION - FLEET LOCK OWNERSHIP WAS NOT VERIFIED
+       ●  error: cannot locate harness process in ancestry
+       ●  Skipping every mutating step: stale Herdr child cleanup,
+       ●  secondmate convergence, secondmate liveness, pending remote handoff retry,
+       ●  X-mode artifacts, fleet sync, and wake-queue drain. Detect-only bootstrap
+       ●  diagnostics and the rest of this read-only-safe digest still ran below.
+       ●  Operate read-only until this resolves - do not spawn, steer, merge, or
+       ●  otherwise mutate fleet state from this session.
+       ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       
+       HOME ROLE
+PASS - 7d base commit reproduces the reported read-only wedge
+PASS - 7e base commit wrote no lock on the same ps-denied host
+
+========================================================================
+RESULT
+========================================================================
+ALL LIVE CHECKS PASSED

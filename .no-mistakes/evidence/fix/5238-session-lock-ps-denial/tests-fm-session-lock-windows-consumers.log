@@ -1,0 +1,10 @@
+# tests/fm-session-lock-windows-consumers.test.sh - targeted run of HEAD source in a disposable checkout
+# (a real validation checkout is not a primary home, so the watcher-arm
+#  refusal for disposable no-mistakes checkouts would mask consumer paths)
+# host: Linux 6.18.7 x86_64
+
+ok - untagged lock values: the session-pid helpers answer exactly as fm_pid_identity and fm_pid_alive do
+ok - supervision host: a win:<pid> session lock yields the main-session key only while that Windows process lives
+ok - auto-arm: a claim pins a win:<pid> lock holder and reads open only while that holder lives
+ok - auto-arm: mid-turn health accepts a rewake bound to a live win:<pid> holder and drops it when that holder exits
+SUITE_RC=0
