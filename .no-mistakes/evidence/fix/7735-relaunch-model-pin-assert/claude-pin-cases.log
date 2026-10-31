@@ -1,0 +1,10 @@
+# all fm-spawn-dispatch-profile tests passed
+ok - Claude pin match: collision-checked session id and a recorded assertion
+ok - Claude pin mismatch: recorded against the pin, spawn still succeeds
+ok - Claude snapshot equivalence and distinct model stderr verdicts
+ok - Claude pin with no reported model: recorded as unverified
+ok - Claude pin without uuidgen: launch succeeds and records unverified
+ok - Raw Claude launch: no session id allocated, pin recorded unverified
+ok - Claude pin evidence never displaces the worker's own reported state
+ok - matching and mismatching model verdicts preserve task status bytes
+ok - Claude without a pin: launch and status unchanged

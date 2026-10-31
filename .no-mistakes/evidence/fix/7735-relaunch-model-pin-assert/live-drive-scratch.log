@@ -1,0 +1,8 @@
+1..4
+ok - scratch: fixture recreated Pi session drives the launcher's readback
+ok - scratch: an absolute registered path that never appears ends unverified after the bounded probe
+ok - scratch: an unresolvable session reference is recorded unverified
+# verdict reported by fm-spawn: model pin asserted: pin 'openai-codex/gpt-5.6-sol' actual 'openai-codex/gpt-5.6-sol' (the resumed pi session)
+# turns in the real pi record the launcher read: openai-codex/gpt-5.6-sol 
+ok - scratch: real pi created the registered session during the probe and the launcher read it back
+FM_TEST_COMPLETE

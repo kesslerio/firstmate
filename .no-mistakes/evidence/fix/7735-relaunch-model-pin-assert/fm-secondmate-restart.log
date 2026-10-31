@@ -1,0 +1,181 @@
+FM_TEST_BEGIN 2026-10-31T09:39:18Z tests/fm-secondmate-restart.test.sh family=secondmate expected_gate_skip=none
+ok - T1 persist is a gate, and asks for open records and task status only
+ok - T2 the mate persists before anything is stopped
+ok - T2b an arrived persist answer is resolved before timeout
+ok - T2c a reply between the preliminary scan and timeout decision wins
+ok - T3 a runtime that cannot prove a restart falls back to the re-read message
+ok - T4 every named mate is accounted for, including one this home does not know
+ok - T5 a refused restart leaves the mate running and reports an unknown outcome
+ok - T8 a local restart re-resolves this home's pin and reports the runtime that came up
+ok - native Ultra survives local restart and the remote restart transport
+ok - T6 a remote mate restarts through the host-local control plane over the fm-on hop
+ok - T6a a remote mate with a per-mate override restarts onto that override, not the default pin
+ok - T6b a remote mate with no override line still restarts onto the default pin
+ok - T6d a legacy pin file still restarts the mate onto its first line
+ok - T6c an unreadable per-mate pin falls back to the re-read path with its agent left running
+ok - T6e a successful restart reports the model verdict its relaunch observed
+ok - T7 an unreachable host is reported honestly instead of claimed as reloaded
+ok - T9 the persist gate retains its explicitly allocated correlation
+ok - T10 pending persist answers are polled as one fleet
+ok - T11 post-stop restart failure is never misreported as a nudge
+ok - T12 relaunch waits do not block fleet persistence polling
+ok - T13 a dead restart worker cannot hang the parent
+ok - T14 a result published during reaping is honored
+ok - T15 an already-current live mate is named by the update pass and genuinely restarted
+ok - T16 an already-current mate with an unprovable runtime keeps the honest nudge path
+ok - T17 a T3 mate is routed to the re-read message by both passes, never restarted
+# all fm-secondmate-restart tests passed
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/relaunch-polling-25591/home/state/sm2.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/answer-at-timeout-decision-27318/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/post-stop-25430/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/native-local-24058/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/concurrent-waits-24128/home/state/sm2.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/pin-14580/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/unknown-27765/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/already-current-21347/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/arrived-at-bound-16319/home/state/sm1.git-hooks/commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fm-secondmate-restart.aLlwDA/order-5688/home/state/sm1.git-hooks/commit-msg': Permission denied
+FM_TEST_END 2026-10-31T09:40:21Z tests/fm-secondmate-restart.test.sh exit=0 duration_ms=63702 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=63758
+FM_TEST_SUMMARY_FAMILY family=secondmate count=1 duration_ms=63702 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-secondmate-restart.test.sh duration_ms=63702

@@ -1,0 +1,16 @@
+FM_TEST_BEGIN 2026-10-31T09:44:22Z tests/fm-spawn-dispatch-profile.test.sh family=backend-dispatch expected_gate_skip=none
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M68AE0Y9VDZCW4BD9B078ABT/bin/fm-git-strip-ai-trailers.sh: line 167: sed: command not found
+not ok - allowlist=absent worker environment mismatch: synthetic-unrelated
+synthetic value; $(touch SHOULD_NOT_EXIST) `false` "quoted"
+
+unset
+/tmp/fm-spawn-dispatch-profile.RpZymx/env-absent/home/user-home
+/usr/bin:/bin
+xterm
+synthetic-pane
+/synthetic/gotmp
+hooksPath=
+FM_TEST_END 2026-10-31T09:44:25Z tests/fm-spawn-dispatch-profile.test.sh exit=1 duration_ms=2878 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=1 skipped_gate=0 duration_ms=2924
+FM_TEST_SUMMARY_FAMILY family=backend-dispatch count=1 duration_ms=2878 failed=1
+FM_TEST_SLOWEST rank=1 script=tests/fm-spawn-dispatch-profile.test.sh duration_ms=2878

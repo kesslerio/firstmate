@@ -1,0 +1,7 @@
+1..4
+not ok - assert from recreated file (missing: 'model pin asserted: pin 'anthropic/claude-opus-5-5' actual 'anthropic/claude-opus-5-5'')
+--- output ---
+warning: /tmp/fm-control-relaunch.JwEPMA/nm-live-base-30031/home/data/nm-live-base/launch-brief.md records no ship branch; defaulting to legacy branch fm/nm-live-base
+warning: /tmp/fm-control-relaunch.JwEPMA/nm-live-base-30031/home/data/nm-live-base/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+model pin unverified: pin 'anthropic/claude-opus-5-5' has no session record this launcher can read back for a fresh pi launch
+spawned nm-live-base harness=pi kind=ship mode=no-mistakes yolo=off window=fmlab:%7 worktree=/tmp/fm-control-relaunch.JwEPMA/nm-live-base-30031/wt
