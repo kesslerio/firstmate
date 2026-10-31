@@ -1,0 +1,18 @@
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh status   $LAB/config      # declared home
+active max=2 ceiling=2 models=gpt-6.1-sol pattern=
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh ceiling  $LAB/config
+2
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh models   $LAB/config
+gpt-6.1-sol
+
+# ceiling lowers max, never raises it
+active max=4 ceiling=2 models=gpt-6.1-sol pattern=
+
+# pattern declaration
+active max=4 ceiling=4 models= pattern=^gpt-[0-9.]+\.sol$
+
+# a home that never declared a ceiling is inert
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh status   $LAB/config
+inert
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh ceiling  $LAB/config
+inert

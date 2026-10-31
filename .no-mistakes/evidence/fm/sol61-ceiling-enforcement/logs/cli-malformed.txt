@@ -1,0 +1,30 @@
+# malformed declarations refuse by name (rc=1, no fallback ceiling)
+--- config/sol-cap:
+    max=1
+    ceiling=5
+    models=gpt-6.1-sol
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh status $LAB/config
+/tmp/fm-lab.7eK180/config/sol-cap must declare ceiling as an integer from 1 through 1, not '5'
+rc=1
+
+--- config/sol-cap:
+    max=1
+    models=gpt-6.1-sol
+    sessions=3
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh status $LAB/config
+/tmp/fm-lab.7eK180/config/sol-cap declares an unknown key: sessions
+rc=1
+
+--- config/sol-cap:
+    max=1
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh status $LAB/config
+/tmp/fm-lab.7eK180/config/sol-cap must declare models or model-pattern, the model ids the ceiling covers
+rc=1
+
+--- config/sol-cap:
+    max=zero
+    models=gpt-6.1-sol
+$ FM_HOME=$LAB bin/fm-sol-cap-lib.sh status $LAB/config
+/tmp/fm-lab.7eK180/config/sol-cap must declare max as a positive integer of at most nine digits, not 'zero'
+rc=1
+

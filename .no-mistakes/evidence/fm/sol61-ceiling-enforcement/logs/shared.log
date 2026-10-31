@@ -1,0 +1,2 @@
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task solShared (sleep, gpt-6.1-sol) was refused. Active sessions: crewmate (gpt-6.1-sol, age 1s) in /tmp/fm-lab.7eK180/mate2/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+SPAWN_RC=1

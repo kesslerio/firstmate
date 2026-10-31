@@ -1,0 +1,3 @@
+WARNING: watcher still down (same stale episode; last beat: 236s ago, grace 300s) - full banner already printed this episode.
+error: Sol ceiling unavailable: /tmp/fm-lab.7eK180/config/sol-cap must declare ceiling as an integer from 1 through 1, not '5'; task solNext with model gpt-5.6-luna was not dispatched rather than launched against an undeclared ceiling
+SPAWN_RC=1

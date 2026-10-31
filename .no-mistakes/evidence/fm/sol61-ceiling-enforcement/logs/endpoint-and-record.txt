@@ -1,0 +1,40 @@
+## live tmux server state (lab socket /tmp/fm-lab.7eK180/tmux, session primary)
+$ TMUX_TMPDIR=$LAB/tmux tmux -L fm-lab list-windows -a -F "#{session_name}:#{window_name} #{pane_current_path}"
+primary:bash /tmp/fm-lab.7eK180
+primary:fm-solPlain /home/art/.treehouse/project-441974/1/project
+
+## the admitted worker's real pane (real tmux endpoint, real treehouse worktree)
+$ tmux -L fm-lab capture-pane -p -t primary:fm-solPlain
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+🌳 Setting up worktree...
+🌳 Entered worktree at ~/.treehouse/project-441974/1/project. Type 'exit' to ret
+urn.
+[art@zeppola:~/.treehouse/project-441974/1/project]$ cd -- '/home/art/.treehouse
+/project-441974/1/project'
+[art@zeppola:~/.treehouse/project-441974/1/project]$ export GOTMPDIR=/tmp/fm-sol
+Plain/gotmp
+export COMPACT_ADVISER_DISABLE=1
+[art@zeppola:~/.treehouse/project-441974/1/project]$ export COMPACT_ADVISER_DISA
+BLE=1
+export FM_TASK_ID=solPlain
+[art@zeppola:~/.treehouse/project-441974/1/project]$ export FM_TASK_ID=solPlain
+[art@zeppola:~/.treehouse/project-441974/1/project]$ . '/tmp/fm-solPlain+ad63098
+77ab475a06707c4ab06bff42a251ca41fdc9e92e552096c9bc823a9fb/launch.s1793429923.277
+8181.3068.sh'
+
+## task record published by the real spawn
+$ cat $LAB/state/solPlain.meta
+window=primary:fm-solPlain
+endpoint_task_id=solPlain
+worktree=/home/art/.treehouse/project-441974/1/project
+project=/tmp/fm-lab.7eK180/project
+harness=sleep
+kind=ship
+mode=no-mistakes
+yolo=off
+branch=fm/solPlain
+tasktmp=/tmp/fm-solPlain
+model=gpt-6.1-sol
+effort=default
+spawn_gen=s1793429923.2778181.3068

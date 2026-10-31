@@ -1,0 +1,12 @@
+# host-side relaunch refusal proof, driven directly on a seeded lab secondmate home
+# (bin/fm-remote-secondmate-control.sh relaunch arms the proof after validate_id and disarms it immediately before fm-control)
+
+$ bin/fm-remote-secondmate-control.sh relaunch crewmate codex gpt-6.1-sol bogus   # refusal before the endpoint boundary
+error: invalid remote secondmate effort: bogus
+relaunch_refused_before_control=crewmate
+rc=1
+
+$ bin/fm-remote-secondmate-control.sh relaunch crewmate codex gpt-6.1-sol medium  # still before fm-control
+error: remote secondmate crewmate endpoint metadata is invalid; refusing access until it is explicitly migrated
+relaunch_refused_before_control=crewmate
+rc=1
