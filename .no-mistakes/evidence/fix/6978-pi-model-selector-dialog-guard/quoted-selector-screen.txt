@@ -1,0 +1,8 @@
+
+[art@zeppola:/tmp/fm-piwork.MZBBH5]$ echo "  ✓ alpha-model-one [localfake]"; echo "→   beta-model-tw
+o [localfake]"; echo "  Enter to select · Ctrl+S to set as default · Escape/Ctrl+C to cancel"
+  ✓ alpha-model-one [localfake]
+→   beta-model-two [localfake]
+  Enter to select · Ctrl+S to set as default · Escape/Ctrl+C to cancel
+
+[art@zeppola:/tmp/fm-piwork.MZBBH5]$

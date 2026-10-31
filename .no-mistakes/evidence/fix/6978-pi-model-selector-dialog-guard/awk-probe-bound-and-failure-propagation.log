@@ -1,0 +1,17 @@
+Focused non-Pi shell test: tests/fm-composer-lib.test.sh, exercised through its executable interface.
+
+A) real host awk candidates (awk=gawk 5.3.2 only on PATH):
+   $ bash tests/fm-composer-lib.test.sh
+   -> exit 0 in 19s; 'ok - the recorded Pi model selector matches under every awk on this host'
+
+B) matcher failure under a real candidate name must fail the whole script (no swallowing):
+   $ PATH=/tmp/fakepath:$PATH bash tests/fm-composer-lib.test.sh    # /tmp/fakepath/mawk exits 1 without output
+   stderr: not ok - the recorded Pi model selector did not match under mawk (rc 1)
+   -> script exit 1; later passing cases were not reached:
+   last ok: ok - the Pi selector ends at its closing rule, not at the pane's last row
+
+C) a hanging awk candidate must be cut by the fixed 10s bound, not hang the test:
+   $ PATH=/tmp/fakepath:$PATH bash tests/fm-composer-lib.test.sh    # /tmp/fakepath/mawk = sleep 120
+   -> whole script finished in 26s and exited 1:
+   stderr: not ok - /tmp/fakepath/mawk did not finish within 10s as awk; the name is not an awk implementation
+   -> the hang fixture itself is cut by fm_run_timed 10 (status 124), and no same-group descendant survived.

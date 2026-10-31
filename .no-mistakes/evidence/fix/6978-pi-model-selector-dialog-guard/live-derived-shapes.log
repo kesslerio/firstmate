@@ -1,0 +1,4 @@
+current matcher on live-dialog-region.txt       rc=0 name=[Pi model selector]
+current matcher on live-tail-at-footer.txt      rc=0 name=[Pi model selector]
+pre-R1  matcher on live-dialog-region.txt       rc=1 name=[]
+pre-R1  matcher on live-tail-at-footer.txt      rc=1 name=[]

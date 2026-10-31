@@ -1,0 +1,25 @@
+target=pi:1.1
+startup: composer reached 'empty' after 1s
+selector opened and named after 1s
+matcher_rc=0 matcher_name='Pi model selector'
+highlighted/current rows:
+  29:  ✓ alpha-model-one [localfake]
+  30:→   beta-model-two [localfake]
+footer_row=37 of 40 rows
+current-highlight matcher_rc=0 matcher_name='Pi model selector'
+fm-send rc=1
+fm-send stderr: fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.1h3Pgr|error: blocked on a prompt: Pi model selector|error: text not sent to pi:1.1 (tmux send failed; tried meta=/tmp/fm-lab.1h3Pgr/state/pi:1.1.meta; metadata window/terminal lookup; backend=tmux; endpoint=verified)|
+pane unchanged=yes
+probe text visible=0
+selector still named=Pi model selector
+quoted-pane matcher_rc=1 matcher_name=''
+quoted fm-send rc=1
+quoted fm-send stderr: fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.1h3Pgr|error: text not submitted to pi:quoted (delivery unconfirmed; verdict=unknown; tried meta=/tmp/fm-lab.1h3Pgr/state/pi:quoted.meta; metadata window/terminal lookup; backend=tmux; endpoint=verified)|
+quoted send typed the text=1
+after-escape matcher_rc=1 name=''
+after-escape fm-send rc=1
+after-escape fm-send stderr: fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.1h3Pgr|error: text not submitted to pi:1.1 (delivery unconfirmed; verdict=unknown; tried meta=/tmp/fm-lab.1h3Pgr/state/pi:1.1.meta; metadata window/terminal lookup; backend=tmux; endpoint=verified)|
+probe reached pi conversation=1
+--- assertions ---
+post-dialog send rc=1 (the guard did not block; any other verdict is pre-existing composer classification)
+ALL LIVE ASSERTIONS PASS

@@ -1,0 +1,186 @@
+#!/usr/bin/env bash
+# Disposable live driver: the Pi model selector guard, run against a real pi.
+# Everything it creates is under /tmp and removed by teardown().
+set -u
+REPO=/home/art/.no-mistakes/worktrees/9f75ec418609/01M68B72C1V1GXTB5DNFDN3GC7
+EVID=/home/art/.no-mistakes/evidence/01M68B72C1V1GXTB5DNFDN3GC7
+cd "$REPO" || exit 1
+
+LAB=$(mktemp -d "${TMPDIR:-/tmp}/fm-lab.XXXXXX") || exit 1
+PIA=$(mktemp -d "${TMPDIR:-/tmp}/fm-piagent.XXXXXX") || exit 1
+SHIM=$(mktemp -d "${TMPDIR:-/tmp}/fm-pishim.XXXXXX") || exit 1
+WORK=$(mktemp -d "${TMPDIR:-/tmp}/fm-piwork.XXXXXX") || exit 1
+LOG=/tmp/fm-pi-live.log
+: > "$LOG"
+
+teardown() {
+  TMUX_TMPDIR="$LAB/tmux" tmux -L fm-lab kill-server 2>/dev/null || true
+  rm -rf "$LAB" "$PIA" "$SHIM" "$WORK"
+}
+trap teardown EXIT
+
+say() { printf '%s\n' "$*" | tee -a "$LOG"; }
+
+bin/fm-lab-home.sh create "$LAB" >/dev/null || { say "LAB CREATE FAILED"; exit 1; }
+mkdir -p "$LAB/tmux" || exit 1
+mkdir -p "$PIA/agent" || exit 1
+
+cat > "$PIA/agent/models.json" <<'JSON'
+{
+  "providers": {
+    "localfake": {
+      "name": "Local Fake",
+      "baseUrl": "http://127.0.0.1:9/v1",
+      "api": "openai-completions",
+      "apiKey": "localfake",
+      "models": [
+        { "id": "alpha-model-one", "contextWindow": 128000 },
+        { "id": "beta-model-two", "contextWindow": 128000 },
+        { "id": "gamma-model-three", "contextWindow": 128000 }
+      ]
+    }
+  }
+}
+JSON
+
+REAL_TMUX=$(command -v tmux) || exit 1
+printf '#!/usr/bin/env bash\nexec %s -L fm-lab "$@"\n' "$REAL_TMUX" > "$SHIM/tmux"
+chmod +x "$SHIM/tmux"
+export PATH="$SHIM:$PATH"
+export TMUX_TMPDIR="$LAB/tmux"
+export FM_HOME="$LAB"
+unset NO_MISTAKES_GATE FM_GATE_REFUSE_BYPASS FM_ROOT_OVERRIDE FM_STATE_OVERRIDE \
+  FM_DATA_OVERRIDE FM_CONFIG_OVERRIDE FM_PROJECTS_OVERRIDE 2>/dev/null || true
+
+# shellcheck source=/dev/null
+. "$REPO/bin/fm-tmux-lib.sh"
+
+tmux new-session -d -s pi -x 100 -y 40 -c "$WORK" -- \
+  env PI_CODING_AGENT_DIR="$PIA/agent" pi --offline --no-session --no-context-files \
+  --no-extensions --no-mcp --no-skills --no-prompt-templates -na \
+  || { say "PI LAUNCH FAILED"; exit 1; }
+TARGET=$(tmux list-panes -t pi -F '#{window_index}.#{pane_index}' | head -1) || exit 1
+TARGET="pi:$TARGET"
+say "target=$TARGET"
+
+i=0
+while [ "$i" -lt 60 ]; do
+  [ "$(fm_tmux_composer_state "$TARGET" 2>/dev/null)" = empty ] && break
+  i=$((i + 1)); sleep 1
+done
+if [ "$i" -ge 60 ]; then
+  say "PI IDLE FAILED; pane tail:"; tmux capture-pane -p -t "$TARGET" | tail -20 >> "$LOG"
+  exit 1
+fi
+say "startup: composer reached 'empty' after ${i}s"
+
+tmux send-keys -t "$TARGET" -l '/model' || exit 1
+sleep 1
+tmux send-keys -t "$TARGET" Enter || exit 1
+i=0
+while [ "$i" -lt 40 ]; do
+  if fm_composer_blocking_dialog "$(fm_tmux_composer_capture "$TARGET" 2>/dev/null)" >/dev/null 2>&1; then break; fi
+  i=$((i + 1)); sleep 1
+done
+say "selector opened and named after ${i}s"
+# Move the highlight off the current model: the arrow and the check must be on
+# different rows, which is the shape the old matcher missed.
+tmux send-keys -t "$TARGET" Down || exit 1
+sleep 1
+
+SCREEN=$(tmux capture-pane -p -t "$TARGET") || { say "CAPTURE FAILED"; exit 1; }
+printf '%s\n' "$SCREEN" > "$EVID/pi-model-selector-screen.txt"
+tmux capture-pane -e -p -t "$TARGET" > "$EVID/pi-model-selector-screen.ansi" 2>/dev/null || true
+DIALOG=$(fm_composer_blocking_dialog "$SCREEN"); DRC=$?
+say "matcher_rc=$DRC matcher_name='$DIALOG'"
+
+CHECK_ROWS=$(printf '%s\n' "$SCREEN" | grep -nE '✓|→' | sed 's/^/  /')
+say "highlighted/current rows:"
+printf '%s\n' "$CHECK_ROWS" | tee -a "$LOG"
+FOOT=$(printf '%s\n' "$SCREEN" | grep -n 'Enter to select' | cut -d: -f1)
+say "footer_row=$FOOT of $(printf '%s\n' "$SCREEN" | wc -l) rows"
+
+# The same pane with the highlight back on the CURRENT model (arrow and check
+# on one row): the shape the old matcher accepted markers for but still missed,
+# because pi's status bar follows the closing rule.
+tmux send-keys -t "$TARGET" Up || exit 1
+sleep 1
+CSCREEN=$(tmux capture-pane -p -t "$TARGET") || exit 1
+printf '%s\n' "$CSCREEN" > "$EVID/pi-model-selector-current-highlight.txt"
+tmux capture-pane -e -p -t "$TARGET" > "$EVID/pi-model-selector-current-highlight.ansi" 2>/dev/null || true
+CDIALOG=$(fm_composer_blocking_dialog "$CSCREEN"); CDRC=$?
+say "current-highlight matcher_rc=$CDRC matcher_name='$CDIALOG'"
+tmux send-keys -t "$TARGET" Down || exit 1
+sleep 1
+
+# The real steer path: a typed send to this endpoint must be refused before it
+# types and before it sends Enter.
+BEFORE=$(printf '%s' "$SCREEN" | md5sum | cut -d' ' -f1)
+bin/fm-send.sh "$TARGET" 'live-guard probe: this text must not reach the selector' \
+  > /tmp/fm-pi-send.out 2> /tmp/fm-pi-send.err
+SEND_RC=$?
+AFTER_SCREEN=$(tmux capture-pane -p -t "$TARGET" 2>/dev/null)
+AFTER=$(printf '%s' "$AFTER_SCREEN" | md5sum | cut -d' ' -f1)
+say "fm-send rc=$SEND_RC"
+say "fm-send stderr: $(tr '\n' '|' < /tmp/fm-pi-send.err)"
+say "pane unchanged=$([ "$BEFORE" = "$AFTER" ] && echo yes || echo no)"
+say "probe text visible=$(printf '%s' "$AFTER_SCREEN" | grep -c 'live-guard probe')"
+say "selector still named=$(fm_composer_blocking_dialog "$AFTER_SCREEN" 2>/dev/null || echo NO)"
+printf '%s\n' "$AFTER_SCREEN" > "$EVID/pi-model-selector-after-send.txt"
+
+# Negative control: a pane that merely QUOTES the selector rows above an
+# ordinary shell prompt must not be read as a dialog.
+tmux new-window -d -t 'pi:' -n quoted -c "$WORK" -- bash -i
+sleep 3
+tmux send-keys -t 'pi:quoted' -l \
+  'echo "  ✓ alpha-model-one [localfake]"; echo "→   beta-model-two [localfake]"; echo "  Enter to select · Ctrl+S to set as default · Escape/Ctrl+C to cancel"'
+sleep 1
+tmux send-keys -t 'pi:quoted' Enter
+sleep 2
+QSCREEN=$(tmux capture-pane -p -t 'pi:quoted' 2>/dev/null)
+printf '%s\n' "$QSCREEN" > "$EVID/quoted-selector-screen.txt"
+tmux capture-pane -e -p -t 'pi:quoted' > "$EVID/quoted-selector-screen.ansi" 2>/dev/null || true
+QDIALOG=$(fm_composer_blocking_dialog "$QSCREEN"); QRC=$?
+say "quoted-pane matcher_rc=$QRC matcher_name='$QDIALOG'"
+bin/fm-send.sh 'pi:quoted' '# quoted-control probe' > /tmp/fm-pi-qsend.out 2> /tmp/fm-pi-qsend.err
+QSEND_RC=$?
+QAFTER=$(tmux capture-pane -p -t 'pi:quoted' 2>/dev/null)
+say "quoted fm-send rc=$QSEND_RC"
+say "quoted fm-send stderr: $(tr '\n' '|' < /tmp/fm-pi-qsend.err)"
+say "quoted send typed the text=$(printf '%s' "$QAFTER" | grep -c 'quoted-control probe')"
+printf '%s\n' "$QAFTER" > "$EVID/quoted-selector-after-send.txt"
+
+tmux kill-window -t 'pi:quoted' 2>/dev/null || true
+
+# The guard must not over-block: with the selector closed this is an ordinary
+# pi composer, so the same steer path proceeds.
+tmux send-keys -t "$TARGET" Escape || exit 1
+sleep 2
+POST=$(tmux capture-pane -p -t "$TARGET" 2>/dev/null)
+printf '%s\n' "$POST" > "$EVID/pi-after-escape-screen.txt"
+PDIALOG=$(fm_composer_blocking_dialog "$POST"); PRC=$?
+say "after-escape matcher_rc=$PRC name='$PDIALOG'"
+bin/fm-send.sh "$TARGET" 'post-dialog probe' > /tmp/fm-pi-post.out 2> /tmp/fm-pi-post.err
+POST_RC=$?
+POSTAFTER=$(tmux capture-pane -p -t "$TARGET" 2>/dev/null)
+say "after-escape fm-send rc=$POST_RC"
+say "after-escape fm-send stderr: $(tr '\n' '|' < /tmp/fm-pi-post.err)"
+say "probe reached pi conversation=$(printf '%s' "$POSTAFTER" | grep -c 'post-dialog probe')"
+printf '%s\n' "$POSTAFTER" > "$EVID/pi-after-escape-after-send.txt"
+
+say '--- assertions ---'
+FAIL=0
+[ "$DRC" -eq 0 ] && [ "$DIALOG" = 'Pi model selector' ] || { say "FAIL matcher"; FAIL=1; }
+[ "$SEND_RC" -ne 0 ] || { say "FAIL fm-send exit"; FAIL=1; }
+grep -q 'blocked on a prompt: Pi model selector' /tmp/fm-pi-send.err || { say "FAIL refusal text"; FAIL=1; }
+[ "$BEFORE" = "$AFTER" ] || { say "FAIL pane changed"; FAIL=1; }
+printf '%s' "$AFTER_SCREEN" | grep -q 'live-guard probe' && { say "FAIL probe typed"; FAIL=1; }
+[ "$QRC" -eq 1 ] && [ -z "$QDIALOG" ] || { say "FAIL quoted false positive"; FAIL=1; }
+grep -q 'blocked on a prompt' /tmp/fm-pi-qsend.err && { say "FAIL quoted send blocked as dialog"; FAIL=1; }
+[ "$PRC" -eq 1 ] && [ -z "$PDIALOG" ] || { say "FAIL selector still named after Escape"; FAIL=1; }
+grep -q 'blocked on a prompt' /tmp/fm-pi-post.err && { say "FAIL post-dialog send blocked"; FAIL=1; }
+say "post-dialog send rc=$POST_RC (the guard did not block; any other verdict is pre-existing composer classification)"
+printf '%s' "$POSTAFTER" | grep -q 'post-dialog probe' || { say "FAIL post-dialog text never reached pi"; FAIL=1; }
+printf '%s' "$QAFTER" | grep -q 'quoted-control probe' || { say "FAIL quoted send never typed"; FAIL=1; }
+[ "$FAIL" -eq 0 ] && say "ALL LIVE ASSERTIONS PASS" || say "LIVE ASSERTIONS FAILED"
+exit "$FAIL"
