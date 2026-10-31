@@ -91,9 +91,13 @@
 #                          escalation that ends the run names the guard.
 #                          A genuinely busy pane
 #                          (window_is_busy true) is exempt from the above, but
-#                          only up to BUSY_TURN_MAX_SECS with no completed turn
-#                          (state/<id>.turn-ended, or the spawn record before any
-#                          turn completes). Past that bound, a declared external
+#                          only up to BUSY_TURN_MAX_SECS with no completed turn,
+#                          explicit native-harness progress, or opted-in model
+#                          progress (state/<id>.turn-ended, the native progress
+#                          marker beside it, or the spawn record before either
+#                          exists); an opted-in Pi model stream silent past
+#                          FM_STREAM_SILENT_MAX_SECS crosses that bound early.
+#                          Past that bound, a declared external
 #                          wait or verified captain-held transfer uses the long
 #                          pause recheck cadence; under daemon-backed afk an
 #                          external wait is instead handed to the daemon as this
@@ -102,10 +106,12 @@
 #                          (busy_turn_bound_check owns that split);
 #                          every other pane goes through the same wedge timer,
 #                          the dead-record probe above included, and surfaces
-#                          with the identical "stale: ..." reason, escalation
+#                          with the same "stale: ..." reason, escalation
 #                          count, and demand-deep-inspection marker for a live
-#                          agent, for human inspection only - never an automatic
-#                          interrupt, signal, or restart of the worker or its
+#                          agent (the reason names model-stream silence when a
+#                          silent stream crossed the bound), for human
+#                          inspection only - never an automatic interrupt,
+#                          signal, or restart of the worker or its
 #                          tool process.
 #                          At escalation time a T3 Code thread whose shared
 #                          classification still reads running resets the timer
@@ -378,19 +384,21 @@ STALE_ESCALATE_SECS=${FM_STALE_ESCALATE_SECS:-240}  # idle secs before a provabl
 # A busy pane is unconditional proof of liveness with no built-in duration bound,
 # so a hung foreground call can remain hidden even while its rendered busy
 # footer changes every poll. BUSY_TURN_MAX_SECS bounds how long any busy pane
-# may go without a completed turn or explicit native-harness progress (the
-# marker-selection contract is in busy_turn_over_age below). Once this bound
-# is crossed, busy_turn_over_age routes the pane through
-# busy_turn_bound_check, which hands a crossed bound to the same
-# STALE_ESCALATE_SECS-paced wedge_timer_check used for a provably-working
-# non-busy stale - so it escalates via the existing stale reason, escalation
-# counter, and demand-deep-inspection marker for human inspection only, never an
-# automatic interrupt, signal, or restart - unless the crew declared the wait
-# itself, which takes the long pause cadence instead. Set generously above
-# any legitimate interval without observable progress, including silent long
-# tool calls, builds, or test runs.
+# may go without a completed turn, explicit native-harness progress, or - in an
+# opted-in home only - model progress (the marker-selection contract is in
+# busy_turn_over_age below). Once this bound is crossed, busy_turn_over_age
+# routes the pane through busy_turn_bound_check, which hands a crossed bound to
+# the same STALE_ESCALATE_SECS-paced wedge_timer_check used for a
+# provably-working non-busy stale - so it escalates via the existing stale
+# reason, escalation counter, and demand-deep-inspection marker for human
+# inspection only, never an automatic interrupt, signal, or restart - unless
+# the crew declared the wait itself, which takes the long pause cadence instead.
+# Set generously above any legitimate interval without observable progress,
+# including silent long tool calls, builds, or test runs.
 BUSY_TURN_MAX_SECS=${FM_BUSY_TURN_MAX_SECS:-3600}
-# Optional foreground Pi model observation. Invalid/unset/zero stays off.
+# Optional foreground Pi model observation. Invalid/unset/zero stays off; a
+# current stream silent past this many seconds crosses BUSY_TURN_MAX_SECS early
+# and names that silence in its escalation reason.
 # The generation/request record contract is owned by fm-busy-lib.sh.
 STREAM_SILENT_MAX_SECS=$(fm_busy_stream_seconds "${FM_STREAM_SILENT_MAX_SECS:-}")
 BUSY_STREAM_SNAPSHOT=
