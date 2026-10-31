@@ -1,0 +1,1 @@
+{"schema":"fm-primary-ready.v1","home":"s6-live-numeric-holder-is-held/forkpoint","observed_at":"2026-10-31T07:18:00Z","lock":{"state":"held","pid":180119,"live_harness":true},"wake_consumer":{"state":"down","reason":"no-beacon","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":false}

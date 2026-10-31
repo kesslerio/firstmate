@@ -1,0 +1,4 @@
+== tagged pid win:7204 reused by C:\Windows\explorer.exe
+exit=0
+output: lock acquired: harness pid win:7300
+state/.lock after=[win:7300]

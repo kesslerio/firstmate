@@ -1,0 +1,4 @@
+== pre-fix baseline (/tmp/fm-base-2586547), identical fixture
+exit=1
+output: error: cannot locate harness process in ancestry
+state/.lock=[<absent>]

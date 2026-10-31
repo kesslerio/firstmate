@@ -1,0 +1,8 @@
+== live harness owner pid=161581 (kernel comm: claude)
+== head: second session acquires with ps denied
+exit=1
+output: error: another live firstmate session holds the lock (pid 161581, session S1); operate read-only until resolved
+state/.lock after the attempt=[161581]
+== head: bin/fm-lock.sh status with ps denied
+exit=0
+output: lock: held by live harness pid 161581

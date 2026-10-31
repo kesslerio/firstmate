@@ -1,0 +1,4 @@
+== arm 3: ps denied, provider root=/tmp/fm-live-lock.E7sKr8/fakeproc-dead, owner 163462 is dead
+exit=0
+output: lock acquired: harness pid 163555
+state/.lock=[163555] session harness pid=163555

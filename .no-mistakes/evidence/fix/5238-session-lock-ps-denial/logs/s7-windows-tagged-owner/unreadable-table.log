@@ -1,0 +1,4 @@
+== unreadable Windows process table, owner win:7204
+exit=1
+output: error: another live firstmate session holds the lock (pid win:7204, session S1); operate read-only until resolved
+state/.lock after=[win:7204]

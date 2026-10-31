@@ -1,0 +1,4 @@
+== arm 2: live owner 246796, ps denied and its identity unreadable
+owner still live: yes
+state/.lock after=[246796]
+hook output: 

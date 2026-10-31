@@ -1,0 +1,3 @@
+== environment cause of the pty-host assertion
+orphaned child pid=590659 reparented to ppid=1310 (systemd)
+pid 1 is systemd; pid 1310 is systemd

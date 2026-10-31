@@ -1,0 +1,4 @@
+== record [win:7abc]
+exit=0
+output: lock acquired: harness pid win:7300
+state/.lock after=[win:7300]

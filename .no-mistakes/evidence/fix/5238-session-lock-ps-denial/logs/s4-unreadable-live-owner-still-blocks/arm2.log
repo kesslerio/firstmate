@@ -1,0 +1,7 @@
+== arm 2: ps denied, provider root=/tmp/fm-live-lock.E7sKr8/fakeproc-unreadable; the harness process registers its
+   own entry, the live owner 162758 has none
+provider entry for 162758 exists: no
+owner still live: yes
+exit=1
+output: error: another live firstmate session holds the lock (pid 162758, session S1); operate read-only until resolved
+state/.lock=[162758]

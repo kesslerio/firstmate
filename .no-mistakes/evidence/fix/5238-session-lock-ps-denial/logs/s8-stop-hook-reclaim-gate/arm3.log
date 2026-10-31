@@ -1,0 +1,6 @@
+== arm 3: live owner 220809, ps denied and its identity unreadable
+owner still live: yes
+hook exit=0
+state/.lock after=[220809]
+watch arm fired: no
+hook output: 

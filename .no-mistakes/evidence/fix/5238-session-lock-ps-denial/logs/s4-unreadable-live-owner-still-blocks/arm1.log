@@ -1,0 +1,4 @@
+== arm 1: ps denied, real /proc readable
+exit=0
+output: lock acquired: harness pid 162771
+state/.lock=[162771] session harness pid=162771

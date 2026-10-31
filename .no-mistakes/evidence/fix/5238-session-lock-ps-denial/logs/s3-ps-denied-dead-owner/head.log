@@ -1,0 +1,6 @@
+== dead owner pid=162204 (/proc/162204 present: no)
+== head: acquire with ps denied
+exit=0
+output: lock acquired: harness pid 162293
+state/.lock after acquisition=[162293] (session harness pid=162293)
+state/.lock-session=[<absent>]

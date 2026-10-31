@@ -1,0 +1,3 @@
+== head, live non-harness holder pid=180132
+fm-lock.sh status: lock: stale (pid 180132 dead or not a harness)
+{"schema":"fm-primary-ready.v1","home":"s6-live-numeric-holder-is-held/live-non-harness","observed_at":"2026-10-31T07:17:59Z","lock":{"state":"unknown","pid":180132,"live_harness":false},"wake_consumer":{"state":"unknown","reason":"supervision-model-unknown-for-home","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":"unknown"}

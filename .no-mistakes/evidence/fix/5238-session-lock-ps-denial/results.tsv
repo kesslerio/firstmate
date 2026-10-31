@@ -1,0 +1,72 @@
+s1-ps-denied-own-lock	pass	head lock acquisition exit = 0
+s1-ps-denied-own-lock	pass	head state/.lock names the session's harness pid = 160834
+s1-ps-denied-own-lock	pass	pre-fix exit = 1
+s1-ps-denied-own-lock	pass	pre-fix left no lock = <absent>
+s2-ps-denied-live-harness-owner	pass	second session exit = 1
+s2-ps-denied-live-harness-owner	pass	refusal names the live owner and its session
+s2-ps-denied-live-harness-owner	pass	owner lock after the refused attempt = 161581
+s2-ps-denied-live-harness-owner	pass	ps-denied status verdict = lock: held by live harness pid 161581
+s3-ps-denied-dead-owner	pass	acquisition exit = 0
+s3-ps-denied-dead-owner	pass	the dead owner's lock was replaced by the acquired session = 162293
+s4-unreadable-live-owner-still-blocks	pass	arm 1 (identity readable) acquisition exit = 0
+s4-unreadable-live-owner-still-blocks	pass	arm 1 reclaimed the reused pid = 162771
+s4-unreadable-live-owner-still-blocks	pass	arm 2 (identity unreadable) acquisition exit = 1
+s4-unreadable-live-owner-still-blocks	pass	unreadable live owner refused takeover: error: another live firstmate session holds the lock (pid 162758, session S1); operate read-only until resolved
+s4-unreadable-live-owner-still-blocks	pass	unreadable live owner lock preserved = 162758
+s4-unreadable-live-owner-still-blocks	pass	arm 3 (dead owner) acquisition exit = 0
+s4-unreadable-live-owner-still-blocks	pass	arm 3 reclaimed the dead owner = 163555
+s5-zero-and-malformed-records	pass	head reclaims record [] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [] = 163868
+s5-zero-and-malformed-records	pass	head reclaims record [   ] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [   ] = 164341
+s5-zero-and-malformed-records	pass	head reclaims record [0] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [0] = 164649
+s5-zero-and-malformed-records	pass	head reclaims record [00] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [00] = 166809
+s5-zero-and-malformed-records	pass	head reclaims record [000] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [000] = 168160
+s5-zero-and-malformed-records	pass	head reclaims record [0000] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [0000] = 169443
+s5-zero-and-malformed-records	pass	head reclaims record [not-a-pid] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [not-a-pid] = 170848
+s5-zero-and-malformed-records	pass	head reclaims record [win:] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [win:] = 171523
+s5-zero-and-malformed-records	pass	head reclaims record [win:7abc] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [win:7abc] = 172196
+s5-zero-and-malformed-records	pass	head reclaims record [999999999999999999999] (exit) = 0
+s5-zero-and-malformed-records	pass	head replaces record [999999999999999999999] = 172940
+s5-zero-and-malformed-records	pass	pre-fix wedged on record [00] (exit 1, lock kept) - reproduced
+s5-zero-and-malformed-records	pass	pre-fix wedged on record [000] (exit 1, lock kept) - reproduced
+s5-zero-and-malformed-records	pass	pre-fix wedged on record [0000] (exit 1, lock kept) - reproduced
+s6-live-numeric-holder-is-held	pass	head status verdict for a live harness holder = lock: held by live harness pid 180119
+s6-live-numeric-holder-is-held	pass	inbox ready reports lock.state=held
+s6-live-numeric-holder-is-held	pass	inbox ready reports live_harness=true
+s6-live-numeric-holder-is-held	pass	inbox ready names holder pid 180119
+s6-live-numeric-holder-is-held	pass	head status verdict for a live non-harness = lock: stale (pid 180132 dead or not a harness)
+s6-live-numeric-holder-is-held	pass	inbox ready keeps a live non-harness fail-closed
+s6-live-numeric-holder-is-held	pass	pre-fix reported the live harness holder as stale - reproduced
+s6-live-numeric-holder-is-held	pass	fork-point status verdict for the same live harness holder = lock: held by live harness pid 180119
+s7-windows-tagged-owner	pass	live tagged harness owner refusal exit = 1
+s7-windows-tagged-owner	pass	refusal names the tagged owner
+s7-windows-tagged-owner	pass	live tagged owner lock preserved = win:7204
+s7-windows-tagged-owner	pass	unreadable table refusal exit = 1
+s7-windows-tagged-owner	pass	unreadable table kept the owner protected
+s7-windows-tagged-owner	pass	unreadable table kept the lock = win:7204
+s7-windows-tagged-owner	pass	dead tagged owner reclaimed (exit) = 0
+s7-windows-tagged-owner	pass	dead tagged owner replaced by the session anchor = win:7300
+s7-windows-tagged-owner	pass	reused tagged pid reclaimed (exit) = 0
+s7-windows-tagged-owner	pass	reused tagged pid replaced = win:7300
+s7-windows-tagged-owner	pass	malformed record [win:] reclaimed (exit) = 0
+s7-windows-tagged-owner	pass	malformed record [win:] replaced = win:7300
+s7-windows-tagged-owner	pass	malformed record [win:7abc] reclaimed (exit) = 0
+s7-windows-tagged-owner	pass	malformed record [win:7abc] replaced = win:7300
+s7-windows-tagged-owner	pass	malformed record [00] reclaimed (exit) = 0
+s7-windows-tagged-owner	pass	malformed record [00] replaced = win:7300
+s7-windows-tagged-owner	pass	malformed record [000] reclaimed (exit) = 0
+s7-windows-tagged-owner	pass	malformed record [000] replaced = win:7300
+s8-stop-hook-reclaim-gate	pass	arm 1 hook reclaims the readable non-harness owner = 220904
+s8-stop-hook-reclaim-gate	pass	arm 2 hook reclaims with ps denied but identity readable = 226431
+s8-stop-hook-reclaim-gate	pass	arm 3 hook leaves an unreadable live owner's lock in place = 220809
+s8-stop-hook-reclaim-gate	pass	arm 3 hook ran no watch arm = no
+s9-turnend-guard-reclaim-gate	pass	arm 1 guard reclaims the readable non-harness owner = 246850
+s9-turnend-guard-reclaim-gate	pass	arm 2 guard leaves an unreadable live owner's lock in place = 246796

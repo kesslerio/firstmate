@@ -1,0 +1,4 @@
+== head record=[0]
+exit=0
+output: lock acquired: harness pid 164649
+state/.lock after=[164649] (session harness pid=164649)

@@ -1,0 +1,4 @@
+== pre-fix record=[000]
+exit=1
+output: error: another live firstmate session holds the lock (pid 000, session S1); operate read-only until resolved
+state/.lock after=[000]

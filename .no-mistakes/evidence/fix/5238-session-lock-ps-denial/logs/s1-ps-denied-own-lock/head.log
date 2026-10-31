@@ -1,0 +1,8 @@
+== ps denial in effect for the driven environment
+/tmp/fm-live-lock.E7sKr8/denied/ps: Operation not permitted
+ps -V exit=126
+== head (bb17a785) bin/fm-lock.sh, ps denied, private FM_HOME
+session harness pid=160834
+exit=0
+output: lock acquired: harness pid 160834
+state/.lock=[160834]
