@@ -1,0 +1,4 @@
+ok - real Pi 1.4.0 default-off worker
+# pi-signed unavailable: signed executable not exercised
+ok - real Pi 1.4.0 unverified-version warning, inert stream observation, and existing busy/idle behavior
+exit=0

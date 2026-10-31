@@ -1,0 +1,35 @@
+===== real fm-busy-event.sh stream contract (state: /tmp/fm-manual-writer.dkwdY0) =====
+armed gen=g1793443115.1342670.12314
+apply busy pi-ext agent-start              exit=0 (want 0) output=<none>
+open request 1                             exit=0 (want 0) output=<none>
+after open:   w.busy-gen w.busy-state w.model-stream w.model-stream-order 
+order:        v1 gen=g1793443115.1342670.12314 request=1 phase=active
+marker:       v1 gen=g1793443115.1342670.12314 request=1 rev=1 ts=1793443116
+progress request 1                         exit=0 (want 0) output=<none>
+after progress marker: v1 gen=g1793443115.1342670.12314 request=1 rev=2 ts=1793443116
+close request 1                            exit=0 (want 0) output=<none>
+after close:  w.busy-gen w.busy-state w.model-progress w.model-stream-order 
+order:        v1 gen=g1793443115.1342670.12314 request=1 phase=closed
+late progress after close rejected         exit=1 (want 1) output=<none>
+closed request cannot reopen               exit=1 (want 1) output=<none>
+newer request 2 opens                      exit=0 (want 0) output=<none>
+old request 1 progress rejected            exit=1 (want 1) output=<none>
+marker still: v1 gen=g1793443115.1342670.12314 request=2 rev=1 ts=1793443116
+stale generation rejected                  exit=1 (want 1) output=error: stale busy-state gen for w (event rejected)
+retire current generation                  exit=0 (want 0) output=<none>
+after retire: 
+re-armed gen=g1793443116.1343200.24606
+old generation open rejected               exit=1 (want 1) output=error: stale busy-state gen for w (event rejected)
+foreign source cannot open stream          exit=1 (want 1) output=<none>
+note: previous run created the record from a non-pi source above only after apply
+apply busy claude-hook                     exit=0 (want 0) output=<none>
+foreign (claude-hook) open rejected        exit=1 (want 1) output=<none>
+unarmed task open rejected                 exit=1 (want 1) output=error: no armed busy-state gen for not-armed
+malformed request rejected (usage)         exit=2 (want 2) output=usage:
+  fm-busy-event.sh arm <state-dir> <id> [--state busy|idle|unknown] [--source S] [--event E]
+  fm-busy-event.sh apply <state-dir> <id> <busy|idle|unknown> (--gen G | --current-gen) --source S --event E [--turn-ended]
+  fm-busy-event.sh progress <state-dir> <id> --gen G
+  fm-busy-event.sh stream <state-dir> <id> <open|progress|close> --gen G --request N
+  fm-busy-event.sh retire <state-dir> <id> (--gen G | --current-gen)
+See the header comment for the full contract.
+TMP_STATE=/tmp/fm-manual-writer.dkwdY0

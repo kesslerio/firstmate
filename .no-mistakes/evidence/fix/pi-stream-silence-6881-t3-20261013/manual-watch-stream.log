@@ -1,0 +1,26 @@
+===== case static (FM_STREAM_SILENT_MAX_SECS=2, ticking=0) =====
+--- stream marker before watcher: v1 gen=g1793443066.1217422.29503 request=1 rev=1 ts=1793443066
+--- entered inspection timer: no
+--- watcher stdout ---
+stale: live:fm-stream-static (idle 2s, possible wedge, escalation 1, model stream silent for 5s (foreground request))
+--- wake-queue ---
+1793443071	1	stale	live:fm-stream-static	stale: live:fm-stream-static (idle 2s, possible wedge, escalation 1, model stream silent for 5s (foreground request))
+===== write summary static =====
+exit_wake=1
+===== case ticking (FM_STREAM_SILENT_MAX_SECS=2, ticking=1) =====
+--- stream marker before watcher: v1 gen=g1793443071.1238698.4515 request=1 rev=1 ts=1793443071
+--- entered inspection timer: no
+--- watcher stdout ---
+stale: live:fm-stream-ticking (idle 2s, possible wedge, escalation 1, model stream silent for 6s (foreground request))
+--- wake-queue ---
+1793443077	1	stale	live:fm-stream-ticking	stale: live:fm-stream-ticking (idle 2s, possible wedge, escalation 1, model stream silent for 6s (foreground request))
+===== write summary ticking =====
+exit_wake=1
+===== case optout (FM_STREAM_SILENT_MAX_SECS=unset, ticking=0) =====
+--- stream marker before watcher: v1 gen=g1793443077.1256502.13426 request=1 rev=1 ts=1793443077
+--- entered inspection timer: no
+--- watcher stdout ---
+--- wake-queue ---
+===== write summary optout =====
+exit_wake=0
+TMP_ROOT=/tmp/fm-manual-stream.CYL68w
