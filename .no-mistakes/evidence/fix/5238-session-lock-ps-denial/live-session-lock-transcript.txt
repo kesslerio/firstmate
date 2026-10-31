@@ -1,0 +1,127 @@
+# live session-lock drive, worktree /home/art/.no-mistakes/worktrees/9f75ec418609/01M68V48YCS9BWT0V4RCARKGZP at 31eea577
+# driver: /home/art/.no-mistakes/evidence/01M68V48YCS9BWT0V4RCARKGZP/live-session-lock-driver.sh
+
+worktree=/home/art/.no-mistakes/worktrees/9f75ec418609/01M68V48YCS9BWT0V4RCARKGZP
+home=/tmp/fm-lab.izqIVm
+bash=/run/current-system/sw/bin/bash claude_symlink=/tmp/fm-tree.tWVS9R/bin/claude
+
+===== S1  ps denied: a real claude-named session acquires its own home lock and reads it as held =====
+  mode=acquire ps_denied=126
+  acquire_rc=0
+  acquire_out=lock acquired: harness pid 1000830
+  lock_after=1000830
+  session_after=
+  status_out=lock: held by live harness pid 1000830
+  ready_rc=0
+  ready_out={"schema":"fm-primary-ready.v1","home":"tmp/fm-lab.izqIVm","observed_at":"2026-10-31T11:55:16Z","lock":{"state":"held","pid":1000830,"live_harness":true},"wake_consumer":{"state":"unknown","reason":"supervision-model-unknown-for-home","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":"unknown"}
+PASS - the driver's ps shim really refuses ps inside the product's own process (rc 126)
+PASS - fm-lock.sh acquired a free lock with ps denied (no read-only wedge)
+PASS - state/.lock names the live claude-named ancestor pid 1000830 read through /proc
+PASS - fm-lock.sh status reports held for the live harness owner
+PASS - fm-inbox.sh ready projects lock.state=held, live_harness=true for that pid
+
+===== S2  baseline: the same session tree with the real ps binary behaves identically =====
+  mode=acquire ps_denied=0
+  acquire_rc=0
+  acquire_out=lock acquired: harness pid 1001405
+  lock_after=1001405
+  session_after=
+  status_out=lock: held by live harness pid 1001405
+  ready_rc=0
+  ready_out={"schema":"fm-primary-ready.v1","home":"tmp/fm-lab.izqIVm","observed_at":"2026-10-31T11:55:17Z","lock":{"state":"held","pid":1001405,"live_harness":true},"wake_consumer":{"state":"down","reason":"no-beacon","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":false}
+PASS - the baseline run really used the working ps binary
+PASS - with ps working, the same tree acquires the same lock pid (nothing drifted)
+PASS - with ps working, status reports held for the same owner
+PASS - with ps working, fm-inbox.sh ready reports the same held lock
+
+===== S3  foreign live harness: a second live claude session's lock is refused, never taken over =====
+PASS - a second, independent live claude-named session is running (pid 1003253)
+  [denied route]
+  acquire_rc=1
+  acquire_out=error: another live firstmate session holds the lock (pid 1003253); operate read-only until resolved
+  lock_after=1003253
+  status_out=lock: held by live harness pid 1003253
+PASS - denied route: fm-lock.sh refused a live foreign harness owner
+PASS - denied route: the refusal names the foreign owner pid 1003253
+PASS - denied route: the live foreign owner's lock file was left untouched
+PASS - denied route: status reports the foreign owner as held
+  [real route]
+  acquire_rc=1
+  acquire_out=error: another live firstmate session holds the lock (pid 1003253); operate read-only until resolved
+  lock_after=1003253
+  status_out=lock: held by live harness pid 1003253
+PASS - real route: fm-lock.sh refused a live foreign harness owner
+PASS - real route: the refusal names the foreign owner pid 1003253
+PASS - real route: the live foreign owner's lock file was left untouched
+PASS - real route: status reports the foreign owner as held
+
+===== S4  ps denied: zero-valued and malformed lock records stay reclaimable, never a permanent wedge =====
+  record=[] acquire_rc=0 lock_after=[1006703]
+  record=[ ] acquire_rc=0 lock_after=[1006703]
+  record=[not-a-pid] acquire_rc=0 lock_after=[1006703]
+  record=[0] acquire_rc=0 lock_after=[1006703]
+  record=[00] acquire_rc=0 lock_after=[1006703]
+  record=[000] acquire_rc=0 lock_after=[1006703]
+  record=[0000] acquire_rc=0 lock_after=[1006703]
+  record=[win:] acquire_rc=0 lock_after=[1006703]
+  record=[win:7abc] acquire_rc=0 lock_after=[1006703]
+PASS - record [] was reclaimed and rewritten to the current session pid
+PASS - record [ ] was reclaimed and rewritten to the current session pid
+PASS - record [not-a-pid] was reclaimed and rewritten to the current session pid
+PASS - record [0] was reclaimed and rewritten to the current session pid
+PASS - record [00] was reclaimed and rewritten to the current session pid
+PASS - record [000] was reclaimed and rewritten to the current session pid
+PASS - record [0000] was reclaimed and rewritten to the current session pid
+PASS - record [win:] was reclaimed and rewritten to the current session pid
+PASS - record [win:7abc] was reclaimed and rewritten to the current session pid
+PASS - no zero or malformed record produced a lock refusal
+
+===== S5  ps denied: a live pid that is not a harness is a reusable record, not a wedge =====
+PASS - a live non-harness process is running (pid 1010870, comm sleep)
+  acquire_rc=0
+  acquire_out=lock acquired: harness pid 1010882
+  lock_after=1010882
+  status_out=lock: held by live harness pid 1010882
+PASS - a reused live non-harness pid was reclaimed and the lock rewritten
+
+===== S6  ps denied: a live Cursor owner behind a UTF-8 install path keeps its identity and its lock =====
+PASS - a live Cursor-shaped process runs through the UTF-8 symlink alias (pid 1011548, comm agent)
+  ps_route      =agent	/tmp/fm-tree.tWVS9R/cursor/José/.local/bin/agent -c sleep 150; :
+  denied_route  =agent	/tmp/fm-tree.tWVS9R/cursor/José/.local/bin/agent -c sleep 150; :
+PASS - the denied-ps identity is byte-identical to what the working ps reports
+PASS - the denied-ps route preserves the UTF-8 alias path bytes
+PASS - the denied-ps route classifies the live Cursor alias as a harness that blocks reclaim
+  mangled_args  =/tmp/fm-tree.tWVS9R/cursor/Jos??/.local/bin/agent -c sleep 150; :
+PASS - the pre-fix ANSI-only byte rule (é -> ?) would have lost this owner's identity
+  [denied route]
+  acquire_rc=1
+  acquire_out=error: another live firstmate session holds the lock (pid 1011548); operate read-only until resolved
+  lock_after=1011548
+  status_out=lock: held by live harness pid 1011548
+PASS - denied route: fm-lock.sh refused to take over the live Cursor owner's lock
+PASS - denied route: the Cursor owner's lock file is unchanged
+PASS - denied route: status reports the Cursor owner as held
+  [real route]
+  acquire_rc=1
+  acquire_out=error: another live firstmate session holds the lock (pid 1011548); operate read-only until resolved
+  lock_after=1011548
+  status_out=lock: held by live harness pid 1011548
+PASS - real route: fm-lock.sh refused to take over the live Cursor owner's lock
+PASS - real route: the Cursor owner's lock file is unchanged
+PASS - real route: status reports the Cursor owner as held
+
+===== S7  ps denied: a live owner whose identity cannot be read is refused, not guessed at =====
+PASS - a live owner process for the unreadable case is running (pid 1013389)
+  owner_alive=0
+  acquire_rc=1
+  acquire_out=error: another live firstmate session holds the lock (pid 1013389); operate read-only until resolved
+  lock_after=1013389
+PASS - the owner is genuinely live when the product reads it
+PASS - fm-lock.sh refused to reclaim a lock held by a live but unreadable owner
+PASS - the refusal names the live owner pid 1013389
+PASS - the unreadable live owner's lock file is unchanged
+
+===== summary =====
+checks passed: 46
+checks failed: 0
+RESULT: ALL CHECKS PASSED

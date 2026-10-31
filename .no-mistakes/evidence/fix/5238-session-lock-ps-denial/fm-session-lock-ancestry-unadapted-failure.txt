@@ -1,0 +1,16 @@
+# Unmodified tests/fm-session-lock-ancestry.test.sh on this host.
+#
+# rc=1, failing at the pre-existing recycled-chain e2e assertion (the assertion
+# and its fixture are unchanged on this branch; they are identical at the base
+# commit bb3e6906):
+
+22:not ok - the pty-host was not reparented to init after the daemon ended
+
+# Why: this host runs the session under a nested user systemd, which registers
+# PR_SET_CHILD_SUBREAPER, so an orphan reparents to it instead of pid 1:
+
+orphan pid 1405665 -> ppid 1310 (systemd) /run/current-system/systemd/lib/systemd/systemd --user --deserialize=34 
+
+# The same suite with only that one assertion relaxed to "reparented away from
+# the daemon" (the property the case actually depends on) passes 29/29:
+#   see fm-session-lock-ancestry-hostfix.tap.txt
