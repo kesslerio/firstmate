@@ -1,0 +1,6 @@
+option in environment: unset
+--- watch stdout: (empty)
+--- wake queue: (none)
+--- inspection timer: (none)
+--- escalation count: (none)
+PASS mode=default (unset option leaves the general busy bound in force)

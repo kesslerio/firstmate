@@ -1,0 +1,125 @@
+
+### mode=enabled (real tmux pane changing each poll; verify escalation names model-stream silence)
+--- enabled watcher_alive_after_wait=no exit=n/a
+--- enabled watch stdout:
+stale: firstmate:fm-stream-enabled (idle 2s, possible wedge, escalation 1, model stream silent for 603s (foreground request))
+--- enabled wake queue:
+1793451042	1	stale	firstmate:fm-stream-enabled	stale: firstmate:fm-stream-enabled (idle 2s, possible wedge, escalation 1, model stream silent for 603s (foreground request))
+--- enabled escalation count:
+1
+--- enabled cap markers:
+(none)
+--- enabled episode marker:
+g1793451039.1357442.3777 1 1 1793450439--- enabled triage log:
+[2026-10-31T05:50:40-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream-enabled
+PASS mode=enabled
+
+### mode=disabled (FM_STREAM_SILENT_MAX_SECS=0 must leave the general busy bound in force)
+--- disabled watcher_alive_after_wait=yes exit=n/a
+--- disabled watch stdout:
+--- disabled wake queue:
+(none)
+--- disabled escalation count:
+(none)
+--- disabled cap markers:
+(none)
+--- disabled episode marker:
+(none)
+--- disabled triage log:
+(none)
+PASS mode=disabled
+
+### mode=invalid (FM_STREAM_SILENT_MAX_SECS=invalid must leave the general busy bound in force)
+--- invalid watcher_alive_after_wait=yes exit=n/a
+--- invalid watch stdout:
+--- invalid wake queue:
+(none)
+--- invalid escalation count:
+(none)
+--- invalid cap markers:
+(none)
+--- invalid episode marker:
+(none)
+--- invalid triage log:
+(none)
+PASS mode=invalid
+
+### mode=fresh (live foreground progress during the silence window cancels publication)
+--- fresh watcher_alive_after_wait=yes exit=n/a
+--- fresh watch stdout:
+--- fresh wake queue:
+(none)
+--- fresh escalation count:
+(none)
+--- fresh cap markers:
+(none)
+--- fresh episode marker:
+(none)
+--- fresh triage log:
+[2026-10-31T05:50:47-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream-fresh
+PASS mode=fresh
+
+### mode=close (live close during the silence window cancels publication)
+--- close watcher_alive_after_wait=yes exit=n/a
+--- close watch stdout:
+--- close wake queue:
+(none)
+--- close escalation count:
+(none)
+--- close cap markers:
+(none)
+--- close episode marker:
+(none)
+--- close triage log:
+[2026-10-31T05:50:52-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream-close
+PASS mode=close
+
+### mode=replace (a new foreground request during the silence window cancels publication)
+--- replace watcher_alive_after_wait=yes exit=n/a
+--- replace watch stdout:
+--- replace wake queue:
+(none)
+--- replace escalation count:
+(none)
+--- replace cap markers:
+(none)
+--- replace episode marker:
+(none)
+--- replace triage log:
+[2026-10-31T05:50:56-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream-replace
+PASS mode=replace
+
+### mode=cap (FM_WEDGE_MAX_ESCALATIONS=1 publishes one terminal model-stream wake)
+--- cap watcher_alive_after_wait=no exit=n/a
+--- cap watch stdout:
+stale: firstmate:fm-stream-cap (idle 2s, possible wedge, escalation 1, model stream silent for 604s (foreground request)), PERMANENTLY-WEDGED: FM_WEDGE_MAX_ESCALATIONS=1 reached - no further wedge escalations for this WINDOW while its cap marker stands: until FM_CAP_HORIZON_SECS elapses, the crew resumes, or the operator manually removes STATE/.wedge-permanent-<key>
+--- cap wake queue:
+1793451064	1	stale	firstmate:fm-stream-cap	stale: firstmate:fm-stream-cap (idle 2s, possible wedge, escalation 1, model stream silent for 604s (foreground request)), PERMANENTLY-WEDGED: FM_WEDGE_MAX_ESCALATIONS=1 reached - no further wedge escalations for this WINDOW while its cap marker stands: until FM_CAP_HORIZON_SECS elapses, the crew resumes, or the operator manually removes STATE/.wedge-permanent-<key>
+--- cap escalation count:
+--- cap cap markers:
+/tmp/fm-watch-live.Yd2l9r/live-cap/state/.wedge-permanent-firstmate_fm-stream-cap
+/tmp/fm-watch-live.Yd2l9r/live-cap/state/.wedge-terminal-queued-firstmate_fm-stream-cap
+--- cap episode marker:
+g1793451060.1405229.14852 1 1 1793450460--- cap triage log:
+[2026-10-31T05:51:01-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream-cap
+[2026-10-31T05:51:04-0700] wedge permanently capped: firstmate:fm-stream-cap (escalation 1, max 1, hash d41d8cd98f00)
+PASS mode=cap
+
+### mode=counterfault (refused count-file write; uncapped route still delivers one wake)
+--- counterfault watcher_alive_after_wait=no exit=n/a
+--- counterfault watch stdout:
+rm: cannot remove '/tmp/fm-watch-live.Yd2l9r/live-counterfault/state/.wedge-escalations-firstmate_fm-stream-counterfault': Is a directory
+stale: firstmate:fm-stream-counterfault (idle 2s, possible wedge, escalation 1, model stream silent for 602s (foreground request))
+--- counterfault wake queue:
+1793451066	1	stale	firstmate:fm-stream-counterfault	stale: firstmate:fm-stream-counterfault (idle 2s, possible wedge, escalation 1, model stream silent for 602s (foreground request))
+--- counterfault escalation count:
+(none)
+--- counterfault cap markers:
+(none)
+--- counterfault episode marker:
+g1793451064.1407561.5183 1 1 1793450464--- counterfault triage log:
+[2026-10-31T05:51:04-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream-counterfault
+[2026-10-31T05:51:06-0700] wedge_timer_check: escalation counter write FAILED for firstmate:fm-stream-counterfault (/tmp/fm-watch-live.Yd2l9r/live-counterfault/state/.wedge-escalations-firstmate_fm-stream-counterfault); the next poll restarts this window's count at 1
+PASS mode=counterfault
+
+ALL LIVE WATCHER MATRIX CHECKS PASSED

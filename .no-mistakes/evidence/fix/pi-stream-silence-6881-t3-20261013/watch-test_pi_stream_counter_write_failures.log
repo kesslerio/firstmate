@@ -1,0 +1,2 @@
+rm: cannot remove '/tmp/fm-watch-triage-tests.M1gQwF/pi-counter-uncapped/state/.wedge-escalations-test_fm-counter-uncapped': Is a directory
+ok - stream count writes and cap truncation defend failures while uncapped delivery continues

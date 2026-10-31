@@ -1,0 +1,56 @@
+
+### queue-close: worker close during the queue lock wait
+--- held the queue lock with live pid 1409684 before publication: blocked=yes
+--- watcher alive after release: yes
+--- watch stdout: (empty)
+--- wake queue: (none)
+--- escalation count: (none)
+--- triage log: (none)
+PASS queue-close
+
+### queue-progress: worker progress during the queue lock wait
+--- held the queue lock with live pid 1409684 before publication: blocked=yes
+--- watcher alive after release: yes
+--- watch stdout: (empty)
+--- wake queue: (none)
+--- escalation count: (none)
+--- triage log: (none)
+PASS queue-progress
+
+### queue-replace: worker replace during the queue lock wait
+--- held the queue lock with live pid 1409684 before publication: blocked=yes
+--- watcher alive after release: yes
+--- watch stdout: (empty)
+--- wake queue: (none)
+--- escalation count: (none)
+--- triage log: (none)
+PASS queue-replace
+
+### recovery-close: worker close during the recovery lock wait
+--- held the recovery lock with live pid 1409684 before publication: blocked=yes
+--- watcher alive after release: yes
+--- watch stdout: (empty)
+--- wake queue: (none)
+--- escalation count: (none)
+--- triage log: (none)
+PASS recovery-close
+
+### recovery-progress: worker progress during the recovery lock wait
+--- held the recovery lock with live pid 1409684 before publication: blocked=yes
+--- watcher alive after release: yes
+--- watch stdout: (empty)
+--- wake queue: (none)
+--- escalation count: (none)
+--- triage log: (none)
+PASS recovery-progress
+
+### recovery-replace: worker replace during the recovery lock wait
+--- held the recovery lock with live pid 1409684 before publication: blocked=yes
+--- watcher alive after release: yes
+--- watch stdout: (empty)
+--- wake queue: (none)
+--- escalation count: (none)
+--- triage log: (none)
+PASS recovery-replace
+
+ALL LIVE PUBLICATION LOCK CHECKS PASSED
