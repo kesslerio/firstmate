@@ -1,0 +1,72 @@
+### S2: a Sol dispatch under the ceiling is admitted, launches, and records its slot
+Real bin/fm-spawn.sh against the disposable lab home and a real tmux session on the lab socket.
+codex and treehouse are lab stand-ins for those external tools; firstmate itself is the real product.
+
+$ cat $FM_HOME/config/sol-cap
+max=2
+models=gpt-6.1-sol|gpt-6-sol
+
+$ bin/fm-spawn.sh task-a $LAB/projects/demo --harness codex --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.GJ009L
+warning: /tmp/fm-lab.GJ009L/data/task-a/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-a
+spawned task-a harness=codex kind=ship mode=no-mistakes yolo=off window=primary:fm-task-a worktree=/tmp/fm-lab.GJ009L/wt/task-a
+exit=0
+
+--- $FM_HOME/state/sol-sessions.tsv (id <TAB> model <TAB> start <TAB> pid)
+task-a	gpt-6.1-sol	1793450515	733576
+--- the recorded pid 733576 is the live worker:
+ 733576  732129 bash /tmp/fm-lab.GJ009L/fakebin/codex --model gpt-6.1-sol --dangerously-bypass-approvals-and-sandbox --disable hooks -c noti
+--- task record state/task-a.meta
+window=primary:fm-task-a
+endpoint_task_id=task-a
+worktree=/tmp/fm-lab.GJ009L/wt/task-a
+project=/tmp/fm-lab.GJ009L/projects/demo
+harness=codex
+approval_mode=bypass
+kind=ship
+mode=no-mistakes
+yolo=off
+branch=fm/task-a
+tasktmp=/tmp/fm-task-a
+model=gpt-6.1-sol
+effort=default
+spawn_gen=s1793450517.731580.4379
+--- tmux windows on the lab socket
+1: bash* (1 panes) [80x24] [layout b25d,80x24,0,0,0] @0 (active)
+2: fm-task-a (1 panes) [80x24] [layout b25f,80x24,0,0,2] @2
+--- the launch reached the worker stand-in with:
+--model gpt-6.1-sol --dangerously-bypass-approvals-and-sandbox --disable hooks -c notify=["bash","-c","touch '/tmp/fm-lab.GJ009L/state/task-a.turn-ended'"] ⁣FIRSTMATE_OP: v1 launch-brief: # Current 
+You are a crewmate: an autonomous worker agent managed by firstmate.
+This section establishes your current identity before every project or task instruction below and supersedes any conflicting role identity in those instructions.
+Do the assigned work yourself and report only to firstmate; do not adopt a firstmate or secondmate supervisor identity, delegate the task, run fleet supervision, or address the captain.
+Your steering inbox is `/tmp/fm-lab.GJ009L/state/task-a.inbox`; this exact path belongs to your current task even when it is outside the worktree or under the supervising firstmate home, so read and a
+Never inspect or change any other home's endpoint namespace; this authorization is limited to the exact task paths named by this brief.
+When this task works on Firstmate itself, the repository root `AGENTS.md` (also imported by `CLAUDE.md`) is project content and the supervisor contract for the firstmate managing you: follow this brie
+Project instructions still govern the work wherever they do not conflict with this worker identity, including `CONTRIBUTING.md` and `firstmate-coding-guidelines` for Firstmate changes.
+If the `firstmate-coding-guidelines` skill name does not resolve in this session, read `/home/art/.no-mistakes/worktrees/9f75ec418609/01M68YTHKF1JSMAW731ZBVZMN3/.agents/skills/firstmate-coding-guideli
+
+# Task
+## Captain's intent
+Run the Sol-routed task for task-a.
+
+## Firstmate spec
+Exercise the Sol session ceiling.
+
+# Definition of done
+Delivery contract: mode=no-mistakes
+
+# Current no-mistakes intent contract
+This section supersedes every earlier brief instruction about constructing `--intent`, but not later clarifications actually supplied by the captain.
+Use everything under `## Captain intent authorized for --intent` through the end of this brief, including any nested subheadings but excluding that heading, plus any later words the captain actually s
+Preserve those words without adding speaker labels or direct address.
+Firstmate-authored constraints, acceptance criteria, implementation details, decisions, and tradeoffs are specification, not captain intent.
+The Definition of done's rule that `--intent` must be self-sufficient still governs the string you pass: resolve any report, decision, or PR the intent below refers to into its substance rather than p
+
+## Captain intent authorized for --intent
+Run the Sol-routed task for task-a.
+
+--- a NON-covered model (gpt-5.6-luna) never claims a slot:
+not-capped
+exit=0
+--- registry after the uncovered claim (unchanged):
+task-a	gpt-6.1-sol	1793450515	733576

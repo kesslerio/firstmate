@@ -1,0 +1,26 @@
+### S10 (boundary): an unpinned (--model default) dispatch is never capped, even with the ceiling exceeded
+$ cat $FM_HOME/config/sol-cap
+max=1
+models=gpt-6.1-sol|gpt-6-sol
+model-pattern=^gpt-[0-9.]+-sol$
+$ cat $FM_HOME/state/sol-sessions.tsv   # a live capped session plus a superseded row already exceed max=1
+task-l	gpt-6.1-sol	1793451615	2808534
+task-r	gpt-6.1-sol	1793451615	-2
+
+--- control: a COVERED dispatch is refused at this state
+error: Sol ceiling reached: 2 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch o
+exit=1
+
+$ bin/fm-spawn.sh task-f $LAB/projects/demo --harness codex --model default --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.GJ009L
+warning: /tmp/fm-lab.GJ009L/data/task-f/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-f
+spawned task-f harness=codex kind=ship mode=no-mistakes yolo=off window=primary:fm-task-f worktree=/tmp/fm-lab.GJ009L/wt/task-f
+exit=0
+
+--- registry: no capped row was created for the unpinned worker
+task-l	gpt-6.1-sol	1793451615	2808534
+task-r	gpt-6.1-sol	1793452011	-2
+--- task-f record:
+window=primary:fm-task-f
+harness=codex
+model=default

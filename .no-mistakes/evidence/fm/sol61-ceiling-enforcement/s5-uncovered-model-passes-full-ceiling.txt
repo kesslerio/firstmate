@@ -1,0 +1,24 @@
+### S5: a model the declaration does not cover passes a full ceiling and never claims a slot
+Ceiling max=1 and task-b's covered worker (pid 788341) already fills it.
+$ cat $FM_HOME/config/sol-cap
+max=1
+models=gpt-6.1-sol|gpt-6-sol
+$ cat $FM_HOME/state/sol-sessions.tsv
+task-a	gpt-6.1-sol	1793450515	733576
+task-b	gpt-6.1-sol	1793450559	788341
+
+$ bin/fm-spawn.sh task-c $LAB/projects/demo --harness codex --model gpt-5.6-luna --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.GJ009L
+warning: /tmp/fm-lab.GJ009L/data/task-c/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-c
+spawned task-c harness=codex kind=ship mode=no-mistakes yolo=off window=primary:fm-task-c worktree=/tmp/fm-lab.GJ009L/wt/task-c
+exit=0
+
+--- registry: no row for task-c, the covered session untouched
+task-a	gpt-6.1-sol	1793450515	733576
+task-b	gpt-6.1-sol	1793450559	788341
+--- task-c record exists and names the uncovered model:
+worktree=/tmp/fm-lab.GJ009L/wt/task-c
+harness=codex
+model=gpt-5.6-luna
+--- task-c's window:
+4: fm-task-c (1 panes) [80x24] [layout b261,80x24,0,0,4] @4

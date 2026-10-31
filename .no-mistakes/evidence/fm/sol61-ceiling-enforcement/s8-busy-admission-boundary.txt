@@ -1,0 +1,50 @@
+### S8 (adversarial): the admission boundary stays busy while an uncapped replacement runs
+
+--- starting state
+$ cat config/sol-cap
+max=2
+models=gpt-6-sol
+$ cat state/sol-sessions.tsv
+task-r	gpt-6.1-sol	1793451613	-1
+holder alive as pid 2049806
+
+--- the boundary is held by a live process:
+state/.sol-cap.lock/pid = 2049806 (live: yes)
+
+$ bin/fm-sol-cap-lib.sh refuse-claim task-r ship codex gpt-6.1-sol $FM_HOME/config $FM_HOME/state   # the uncapped replacement
+not-capped
+exit=0
+
+--- while the boundary was still held:
+published invalidation:      .sol-cap-supersede-task-r
+anything else matching it:   1
+task-r row pid (unchanged):  -1
+boundary still held:         yes
+
+--- release the boundary and restore a declaration that covers gpt-6.1-sol
+publishing marker still present: .sol-cap-supersede-task-r
+
+$ bin/fm-sol-cap-lib.sh refuse-claim task-s ship codex gpt-6.1-sol $FM_HOME/config $FM_HOME/state   # the next admission
+claimed
+exit=0
+
+--- after the next admission:
+task-r row pid (superseded, claims no slot until adoption): -2
+task-s row model (its claim survived): gpt-6.1-sol
+invalidations left:                                      none
+$ cat state/sol-sessions.tsv
+task-r	gpt-6.1-sol	1793451615	-2
+task-s	gpt-6.1-sol	1793451615	2053662
+
+--- now a live capped session occupies the other slot:
+$ bin/fm-sol-cap-lib.sh refuse-claim task-l ...
+claimed
+$ bin/fm-sol-cap-lib.sh run task-l $FM_HOME/state sleep 300   (the reservation moves to the worker)
+task-l row pid 2054025 -> sleep 300 (live: yes)
+$ cat state/sol-sessions.tsv
+task-r	gpt-6.1-sol	1793451615	-2
+task-l	gpt-6.1-sol	1793451615	2054025
+
+$ bin/fm-sol-cap-lib.sh refuse-claim task-x ship codex gpt-6.1-sol $FM_HOME/config $FM_HOME/state   # above the ceiling
+error: Sol ceiling reached: 2 concurrent capped session(s) already active and this ceiling is 2 (declared in config/sol-cap); the dispatch of task task-x (codex, gpt-6.1-sol) was refused. Active sessions: task-l (gpt-6.1-sol, age 0s); task-r (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1

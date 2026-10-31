@@ -1,0 +1,31 @@
+### S3: with the ceiling reached, a covered dispatch is refused with one actionable error and nothing is created
+Real bin/fm-spawn.sh; the ceiling is lowered to max=1 while task-a's worker (pid 733576) is live.
+
+$ cat $FM_HOME/config/sol-cap
+max=1
+models=gpt-6.1-sol|gpt-6-sol
+$ cat $FM_HOME/state/sol-sessions.tsv
+task-a	gpt-6.1-sol	1793450515	733576
+windows before=2
+
+$ bin/fm-spawn.sh task-b $LAB/projects/demo --harness codex --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.GJ009L
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 75s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68YTHKF1JSMAW731ZBVZMN3/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M68YTHKF1JSMAW731ZBVZMN3/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-b (codex, gpt-6.1-sol) was refused. Active sessions: task-a (gpt-6.1-sol, age 21s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+
+--- nothing was created for task-b:
+task record:         absent
+rendered brief:      absent
+registry row:        absent
+tmux windows after:  2 (before 2)
+worker launches:     1 (the log holds only task-a's launch, 29 lines because the brief is multi-line)
+
+--- the registry still names only the live session:
+task-a	gpt-6.1-sol	1793450515	733576

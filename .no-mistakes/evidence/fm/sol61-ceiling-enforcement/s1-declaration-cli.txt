@@ -1,0 +1,45 @@
+### Scenario S1: operator inspects the Sol ceiling declaration (real CLI, disposable lab home)
+$ export FM_HOME=/tmp/fm-lab.WengdA
+
+--- no declaration (guard must be inert) ---
+$ bin/fm-sol-cap-lib.sh status $FM_HOME/config
+inert
+exit=0
+$ bin/fm-sol-cap-lib.sh ceiling $FM_HOME/config
+inert
+exit=0
+
+--- captain declares max=4 ceiling=2 models ---
+$ cat $FM_HOME/config/sol-cap
+max=4
+ceiling=2
+models=gpt-6.1-sol|gpt-6-sol
+$ bin/fm-sol-cap-lib.sh status $FM_HOME/config
+active max=4 ceiling=2 models=gpt-6.1-sol|gpt-6-sol pattern=
+exit=0
+$ bin/fm-sol-cap-lib.sh models $FM_HOME/config
+gpt-6.1-sol|gpt-6-sol
+exit=0
+$ bin/fm-sol-cap-lib.sh ceiling $FM_HOME/config
+2
+exit=0
+
+--- adversarial: malformed declaration (ceiling above max) ---
+$ bin/fm-sol-cap-lib.sh status $FM_HOME/config
+/tmp/fm-lab.WengdA/config/sol-cap must declare ceiling as an integer from 1 through 2, not '5'
+exit=1
+
+--- adversarial: unknown key ---
+$ bin/fm-sol-cap-lib.sh status $FM_HOME/config
+/tmp/fm-lab.WengdA/config/sol-cap declares an unknown key: modelz
+exit=1
+
+--- adversarial: declaration naming no covered model ---
+$ bin/fm-sol-cap-lib.sh status $FM_HOME/config
+/tmp/fm-lab.WengdA/config/sol-cap must declare models or model-pattern, the model ids the ceiling covers
+exit=1
+
+--- restore declaration ---
+$ bin/fm-sol-cap-lib.sh status $FM_HOME/config
+active max=2 ceiling=2 models=gpt-6.1-sol|gpt-6-sol pattern=
+exit=0

@@ -1,0 +1,18 @@
+### S6: a home that never declares a ceiling dispatches exactly as before (guard inert)
+$ ls $FM_HOME/config/sol-cap
+ls: cannot access '/tmp/fm-lab.GJ009L/config/sol-cap': No such file or directory
+$ bin/fm-sol-cap-lib.sh status $FM_HOME/config
+inert
+
+$ bin/fm-spawn.sh task-d $LAB/projects/demo --harness codex --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.GJ009L
+warning: /tmp/fm-lab.GJ009L/data/task-d/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-d
+spawned task-d harness=codex kind=ship mode=no-mistakes yolo=off window=primary:fm-task-d worktree=/tmp/fm-lab.GJ009L/wt/task-d
+exit=0
+
+--- registry: the home owns no capped occupancy, so no row was written for task-d
+task-a	gpt-6.1-sol	1793450515	733576
+task-b	gpt-6.1-sol	1793450559	788341
+--- task-d record:
+harness=codex
+model=gpt-6.1-sol

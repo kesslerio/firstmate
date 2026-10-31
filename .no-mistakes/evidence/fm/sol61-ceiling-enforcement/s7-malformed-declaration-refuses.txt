@@ -1,0 +1,22 @@
+### S7 (adversarial): an unreadable declaration refuses every guarded dispatch, including a model it does not cover
+$ cat $FM_HOME/config/sol-cap   # ceiling above max
+max=2
+ceiling=9
+models=gpt-6.1-sol
+
+$ bin/fm-spawn.sh task-e $LAB/projects/demo --harness codex --model gpt-5.6-luna --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.GJ009L
+error: Sol ceiling unavailable: /tmp/fm-lab.GJ009L/config/sol-cap must declare ceiling as an integer from 1 through 2, not '9'; task task-e with model gpt-5.6-luna was not dispatched rather than launched against an undeclared ceiling
+exit=1
+
+--- nothing was created for task-e:
+task record:        absent (before: absent)
+rendered brief:     absent
+tmux windows:       5 (before 5)
+registry unchanged: 
+task-a	gpt-6.1-sol	1793450515	733576
+task-b	gpt-6.1-sol	1793450559	788341
+
+--- the CLI reports the same refusal:
+/tmp/fm-lab.GJ009L/config/sol-cap must declare ceiling as an integer from 1 through 2, not '9'
+exit=1

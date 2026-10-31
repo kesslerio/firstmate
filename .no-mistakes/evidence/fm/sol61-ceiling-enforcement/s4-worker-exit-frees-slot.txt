@@ -1,0 +1,24 @@
+### S4: a capped session frees its slot when its worker process ends, so the next covered dispatch is admitted
+Live state carried over from S3: ceiling max=1, task-a's worker is the only live capped session.
+
+$ kill -9 733576   # the worker exits
+worker alive? no
+registry (the row survives as stop evidence, its pid is now dead):
+task-a	gpt-6.1-sol	1793450515	733576
+
+$ bin/fm-spawn.sh task-b $LAB/projects/demo --harness codex --model gpt-6.1-sol --mode no-mistakes --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.GJ009L
+WARNING: watcher still down (same stale episode; last beat: 99s ago, grace 300s) - full banner already printed this episode.
+warning: /tmp/fm-lab.GJ009L/data/task-b/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-b
+spawned task-b harness=codex kind=ship mode=no-mistakes yolo=off window=primary:fm-task-b worktree=/tmp/fm-lab.GJ009L/wt/task-b
+exit=0
+
+--- registry after the new dispatch (task-b claimed the freed slot):
+task-a	gpt-6.1-sol	1793450515	733576
+task-b	gpt-6.1-sol	1793450559	788341
+--- task-b's recorded pid 788341 is live:
+ 788341 bash /tmp/fm-lab.GJ009L/fakebin/codex --model gpt-6.1-sol --dangerously-bypass-approvals-and-sandbox -
+--- tmux windows:
+1: bash* (1 panes) [80x24] [layout b25d,80x24,0,0,0] @0 (active)
+2: fm-task-a (1 panes) [80x24] [layout b25f,80x24,0,0,2] @2
+3: fm-task-b (1 panes) [80x24] [layout b260,80x24,0,0,3] @3
