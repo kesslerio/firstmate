@@ -1,0 +1,4 @@
+ps -V says: lock before: 2377050
+lock acquired: harness pid 2377364
+fm-lock rc=0
+lock after: 2377364

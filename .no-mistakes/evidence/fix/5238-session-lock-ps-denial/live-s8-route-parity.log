@@ -1,0 +1,30 @@
+== live harness (pid 2412666)
+   ps        : verdict readable match=yes|fields comm=claude args=/tmp/fm-lab.VEsueQ/bin/claude\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ \"\$1\"\;\ :\ /tmp/fm-lab.VEsueQ/out/hold-session.pid\ 90 ppid=1310
+   denied-ps : verdict readable match=yes|fields comm=claude args=/tmp/fm-lab.VEsueQ/bin/claude\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ \"\$1\"\;\ :\ /tmp/fm-lab.VEsueQ/out/hold-session.pid\ 90 ppid=1310
+   PARITY verdict same (verdict readable match=yes)
+   fields identical
+== python control-byte argv (pid 2412940)
+   ps        : verdict readable match=no|fields comm=python3 args=/run/current-system/sw/bin/python3\ -c\ import\ time\;\ time.sleep\(60\)\ \ \ \ tab\?here\ cr\?\ unié\ sp\ ace\ a\)b\(c ppid=1310
+   denied-ps : verdict readable match=no|fields comm=python3 args=/run/current-system/sw/bin/python3\ -c\ import\ time\;\ time.sleep\(60\)\ \ \ \ tab\?here\ cr\?\ uni\?\?\ sp\ ace\ a\)b\(c ppid=1310
+   PARITY verdict same (verdict readable match=no)
+   fields differ between routes (byte rendering)
+== comm with space/paren/newline (pid 2414701)
+   ps        : verdict readable match=no|fields comm=sle\ ep\ \(x\?2 args=python3\ -c\ import\ ctypes\,sys\,time\ open\(sys.argv\[1\]\,\"w\"\).write\(\"%d\\n\"\ %\ __import__\(\"os\"\).getpid\(\)\)\ ctypes.CDLL\(None\).prctl\(15\,\ b\"sle\ ep\ \(x\\n2\"\,\ 0\,0\,0\)\ time.sleep\(60\)\ /tmp/fm-lab.VEsueQ/out/t3.pid ppid=1310
+   denied-ps : verdict readable match=no|fields comm=sle\ ep\ \(x\ 2 args=python3\ -c\ import\ ctypes\,sys\,time\ open\(sys.argv\[1\]\,\"w\"\).write\(\"%d\\n\"\ %\ __import__\(\"os\"\).getpid\(\)\)\ ctypes.CDLL\(None\).prctl\(15\,\ b\"sle\ ep\ \(x\\n2\"\,\ 0\,0\,0\)\ time.sleep\(60\)\ /tmp/fm-lab.VEsueQ/out/t3.pid ppid=1310
+   PARITY verdict same (verdict readable match=no)
+   fields differ between routes (byte rendering)
+== harness name with non-ASCII (pid 2414876)
+   ps        : verdict readable match=yes|fields comm=claude-é args=/tmp/fm-lab.VEsueQ/bin/claude-é\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ 60\;\ :\ /tmp/fm-lab.VEsueQ/out/t5.pid ppid=1310
+   denied-ps : verdict readable match=yes|fields comm=claude-\?\? args=/tmp/fm-lab.VEsueQ/bin/claude-\?\?\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ 60\;\ :\ /tmp/fm-lab.VEsueQ/out/t5.pid ppid=1310
+   PARITY verdict same (verdict readable match=yes)
+   fields differ between routes (byte rendering)
+== dead pid (pid 2415021)
+   ps        : verdict unreadable match=no|fields none
+   denied-ps : verdict unreadable match=no|fields none
+   PARITY verdict same (verdict unreadable match=no)
+   fields identical
+== live non-harness (pid 2409945)
+   ps        : verdict readable match=no|fields comm=python3 args=python3\ -c\ import\ os\,sys\,time\ open\(sys.argv\[1\]\,\"w\"\).write\(\"%d\\n\"\ %\ os.getpid\(\)\)\ time.sleep\(float\(sys.argv\[2\]\)\)\ /tmp/fm-lab.VEsueQ/out/plain.pid\ 90 ppid=1310
+   denied-ps : verdict readable match=no|fields comm=python3 args=python3\ -c\ import\ os\,sys\,time\ open\(sys.argv\[1\]\,\"w\"\).write\(\"%d\\n\"\ %\ os.getpid\(\)\)\ time.sleep\(float\(sys.argv\[2\]\)\)\ /tmp/fm-lab.VEsueQ/out/plain.pid\ 90 ppid=1310
+   PARITY verdict same (verdict readable match=no)
+   fields identical

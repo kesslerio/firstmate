@@ -1,0 +1,4 @@
+$ bin/fm-inbox.sh ready   (live harness pid 2409797)
+{"schema":"fm-primary-ready.v1","home":"homes/s7","observed_at":"2026-10-31T08:32:59Z","lock":{"state":"held","pid":2409797,"live_harness":true},"wake_consumer":{"state":"down","reason":"no-beacon","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":false}
+$ bin/fm-inbox.sh ready   (live non-harness pid 2409945)
+{"schema":"fm-primary-ready.v1","home":"homes/s7","observed_at":"2026-10-31T08:32:59Z","lock":{"state":"unknown","pid":2409945,"live_harness":false},"wake_consumer":{"state":"unknown","reason":"supervision-model-unknown-for-home","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":"unknown"}

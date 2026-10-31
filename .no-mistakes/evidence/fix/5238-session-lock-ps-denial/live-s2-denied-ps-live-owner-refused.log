@@ -1,0 +1,5 @@
+ps -V says: ps refused (rc=126)
+lock before: 2368443
+fm-lock rc=1
+lock after: 2368443
+error: another live firstmate session holds the lock (pid 2368443, session S2-foreign-session); operate read-only until resolved

@@ -1,0 +1,34 @@
+== route decision matrix
+--- /tmp/fm-lab.VEsueQ/out/s8b-dead-denied.log
+ps -V says: ps refused (rc=126)
+lock before: 2431623
+lock acquired: harness pid 2435806
+fm-lock rc=0
+lock after: 2435806
+--- /tmp/fm-lab.VEsueQ/out/s8b-dead-ps.log
+ps -V says: lock before: 2431623
+lock acquired: harness pid 2431704
+fm-lock rc=0
+lock after: 2431704
+--- /tmp/fm-lab.VEsueQ/out/s8b-live-harness-denied.log
+ps -V says: ps refused (rc=126)
+lock before: 2417750
+fm-lock rc=1
+lock after: 2417750
+error: another live firstmate session holds the lock (pid 2417750); operate read-only until resolved
+--- /tmp/fm-lab.VEsueQ/out/s8b-live-harness-ps.log
+ps -V says: lock before: 2417750
+fm-lock rc=1
+lock after: 2417750
+error: another live firstmate session holds the lock (pid 2417750); operate read-only until resolved
+--- /tmp/fm-lab.VEsueQ/out/s8b-live-non-harness-denied.log
+ps -V says: ps refused (rc=126)
+lock before: 2424632
+lock acquired: harness pid 2429865
+fm-lock rc=0
+lock after: 2429865
+--- /tmp/fm-lab.VEsueQ/out/s8b-live-non-harness-ps.log
+ps -V says: lock before: 2424632
+lock acquired: harness pid 2425023
+fm-lock rc=0
+lock after: 2425023

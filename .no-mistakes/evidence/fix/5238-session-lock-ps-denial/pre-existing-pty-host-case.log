@@ -1,0 +1,8 @@
+$ bash tests/fm-session-lock-ancestry.test.sh   (only the pre-existing e2e pty-host case registered)
+1..1
+not ok - the pty-host was not reparented to init after the daemon ended
+
+$ orphaned process reparenting on this host (the case asserts ppid == 1):
+the live holders started by the scenario driver reparent to systemd (pid 1310), not init:
+   ps        : verdict readable match=yes|fields comm=claude args=/tmp/fm-lab.VEsueQ/bin/claude\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ \"\$1\"\;\ :\ /tmp/fm-lab.VEsueQ/out/hold-session.pid\ 90 ppid=1310
+   denied-ps : verdict readable match=yes|fields comm=claude args=/tmp/fm-lab.VEsueQ/bin/claude\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ \"\$1\"\;\ :\ /tmp/fm-lab.VEsueQ/out/hold-session.pid\ 90 ppid=1310

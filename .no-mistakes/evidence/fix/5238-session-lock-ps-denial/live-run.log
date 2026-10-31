@@ -1,0 +1,269 @@
+
+==== SCENARIO: S1 a session on a ps-denied host acquires the session lock (the reported permanent read-only wedge) ====
+    | ps -V says: ps refused (rc=126)
+    | lock acquired: harness pid 2367027
+    | fm-lock rc=0
+    | lock after: 2367027
+CHECK ok   - fm-lock.sh acquires under a denied ps (rc=0)
+CHECK ok   - the acquisition is reported (contains: lock acquired: harness pid)
+CHECK ok   - state/.lock holds this session's harness pid (= 2367027)
+CHECK ok   - no fail-closed diagnostic on a resolved identity (absent: fm-session-lock:)
+RESULT pass - S1 a session on a ps-denied host acquires the session lock (the reported permanent read-only wedge)
+
+==== SCENARIO: S2 a live harness owner on a ps-denied host keeps the lock: a second session is refused, lock unchanged (no takeover) ====
+    | ps -V says: ps refused (rc=126)
+    | lock before: 2368443
+    | fm-lock rc=1
+    | lock after: 2368443
+    | error: another live firstmate session holds the lock (pid 2368443, session S2-foreign-session); operate read-only until resolved
+CHECK ok   - the second session is refused (rc=1)
+CHECK ok   - the refusal names the live owner (contains: another live firstmate session holds the lock (pid 2368443)
+CHECK ok   - the lock file is unchanged (= 2368443)
+CHECK ok   - the sidecar is unchanged (= S2-foreign-session)
+RESULT pass - S2 a live harness owner on a ps-denied host keeps the lock: a second session is refused, lock unchanged (no takeover)
+
+==== SCENARIO: S3 a live owner whose identity cannot be read blocks reclaim (fail closed) ====
+unreadable live owner: thread id 2370051
+  kill -0 -> alive; ps -o comm= -p 2370051 -> rc=1
+    | ps -V says: lock before: 2370051
+    | fm-lock rc=1
+    | lock after: 2370051
+    | error: another live firstmate session holds the lock (pid 2370051); operate read-only until resolved
+CHECK ok   - an unreadable live owner is not reclaimed (rc=1)
+CHECK ok   - the refusal names the unreadable owner (contains: another live firstmate session holds the lock (pid 2370051)
+CHECK ok   - the lock file is unchanged (= 2370051)
+RESULT pass - S3 a live owner whose identity cannot be read blocks reclaim (fail closed)
+
+==== SCENARIO: S4 a dead owner record is reclaimed on a ps-denied host ====
+dead owner pid: 2375787
+    | ps -V says: ps refused (rc=126)
+    | lock before: 2375787
+    | lock acquired: harness pid 2375818
+    | fm-lock rc=0
+    | lock after: 2375818
+CHECK ok   - the stale lock is reclaimed (rc=0)
+CHECK ok   - the acquisition is reported (contains: lock acquired: harness pid)
+CHECK ok   - state/.lock is rewritten to this session (= 2375818)
+RESULT pass - S4 a dead owner record is reclaimed on a ps-denied host
+
+==== SCENARIO: S5 a reused pid owned by a live non-harness is reclaimed ====
+live non-harness owner pid: 2377050 (python3)
+    | ps -V says: lock before: 2377050
+    | lock acquired: harness pid 2377364
+    | fm-lock rc=0
+    | lock after: 2377364
+CHECK ok   - the reused pid does not wedge the home (rc=0)
+CHECK ok   - state/.lock is rewritten to this session (= 2377364)
+    | ps -V says: ps refused (rc=126)
+    | lock before: 2377050
+    | lock acquired: harness pid 2382492
+    | fm-lock rc=0
+    | lock after: 2382492
+CHECK ok   - the same reused pid is reclaimed under a denied ps too (rc=0)
+RESULT pass - S5 a reused pid owned by a live non-harness is reclaimed
+
+==== SCENARIO: S6 malformed, empty, whitespace and zero-form lock records stay reclaimable ====
+
+-- record 0
+    | ps -V says: lock before: 0
+    | lock acquired: harness pid 2384332
+    | fm-lock rc=0
+    | lock after: 2384332
+CHECK ok   - record '0' is reclaimed (rc=0)
+CHECK ok   - record '0' is replaced by this session (= 2384332)
+
+-- record 00
+    | ps -V says: lock before: 00
+    | lock acquired: harness pid 2389410
+    | fm-lock rc=0
+    | lock after: 2389410
+CHECK ok   - record '00' is reclaimed (rc=0)
+CHECK ok   - record '00' is replaced by this session (= 2389410)
+
+-- record 000
+    | ps -V says: lock before: 000
+    | lock acquired: harness pid 2393217
+    | fm-lock rc=0
+    | lock after: 2393217
+CHECK ok   - record '000' is reclaimed (rc=0)
+CHECK ok   - record '000' is replaced by this session (= 2393217)
+
+-- record not-a-pid
+    | ps -V says: lock before: not-a-pid
+    | lock acquired: harness pid 2396898
+    | fm-lock rc=0
+    | lock after: 2396898
+CHECK ok   - record 'not-a-pid' is reclaimed (rc=0)
+CHECK ok   - record 'not-a-pid' is replaced by this session (= 2396898)
+
+-- record win:
+    | ps -V says: lock before: win:
+    | lock acquired: harness pid 2399181
+    | fm-lock rc=0
+    | lock after: 2399181
+CHECK ok   - record 'win:' is reclaimed (rc=0)
+CHECK ok   - record 'win:' is replaced by this session (= 2399181)
+
+-- record win:7abc
+    | ps -V says: lock before: win:7abc
+    | lock acquired: harness pid 2401615
+    | fm-lock rc=0
+    | lock after: 2401615
+CHECK ok   - record 'win:7abc' is reclaimed (rc=0)
+CHECK ok   - record 'win:7abc' is replaced by this session (= 2401615)
+
+-- record <empty file>
+    | ps -V says: lock before: 
+    | lock acquired: harness pid 2404208
+    | fm-lock rc=0
+    | lock after: 2404208
+CHECK ok   - an empty lock record is reclaimed (rc=0)
+CHECK ok   - the empty record is replaced by this session (= 2404208)
+
+-- record <whitespace>
+    | ps -V says: lock before:    
+    | lock acquired: harness pid 2406156
+    | fm-lock rc=0
+    | lock after: 2406156
+CHECK ok   - a whitespace lock record is reclaimed (rc=0)
+
+-- record 00 under a denied ps
+    | ps -V says: ps refused (rc=126)
+    | lock before: 00
+    | lock acquired: harness pid 2408468
+    | fm-lock rc=0
+    | lock after: 2408468
+CHECK ok   - the zero-form record is reclaimed under a denied ps (rc=0)
+RESULT pass - S6 malformed, empty, whitespace and zero-form lock records stay reclaimable
+
+==== SCENARIO: S7 status/inspect report a live harness holder as held and a non-harness holder as not ====
+    | $ bin/fm-lock.sh status   (live harness pid 2409797, real ps)
+    | lock: held by live harness pid 2409797
+    | $ bin/fm-lock.sh status   (same holder, denied ps)
+    | lock: held by live harness pid 2409797
+    | $ bin/fm-lock.sh status   (live non-harness pid 2409945)
+    | lock: stale (pid 2409945 dead or not a harness)
+    | $ bin/fm-lock.sh status   (dead pid 2410975)
+    | lock: stale (pid 2410975 dead or not a harness)
+    | $ bin/fm-lock.sh status   (record "00")
+    | lock: stale (pid 00 dead or not a harness)
+CHECK ok   - status reports the live harness holder through both the ps and denied-ps routes
+CHECK ok   - status reports a live non-harness as stale (contains: lock: stale (pid 2409945 dead or not a harness))
+    | $ bin/fm-inbox.sh ready   (live harness pid 2409797)
+    | {"schema":"fm-primary-ready.v1","home":"homes/s7","observed_at":"2026-10-31T08:32:59Z","lock":{"state":"held","pid":2409797,"live_harness":true},"wake_consumer":{"state":"down","reason":"no-beacon","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":false}
+    | $ bin/fm-inbox.sh ready   (live non-harness pid 2409945)
+    | {"schema":"fm-primary-ready.v1","home":"homes/s7","observed_at":"2026-10-31T08:32:59Z","lock":{"state":"unknown","pid":2409945,"live_harness":false},"wake_consumer":{"state":"unknown","reason":"supervision-model-unknown-for-home","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":"unknown"}
+CHECK ok   - fm-inbox.sh ready reports lock.state=held for the harness holder
+CHECK ok   - fm-inbox.sh ready reports live_harness=true for the harness holder
+CHECK ok   - fm-inbox.sh ready reports live_harness=false for the non-harness holder
+RESULT pass - S7 status/inspect report a live harness holder as held and a non-harness holder as not
+
+==== SCENARIO: S8 the ps route and the ps-free provider route reach the same identity verdict for real processes (control bytes, empty argv elements, comm with space/paren/newline, non-ASCII harness name) ====
+== live harness (pid 2412666)
+   ps        : verdict readable match=yes|fields comm=claude args=/tmp/fm-lab.VEsueQ/bin/claude\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ \"\$1\"\;\ :\ /tmp/fm-lab.VEsueQ/out/hold-session.pid\ 90 ppid=1310
+   denied-ps : verdict readable match=yes|fields comm=claude args=/tmp/fm-lab.VEsueQ/bin/claude\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ \"\$1\"\;\ :\ /tmp/fm-lab.VEsueQ/out/hold-session.pid\ 90 ppid=1310
+   PARITY verdict same (verdict readable match=yes)
+   fields identical
+== python control-byte argv (pid 2412940)
+   ps        : verdict readable match=no|fields comm=python3 args=/run/current-system/sw/bin/python3\ -c\ import\ time\;\ time.sleep\(60\)\ \ \ \ tab\?here\ cr\?\ unié\ sp\ ace\ a\)b\(c ppid=1310
+   denied-ps : verdict readable match=no|fields comm=python3 args=/run/current-system/sw/bin/python3\ -c\ import\ time\;\ time.sleep\(60\)\ \ \ \ tab\?here\ cr\?\ uni\?\?\ sp\ ace\ a\)b\(c ppid=1310
+   PARITY verdict same (verdict readable match=no)
+   fields differ between routes (byte rendering)
+== comm with space/paren/newline (pid 2414701)
+   ps        : verdict readable match=no|fields comm=sle\ ep\ \(x\?2 args=python3\ -c\ import\ ctypes\,sys\,time\ open\(sys.argv\[1\]\,\"w\"\).write\(\"%d\\n\"\ %\ __import__\(\"os\"\).getpid\(\)\)\ ctypes.CDLL\(None\).prctl\(15\,\ b\"sle\ ep\ \(x\\n2\"\,\ 0\,0\,0\)\ time.sleep\(60\)\ /tmp/fm-lab.VEsueQ/out/t3.pid ppid=1310
+   denied-ps : verdict readable match=no|fields comm=sle\ ep\ \(x\ 2 args=python3\ -c\ import\ ctypes\,sys\,time\ open\(sys.argv\[1\]\,\"w\"\).write\(\"%d\\n\"\ %\ __import__\(\"os\"\).getpid\(\)\)\ ctypes.CDLL\(None\).prctl\(15\,\ b\"sle\ ep\ \(x\\n2\"\,\ 0\,0\,0\)\ time.sleep\(60\)\ /tmp/fm-lab.VEsueQ/out/t3.pid ppid=1310
+   PARITY verdict same (verdict readable match=no)
+   fields differ between routes (byte rendering)
+== harness name with non-ASCII (pid 2414876)
+   ps        : verdict readable match=yes|fields comm=claude-é args=/tmp/fm-lab.VEsueQ/bin/claude-é\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ 60\;\ :\ /tmp/fm-lab.VEsueQ/out/t5.pid ppid=1310
+   denied-ps : verdict readable match=yes|fields comm=claude-\?\? args=/tmp/fm-lab.VEsueQ/bin/claude-\?\?\ -c\ printf\ \"%s\\n\"\ \"\$\$\"\ \>\ \"\$0\"\;\ sleep\ 60\;\ :\ /tmp/fm-lab.VEsueQ/out/t5.pid ppid=1310
+   PARITY verdict same (verdict readable match=yes)
+   fields differ between routes (byte rendering)
+== dead pid (pid 2415021)
+   ps        : verdict unreadable match=no|fields none
+   denied-ps : verdict unreadable match=no|fields none
+   PARITY verdict same (verdict unreadable match=no)
+   fields identical
+== live non-harness (pid 2409945)
+   ps        : verdict readable match=no|fields comm=python3 args=python3\ -c\ import\ os\,sys\,time\ open\(sys.argv\[1\]\,\"w\"\).write\(\"%d\\n\"\ %\ os.getpid\(\)\)\ time.sleep\(float\(sys.argv\[2\]\)\)\ /tmp/fm-lab.VEsueQ/out/plain.pid\ 90 ppid=1310
+   denied-ps : verdict readable match=no|fields comm=python3 args=python3\ -c\ import\ os\,sys\,time\ open\(sys.argv\[1\]\,\"w\"\).write\(\"%d\\n\"\ %\ os.getpid\(\)\)\ time.sleep\(float\(sys.argv\[2\]\)\)\ /tmp/fm-lab.VEsueQ/out/plain.pid\ 90 ppid=1310
+   PARITY verdict same (verdict readable match=no)
+   fields identical
+CHECK ok   - both routes reach the same identity verdict for every real process shape
+RESULT pass - S8 the ps route and the ps-free provider route reach the same identity verdict for real processes (control bytes, empty argv elements, comm with space/paren/newline, non-ASCII harness name)
+
+==== SCENARIO: S8b a ps-denied host and a ps host reach the same lock decision for the same owner state ====
+live-harness     ps      owner=2417750 -> fm-lock rc=1
+live-harness     denied  owner=2417750 -> fm-lock rc=1
+CHECK ok   - same decision on both routes for a live-harness owner (rc) (= 1)
+live-non-harness ps      owner=2424632 -> fm-lock rc=0
+live-non-harness denied  owner=2424632 -> fm-lock rc=0
+CHECK ok   - same decision on both routes for a live-non-harness owner (rc) (= 0)
+dead             ps      owner=2431623 -> fm-lock rc=0
+dead             denied  owner=2431623 -> fm-lock rc=0
+CHECK ok   - same decision on both routes for a dead owner (rc) (= 0)
+CHECK ok   - a live harness owner is still refused when ps is denied (= 1)
+CHECK ok   - a dead owner is reclaimed when ps is denied (= 0)
+CHECK ok   - a reused non-harness owner is reclaimed when ps is denied (= 0)
+RESULT pass - S8b a ps-denied host and a ps host reach the same lock decision for the same owner state
+
+==== SCENARIO: S9 Windows tagged win:<pid> owners: live harness and unreadable table block, absent/reused/malformed are reclaimable ====
+the reclaim verdict is the Windows-table read number 5 of this run
+    | uname: MINGW64_NT-10.0-26200
+    | lock before: win:7204
+    | fm-lock rc=1
+    | lock after: win:7204
+    | error: another live firstmate session holds the lock (pid win:7204); operate read-only until resolved
+CHECK ok   - a live tagged harness owner is not reclaimed (rc=1)
+CHECK ok   - the refusal names the tagged owner (contains: holds the lock (pid win:7204)
+CHECK ok   - the tagged lock is unchanged (= win:7204)
+    | uname: MINGW64_NT-10.0-26200
+    | lock before: win:7204
+    | fm-lock rc=1
+    | lock after: win:7204
+    | error: cannot identify this harness session on Windows: it publishes no session pid this build recognizes (see FM_WIN_HARNESS_PID_VARS in bin/fm-session-lock-lib.sh; CLAUDE_PID is taken only together with CLAUDE_CODE_SESSION_ID); operate read-only until resolved
+CHECK ok   - an unreadable Windows process table leaves the home read-only (rc=1)
+CHECK ok   - the lock survives a fully unreadable table (= win:7204)
+denying Windows-table read 5 of this run, the reclaim verdict's own read
+    | uname: MINGW64_NT-10.0-26200
+    | lock before: win:7204
+    | fm-lock rc=1
+    | lock after: win:7204
+    | error: another live firstmate session holds the lock (pid win:7204); operate read-only until resolved
+CHECK ok   - the reclaim gate is denied when the Windows table stops reading (rc=1)
+CHECK ok   - the gate refusal names the tagged owner (contains: holds the lock (pid win:7204)
+CHECK ok   - the lock survives a gate-time unreadable table (= win:7204)
+    | uname: MINGW64_NT-10.0-26200
+    | lock before: win:7204
+    | lock acquired: harness pid win:700
+    | fm-lock rc=0
+    | lock after: win:700
+CHECK ok   - a tagged pid absent from the table is reclaimed (rc=0)
+CHECK ok   - the tagged lock is replaced by this session (= win:700)
+    | uname: MINGW64_NT-10.0-26200
+    | lock before: win:7204
+    | lock acquired: harness pid win:700
+    | fm-lock rc=0
+    | lock after: win:700
+CHECK ok   - a tagged pid present as a live non-harness is reclaimed (rc=0)
+
+-- tagged record win:
+    | uname: MINGW64_NT-10.0-26200
+    | lock before: win:
+    | lock acquired: harness pid win:700
+    | fm-lock rc=0
+    | lock after: win:700
+CHECK ok   - malformed tagged record 'win:' is reclaimed (rc=0)
+CHECK ok   - record 'win:' is replaced by this session (= win:700)
+
+-- tagged record win:7abc
+    | uname: MINGW64_NT-10.0-26200
+    | lock before: win:7abc
+    | lock acquired: harness pid win:700
+    | fm-lock rc=0
+    | lock after: win:700
+CHECK ok   - malformed tagged record 'win:7abc' is reclaimed (rc=0)
+CHECK ok   - record 'win:7abc' is replaced by this session (= win:700)
+RESULT pass - S9 Windows tagged win:<pid> owners: live harness and unreadable table block, absent/reused/malformed are reclaimable
+
+==== OVERALL: 0 failed check(s) ====

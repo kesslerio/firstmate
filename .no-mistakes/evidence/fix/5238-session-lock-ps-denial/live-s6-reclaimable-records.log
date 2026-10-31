@@ -1,0 +1,47 @@
+== malformed/zero/empty record transcripts
+--- /tmp/fm-lab.VEsueQ/out/s6-000.log
+ps -V says: lock before: 000
+lock acquired: harness pid 2393217
+fm-lock rc=0
+lock after: 2393217
+--- /tmp/fm-lab.VEsueQ/out/s6-00.log
+ps -V says: lock before: 00
+lock acquired: harness pid 2389410
+fm-lock rc=0
+lock after: 2389410
+--- /tmp/fm-lab.VEsueQ/out/s6-0.log
+ps -V says: lock before: 0
+lock acquired: harness pid 2384332
+fm-lock rc=0
+lock after: 2384332
+--- /tmp/fm-lab.VEsueQ/out/s6-empty.log
+ps -V says: lock before: 
+lock acquired: harness pid 2404208
+fm-lock rc=0
+lock after: 2404208
+--- /tmp/fm-lab.VEsueQ/out/s6-not_a_pid.log
+ps -V says: lock before: not-a-pid
+lock acquired: harness pid 2396898
+fm-lock rc=0
+lock after: 2396898
+--- /tmp/fm-lab.VEsueQ/out/s6-space.log
+ps -V says: lock before:    
+lock acquired: harness pid 2406156
+fm-lock rc=0
+lock after: 2406156
+--- /tmp/fm-lab.VEsueQ/out/s6-win_7abc.log
+ps -V says: lock before: win:7abc
+lock acquired: harness pid 2401615
+fm-lock rc=0
+lock after: 2401615
+--- /tmp/fm-lab.VEsueQ/out/s6-win_.log
+ps -V says: lock before: win:
+lock acquired: harness pid 2399181
+fm-lock rc=0
+lock after: 2399181
+--- /tmp/fm-lab.VEsueQ/out/s6-zero-denied.log
+ps -V says: ps refused (rc=126)
+lock before: 00
+lock acquired: harness pid 2408468
+fm-lock rc=0
+lock after: 2408468

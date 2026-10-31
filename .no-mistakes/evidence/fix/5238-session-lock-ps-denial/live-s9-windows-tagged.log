@@ -1,0 +1,43 @@
+== Cygwin/MSYS tagged-owner transcripts
+--- /tmp/fm-lab.VEsueQ/out/s9-absent.log
+uname: MINGW64_NT-10.0-26200
+lock before: win:7204
+lock acquired: harness pid win:700
+fm-lock rc=0
+lock after: win:700
+--- /tmp/fm-lab.VEsueQ/out/s9-live.log
+uname: MINGW64_NT-10.0-26200
+lock before: win:7204
+fm-lock rc=1
+lock after: win:7204
+error: another live firstmate session holds the lock (pid win:7204); operate read-only until resolved
+--- /tmp/fm-lab.VEsueQ/out/s9-reused.log
+uname: MINGW64_NT-10.0-26200
+lock before: win:7204
+lock acquired: harness pid win:700
+fm-lock rc=0
+lock after: win:700
+--- /tmp/fm-lab.VEsueQ/out/s9-unreadable-gate.log
+uname: MINGW64_NT-10.0-26200
+lock before: win:7204
+fm-lock rc=1
+lock after: win:7204
+error: another live firstmate session holds the lock (pid win:7204); operate read-only until resolved
+--- /tmp/fm-lab.VEsueQ/out/s9-unreadable.log
+uname: MINGW64_NT-10.0-26200
+lock before: win:7204
+fm-lock rc=1
+lock after: win:7204
+error: cannot identify this harness session on Windows: it publishes no session pid this build recognizes (see FM_WIN_HARNESS_PID_VARS in bin/fm-session-lock-lib.sh; CLAUDE_PID is taken only together with CLAUDE_CODE_SESSION_ID); operate read-only until resolved
+--- /tmp/fm-lab.VEsueQ/out/s9-win_7abc.log
+uname: MINGW64_NT-10.0-26200
+lock before: win:7abc
+lock acquired: harness pid win:700
+fm-lock rc=0
+lock after: win:700
+--- /tmp/fm-lab.VEsueQ/out/s9-win_.log
+uname: MINGW64_NT-10.0-26200
+lock before: win:
+lock acquired: harness pid win:700
+fm-lock rc=0
+lock after: win:700

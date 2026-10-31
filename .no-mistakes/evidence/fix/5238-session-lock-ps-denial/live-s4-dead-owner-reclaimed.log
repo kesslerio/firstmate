@@ -1,0 +1,5 @@
+ps -V says: ps refused (rc=126)
+lock before: 2375787
+lock acquired: harness pid 2375818
+fm-lock rc=0
+lock after: 2375818

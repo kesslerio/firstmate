@@ -1,0 +1,10 @@
+$ bin/fm-lock.sh status   (live harness pid 2409797, real ps)
+lock: held by live harness pid 2409797
+$ bin/fm-lock.sh status   (same holder, denied ps)
+lock: held by live harness pid 2409797
+$ bin/fm-lock.sh status   (live non-harness pid 2409945)
+lock: stale (pid 2409945 dead or not a harness)
+$ bin/fm-lock.sh status   (dead pid 2410975)
+lock: stale (pid 2410975 dead or not a harness)
+$ bin/fm-lock.sh status   (record "00")
+lock: stale (pid 00 dead or not a harness)

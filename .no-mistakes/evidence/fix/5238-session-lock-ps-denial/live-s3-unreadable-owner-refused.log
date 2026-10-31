@@ -1,0 +1,4 @@
+ps -V says: lock before: 2370051
+fm-lock rc=1
+lock after: 2370051
+error: another live firstmate session holds the lock (pid 2370051); operate read-only until resolved
