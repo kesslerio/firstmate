@@ -465,7 +465,7 @@ test_kimi_unverified_gate() {
   pass "standalone kimi classifies unknown until the live verification gate opens"
 }
 
-test_pi_stream_version_floor_accepts_verified_and_newer() {
+test_pi_stream_version_floor_accepts_verified_rejects_unverified() {
   local version
   version=1.2.0
   fm_busy_pi_stream_version_supported "$version" \
@@ -740,7 +740,7 @@ test_launch_prompt_requires_a_captured_tail
 test_grok_regex_isolated
 test_codex_unverified_gate
 test_kimi_unverified_gate
-test_pi_stream_version_floor_accepts_verified_and_newer
+test_pi_stream_version_floor_accepts_verified_rejects_unverified
 test_cursor_ignores_rendered_and_native_signals
 test_dead_endpoint_overrides
 test_herdr_native_busy_only
