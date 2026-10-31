@@ -1,0 +1,23 @@
+== lab home: /tmp/fm-lab.74MrO2 ==
+== config/sol-cap ==
+max=1
+models=haiku
+
+== ceiling held by (scout5, live capped worker) ==
+scout5	haiku	1793436463	2012819
+scout5 worker pid=2012819
+
+== stop that capped worker (the session ends, its row's pid is no longer alive) ==
+    PID STAT COMMAND
+
+== a new capped dispatch must be admitted because the dead row does not count ==
+spawned scout6 harness=claude kind=scout window=primary:fm-scout6 worktree=/home/art/.treehouse/demo-242ea0/4/demo
+
+== registry after the admission (scout5's dead row retained as stop evidence, scout6 holds the slot) ==
+scout1	haiku	1793436197	1206702
+scout5	haiku	1793436463	2012819
+scout6	haiku	1793437022	771590
+
+== scout6 worker process ==
+    PID STAT COMMAND
+ 771590 Sl+  claude --dangerously-skip-permissions --add-dir /tmp/fm-lab.74MrO2/state/operational-inbox --add-dir /tmp/f

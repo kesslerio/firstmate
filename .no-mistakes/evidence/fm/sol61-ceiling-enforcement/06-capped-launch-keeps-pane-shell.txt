@@ -1,0 +1,13 @@
+== lab home: /tmp/fm-lab.PCyO3v (config/sol-cap: max=1, models=haiku) ==
+== a raw launch line that reports its own interpreter (\$0) was run twice ==
+   capped:   bin/fm-spawn.sh raw1 <proj> --scout --harness 'printf ... "$0" ...; exec sleep 600' --model haiku
+   uncapped: bin/fm-spawn.sh raw2 <proj> --scout --harness 'printf ... "$0" ...; exec sleep 600' --model sonnet
+
+capped launch interpreter : /run/current-system/sw/bin/bash
+uncapped launch interpreter: /run/current-system/sw/bin/bash
+
+== the capped launch is the interpreter the pane shell reported, not a substituted /bin/sh ==
+lab tmux pane shell (SHELL at server start): /run/current-system/sw/bin/bash
+
+== registry (only the capped raw1 holds a slot) ==
+raw1	haiku	1793436419	1781325

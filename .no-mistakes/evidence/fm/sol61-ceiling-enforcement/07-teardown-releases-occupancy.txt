@@ -1,0 +1,27 @@
+== lab home: /tmp/fm-lab.74MrO2 (config/sol-cap: max=1, models=haiku) ==
+
+== before: scout6 holds the one capped slot ==
+scout1	haiku	1793436197	1206702
+scout5	haiku	1793436463	2012819
+scout6	haiku	1793437022	771590
+
+== operator teardown of the capped worker ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.74MrO2
+teardown: reaping leaked worktree process group for scout6: 740208
+teardown: force-killing leaked worktree process group for scout6: 740208
+🌳 Worktree returned to pool.
+teardown scout6 complete (window primary:fm-scout6, worktree /home/art/.treehouse/demo-242ea0/4/demo)
+Backlog: scout6 just finished (this home keeps no markdown backlog at /tmp/fm-lab.74MrO2/data/backlog.md). Update /tmp/fm-lab.74MrO2/data/backlog.md - move scout6 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+
+== registry after teardown (scout6 releases its slot) ==
+scout1	haiku	1793436197	1206702
+scout5	haiku	1793436463	2012819
+scout6	haiku	1793437022	771590
+
+== a new capped dispatch is admitted after the confirmed teardown ==
+spawned scout7 harness=claude kind=scout window=primary:fm-scout7 worktree=/home/art/.treehouse/demo-242ea0/4/demo
+
+== registry after the new admission ==
+scout1	haiku	1793436197	1206702
+scout5	haiku	1793436463	2012819
+scout7	haiku	1793437055	935534

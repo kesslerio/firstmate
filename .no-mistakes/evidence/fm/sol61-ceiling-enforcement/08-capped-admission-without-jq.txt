@@ -1,0 +1,20 @@
+== lab home: /tmp/fm-lab.PCyO3v ==
+== poisoned jq on PATH (proves the ceiling machinery never shells out to jq) ==
+jq: this host has no jq (poisoned for the lab)
+jq exit=1
+
+== guard CLI with the poisoned jq ==
+active max=1 ceiling=1 models=haiku pattern=
+status exit=0
+1
+ceiling exit=0
+
+== a capped dispatch with the poisoned jq ==
+spawned raw3 harness=printf kind=scout window=primary:fm-raw3 worktree=/home/art/.treehouse/demo-eeeed7/2/demo
+
+== registry (raw3 claimed the slot with no jq available) ==
+raw1	haiku	1793436419	1781325
+raw3	haiku	1793437648	3371519
+
+== proof file ==
+capped-without-jq

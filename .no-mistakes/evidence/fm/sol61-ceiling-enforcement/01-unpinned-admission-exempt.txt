@@ -1,0 +1,19 @@
+== lab home: /tmp/fm-lab.PdbnBc ==
+== config/sol-cap ==
+max=1
+model-pattern=.*
+
+== spawn: unpinned worker (no --model) with model-pattern=.* ==
+(command) bin/fm-spawn.sh unpinned <proj> --scout --harness claude --backend tmux
+
+== state/unpinned.meta (model axis) ==
+window=primary:fm-unpinned
+harness=claude
+kind=scout
+model=default
+
+== registry sol-sessions.tsv after the unpinned admission ==
+$ cat /tmp/fm-lab.PdbnBc/state/sol-sessions.tsv
+cat: /tmp/fm-lab.PdbnBc/state/sol-sessions.tsv: No such file or directory
+(observed during the live run: no ledger file existed yet, so the unpinned worker claimed no slot;
+ the later pinned dispatch in 02 created the file with its own row only)

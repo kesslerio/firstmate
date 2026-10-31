@@ -1,0 +1,19 @@
+== lab home: /tmp/fm-lab.PCyO3v ==
+== config/sol-cap (only haiku is capped; max=1) ==
+max=1
+models=haiku
+
+== registry: only the capped raw1 holds a slot ==
+raw1	haiku	1793436419	1781325
+
+== raw2 requested an uncapped model (sonnet) while the capped ceiling was full ==
+spawn: spawned raw2 harness=printf kind=scout window=primary:fm-raw2 (exit 0)
+state/raw2.meta model axis: model=sonnet
+
+== the ceiling was not applied to raw2: the registry still holds only raw1 ==
+raw1	haiku	1793436419	1781325
+
+== both raw launches are live panes ==
+primary:1: bash* (1 panes) [80x24] 
+primary:2: fm-raw1 (1 panes) [80x24] 
+primary:3: fm-raw2 (1 panes) [80x24] 

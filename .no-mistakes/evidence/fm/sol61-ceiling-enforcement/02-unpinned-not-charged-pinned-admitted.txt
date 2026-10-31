@@ -1,0 +1,30 @@
+== lab home: /tmp/fm-lab.PdbnBc ==
+== config/sol-cap ==
+max=1
+model-pattern=.*
+
+== spawn: pinned capped model while the unpinned worker runs (the review fix) ==
+(command) bin/fm-spawn.sh pinned <proj> --scout --harness claude --model haiku --backend tmux
+result: spawned pinned harness=claude kind=scout window=primary:fm-pinned
+
+== state/pinned.meta ==
+window=primary:fm-pinned
+harness=claude
+kind=scout
+model=haiku
+
+== registry sol-sessions.tsv (only the pinned capped worker holds a slot) ==
+pinned	haiku	1793436325	1481404
+
+== tmux windows on the lab's private socket ==
+primary:1: bash* (1 panes) [80x24] 
+primary:2: fm-unpinned (1 panes) [80x24] 
+primary:3: fm-pinned (1 panes) [80x24] 
+
+== pinned pane (live claude worker) ==
+      captain inventory attested"…)
+  ⎿  done [at=1793436344]: lab scout report written to /tmp/fm-lab.PdbnBc/d
+     ata/pinned/report.md; worktree clean at 9dcf35d, empty captain invento
+     ry attested
+
+● The scout task is done. The one-line report is at

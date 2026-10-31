@@ -1,0 +1,26 @@
+== lab home: /tmp/fm-lab.PdbnBc ==
+== config/sol-cap ==
+max=1
+model-pattern=.*
+
+== ceiling already held by ==
+pinned	haiku	1793436325	1481404
+
+== spawn: a second pinned model at the ceiling ==
+(command) bin/fm-spawn.sh overflow <proj> --scout --harness claude --model sonnet --backend tmux
+
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task overflow (claude, sonnet) was refused. Active sessions: pinned (haiku, age 11m17s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+exit=1
+
+== registry after the refusal (unchanged; no claim for overflow) ==
+pinned	haiku	1793436325	1481404
+
+== resources created for overflow? ==
+state/overflow.meta: absent
+data/overflow contents: brief.md 
+worktree pool for this project after refusal: 4 slot(s)
+
+== tmux windows after the refusal (no fm-overflow window) ==
+primary:1: bash* (1 panes) [80x24] 
+primary:2: fm-unpinned (1 panes) [80x24] 
+primary:3: fm-pinned (1 panes) [80x24] 
