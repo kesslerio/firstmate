@@ -1,0 +1,117 @@
+TR=/tmp/fm-7168-r2.SeM1kF
+harness=claude TMUX_PANE=%0 socket=/tmp/fm-lab.3NH3xh/tmux FM_HOME=/tmp/fm-lab.3NH3xh
+
+===== S1 gap1: start-native from a session with no operator session refuses pre-flag
+rc=1
+fm-afk-launch: could not resolve a verifiable operator session for away supervision (no FM_SUPERVISOR_TARGET, TMUX_PANE, herdr, Rex, T3 thread, or Orca terminal in this session); refusing to arm away mode
+state:
+.
+..
+.afk-contract
+PASS: s1 native entry refuses before state/.afk with no operator session, posture record untouched
+
+===== S2 gap1: the same native entry still arms from the real tmux pane it runs in
+rc=0
+
+--- .afk:
+away
+1793436632
+--- daemon terminal record:
+none - native
+PASS: s2 a supported real tmux session arms and records the existing 'none - native' shape
+
+===== S3 gap1: a resolved-but-nonexistent endpoint is refused before arming (real probe)
+[start] rc=1
+fm-afk-launch: supervisor target 'no-such-session:0' does not resolve to a tmux endpoint; refusing to arm away mode. Set FM_SUPERVISOR_TARGET to firstmate's own pane
+PASS: s3 start refuses an unresolvable supervisor target before arming
+[start-native] rc=1
+fm-afk-launch: supervisor target 'no-such-session:0' does not resolve to a tmux endpoint; refusing to arm away mode. Set FM_SUPERVISOR_TARGET to firstmate's own pane
+PASS: s3 start-native refuses an unresolvable supervisor target before arming
+
+===== S4 gap1: a refused refresh preserves the prior armed lifecycle byte-for-byte
+rc=1
+fm-afk-launch: could not resolve a verifiable operator session for away supervision (no FM_SUPERVISOR_TARGET, TMUX_PANE, herdr, Rex, T3 thread, or Orca terminal in this session); refusing to arm away mode
+before: 3115480707 16 .afk
+1021799013 18 .subsuper-escalations
+2210368683 11 .subsuper-escalations.since
+2130806521 6 .subsuper-reported-stale-abc123
+after:  3115480707 16 .afk
+1021799013 18 .subsuper-escalations
+2210368683 11 .subsuper-escalations.since
+2130806521 6 .subsuper-reported-stale-abc123
+PASS: s4 refused refresh left the armed flag and stale escalation artifacts untouched
+
+===== S5 gap2: an Orca primary is refused by name on both launcher paths
+[start] rc=1
+fm-afk-launch: away supervision does not support supervisor backend 'orca' yet (supported: tmux herdr rex t3code); refusing to arm away mode. Run firstmate inside a supported session, or set FM_SUPERVISOR_BACKEND/FM_SUPERVISOR_TARGET explicitly
+PASS: s5 start recognizes the Orca terminal and refuses orca by name, before arming
+[start-native] rc=1
+fm-afk-launch: away supervision does not support supervisor backend 'orca' yet (supported: tmux herdr rex t3code); refusing to arm away mode. Run firstmate inside a supported session, or set FM_SUPERVISOR_BACKEND/FM_SUPERVISOR_TARGET explicitly
+PASS: s5 start-native recognizes the Orca terminal and refuses orca by name, before arming
+
+===== S6 gap2: the away daemon refuses orca at startup and logs the source
+rc=1
+afk: starting supervise daemon in foreground; keep this command as a tracked background session
+error: away-mode daemon does not support supervisor backend 'orca' yet (supported: tmux herdr rex t3code); set FM_SUPERVISOR_BACKEND=tmux|herdr|rex|t3code and FM_SUPERVISOR_TARGET to run firstmate's own pane under a supported backend
+--- state/.supervise-daemon.log:
+[2026-10-31T01:50:40-0700] startup failed: unsupported supervisor backend 'orca' (source=ORCA_TERMINAL_HANDLE)
+PASS: s6 daemon startup names orca and logs source=ORCA_TERMINAL_HANDLE instead of aiming at tmux
+
+===== S7 gap2: an innermost tmux pane inside an Orca terminal keeps tmux (not refused)
+rc=0
+
+PASS: s7 a tmux session nested in an Orca terminal keeps its own transport and arms
+
+===== S8 one supported-backend owner: an unsupported backend refuses on both paths
+[start] rc=1
+fm-afk-launch: away supervision does not support supervisor backend 'zellij' yet (supported: tmux herdr rex t3code); refusing to arm away mode. Run firstmate inside a supported session, or set FM_SUPERVISOR_BACKEND/FM_SUPERVISOR_TARGET explicitly
+PASS: s8 start refuses the unsupported backend from the shared list before arming
+[start-native] rc=1
+fm-afk-launch: away supervision does not support supervisor backend 'zellij' yet (supported: tmux herdr rex t3code); refusing to arm away mode. Run firstmate inside a supported session, or set FM_SUPERVISOR_BACKEND/FM_SUPERVISOR_TARGET explicitly
+PASS: s8 start-native refuses the unsupported backend from the shared list before arming
+
+===== S9 end-to-end: start launches a real daemon terminal in the lab socket, stop tears it down
+rc=0
+fm-afk-launch: daemon launched in detached tmux session 'fm-afk-daemon-2652997318-2962501-29211-1793436647', supervising %0
+--- daemon terminal record:
+tmux fm-afk-daemon-2652997318-2962501-29211-1793436647 
+--- lab tmux sessions:
+fm-afk-daemon-2652997318-2962501-29211-1793436647: 1 windows (created Sat Oct 31 01:50:48 2026)
+primary: 1 windows (created Sat Oct 31 01:49:44 2026)
+--- daemon log:
+[2026-10-31T01:50:48-0700] daemon starting (pid 2972772); target=%0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=90s
+[stop] rc=0
+fm-afk-launch: terminal close command failed, but exact absence was confirmed
+fm-afk-launch: away-posture record archived at /tmp/fm-7168-r2.SeM1kF/s9/state/afk-contracts/1793436645.afk-contract
+fm-afk-launch: away mode stopped; daemon terminal torn down, .afk cleared, and the posture record archived
+--- state after stop:
+.
+..
+afk-contracts
+home-summary.json
+.inactive-outcome-reconcile
+.last-check
+.last-heartbeat
+.last-watcher-beat
+.secondmate-liveness-tick
+.subsuper-last-housekeep
+.subsuper-last-scan
+.supervise-daemon.log
+.supervise-daemon.watcher.err
+terminal-outcomes
+.watcher-down
+--- lab tmux sessions after stop:
+primary: 1 windows (created Sat Oct 31 01:49:44 2026)
+PASS: s9 start armed and launched a real daemon terminal; stop cleared .afk and archived the record
+
+===== S10 docs split: direct daemon startup with no discovery warns and keeps the firstmate:0 fallback
+rc=1
+afk: starting supervise daemon in foreground; keep this command as a tracked background session
+warn: could not auto-discover supervisor pane (no FM_SUPERVISOR_TARGET, TMUX_PANE, HERDR_ENV/HERDR_PANE_ID, Rex block, single live T3 thread in this home, or Orca terminal); falling back to 'firstmate:0' - verify this is firstmate's pane
+error: supervisor target 'firstmate:0' does not resolve to a tmux pane; set FM_SUPERVISOR_TARGET
+--- daemon log:
+[2026-10-31T01:50:53-0700] startup failed: target 'firstmate:0' not found (backend=tmux)
+PASS: s10 direct daemon startup warns about the missing operator session and continues on the legacy firstmate:0 fallback (no refusal), matching docs/architecture.md
+
+===== SUMMARY pass=13 fail=0
+TR=/tmp/fm-7168-r2.SeM1kF (left for the outer teardown)

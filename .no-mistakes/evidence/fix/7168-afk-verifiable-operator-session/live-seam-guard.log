@@ -1,0 +1,4 @@
+probe=true FM_TEST_SEAM=<unset>
+rc=1
+fm-afk-launch: supervisor target 'no-such-session:0' does not resolve to a tmux endpoint; refusing to arm away mode. Set FM_SUPERVISOR_TARGET to firstmate's own pane
+PASS: a stray FM_AFK_LAUNCH_TARGET_PROBE without FM_TEST_SEAM=1 cannot bypass the real endpoint check

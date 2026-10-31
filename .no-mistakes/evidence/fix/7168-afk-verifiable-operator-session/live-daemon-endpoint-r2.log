@@ -1,0 +1,9 @@
+home=/tmp/fm-7168-daemon.rl2r6i
+=== daemon startup: FM_SUPERVISOR_TARGET=no-such-session:0 backend=tmux
+rc=1
+afk: starting supervise daemon in foreground; keep this command as a tracked background session
+error: supervisor target 'no-such-session:0' does not resolve to a tmux pane; set FM_SUPERVISOR_TARGET
+--- daemon log:
+[2026-10-31T01:52:07-0700] startup failed: target 'no-such-session:0' not found (backend=tmux)
+PASS: daemon startup refuses an unresolvable supervisor target (the check the launcher now mirrors)
+cleanup-home=/tmp/fm-7168-daemon.rl2r6i
