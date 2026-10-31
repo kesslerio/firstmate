@@ -519,12 +519,13 @@ leave_dead_link_locks() {  # <state> <lock>...
 }
 
 test_lock_reclaims_dead_steal_owner_without_nested_markers() {
-  local dir state lockdir fakebin lnlog rc
+  local dir state lockdir fakebin lnlog real_ln rc
   dir=$(make_case lock-dead-steal-owner)
   state="$dir/state"
   lockdir="$state/.contend.lock"
   fakebin="$dir/fakebin"
   lnlog="$dir/ln.log"
+  real_ln=$(command -v ln)
   mkdir "$lockdir"
   printf '%s\n' "$(dead_pid)" > "$lockdir/pid"
   leave_dead_link_locks "$state" "$lockdir.steal"
@@ -533,13 +534,13 @@ test_lock_reclaims_dead_steal_owner_without_nested_markers() {
 last=
 for arg do last=$arg; done
 printf '%s\n' "$last" >> "$FM_TEST_LN_LOG"
-exec /bin/ln "$@"
+exec "$FM_TEST_REAL_LN" "$@"
 SH
   chmod +x "$fakebin/ln"
   : > "$lnlog"
 
   rc=0
-  PATH="$fakebin:$PATH" FM_TEST_LN_LOG="$lnlog" FM_STATE_OVERRIDE="$state" bash -c '
+  PATH="$fakebin:$PATH" FM_TEST_LN_LOG="$lnlog" FM_TEST_REAL_LN="$real_ln" FM_STATE_OVERRIDE="$state" bash -c '
     . "$1"
     fm_lock_try_acquire "$2" || exit 8
     fm_lock_release "$2"
@@ -997,7 +998,7 @@ test_lock_reclaims_holder_whose_identity_no_longer_recomputes() {
   lockdir="$state/.watch.lock"
   # Naming the holder under the fixture root lets the suite's cleanup reap it
   # if an assertion below fails before the kill at the end.
-  (exec -a "$dir/holder" sleep 300) >/dev/null 2>&1 &
+  python3 -c 'import sys, time; time.sleep(300)' "$dir/holder" >/dev/null 2>&1 &
   live=$!
   identity=$(FM_STATE_OVERRIDE="$state" bash -c '. "$1"; fm_pid_identity "$2"' _ "$LIB" "$live") \
     || fail "could not identify the fixture holder"
@@ -1049,7 +1050,7 @@ test_lock_keeps_live_daemon_holder_with_stale_identity() {
   lockdir="$state/.supervise-daemon.lock"
   # Naming the holder under the fixture root lets the suite's cleanup reap it
   # if an assertion below fails before the kill at the end.
-  (exec -a "$dir/holder" sleep 300) >/dev/null 2>&1 &
+  python3 -c 'import sys, time; time.sleep(300)' "$dir/holder" >/dev/null 2>&1 &
   live=$!
   identity=$(FM_STATE_OVERRIDE="$state" bash -c '. "$1"; fm_pid_identity "$2"' _ "$LIB" "$live") \
     || fail "could not identify the fixture daemon"
