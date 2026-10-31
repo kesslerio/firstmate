@@ -17,6 +17,9 @@
 #         --source S --event E [--turn-ended]
 #       Append one lifecycle event: validate the gen against the armed
 #       sidecar, advance seq under the lock, atomically replace the record.
+#       A non-busy event also clears active stream evidence and closes any
+#       request ordering record, so a settled or unknown worker never leaves
+#       an observation standing.
 #       --turn-ended also touches state/<id>.turn-ended, the watcher
 #       notification, under the same lock, so a writer whose gen was refused,
 #       or whose incarnation is replaced right after, never signals the
@@ -41,9 +44,10 @@
 #
 #   stream <state-dir> <id> <open|progress|close> --gen G --request N
 #       Mutate the optional Pi stream contract owned by fm-busy-lib.sh.
-#       Open requires a newer request; progress requires the active request
-#       and a busy pi-ext record. Close removes active evidence before persisting
-#       closed ordering, so a persistence failure cannot leave observation active.
+#       Open requires a strictly newer request; open and progress both require
+#       a busy pi-ext record, and progress and close must name the recorded
+#       request. Close removes active evidence before persisting closed
+#       ordering, so a persistence failure cannot leave observation active.
 #
 # Exit codes: 0 applied; 1 refused (stale gen, unarmed task, lock timeout,
 # invalid input); 2 usage. Adapter hook command lines append `|| true` so a
