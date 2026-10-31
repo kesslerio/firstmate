@@ -1,0 +1,16 @@
+FM_TEST_BEGIN 2026-10-31T06:00:41Z tests/fm-pi-worker-stream-live-e2e.test.sh family=live-harness-optin expected_gate_skip=live-capability
+ok - real Pi 1.2.0 stream, tool, completion, and background request phases
+ok - real Pi 1.2.0 default-off worker
+Firstmate model-stream observation write failed; inspect worker instrumentation.
+ok - real Pi 1.2.0 instrumentation deadline terminated writer and output-holding descendant
+ok - real Pi 1.2.0 stream, tool, completion, and background request phases
+# pi-signed unavailable: signed executable not exercised
+ok - real Pi 1.2.0 worker stream lifecycle, background exclusion, and default-off behavior
+FM_TEST_END 2026-10-31T06:01:07Z tests/fm-pi-worker-stream-live-e2e.test.sh exit=0 duration_ms=26018 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=26089
+FM_TEST_SUMMARY_FAMILY family=live-harness-optin count=1 duration_ms=26018 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-pi-worker-stream-live-e2e.test.sh duration_ms=26018
+
+real	0m26.115s
+user	0m7.342s
+sys	0m4.411s

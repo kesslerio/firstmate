@@ -1,0 +1,49 @@
+=== case 1: opted-in following stream silence escalates through the real inspection cadence
+watch exit=0  output:
+    stale: live:fm-stream (idle 1s, possible wedge, escalation 1, model stream silent for 7s (foreground request))
+ok   - escalation reason names model-stream silence
+ok   - escalation used the existing inspection wording (no new recovery path)
+ok   - reason carries the observed silence duration
+ok   - worker endpoint still alive after the notification (inspection only)
+--- wake queue rows:
+    1793427833	1	stale	live:fm-stream	stale: live:fm-stream (idle 1s, possible wedge, escalation 1, model stream silent for 7s (foreground request))
+=== case 2c: an unset, zero, negative, malformed, or out-of-range option is off
+ok   - option 'unset' stays off (no timer, no wake)
+ok   - option '0' stays off (no timer, no wake)
+ok   - option '-5' stays off (no timer, no wake)
+ok   - option 'abc' stays off (no timer, no wake)
+ok   - option '1000000000' stays off (no timer, no wake)
+=== case 1b: the same opt-in silence escalates while the pane display keeps changing
+ok   - the worker pane really is changing between polls
+watch exit=0  output:
+    stale: live:fm-stream (idle 2s, possible wedge, escalation 1, model stream silent for 8s (foreground request))
+ok   - changing-pane path still names model-stream silence
+=== case 2a: default-off (option unset) keeps the general busy bound - no stream timer, no wake
+watch exit=124 (124 = still supervising, i.e. nothing surfaced)
+--- output:
+    Terminated                 sleep "$POLL"
+ok   - the poll really processed the worker window
+ok   - no model-silence timer or wake with the option unset
+=== case 2b: default-off still enforces the pre-existing general busy bound, without stream wording
+watch exit=0  output:
+    stale: live:fm-stream (idle 2s, possible wedge, escalation 1)
+ok   - general busy bound still escalates with the option unset
+ok   - default-off escalation carries no model-stream claim
+ok   - close: request changed during publication preparation (guard hook fired)
+  close watcher output: 
+ok   - close: obsolete observation published no model-silence wake and cleared its timer
+ok   - close: no escalation count or cap marker committed for the cancelled wake
+ok   - progress: request changed during publication preparation (guard hook fired)
+  progress watcher output: 
+ok   - progress: obsolete observation published no model-silence wake and cleared its timer
+ok   - progress: no escalation count or cap marker committed for the cancelled wake
+ok   - replace: request changed during publication preparation (guard hook fired)
+  replace watcher output: 
+ok   - replace: obsolete observation published no model-silence wake and cleared its timer
+ok   - replace: no escalation count or cap marker committed for the cancelled wake
+=== summary
+ALL CHECKS PASSED
+
+real	1m38.611s
+user	0m12.695s
+sys	0m15.556s

@@ -1,0 +1,45 @@
+
+== open current request
+v1 gen=g1793427813.975954.6459 request=1 rev=1 ts=1793427814
+
+== close the request (assistant completion / tool start)
+$ fm-busy-event.sh stream /tmp/fm-stream-writer-live.nxW8Xh stream close --gen g1793427813.975954.6459 --request 1
+  exit=0
+ok   - close removed active evidence
+ok   - closed ordering retained
+
+== delayed progress for the closed request
+$ fm-busy-event.sh stream /tmp/fm-stream-writer-live.nxW8Xh stream progress --gen g1793427813.975954.6459 --request 1
+  exit=1
+ok   - late progress could not recreate closed evidence
+
+== duplicate open of the same request
+$ fm-busy-event.sh stream /tmp/fm-stream-writer-live.nxW8Xh stream open --gen g1793427813.975954.6459 --request 1
+  exit=1
+ok   - duplicate open refused
+
+== newer request opens, then stale request 1 activity
+$ fm-busy-event.sh stream /tmp/fm-stream-writer-live.nxW8Xh stream progress --gen g1793427813.975954.6459 --request 1
+  exit=1
+ok   - superseded request left the replacement untouched
+$ fm-busy-event.sh stream /tmp/fm-stream-writer-live.nxW8Xh stream close --gen g1793427813.975954.6459 --request 1
+  exit=1
+ok   - superseded close left the replacement untouched
+
+== re-armed worker rejects its previous generation
+ok   - arm cleared the previous incarnation evidence
+$ fm-busy-event.sh stream /tmp/fm-stream-writer-live.nxW8Xh stream open --gen g1793427813.975954.6459 --request 3
+error: stale busy-state gen for stream (event rejected)
+  exit=1
+ok   - old-generation open refused
+
+== unarmed task
+$ fm-busy-event.sh stream /tmp/fm-stream-writer-live.nxW8Xh unarmed open --gen g1793427814.976891.22832 --request 1
+error: no armed busy-state gen for unarmed
+  exit=1
+ok   - unarmed task cannot open evidence
+
+== retire clears everything for the incarnation
+ok   - retire removed the incarnation stream files
+
+ALL CHECKS PASSED
