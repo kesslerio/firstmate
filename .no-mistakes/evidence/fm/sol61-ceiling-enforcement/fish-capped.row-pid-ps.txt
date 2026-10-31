@@ -1,0 +1,6 @@
+registry pid for task-a = 1476418
+    PID    PPID STAT COMMAND         COMMAND
+1476418 1469447 S+   fish            /tmp/fishlab/bin/fish -c export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='/tmp/fm-lab.XOmKvr/state/task-a.inbox'; '/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC8966QSSJ/bin/fm-git-strip-ai-trailers.sh' env-file '/tmp/fm-lab.XOmKvr/state/task-a.git-hooks' '/tmp/fm-task-a+9ab1d02e43ae2d9de1780730fc42421c5fc4afe128b89d63e13c3dc9f4b0e759/git-config.s1793448036.1465641.17457.sh' && . '/tmp/fm-task-a+9ab1d02e43ae2d9de1780730fc42421c5fc4afe128b89d63e13c3dc9f4b0e759/git-config.s1793448036.1465641.17457.sh' || return 1 2>/dev/null || exit 1; /tmp/fm-lab.XOmKvr/bin/worker --brief (printf %s fish-pane)
+--- process chain from the worker up to the claimed pid:
+1476747 1476418 S+   sleep
+1476418 1469447 S+   fish

@@ -1,0 +1,12 @@
+state entries before: home-summary.json
+sol-sessions.tsv
+task-a.git-hooks
+task-a.meta
+state entries after: home-summary.json
+sol-sessions.tsv
+task-a.git-hooks
+task-a.meta
+treehouse pool before: proj-a27d9e
+update-check.json
+treehouse pool after: proj-a27d9e
+update-check.json

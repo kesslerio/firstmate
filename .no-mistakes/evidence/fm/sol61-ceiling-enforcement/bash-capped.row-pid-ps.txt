@@ -1,0 +1,5 @@
+registry pid for task-a = 1432055
+    PID    PPID STAT COMMAND         COMMAND
+1432055 1427312 S+   sleep           sleep 600
+--- process chain from the worker up to the claimed pid:
+1432055 1427312 S+   sleep

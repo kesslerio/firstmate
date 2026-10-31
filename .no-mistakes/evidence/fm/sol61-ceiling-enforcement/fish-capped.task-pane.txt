@@ -1,0 +1,50 @@
+treehouse get
+Welcome to fish, the friendly interactive shell
+Type help for instructions on how to use fish
+art@zeppola /t/f/proj (main)> treehouse get
+🌳 Setting up worktree...
+🌳 Entered worktree at ~/.treehouse/proj-66e0d9/1/proj. Type 'exit' to return.
+Welcome to fish, the friendly interactive shell
+Type help for instructions on how to use fish
+art@zeppola ~/.t/p/1/proj ((a6ba1528))> cd -- '/tmp/fm-lab.XOmKvr/user-home/.treehouse/proj-66e0d9/1/proj'
+art@zeppola ~/.t/p/1/proj ((a6ba1528))> export GOTMPDIR=/tmp/fm-task-a/gotmp
+art@zeppola ~/.t/p/1/proj ((a6ba1528))> export COMPACT_ADVISER_DISABLE=1
+art@zeppola ~/.t/p/1/proj ((a6ba1528))> export FM_TASK_ID=task-a
+art@zeppola ~/.t/p/1/proj ((a6ba1528))> . '/tmp/fm-task-a+9ab1d02e43ae2d9de1780730fc42421c5fc4afe128b89d63e13c3dc9f4b0e759/launch.s1793448036.1465641.17457.sh'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

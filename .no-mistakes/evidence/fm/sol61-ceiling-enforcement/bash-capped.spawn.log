@@ -1,0 +1,5 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7oEH9C
+warning: /tmp/fm-lab.7oEH9C/data/task-a/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-a
+warning: /tmp/fm-lab.7oEH9C/data/task-a/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+spawned task-a harness=worker kind=ship mode=no-mistakes yolo=off window=lab:fm-task-a worktree=/tmp/fm-lab.7oEH9C/user-home/.treehouse/proj-a27d9e/1/proj
+SPAWNRC=0

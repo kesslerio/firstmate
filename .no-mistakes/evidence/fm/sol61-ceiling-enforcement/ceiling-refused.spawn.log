@@ -1,0 +1,3 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7oEH9C
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-b (worker, probe-sol) was refused. Active sessions: task-a (probe-sol, age 5s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+SPAWNRC=1

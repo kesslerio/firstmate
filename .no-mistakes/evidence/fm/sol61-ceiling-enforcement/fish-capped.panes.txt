@@ -1,0 +1,2 @@
+bash pane=%0 cmd=bash path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC8966QSSJ
+fm-task-a pane=%1 cmd=fish path=/tmp/fm-lab.XOmKvr/user-home/.treehouse/proj-66e0d9/1/proj

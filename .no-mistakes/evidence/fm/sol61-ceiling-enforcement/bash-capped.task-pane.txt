@@ -1,0 +1,50 @@
+treehouse get
+
+[art@zeppola:/tmp/fm-lab.7oEH9C/proj]$ treehouse get
+🌳 Setting up worktree...
+🌳 Entered worktree at ~/.treehouse/proj-a27d9e/1/proj. Type 'exit' to return.
+
+[art@zeppola:~/.treehouse/proj-a27d9e/1/proj]$ cd -- '/tmp/fm-lab.7oEH9C/user-home/.treehouse/proj-a27d9e/1/proj'
+
+[art@zeppola:~/.treehouse/proj-a27d9e/1/proj]$ export GOTMPDIR=/tmp/fm-task-a/gotmp
+export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:~/.treehouse/proj-a27d9e/1/proj]$ export COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=task-a
+
+[art@zeppola:~/.treehouse/proj-a27d9e/1/proj]$ export FM_TASK_ID=task-a
+
+[art@zeppola:~/.treehouse/proj-a27d9e/1/proj]$ . '/tmp/fm-task-a+1f2715aeba896c7d6ae9a7824dd9a2fce1d160220399d5f7988f6464f782de09/launch.s1793448017.1426391.16262.sh'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

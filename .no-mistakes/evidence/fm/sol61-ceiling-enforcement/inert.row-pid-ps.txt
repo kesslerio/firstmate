@@ -1,0 +1,19 @@
+registry pid for task-a = <none>
+error: list of process IDs must follow -p
+
+Usage:
+ ps [options]
+
+ Try 'ps --help <simple|list|output|threads|misc|all>'
+  or 'ps --help <s|l|o|t|m|a>'
+ for additional help text.
+
+For more details see ps(1).
+--- process chain from the worker up to the claimed pid:
+1400999 1394113 S+   sleep
+1394113 1394020 S    bash
+1394020 1393933 Sl   treehouse
+1393933 1392691 Ss   bash
+1392691    1310 Ss   tmux: server
+   1310       1 Ss   systemd
+      1       0 Ss   systemd
