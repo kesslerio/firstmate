@@ -1,0 +1,63 @@
+### The reported CI failure: 'Lint 2' == bin/fm-lint.sh --partition 2of2 (ci.yml matrix partition 2)
+### Reproduced on head 6e26ecbf (pre-fix bin/fm-session-lock-lib.sh), fixed on head 3b3a9e65
+
+=== A) bare ShellCheck, exactly the invocation that failed: shellcheck --norc --external-sources bin/backends/rex.sh
+--- pre-fix tree (/tmp/fm-lintrepro.NfT6k0, lib from 6e26ecbf) ---
+In bin/backends/rex.sh line 1337:
+        ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+In bin/backends/rex.sh line 1338:
+                     ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+                             ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+In bin/backends/rex.sh line 1339:
+  ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+          ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+In bin/backends/rex.sh line 1343:
+        ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+                ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+In bin/backends/rex.sh line 1348:
+      ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+              ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+In bin/backends/rex.sh line 1352:
+      ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+              ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+In bin/backends/rex.sh line 1355:
+                                 ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+  https://www.shellcheck.net/wiki/SC2128 -- Expanding an array without an ind...
+  https://www.shellcheck.net/wiki/SC2178 -- Variable was used as an array but...
+rc=1
+--- fixed tree (head 3b3a9e65) ---
+rc=0
+
+=== B) The repo's own lint owner, source-following, explicit path
+--- pre-fix tree ---
+fm-lint.sh: ShellCheck 0.11.0 (pinned 0.11.0)
+fm-lint.sh: full ShellCheck extended analysis enabled
+
+In bin/backends/rex.sh line 1337:
+  local fields="state=$1" msg=${4:-} title=${5:-} progress=${6:-}
+        ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+
+
+rc=1 (SC2178/SC2128 in bin/backends/rex.sh)
+--- fixed tree ---
+fm-lint.sh: ShellCheck 0.11.0 (pinned 0.11.0)
+fm-lint.sh: full ShellCheck extended analysis enabled
+rc=0
+
+=== C) CI lane reproduction on the fixed head: bin/fm-lint.sh --partition 2of2
+  (full log: lint-2of2.log)
+fm-lint.sh: ShellCheck 0.11.0 (pinned 0.11.0)
+fm-lint: begin bin/backends/rex.sh (shard 0, full mode)
+fm-lint: end bin/backends/rex.sh reason=ok rc=0 duration_ms=8179 rss_kib=unavailable
+fm-lint-workflows.sh: actionlint 1.7.12 (pinned 1.7.12)
+rc=0
+  rex.sh line from that lane:
+fm-lint: begin bin/backends/rex.sh (shard 0, full mode)
+fm-lint: end bin/backends/rex.sh reason=ok rc=0 duration_ms=8179 rss_kib=unavailable
+  final: rc=0
+  roots linted in the lane: 281
+
+=== D) The changed file itself lints clean under the same owner (source-following)
+  bin/fm-session-lock-lib.sh rc=0
+  bin/fm-lock.sh rc=0
+  bin/fm-agent-process-lib.sh rc=0

@@ -1,0 +1,25 @@
+ok - live owner with unreadable identity returns a successful verdict
+ok - partial identity reads block reclaim; successfully empty args remain readable
+ok - empty, whitespace and non-numeric lock records allow acquisition
+ok - acquisition refuses a live owner with unreadable identity
+ok - 126-route parse assigns each field and refuses a blank ppid
+ok - provider records off the defined shape are refused, not parsed
+ok - a provider record with an empty comm field reports a present pid
+ok - ps 1 stays a stop with the provider untouched; ps 127 routes to it
+ok - refused -p with a live ps -V stays a stop; the denial check is cached once
+ok - the denied-ps diagnostic prints once per shell, whatever reads follow
+ok - ps returning no name stays a present pid, never a reclaimable stale one
+ok - denied ps: own lock is owned, foreign live harness is refused and named
+ok - linux route parses a fixture /proc tree through the repo's override hook
+ok - Unicode identity survives denied ps; controls flatten and live Cursor blocks reclaim
+ok - ps denied: ancestry and liveness still resolve through the OS provider
+ok - ps denied with no provider data: the walk refuses, it never guesses
+ok - ps denied: a chain containing no harness is still no harness
+ok - ps works: the fallback provider is never consulted
+ok - e2e blocked ps: the real platform provider identified a real harness tree, identity included
+ok - fm-procinfo.py: macOS-only, skipped
+ok - fm-procinfo.py fail-closed: macOS-only, skipped
+ok - route equivalence: macOS-only, skipped
+ok - control bytes preserve identical identity fields across routes
+ok - trailing empty argv elements are dropped; interior empties and argument spaces survive
+ALL PASS

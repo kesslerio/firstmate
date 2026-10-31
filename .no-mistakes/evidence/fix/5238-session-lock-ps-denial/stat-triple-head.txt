@@ -1,0 +1,13 @@
+case1 rc=0 triple=[1000	claude	claude --resume]
+case2 rc=0 triple=[1000	cl aude	claude --resume]
+case3 rc=0 triple=[1000	a)b	claude --resume]
+case4 rc=0 triple=[1000	José	claude --resume]
+case5 rc=0 triple=[1000	agent	claude --resume]
+case6 rc=1 triple=[]
+case7 rc=0 triple=[1000	claude	claude --resume]
+case8 rc=0 triple=[1000	claude	claude --resume]
+case9 rc=1 triple=[]
+case10 rc=1 triple=[]
+case11 rc=0 triple=[1234	claude	claude --resume]
+args-utf8=[0	x	café
+ctlend]

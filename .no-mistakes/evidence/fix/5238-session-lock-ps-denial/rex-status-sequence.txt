@@ -1,0 +1,5 @@
+### The unrelated consumer file ShellCheck flagged is byte-identical to main's, and still produces its OSC 7501 record:
+git diff base..HEAD -- bin/backends/rex.sh:
+  (no output = untouched)
+
+^[]7501;state=blocked:kind=approval:app=firstmate:id=task42:progress=40:title=QXBwcm92ZSBkZXBsb3k=:msg=TmVlZCB5b3VyIGNhbGw=^[\

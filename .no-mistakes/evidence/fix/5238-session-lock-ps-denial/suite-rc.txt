@@ -1,0 +1,4 @@
+windows-consumers rc=0
+ps-denied rc=0
+inbox rc=0
+ancestry rc=1

@@ -1,67 +1,82 @@
-# Live validation - fix/5238 session lock ps-denial (head a5b0e0a4)
+# Test evidence - fix/5238 session-lock ps-denial (head 3b3a9e65)
 
-Host: Linux (NixOS), x86_64. Worktree: no-mistakes gate worktree for the branch.
-Change under test: ps-free process identity for the firstmate session lock
-(`bin/fm-session-lock-lib.sh`, `bin/fm-procinfo.py`) plus the shared verdict
-consumers (`bin/fm-lock.sh`, `bin/fm-inbox.sh`, `bin/fm-claude-stop-autoarm.sh`,
-both turn-end guards) and docs.
+Change under validation: `3b3a9e65 fix(session-lock): parse /proc stat fields as
+stat_fields so rex.sh lints clean` on top of the PR head `6e26ecbf`.
 
-## How the ps denial was made real
-Every denied-ps run executed inside `unshare -r -m --propagation private`, where
-`mount --bind /dev/null "$(command -v ps)"` removes the ps binary's ability to
-exec. The OS then refuses the exec exactly as the intent describes:
+The author's intent is narrow and is what this run tests:
 
-    ps -V            -> "Permission denied", rc=126
-    ps -o comm= -p 1 -> "Permission denied", rc=126
+1. the maintainer's `full-ci` **Lint 2** failure must be fixed at its source -
+   ShellCheck's source-following made the new `/proc` stat parser's array local
+   `fields` clash with `bin/backends/rex.sh`'s own string `fields`
+   (SC2178/SC2128), failing that lane on `6e26ecbf` while main's lane passes;
+2. **lock behavior must not change**;
+3. the PR body must keep its `Closes #5238` line;
+4. the corrected head must reach the fork so the maintainer's lanes rerun
+   (owned by the outer executor's push/CI phases, not performed here).
 
-This is the same status `fm_proc_info` uses to route a read to the ps-free
-provider; nothing in the product was stubbed, patched, or bypassed. Sessions were
-real long-lived processes whose `comm`/`args` are harness-shaped (a `claude`-named
-executable), started as parents of a real shell that ran the real product
-scripts. Homes were disposable `bin/fm-lab-home.sh create` labs, removed after
-each run; no operator home, fleet state, or credential was touched.
+Hardware/OS: Linux (NixOS) x86_64, ShellCheck 0.11.0 - the version
+`bin/fm-lint.sh` pins (`REQUIRED_SHELLCHECK=0.11.0`).
 
-## Logs in this directory
-| file | what it shows |
-| --- | --- |
-| `01-ps-denied-suite.log` | `tests/fm-session-lock-ps-denied.test.sh` - ALL PASS |
-| `02-windows-consumers-suite.log` | `tests/fm-session-lock-windows-consumers.test.sh` - exit 0 |
-| `03-inbox-suite.log` | `tests/fm-inbox.test.sh` - exit 0 |
-| `04-ancestry-suite.log` | `tests/fm-session-lock-ancestry.test.sh` - 21 ok, 1 known pre-existing failure (`the pty-host was not reparented to init after the daemon ended`, an environment/reparent assumption already reported in earlier rounds) |
-| `05-live-denied-ps-matrix.log` | live accept/refuse matrix under a genuine ps exec denial |
-| `06-live-ps-available-baseline.log` | the same matrix with ps working, for regression |
-| `07-live-guard-denied-ps.log` | the Cursor turn-end guard driven live under denied ps: live owner -> no takeover, dead owner -> reclaim |
-| `08-live-stop-autoarm-denied-ps.log` | the Claude Stop auto-arm driven live under denied ps: live owner -> inert, dead owner -> reclaim |
-| `09-live-claude-guard-denied-ps.log` | the Claude turn-end guard driven live under denied ps: live owner -> the "owned by another live session" systemMessage, dead owner -> the blind-supervision path |
+## The reported failure, reproduced and fixed (`lint-repro.txt`)
 
-## Live matrix result (05, 06)
-Both runs produce the same verdicts; only the identity route differs.
+`Lint 2` in `.github/workflows/ci.yml` is matrix partition 2, i.e.
+`bin/fm-lint.sh --partition 2of2`. A control tree was made by copying the
+worktree and restoring only `bin/fm-session-lock-lib.sh` from `6e26ecbf`
+(the pre-fix head), so the two trees differ only in this commit.
 
-| step | denied ps (05) | ps available (06) |
+| invocation | pre-fix lib (`6e26ecbf`) | head (`3b3a9e65`) |
 | --- | --- | --- |
-| route equivalence for the same live pids | identical comm/args/ppid | identical |
-| session A acquires | rc=0, `.lock`=A, `status` = held by live harness, `inbox ready` = held/live_harness=true | same |
-| session B (second live harness) | rc=1, "another live firstmate session holds the lock (pid A)", `.lock` unchanged, A alive | same |
-| stale record naming a live NON-harness pid | reclaimed, `.lock` rewritten | reclaimed |
-| live owner whose identity is unreadable (`/proc/<pid>` hidden) | rc=1, `.lock` unchanged, inbox = unknown/live_harness=null | same |
-| A exits | next session reclaims, rc=0 | same |
-| dead / `0` / empty / non-numeric record | reclaimed, rc=0 | same |
+| `shellcheck --norc --external-sources bin/backends/rex.sh` | rc=1, SC2178 + SC2128 at rex.sh:1337-1355 | rc=0 |
+| `bin/fm-lint.sh bin/backends/rex.sh` (source-following) | rc=1, same diagnostics | rc=0 |
+| `bin/fm-lint.sh --partition 2of2` (the CI lane) | - | rc=0, 281 roots, `bin/backends/rex.sh reason=ok rc=0` |
+| `bin/fm-lint.sh bin/fm-session-lock-lib.sh` | - | rc=0 |
+| `bin/fm-lint.sh bin/fm-lock.sh` | - | rc=0 |
 
-Stop auto-arm (08): with A live and a supervision need staged, the auto-arm fired
-from a second real harness exits 0 and leaves `.lock`=A. With A dead and its
-record left in place the same auto-arm reclaims the lock (`.lock` becomes the new
-session's harness pid) and then reaches its normal arming path, which refuses to
-arm from a disposable validation checkout - the environment guard for labs, not a
-lock verdict.
+`bin/backends/rex.sh` was not modified by this branch
+(`git diff bb3e690..HEAD -- bin/backends/rex.sh` is empty) and still emits its
+OSC 7501 record (`rex-status-sequence.txt`). The rename matches the repo's other
+`/proc` readers: `bin/fm-remote-job-lib.sh:980` and `bin/fm-teardown.sh:2333`
+also use `local -a stat_fields`, and no file uses `stat_fields` as a string.
 
-Claude turn-end guard (09): with A live the guard emits
-`{"systemMessage":"FIRSTMATE SUPERVISION IS OWNED BY ANOTHER LIVE SESSION ... (lock owner pid <A>)"}`
-and exits 0 with the lock untouched; with A dead it instead takes the
-blind-supervision block path (rc=2). The different outcomes on the same home
-show the guard's branch is driven by the shared live-owner verdict.
+## Lock behavior unchanged
 
-Cursor turn-end guard (07): with A live, the Cursor turn-end guard run from a second real harness
-exits 0 and leaves `.lock`=A (no takeover). With A dead and its record left in
-place, the same guard reclaims through `bin/fm-lock.sh` and `.lock` becomes the new
-session's harness pid - so the recovery caller is neither wedged nor a takeover
-path on the ps-free route.
+* `stat-triple-head.txt` vs `stat-triple-prefix.txt`: the real
+  `fm_linux_stat_triple` parser (the only function this commit touches) driven
+  over 12 `/proc` stat-line cases - comm with spaces, an embedded `)`, valid
+  UTF-8 (`José`), collapsed runs of spaces, missing ppid, non-numeric ppid,
+  no `(...)` at all - produces byte-identical output on both trees (empty diff).
+* `live-matrix-head.txt` vs `live-matrix-prefix.txt`: the real
+  `bin/fm-lock.sh` was driven from harness-shaped sessions (a `claude`-named
+  executable as the session parent) in disposable marked lab homes
+  (`bin/fm-lab-home.sh create`) under a **genuine ps exec denial**
+  (`unshare -r -m` + `mount --bind /dev/null "$(command -v ps)"`, `ps -V`
+  rc=126). Both trees give the same verdicts (`live-matrix-parity.diff` is
+  empty):
+  * S1 session A acquires: rc=0, `.lock`=A, `status` = `lock: held by live
+    harness pid A`;
+  * S2 a second live session is refused: rc=1
+    `error: another live firstmate session holds the lock (pid A);
+    operate read-only until resolved`, `.lock` unchanged, A still alive;
+  * S3 A exits, its stale record stays, the next session reclaims:
+    rc=0, `.lock` rewritten to the new harness pid.
+
+## Focused suites (targeted, on this head)
+
+| log | suite | result |
+| --- | --- | --- |
+| `test-ps-denied.log` | `tests/fm-session-lock-ps-denied.test.sh` | ALL PASS (24 cases, incl. the blocked-ps real-process-tree e2e, the Unicode/live-Cursor verdict case, and route equivalence) |
+| `test-windows-consumers.log` | `tests/fm-session-lock-windows-consumers.test.sh` | rc=0 |
+| `test-inbox.log` | `tests/fm-inbox.test.sh` | rc=0 |
+| `test-ancestry.log` | `tests/fm-session-lock-ancestry.test.sh` | 21 ok, 1 known pre-existing failure: `the pty-host was not reparented to init after the daemon ended`. The same assertion exists on the base commit (`git show bb3e690:tests/fm-session-lock-ancestry.test.sh` line 1135) and asserts the host reparents orphans to pid 1, which this host does not; already reported in earlier rounds, unrelated to this commit. |
+
+## Not performed here
+
+The push of the corrected head to the fork and the maintainer's CI rerun are the
+outer executor's push/CI phases; at the time of this run the fork branch and PR
+head still pointed at `6e26ecbf`. The PR body was read (not modified) and still
+opens with `Closes #5238`.
+
+## Cleanup
+
+The control tree, scratch dirs and lab homes were removed; the worktree is
+clean (`git status --short` empty).

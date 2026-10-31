@@ -1,0 +1,23 @@
+### label=prefix tree=fm-lintrepro.NfT6k0
+  ps -V rc=126  (126 == exec refused by the OS)
+  ps -o comm= rc=126
+### S1: session A (real harness-shaped process) acquires on the denied-ps host
+    acquire rc=0 out=[lock acquired: harness pid 2355568]
+    lock=[2355568]
+    status=[lock: held by live harness pid 2355568]
+    session A anchor pid=2355568  alive=yes
+### S2: session B, a second live harness, tries the same home
+    acquire rc=1 out=[error: another live firstmate session holds the lock (pid 2355568); operate read-only until resolved]
+    lock=[2355568]
+    status=[lock: held by live harness pid 2355568]
+    lock after B=[2355568] (must still be A=2355568)
+    A alive after B: yes
+### S3: the owner exits; its stale record stays; the next session reclaims
+    owner gone: yes
+    stale record=[2355568]
+    acquire rc=0 out=[lock acquired: harness pid 2356905]
+    lock=[2356905]
+    status=[lock: held by live harness pid 2356905]
+### teardown
+DONE
+SCRATCH removed: /tmp/fm-live-prefix.xx5zwN
