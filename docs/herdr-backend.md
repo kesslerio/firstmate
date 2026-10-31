@@ -884,12 +884,14 @@ A fresh spawn never meets this: it gets a new pane with nothing bound.
 
 So a **relaunch** preserves the binding instead of fighting it: before the Pi-family launch line is composed, `bin/fm-spawn.sh` reads the pane's recorded session reference through `fm_backend_herdr_pane_agent_session_ref` and passes it back as Pi's own `--session <path-or-id>` (`relaunch_resume_args`; `bin/fm-control-lib.sh`'s `fm_control_relaunch_resume_flag` owns which adapters and which registration labels qualify).
 The replacement therefore starts on the exact identity the authority is bound to, and its `working`/`idle`/`blocked` reports land again.
+When a concrete model is requested, the relaunch reads the model reported by that session and refuses to resume if the pin does not match; a provider-qualified pin must match exactly, while an unqualified pin may match the reported model id.
 The reference is the endpoint's own record, never a guess about which session is recent, and only a `pi` label may supply it: a registration belonging to another adapter is ignored, as is an unreadable, missing, or malformed one, in which case the relaunch is the ordinary fresh session it always was.
 A relaunch that changes harness AWAY from Pi is not repaired by this and keeps the pre-existing behavior; only the adapter the authority belongs to can resume its session.
 
 The session file may not exist any more: Pi creates it at exactly that path, so the identity survives either way.
 The read grants no send, close, or lifecycle authority of its own - it is a read of Herdr's record.
-The portable halves are pinned by `tests/fm-backend-herdr.test.sh` (the read, against a canned CLI) and `tests/fm-control.test.sh` (the per-adapter rule), and `tests/fm-control-herdr-smoke.test.sh` exercises the relaunch path against the real binary; the versioned live measurement, including the reproduction and the resume that lifts it, is [`verification/runtime-backends.md`](verification/runtime-backends.md) "Pane status authority across a relaunch".
+The portable halves are pinned by `tests/fm-backend-herdr.test.sh` (the read, against a canned CLI), `tests/fm-control.test.sh` (the per-adapter rule), and `tests/fm-control-relaunch.test.sh` (the requested-model assertion); `tests/fm-control-herdr-smoke.test.sh` exercises the relaunch path against the real binary.
+The versioned live measurement, including the reproduction and the resume that lifts it, is [`verification/runtime-backends.md`](verification/runtime-backends.md) "Pane status authority across a relaunch".
 
 ## Push events and polling fallback
 
