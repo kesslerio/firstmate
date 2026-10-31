@@ -1,0 +1,28 @@
+--- ready: daemon wake handling ---
+wake queue after handling: [1793444233 1 heartbeat heartbeat heartbeat]
+escalation records: 1
+--- submitted lines in the supervisor pane ---
+injection :: ⁣FIRSTMATE_OP: v1 away-supervisor: Supervisor escalate (1 event(s)): ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker (pre-read; re-arm not needed — watcher daemon-managed)
+PASS: daemon escalated ready work into the live supervisor pane
+--- pane capture (tail) ---
+❯ ⁣FIRSTMATE_OP: v1 away-supervisor: Supervisor escalate (1 event(s)): ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or
+❯ ⁣FIRSTMATE_OP: v1 away-supervisor: Supervisor escalate (1 event(s)): ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or
+❯ ⁣FIRSTMATE_OP: v1 away-supervisor: Supervisor escalate (1 event(s)): ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or
+
+❯
+--- daemon stderr (tail) ---
+--- daemon log (tail) ---
+--- empty: daemon wake handling ---
+wake queue after handling: []
+escalation records: 0
+--- submitted lines in the supervisor pane ---
+PASS: empty produced no dispatch wake and acknowledged the heartbeat
+--- pane capture (tail) ---
+
+
+
+
+
+--- daemon stderr (tail) ---
+--- daemon log (tail) ---
+TOTAL FAILURES: 0

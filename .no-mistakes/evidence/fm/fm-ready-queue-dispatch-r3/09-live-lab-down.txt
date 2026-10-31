@@ -1,0 +1,6 @@
+stopped: lab tmux server and lab processes
+removed: task temp /tmp/fm-lab7504a73d2d00-worker+9703e74747587fa7cd4760bc0c3c903c6270542aa2fcbd9cd48a16aca555f1f1
+removed: task temp /tmp/fm-lab7504a73d2d00-worker
+removed: 2 Claude project entries under /tmp/fmlab-base.nogyri/lab
+warning: ~/.treehouse gained entries during the lab; left as is: notes-62244c
+removed: /tmp/fmlab-base.nogyri/lab

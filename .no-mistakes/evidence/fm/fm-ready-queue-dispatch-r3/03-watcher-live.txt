@@ -1,0 +1,82 @@
+=== scenario S1: landed dependency, no status events, no away record ===
+ok: added cap-ready -> Queued
+task:
+  id: cap-ready
+  title: beyond current spend cap
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-31
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start cap-ready` to move it to in flight
+  - Run `tasks-axi block cap-ready --by <other>` to record a dependency
+ok: added dependency -> Queued
+task:
+  id: dependency
+  title: landed dependency
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-31
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start dependency` to move it to in flight
+  - Run `tasks-axi block dependency --by <other>` to record a dependency
+ok: block cap-ready -> blocked-by dependency
+help[2]:
+  - Run `tasks-axi unblock cap-ready --by <other>` to clear it
+  - Run `tasks-axi ready` to see what is still dispatchable
+ok: done dependency -> Done (pr https://github.com/example/fixture/pull/1)
+help[1]:
+  - Run `tasks-axi ready` to dispatch work unblocked by this
+--- tasks-axi ready (what the watcher consumes) ---
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  cap-ready,queued,task,"-",beyond current spend cap
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+--- queue before the heartbeat ---
+
+--- running the real watcher (FM_HEARTBEAT=1) ---
+watcher exit=0; stdout=[heartbeat]
+--- durable wake queue ---
+1793443981	1	heartbeat	heartbeat	heartbeat
+--- drain output (supervision host home) ---
+drain exit=0
+1:1793443981	1	heartbeat	heartbeat	heartbeat
+--- watcher stderr (tail) ---
+
+=== scenario S3a: empty queue must stay quiet ===
+watcher rc=124 (124 = still running, i.e. absorbed)
+/tmp/drive-watcher.sh: line 54: /tmp/fm-lab.MlYjvo/state/.wake-queue: No such file or directory
+stdout=[] wake-queue-size=0 heartbeat-streak=3
+
+=== scenario S3b: held queue must stay quiet ===
+watcher rc=124 (124 = still running, i.e. absorbed)
+/tmp/drive-watcher.sh: line 67: /tmp/fm-lab.8m0WiI/state/.wake-queue: No such file or directory
+stdout=[] wake-queue-size=0 heartbeat-streak=3
+
+=== scenario S3c: unreadable readiness must escalate ===
+watcher rc=0; stdout=[heartbeat]

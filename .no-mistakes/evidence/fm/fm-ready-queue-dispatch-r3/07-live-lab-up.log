@@ -1,0 +1,14 @@
+lab: /tmp/fmlab-base.nogyri/lab (tear down with: bin/fm-live-lab.sh down /tmp/fmlab-base.nogyri/lab)
+tree: 81f817b154c258c2459c97fdfc292499df8102cc from /home/art/.no-mistakes/worktrees/9f75ec418609/01M68S4R3Z86VFFVT7AQQMHENQ
+spawned lab7504a73d2d00-worker harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-lab7504a73d2d00-worker worktree=/home/art/.treehouse/notes-62244c/1/notes
+gate: /tmp/fmlab-base.nogyri/lab/home/data/lab7504a73d2d00-worker/gate (touch, then message the worker to resume)
+primary: claude --setting-sources project,local --model sonnet --effort medium --permission-mode auto
+ok primary: claude pid 4103908 in /tmp/fmlab-base.nogyri/lab/home
+ok probe: the primary answered LABREADY-7504a73d2d00
+ok trust: /tmp/fmlab-base.nogyri/lab/home is trusted in the Claude store
+ok mirror: verified writer, check passed, captain=1 main=1
+ok host: supervision host pid 4134931
+ok watcher: live watcher with a fresh beacon
+ok worker: lab7504a73d2d00-worker parked on /tmp/fmlab-base.nogyri/lab/home/data/lab7504a73d2d00-worker/gate
+fail treehouse: new ~/.treehouse entries: notes-62244c
+not ready after 240s; the lab is left up for inspection: bin/fm-live-lab.sh pane /tmp/fmlab-base.nogyri/lab, then bin/fm-live-lab.sh down /tmp/fmlab-base.nogyri/lab

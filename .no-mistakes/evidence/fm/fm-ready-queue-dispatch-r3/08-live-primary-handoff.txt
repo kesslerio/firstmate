@@ -1,0 +1,32 @@
+=== unit readback after MAIN processed the handoff ===
+task:
+  id: lab7504a73d2d00-next
+  title: ready queued unit for the live handoff
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+  priority: "-"
+  created: 2026-10-31
+  closed: "-"
+  deps: none
+  links: none
+  body: "Not dispatched: no project (repo) and no task description recorded, so there is nothing for a worker to build. Retry once a project and a concrete ask are added to this item."
+
+=== outcome store ===
+{"seq":1,"task":"lab7504a73d2d00-worker","verdict":"routine","silent":true,"summary":"Worker is paused awaiting its gate file; gate not present, nothing new, no action taken."}
+{"seq":2,"task":"lab7504a73d2d00-worker","verdict":"routine","silent":true,"summary":"Stale check: worker still paused on its gate file (not present), no pending steers; nothing to recover, no action taken."}
+{"seq":3,"task":"fleet","verdict":"captain","silent":false,"summary":"Ready queued unit lab7504a73d2d00-next has no blockers, holds, or live worker; MAIN please dispatch it this turn. Worker lab7504a73d2d00-worker remains paused on its gate file."}
+
+=== pending (unprocessed) outcomes ===
+{"seq":1,"epoch":1793444677,"task":"lab7504a73d2d00-worker","wake":"signal: /tmp/fmlab-base.nogyri/lab/home/state/lab7504a73d2d00-worker.status /tmp/fmlab-base.nogyri/lab/home/state/lab7504a73d2d00-worker.turn-ended","verdict":"routine","summary":"Worker is paused awaiting its gate file; gate not present, nothing new, no action taken.","silent":true,"statusEndpoint":130,"statusIdent":"strong:66306:65936621:2026-10-31 04:03:36.948968692 -0700"}
+{"seq":2,"epoch":1793444708,"task":"lab7504a73d2d00-worker","wake":"stale: firstmate:fm-lab7504a73d2d00-worker","verdict":"routine","summary":"Stale check: worker still paused on its gate file (not present), no pending steers; nothing to recover, no action taken.","silent":true,"statusEndpoint":130,"statusIdent":"strong:66306:65936621:2026-10-31 04:03:36.948968692 -0700"}
+{"seq":3,"epoch":1793444943,"task":"fleet","wake":"heartbeat","verdict":"captain","summary":"Ready queued unit lab7504a73d2d00-next has no blockers, holds, or live worker; MAIN please dispatch it this turn. Worker lab7504a73d2d00-worker remains paused on its gate file.","silent":false,"statusEndpoint":0,"statusIdent":"-"}
+
+=== wake queue (empty means acknowledged) ===
+=== host log tail ===
