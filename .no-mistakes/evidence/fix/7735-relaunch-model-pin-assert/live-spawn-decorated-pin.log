@@ -1,0 +1,2 @@
+warn: model pin was not honored pin 'sonnet[1m]' but pinned Claude session 9a7b4558-29f9-452a-bbc4-eb61fdc45944 reports 'claude-sonnet-5-5'
+spawned lab-pin-decorated-probe harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-lab-pin-decorated-probe worktree=/home/art/.treehouse/notes-4adbff/2/notes

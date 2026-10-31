@@ -1,0 +1,13 @@
+lab: /tmp/fmlab.XZXka1 (tear down with: bin/fm-live-lab.sh down /tmp/fmlab.XZXka1)
+tree: 9047798eb492f23f4acf8acfd0080c9c14d7fa2f from /home/art/.no-mistakes/worktrees/9f75ec418609/01M68AE0Y9VDZCW4BD9B078ABT
+spawned lab21d983ae983e-worker harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-lab21d983ae983e-worker worktree=/home/art/.treehouse/notes-4adbff/1/notes
+gate: /tmp/fmlab.XZXka1/home/data/lab21d983ae983e-worker/gate (touch, then message the worker to resume)
+primary: claude --setting-sources project,local --model haiku --effort low --permission-mode auto
+ok primary: claude pid 2052922 in /tmp/fmlab.XZXka1/home
+ok probe: the primary answered LABREADY-21d983ae983e
+ok trust: /tmp/fmlab.XZXka1/home is trusted in the Claude store
+ok host: none running, as expected
+ok watcher: live watcher with a fresh beacon
+ok worker: lab21d983ae983e-worker parked on /tmp/fmlab.XZXka1/home/data/lab21d983ae983e-worker/gate
+fail treehouse: new ~/.treehouse entries: notes-4adbff project-441974
+not ready after 420s; the lab is left up for inspection: bin/fm-live-lab.sh pane /tmp/fmlab.XZXka1, then bin/fm-live-lab.sh down /tmp/fmlab.XZXka1

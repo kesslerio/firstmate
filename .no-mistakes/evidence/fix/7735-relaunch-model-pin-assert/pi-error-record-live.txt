@@ -1,0 +1,2 @@
+{"model":"qwen3.8-flash-next","provider":"john-lan","stopReason":"stop","errorMessage":"null"}
+{"model":"does-not-exist-9","provider":"john-lan","stopReason":"error","errorMessage":"404: {\"message\":\"The model `does-not-exist-9` does not exist. Valid aliases: qwen3.8-flash-next.\",\"type\":\"NotFoundError\",\"param\":\"model\",\"code\":404}"}

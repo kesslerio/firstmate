@@ -1,0 +1,29 @@
+treehouse get
+[art@zeppola:/tmp/fmlab.XZXka1/home/projects/notes]$ treehouse get
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+🌳 Setting up worktree...
+🌳 Entered worktree at ~/.treehouse/notes-4adbff/2/notes. Type 'exit' to return.
+[art@zeppola:~/.treehouse/notes-4adbff/2/notes]$ cd -- '/home/art/.treehouse/notes-4adbff/2/notes'
+[art@zeppola:~/.treehouse/notes-4adbff/2/notes]$ export GOTMPDIR=/tmp/fm-lab-pin-decorated-probe/gotmp
+export COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=lab-pin-decorated-probe
+[art@zeppola:~/.treehouse/notes-4adbff/2/notes]$ export COMPACT_ADVISER_DISABLE=1
+[art@zeppola:~/.treehouse/notes-4adbff/2/notes]$ export FM_TASK_ID=lab-pin-decorated-probe
+[art@zeppola:~/.treehouse/notes-4adbff/2/notes]$ . '/tmp/fm-lab-pin-decorated-probe+6bdd44e4bfaebb2a5e74146fa3b66b777b5d6fd8d0c2156e0301e6774b0c2a27/launch.s1793430121.3159740.13471.sh'
+ ▐▛███▛█   Claude Code v2.1.314
+▝▜██████▀  Sonnet 5.5 with low effort · Claude Max
+ ▝▝   ▝▝   ~/.treehouse/notes-4adbff/2/notes
+❯ : Firstmate operational input waiting: read '/tmp/fmlab.XZXka1/home/state/operational-inbox/1793430122-b8ae274850294307.msg' and handle its contents as Firstmate operational input.                                      
+  Read 1 file (ctrl+o to expand)                      
+● Bash(echo "done [at=$(date +%s)]: lab model-pin probe, no files changed" >> '/tmp/fmlab.XZXka1/home/state/lab-pin-decorated-probe.status')
+  ⎿  (No output)                                                                                                                            
+  ⎿  Allowed by auto mode
+● I appended one status line to the status file saying I'm a lab model-pin probe, and I changed no files. I didn't create the branch, run the isolation checks or commit anything. The brief said "end your turn
+  immediately", so I read that as overriding its setup and delivery steps.
+  I marked the line done because the brief gave no other state for a probe.                                                                                                                                                 
+✻ Brewed for 6s · done 12:02 AM                                                                                                                                                                                           
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle)                                                                                                                                                                                    

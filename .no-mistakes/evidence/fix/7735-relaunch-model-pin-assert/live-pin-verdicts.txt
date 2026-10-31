@@ -1,0 +1,20 @@
+# live fm-spawn model-pin verdicts (real Claude Code 2.1.314 (Claude Code))
+
+## asserted: pin 'sonnet' (lab gated worker, real spawn)
+note [at=1793429622]: model pin asserted: pin 'sonnet' actual 'claude-sonnet-5-5' (pinned Claude session e76d255b-d06f-40f7-927f-c5d65978e8ef)
+   transcript: /home/art/.claude/projects/-home-art--treehouse-notes-4adbff-1-notes/e76d255b-d06f-40f7-927f-c5d65978e8ef.jsonl
+   reported:   claude-sonnet-5-5
+   launch:     
+
+## mismatch: pin 'sonnet[1m]' (decorated id), spawn still succeeds
+note [at=1793430126]: model pin mismatch: pin 'sonnet[1m]' but pinned Claude session 9a7b4558-29f9-452a-bbc4-eb61fdc45944 reports 'claude-sonnet-5-5'
+   spawn said: spawned lab-pin-decorated-probe harness=claude ... (exit 0)
+   blocked decisions: 0
+
+## unverified: pin 'claude-does-not-exist-9' (no model ran)
+note [at=1793430150]: model pin unverified: pin 'claude-does-not-exist-9' was not confirmed by pinned Claude session 7f8ea697-e169-4aa2-8bcd-aba7895bc5ed (no session-reported model)
+
+## unpinned launch: no --session-id, no pin note
+   --session-id occurrences on launch line: 0
+   status: done [at=1793430174]: lab model-pin probe; no files changed, branch fm/lab-pin-unpinned-probe at seed HEAD
+   model-pin notes recorded: 0
