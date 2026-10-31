@@ -1,0 +1,4 @@
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M68GCSRABZ6XBT0NN9A2PP05/bin/fm-wake-lib.sh: line 19: mkdir: command not found
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M68GCSRABZ6XBT0NN9A2PP05/bin/fm-supervision-instructions.sh: line 146: sed: command not found
+jq: error: Could not open file /tmp/fm-session-start-tests.Zf9C4I/context-digest/home/state/home-summary.json: No such file or directory
+not ok - a locked session start did not publish the home summary ledger
