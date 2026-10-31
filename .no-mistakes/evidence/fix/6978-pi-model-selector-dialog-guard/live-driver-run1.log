@@ -1,0 +1,15 @@
+## pi version: 1.4.0 ; tmux: tmux 3.6a
+ok - a real idle pi pane (cursor in its composer) is not named as a blocking dialog
+ok - the live /model selector is named: Pi model selector
+ok - with the highlight on a non-current model the selector is still named: Pi model selector
+ok - the send was refused (rc=1)
+ok - the refusal names the dialog: error: blocked on a prompt: Pi model selector 
+ok - the probe text was never typed into the selector
+ok - the selector pane is byte-identical before and after the refused send
+ok - the selector is still open after the refused send (no Enter was sent to it)
+ok - a real pi composer accepts a send (no dialog refusal; send rc=0)
+ok - the typed text is visible in the real pi pane
+ok - a quoted selector above a live bare '>' composer is not named as a dialog
+ok - the quoted-selector pane accepted the send (send rc=0)
+ok - the typed command actually ran in the live pane
+ALL LIVE SCENARIOS PASSED

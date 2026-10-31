@@ -1,10 +1,44 @@
+> cat quoted-frame.txt
+────────────────────────────────────────────────────────────────────────────
 
-[art@zeppola:/tmp/fm-piwork.MZBBH5]$ echo "  ✓ alpha-model-one [localfake]"; echo "→   beta-model-tw
-o [localfake]"; echo "  Enter to select · Ctrl+S to set as default · Escape/Ctrl+C to cancel"
+Only showing models from configured providers. Use /login to add providers.
+
+>
+
   ✓ alpha-model-one [localfake]
 →   beta-model-two [localfake]
+    gamma-model-three [localfake]
+
+  Model Name: beta-model-two
+
+  Model catalogs refreshed.
+
   Enter to select · Ctrl+S to set as default · Escape/Ctrl+C to cancel
+────────────────────────────────────────────────────────────────────────────
+> echo quoted-selector-negative-probe-ok
+quoted-selector-negative-probe-ok
+>
 
-[art@zeppola:/tmp/fm-piwork.MZBBH5]$ # quoted-control probe
 
-[art@zeppola:/tmp/fm-piwork.MZBBH5]$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

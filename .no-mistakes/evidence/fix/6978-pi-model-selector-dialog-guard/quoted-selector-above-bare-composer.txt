@@ -1,0 +1,44 @@
+> cat quoted-frame.txt
+────────────────────────────────────────────────────────────────────────────
+
+Only showing models from configured providers. Use /login to add providers.
+
+>
+
+  ✓ alpha-model-one [localfake]
+→   beta-model-two [localfake]
+    gamma-model-three [localfake]
+
+  Model Name: beta-model-two
+
+  Model catalogs refreshed.
+
+  Enter to select · Ctrl+S to set as default · Escape/Ctrl+C to cancel
+────────────────────────────────────────────────────────────────────────────
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

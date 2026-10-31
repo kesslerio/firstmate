@@ -1,0 +1,4 @@
+--- base (pre-fix) matcher on the live /model capture:
+rc=1 no-dialog (guard dead)
+--- target (fixed) matcher on the same capture:
+Pi model selectorrc=0 dialog-named
