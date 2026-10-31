@@ -1,0 +1,15 @@
+# Live drive: real private tmux pane (no fake tmux) + real bin/fm-watch.sh + real bin/fm-busy-event.sh
+# Fixture: armed busy pi-ext record, open foreground request, stream evidence backdated 600s,
+# FM_STREAM_SILENT_MAX_SECS=300, FM_BUSY_TURN_MAX_SECS=99999, FM_STALE_ESCALATE_SECS=2.
+
+LAB=/tmp/fm-streamfinal.GwFzOF
+firstmate:fm-stream
+watcher exited after ~5s
+--- watch stdout:
+stale: firstmate:fm-stream (idle 2s, possible wedge, escalation 1, model stream silent for 602s (foreground request))
+--- wake queue:
+1793447341	1	stale	firstmate:fm-stream	stale: firstmate:fm-stream (idle 2s, possible wedge, escalation 1, model stream silent for 602s (foreground request))
+--- escalation count:
+1
+--- triage log tail:
+[2026-10-31T04:48:59-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream

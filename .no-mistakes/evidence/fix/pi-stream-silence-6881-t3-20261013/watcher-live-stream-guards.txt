@@ -1,0 +1,144 @@
+# Live drive per mode: real private tmux pane + real bin/fm-watch.sh + real bin/fm-busy-event.sh.
+# resume/close: the watcher enters the model-stream ladder, then the worker writes live
+#   progress or closes the request before the escalate threshold re-fires.
+# off: FM_STREAM_SILENT_MAX_SECS unset leaves the general busy bound in force.
+# cap: FM_WEDGE_MAX_ESCALATIONS=1 terminal wake carrying the model-stream evidence.
+# counterfault: the count-file write is refused; the uncapped route still delivers one wake.
+# foreign/malformed: non-Pi harness and malformed evidence convey no model-phase observation.
+
+=============== mode=resume
+firstmate:fm-stream
+watcher reached the model-stream busy ladder
+sent live foreground progress
+--- mode=resume watcher_alive_after_wait=yes exit=143
+--- watch stdout:
+--- wake queue:
+(none)
+--- escalation count:
+(none)
+--- cap markers:
+(none)
+--- model stream files:
+/tmp/fm-stream-resume.bWW0mg/state/stream.model-progress
+/tmp/fm-stream-resume.bWW0mg/state/stream.model-stream
+/tmp/fm-stream-resume.bWW0mg/state/stream.model-stream-order
+--- episode marker:
+(none)
+--- triage log:
+[2026-10-31T04:56:54-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream
+
+=============== mode=close
+firstmate:fm-stream
+watcher reached the model-stream busy ladder
+closed the foreground request
+--- mode=close watcher_alive_after_wait=yes exit=143
+--- watch stdout:
+--- wake queue:
+(none)
+--- escalation count:
+(none)
+--- cap markers:
+(none)
+--- model stream files:
+/tmp/fm-stream-close.w2xBv1/state/stream.model-stream-order
+--- episode marker:
+(none)
+--- triage log:
+[2026-10-31T04:57:05-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream
+
+=============== mode=off
+firstmate:fm-stream
+--- mode=off watcher_alive_after_wait=yes exit=143
+--- watch stdout:
+--- wake queue:
+(none)
+--- escalation count:
+(none)
+--- cap markers:
+(none)
+--- model stream files:
+/tmp/fm-stream-off.kFbHwt/state/stream.model-stream
+/tmp/fm-stream-off.kFbHwt/state/stream.model-stream-order
+--- episode marker:
+(none)
+--- triage log:
+(none)
+
+=============== mode=cap
+firstmate:fm-stream
+--- mode=cap watcher_alive_after_wait=no exit=0
+--- watch stdout:
+stale: firstmate:fm-stream (idle 3s, possible wedge, escalation 1, model stream silent for 603s (foreground request)), PERMANENTLY-WEDGED: FM_WEDGE_MAX_ESCALATIONS=1 reached - no further wedge escalations for this WINDOW while its cap marker stands: until FM_CAP_HORIZON_SECS elapses, the crew resumes, or the operator manually removes STATE/.wedge-permanent-<key>
+--- wake queue:
+1793447848	1	stale	firstmate:fm-stream	stale: firstmate:fm-stream (idle 3s, possible wedge, escalation 1, model stream silent for 603s (foreground request)), PERMANENTLY-WEDGED: FM_WEDGE_MAX_ESCALATIONS=1 reached - no further wedge escalations for this WINDOW while its cap marker stands: until FM_CAP_HORIZON_SECS elapses, the crew resumes, or the operator manually removes STATE/.wedge-permanent-<key>
+--- escalation count:
+--- cap markers:
+/tmp/fm-stream-cap.tqqj8J/state/.wedge-permanent-firstmate_fm-stream
+/tmp/fm-stream-cap.tqqj8J/state/.wedge-terminal-queued-firstmate_fm-stream
+(none)
+--- model stream files:
+/tmp/fm-stream-cap.tqqj8J/state/stream.model-stream
+/tmp/fm-stream-cap.tqqj8J/state/stream.model-stream-order
+--- episode marker:
+/tmp/fm-stream-cap.tqqj8J/state/.model-stream-episode-firstmate_fm-stream
+--- triage log:
+[2026-10-31T04:57:25-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream
+[2026-10-31T04:57:28-0700] wedge permanently capped: firstmate:fm-stream (escalation 1, max 1, hash 9c8a77ee3bca)
+
+=============== mode=counterfault
+firstmate:fm-stream
+--- mode=counterfault watcher_alive_after_wait=no exit=0
+--- watch stdout:
+rm: cannot remove '/tmp/fm-stream-counterfault.YWbi6C/state/.wedge-escalations-firstmate_fm-stream': Is a directory
+stale: firstmate:fm-stream (idle 3s, possible wedge, escalation 1, model stream silent for 603s (foreground request))
+--- wake queue:
+1793447852	1	stale	firstmate:fm-stream	stale: firstmate:fm-stream (idle 3s, possible wedge, escalation 1, model stream silent for 603s (foreground request))
+--- escalation count:
+(none)
+--- cap markers:
+(none)
+--- model stream files:
+/tmp/fm-stream-counterfault.YWbi6C/state/stream.model-stream
+/tmp/fm-stream-counterfault.YWbi6C/state/stream.model-stream-order
+--- episode marker:
+/tmp/fm-stream-counterfault.YWbi6C/state/.model-stream-episode-firstmate_fm-stream
+--- triage log:
+[2026-10-31T04:57:29-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream
+[2026-10-31T04:57:32-0700] wedge_timer_check: escalation counter write FAILED for firstmate:fm-stream (/tmp/fm-stream-counterfault.YWbi6C/state/.wedge-escalations-firstmate_fm-stream); the next poll restarts this window's count at 1
+
+=============== mode=foreign
+firstmate:fm-stream
+--- mode=foreign watcher_alive_after_wait=yes exit=143
+--- watch stdout:
+--- wake queue:
+(none)
+--- escalation count:
+(none)
+--- cap markers:
+(none)
+--- model stream files:
+/tmp/fm-stream-foreign.xjWxrP/state/stream.model-stream
+/tmp/fm-stream-foreign.xjWxrP/state/stream.model-stream-order
+--- episode marker:
+(none)
+--- triage log:
+(none)
+
+=============== mode=malformed
+firstmate:fm-stream
+--- mode=malformed watcher_alive_after_wait=yes exit=143
+--- watch stdout:
+--- wake queue:
+(none)
+--- escalation count:
+(none)
+--- cap markers:
+(none)
+--- model stream files:
+/tmp/fm-stream-malformed.O8hUr4/state/stream.model-stream
+/tmp/fm-stream-malformed.O8hUr4/state/stream.model-stream-order
+--- episode marker:
+(none)
+--- triage log:
+(none)
+

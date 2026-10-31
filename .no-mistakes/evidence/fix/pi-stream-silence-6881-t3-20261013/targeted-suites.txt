@@ -1,0 +1,42 @@
+# Targeted repository suites for this change (run from the change worktree).
+
+$ bash tests/fm-busy-state.test.sh
+ok - failed close invalidates observation before persistence and denies late replay
+ok - model streams preserve state and reject stale, closed, superseded, foreign, and retired events
+all fm-busy-state tests passed
+
+$ bash tests/fm-documentation-audiences.test.sh
+ok - documentation inventory classifies every maintained prose surface exactly once
+ok - classification, setup routing, and maintained-prose scope fail safely
+ok - required documentation owner pointers cannot silently disappear
+ok - local links resolve while dates, versions, commands, and incident prose remain semantically reviewed
+
+# The stream adapter-wiring case alone (see pre-existing-failure note below).
+$ bash tests/only-stream.test.sh   # disposable copy of tests/fm-busy-adapter-wiring.test.sh with only the new case registered
+ok - generated Pi wiring gates stream observation and clears model phases without accepting late updates
+
+# Pre-existing, unrelated first case in the same file, reproduced on the BASE commit:
+$ cd /tmp/fmbase && bash tests/fm-busy-adapter-wiring.test.sh   # base commit bb3e690 tree
+not ok - a secondmate inside an armed turn published a durable stall notification
+
+# Same first case on the change worktree (identical failure, so not introduced here):
+not ok - a secondmate inside an armed turn published a durable stall notification
+
+# New watcher-triage cases, selected with the suite-owned FM_TEST_ONLY selector:
+$ FM_TEST_ONLY=test_pi_stream_silence_uses_inspection_timer bash tests/fm-watch-triage.test.sh
+ok - opted-in current stream silence uses inspection delay across changing panes; disabled, tool, and foreign phases do not
+$ FM_TEST_ONLY=test_pi_model_progress_and_legacy_fallback bash tests/fm-watch-triage.test.sh
+ok - model progress extends only opted-in bounds and obsolete stream episodes reset before legacy fallback
+$ FM_TEST_ONLY=test_pi_stream_publication_lock_revalidation bash tests/fm-watch-triage.test.sh
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+$ FM_TEST_ONLY=test_pi_stream_uninterrupted_publication bash tests/fm-watch-triage.test.sh
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+$ FM_TEST_ONLY=test_pi_stream_terminal_publication bash tests/fm-watch-triage.test.sh
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+$ FM_TEST_ONLY=test_pi_stream_counter_write_failures bash tests/fm-watch-triage.test.sh
+ok - stream count writes and cap truncation defend failures while uncapped delivery continues
+$ FM_TEST_ONLY=test_pi_stream_resume_restarts_capped_episode bash tests/fm-watch-triage.test.sh
+ok - a capped stream that resumes and stalls before rearming starts a fresh episode
+
+# verified-version gate wording, recaptured:
+ok - Pi stream gate accepts only the verified release, rejects newer, older, prerelease, and malformed

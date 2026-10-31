@@ -1,0 +1,40 @@
+# Live lock-contention drive. A real live pid holds the real state/.wake-queue.lock
+# while the real watcher is inside the publication lock wait. Real private tmux pane,
+# real bin/fm-watch.sh, real bin/fm-busy-event.sh; nothing stubbed.
+
+### rejection: the worker closes the foreground request during the lock wait
+watcher entered the model-stream busy ladder
+held the publication lock with live pid 648609 before the escalate threshold
+blocked with no wake published: yes
+closed the foreground request while the watcher was in the lock wait
+--- watcher alive after release: yes
+--- watch stdout:
+--- wake queue:
+(none)
+--- escalation count file:
+(none)
+--- cap markers:
+(none)
+--- episode marker:
+(none)
+--- triage log:
+[2026-10-31T04:50:44-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream
+
+### control: the same lock wait with the observation left standing publishes its wake
+watcher entered the model-stream busy ladder
+held the publication lock with live pid 667244 before the escalate threshold
+control blocked while the lock is held, no wake yet: yes
+control: the foreground request is left standing through the lock wait
+--- watcher alive after release: no
+--- watch stdout:
+stale: firstmate:fm-stream (idle 12s, possible wedge, escalation 1, model stream silent for 613s (foreground request))
+--- wake queue:
+1793447479	1	stale	firstmate:fm-stream	stale: firstmate:fm-stream (idle 12s, possible wedge, escalation 1, model stream silent for 613s (foreground request))
+--- escalation count file:
+/tmp/fm-stream-lock2.g9wC5O/state/.wedge-escalations-firstmate_fm-stream
+--- cap markers:
+(none)
+--- episode marker:
+/tmp/fm-stream-lock2.g9wC5O/state/.model-stream-episode-firstmate_fm-stream
+--- triage log:
+[2026-10-31T04:51:07-0700] absorbed busy (model stream silent) timer reset: firstmate:fm-stream
