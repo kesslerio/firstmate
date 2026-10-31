@@ -1,0 +1,45 @@
+ok - queued delivery retains occupancy after spawning process exits
+ok - adopted exits free capacity while uncertain and in-flight claims remain
+ok - confirmed-stop paths remember legacy workers with missing registries or rows
+ok - pruning and explicit release preserve stop evidence while metadata survives
+ok - unpinned workers remain exempt during broad-pattern and explicit-list adoption
+ok - admission adopts preserved live or uncertain Sol workers without duplicating or counting stopped/non-Sol workers
+ok - proven local stops and unpublished remote recovery release conservative occupancy
+ok - remote parent-route ownership shares the ceiling and recovery preserves uncertain claims
+ok - retries preserve occupancy and only confirmed teardown releases it
+ok - local homes share admission lock and preserve distinct task identities
+/tmp/fm-sol-cap.O2NALX/review/home/config/sol-cap must declare ceiling as an integer from 1 through 4, not '5'
+ok - exact identities, worker lifetime, live age, bounded declarations and non-Sol isolation
+ok - a Sol delivery under the ceiling retains a conservative claim
+ok - a capped launch runs the uncapped command unchanged under the pane shell
+ok - a capped launch runs the uncapped command unchanged in a fish pane
+ok - an unnamed pane shell falls back to a shell that runs the launch line
+ok - a dispatch at the ceiling is refused, naming sessions and ages, and creates nothing
+ok - dead workers are pruned regardless of age
+ok - a non-Sol model dispatch passes a full ceiling and touches no registry row
+ok - config/sol-cap declares the ceiling the guard enforces
+ok - a home that declared no ceiling has no ceiling, no reservation, and no registry row
+ok - only the models the captain declared are capped, by exact id or by declared pattern
+ok - the declaration documented in docs/configuration.md parses as written
+ok - a home that dropped its declaration owns no occupancy and keeps its rows as evidence
+ok - a reused row follows the current declaration and its model is reconciled
+ok - a row whose model the declaration dropped holds no occupancy
+ok - a replacement while the guard is off marks the prior incarnation's row superseded
+ok - a replacement on an excluded model marks the prior incarnation's row superseded
+ok - the adoption resolves a superseded row into the live incarnation it names
+ok - an uncapped incarnation resolves the superseded row it replaced
+ok - an abandoned replacement leaves no capacity behind
+ok - a live row is not superseded by a dispatch that displaced no session
+ok - a busy admission boundary keeps the invalidation pending and the next admission supersedes the prior row
+ok - admission cannot consume marker staging before atomic publication
+ok - failed marker publication reports the unavailable count
+ok - a concurrent admission preserves its claim while applying a pending invalidation
+ok - a busy-boundary replacement holds its slot at the next ceiling decision
+ok - a relaunched task id replaces its own registry row instead of counting itself
+ok - a reused live Sol endpoint's reported model claims its occupancy
+ok - a non-Sol reported model releases the task's stale Sol claim
+ok - a confirmed Sol report preserves an adopted uncertain claim's reconciliation
+ok - a Sol report under an existing claim keeps the claim and reconciles the model
+ok - a malformed registry row refuses every Sol dispatch and names the row
+ok - a malformed declaration refuses loudly instead of falling back to a default
+ok - non-Sol reports bypass admission only without owned Sol occupancy

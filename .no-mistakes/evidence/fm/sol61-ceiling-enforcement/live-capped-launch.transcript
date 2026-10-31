@@ -1,0 +1,200 @@
+date: 2026-10-31T06:45:08-07:00
+lab: /tmp/fm-lab.opQYJi
+fish: /nix/store/djgc45v1n9lq05kr5vvg4z03xjj2yqwd-fish-4.2.1/bin/fish (fish, version 4.2.1)
+tmux: tmux 3.6a
+
+===== scenario: capped spawn in a bash pane (bash-only process substitution) =====
+spawn output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.opQYJi/bash-pane/home
+warning: /tmp/fm-lab.opQYJi/bash-pane/home/data/task-c/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-c
+spawned task-c harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-c worktree=/tmp/fm-lab.opQYJi/bash-pane/wt-task-c
+
+pane foreground command: sleep
+staged launch line the bash pane sourced:
+  FM_HOME='/tmp/fm-lab.opQYJi/bash-pane/home' bash '/home/art/.no-mistakes/worktrees/9f75ec418609/01M691VDGDB84JYENPMK2271TZ/bin/fm-sol-cap-lib.sh' run-launch 'task-c' '/tmp/fm-lab.opQYJi/bash-pane/home/state' 'export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='\''/tmp/fm-lab.opQYJi/bash-pane/home/state/task-c.inbox'\''; '\''/home/art/.no-mistakes/worktrees/9f75ec418609/01M691VDGDB84JYENPMK2271TZ/bin/fm-git-strip-ai-trailers.sh'\'' env-file '\''/tmp/fm-lab.opQYJi/bash-pane/home/state/task-c.git-hooks'\'' '\''/tmp/fm-task-c+65a8a04a95d7ed7fbff9bf454be5199b05e9be7a2c046f7cc7dca3a9d007b543/git-config.s1793454311.2552226.5487.sh'\'' && . '\''/tmp/fm-task-c+65a8a04a95d7ed7fbff9bf454be5199b05e9be7a2c046f7cc7dca3a9d007b543/git-config.s1793454311.2552226.5487.sh'\'' || return 1 2>/dev/null || exit 1; env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI /tmp/fm-lab.opQYJi/bash-pane/fakebin/codex --brief "$(cat <(printf %s pane-syntax))"'
+
+worker record:
+argv: --brief pane-syntax
+argc: 2
+worker_pid: 2556079
+worker_ppid: 2553185
+worker_ppid_comm: bash
+worker_cwd: /tmp/fm-lab.opQYJi/bash-pane/wt-task-c
+FM_HOME: /tmp/fm-lab.opQYJi/bash-pane/home
+started: 2026-10-31T06:45:12-07:00
+
+registry rows while the worker runs:
+task-c	gpt-6.1-sol	1793454309	2556079
+row pid for task-c: 2556079
+row pid alive: yes
+pid|ppid|comm|args for the row pid and the worker:
+2553185 2553116 bash            /bin/bash
+2556079 2553185 sleep           sleep 300
+
+pane tail:
+treehouse get
+[art@zeppola:/tmp/fm-lab.opQYJi/bash-pane/project]$ treehouse get
+[art@zeppola:/tmp/fm-lab.opQYJi/bash-pane/wt-task-c]$ cd -- '/tmp/fm-lab.opQYJi/
+bash-pane/wt-task-c'
+[art@zeppola:/tmp/fm-lab.opQYJi/bash-pane/wt-task-c]$ export GOTMPDIR=/tmp/fm-ta
+sk-c/gotmp
+export COMPACT_ADVISER_DISABLE=1
+[art@zeppola:/tmp/fm-lab.opQYJi/bash-pane/wt-task-c]$ export COMPACT_ADVISER_DIS
+ABLE=1
+export FM_TASK_ID=task-c
+[art@zeppola:/tmp/fm-lab.opQYJi/bash-pane/wt-task-c]$ export FM_TASK_ID=task-c
+[art@zeppola:/tmp/fm-lab.opQYJi/bash-pane/wt-task-c]$ . '/tmp/fm-task-c+65a8a04a
+95d7ed7fbff9bf454be5199b05e9be7a2c046f7cc7dca3a9d007b543/launch.s1793454311.2552
+226.5487.sh'
+
+===== scenario: capped spawn in a fish pane (fish-only command substitution) =====
+spawn output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.opQYJi/fish-pane/home
+warning: /tmp/fm-lab.opQYJi/fish-pane/home/data/task-c/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-c
+spawned task-c harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-c worktree=/tmp/fm-lab.opQYJi/fish-pane/wt-task-c
+
+pane foreground command: fish
+staged launch line the fish pane sourced:
+  FM_HOME='/tmp/fm-lab.opQYJi/fish-pane/home' bash '/home/art/.no-mistakes/worktrees/9f75ec418609/01M691VDGDB84JYENPMK2271TZ/bin/fm-sol-cap-lib.sh' run-launch 'task-c' '/tmp/fm-lab.opQYJi/fish-pane/home/state' 'export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='\''/tmp/fm-lab.opQYJi/fish-pane/home/state/task-c.inbox'\''; '\''/home/art/.no-mistakes/worktrees/9f75ec418609/01M691VDGDB84JYENPMK2271TZ/bin/fm-git-strip-ai-trailers.sh'\'' env-file '\''/tmp/fm-lab.opQYJi/fish-pane/home/state/task-c.git-hooks'\'' '\''/tmp/fm-task-c+d1c860d40ff2c0bd0c673ce138027483e929dfa05a06d74d69fd15b72efd46c8/git-config.s1793454316.2558965.22065.sh'\'' && . '\''/tmp/fm-task-c+d1c860d40ff2c0bd0c673ce138027483e929dfa05a06d74d69fd15b72efd46c8/git-config.s1793454316.2558965.22065.sh'\'' || return 1 2>/dev/null || exit 1; env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI /tmp/fm-lab.opQYJi/fish-pane/fakebin/codex --brief (printf %s fish-pane)'
+
+worker record:
+argv: --brief fish-pane
+argc: 2
+worker_pid: 2562614
+worker_ppid: 2562447
+worker_ppid_comm: fish
+worker_cwd: /tmp/fm-lab.opQYJi/fish-pane/wt-task-c
+FM_HOME: /tmp/fm-lab.opQYJi/fish-pane/home
+started: 2026-10-31T06:45:17-07:00
+
+registry rows while the worker runs:
+task-c	gpt-6.1-sol	1793454314	2562447
+row pid for task-c: 2562447
+row pid alive: yes
+pid|ppid|comm|args for the row pid and the worker:
+2562447 2559702 fish            /nix/store/djgc45v1n9lq05kr5vvg4z03xjj2yqwd-fish-4.2.1/bin/fish -c export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='/tmp/fm-lab.opQ
+2562614 2562447 sleep           sleep 300
+row pid == worker pid: no
+row pid == worker's parent: yes
+
+pane tail:
+treehouse get
+Welcome to fish, the friendly interactive shell
+Type help for instructions on how to use fish
+art@zeppola /t/f/f/project (master)> treehouse get
+Welcome to fish, the friendly interactive shell
+Type help for instructions on how to use fish
+art@zeppola /t/f/f/wt-task-c (wt-task-c)> cd -- '/tmp/fm-lab.opQYJi/fish-pane/wt
+-task-c'
+art@zeppola /t/f/f/wt-task-c (wt-task-c)> export GOTMPDIR=/tmp/fm-task-c/gotmp
+art@zeppola /t/f/f/wt-task-c (wt-task-c)> export COMPACT_ADVISER_DISABLE=1
+art@zeppola /t/f/f/wt-task-c (wt-task-c)> export FM_TASK_ID=task-c
+art@zeppola /t/f/f/wt-task-c (wt-task-c)> . '/tmp/fm-task-c+d1c860d40ff2c0bd0c67
+3ce138027483e929dfa05a06d74d69fd15b72efd46c8/launch.s1793454316.2558965.22065.sh
+'
+
+===== scenario: the same dispatch with no config/sol-cap stays inert =====
+spawn output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.opQYJi/inert/home
+warning: /tmp/fm-lab.opQYJi/inert/home/data/task-c/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-c
+spawned task-c harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-c worktree=/tmp/fm-lab.opQYJi/inert/wt-task-c
+
+declaration present: no
+staged launch line the bash pane sourced:
+  export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='/tmp/fm-lab.opQYJi/inert/home/state/task-c.inbox'; '/home/art/.no-mistakes/worktrees/9f75ec418609/01M691VDGDB84JYENPMK2271TZ/bin/fm-git-strip-ai-trailers.sh' env-file '/tmp/fm-lab.opQYJi/inert/home/state/task-c.git-hooks' '/tmp/fm-task-c+ead169fb0bb38ae3b0e8a3e0db2cef57f4767ea5297e9f89c97bf9cda38f0173/git-config.s1793454321.2564879.12009.sh' && . '/tmp/fm-task-c+ead169fb0bb38ae3b0e8a3e0db2cef57f4767ea5297e9f89c97bf9cda38f0173/git-config.s1793454321.2564879.12009.sh' || return 1 2>/dev/null || exit 1; env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI /tmp/fm-lab.opQYJi/inert/fakebin/codex --brief "$(cat <(printf %s pane-syntax))"
+
+worker record:
+argv: --brief pane-syntax
+argc: 2
+worker_pid: 2571832
+worker_ppid: 2565542
+worker_ppid_comm: bash
+worker_cwd: /tmp/fm-lab.opQYJi/inert/wt-task-c
+FM_HOME: 
+started: 2026-10-31T06:45:22-07:00
+
+registry rows:
+(no registry file)
+row pid for task-c: 
+
+===== scenario: a second capped dispatch is refused at the ceiling, then admitted once the worker exits =====
+first spawn:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.opQYJi/ceiling/home
+warning: /tmp/fm-lab.opQYJi/ceiling/home/data/task-c/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-c
+spawned task-c harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-c worktree=/tmp/fm-lab.opQYJi/ceiling/wt-task-c
+
+registry rows (max=1):
+task-c	gpt-6.1-sol	1793454324	2581864
+live worker row pid: 2581864 alive: yes
+
+second capped spawn at the ceiling:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.opQYJi/ceiling/home
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-d (codex, gpt-6.1-sol) was refused. Active sessions: task-c (gpt-6.1-sol, age 4s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+
+task-d record after the refusal: absent
+task-d launch brief after the refusal: absent
+git worktree count before/after the refusal: 2/2
+
+now stop the live worker and retry the same capped dispatch:
+row pid alive after the worker exit: no
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.opQYJi/ceiling/home
+warning: /tmp/fm-lab.opQYJi/ceiling/home/data/task-d/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-d
+spawned task-d harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-d worktree=/tmp/fm-lab.opQYJi/ceiling/wt-task-c
+task-d row pid: 2591069 alive: yes
+
+registry rows after the release and the admitted retry:
+task-c	gpt-6.1-sol	1793454324	2581864
+task-d	gpt-6.1-sol	1793454329	2591069
+
+===== scenario: a busy admission boundary keeps the invalidation pending, and the next admission applies it =====
+admission boundary held by pid 2591675: yes
+
+spawn output with the boundary busy:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.opQYJi/busy-boundary/home
+warning: /tmp/fm-lab.opQYJi/busy-boundary/home/data/task-c/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-c
+spawned task-c harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-c worktree=/tmp/fm-lab.opQYJi/busy-boundary/wt-task-c
+
+registry rows while the boundary is still busy (the prior row must be untouched):
+task-c	gpt-6.1-sol	1793454333	-1
+pending marker /tmp/fm-lab.opQYJi/busy-boundary/home/state/.sol-cap-supersede-task-c: present
+  marker content (start<TAB>pid): 1793454333	-1
+staging leftovers: 0
+
+boundary released; the next admission is an ordinary capped dispatch for task-d:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.opQYJi/busy-boundary/home
+warning: /tmp/fm-lab.opQYJi/busy-boundary/home/data/task-d/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-d
+spawned task-d harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-d worktree=/tmp/fm-lab.opQYJi/busy-boundary/wt-task-c
+
+registry rows after that admission:
+task-d	gpt-6.1-sol	1793454339	2600704
+marker after that admission: absent
+task-c prior row pid after that admission:  (empty means resolution removed a row whose record names no live incarnation; -3 means it is held as superseded)
+task-d new row pid: 2600704 alive: yes
+
+===== scenario: a state-directory failure refuses the dispatch instead of launching it uncounted =====
+admission boundary held by pid 2601453: yes
+spawn output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.opQYJi/storage-failure/home
+error: this home's task set is locked by another operation; refusing to create task task-c rather than racing it
+
+registry rows after the refused dispatch:
+task-c	gpt-6.1-sol	1793454343	-1
+task record after the refusal: absent
+worker record after the refusal: absent
+
+the same failure at the guard CLI seam (bin/fm-sol-cap-lib.sh refuse-claim),
+which is the runtime entry point docs/configuration.md publishes:
+exit status: 1
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M691VDGDB84JYENPMK2271TZ/bin/fm-sol-cap-lib.sh: line 649: /tmp/fm-lab.opQYJi/storage-failure/home/state/.sol-cap-supersede.tmp.task-c.2601734: Permission denied
+error: Sol ceiling unavailable: cannot record pending supersede for task task-c in /tmp/fm-lab.opQYJi/storage-failure/home/state; check state-directory permissions and free space; task was not dispatched rather than launched possibly uncounted
+registry rows after the CLI refusal:
+task-c	gpt-6.1-sol	1793454343	-1
+pending marker files left behind: 0
+staging leftovers: 0
+
+===== summary =====
+bash pane: row pid=2556079 worker pid=2556079 worker argv=[--brief pane-syntax] worker's parent shell=bash
+fish pane: row pid=2562447 worker pid=2562614 worker argv=[--brief fish-pane] worker's parent shell=fish
+inert run: worker argv=[--brief pane-syntax]
+capped bash worker argv == inert worker argv: yes
+lab removed at exit: /tmp/fm-lab.opQYJi

@@ -1,0 +1,5 @@
+ok - confirmed dispatch preserves Tern, HC and T3 Code close arguments and verdicts
+ok - cmux proves absence across every window and refuses incomplete inventories
+ok - zellij distinguishes confirmed absence from failed reads, closes and identity checks
+ok - paseo proves its terminal absent from the live inventory and refuses a failed close
+ok - orca reports close command and protocol failures while accepting successful closes
