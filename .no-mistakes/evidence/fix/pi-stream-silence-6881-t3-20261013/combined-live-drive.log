@@ -1,0 +1,35 @@
+
+### 1. spawn a Pi worker with the opt-in option set (real fm-spawn + real pi 1.2.0)
+spawned stream harness=pi kind=ship mode=no-mistakes yolo=off window=firstmate:fm-stream worktree=/tmp/fm-combined-lab.R6T4L8/wt
+recorded meta window: firstmate:fm-stream
+recorded harness: harness=pi
+busy record after spawn: v1 gen=g1793452968.733478.25098 seq=1 state=busy source=fm-spawn event=launch-brief ts=1793452968
+
+### 2. stand the spawned window up as a REAL tmux window on a private server
+1: fm-stream* (1 panes) [80x24] [layout b25d,80x24,0,0,0] @0 (active)
+foreground command: tmux
+
+### 3. drive the spawned extension through the real Pi 1.2.0 SDK, holding a stalled stream
+live foreground stream evidence: v1 gen=g1793452968.733478.25098 request=1793452970784 rev=2 ts=1793452970
+model progress anchor:          v1 gen=g1793452968.733478.25098 request=1793452970784 rev=2 ts=1793452970
+busy record:                    v1 gen=g1793452968.733478.25098 seq=2 state=busy source=pi-ext event=agent-start ts=1793452970
+
+### 4. sustained live silence: the real watcher must escalate early naming model-stream silence
+stale: firstmate:fm-stream (idle 1s, possible wedge, escalation 1, model stream silent for 10s (foreground request))
+wake-queue row: 1793452980	1	stale	firstmate:fm-stream	stale: firstmate:fm-stream (idle 1s, possible wedge, escalation 1, model stream silent for 10s (foreground request))
+escalation count: 1
+
+### 5. settle phase one through the real extension, then acknowledge the wake
+after assistant completion: model-stream marker absent, busy record v1 gen=g1793452968.733478.25098 seq=3 state=idle source=pi-ext event=agent-settled ts=1793452980
+wake acknowledged through the real drain
+
+### 6. adversarial: live progress during the watcher's silence window must prevent the escalation
+second request evidence: v1 gen=g1793452968.733478.25098 request=1793452982226 rev=1 ts=1793452982
+progress refreshed mid-window: v1 gen=g1793452968.733478.25098 request=1793452982226 rev=2 ts=1793452982
+watcher output empty; no inspection timer, no escalation count for the silent-while-progressing request
+
+### 7. close phase two through the real extension and confirm clean settle
+ok - real Pi worker phases completed; final marker empty
+final busy record: v1 gen=g1793452968.733478.25098 seq=5 state=idle source=pi-ext event=agent-settled ts=1793452988
+
+ALL COMBINED LIVE CHECKS PASSED

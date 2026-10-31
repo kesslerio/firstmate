@@ -1,0 +1,28 @@
+
+### 1. watcher with FM_STREAM_SILENT_MAX_SECS unset ignores a backdated stream observation (real tmux pane)
+backdated stream evidence: v1 gen=g1793453071.837294.18010 request=1 rev=1 ts=1793452471
+--- watcher alive after two polls: yes
+--- watch stdout:
+(empty)
+--- wake queue:
+(none)
+--- inspection timer:
+(none)
+--- escalation count:
+(none)
+--- triage log:
+(none)
+PASS unset option leaves the general busy bound in force
+
+### 2. spawn with FM_STREAM_SILENT_MAX_SECS unset: no warning, and the spawned extension records no stream evidence
+spawned stream harness=pi kind=ship mode=no-mistakes yolo=off window=firstmate:fm-stream worktree=/tmp/fm-default-off-lab.A1z1pD/wt
+warning: /tmp/fm-default-off-lab.A1z1pD/home/data/stream/launch-brief.md records no ship branch; defaulting to legacy branch fm/stream
+warning: /tmp/fm-default-off-lab.A1z1pD/home/data/stream/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+spawn output carried no model-stream warning for documented default-off
+busy record while the foreground request is held: v1 gen=g1793453077.849509.30638 seq=2 state=busy source=pi-ext event=agent-start ts=1793453079
+model-stream marker present: no
+model-progress marker present: no
+ok - real Pi worker phases completed; final marker empty
+PASS default-off spawn instruments nothing while semantic busy/idle still moves
+
+ALL LIVE DEFAULT-OFF CHECKS PASSED

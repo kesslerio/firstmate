@@ -1,0 +1,29 @@
+$ FM_TEST_ONLY=test_pi_stream_silence_uses_inspection_timer bash tests/fm-watch-triage.test.sh
+ok - opted-in current stream silence uses inspection delay across changing panes; disabled, tool, and foreign phases do not
+EXIT=0
+
+$ FM_TEST_ONLY=test_pi_model_progress_and_legacy_fallback bash tests/fm-watch-triage.test.sh
+ok - model progress extends only opted-in bounds and obsolete stream episodes reset before legacy fallback
+EXIT=0
+
+$ FM_TEST_ONLY=test_pi_stream_publication_lock_revalidation bash tests/fm-watch-triage.test.sh
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+EXIT=0
+
+$ FM_TEST_ONLY=test_pi_stream_uninterrupted_publication bash tests/fm-watch-triage.test.sh
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+EXIT=0
+
+$ FM_TEST_ONLY=test_pi_stream_terminal_publication bash tests/fm-watch-triage.test.sh
+ok - stream close, progress, and replacement cancel publication after queue and recovery lock waits
+EXIT=0
+
+$ FM_TEST_ONLY=test_pi_stream_counter_write_failures bash tests/fm-watch-triage.test.sh
+rm: cannot remove '/tmp/fm-watch-triage-tests.LqBQT0/pi-counter-uncapped/state/.wedge-escalations-test_fm-counter-uncapped': Is a directory
+ok - stream count writes and cap truncation defend failures while uncapped delivery continues
+EXIT=0
+
+$ FM_TEST_ONLY=test_pi_stream_resume_restarts_capped_episode bash tests/fm-watch-triage.test.sh
+ok - a capped stream that resumes and stalls before rearming starts a fresh episode
+EXIT=0
+
