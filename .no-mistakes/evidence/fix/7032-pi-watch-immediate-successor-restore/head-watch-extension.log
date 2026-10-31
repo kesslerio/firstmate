@@ -1,0 +1,6 @@
+2026-10-31T06:45:27.347Z pid=580566 restore attempt=0 predecessor=581729 start=ok pid=586484
+2026-10-31T06:45:27.873Z pid=580566 confirm generation=581824.1793429126.h52rJ7 watcherPid=586507 result=confirmed
+2026-10-31T06:45:29.974Z pid=580566 restore attempt=0 predecessor=586484 start=ok pid=594881
+2026-10-31T06:45:31.311Z pid=580566 restore attempt=0 predecessor=594881 start=ok pid=600049
+2026-10-31T06:45:31.565Z pid=580566 confirm generation=581824.1793429126.h52rJ7 watcherPid=595013 result=confirmed
+2026-10-31T06:45:31.931Z pid=580566 confirm generation=581824.1793429126.h52rJ7 watcherPid=600151 result=confirmed

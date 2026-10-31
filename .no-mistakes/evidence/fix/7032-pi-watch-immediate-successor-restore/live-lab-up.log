@@ -1,0 +1,10 @@
+lab: /tmp/nm7032-livelab (tear down with: bin/fm-live-lab.sh down /tmp/nm7032-livelab)
+tree: e1d2663f8a79866a05f0832208fcb9c19db203c4 from /home/art/.no-mistakes/worktrees/9f75ec418609/01M68ARPNTJVPDADBNENRT9SG1
+primary: pi --approve --session-dir /tmp/nm7032-livelab/pi-sessions --model openai-codex/gpt-6-luna --thinking medium
+ok primary: pi pid 2335800 in /tmp/nm7032-livelab/home
+ok probe: the primary answered LABREADY-68a8113ff42b
+ok trust: Pi trust store unchanged (session-only --approve)
+ok extensions: fm-primary-pi-watch fm-primary-turnend-guard fm-branch-supervision
+ok watcher: skipped (empty fleet)
+ok treehouse: ~/.treehouse unchanged
+ready: /tmp/nm7032-livelab

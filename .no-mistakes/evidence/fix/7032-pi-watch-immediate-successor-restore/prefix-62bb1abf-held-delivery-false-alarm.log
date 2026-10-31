@@ -1,0 +1,28 @@
+== live lab ==
+commit 62bb1abf8adc9eac4d6aa34c482769697a1b8afe in /tmp/nm7032-run-int/project
+pi 1.4.0 (real TUI, real extensions, real arm/watcher)
+extension sha256 03833def0ff70f88e4f0c11cec4a04ff60ce464a293e005a820693d0ac203302
+lab /tmp/nm7032-run-int
+ok - real pi TUI loaded the tracked watcher extension and the branch offer handler
+ok - extension armed a live watcher cycle (pid 750652) without any model turn
+ok - close 1 restored its successor and its wake is held in branch delivery 1
+ok - close 2 restored its own successor while delivery 1 was still held
+ok - close 3 restored its own successor while delivery 1 was still held
+ok - all three successors restored while delivery 1 stayed held (offers=1 settled=0)
+trace:   2026-10-31T06:46:21.630Z pid=748283 restore attempt=0 predecessor=750577 start=ok pid=756495   2026-10-31T06:46:24.200Z pid=748283 restore attempt=0 predecessor=756495 start=ok pid=765490   2026-10-31T06:46:25.426Z pid=748283 restore attempt=0 predecessor=765490 start=ok pid=770504 
+ok - delivery 2 arrived only after delivery 1 settled
+ok - delivery 3 stayed queued behind delivery 2
+not ok - delivery 3 never reached the branch
+delivery order: offered=1:1,2:3|settled=1,2|maxActive=1|declined=0
+not ok - queued wakes lost their order or their serialization: offered=1:1,2:3|settled=1,2|maxActive=1|declined=0
+not ok - a healthy successor was reported as a restoration failure (confirmed=2 rejected=1 hand-to-main=0)
+not ok - only 2 of 3 handoffs confirmed: 2026-10-31T06:46:22.058Z pid=748283 confirm generation=750652.1793429181.iqymnS watcherPid=756570 result=confirmed 2026-10-31T06:46:25.595Z pid=748283 confirm generation=750652.1793429181.iqymnS watcherPid=765592 result=rejected 2026-10-31T06:46:25.829Z pid=748283 confirm generation=765592.1793429185.CHS9mo watcherPid=770591 result=confirmed 
+not ok - main was told supervision failed:  watcher: FAILED - handling delivery confirmation was rejected (status=1 
+ok - pi exited cleanly on /quit
+ok - every arm and watcher pid this run recorded stopped with the session
+== artifacts ==
+extension log: /tmp/nm7032-run-int/home/state/.watch-extension.log
+branch ledger: /tmp/nm7032-run-int/branch-ledger.ndjson
+cycle exits:   /tmp/nm7032-run-int/home/state/.watch-cycle-exits.log
+observed failures: 1
+RESULT: OBSERVED

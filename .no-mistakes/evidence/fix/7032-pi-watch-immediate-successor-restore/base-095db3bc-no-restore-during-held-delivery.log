@@ -1,0 +1,28 @@
+== live lab ==
+commit 095db3bc7e57b4d50b7e2ac66f9671ba66be692b in /tmp/nm7032-run-base/project
+pi 1.4.0 (real TUI, real extensions, real arm/watcher)
+extension sha256 4e7cf855b5ffe82b1c4f5b03e647ee03894adae3f0af9820286194cccb633588
+lab /tmp/nm7032-run-base
+ok - real pi TUI loaded the tracked watcher extension and the branch offer handler
+ok - extension armed a live watcher cycle (pid 1246069) without any model turn
+ok - close 1 restored its successor and its wake is held in branch delivery 1
+not ok - close 2 did not restore a successor while delivery 1 was held (restores=1)
+not ok - close 3 did not restore a successor while delivery 1 was held (restores=1)
+ok - all three successors restored while delivery 1 stayed held (offers=1 settled=0)
+trace:   2026-10-31T06:48:37.355Z pid=1243935 restore attempt=0 predecessor=1246001 start=ok pid=1252705 
+ok - delivery 2 arrived only after delivery 1 settled
+ok - delivery 3 stayed queued behind delivery 2
+ok - delivery 3 arrived only after delivery 2 settled
+delivery order: offered=1:1,2:2,3:3|settled=1,2,3|maxActive=1|declined=0
+ok - queued wakes arrived in close order, settled in order, never more than one delivery at a time
+ok - no healthy successor was reported as a restoration failure (confirmed=3 rejected=0 hand-to-main=0)
+ok - each queued close confirmed its own live successor inside its continuity operation (confirmed=3)
+ok - no watcher: FAILED alarm reached main
+ok - pi exited cleanly on /quit
+ok - every arm and watcher pid this run recorded stopped with the session
+== artifacts ==
+extension log: /tmp/nm7032-run-base/home/state/.watch-extension.log
+branch ledger: /tmp/nm7032-run-base/branch-ledger.ndjson
+cycle exits:   /tmp/nm7032-run-base/home/state/.watch-cycle-exits.log
+observed failures: 1
+RESULT: OBSERVED
