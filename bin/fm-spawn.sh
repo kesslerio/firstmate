@@ -6549,8 +6549,9 @@ EOF
       fi
     fi
     cat >"$STATE/$ID.pi-ext.ts" <<EOF
-// Firstmate semantic busy-state events + turn-end notification; written by
-// fm-spawn under the contract owned by bin/fm-busy-lib.sh.
+// Firstmate semantic busy-state events, turn-end notification, and - when this
+// worker was launched with opted-in stream observation - foreground model-stream
+// evidence; written by fm-spawn under the contract owned by bin/fm-busy-lib.sh.
 // Semantic state: "agent_start" -> busy when a low-level agent run begins;
 // "agent_settled" -> idle only when ctx.isIdle() confirms Pi will not
 // continue automatically - auto-retries, auto-compaction retries, tool
