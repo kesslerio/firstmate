@@ -1,0 +1,26 @@
+# admission after the previous worker exited
+## log
+# spawn-raw id=live-after2 kind=bash model=gpt-6.1-sol home=/tmp/fmsol-lab/home
+# raw=/usr/bin/env bash -c printf\ \"task=%s\ argv=%s\ worker_pid=%s\\n\"\ live-after2\ \"\$1\"\ \"\$\$\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"exported=%s\ local=%s\\n\"\ \"\$FM_LIVE_EXPORTED\"\ \"\$FM_LIVE_LOCAL\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"env_inbox=%s\ env_cad=%s\\n\"\ \"\$FM_TASK_INBOX\"\ \"\$COMPACT_ADVISER_DISABLE\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ exec\ sleep\ 60 _ "$(cat <(printf %s bash-pane))"
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmsol-lab/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+spawned live-after2 harness=env kind=scout window=primary:fm-live-after2 worktree=/tmp/fmsol-lab/userhome/.treehouse/project-46f84b/12/project
+# spawn-exit=0
+
+## registry
+live-bash	gpt-6.1-sol	1793443951	2998003
+live-fish	gpt-6.1-sol	1793444120	3337251
+live-after	gpt-6.1-sol	1793444297	3670659
+live-home-a	gpt-6.1-sol	1793444410	3869662
+live-bash2	gpt-6.1-sol	1793444654	4191929
+live-fish2	gpt-6.1-sol	1793444703	70716
+live-after2	gpt-6.1-sol	1793444752	131206
+
+## aliveness of every registered pid
+live-bash pid=2998003 alive=no
+live-fish pid=3337251 alive=no
+live-after pid=3670659 alive=no
+live-home-a pid=3869662 alive=no
+live-bash2 pid=4191929 alive=no
+live-fish2 pid=70716 alive=no
+live-after2 pid=131206 alive=yes

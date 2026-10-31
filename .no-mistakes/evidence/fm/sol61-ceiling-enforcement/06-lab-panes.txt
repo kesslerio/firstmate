@@ -1,0 +1,94 @@
+# the two lab panes that sourced the capped launch lines
+
+## bash lab pane (server on a private socket with default-shell bash)
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-bash gpt-6.1-s
+ol bash 150; echo EXIT=$?
+EXIT=0
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-second gpt-6.1
+-sol bash 60
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-other gpt-5.6-
+luna bash 45
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/inert-home live-inert gp
+t-6.1-sol bash 45
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-after gpt-6.1-
+sol bash 45
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/cap2-home live-home-b gp
+t-6.1-sol bash 90
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-home-a gpt-6.1
+-sol bash 45
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-home-a gpt-6.1
+-sol bash 45
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/mate-home live-mate gpt-
+6.1-sol bash 120
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-root gpt-6.1-s
+ol bash 45
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-bash2 gpt-6.1-
+sol bash 300
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-bash2 gpt-6.1-
+sol bash 300
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-after2 gpt-6.1
+-sol bash 60
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$ bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-refuse gpt-6.1
+-sol bash 30
+
+[art@zeppola:/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC896
+6QSSJ]$
+
+## fish lab pane (server on a private socket with default-shell )
+Welcome to fish, the friendly interactive shell
+Type help for instructions on how to use fish
+art@zeppola /h/a/.n/w/9/01M68R6X2YXENR6JHC8966QSSJ ((9083b497))> bash /tmp/fmsol
+-lab/spawn-raw.sh /tmp/fmsol-lab/home live-fish gpt-6.1-sol fish 180; echo
+fish: $? is not the exit status. In fish, please use $status.
+bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-fish gpt-6.1-sol fish
+180; echo EXIT=$?
+
+                ^
+art@zeppola /h/a/.n/w/9/01M68R6X2YXENR6JHC8966QSSJ ((9083b497))> bash /tmp/fmsol
+-lab/spawn-raw.sh /tmp/fmsol-lab/home live-fish gpt-6.1-sol fish 180; echo EXIT=
+$?bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-fish gpt-6.1-sol fis
+h
+fish: $? is not the exit status. In fish, please use $status.
+bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-fish gpt-6.1-sol fish
+180; echo EXIT=$?bash /tmp/fmsol-lab/spawn-raw.sh /tmp/fmsol-lab/home live-fish
+gpt-6.1-sol fish 180
+
+                ^
+art@zeppola /h/a/.n/w/9/01M68R6X2YXENR6JHC8966QSSJ ((9083b497))> bash /tmp/fmsol
+-lab/spawn-raw.sh /tmp/fmsol-lab/home live-fish gpt-6.1-sol fish 180
+art@zeppola /h/a/.n/w/9/01M68R6X2YXENR6JHC8966QSSJ ((9083b497))> bash /tmp/fmsol
+-lab/spawn-raw.sh /tmp/fmsol-lab/inert-home live-fish-inert gpt-6.1-sol fish 40
+art@zeppola /h/a/.n/w/9/01M68R6X2YXENR6JHC8966QSSJ ((9083b497)) [1]> bash /tmp/f
+msol-lab/spawn-raw.sh /tmp/fmsol-lab/inert-home live-fish-inert gpt-6.1-sol fish
+ 40
+art@zeppola /h/a/.n/w/9/01M68R6X2YXENR6JHC8966QSSJ ((9083b497))> bash /tmp/fmsol
+-lab/spawn-raw.sh /tmp/fmsol-lab/home live-fish2 gpt-6.1-sol fish 300
+art@zeppola /h/a/.n/w/9/01M68R6X2YXENR6JHC8966QSSJ ((9083b497))>

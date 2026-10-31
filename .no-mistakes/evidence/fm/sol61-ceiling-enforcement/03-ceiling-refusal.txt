@@ -1,0 +1,44 @@
+# ceiling refusal with one live capped session (max=1)
+
+## registry before the refused dispatch (id<TAB>model<TAB>start<TAB>pid)
+live-bash	gpt-6.1-sol	1793443951	2998003
+live-fish	gpt-6.1-sol	1793444120	3337251
+live-after	gpt-6.1-sol	1793444297	3670659
+live-home-a	gpt-6.1-sol	1793444410	3869662
+live-bash2	gpt-6.1-sol	1793444654	4191929
+live-fish2	gpt-6.1-sol	1793444703	70716
+live-after2	gpt-6.1-sol	1793444752	131206
+
+## capped dispatch refused in the same home
+# spawn-raw id=live-refuse kind=bash model=gpt-6.1-sol home=/tmp/fmsol-lab/home
+# raw=/usr/bin/env bash -c printf\ \"task=%s\ argv=%s\ worker_pid=%s\\n\"\ live-refuse\ \"\$1\"\ \"\$\$\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"exported=%s\ local=%s\\n\"\ \"\$FM_LIVE_EXPORTED\"\ \"\$FM_LIVE_LOCAL\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"env_inbox=%s\ env_cad=%s\\n\"\ \"\$FM_TASK_INBOX\"\ \"\$COMPACT_ADVISER_DISABLE\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ exec\ sleep\ 30 _ "$(cat <(printf %s bash-pane))"
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmsol-lab/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task live-refuse (env, gpt-6.1-sol) was refused. Active sessions: live-after2 (gpt-6.1-sol, age 53s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+# spawn-exit=1
+
+## nothing was created for the refused task
+ls: cannot access '/tmp/fmsol-lab/home/state/live-refuse.meta': No such file or directory
+ls: cannot access '/tmp/fmsol-lab/home/data/live-refuse/launch-brief.md': No such file or directory
+
+## registry after the refused dispatch (unchanged: no row for live-refuse)
+live-bash	gpt-6.1-sol	1793443951	2998003
+live-fish	gpt-6.1-sol	1793444120	3337251
+live-after	gpt-6.1-sol	1793444297	3670659
+live-home-a	gpt-6.1-sol	1793444410	3869662
+live-bash2	gpt-6.1-sol	1793444654	4191929
+live-fish2	gpt-6.1-sol	1793444703	70716
+live-after2	gpt-6.1-sol	1793444752	131206
+
+## a live secondmate home's session counts against the primary's ceiling
+- /tmp/fmsol-lab/home/data/secondmates.md:
+- labmate - lab secondmate fixture (home: /tmp/fmsol-lab/mate-home; scope: lab; projects: project; added 2026-01-01)
+- the secondmate home's own registry while it held the slot:
+live-mate	gpt-6.1-sol	1793444456	3893226
+- the primary's capped dispatch refused, naming that session and its state directory:
+# spawn-raw id=live-root kind=bash model=gpt-6.1-sol home=/tmp/fmsol-lab/home
+# raw=/usr/bin/env bash -c printf\ \"task=%s\ argv=%s\ worker_pid=%s\\n\"\ live-root\ \"\$1\"\ \"\$\$\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"exported=%s\ local=%s\\n\"\ \"\$FM_LIVE_EXPORTED\"\ \"\$FM_LIVE_LOCAL\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"env_inbox=%s\ env_cad=%s\\n\"\ \"\$FM_TASK_INBOX\"\ \"\$COMPACT_ADVISER_DISABLE\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ exec\ sleep\ 45 _ "$(cat <(printf %s bash-pane))"
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmsol-lab/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task live-root (env, gpt-6.1-sol) was refused. Active sessions: live-mate (gpt-6.1-sol, age 32s) in /tmp/fmsol-lab/mate-home/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+# spawn-exit=1

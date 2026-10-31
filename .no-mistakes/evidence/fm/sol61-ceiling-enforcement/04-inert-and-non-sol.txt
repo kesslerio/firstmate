@@ -1,0 +1,65 @@
+# guard inert without config/sol-cap, and a non-capped model under a full ceiling
+
+## declaration states
+home home: active max=1 ceiling=1 models=gpt-6.1-sol pattern=
+home inert-home: inert
+home mate-home: active max=1 ceiling=1 models=gpt-6.1-sol pattern=
+
+## a capped-model dispatch in the inert home launches and claims no slot
+# spawn-raw id=live-inert kind=bash model=gpt-6.1-sol home=/tmp/fmsol-lab/inert-home
+# raw=/usr/bin/env bash -c printf\ \"task=%s\ argv=%s\ worker_pid=%s\\n\"\ live-inert\ \"\$1\"\ \"\$\$\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"exported=%s\ local=%s\\n\"\ \"\$FM_LIVE_EXPORTED\"\ \"\$FM_LIVE_LOCAL\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"env_inbox=%s\ env_cad=%s\\n\"\ \"\$FM_TASK_INBOX\"\ \"\$COMPACT_ADVISER_DISABLE\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ exec\ sleep\ 45 _ "$(cat <(printf %s bash-pane))"
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmsol-lab/inert-home
+spawned live-inert harness=env kind=scout window=primary:fm-live-inert worktree=/tmp/fmsol-lab/userhome/.treehouse/project-46f84b/4/project
+# spawn-exit=0
+- registry files in that home:
+0
+  none
+
+## the same fish-pane command in the inert home (uncapped control)
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+spawned live-fish-inert harness=env kind=scout window=primary:fm-live-fish-inert worktree=/tmp/fmsol-lab/userhome/.treehouse/project-46f84b/9/project
+# spawn-exit=0
+
+## a non-capped model launches while the Sol ceiling is full
+# spawn-raw id=live-other kind=bash model=gpt-5.6-luna home=/tmp/fmsol-lab/home
+# raw=/usr/bin/env bash -c printf\ \"task=%s\ argv=%s\ worker_pid=%s\\n\"\ live-other\ \"\$1\"\ \"\$\$\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"exported=%s\ local=%s\\n\"\ \"\$FM_LIVE_EXPORTED\"\ \"\$FM_LIVE_LOCAL\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"env_inbox=%s\ env_cad=%s\\n\"\ \"\$FM_TASK_INBOX\"\ \"\$COMPACT_ADVISER_DISABLE\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ exec\ sleep\ 45 _ "$(cat <(printf %s bash-pane))"
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmsol-lab/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+spawned live-other harness=env kind=scout window=primary:fm-live-other worktree=/tmp/fmsol-lab/userhome/.treehouse/project-46f84b/3/project
+# spawn-exit=0
+
+## worker log: identical argv capped vs uncapped, and the launch line's exports reached the worker
+task=live-bash argv=bash-pane worker_pid=2998003
+exported= local=
+task=live-fish argv=fish-pane worker_pid=3337398
+exported= local=
+task=live-other argv=bash-pane worker_pid=3522716
+exported= local=
+env_inbox=/tmp/fmsol-lab/home/state/live-other.inbox env_cad=1
+task=live-inert argv=bash-pane worker_pid=3580186
+exported= local=
+env_inbox=/tmp/fmsol-lab/inert-home/state/live-inert.inbox env_cad=1
+task=live-after argv=bash-pane worker_pid=3670659
+exported= local=
+env_inbox=/tmp/fmsol-lab/home/state/live-after.inbox env_cad=1
+task=live-home-b argv=bash-pane worker_pid=3822610
+exported= local=
+env_inbox=/tmp/fmsol-lab/cap2-home/state/live-home-b.inbox env_cad=1
+task=live-home-a argv=bash-pane worker_pid=3869662
+exported= local=
+env_inbox=/tmp/fmsol-lab/home/state/live-home-a.inbox env_cad=1
+task=live-mate argv=bash-pane worker_pid=3893226
+exported= local=
+env_inbox=/tmp/fmsol-lab/mate-home/state/live-mate.inbox env_cad=1
+task=live-fish-inert argv=fish-pane worker_pid=4035140
+exported= local=
+env_inbox=/tmp/fmsol-lab/inert-home/state/live-fish-inert.inbox env_cad=1
+task=live-bash2 argv=bash-pane worker_pid=4191929
+exported= local=
+env_inbox=/tmp/fmsol-lab/home/state/live-bash2.inbox env_cad=1
+task=live-fish2 argv=fish-pane worker_pid=70911
+exported= local=
+env_inbox=/tmp/fmsol-lab/home/state/live-fish2.inbox env_cad=1
+task=live-after2 argv=bash-pane worker_pid=131206
+exported= local=
+env_inbox=/tmp/fmsol-lab/home/state/live-after2.inbox env_cad=1

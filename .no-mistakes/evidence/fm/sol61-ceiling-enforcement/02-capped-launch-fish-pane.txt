@@ -1,0 +1,65 @@
+# live capped spawn - fish pane (fish-only command substitution)
+
+## spawn output
+# spawn-raw id=live-fish2 kind=fish model=gpt-6.1-sol home=/tmp/fmsol-lab/home
+# raw=/usr/bin/env bash -c printf\ \"task=%s\ argv=%s\ worker_pid=%s\\n\"\ live-fish2\ \"\$1\"\ \"\$\$\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"exported=%s\ local=%s\\n\"\ \"\$FM_LIVE_EXPORTED\"\ \"\$FM_LIVE_LOCAL\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"env_inbox=%s\ env_cad=%s\\n\"\ \"\$FM_TASK_INBOX\"\ \"\$COMPACT_ADVISER_DISABLE\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ exec\ sleep\ 300 _ (printf %s fish-pane)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmsol-lab/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+spawned live-fish2 harness=env kind=scout window=primary:fm-live-fish2 worktree=/tmp/fmsol-lab/userhome/.treehouse/project-46f84b/11/project
+# spawn-exit=0
+
+## staged launch file the pane sourced
+FM_HOME='/tmp/fmsol-lab/home' bash '/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC8966QSSJ/bin/fm-sol-cap-lib.sh' run-launch 'live-fish2' '/tmp/fmsol-lab/home/state' 'export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='\''/tmp/fmsol-lab/home/state/live-fish2.inbox'\''; '\''/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC8966QSSJ/bin/fm-git-strip-ai-trailers.sh'\'' env-file '\''/tmp/fmsol-lab/home/state/live-fish2.git-hooks'\'' '\''/tmp/fm-live-fish2+3757b397997fbc55ca2fee81c97c2154d3bedad8d6c1bec25bc04568af25dbb9/git-config.s1793444706.64665.22410.sh'\'' && . '\''/tmp/fm-live-fish2+3757b397997fbc55ca2fee81c97c2154d3bedad8d6c1bec25bc04568af25dbb9/git-config.s1793444706.64665.22410.sh'\'' || return 1 2>/dev/null || exit 1; /usr/bin/env bash -c printf\ \"task=%s\ argv=%s\ worker_pid=%s\\n\"\ live-fish2\ \"\$1\"\ \"\$\$\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"exported=%s\ local=%s\\n\"\ \"\$FM_LIVE_EXPORTED\"\ \"\$FM_LIVE_LOCAL\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"env_inbox=%s\ env_cad=%s\\n\"\ \"\$FM_TASK_INBOX\"\ \"\$COMPACT_ADVISER_DISABLE\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ exec\ sleep\ 300 _ (printf %s fish-pane)'
+
+## worker log lines
+task=live-fish2 argv=fish-pane worker_pid=70911
+exported= local=
+env_inbox=/tmp/fmsol-lab/home/state/live-fish2.inbox env_cad=1
+
+## Sol registry (id<TAB>model<TAB>start<TAB>pid)
+live-bash	gpt-6.1-sol	1793443951	2998003
+live-fish	gpt-6.1-sol	1793444120	3337251
+live-after	gpt-6.1-sol	1793444297	3670659
+live-home-a	gpt-6.1-sol	1793444410	3869662
+live-bash2	gpt-6.1-sol	1793444654	4191929
+live-fish2	gpt-6.1-sol	1793444703	70716
+
+## process for registry pid 70716
+    PID    PPID                  STARTED COMMAND
+  70716   66487 Sat Oct 31 04:05:06 2026 /nix/store/djgc45v1n9lq05kr5vvg4z03xjj2yqwd-fish-4.2.1/bin/fish -c export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='/tmp/fmsol-lab/home/state/live-fish2.inbox'; '/home/art/.no-mistakes/worktrees/9f75ec4
+
+## ancestry from the reservation pid
+pid=70716  66487 /nix/store/djgc45v1n9lq05kr5vvg4z03xjj2yqwd-fish-4.2.1/bin/fish -c export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='/tmp/fmsol-lab/home/state/live-fish2.inbox'; '/home/art/.no-mistakes/worktrees/9f75ec4186
+
+## the pane shell that sourced the line and its children
+    PID    PPID COMMAND
+  66487   66408 /nix/store/djgc45v1n9lq05kr5vvg4z03xjj2yqwd-fish-4.2.1/bin/fish
+    PID    PPID COMMAND
+  70716   66487 /nix/store/djgc45v1n9lq05kr5vvg4z03xjj2yqwd-fish-4.2.1/bin/fish -c export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='/tmp/fmsol-lab/home/state/live-fish2.inbox'; '/home/art/.no-mistakes/worktrees/9f
+
+## tmux panes in the fish lab server
+fish pid=2963267 cmd=fish
+fm-live-fish pid=3334486 cmd=fish
+fm-live-fish-inert pid=4033743 cmd=fish
+fm-live-fish2 pid=66305 cmd=fish
+
+## which shells are alive
+pid=70716 comm=fish alive=yes
+pid=66487 comm=fish alive=yes
+
+## the worker itself (pid from the worker's own log)
+    PID    PPID COMMAND
+  70911   70716 sleep 300
+registry pid 70716 alive=yes worker pid 70911 alive=yes
+
+## after the worker exits (kill -TERM 70911)
+registry pid 70716 alive=no worker pid 70911 alive=no
+registry:
+live-bash	gpt-6.1-sol	1793443951	2998003
+live-fish	gpt-6.1-sol	1793444120	3337251
+live-after	gpt-6.1-sol	1793444297	3670659
+live-home-a	gpt-6.1-sol	1793444410	3869662
+live-bash2	gpt-6.1-sol	1793444654	4191929
+live-fish2	gpt-6.1-sol	1793444703	70716
+
+## a fresh capped dispatch is admitted again (stale rows do not count)

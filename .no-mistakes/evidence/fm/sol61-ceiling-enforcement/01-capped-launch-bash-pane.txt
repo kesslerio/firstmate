@@ -1,0 +1,56 @@
+# live capped spawn - bash pane (bash-only process substitution)
+
+## spawn output
+# spawn-raw id=live-bash2 kind=bash model=gpt-6.1-sol home=/tmp/fmsol-lab/home
+# raw=/usr/bin/env bash -c printf\ \"task=%s\ argv=%s\ worker_pid=%s\\n\"\ live-bash2\ \"\$1\"\ \"\$\$\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"exported=%s\ local=%s\\n\"\ \"\$FM_LIVE_EXPORTED\"\ \"\$FM_LIVE_LOCAL\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"env_inbox=%s\ env_cad=%s\\n\"\ \"\$FM_TASK_INBOX\"\ \"\$COMPACT_ADVISER_DISABLE\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ exec\ sleep\ 300 _ "$(cat <(printf %s bash-pane))"
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmsol-lab/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+spawned live-bash2 harness=env kind=scout window=primary:fm-live-bash2 worktree=/tmp/fmsol-lab/userhome/.treehouse/project-46f84b/10/project
+# spawn-exit=0
+
+## staged launch file the pane sourced
+FM_HOME='/tmp/fmsol-lab/home' bash '/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC8966QSSJ/bin/fm-sol-cap-lib.sh' run-launch 'live-bash2' '/tmp/fmsol-lab/home/state' 'export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='\''/tmp/fmsol-lab/home/state/live-bash2.inbox'\''; '\''/home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC8966QSSJ/bin/fm-git-strip-ai-trailers.sh'\'' env-file '\''/tmp/fmsol-lab/home/state/live-bash2.git-hooks'\'' '\''/tmp/fm-live-bash2+3757b397997fbc55ca2fee81c97c2154d3bedad8d6c1bec25bc04568af25dbb9/git-config.s1793444657.4182303.1219.sh'\'' && . '\''/tmp/fm-live-bash2+3757b397997fbc55ca2fee81c97c2154d3bedad8d6c1bec25bc04568af25dbb9/git-config.s1793444657.4182303.1219.sh'\'' || return 1 2>/dev/null || exit 1; /usr/bin/env bash -c printf\ \"task=%s\ argv=%s\ worker_pid=%s\\n\"\ live-bash2\ \"\$1\"\ \"\$\$\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"exported=%s\ local=%s\\n\"\ \"\$FM_LIVE_EXPORTED\"\ \"\$FM_LIVE_LOCAL\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ printf\ \"env_inbox=%s\ env_cad=%s\\n\"\ \"\$FM_TASK_INBOX\"\ \"\$COMPACT_ADVISER_DISABLE\"\ \>\>\ /tmp/fmsol-lab/wlog\;\ exec\ sleep\ 300 _ "$(cat <(printf %s bash-pane))"'
+
+## worker log lines
+task=live-bash2 argv=bash-pane worker_pid=4191929
+exported= local=
+env_inbox=/tmp/fmsol-lab/home/state/live-bash2.inbox env_cad=1
+
+## Sol registry (id<TAB>model<TAB>start<TAB>pid)
+live-bash	gpt-6.1-sol	1793443951	2998003
+live-fish	gpt-6.1-sol	1793444120	3337251
+live-after	gpt-6.1-sol	1793444297	3670659
+live-home-a	gpt-6.1-sol	1793444410	3869662
+live-bash2	gpt-6.1-sol	1793444654	4191929
+
+## worker process for registry pid 4191929
+    PID    PPID                  STARTED COMMAND
+4191929 4184740 Sat Oct 31 04:04:17 2026 sleep 300
+
+## process ancestry from the worker up to the pane shell
+pid=4191929 4184740 sleep 300
+pid=4184740 4184677 /bin/bash
+pid=4184677 4184612 treehouse get
+pid=4184612 2963223 -bash
+pid=2963223   1310 tmux -L fm-lab new-session -d -s primary -c /home/art/.no-mistakes/worktrees/9f75ec418609/01M68R6X2YXENR6JHC8966QSSJ bash
+
+## tmux panes in this lab server
+bash pid=2963233 cmd=bash
+fm-live-bash pid=2988514 cmd=bash
+fm-live-other pid=3515489 cmd=bash
+fm-live-inert pid=3572568 cmd=bash
+fm-live-after pid=3662603 cmd=bash
+fm-live-home-b pid=3814525 cmd=bash
+fm-live-home-a pid=3864604 cmd=bash
+fm-live-mate pid=3888310 cmd=bash
+fm-live-bash2 pid=4184612 cmd=sleep
+
+## after the worker exits (kill -TERM 4191929)
+registry pid 4191929 alive=no
+pane shell 4184740 (the interactive shell that sourced the line) alive=yes
+registry now:
+live-bash	gpt-6.1-sol	1793443951	2998003
+live-fish	gpt-6.1-sol	1793444120	3337251
+live-after	gpt-6.1-sol	1793444297	3670659
+live-home-a	gpt-6.1-sol	1793444410	3869662
+live-bash2	gpt-6.1-sol	1793444654	4191929
