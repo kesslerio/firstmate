@@ -1,0 +1,17 @@
+=== rc=0
+=== stdout
+spawned sm1 harness=pi kind=secondmate mode=secondmate yolo=off window=firstmate:fm-sm1 worktree=/tmp/fm-lab.sDDOmT/sm-home
+=== stderr
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.sDDOmT/home
+warning: secondmate sm1 sync skipped before launch: cannot determine default branch
+model pin unverified: pin 'john-lan/qwen3.8-flash-next' has no session record this launcher can read back for a fresh pi launch
+=== pane
+
+
+
+
+
+
+
+
+=== LAB=/tmp/fm-lab.sDDOmT

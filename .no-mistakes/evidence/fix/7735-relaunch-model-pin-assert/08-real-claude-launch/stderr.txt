@@ -1,0 +1,3 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.6Uplxx/home
+warning: secondmate sm1 sync skipped before launch: cannot determine default branch
+model pin unverified: pin 'claude-haiku-4-5' was not confirmed by pinned Claude session 6aebcb1a-51b8-4b9b-b926-1c85624aba46 (no session-reported model)

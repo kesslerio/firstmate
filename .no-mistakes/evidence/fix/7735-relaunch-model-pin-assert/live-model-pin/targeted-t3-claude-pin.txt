@@ -1,0 +1,1 @@
+ok - T3 Claude pin is immediately unverified without allocating a launcher session id

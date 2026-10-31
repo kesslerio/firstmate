@@ -1,0 +1,4 @@
+# all fm-secondmate-liveness tests passed
+ok - sweep: a confirmed-dead secondmate endpoint is killed and respawned
+ok - automatic recovery forwards the replacement's observed model verdict
+ok - sweep: secondmate recovery resolves its durable account despite a different ambient login

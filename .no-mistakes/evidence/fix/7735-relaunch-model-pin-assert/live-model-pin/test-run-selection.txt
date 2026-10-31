@@ -1,0 +1,12 @@
+$ bin/fm-test-run.sh --list --family backend-dispatch | grep model-pin
+
+$ bin/fm-test-run.sh --list-scheduled --lane portable-parallel-1 | grep model-pin
+
+$ bin/fm-test-run.sh --check-coverage
+FM_TEST_COVERAGE ok total=314 parallel=26 parallel_max_ms=814249 parallel_imbalance_ms=552 parallel_unhinted=0 serial=272 serial_shards=10 serial_unhinted=33 serial_max_ms=1175148 serial_budget_ms=1200000 herdr=16
+$ bin/fm-test-run.sh --list --family live-harness-optin | grep model-pin
+tests/fm-model-pin-readback-live-e2e.test.sh
+
+$ bin/fm-test-run.sh --list --changed --base 095db3bc7e57b4d50b7e2ac66f9671ba66be692b | grep -c . ; grep model-pin
+263
+tests/fm-model-pin-readback-live-e2e.test.sh

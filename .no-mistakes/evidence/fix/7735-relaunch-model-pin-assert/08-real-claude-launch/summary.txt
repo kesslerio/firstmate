@@ -1,0 +1,12 @@
+# Scenario: real Claude Code CLI (2.1.314) launched by the real firstmate
+# launcher in a disposable lab home on a private tmux server, pinned to
+# claude-haiku-4-5 with a 90-poll readback budget.
+#
+# The real CLI stopped on its own first-run theme/onboarding chooser and never
+# processed the launch prompt, so its session transcript carried no
+# session-reported model. The launcher recorded the pin as unverified (never
+# asserted, never guessed) and the spawn still succeeded (rc=0) with the worker
+# running: the report-only guarantee.
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.6Uplxx/home
+warning: secondmate sm1 sync skipped before launch: cannot determine default branch
+model pin unverified: pin 'claude-haiku-4-5' was not confirmed by pinned Claude session 6aebcb1a-51b8-4b9b-b926-1c85624aba46 (no session-reported model)

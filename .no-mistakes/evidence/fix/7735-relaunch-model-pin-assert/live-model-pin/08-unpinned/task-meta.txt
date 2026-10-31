@@ -1,0 +1,16 @@
+window=firstmate:fm-sm1
+endpoint_task_id=sm1
+worktree=/tmp/fm-lab.isWnx1/sm-home
+project=/tmp/fm-lab.isWnx1/sm-home
+harness=claude
+approval_mode=bypass
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-sm1
+model=default
+effort=default
+busy_gen=g1793434953.374901.11813
+spawn_gen=s1793434953.372322.9411
+home=/tmp/fm-lab.isWnx1/sm-home
+projects=

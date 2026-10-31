@@ -1,0 +1,1 @@
+spawned sm1 harness=claude kind=secondmate mode=secondmate yolo=off window=firstmate:fm-sm1 worktree=/tmp/fm-lab.isWnx1/sm-home

@@ -1,0 +1,3 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.fms3oj/home
+warning: secondmate sm1 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin unverified: pin 'claude-opus-5-5' could not be addressed for this raw Claude launch (no session address exists for this path)

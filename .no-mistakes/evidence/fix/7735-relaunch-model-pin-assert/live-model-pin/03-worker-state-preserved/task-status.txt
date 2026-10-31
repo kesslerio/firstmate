@@ -1,0 +1,2 @@
+working: the worker owns this status
+done: the worker finished during the readback

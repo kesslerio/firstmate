@@ -1,0 +1,16 @@
+# scenario: s8
+# launcher exit: 0
+
+# stderr (the operator-visible verdict channel)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.isWnx1/home
+warning: secondmate sm1 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+
+# stdout
+spawned sm1 harness=claude kind=secondmate mode=secondmate yolo=off window=firstmate:fm-sm1 worktree=/tmp/fm-lab.isWnx1/sm-home
+
+# delivered launch (the argv the pane really ran)
+--dangerously-skip-permissions --add-dir /tmp/fm-lab.isWnx1/home/state/sm1.inbox --settings /tmp/fm-lab.isWnx1/home/state/sm1.claude-settings.json : Firstmate operational input waiting: read '/tmp/fm-lab.isWnx1/sm-home/state/operational-inbox/1793434954-b3a25de11a6fb6aa.msg' and handle its contents as Firstmate operational input.
+
+# session transcript at <config-dir>/projects/*/<session-id>.jsonl
+
+# task status file

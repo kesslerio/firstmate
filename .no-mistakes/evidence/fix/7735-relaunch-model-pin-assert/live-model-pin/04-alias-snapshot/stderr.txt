@@ -1,0 +1,3 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.9s2JQg/home
+warning: secondmate sm1 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin asserted: pin 'claude-haiku-4-5' actual 'claude-haiku-4-5-20251001' (pinned Claude session 7d449464-8f21-40ed-9145-5c1a46e9e68a)

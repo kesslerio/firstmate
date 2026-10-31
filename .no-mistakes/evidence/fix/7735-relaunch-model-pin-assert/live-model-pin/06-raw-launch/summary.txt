@@ -1,0 +1,18 @@
+# scenario: s6
+# launcher exit: 0
+# wall seconds: 2
+
+# stderr (the operator-visible verdict channel)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.fms3oj/home
+warning: secondmate sm1 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin unverified: pin 'claude-opus-5-5' could not be addressed for this raw Claude launch (no session address exists for this path)
+
+# stdout
+spawned sm1 harness=claude kind=secondmate mode=secondmate yolo=off window=firstmate:fm-sm1 worktree=/tmp/fm-lab.fms3oj/sm-home
+
+# delivered launch (the argv the pane really ran)
+--dangerously-skip-permissions
+
+# session transcript at <config-dir>/projects/*/<session-id>.jsonl
+
+# task status file

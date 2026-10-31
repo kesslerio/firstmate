@@ -1,0 +1,9 @@
+1 PASS pinned claude launch asserts the model its own session reports
+2 PASS a diverged session is reported and the worker keeps running
+3 PASS the worker's done: stays current, status bytes carry no model note, verdict on stderr
+4 PASS a vendor alias and the snapshot it resolves to assert instead of mismatching
+5 PASS a silent session is unverified, never a guessed match
+6 PASS raw launch: no session id minted and unverified without polling (2s)
+7 PASS no uuidgen: launch succeeds, no invented session id, unverified
+8 PASS unpinned launch: no minted session id, no verdict, no status
+9 PASS automatic recovery relaunched the mate and reported its model verdict

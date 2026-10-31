@@ -1,0 +1,5 @@
+# pi 1.4.0: inherited turn john-lan/qwen3.8-flash-next, resumed turn john-remote/qwen3.8-flash-next in one record
+ok - pi 1.4.0: a resumed session's own turn carries the model it was pinned to, over an inherited record naming another
+# claude 2.1.314 (Claude Code) reported claude-haiku-4-5-20251001 for pin claude-haiku-4-5
+ok - claude 2.1.314 (Claude Code): a pinned launch reads back the model its own session id addresses
+rc=0

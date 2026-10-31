@@ -1,0 +1,4 @@
+ok - fm-spawn --relaunch: a pinned Pi resume keeps its session and asserts the turn it produced
+ok - fm-spawn --relaunch: a diverged pinned Pi resume is recorded against the pin
+ok - fm-spawn --relaunch: a silent pinned Pi resume is recorded as unverified
+ok - Pi model evidence requires a completed response after error or abort

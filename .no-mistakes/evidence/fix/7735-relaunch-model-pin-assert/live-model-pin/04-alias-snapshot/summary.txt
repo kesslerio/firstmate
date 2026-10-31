@@ -1,0 +1,18 @@
+# scenario: s4
+# launcher exit: 0
+
+# stderr (the operator-visible verdict channel)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.9s2JQg/home
+warning: secondmate sm1 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin asserted: pin 'claude-haiku-4-5' actual 'claude-haiku-4-5-20251001' (pinned Claude session 7d449464-8f21-40ed-9145-5c1a46e9e68a)
+
+# stdout
+spawned sm1 harness=claude kind=secondmate mode=secondmate yolo=off window=firstmate:fm-sm1 worktree=/tmp/fm-lab.9s2JQg/sm-home
+
+# delivered launch (the argv the pane really ran)
+--session-id 7d449464-8f21-40ed-9145-5c1a46e9e68a --dangerously-skip-permissions --add-dir /tmp/fm-lab.9s2JQg/home/state/sm1.inbox --settings /tmp/fm-lab.9s2JQg/home/state/sm1.claude-settings.json --model claude-haiku-4-5 : Firstmate operational input waiting: read '/tmp/fm-lab.9s2JQg/sm-home/state/operational-inbox/1793434944-059d377745424bc3.msg' and handle its contents as Firstmate operational input.
+
+# session transcript at <config-dir>/projects/*/<session-id>.jsonl
+{"type":"assistant","sessionId":"7d449464-8f21-40ed-9145-5c1a46e9e68a","message":{"role":"assistant","model":"claude-haiku-4-5-20251001","content":[]}}
+
+# task status file

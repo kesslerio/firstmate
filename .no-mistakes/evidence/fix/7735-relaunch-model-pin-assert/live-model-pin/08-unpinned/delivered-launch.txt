@@ -1,0 +1,1 @@
+--dangerously-skip-permissions --add-dir /tmp/fm-lab.isWnx1/home/state/sm1.inbox --settings /tmp/fm-lab.isWnx1/home/state/sm1.claude-settings.json : Firstmate operational input waiting: read '/tmp/fm-lab.isWnx1/sm-home/state/operational-inbox/1793434954-b3a25de11a6fb6aa.msg' and handle its contents as Firstmate operational input.
