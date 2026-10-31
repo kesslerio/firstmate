@@ -1,0 +1,6 @@
+receipt: 2026-10-31T08:23:35Z
+pid=615151 comm=bash ppid=615144
+pid=615144 comm=bash ppid=1310
+pid=1310 comm=systemd ppid=1
+fm_harness_ancestry_pids: []
+harness-shaped ancestors in the suite run: none

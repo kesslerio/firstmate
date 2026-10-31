@@ -1,4 +1,5 @@
 ok - branch prompt is byte-stable across homes, cwd, timezone, and time, above the cache floor
+ok - emitted branch prompt routes completed scouts through existing policies and leased cleanup, preserving unfinished work
 ok - outcome store is append-only and refuses sequence reuse after a torn tail
 ok - outcome append refreshes a bounded, verbatim display tail of the newest rows without moving the cursor
 ok - the display tail keeps only whole newest rows within its 1 MiB budget, never shortening one
@@ -22,6 +23,7 @@ ok - an unmarked main honors a live branch lease across processes and ignores a 
 ok - a lease file makes an unmarked guard exclude a concurrent claim for the complete mutation
 ok - a host home's unmarked main excludes the host's first claim for its whole mutation, and other homes take no lock
 ok - lease liveness requires an exact valid session-lock pid
+ok - a claim pinned before a re-anchor records the live lock holder; a dead pin stays stale
 ok - concurrent stale-lease claims serialize so exactly one actor succeeds
 ok - guard stale cleanup cannot race with or delete a newer lease claim
 ok - lease guard excludes a concurrent actor for the complete mutation
@@ -32,3 +34,4 @@ ok - the away-posture record relocates the PR merge and a spawn under the spend 
 ok - relocated branch spawn admits only already-queued dispatchable work, including on a manual-backend home
 ok - the away spend cap is rechecked under the task-set lock so concurrent spawns cannot both publish
 ok - a quiet-mode record never caps a present captain's spawn, while the away record's cap still binds
+exit=0

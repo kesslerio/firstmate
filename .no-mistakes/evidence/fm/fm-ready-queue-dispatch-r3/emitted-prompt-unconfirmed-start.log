@@ -1,0 +1,9 @@
+$ bin/fm-branch-prompt.sh | grep -o "If startup cannot be confirmed[^.]*\.[^.]*\.[^.]*\."
+If startup cannot be confirmed, keep its endpoint and work intact and leave the unit In flight rather than reopening it:
+ `bin/fm-bootstrap.sh` reads a queued row paired with a worker record this home still owns as work it must mark In fligh
+t, so a reopen silently drops the unit out of the queue without a confirmed starter while the endpoint still needs atten
+tion. Record the observed startup stop and retry condition in its note and outcome, and retry on that endpoint by inspec
+ting it until it proves the start or by relaunching it;
+
+$ prompted reopen guidance present?
+0

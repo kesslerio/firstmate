@@ -1,0 +1,12 @@
+ready backlog: count: 1
+watcher stdout (ready queue): [heartbeat ]
+ok: ready queued work produced a heartbeat wake
+ok: the heartbeat wake reached MAIN through the real drain
+1793435198	1	heartbeat	heartbeat	heartbeat
+ready backlog: count: 0
+watcher stdout (empty queue): []
+ok: an empty queue stayed absorbed while the heartbeat schedule advanced
+ok: the absorbed heartbeat was still triaged
+ready backlog (held unit): count: 0
+watcher stdout (held queue): []
+ok: captain-held work stayed quiet while the heartbeat schedule advanced

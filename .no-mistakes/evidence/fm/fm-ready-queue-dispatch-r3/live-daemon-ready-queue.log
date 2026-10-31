@@ -1,0 +1,9 @@
+daemon started pid=841521 target=%0 socket=fm-lab-readyq-840660
+ready backlog: count: 1 ready[1]{id,state,kind,repo,title}:   next-unit,queued,task,"-",queued unit with no blocker ready_public_followups: 0 delivery-ready obligations help[1]:   - Run `tasks-axi start <id>` to dispatch one of these 
+ok: ready queued work reached the supervisor pane despite FM_INJECT_SKIP=heartbeat
+ok: the handled heartbeat was acknowledged
+empty backlog ready: count: 0 ready: 0 unblocked queued tasks ready_public_followups: 0 delivery-ready obligations help[1]:   - Run `tasks-axi list --state queued` to see all queued work (incl. blocked) 
+ok: an empty queue produced no dispatch wake
+ok: the absorbed heartbeat was acknowledged
+ok: unreadable readiness escalated instead of reading as an empty queue
+⁣FIRSTMATE_OP: v1 away-supervisor: Supervisor escalate (1 event(s)): ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker (pre-read; re-arm not needed — watcher daemon-managed)	injection
