@@ -1,0 +1,25 @@
+
+### environment: ps works normally (no shim on PATH)
+ps = /run/current-system/sw/bin/ps
+ps -o comm= exit=0
+
+### 1. a claude-named session acquires the lock
+session pid        = 634297
+acquire exit       = 0
+acquire stdout     = lock acquired: harness pid 634297
+acquire stderr     = 
+lock contents      = 634297 (MATCH)
+
+### 2. status and inbox ready
+lock: held by live harness pid 634297
+{"schema":"fm-primary-ready.v1","home":"fm-lab.2Y9BI9/home4","observed_at":"2026-10-31T13:21:27Z","lock":{"state":"held","pid":634297,"live_harness":true},"wake_consumer":{"state":"down","reason":"no-beacon","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":false}
+
+### 3. a competing session is refused a live harness owner lock
+competitor exit    = 1
+competitor stderr  = error: another live firstmate session holds the lock (pid 634297); operate read-only until resolved
+lock after attempt = 634297
+
+### 4. owner ends; the lock reads stale and is reclaimed
+lock: stale (pid 634297 dead or not a harness)
+reclaim exit       = 0
+lock after reclaim = 636501 (reclaimer 636501)

@@ -1,0 +1,18 @@
+
+### environment: ps binary refused (exit 126)
+/tmp/fm-lab.2Y9BI9/fakebin/ps: Operation not permitted
+ps -V exit=126
+
+### 1. dead record
+dead pid 619390            lock now = 619483   exit = 0  expected-pid = 619483  REWRITTEN-TO-SESSION
+
+### 2. reused pid that is now a live NON-harness process
+live non-harness 619822    lock now = 619823   exit = 0  expected-pid = 619823  REWRITTEN-TO-SESSION
+
+### 3. malformed, empty, and zero-valued records
+record '[not-a-pid]'       lock now = 620155   exit = 0  expected-pid = 620155  REWRITTEN-TO-SESSION
+record '[]'                lock now = 620325   exit = 0  expected-pid = 620325  REWRITTEN-TO-SESSION
+record '[   ]'             lock now = 620484   exit = 0  expected-pid = 620484  REWRITTEN-TO-SESSION
+record '[0]'               lock now = 620656   exit = 0  expected-pid = 620656  REWRITTEN-TO-SESSION
+record '[00]'              lock now = 620928   exit = 0  expected-pid = 620928  REWRITTEN-TO-SESSION
+record '[0000]'            lock now = 621217   exit = 0  expected-pid = 621217  REWRITTEN-TO-SESSION

@@ -1,0 +1,20 @@
+
+### deny the ps binary's exec
+  ps -V rc=126 (126 == exec refused)
+
+### session A (live harness) acquires the home lock under denied ps
+  A pid=1951834 acquire rc=0 [lock acquired: harness pid 1951834] lock=[1951834]
+
+### LIVE FOREIGN OWNER: session B runs the Cursor turn-end guard while A holds the lock
+  B pid=1977796 guard rc=0
+  guard output: 
+  lock after guard=[1951834] (must still be A=1951834 - no takeover)
+  A alive: yes
+
+### DEAD OWNER: A is killed, its stale lock record stays, session B runs the same guard
+  A dead: yes; lock record=[1951834]
+  C pid=1997579 guard rc=0
+  guard output: 
+  lock after guard=[1997579] (reclaim by the shared verdict is allowed)
+
+DONE

@@ -1,0 +1,22 @@
+
+### deny the ps binary's exec
+  ps -V rc=126 (126 == exec refused)
+  scratch primary root: plain git checkout at /tmp/fm-lab.VtnjXM/root
+  supervision need staged: state/demo.meta (in-flight meta)
+
+### session A (live harness) acquires the home lock under denied ps
+  A pid=2302575 acquire rc=0 [lock acquired: harness pid 2302575] lock=[2302575]
+
+### LIVE FOREIGN OWNER: session B fires the Claude turn-end guard
+  B pid=2322975 guard rc=0
+  guard output: {"systemMessage":"FIRSTMATE SUPERVISION IS OWNED BY ANOTHER LIVE SESSION: this read-only session cannot and should not arm or repair the watcher (lock owner pid 2302575). Allowing this turn to end safely; the owning session must restore supervision."} 
+  lock after guard=[2302575] (must still be A=2302575)
+  A alive: yes
+
+### DEAD OWNER (control): A exits, stale record stays, session B fires the same guard
+  A dead: yes; lock record=[2302575]
+  C pid=2339596 guard rc=2
+  guard output: ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ●  TURN WOULD END BLIND - SUPERVISION IS OFF ●  1 task(s) in flight, but no live watcher holds this home lock (last beat: never). ●  The Stop-owned auto-arm did not claim this home either, so recovery is NOT already under way. ●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &. ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+  lock after guard=[2302575] (control: the guard reports, it does not take over)
+
+DONE

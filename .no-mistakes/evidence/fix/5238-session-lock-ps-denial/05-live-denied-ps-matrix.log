@@ -1,0 +1,57 @@
+
+### identity route A: ps available (normal product route)
+pid=1 ppid=0 comm=[systemd] args=[/run/current-system/systemd/lib/systemd/systemd --system --deserialize=12]
+pid=1337961 ppid=1337953 comm=[claude] args=[/tmp/fm-lab.E4S7hC/bin/claude -c sleep 900; :]
+pid=1337960 ppid=1337953 comm=[sleep] args=[sleep 900]
+
+### ps denied: bound /dev/null over /run/current-system/sw/bin/ps
+  ps -V rc=126 (126 == exec refused by the OS)
+  ps -o comm= -p 1 rc=126
+
+### identity route B: same live pids through the ps-free provider
+pid=1 ppid=0 comm=[systemd] args=[/run/current-system/systemd/lib/systemd/systemd --system --deserialize=12]
+pid=1337961 ppid=1337953 comm=[claude] args=[/tmp/fm-lab.E4S7hC/bin/claude -c sleep 900; :]
+pid=1337960 ppid=1337953 comm=[sleep] args=[sleep 900]
+  ROUTE EQUIVALENCE: identical comm/args/ppid for every pid on both routes
+
+### ancestry probe from a harness-named session under denied ps
+self=1338760 comm=[bash]
+ancestry=[1338757 ]
+anchor=[1338757]
+
+### S1: session A (real harness-shaped process) acquires on the denied-ps host
+  A harness pid=1352011  acquire rc=0  out=lock acquired: harness pid 1352011
+  lock file=[1352011]  status=[lock: held by live harness pid 1352011]
+  inbox ready lock fields=["state":"held","pid":1352011,"live_harness":true]
+
+### S2: session B, a second live harness, tries to acquire the same home
+  B harness pid=1363126  acquire rc=1
+  B stderr/stdout=[error: another live firstmate session holds the lock (pid 1352011); operate read-only until resolved ]
+  lock after B=[1352011] (A's pid 1352011 must be unchanged)
+  A still alive: yes
+
+### S8: a stale lock naming a live NON-harness pid (reused pid) is reclaimable
+  lock forced to live non-harness pid 1371868  (ps -o comm: /tmp/fmdrv/inner.sh: line 90: /run/current-system/sw/bin/ps: Permission denied)
+  C acquire rc=0  out=[lock acquired: harness pid 1371918]  lock now=[1371918]
+
+### S4: a LIVE owner whose identity cannot be read must block reclaim
+  hid /proc/1387912 (identity unreadable, process alive)
+  kill -0 1387912: alive
+  D acquire rc=1  out=[error: another live firstmate session holds the lock (pid 1387912); operate read-only until resolved ]
+  lock after D=[1387912] (must still be 1387912)
+  D status=[lock: stale (pid 1387912 dead or not a harness)]
+  D inbox lock fields=["state":"unknown","pid":1387912,"live_harness":null]
+
+### S3: after the live owner exits its lock is reclaimed by the next session
+  A (pid 1352011) is dead
+  E acquire rc=0  out=[lock acquired: harness pid 1408365]  lock now=[1408365] (must be 1408365)
+
+### S7: dead, empty, zero and malformed lock records stay reclaimable
+  lock=[1454819] -> acquire rc=0 out=[lock acquired: harness pid 1455804 ] lock now=[1455804]
+  lock=[0] -> acquire rc=0 out=[lock acquired: harness pid 1488928 ] lock now=[1488928]
+  lock=[] -> acquire rc=0 out=[lock acquired: harness pid 1496095 ] lock now=[1496095]
+  lock=[notapid] -> acquire rc=0 out=[lock acquired: harness pid 1501413 ] lock now=[1501413]
+
+### teardown
+
+DONE

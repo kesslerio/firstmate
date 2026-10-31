@@ -1,0 +1,22 @@
+
+### deny the ps binary's exec
+  ps -V rc=126 (126 == exec refused)
+  scratch primary root: plain git checkout at /tmp/fm-lab.M51uyp/root
+  supervision need staged: state/demo.meta (in-flight meta)
+
+### session A (live harness) acquires the home lock under denied ps
+  A pid=2144895 acquire rc=0 [lock acquired: harness pid 2144895] lock=[2144895]
+
+### LIVE FOREIGN OWNER: session B fires the Claude Stop auto-arm
+  B pid=2184818 autoarm rc=0
+  autoarm output: 
+  lock after autoarm=[2144895] (must still be A=2144895)
+  A alive: yes
+
+### DEAD OWNER: A exits, stale record stays, session B fires the same Stop auto-arm
+  A dead: yes; lock record=[2144895]
+  C pid=2205653 autoarm rc=2
+  autoarm output: firstmate watcher auto-arm FAILED - the Stop-owned automatic supervision mechanism is broken after 2 bounded attempts, and no live watcher with a fresh beacon was verified. watcher: FAILED - refusing to arm from a disposable validation checkout: /home/art/.no-mistakes/worktrees/9f75ec418609/01M69187TSE1EK203M209N84DM/bin The supervision host (docs/supervision-host.md) ran these cycles; its last one exited 0 without a wake. Do not launch a manual background arm from this notice; investigate the automatic Stop hook and watcher startup before ending blind. 
+  lock after autoarm=[2205653] (reclaim allowed when the owner is gone)
+
+DONE

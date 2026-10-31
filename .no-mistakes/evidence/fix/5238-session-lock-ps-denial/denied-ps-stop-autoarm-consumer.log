@@ -1,0 +1,8 @@
+
+### environment: ps refused; idle plain-checkout hook home
+/tmp/nmsl-j1bD3y/fakebin/ps: Operation not permitted
+ps -V exit=126
+home = /tmp/nmsl-j1bD3y/hookhome (AGENTS.md, bin/, state/ with no in-flight work)
+
+### 1. foreign LIVE harness owns the lock: the Stop hook must stay inert
+foreign owner pid  = 2729618 (comm claude)

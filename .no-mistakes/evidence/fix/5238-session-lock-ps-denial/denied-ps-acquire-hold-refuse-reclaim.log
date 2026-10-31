@@ -1,0 +1,35 @@
+
+### environment: the ps binary itself is refused (EDR-style denial)
+/tmp/fm-lab.2Y9BI9/fakebin/ps: Operation not permitted
+ps -V exit=126
+kernel=Linux python3=/run/current-system/sw/bin/python3
+
+### state directory starts empty
+no lock yet
+
+### 1. a claude-named primary session acquires the lock with ps denied
+session pid        = 532510 (comm claude)
+acquire exit       = 0
+acquire stdout     = lock acquired: harness pid 532510
+acquire stderr     = 
+lock contents      = 532510
+MATCH: the lock names the live session
+
+### 2. fm-lock.sh status on the held lock
+lock: held by live harness pid 532510
+
+### 3. fm-inbox.sh ready lock projection (real consumer JSON)
+{"schema":"fm-primary-ready.v1","home":"fm-lab.2Y9BI9/home","observed_at":"2026-10-31T13:19:50Z","lock":{"state":"held","pid":532510,"live_harness":true},"wake_consumer":{"state":"unknown","reason":"supervision-model-unknown-for-home","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":"unknown"}
+
+### 4. a competing claude-named session must not take a live owner lock
+competitor pid     = 532794
+competitor exit    = 1
+competitor stderr  = error: another live firstmate session holds the lock (pid 532510); operate read-only until resolved
+lock after attempt = 532510
+
+### 5. the owner session ends; the lock reads stale and a new session reclaims it
+lock: stale (pid 532510 dead or not a harness)
+reclaim exit       = 0
+reclaim stderr     = 
+reclaimer pid      = 533720
+lock after reclaim = 533720

@@ -1,0 +1,20 @@
+
+### environment: ps binary refused (exit 126)
+/tmp/fm-lab.2Y9BI9/fakebin/ps: Operation not permitted
+ps -V exit=126
+
+### 1. a live NON-harness process is recorded as the lock owner and its identity is unreadable
+live owner pid     = 617937 (comm sleep)
+lock contents      = 617937
+
+### 2. a claude-named session must refuse that live, unreadable owner
+acquire exit       = 1
+acquire stderr     = error: another live firstmate session holds the lock (pid 617937); operate read-only until resolved
+lock after attempt = 617937 (unchanged: yes)
+owner alive        = yes
+
+### 3. once that owner is gone the same record is reclaimable
+reclaim exit       = 0
+reclaim stderr     = 
+reclaimer pid      = 618084
+lock after reclaim = 618084
