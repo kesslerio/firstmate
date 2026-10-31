@@ -1,0 +1,2 @@
+another live firstmate session holds the lock (pid 3959969, started Sat Oct 31 00:12:47 2026, age 00:08); this session does not own the fleet lock, so it must not record a mandate it cannot carry out. Stopping the holder is a decision for the operator, never for this script.
+rc=1

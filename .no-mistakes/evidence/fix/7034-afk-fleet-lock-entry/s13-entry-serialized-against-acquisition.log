@@ -1,0 +1,12 @@
+### Scenario: an away entry started while another session is inside a lock acquisition
+acquirer: took the acquisition boundary (/tmp/fm-lab.7VTXeA/state/.lock.acquire) with no state/.lock published
+acquisition boundary held: yes; state/.lock published: no
+after 4s: entry still running (waiting for the in-flight acquisition): yes
+after 4s: away record written: no
+acquirer: took the acquisition boundary (/tmp/fm-lab.7VTXeA/state/.lock.acquire) with no state/.lock published
+acquirer: published state/.lock as pid 1571639 while still holding the boundary
+entry exit code: 1
+away record written: no
+acquirer process still alive (nothing stopped automatically): yes
+entry output:
+another live firstmate session holds the lock (pid 1571639, started Sat Oct 31 01:00:35 2026, age 00:04); this session does not own the fleet lock, so it must not record a mandate it cannot carry out. Stopping the holder is a decision for the operator, never for this script.

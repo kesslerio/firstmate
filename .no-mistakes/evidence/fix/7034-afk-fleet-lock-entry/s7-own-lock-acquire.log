@@ -1,0 +1,3 @@
+lock acquired: harness pid 3790434
+acquire rc=0
+lock: held by live harness pid 3790434

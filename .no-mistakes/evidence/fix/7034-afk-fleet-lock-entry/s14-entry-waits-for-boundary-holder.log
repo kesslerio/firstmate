@@ -1,0 +1,11 @@
+### Scenario: an away entry waits out an ordinary boundary holder and then proceeds
+sweep: holding the acquisition boundary without publishing state/.lock
+boundary held: yes; state/.lock published: no
+after 3s: entry still running (waiting): yes
+after 3s: away record written: no
+sweep: holding the acquisition boundary without publishing state/.lock
+sweep: released the boundary
+entry exit code: 0
+away record written: yes
+recorded mode: away
+boundary left held: no
