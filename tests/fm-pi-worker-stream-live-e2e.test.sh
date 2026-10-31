@@ -89,4 +89,8 @@ done
 if ! command -v pi-signed >/dev/null 2>&1; then
   printf '# pi-signed unavailable: signed executable not exercised\n'
 fi
-pass "real Pi $PI_VERSION worker stream lifecycle, background exclusion, and default-off behavior"
+if [ "$cases" = unverified ]; then
+  pass "real Pi $PI_VERSION unverified-version warning, inert stream observation, and existing busy/idle behavior"
+else
+  pass "real Pi $PI_VERSION worker stream lifecycle, background exclusion, and default-off behavior"
+fi

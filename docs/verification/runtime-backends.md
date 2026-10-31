@@ -3250,6 +3250,16 @@ No external provider, credentials, primary extension, or live fleet is used.
 The signed executable was absent and is not credited as live-verified on this version.
 The portable busy-state, adapter-wiring, and watcher-triage suites own generation/request rejection and inspection notification behavior.
 
+The unverified-version fallback was checked on 2026-10-31 with installed Pi 1.4.0 and Node v24.22.1 using the same command above.
+The guard asserted the exact spawn warning and absence of stream handlers, then exercised ordinary busy/idle behavior through the real SDK.
+Observed output:
+
+```text
+ok - real Pi 1.4.0 default-off worker
+# pi-signed unavailable: signed executable not exercised
+ok - real Pi 1.4.0 unverified-version warning, inert stream observation, and existing busy/idle behavior
+```
+
 ## Native Codex through Pi
 
 Verified on 2026-09-08 with Pi 0.85.1 and the installed `pi-codex-native` 0.2.1 adapter.
