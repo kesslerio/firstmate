@@ -1,0 +1,6 @@
+1..3
+ok - a heartbeat with no captain-relevant change is absorbed and backs off the cadence
+ok - the heartbeat backstop surfaces a captain event hidden behind a later routine append
+ok - heartbeat backstop fail-safe surfaces a captain-relevant status the per-wake path missed
+FM_TEST_COMPLETE
+RC=0

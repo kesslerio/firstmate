@@ -1,0 +1,5 @@
+other note: "Not dispatched: away words say 'No dispatch is authorized.' Retry waits for the captain's return or an applicable dispatch grant."
+other2 note: "Not dispatched: away words say 'No dispatch is authorized.' Retry waits for the captain's return or an applicable dispatch grant."
+captain outcomes: {"seq":1,"epoch":1793432217,"task":"fleet","wake":"heartbeat","verdict":"captain","summary":"Heartbeat: two queued units (other, other2) are ready but not dispatched, because your away words say 'No dispatch is authorized.' I recorded that stop on both backlog notes. They wait for your return or a dispatch grant. No other fleet changes.","silent":false,"statusEndpoint":0,"statusIdent":"-"}
+ok - away live: both out-of-scope ready units stay queued with a durable stop and retry condition
+RC=0

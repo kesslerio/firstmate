@@ -1,0 +1,26 @@
+lab: /tmp/fmlab.8iyeGp (tear down with: bin/fm-live-lab.sh down /tmp/fmlab.8iyeGp)
+tree: 65fc16dcd8d58e21b6975599364a2f5cfd0db7a2 from /tmp/fm-labsrc.10IaqA
+scaffolded: /tmp/fmlab.8iyeGp/home/data/labe77692378f3b-mate/brief.md (secondmate charter)
+home=/tmp/fmlab.8iyeGp/mate
+spawned labe77692378f3b-mate harness=claude kind=secondmate mode=secondmate yolo=off window=firstmate:fm-labe77692378f3b-mate worktree=/tmp/fmlab.8iyeGp/mate
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+spawned labe77692378f3b-worker harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labe77692378f3b-worker worktree=/home/art/.treehouse/notes-e9ace8/1/notes
+gate: /tmp/fmlab.8iyeGp/home/data/labe77692378f3b-worker/gate (touch, then message the worker to resume)
+primary: claude --setting-sources project,local --model sonnet --effort medium --permission-mode auto
+ok primary: claude pid 3912577 in /tmp/fmlab.8iyeGp/home
+ok probe: the primary answered LABREADY-e77692378f3b
+ok trust: /tmp/fmlab.8iyeGp/home is trusted in the Claude store
+ok mirror: verified writer, check passed, captain=1 main=2
+ok host: supervision host pid 2056766
+ok watcher: live watcher with a fresh beacon
+ok mate: labe77692378f3b-mate pid 3814417 in /tmp/fmlab.8iyeGp/mate
+ok worker: labe77692378f3b-worker parked on /tmp/fmlab.8iyeGp/home/data/labe77692378f3b-worker/gate
+fail treehouse: new ~/.treehouse entries: notes-e9ace8
+not ready after 600s; the lab is left up for inspection: bin/fm-live-lab.sh pane /tmp/fmlab.8iyeGp, then bin/fm-live-lab.sh down /tmp/fmlab.8iyeGp
+RC=1

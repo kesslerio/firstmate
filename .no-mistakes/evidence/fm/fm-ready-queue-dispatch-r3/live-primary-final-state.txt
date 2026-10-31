@@ -1,0 +1,20 @@
+== backlog
+# Backlog
+
+## In flight
+- [ ] labe77692378f3b-worker - lab gated worker (repo: notes) (kind: ship) (since 2026-10-31)
+## Queued
+- [ ] lab-ready-9c1 - Add a subtract helper to the notes library (repo: notes) (kind: ship) (since 2026-10-31)
+## Done
+== outcomes
+{"seq":1,"epoch":1793432329,"task":"labe77692378f3b-worker","wake":"signal: /tmp/fmlab.8iyeGp/home/state/labe77692378f3b-mate.status /tmp/fmlab.8iyeGp/home/state/labe77692378f3b-worker.status /tmp/fmlab.8iyeGp/home/state/labe77692378f3b-worker.turn-ended","verdict":"routine","summary":"Worker is paused waiting on its gate file, which doesn't exist yet; the mate's config re-read finished. No action needed.","silent":true,"statusEndpoint":121,"statusIdent":"strong:66306:66603864:2026-10-31 00:37:29.532129269 -0700"}
+{"seq":2,"epoch":1793432366,"task":"labe77692378f3b-worker","wake":"stale: firstmate:fm-labe77692378f3b-worker","verdict":"routine","summary":"Worker is still paused on its gate file, which hasn't appeared; the wait is healthy. No queued work is ready.","silent":true,"statusEndpoint":121,"statusIdent":"strong:66306:66603864:2026-10-31 00:37:29.532129269 -0700"}
+{"seq":3,"epoch":1793432719,"task":"fleet","wake":"heartbeat","verdict":"captain","summary":"Queued task lab-ready-9c1 (Add a subtract helper to the notes library) is unblocked, not held, and has no worker. MAIN please dispatch it now. The other worker is still paused on its gate file.","silent":false,"statusEndpoint":0,"statusIdent":"-"}
+== wake queue
+== host log
+1793432282	start	gen=host-4073374-1793432281	primary=claude
+1793432335	handled	turn=host-4073374-1793432281.1	posture=attended	rc=0	reports=1	error=0 cost=0.028277 conversation_cost=0.028277 input=12 cache_read=111551 cache_write=2372 output=761 turns=6	signal: /tmp/fmlab.8iyeGp/home/state/labe77692378f3b-mate.status /tmp/fmlab.8iyeGp/home/state/labe77692378f3b-worker.status /tmp/fmlab.8iyeGp/home/state/labe77692378f3b-worker.turn-ended
+1793432370	handled	turn=host-4073374-1793432281.2	posture=attended	rc=0	reports=1	error=0 cost=0.017586 conversation_cost=0.045863 input=10 cache_read=79977 cache_write=1032 output=544 turns=4	stale: firstmate:fm-labe77692378f3b-worker
+1793432722	handled	turn=host-4073374-1793432281.3	posture=attended	rc=0	reports=1	error=0 cost=0.018739 conversation_cost=0.064602 input=10 cache_read=84029 cache_write=1114 output=586 turns=4	heartbeat
+1793432722	to-main	branch-outcome: the supervision session handled this wake and recorded captain outcomes for you (store rows 3); run bin/fm-wake-drain.sh, act on its BRANCH OUTCOMES section, and acknowledge them as it prints
+1793432761	start	gen=host-2056766-1793432760	primary=claude

@@ -1,0 +1,13 @@
+== before: backlog
+# Backlog
+
+## In flight
+- [ ] labe77692378f3b-worker - lab gated worker (repo: notes) (kind: ship) (since 2026-10-31)
+## Queued
+## Done
+== before: outcomes
+{"seq":1,"epoch":1793432329,"task":"labe77692378f3b-worker","wake":"signal: /tmp/fmlab.8iyeGp/home/state/labe77692378f3b-mate.status /tmp/fmlab.8iyeGp/home/state/labe77692378f3b-worker.status /tmp/fmlab.8iyeGp/home/state/labe77692378f3b-worker.turn-ended","verdict":"routine","summary":"Worker is paused waiting on its gate file, which doesn't exist yet; the mate's config re-read finished. No action needed.","silent":true,"statusEndpoint":121,"statusIdent":"strong:66306:66603864:2026-10-31 00:37:29.532129269 -0700"}
+{"seq":2,"epoch":1793432366,"task":"labe77692378f3b-worker","wake":"stale: firstmate:fm-labe77692378f3b-worker","verdict":"routine","summary":"Worker is still paused on its gate file, which hasn't appeared; the wait is healthy. No queued work is ready.","silent":true,"statusEndpoint":121,"statusIdent":"strong:66306:66603864:2026-10-31 00:37:29.532129269 -0700"}
+== before: workers
+/tmp/fmlab.8iyeGp/home/state/labe77692378f3b-mate.meta
+/tmp/fmlab.8iyeGp/home/state/labe77692378f3b-worker.meta
