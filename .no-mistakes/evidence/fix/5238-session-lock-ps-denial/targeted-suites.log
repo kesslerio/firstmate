@@ -1,0 +1,89 @@
+Targeted suites for fix/5238-session-lock-ps-denial, head ab07106b (plus one base-commit comparison).
+Host: Linux 6.18.7 x86_64, NixOS; /bin/ln absent; pid 1 = systemd; orphan reparent target = 1310 (sandbox subreaper).
+
+### tests/fm-session-lock-ps-denied.test.sh (head) — exit 0, 24 cases
+ok - live owner with unreadable identity returns a successful verdict
+ok - partial identity reads block reclaim; successfully empty args remain readable
+ok - empty, whitespace and non-numeric lock records allow acquisition
+ok - acquisition refuses a live owner with unreadable identity
+ok - 126-route parse assigns each field and refuses a blank ppid
+ok - provider records off the defined shape are refused, not parsed
+ok - a provider record with an empty comm field reports a present pid
+ok - ps 1 stays a stop with the provider untouched; ps 127 routes to it
+ok - refused -p with a live ps -V stays a stop; the denial check is cached once
+ok - the denied-ps diagnostic prints once per shell, whatever reads follow
+ok - ps returning no name stays a present pid, never a reclaimable stale one
+ok - denied ps: own lock is owned, foreign live harness is refused and named
+ok - linux route parses a fixture /proc tree through the repo's override hook
+ok - Unicode identity survives denied ps; controls flatten and live Cursor blocks reclaim
+ok - ps denied: ancestry and liveness still resolve through the OS provider
+ok - ps denied with no provider data: the walk refuses, it never guesses
+ok - ps denied: a chain containing no harness is still no harness
+ok - ps works: the fallback provider is never consulted
+ok - e2e blocked ps: the real platform provider identified a real harness tree, identity included
+ok - fm-procinfo.py: macOS-only, skipped
+ok - fm-procinfo.py fail-closed: macOS-only, skipped
+ok - route equivalence: macOS-only, skipped
+ok - control bytes preserve identical identity fields across routes
+ok - trailing empty argv elements are dropped; interior empties and argument spaces survive
+ALL PASS
+
+### tests/fm-session-lock-ancestry.test.sh (head) — exits at a PRE-EXISTING host assumption
+    (unchanged from base: an orphaned pty-host is expected to reparent to pid 1; this sandbox reparents to subreaper 1310)
+ok - session-lock: a version-named Claude Code session is identified from its install path and argv[0]
+ok - session-lock: a harness that is pid 1 of its own namespace is examined, not skipped
+ok - session-lock: ordinary script paths under a harness directory are not harness processes
+ok - session-lock: ownership stops at the first non-harness gap above the contiguous run
+ok - session-lock: a live version-named session holding the lock is not mistaken for a stale owner
+ok - session-lock: a trusted same-session id keeps owning a recycled background chain, and nothing weaker does
+ok - session-lock: a trusted id anchors the lock on the model-loop process, anything else on the outermost pid
+ok - session-lock: a Windows session is identified from its published pid across the severed parent link
+ok - session-lock: a published Windows pid is confirmed against the process table before it is trusted
+ok - session-lock: a tagged Windows pid is never resolved against the Cygwin process table
+ok - session-lock: a published identity is accepted by every gate that reads the lock
+ok - session-lock: a live tagged lock holder is a live foreign owner to a second Windows session
+ok - session-lock: fm-lock.sh protects valid tagged owners and reclaims dead or malformed records
+ok - session-lock: a published Windows Claude pid is accepted only with its session id
+ok - session-lock: a Windows /clear keeps the lock and re-keys its session id
+ok - session-lock: a Windows-tagged lock stays inert off Windows
+ok - session-lock: a task lease follows a live tagged lock holder and goes stale when it exits
+ok - session-lock: a harness in the local process table resolves untagged when ps has no -o option
+ok - session-lock e2e: a version-named session claims the home and arms supervision
+ok - session-lock e2e: a session parented by a harness-named daemon claims the home and arms supervision
+ok - session-lock e2e: a version-named session under a harness-named daemon keeps its own lock
+not ok - the pty-host was not reparented to init after the daemon ended
+
+### tests/fm-inbox.test.sh (head) — exit 0
+ok - plain note, list, and wake stay on the historical human path
+ok - plain note keeps exit 1 for a saved-but-unannounced failure
+ok - the same request id returns the original note as a distinguishable replay
+ok - a crash between recording the request id and publishing the note reuses the original id
+ok - saved-but-unannounced notes are repairable without creating a second note
+ok - repair and replay do not wake firstmate for an already-acknowledged note
+ok - receipts JSON is bounded by fixed bounds and discloses what it omitted
+ok - notes that predate the announcement marker are unknown, not re-announced
+ok - the reply channel is durable and its cursor is a strict order
+ok - the reply cursor never goes backwards when the sequence counter is lost
+ok - a reply without a valid sequence is reported as malformed
+ok - a non-UTF-8 note does not break the receipts view
+ok - readiness says unknown (or not-receivable) instead of inferring liveness from a lock
+ok - empty bodies and unsafe request ids are refused
+ok - a note body that opens with a double dash is queued as text
+ok - drain --ack still moves the note to handled
+
+### tests/fm-session-lock-windows-consumers.test.sh (head) — exit 0
+ok - supervision host: a win:<pid> session lock yields the main-session key only while that Windows process lives
+ok - auto-arm: a claim pins a win:<pid> lock holder and reads open only while that holder lives
+ok - auto-arm: mid-turn health accepts a rewake bound to a live win:<pid> holder and drops it when that holder exits
+
+### tests/fm-turnend-guard.test.sh (head) — exit 0
+ok - fm-turnend-guard: a dead away-mode daemon still blocks under the poll-derived grace
+ok - fm-turnend-guard: the poll-derived grace is bounded, not unlimited
+ok - fm-turnend-guard: with away mode off, the poll-derived grace never applies
+
+### tests/fm-claude-stop-autoarm.test.sh — the same case fails at BASE and at HEAD
+head ab07106b exit: not ok - a dead-owner steal mutex must not keep an abandoned claim unrecoverable: expected exit 2, got 0
+not ok - a dead-owner steal mutex must not keep an abandoned claim unrecoverable: expected exit 2, got 0
+base bb3e6906 exit: not ok - a dead-owner steal mutex must not keep an abandoned claim unrecoverable: expected exit 2, got 0
+not ok - a dead-owner steal mutex must not keep an abandoned claim unrecoverable: expected exit 2, got 0
+cause: that case's ln shim execs /bin/ln, which does not exist on NixOS; unrelated to this change.

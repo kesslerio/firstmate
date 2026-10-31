@@ -1,0 +1,117 @@
+lab home: /tmp/fm-lab.ElaRvw
+denied ps: /tmp/fm-lab.ElaRvw/denied/ps: Operation not permitted
+rc=126
+
+===== denied ps: live verified harness owner must be refused =====
+live harness pid 1086958 comm=claude args=/tmp/fm-lab.ElaRvw/bin/claude -c while :; do sleep 1; done
+acquire rc=1
+error: another live firstmate session holds the lock (pid 1086958, session S1); operate read-only until resolved
+lock now: 1086958
+PASS: acquisition refused with exit 1
+PASS: refusal names the live owner and its session
+PASS: the live owner's lock was left untouched
+
+===== denied ps: dead owner record must be reclaimed =====
+dead pid 1087382 is gone
+acquire rc=0
+lock acquired: harness pid 2665029
+lock now: 2665029
+PASS: acquisition succeeded
+PASS: acquisition reported the claimed harness pid
+PASS: the dead record was replaced
+PASS: the new owner is a live process
+
+===== denied ps: live non-harness owner must be reclaimed =====
+live non-harness pid 1087773 comm=sleep
+acquire rc=0
+lock acquired: harness pid 2665029
+lock now: 2665029
+PASS: acquisition succeeded over the reused non-harness pid
+PASS: the non-harness record was replaced
+
+===== denied ps: live owner with unreadable identity must be refused =====
+masked owner -> acquire rc=1
+error: another live firstmate session holds the lock (pid 1087773, session S1); operate read-only until resolved
+lock now: 1087773
+PASS: acquisition refused a live owner whose identity cannot be read
+PASS: the unreadable owner's lock was left untouched
+control mask  -> acquire rc=0
+lock acquired: harness pid 2665029
+lock now: 2665029
+PASS: the same sandbox still reclaims when the owner is readable
+PASS: the readable non-harness owner was replaced
+
+===== denied ps: fm-lock.sh status reports the live harness as held =====
+lock: held by live harness pid 1086958
+PASS: status reports held by the live harness
+ready (denied ps): {"schema":"fm-primary-ready.v1","home":"tmp/fm-lab.ElaRvw","observed_at":"2026-10-31T12:46:35Z","lock":{"state":"held","pid":1086958,"live_harness":true},"wake_consumer":{"state":"unknown","reason":"supervision-model-unknown-for-home","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":"unknown"}
+PASS: denied ps: inbox ready reports lock.state=held
+PASS: denied ps: inbox ready reports live_harness=true
+
+===== working ps: status and inbox ready report the live harness holder =====
+status: lock: held by live harness pid 1086958
+ready: {"schema":"fm-primary-ready.v1","home":"tmp/fm-lab.ElaRvw","observed_at":"2026-10-31T12:46:35Z","lock":{"state":"held","pid":1086958,"live_harness":true},"wake_consumer":{"state":"down","reason":"no-beacon","beacon_age_seconds":null},"posture":{"state":"present"},"can_receive":false}
+PASS: status reports held by the live harness
+PASS: inbox ready reports lock.state=held
+PASS: inbox ready reports live_harness=true
+PASS: inbox ready reports the harness pid
+
+===== denied ps: all-zero lock records must be reclaimed =====
+record '0'  -> rc=0 lock=2665029 lock acquired: harness pid 2665029
+PASS: zero-form record '0' was reclaimed
+PASS: zero-form record '0' no longer holds the lock
+record '00' -> rc=0 lock=2665029 lock acquired: harness pid 2665029
+PASS: zero-form record '00' was reclaimed
+PASS: zero-form record '00' no longer holds the lock
+record '000' -> rc=0 lock=2665029 lock acquired: harness pid 2665029
+PASS: zero-form record '000' was reclaimed
+PASS: zero-form record '000' no longer holds the lock
+record '0000' -> rc=0 lock=2665029 lock acquired: harness pid 2665029
+PASS: zero-form record '0000' was reclaimed
+PASS: zero-form record '0000' no longer holds the lock
+
+===== denied ps: live Cursor owner under a UTF-8 path must be refused =====
+live Cursor alias pid 1093057 comm=agent argv0=/tmp/fm-lab.ElaRvw/José/.local/bin/agent
+status (ps): lock: held by live harness pid 1093057
+status (denied): lock: held by live harness pid 1093057
+PASS: ps route reports the UTF-8 Cursor owner as held
+PASS: fallback route reports the UTF-8 Cursor owner as held
+acquire rc=1
+error: another live firstmate session holds the lock (pid 1093057, session S1); operate read-only until resolved
+lock now: 1093057
+PASS: acquisition refused the live UTF-8 Cursor owner
+PASS: the UTF-8 Cursor owner's lock was left untouched
+
+===== denied ps: Claude Stop auto-arm stays inert for a live foreign owner =====
+hook rc=0
+--stdout--
+
+--stderr--
+
+lock now: 1093057
+PASS: the Stop hook exited 0 (inert)
+PASS: the Stop hook left the foreign owner's lock untouched
+PASS: the Stop hook wrote no auto-arm ledger for the foreign home
+
+===== denied ps: Cursor turn-end guard is inert for a live foreign owner and recovers a dead one =====
+foreign owner -> guard rc=0, lock now: 1093057
+PASS: the guard exited 0 for a live foreign owner
+PASS: the guard left the foreign owner's lock untouched
+dead owner    -> guard rc=0, lock now: 2665029
+PASS: the guard exited 0 after recovering the dead record
+PASS: the guard reclaimed and rewrote the dead record
+
+===== before/after: the base commit cannot reclaim the same dead record =====
+base  acquire rc=1
+error: cannot locate harness process in ancestry
+lock now: 1087382
+PASS: the base build still refuses on the denied-ps host
+PASS: the base build leaves the dead record in place
+head  acquire rc=0
+lock acquired: harness pid 2665029
+lock now: 2665029
+PASS: the fixed build reclaims the same record
+PASS: the fixed build replaces the dead record
+
+===== summary =====
+ALL LIVE CHECKS PASSED
