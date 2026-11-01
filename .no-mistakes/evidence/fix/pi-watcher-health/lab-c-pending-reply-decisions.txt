@@ -1,0 +1,35 @@
+Disposable lab home: /tmp/fm-lab.XZEHwF (marked by bin/fm-lab-home.sh; config/wait-no-turns present)
+Every cycle below is a real bin/fm-watch.sh process against that home; the only substitution is the documented FM_PENDING_REPLY_SEND_HOOK delivery hook, which records instead of sending.
+
+== cycle 2 - 12 pending-reply records on ONE unchanged task snapshot (task hibit, open needs-decision)
+recoveries sent: 0
+decision-snapshot files inside the tick's cache dir: files=0 files=1 files=2 
+  (12 records on one unchanged snapshot => one snapshot file; the classifier fold ran once for that task in that tick)
+
+== cycle 3 - 18 records across TWO unchanged task snapshots (hibit 12 + homer 6, both with open decisions)
+recoveries sent: 0
+decision-snapshot files observed in that tick: files=0, files=1, files=2 (peaked at 2 for 2 distinct task snapshots)
+
+== cycle 4 - hibit decision resolved
+recoveries sent: 12, all task=hibit, 12 distinct messages, one per correlation
+task homer records untouched: 6 awaiting_report
+
+== cycle 5 - homer decision resolved
+recoveries sent: 6, all task=homer, 6 distinct messages
+all 18 records now recovery_sent exactly once
+
+== cycle 6 - adversarial: the task snapshot changes DURING one tick (juno)
+changed juno.status at 13:04:45.599 after 1 snapshot(s)
+recoveries sent in that same tick: 11
+juno phases after the tick: 11 recovery_sent, 1 awaiting_report (the record denied while the snapshot was unchanged)
+
+== cycle 7 - two NEW denied tasks (t1, t2, 6 records each) in one tick
+recoveries sent: 1 - and it is juno's leftover record whose decision had been resolved in cycle 6, not t1/t2
+juno send line: task=juno msg=[fm-from-firstmate]⁣corr=0feb6d75c8c26865 REPOST REQUIRED: previous marked request had no correlated parent report. Reply on the parent status channel including corr=0feb6d75c8c26865. Original request: juno request 3
+t1/t2 phases: 12 awaiting_report (denial held)
+decision-snapshot files in that tick: files=0 files=1 files=2 
+
+== fresh uncached pre-send authority (shipped fm_pending_reply_send_recovery, same function the tick calls before delivery)
+record eligible (no decision at fold time), then a needs-decision line opened before delivery:
+  result: REFUSED (rc=1), phase=awaiting_report, recovery_attempted_epoch empty, 0 delivery-hook calls
+after the decision closed: SENT once, phase=recovery_sent

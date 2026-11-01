@@ -1,0 +1,3 @@
+2026-11-01T20:51:42.155Z pid=2943891 health monitor retire=timeout arm=2972515 wait=1000ms
+2026-11-01T20:53:36.729Z pid=2943891 health monitor state=retrying arm=3079685
+2026-11-01T20:53:37.730Z pid=2943891 health monitor retire=timeout arm=3079685 wait=1000ms

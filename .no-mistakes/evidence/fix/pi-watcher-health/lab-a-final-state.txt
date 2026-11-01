@@ -1,0 +1,14 @@
+watcher lock after scenarios:
+  fm-home: /tmp/fm-lab.EDPWnB
+  pid: 3211894
+  pid-identity: linux-starttime=5799362 cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d364344443159425631454d48575a344b473957504452412f62696e2f666d2d77617463682e736800
+  pid-start: proc-starttime=5799362
+  watcher-path: /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CDD1YBV1EMHWZ4KG9WPDRA/bin/fm-watch.sh
+beacon age: 5s
+session lock: 2943891
+    PID    PPID COMMAND
+2944510 2943891 node /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CDD1YBV1EMHWZ4KG9WPDRA/.pi/extensions/lib/fm-sessionstart-supervisor.mjs /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CDD1YBV1EMHWZ4KG9WPDRA/bin/fm-sessionstart-run.sh --source startup --pi-prerequisite
+2944605 2943891 node /home/art/tools/attio-mcp/dist/cli.js
+2944609 2943891 node /home/art/.npm-packages/bin/dropbox-mcp
+2944614 2943891 /home/art/.local/bin/tincan mcp
+3211682 2943891 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CDD1YBV1EMHWZ4KG9WPDRA/bin/fm-watch-arm.sh --restart

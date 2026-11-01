@@ -1,0 +1,8 @@
+arm_pid=3059992	watcher_pid=3061869	origin=started	ended_at=1793566307	exit_code=1	signal=none	reason=nonzero-exit	beacon_age=372
+arm_pid=3062256	watcher_pid=3066315	origin=started	ended_at=1793566313	exit_code=1	signal=none	reason=nonzero-exit	beacon_age=378
+arm_pid=3066774	watcher_pid=3069492	origin=started	ended_at=1793566319	exit_code=1	signal=none	reason=nonzero-exit	beacon_age=384
+arm_pid=3070738	watcher_pid=3072868	origin=started	ended_at=1793566325	exit_code=1	signal=none	reason=nonzero-exit	beacon_age=390
+arm_pid=3074478	watcher_pid=3077769	origin=started	ended_at=1793566333	exit_code=1	signal=none	reason=nonzero-exit	beacon_age=398
+arm_pid=2972515	watcher_pid=2972615	origin=started	ended_at=1793566340	exit_code=143	signal=TERM	reason=arm-interrupted	beacon_age=405
+arm_pid=3196425	watcher_pid=3208978	origin=started	ended_at=1793566423	exit_code=1	signal=none	reason=nonzero-exit	beacon_age=367
+arm_pid=3079685	watcher_pid=3082178	origin=started	ended_at=1793566423	exit_code=143	signal=TERM	reason=arm-interrupted	beacon_age=367

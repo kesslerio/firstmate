@@ -1,0 +1,62 @@
+Live Pi primary watcher-health run (disposable lab home, real `pi` CLI, real
+bin/fm-watch-arm.sh + bin/fm-watch.sh, private tmux socket `-L fm-lab`).
+
+Harness: env -u NO_MISTAKES_GATE ... TMUX_TMPDIR=$LAB/tmux tmux -L fm-lab
+new-session -d -s primary -c <worktree> -e FM_HOME=$LAB
+-e FM_WATCH_EXTENSION_LOG_KEEP_LINES=500 pi -a --session-dir $LAB/sessions
+-e <worktree>/.pi/extensions/fm-primary-pi-watch.ts
+
+Scenario 1 - healthy arm is verified, not assumed
+  Pi ran `bin/fm-lock.sh` (lock acquired: harness pid 2943891), then called the
+  fm_watch_arm_pi tool -> "watcher: started Pi extension arm child 1 ..."
+  (state=starting, watcher pid 2972615).
+  Second call while that arm was established ->
+  "watcher: unchanged - Pi extension verified this home's watcher identity and
+   fresh progress; no manual re-arm needed ..."
+  Watcher pid unchanged (2972615); beacon 11s.
+
+Scenario 2 - repair call replaces an identity-proved stale watcher
+  kill -STOP 2972615 (wedged: alive, no progress) + beacon mtime aged to 360s,
+  just past the default 300s grace and below the 900s stall bound.
+  fm_watch_arm_pi call ->
+  "watcher: unhealthy - existing arm owns this home's identity-verified watcher
+   but progress is stale; Pi extension is retiring that arm and replacing the
+   watcher"  (state=retrying)
+  state/.watch-extension.log: "health monitor retire=timeout arm=2972515
+  wait=1000ms" (the SIGTERMed arm's stdio was still held by its stopped
+  descendant, exactly the documented slow-retire case).
+  The wedged process then handled its pending TERM (kill -CONT after the
+  retirement), and the arm layer replaced the holder: new watcher 3082178 with
+  a fresh beacon. Cycle ledger state/.watch-cycle-exits.log rows show the
+  failed arms (exit_code=1 nonzero-exit) and the retired arm
+  (exit_code=143 signal=TERM reason=arm-interrupted).
+  Follow-up fm_watch_arm_pi call -> "watcher: unchanged - Pi extension verified
+  this home's watcher identity and fresh progress ..." on pid 3082178.
+  No user-visible "watcher: FAILED" alarm was delivered to the session.
+
+Scenario 3 - the independent health monitor recovers with NO tool call
+  kill -STOP 3082178 + beacon aged to 360s; no keystrokes sent afterwards.
+  state/.watch-extension.log (only the interval callback writes these rows):
+    20:53:36.729Z health monitor state=retrying arm=3079685
+    20:53:37.730Z health monitor retire=timeout arm=3079685 wait=1000ms
+  The wedged holder then handled its pending TERM, and the monitor's
+  replacement came up as watcher pid 3211894 with a 1s-old beacon.
+  No fm_watch_arm_pi call ran in this window.
+
+Scenario 5 - unproved identity never touches a process or lock record
+  state/.watch.lock/pid-identity overwritten with a foreign value.
+  * 50s (two 30s monitor ticks) elapsed: watcher pid 3211894 unchanged, arm
+    child 3211682 unchanged, beacon still fresh, every lock file byte-identical
+    (sha256 compared before/after), no log rows, no new cycle rows.
+  * fm_watch_arm_pi call -> "watcher: unhealthy - existing arm has no verified
+    home-bound watcher with fresh progress; replacement withheld because watcher
+    identity is not proved"
+  * state/.watch.lock/fm-home set to /tmp/not-this-home -> same withheld text.
+  * state/.watch.lock/watcher-path set to /tmp/not-the-watcher.sh -> same
+    withheld text.
+  * identity restored -> fm_watch_arm_pi -> "watcher: unchanged - Pi extension
+    verified this home's watcher identity and fresh progress ..."
+
+Only the identity metadata was mutated by this run; the live watcher process,
+the extension's arm child, and the rest of the lock directory were never
+signalled or rewritten while their identity could not be proved.

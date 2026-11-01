@@ -1,0 +1,8 @@
+lab home: /tmp/fm-lab.KO3V42 (config/watch.env: export FM_POLL=600)
+watcher pid: 3823898
+beacon age at capture: 572s
+extension log: (absent - no replacement ever attempted)
+arm cycle ledger: (absent - exactly one arm, never retired)
+watcher env:
+FM_POLL=600
+FM_HOME=/tmp/fm-lab.KO3V42
