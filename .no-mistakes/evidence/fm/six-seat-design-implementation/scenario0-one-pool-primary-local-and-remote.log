@@ -1,0 +1,30 @@
+
+=== 0. disposable transport to the disposable remote account ===
+remote account art resolves /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2/bin/fm-remote-entrypoint.sh
+
+=== 1. the three surfaces: primary, a local secondmate home, a remote host supervisor ===
+one capacity-2 declaration for all three surfaces:
+  {"pools":[{"name":"fleet","capacity":2,"models":["pool-model-a"]}]}
+registry:
+  - mate - Live local mate. (home: /tmp/fm-drive2-lab.9w7iSx/mate; scope: live; projects: ; added 2026-10-20)
+  - rem - Live remote mate. (host: labremote; root: /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2; home: /tmp/fm-drive2-lab.9w7iSx/remote; scope: live; projects: ; added 2026-10-20)
+
+=== 2. the remote host confirms the declaration, so its supervisor is counted ===
+served rem policy=1967035279-68 epoch=r17935640825546662540.1 holders=1
+serve-remotes rc=0
+[{"state_dir":"/tmp/fm-drive2-lab.9w7iSx/remote/state/parent-route","task":"rem","generation":"legacyA","model":"pool-model-a","lifecycle":"confirmed"}]
+
+=== 3. a launch at the primary takes the second seat of the same pool ===
+fleet-seats: reserved pool=fleet id=primary-ship generation=gP used=2 capacity=2
+rc=0
+
+=== 4. a launch from the local secondmate home is refused against the same count ===
+fleet-seats: pool fleet is full (2 of 2 seats held); mate-ship gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-drive2-lab.9w7iSx/primary/state primary-ship
+  holder /tmp/fm-drive2-lab.9w7iSx/primary/state rem
+rc=4
+
+=== 5. the refusal disappears exactly when the primary releases its generation ===
+fleet-seats: released id=primary-ship generation=gP reason=teardown
+fleet-seats: reserved pool=fleet id=mate-ship generation=gM used=2 capacity=2
+rc=0

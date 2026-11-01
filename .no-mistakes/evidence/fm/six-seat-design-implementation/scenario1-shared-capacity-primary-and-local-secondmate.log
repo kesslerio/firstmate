@@ -1,0 +1,67 @@
+
+=== 1. a primary home and a real local secondmate home with a capacity-2 pool ===
+primary pool declaration:
+  {"pools":[{"name":"shared","capacity":2,"models":["pool-model-a","pool-model-b"]}]}
+secondmate binding:
+  schema=fm-secondmate-parent.v1
+  route=local
+  parent_home=/tmp/fm-live-s1.H6EO3Y/primary
+
+=== 2. a launch from the primary takes the first seat ===
+fleet-seats: reserved pool=shared id=ship-one generation=gA used=1 capacity=2
+rc=0
+
+=== 3. a launch from the secondmate home takes the second seat out of the SAME pool ===
+fleet-seats: reserved pool=shared id=ship-two generation=gB used=2 capacity=2
+rc=0
+
+=== 4. a third launch from the secondmate home is refused with the shared holders listed ===
+fleet-seats: pool shared is full (2 of 2 seats held); ship-three gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-live-s1.H6EO3Y/mate/state ship-two
+  holder /tmp/fm-live-s1.H6EO3Y/primary/state ship-one
+rc=4
+
+=== 5. the ledger lives once, at the root, not in the secondmate home ===
+2786179283-45.json
+791703965-42.json
+no ledger of its own in the secondmate home
+
+=== 6. releasing one generation admits exactly one new launch ===
+fleet-seats: released id=ship-one generation=gA reason=teardown
+fleet-seats: reserved pool=shared id=ship-three generation=gC used=2 capacity=2
+retry rc=0
+
+=== 7. adversarial: the same generation cannot be confirmed twice or revived after release ===
+fleet-seats: pool shared is full (2 of 2 seats held); ship-four gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-live-s1.H6EO3Y/mate/state ship-three
+  holder /tmp/fm-live-s1.H6EO3Y/mate/state ship-two
+reuse-of-released-generation rc=4
+fleet-seats: no seat - harness claude launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+unverified-default-model rc=5
+
+=== 8. adversarial: a terminal generation is never revived for the same holder
+fleet-seats: refused - generation gA of ship-one is already terminal; a new episode needs a new generation
+revive-released-generation rc=5
+
+=== 9. two generations of one holder in one pool count once
+fleet-seats: released id=ship-two generation=gB reason=teardown
+fleet-seats: reserved pool=shared id=ship-two generation=gB2 used=2 capacity=2
+successor rc=0
+=== 10. capacity after the successor (one holder, one pool) 
+{"generation":"gB","lifecycle":"released","model":"pool-model-b"}
+{"generation":"gB2","lifecycle":"reserved","model":"pool-model-a"}
+fleet-seats: pool shared is full (2 of 2 seats held); ship-six gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-live-s1.H6EO3Y/mate/state ship-three
+  holder /tmp/fm-live-s1.H6EO3Y/mate/state ship-two
+next rc=4
+
+=== 11. the same real launch is admitted once the pool has room (live fm-spawn.sh --secondmate)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-live-s5.9gh3II/primary
+fleet-seats: reserved pool=shared id=labmate generation=s1793563585.4104905.3057 used=2 capacity=2
+error: secondmate home cannot be the active firstmate home: /tmp/fm-live-s5.9gh3II/primary
+spawn rc=1
+--- the seat ledger the real launch wrote:
+{"generation":"s1793563585.4104905.3057","lifecycle":"released","kind":"secondmate","model":"pool-model-a","launch_phase":"prepared"}
+--- capacity now:
+fleet-seats: reserved pool=shared id=probe generation=gProbe used=2 capacity=2
+probe rc=0

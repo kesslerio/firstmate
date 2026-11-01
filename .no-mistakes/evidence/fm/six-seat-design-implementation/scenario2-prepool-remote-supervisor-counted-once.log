@@ -1,0 +1,57 @@
+
+=== 0. disposable transport: a real sshd, a real ssh client, the real remote entrypoint ===
+remote account art resolves the firstmate entrypoint: /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2/bin/fm-remote-entrypoint.sh
+
+=== A1. the remote host already ran a supervisor before pools existed ===
+host supervisor record (pre-pool, no seat generation recorded):
+  kind=secondmate
+  harness=claude
+  model=pool-model-a
+  backend=herdr
+  window=fm-remote:w1:p1
+  endpoint_task_id=rem
+  herdr_session=fm-remote
+  herdr_workspace_id=w1
+  herdr_tab_id=w1:t1
+  herdr_pane_id=w1:p1
+  home=/tmp/fm-live-s2.YIi77t/remote
+  project=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2
+  worktree=/tmp/fm-live-s2.YIi77t/remote
+  spawn_gen=legacyA
+
+=== A2. the primary declares a capacity-2 pool and registers that remote (pre-pool route record) ===
+  (parent route record names no generation)
+
+=== A3. serve-remotes over real ssh publishes the certificate; the pre-pool supervisor appears once ===
+served rem policy=866016619-84 epoch=r179356359441104293695.1 holders=1
+serve-remotes rc=0
+certificate:
+{
+  "schema": "fm-fleet-seats-serve.v2",
+  "policy_digest": "866016619-84",
+  "epoch": "r179356359441104293695.1",
+  "complete": true,
+  "holders": [
+    {
+      "state_dir": "/tmp/fm-live-s2.YIi77t/remote/state/parent-route",
+      "task": "rem",
+      "generation": "legacyA",
+      "model": "pool-model-a",
+      "lifecycle": "confirmed"
+    }
+  ]
+}
+
+=== A4. one more launch fits beside it: the pre-pool supervisor is counted exactly once ===
+fleet-seats: reserved pool=shared id=local-ship generation=gLocal used=2 capacity=2
+first local reserve rc=0
+
+=== A5. the next launch is refused and the refusal names one row per counted holder ===
+fleet-seats: pool shared is full (2 of 2 seats held); local-ship-two gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-live-s2.YIi77t/primary/state local-ship
+  holder /tmp/fm-live-s2.YIi77t/primary/state rem
+second local reserve rc=4
+
+=== A6. adversarial: an unreachable remote keeps admission refused instead of freeing its seats ===
+fleet-seats: no seat - remote secondmate(s) rem have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+reserve with no certificate rc=5

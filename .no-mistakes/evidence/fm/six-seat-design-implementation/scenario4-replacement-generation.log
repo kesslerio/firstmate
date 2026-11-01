@@ -1,0 +1,77 @@
+
+=== 0. disposable transport: a real sshd, a real ssh client, the real remote entrypoint ===
+remote account art resolves /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2/bin/fm-remote-entrypoint.sh
+
+=== 1. the host records supervisor generation gA (pre-pool record) ===
+  kind=secondmate
+  harness=claude
+  model=pool-model-a
+  backend=herdr
+  window=fm-remote:w1:p1
+  endpoint_task_id=rem
+  herdr_session=fm-remote
+  herdr_workspace_id=w1
+  herdr_tab_id=w1:t1
+  herdr_pane_id=w1:p1
+  home=/tmp/fm-live-s4.DTbx63/remote
+  project=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2
+  worktree=/tmp/fm-live-s4.DTbx63/remote
+  spawn_gen=gA
+
+=== 2. the primary declares a capacity-2 pool, registers the remote, and serves the declaration ===
+served rem policy=3130302336-69 epoch=r1793563539407298717435.1 holders=1
+serve-remotes rc=0
+
+=== 3. the parent's seat ledger gets a stopped generation and a replacement cancelled before startup ===
+fleet-seats: reserved pool=shared id=rem generation=gA (already held) used=1 capacity=2
+fleet-seats: dispatched id=rem generation=gA
+fleet-seats: confirmed id=rem generation=gA
+-- now a replacement is dispatched and the host cancels it before it confirms a startup:
+fleet-seats: reserved pool=shared id=rem generation=gRepl (already held) used=1 capacity=2
+fleet-seats: dispatched id=rem generation=gRepl
+fleet-seats: released id=rem generation=gRepl reason=cancelled
+-- ledger:
+{"generation":"gA","lifecycle":"released","model":"pool-model-a","target":"fm-remote:w1:p1","disposition":"old-stopped"}
+{"generation":"gRepl","lifecycle":"released","model":"pool-model-a","target":null,"disposition":"cancelled"}
+-- the parent route record still names no generation: 
+
+=== 4. the host, asked over ssh, reports the generation it records ===
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w1:p1
+herdr_session=fm-remote
+harness=claude
+model=pool-model-a
+effort=
+spawn_gen=gA
+route rc=0
+
+=== 5. a replacement launch replaces the generation the host records, not the cancelled candidate ===
+fleet-seats: reserved pool=shared id=rem generation=s1793563546.4077831.481 used=2 capacity=2
+fleet-seats: released id=rem generation=s1793563546.4077831.481 reason=prelaunch
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"rem","operation":"s1793563546.4077831.481","requested_generation":"s1793563546.4077831.481","actual_generation":null,"previous_generation":"gA","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: ultra effort requires pi or pi-signed with an explicit codex-native/<model> model
+relaunch_failure=prelaunch
+error: remote secondmate native effort validation failed
+error: the host refused the relaunch of rem before touching its agent; its fleet seat candidate was released
+relaunch wrapper rc=1
+-- the parent route record now names the host generation: gA
+-- its endpoint target: fm-remote:w1:p1
+-- the host receipt the episode left behind:
+  schema=fm-remote-seat-receipt.v1
+  operation=s1793563546.4077831.481
+  verb=relaunch
+  requested_generation=s1793563546.4077831.481
+  previous_generation=gA
+  phase=prelaunch
+-- ledger:
+{"generation":"gA","lifecycle":"released","previous_generation":null,"target":"fm-remote:w1:p1","disposition":"old-stopped"}
+{"generation":"gRepl","lifecycle":"released","previous_generation":"gA","target":null,"disposition":"cancelled"}
+{"generation":"s1793563546.4077831.481","lifecycle":"released","previous_generation":"gA","target":null,"disposition":"prelaunch"}
+
+=== 6. adversarial: the cancelled candidate is fenced when it is named as the host predecessor ===
+fleet-seats: reserved pool=shared id=rem generation=gBad used=2 capacity=2
+fleet-seats: dispatched id=rem generation=gBad
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"rem","operation":"gBad","requested_generation":"gBad","actual_generation":null,"previous_generation":"gRepl","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: generation-mismatch: the host incarnation is not the reserved predecessor; nothing was changed
+host relaunch naming the cancelled candidate as predecessor rc=6

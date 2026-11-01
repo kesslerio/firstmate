@@ -1,0 +1,4 @@
+$ bash tests/fm-remote-generation.test.sh
+cat: /tmp/fm-remote-generation.Msdrpi/route: No such file or directory
+cat: /tmp/fm-remote-generation.Msdrpi/route: No such file or directory
+remote generation regressions passed
