@@ -1,0 +1,17 @@
+== S8: an unreachable remote keeps its counted seats instead of freeing them ==
+-- the remote is confirmed and holds the running supervisor's seat
+served theshop policy=3130302336-69 epoch=r1793555676243302914742.1 holders=1
+rc=0
+[{"state_dir":"/tmp/fm-seat-live.1m3m8w/remote/state/parent-route","task":"theshop","generation":"host.9","model":"pool-model-a","lifecycle":"confirmed"}]
+-- the next serve pass cannot reach the host
+unreachable theshop
+rc=0
+pending marker retained: previous confirmation invalidated
+-- a local launch is refused rather than spending stale remote counts
+fleet-seats: no seat - remote secondmate(s) theshop have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+rc=5
+-- after the transport recovers (and the 120s failure backoff expires) admission resumes
+served theshop policy=3130302336-69 epoch=r1793555676243302914742.3 holders=1
+rc=0
+fleet-seats: reserved pool=shared id=local-after-recovery generation=g-lar used=2 capacity=2
+rc=0

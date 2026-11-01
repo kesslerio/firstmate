@@ -1,0 +1,18 @@
+== S1: capacity 1 shared by primary and local secondmate ==
+-- mate1 reserves task-a on pooled model
+fleet-seats: reserved pool=shared id=task-a generation=g-task-a used=1 capacity=1
+rc=0
+-- primary reserves task-b on the same pooled model
+fleet-seats: pool shared is full (1 of 1 seats held); task-b gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.1m3m8w/mate1/state task-a
+rc=4
+-- seat owner state seen from the primary
+-- mate1 releases task-a generation after a proven never-dispatched launch
+fleet-seats: released id=task-a generation=g-task-a reason=prelaunch
+rc=0
+-- primary retries task-b
+fleet-seats: reserved pool=shared id=task-b generation=g-task-b used=1 capacity=1
+rc=0
+-- primary cleanup: release task-b prelaunch
+fleet-seats: released id=task-b generation=g-task-b reason=prelaunch
+rc=0

@@ -1,0 +1,30 @@
+== S2: a supervisor already running when pools are enabled is counted exactly once ==
+-- state before pools: parent record has no generation (base-commit remote spawn format), host receipt has one
+/tmp/fm-seat-live.1m3m8w/primary/state/theshop.meta:kind=secondmate
+/tmp/fm-seat-live.1m3m8w/primary/state/theshop.meta:model=pool-model-a
+/tmp/fm-seat-live.1m3m8w/primary/state/theshop.meta:remote_host=seatlab-remote
+/tmp/fm-seat-live.1m3m8w/remote/state/parent-route/theshop.meta:kind=secondmate
+/tmp/fm-seat-live.1m3m8w/remote/state/parent-route/theshop.meta:model=pool-model-a
+/tmp/fm-seat-live.1m3m8w/remote/state/parent-route/theshop.meta:spawn_gen=host.1
+-- the primary serves the remote through real ssh: the host supervisor is adopted into the certificate
+served theshop policy=3130302336-69 epoch=r1793555430184610231606.1 holders=1
+rc=0
+[{"state_dir":"/tmp/fm-seat-live.1m3m8w/remote/state/parent-route","task":"theshop","generation":"host.1","model":"pool-model-a","lifecycle":"confirmed"}]
+-- capacity 2: one seat for the supervisor, one free for a local contender
+fleet-seats: reserved pool=shared id=contender generation=g-contender used=2 capacity=2
+rc=0
+-- the next local contender is refused: the supervisor's single seat is charged
+fleet-seats: pool shared is full (2 of 2 seats held); contender-2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.1m3m8w/primary/state contender
+  holder /tmp/fm-seat-live.1m3m8w/primary/state theshop
+rc=4
+-- a pooled launch inside the remote home files its request; the root serve answers it over ssh
+served theshop policy=3130302336-69 epoch=r1793555430184610231606.2 holders=2
+serve-rc=0
+remote-reserve-rc=0
+fleet-seats: reserved pool=shared id=remote-worker generation=g-remote-worker (granted by the fleet root)
+-- supervisor plus granted remote worker fill capacity 2, so a local launch refuses
+fleet-seats: pool shared is full (2 of 2 seats held); contender-3 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder remote:theshop:/tmp/fm-seat-live.1m3m8w/remote/state remote-worker
+  holder /tmp/fm-seat-live.1m3m8w/primary/state theshop
+rc=4

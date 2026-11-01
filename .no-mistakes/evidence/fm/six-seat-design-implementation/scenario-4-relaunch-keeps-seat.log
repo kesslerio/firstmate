@@ -1,0 +1,20 @@
+== S4: a relaunch keeps its counted seat while the old agent's stop is unproven ==
+-- pool is full with the first generation of task-r
+-- the replacement generation is reserved while the pool is full (same pool keeps one seat)
+fleet-seats: reserved pool=shared id=task-r generation=g-r2 (already held) used=1 capacity=1
+rc=0
+-- new holder record
+{"task":"task-r","incarnations":[{"generation":"g-r1","previous_generation":null,"lifecycle":"reserved"},{"generation":"g-r2","previous_generation":"g-r1","lifecycle":"reserved"}]}
+-- releasing the predecessor is refused while its endpoint still reads a shell
+fleet-seats: retained - the old endpoint for task-r generation g-r1 reads 'ambiguous', so its agent is not proven stopped (the seat stays counted until evidence resolves it)
+rc=3
+-- both counts survive the refusal
+g-r1 reserved
+g-r2 reserved
+-- after the exact predecessor endpoint is proven destroyed the release succeeds
+fleet-seats: released id=task-r generation=g-r1 reason=replaced
+rc=0
+-- one seat still held for the surviving replacement generation
+fleet-seats: pool shared is full (1 of 1 seats held); task-r3 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.1m3m8w/primary/state task-r
+rc=4

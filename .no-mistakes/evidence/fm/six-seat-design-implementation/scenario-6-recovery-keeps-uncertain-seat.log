@@ -1,0 +1,15 @@
+== S6: bounded recovery keeps an uncertain seat counted and frees it only on proof ==
+-- the launch owner died; its endpoint still holds a shell
+fleet-seats: skipped id=task-d generation=g-d1: fleet-seats: retained - the endpoint for task-d generation g-d1 reads 'ambiguous' (the seat stays counted until evidence resolves it)
+rc=0
+-- the uncertain holder is still counted and still blocks the pool
+g-d1 reserved dispatching
+fleet-seats: pool shared is full (1 of 1 seats held); other gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.1m3m8w/recovery-home/state task-d
+rc=4
+-- once the exact endpoint is proven destroyed, recovery reclaims exactly that generation
+fleet-seats: reclaimed id=task-d generation=g-d1 (endpoint-gone)
+rc=0
+g-d1 reclaimed
+fleet-seats: reserved pool=shared id=other generation=g-other used=1 capacity=1
+rc=0

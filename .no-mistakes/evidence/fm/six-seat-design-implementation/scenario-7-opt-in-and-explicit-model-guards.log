@@ -1,0 +1,13 @@
+== S7: seat pools stay opt-in and require an explicit verified model ==
+-- a home with no config/fleet-seats is not capped and prints nothing
+rc=0
+-- a raw launch command is not refused without a declaration
+rc=0
+-- with a declaration, a harness default model is refused before any endpoint
+fleet-seats: no seat - harness claude launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+rc=5
+-- and a raw launch is refused too
+fleet-seats: no seat - a raw launch command cannot verify its actual model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+rc=5
+-- existing holders still record successors during policy opt-out
+rc=0

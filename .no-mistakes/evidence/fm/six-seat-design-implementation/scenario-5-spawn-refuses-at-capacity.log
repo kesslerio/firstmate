@@ -1,0 +1,19 @@
+== S5: a pooled launch refuses at capacity before creating any endpoint or record ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-seat-live.1m3m8w/spawn-home
+fleet-seats: pool shared is full (1 of 1 seats held); full-pool-task gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.1m3m8w/spawn-home/state legacy-agent
+error: spawn refused - full-pool-task has no fleet seat for model pool-model-a (see the fleet-seats line above)
+rc=1
+-- nothing was created for the refused launch
+ls: cannot access '/tmp/fm-seat-live.1m3m8w/spawn-home/state/full-pool-task.meta': No such file or directory
+/tmp/fm-seat-live.1m3m8w/proj 2315212 [master]
+seatlab:1: tmux* (1 panes) [80x24] 
+seatlab:3: keeper (1 panes) [80x24] 
+-- the same launch is accepted once the pooled legacy record is gone
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-seat-live.1m3m8w/spawn-home
+fleet-seats: reserved pool=shared id=full-pool-task generation=s1793555460.1927817.29236 used=1 capacity=1
+warning: /tmp/fm-seat-live.1m3m8w/spawn-home/data/full-pool-task/launch-brief.md records no ship branch; defaulting to legacy branch fm/full-pool-task
+warning: /tmp/fm-seat-live.1m3m8w/spawn-home/data/full-pool-task/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: full-pool-task ships mode=local-only while the standing posture for proj is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned full-pool-task harness=claude kind=ship mode=local-only yolo=off window=firstmate:fm-full-pool-task worktree=/home/art/.treehouse/proj-0ff4ee/1/proj
+rc=0

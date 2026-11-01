@@ -1,0 +1,15 @@
+== S3: an uncertain outcome keeps the counted seat and its route ==
+-- the spawner that reserved and dispatched task-c is killed (pid 1212951)
+-- holder record after the spawner died (seat and route still recorded)
+{"task":"task-c","incarnations":[{"generation":"g-c1","lifecycle":"reserved","launch_phase":"dispatching","kind":"ship","model":"pool-model-a","socket":"/tmp/fm-seat-live.1m3m8w/tmux/tmux-1000/default"}]}
+-- teardown release while the endpoint still holds a shell (buffered launch may still run)
+fleet-seats: retained - the cleanup endpoint for task-c generation g-c1 reads 'ambiguous', so its agent is not proven stopped (the seat stays counted until evidence resolves it)
+rc=3
+-- holder is still counted after the refused release
+g-c1 reserved dispatching
+-- the exact endpoint is then proven destroyed (real tmux window killed on its recorded socket)
+fleet-seats: released id=task-c generation=g-c1 reason=teardown
+rc=0
+-- seat is finally free for another pooled launch
+fleet-seats: reserved pool=shared id=task-c2 generation=g-c2 used=1 capacity=2
+rc=0

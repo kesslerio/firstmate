@@ -1,0 +1,46 @@
+# Persisted seat state (live lab, primary home /tmp/fm-seat-live.1m3m8w/primary)
+
+## config/fleet-seats
+{"pools":[{"name":"shared","capacity":2,"models":["pool-model-a"]}]}
+
+## serve certificate published for the remote host
+{
+  "schema": "fm-fleet-seats-serve.v2",
+  "policy_digest": "3130302336-69",
+  "epoch": "r1793555676243302914742.3",
+  "complete": true,
+  "holders": [
+    {
+      "state_dir": "/tmp/fm-seat-live.1m3m8w/remote/state/parent-route",
+      "task": "theshop",
+      "generation": "host.9",
+      "model": "pool-model-a",
+      "lifecycle": "confirmed"
+    }
+  ]
+}
+
+## holder records under state/fleet-seats/holders
+### 1835868859-59.json
+{
+  "schema": "fm-fleet-seat-holder.v2",
+  "state_dir": "/tmp/fm-seat-live.1m3m8w/primary/state",
+  "task": "local-after-recovery",
+  "revision": 1,
+  "incarnations": [
+    {
+      "generation": "g-lar",
+      "previous_generation": null,
+      "kind": "ship",
+      "model": "pool-model-a",
+      "policy_digest_at_reserve": "3130302336-69",
+      "lifecycle": "reserved",
+      "launch_phase": "prepared",
+      "owner_pid": 2444817,
+      "owner_pid_identity": "linux-starttime=4725048 cmdline-hex=736c6565700036303000",
+      "route": null,
+      "startup_confirmed": false,
+      "disposition": null
+    }
+  ]
+}
