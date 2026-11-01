@@ -1,0 +1,58 @@
+
+### Building disposable release copies (old poll / updated poll / historical stub)
+if [ -n "${FM_LIVE_PROBE:-}" ]; then printf '%s\n' 'old-generation' >> "$FM_LIVE_PROBE"; fi
+if [ -n "${FM_LIVE_PROBE:-}" ]; then printf '%s\n' 'new-generation' >> "$FM_LIVE_PROBE"; fi
+PASS  rel-old and rel-new poll bytes differ (repository update)
+
+### S1 template-update: armed poll survives a repository update and the merge is reported
+PASS  registered generation is the old poll
+PASS  S1 watcher reported the merge: check: /tmp/fm-live-drive.Hgioer/s1/state/task-a.check.sh: merged
+PASS  S1 the updated repository poll ran (probe: new-generation)
+PASS  S1 validated poll retired after the merge
+PASS  S1 merge notification queued: 1793559804	1	check	merged-task-a-https://github.com/cli/cli/pull/1	check: merge landed: task-a https://github.com/cli/cli/pull/1 external
+
+### S2 adversarial: the registered state-file poll bytes are never executed
+PASS  registered generation is the historical stub
+PASS  S2 merge reported from the current repository poll
+PASS  S2 registered stub bytes never executed (no marker file)
+PASS  S2 updated repository poll ran
+PASS  S2 merge notification queued
+
+### S3 control relaunch: control_relaunch_tx metadata leaves the armed poll valid
+PASS  S3/after-pr merge still reported after relaunch metadata
+PASS  S3/after-pr metadata still carries control_relaunch_tx
+PASS  S3/after-pr poll retired after the merge
+PASS  S3/after-pr merge notification queued
+PASS  S3/before-pr merge still reported after relaunch metadata
+PASS  S3/before-pr metadata still carries control_relaunch_tx
+PASS  S3/before-pr poll retired after the merge
+PASS  S3/before-pr merge notification queued
+
+### S4 adversarial: tampered check bytes are still refused after a repository update
+PASS  S4 tampered check not reported as merged
+PASS  S4 watcher refused the tampered check: check: rejected unauthenticated state checks: /tmp/fm-live-drive.Hgioer/s4/state/task-a.check.sh
+PASS  S4 poll never ran on the tampered generation
+PASS  S4 refused generation left its registration unreplaced
+PASS  S4 no merge notification recorded
+
+### S5 adversarial: forged metadata trailing the relaunch marker is refused
+PASS  S5/injected-field forged metadata not reported as merged
+PASS  S5/injected-field watcher refused: check: rejected unauthenticated state checks: /tmp/fm-live-drive.Hgioer/s5-injected-field/state/task-a.check.sh
+PASS  S5/injected-field poll never ran
+PASS  S5/injected-field no merge notification recorded
+PASS  S5/duplicate-pr forged metadata not reported as merged
+PASS  S5/duplicate-pr watcher refused: check: rejected unauthenticated state checks: /tmp/fm-live-drive.Hgioer/s5-duplicate-pr/state/task-a.check.sh
+PASS  S5/duplicate-pr poll never ran
+PASS  S5/duplicate-pr no merge notification recorded
+
+### S6 adversarial: a byte-identical replacement of the registered check is still refused by file identity
+PASS  S6 replaced-inode check not reported as merged
+PASS  S6 watcher refused the replaced file object
+PASS  S6 poll never ran
+
+### CONTROL pre-fix: the same template-update fixture is refused by the base library
+PASS  CONTROL base library refuses the preserved generation (fixture discriminates the fix)
+PASS  CONTROL base library rejected the poll: check: rejected unauthenticated state checks: /tmp/fm-live-drive.Hgioer/prefix/state/task-a.check.sh
+PASS  CONTROL base library never ran the poll
+
+==== live drive result: PASS (0 failures) ====

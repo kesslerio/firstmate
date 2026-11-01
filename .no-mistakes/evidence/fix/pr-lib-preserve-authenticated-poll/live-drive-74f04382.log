@@ -1,0 +1,112 @@
+
+### Building disposable repository generations (old / new / historical-stub)
+PASS  the repository update changes bin/fm-pr-poll.sh bytes (old != new)
+old poll sha256:     60760cbe39cf57de5d0c9000c66946e4cb560295329e51c010f29ea804128688
+new poll sha256:     acdd4ea04365c4fcde444b2bfc35a47dec7ba19de77d5b2f5f0722c40a3273a8
+worktree poll sha256: 820527122387591c2b17c5888aff4d461ffbd0814542b6e4645abb4f6b40fc61
+
+### S1  An armed merge poll survives a repository poll update and still reports the merge
+armed: armed: state/task-a.check.sh
+PASS  S1 registered check is the previous release's poll generation
+PASS  S1 repository update: the armed check no longer equals the shipped bin/fm-pr-poll.sh
+--- registered generation (task-a.pr-poll-registration)
+fm-pr-poll-registration-v2
+task-a
+github
+https://github.com/cli/cli/pull/1
+github.com
+cli/cli
+1
+48e3ddf6ecaacbbdb3fc1a11463e4f6291b2df054f5ee5a343f14a65a58b8f47
+60760cbe39cf57de5d0c9000c66946e4cb560295329e51c010f29ea804128688
+66306:85355741
+66306:85355743
+--- watcher rc=0
+--- watcher stdout
+check: /tmp/fm-live-drive.lCmQWl/s1/state/task-a.check.sh: merged
+PASS  S1 the watcher reported the merge after the update
+PASS  S1 the updated repository poll executed (probe: new-generation)
+PASS  S1 merge notification queued: 1793560580	1	check	merged-task-a-https://github.com/cli/cli/pull/1	check: merge landed: task-a https://github.com/cli/cli/pull/1 external
+PASS  S1 the merged poll retired its artifacts
+PASS  S1 task PR identity preserved
+
+### S1b The shipped worktree bytes (no fixture stamp) also report the merge for a preserved poll
+--- watcher rc=0
+--- watcher stdout
+check: /tmp/fm-live-drive.lCmQWl/s1b/state/task-a.check.sh: merged
+PASS  S1b the real bin/fm-watch.sh + bin/fm-pr-poll.sh reported the merge
+PASS  S1b the registered (older) generation never executed
+PASS  S1b merge notification queued
+
+### S2  Registered state-file poll bytes are never executed; the current repository poll is dispatched
+PASS  S2 registered generation is the historical stub
+--- watcher rc=0
+--- watcher stdout
+check: /tmp/fm-live-drive.lCmQWl/s2/state/task-a.check.sh: merged
+PASS  S2 the merge came from the current repository poll
+PASS  S2 the registered stub body never ran (no marker file)
+PASS  S2 the updated repository poll executed
+PASS  S2 merge notification queued
+
+### S3  A control relaunch appending control_relaunch_tx after the PR identity keeps the poll armed
+--- metadata region after arming + relaunch
+7:pr=https://github.com/cli/cli/pull/1
+8:pr_head=e9a3253762e768badaa1d4a5b3d267416d1e42f4
+9:control_relaunch_tx=114614.20261024T230110Z.26328
+PASS  S3 control_relaunch_tx is recorded after the PR identity, as the relaunch appends it
+--- watcher rc=0
+--- watcher stdout
+check: /tmp/fm-live-drive.lCmQWl/s3/state/task-a.check.sh: merged
+PASS  S3 the merge was still reported after the relaunch metadata
+PASS  S3 the armed poll was not revoked by the relaunch metadata
+PASS  S3 merge notification queued
+PASS  S3 the merged poll retired its artifacts
+
+### S4  Adversarial: tampered check bytes are still refused after a repository update
+--- watcher rc=0
+--- watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-drive.lCmQWl/s4/state/task-a.check.sh
+PASS  S4 the tampered generation was not reported as merged
+PASS  S4 the watcher refused the tampered check
+PASS  S4 no poll ran for the tampered generation
+PASS  S4 the refusal did not rewrite trust for the tampered bytes
+PASS  S4 no merge notification recorded
+
+### S5  Adversarial: forged metadata trailing the relaunch marker is still refused
+--- injected-field watcher rc=0
+--- injected-field watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-drive.lCmQWl/s5-injected-field/state/task-a.check.sh
+PASS  S5/injected-field forged metadata was not reported as merged
+PASS  S5/injected-field the watcher refused the record
+PASS  S5/injected-field no poll ran
+PASS  S5/injected-field no merge notification recorded
+--- duplicate-pr watcher rc=0
+--- duplicate-pr watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-drive.lCmQWl/s5-duplicate-pr/state/task-a.check.sh
+PASS  S5/duplicate-pr forged metadata was not reported as merged
+PASS  S5/duplicate-pr the watcher refused the record
+PASS  S5/duplicate-pr no poll ran
+PASS  S5/duplicate-pr no merge notification recorded
+
+### S6  Adversarial: a byte-identical replacement of the registered check is refused by file identity
+--- watcher rc=0
+--- watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-drive.lCmQWl/s6/state/task-a.check.sh
+PASS  S6 the same-bytes new-inode check was not reported as merged
+PASS  S6 the watcher refused the replaced file object
+PASS  S6 no poll ran
+
+### CONTROL  The base commit's fm-pr-lib.sh refuses the same preserved generation
+base fm-pr-lib.sh sha256: 6ed13e7094827dab4c928f7e2673032ea9792edcaa4d51f2af122a360b8a5c01
+--- template-update watcher rc=0
+--- template-update watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-drive.lCmQWl/control-template-update/state/task-a.check.sh
+PASS  CONTROL/template-update base library loses the merge (fixture discriminates the fix)
+PASS  CONTROL/template-update base library rejected the intact poll
+--- relaunch-only watcher rc=0
+--- relaunch-only watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-drive.lCmQWl/control-relaunch-only/state/task-a.check.sh
+PASS  CONTROL/relaunch-only base library loses the merge (fixture discriminates the fix)
+PASS  CONTROL/relaunch-only base library rejected the intact poll
+
+==== live drive result: PASS (0 failures) ====
