@@ -1,0 +1,5 @@
+18:21:32.564103071 pid=4011812 cmd=python3 -c import sys, time; time.sleep(300) /tmp/fm-watcher-lock-tests.GdPkD9/lock-identity-mismatch/holder 
+18:21:32.617164146 pid=4011812 cmd=python3 -c import sys, time; time.sleep(300) /tmp/fm-watcher-lock-tests.GdPkD9/lock-identity-mismatch/holder 
+18:21:32.665970242 pid=4011812 cmd=python3 -c import sys, time; time.sleep(300) /tmp/fm-watcher-lock-tests.GdPkD9/lock-identity-mismatch/holder 
+18:21:32.718981693 pid=4011812 cmd=
+18:21:32.768341136 pid=4012075 cmd=python3 -c import sys, time; time.sleep(300) /tmp/fm-watcher-lock-tests.GdPkD9/lock-daemon-stale-identity/holder 

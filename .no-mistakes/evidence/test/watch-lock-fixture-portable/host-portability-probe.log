@@ -1,0 +1,13 @@
+host: Linux 7.3.1
+--- /bin contents (no ln, no rm/ps on a truly minimal host) ---
+basename bash cat dirname jq mktemp mv ps rm sh sleep 
+--- ln resolution ---
+ls: cannot access '/bin/ln': No such file or directory
+/run/current-system/sw/bin/ln
+--- sleep is a multicall coreutils that dispatches on argv[0] ---
+lrwxrwxrwx 2 root root 73 Dec 31  1969 /run/current-system/sw/bin/sleep -> /nix/store/5vqn5j8azx3yqcbjrjj29hg9m5abs4bc-coreutils-full-9.11/bin/sleep
+coreutils: unknown program 'holder'
+exec -a exit=1
+--- new python holder used by the fixed fixture stays alive and carries the fixture name ---
+python3 -c import sys, time; time.sleep(300) /tmp/fm-holder-probe.QBBU/holder 
+holder alive after 0.5s (pid 3183696)
