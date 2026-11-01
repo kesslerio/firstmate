@@ -1,0 +1,18 @@
+== disposable marked lab home: config/wait-no-turns, task hibit with an open decision, 8 pending replies
+== real bin/fm-pending-reply-lib.sh tick; classifier call sites counted from an xtrace of the real functions
+== no transport stub: an allowed recovery is visible as recovery_attempted_epoch on the record
+tick 1 (open decision, unchanged snapshot): cache_folds=1 uncached_presend_reads=0 recovery_attempts=0 records=[ 8 awaiting_report ] snapshots_left=40
+tick 2 (same snapshot; reuse must not survive the tick): cache_folds=1 uncached_presend_reads=0 recovery_attempts=0 records=[ 8 awaiting_report ] snapshots_left=40
+tick 3 (decision resolved mid-tick): cache_folds=8 uncached_presend_reads=7 recovery_attempts=7 records=[ 1 awaiting_report  7 escalated ] snapshots_left=40
+
+== decision opened after the eligibility fold, inside the per-correlation lock, before delivery
+send_recovery rc=1 attempted= phase=awaiting_report
+status now:
+working: preparing the report
+needs-decision [key=late]: which build?
+-- real callsite that refused:
++fm_pending_reply_send_recovery:1060 '[' awaiting_report '!=' awaiting_report ']'
++fm_pending_reply_send_recovery:1061 '[' -e /tmp/fm-pr-live.ZHDyFD/config/wait-no-turns ']'
++fm_pending_reply_send_recovery:1062 '[' -n $'late\tneeds-decision\twhich build?' ']'
++fm_pending_reply_send_recovery:1067 fm_lock_release /tmp/fm-pr-live.ZHDyFD/state/.pending-reply-4d83d58cc48bd972.lock
++fm_pending_reply_send_recovery:1068 return 1

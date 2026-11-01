@@ -1,0 +1,42 @@
+== fixture: lab home /tmp/fm-pr-scn.WEvSdR, task hibit, config/wait-no-turns, 8 pending replies
+   status: needs-decision [key=scope]: narrow or wide?
+
+== tick 1 (open decision, unchanged snapshot)
+   classifier folds during tick: 1
+   transport sends during tick:  0
+   snapshot dirs left in TMPDIR: 0
+  record 30a115ea4d0bcbae phase=awaiting_report attempted=
+  record 45b82c94cf6cca54 phase=awaiting_report attempted=
+  record 5cb6714cf176ee4b phase=awaiting_report attempted=
+  record 627b26389aa977d8 phase=awaiting_report attempted=
+  record 953f934d0d1a5cc4 phase=awaiting_report attempted=
+  record a8a5a6d46b37a1e4 phase=awaiting_report attempted=
+  record a8daf4e4f488fc7e phase=awaiting_report attempted=
+  record ef372b0211d20cfc phase=awaiting_report attempted=
+
+== tick 2 (same unchanged snapshot; reuse must not survive the tick)
+   classifier folds during tick: 1
+   transport sends during tick:  0
+
+== answer the decision, then tick 3 (each correlation recovers exactly once)
+   transport sends during tick:  8
+   sends per correlation (count corr):
+      1 30a115ea4d0bcbae
+      1 45b82c94cf6cca54
+      1 5cb6714cf176ee4b
+      1 627b26389aa977d8
+      1 953f934d0d1a5cc4
+      1 a8a5a6d46b37a1e4
+      1 a8daf4e4f488fc7e
+      1 ef372b0211d20cfc
+  record 30a115ea4d0bcbae phase=recovery_sent attempted=1793562620
+  record 45b82c94cf6cca54 phase=recovery_sent attempted=1793562620
+  record 5cb6714cf176ee4b phase=recovery_sent attempted=1793562621
+  record 627b26389aa977d8 phase=recovery_sent attempted=1793562621
+  record 953f934d0d1a5cc4 phase=recovery_sent attempted=1793562622
+  record a8a5a6d46b37a1e4 phase=recovery_sent attempted=1793562623
+  record a8daf4e4f488fc7e phase=recovery_sent attempted=1793562623
+  record ef372b0211d20cfc phase=recovery_sent attempted=1793562624
+
+== replay: an already-recovered correlation must never send twice
+   transport sends after replay: 8

@@ -1,0 +1,87 @@
+== default-poll (FM_POLL=15) lab home: SIGSTOP-wedged watcher, identity+lock still provable
+== repair tool call emitted: 'watcher: unhealthy - existing arm owns this home's identity-verified
+   watcher but progress is stale; Pi extension is retiring that arm and replacing the watcher'
+
+-- supervision state samples (11:58:57-11:59:31) --
+11:58:57 lock=3509844 lock_state=T+ beat_age=1086s cycle_rows=missing lab_arms=1
+11:58:58 lock=3509844 lock_state=T+ beat_age=1087s cycle_rows=missing lab_arms=1
+11:58:59 lock=3509844 lock_state=T+ beat_age=1088s cycle_rows=missing lab_arms=1
+11:58:59 lock=3509844 lock_state=T+ beat_age=1088s cycle_rows=missing lab_arms=1
+11:59:00 lock=3509844 lock_state=T+ beat_age=1089s cycle_rows=missing lab_arms=1
+11:59:00 lock=3509844 lock_state=T+ beat_age=1089s cycle_rows=missing lab_arms=1
+11:59:01 lock=3509844 lock_state=T+ beat_age=1090s cycle_rows=missing lab_arms=1
+11:59:01 lock=3509844 lock_state=T+ beat_age=1090s cycle_rows=missing lab_arms=1
+11:59:02 lock=3509844 lock_state=T+ beat_age=1091s cycle_rows=missing lab_arms=1
+11:59:02 lock=3509844 lock_state=T+ beat_age=1091s cycle_rows=missing lab_arms=1
+11:59:03 lock=3509844 lock_state=T+ beat_age=1092s cycle_rows=missing lab_arms=1
+11:59:03 lock=3509844 lock_state=T+ beat_age=1092s cycle_rows=missing lab_arms=1
+11:59:04 lock=3509844 lock_state=T+ beat_age=1093s cycle_rows=missing lab_arms=1
+11:59:04 lock=3509844 lock_state=T+ beat_age=1093s cycle_rows=missing lab_arms=1
+11:59:05 lock=3509844 lock_state=T+ beat_age=1094s cycle_rows=missing lab_arms=1
+11:59:06 lock=3509844 lock_state=T+ beat_age=1094s cycle_rows=missing lab_arms=1
+11:59:06 lock=3509844 lock_state=T+ beat_age=1095s cycle_rows=missing lab_arms=1
+11:59:07 lock=3509844 lock_state=T+ beat_age=1096s cycle_rows=missing lab_arms=1
+11:59:07 lock=3509844 lock_state=T+ beat_age=1096s cycle_rows=missing lab_arms=1
+11:59:08 lock=3509844 lock_state=T+ beat_age=1097s cycle_rows=missing lab_arms=1
+11:59:08 lock=3509844 lock_state=T+ beat_age=1097s cycle_rows=missing lab_arms=1
+11:59:09 lock=3509844 lock_state=T+ beat_age=1098s cycle_rows=missing lab_arms=1
+11:59:09 lock=3509844 lock_state=T+ beat_age=1098s cycle_rows=missing lab_arms=1
+11:59:10 lock=3509844 lock_state=T+ beat_age=1099s cycle_rows=missing lab_arms=1
+11:59:10 lock=3509844 lock_state=T+ beat_age=1099s cycle_rows=missing lab_arms=1
+11:59:11 lock=3509844 lock_state=T+ beat_age=1100s cycle_rows=missing lab_arms=1
+11:59:11 lock=3509844 lock_state=T+ beat_age=1100s cycle_rows=missing lab_arms=1
+11:59:12 lock=3509844 lock_state=T+ beat_age=1101s cycle_rows=missing lab_arms=1
+11:59:12 lock=3509844 lock_state=T+ beat_age=1101s cycle_rows=missing lab_arms=1
+11:59:13 lock=3509844 lock_state=T+ beat_age=1102s cycle_rows=missing lab_arms=1
+11:59:14 lock=3509844 lock_state=T+ beat_age=1103s cycle_rows=missing lab_arms=1
+11:59:14 lock=3509844 lock_state=T+ beat_age=1103s cycle_rows=missing lab_arms=1
+11:59:15 lock=3509844 lock_state=T+ beat_age=1104s cycle_rows=missing lab_arms=1
+11:59:15 lock=3509844 lock_state=T+ beat_age=1104s cycle_rows=missing lab_arms=1
+11:59:16 lock=3509844 lock_state=T+ beat_age=1105s cycle_rows=missing lab_arms=1
+11:59:16 lock=3509844 lock_state=T+ beat_age=1105s cycle_rows=missing lab_arms=1
+11:59:17 lock=3509844 lock_state=T+ beat_age=1106s cycle_rows=missing lab_arms=1
+11:59:17 lock=3509844 lock_state=T+ beat_age=1106s cycle_rows=missing lab_arms=1
+11:59:18 lock=3509844 lock_state=T+ beat_age=1107s cycle_rows=missing lab_arms=1
+11:59:18 lock=3509844 lock_state=T+ beat_age=1107s cycle_rows=missing lab_arms=1
+11:59:19 lock=3509844 lock_state=T+ beat_age=1108s cycle_rows=missing lab_arms=1
+11:59:19 lock=3509844 lock_state=T+ beat_age=1108s cycle_rows=missing lab_arms=1
+11:59:20 lock=3509844 lock_state=T+ beat_age=1109s cycle_rows=missing lab_arms=1
+11:59:21 lock=3509844 lock_state=T+ beat_age=1110s cycle_rows=missing lab_arms=1
+11:59:21 lock=3509844 lock_state=T+ beat_age=1110s cycle_rows=missing lab_arms=1
+11:59:22 lock=3509844 lock_state=T+ beat_age=1111s cycle_rows=missing lab_arms=1
+11:59:22 lock=3509844 lock_state=T+ beat_age=1111s cycle_rows=missing lab_arms=1
+11:59:23 lock=3509844 lock_state=T+ beat_age=1112s cycle_rows=missing lab_arms=1
+11:59:23 lock=3509844 lock_state=T+ beat_age=1112s cycle_rows=missing lab_arms=1
+11:59:24 lock=3509844 lock_state=T+ beat_age=1113s cycle_rows=missing lab_arms=1
+11:59:24 lock=3509844 lock_state=T+ beat_age=1113s cycle_rows=missing lab_arms=1
+11:59:25 lock=3509844 lock_state=T+ beat_age=1114s cycle_rows=missing lab_arms=1
+11:59:25 lock=3509844 lock_state=T+ beat_age=1114s cycle_rows=missing lab_arms=1
+11:59:26 lock=3509844 lock_state=T+ beat_age=1115s cycle_rows=missing lab_arms=1
+11:59:26 lock=3509844 lock_state=T+ beat_age=1115s cycle_rows=missing lab_arms=1
+11:59:27 lock=3509844 lock_state=T+ beat_age=1116s cycle_rows=missing lab_arms=1
+11:59:27 lock=3509844 lock_state=T+ beat_age=1116s cycle_rows=missing lab_arms=1
+11:59:28 lock=3509844 lock_state=T+ beat_age=1117s cycle_rows=missing lab_arms=1
+11:59:29 lock=3509844 lock_state=T+ beat_age=1118s cycle_rows=missing lab_arms=1
+11:59:29 lock=3509844 lock_state=T+ beat_age=1118s cycle_rows=missing lab_arms=1
+11:59:30 lock=3509844 lock_state=T+ beat_age=1119s cycle_rows=missing lab_arms=1
+11:59:30 lock=3509844 lock_state=T+ beat_age=1119s cycle_rows=missing lab_arms=1
+11:59:31 lock=3509844 lock_state=T+ beat_age=1120s cycle_rows=missing lab_arms=1
+11:59:31 lock=3509844 lock_state=T+ beat_age=1120s cycle_rows=missing lab_arms=1
+
+-- extension log (retire timed out once, then the monitor logs state=retrying every 30s) --
+2026-11-01T19:56:49.065Z pid=3498802 health monitor retire=timeout arm=3509779 wait=1000ms
+2026-11-01T19:57:18.149Z pid=3498802 health monitor state=retrying arm=3509779
+2026-11-01T19:57:48.156Z pid=3498802 health monitor state=retrying arm=3509779
+2026-11-01T19:58:18.133Z pid=3498802 health monitor state=retrying arm=3509779
+2026-11-01T19:58:48.167Z pid=3498802 health monitor state=retrying arm=3509779
+2026-11-01T19:59:18.156Z pid=3498802 health monitor state=retrying arm=3509779
+2026-11-01T19:59:48.160Z pid=3498802 health monitor state=retrying arm=3509779
+
+-- processes: arm still alive, watcher wedged, no successor arm/watcher --
+    PID    PPID STAT     ELAPSED CMD
+3509779 3498802 S+         03:28 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9B7CMCR9VQ0HD545NFD48/bin/fm-watch-arm.sh --restart
+3509844 3509779 T+         03:28 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9B7CMCR9VQ0HD545NFD48/bin/fm-watch.sh
+
+-- Pi primary pane (user-visible messages) --
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+ Warning: watcher: unhealthy - existing arm owns this home's identity-verified watcher but progress is stale; Pi extension is retiring that arm and replacing the watcher

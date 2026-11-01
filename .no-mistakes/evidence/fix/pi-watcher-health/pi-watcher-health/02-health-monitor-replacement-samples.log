@@ -1,0 +1,223 @@
+11:43:44.998843286 lock=1796581 beat_age=700s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:45.534447537 lock=1796581 beat_age=701s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:46.069979918 lock=1796581 beat_age=702s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:46.605145853 lock=1796581 beat_age=702s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:47.138633031 lock=1796581 beat_age=703s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:47.680721690 lock=1796581 beat_age=703s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:48.216623722 lock=1796581 beat_age=704s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:48.754171638 lock=1796581 beat_age=704s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:49.291493672 lock=1796581 beat_age=705s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:49.828443500 lock=1796581 beat_age=705s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:50.361398185 lock=1796581 beat_age=706s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:50.895013436 lock=1796581 beat_age=706s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:51.428486526 lock=1796581 beat_age=707s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:51.960706167 lock=1796581 beat_age=707s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:52.495507016 lock=1796581 beat_age=708s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:53.036333667 lock=1796581 beat_age=709s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:53.578637638 lock=1796581 beat_age=709s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:54.116485923 lock=1796581 beat_age=710s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:54.654639597 lock=1796581 beat_age=710s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:55.190814917 lock=1796581 beat_age=711s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:55.726753820 lock=1796581 beat_age=711s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:56.261084901 lock=1796581 beat_age=712s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:56.794386438 lock=1796581 beat_age=712s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:57.325056681 lock=1796581 beat_age=713s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:57.858381723 lock=1796581 beat_age=713s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:58.392577078 lock=1796581 beat_age=714s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:58.926269806 lock=1796581 beat_age=714s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:59.463506171 lock=1796581 beat_age=715s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:43:59.998626463 lock=1796581 beat_age=715s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:44:00.538557879 lock=1796581 beat_age=716s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:44:01.072212555 lock=1796581 beat_age=717s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:44:01.604268555 lock=1796581 beat_age=717s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:44:02.137734224 lock=1796581 beat_age=718s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:44:02.671372587 lock=1796581 beat_age=718s rows=2 arms=703857,1796499, log=2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=co
+11:44:03.203734096 lock=none beat_age=719s rows=3 arms=703857, log=2026-11-01T19:44:02.671Z pid=1589300 health monitor state=retrying arm=1796499
+11:44:03.735666660 lock=none beat_age=719s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:04.270933868 lock=none beat_age=720s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:04.805788782 lock=none beat_age=720s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:05.341761574 lock=none beat_age=721s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:05.878338751 lock=none beat_age=721s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:06.410427493 lock=none beat_age=722s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:06.944795165 lock=none beat_age=722s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:07.476714018 lock=none beat_age=723s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:08.009705439 lock=none beat_age=723s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:08.542601450 lock=none beat_age=724s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:09.073339778 lock=none beat_age=725s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:09.608975268 lock=none beat_age=725s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:10.144466523 lock=none beat_age=726s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:10.679514141 lock=none beat_age=726s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:11.213499710 lock=none beat_age=727s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:11.749089127 lock=none beat_age=727s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:12.282128222 lock=none beat_age=728s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:12.817613921 lock=none beat_age=728s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:13.351095024 lock=none beat_age=729s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:13.884552281 lock=none beat_age=729s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:14.418937767 lock=none beat_age=730s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:14.956743464 lock=none beat_age=730s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:15.494809241 lock=none beat_age=731s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:16.030197575 lock=none beat_age=732s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:16.564264090 lock=none beat_age=732s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:17.098743443 lock=none beat_age=733s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:17.632629539 lock=none beat_age=733s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:18.166783649 lock=none beat_age=734s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:18.699372164 lock=none beat_age=734s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:19.232471878 lock=none beat_age=735s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:19.765205278 lock=none beat_age=735s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:20.299967223 lock=none beat_age=736s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:20.837082143 lock=none beat_age=736s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:21.379764810 lock=none beat_age=737s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:21.915468860 lock=none beat_age=737s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:22.447447290 lock=none beat_age=738s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:22.983352100 lock=none beat_age=738s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:23.522891481 lock=none beat_age=739s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:24.058848012 lock=none beat_age=740s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:24.592681668 lock=none beat_age=740s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:25.126163981 lock=none beat_age=741s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:25.661847765 lock=none beat_age=741s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:26.196539298 lock=none beat_age=742s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:26.733305275 lock=none beat_age=742s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:27.269505684 lock=none beat_age=743s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:27.801993903 lock=none beat_age=743s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:28.335808406 lock=none beat_age=744s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:28.868908292 lock=none beat_age=744s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:29.404741006 lock=none beat_age=745s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:29.937533707 lock=none beat_age=745s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:30.471346422 lock=none beat_age=746s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:31.005082880 lock=none beat_age=746s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:31.539955496 lock=none beat_age=747s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:32.074461165 lock=none beat_age=748s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:32.610554443 lock=none beat_age=748s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:33.145266307 lock=none beat_age=749s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:33.680446468 lock=none beat_age=749s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:34.213963491 lock=none beat_age=750s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:34.750451866 lock=none beat_age=750s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:35.284137262 lock=none beat_age=751s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:35.816126040 lock=none beat_age=751s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:36.348036906 lock=none beat_age=752s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:36.883654271 lock=none beat_age=752s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:37.419227466 lock=none beat_age=753s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:37.953710329 lock=none beat_age=753s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:38.490259642 lock=none beat_age=754s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:39.024037543 lock=none beat_age=754s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:39.558810754 lock=none beat_age=755s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:40.092405734 lock=none beat_age=756s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:40.623666628 lock=none beat_age=756s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:41.156315001 lock=none beat_age=757s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:41.693067167 lock=none beat_age=757s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:42.228045146 lock=none beat_age=758s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:42.764593929 lock=none beat_age=758s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:43.301949128 lock=none beat_age=759s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:43.834727365 lock=none beat_age=759s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:44.367342958 lock=none beat_age=760s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:44.902447042 lock=none beat_age=760s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:45.436758423 lock=none beat_age=761s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:45.970780008 lock=none beat_age=761s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:46.504749239 lock=none beat_age=762s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:47.041906370 lock=none beat_age=763s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:47.576577562 lock=none beat_age=763s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:48.110414206 lock=none beat_age=764s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:48.644863944 lock=none beat_age=764s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:49.181119705 lock=none beat_age=765s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:49.714515101 lock=none beat_age=765s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:50.249107485 lock=none beat_age=766s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:50.782394447 lock=none beat_age=766s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:51.319436874 lock=none beat_age=767s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:51.854352735 lock=none beat_age=767s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:52.390692048 lock=none beat_age=768s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:52.928307913 lock=none beat_age=768s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:53.462774344 lock=none beat_age=769s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:53.998084735 lock=none beat_age=769s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:54.537312008 lock=none beat_age=770s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:55.072186694 lock=none beat_age=771s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:55.605335814 lock=none beat_age=771s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:56.138288229 lock=none beat_age=772s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:56.673420738 lock=none beat_age=772s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:57.206474553 lock=none beat_age=773s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:57.741098315 lock=none beat_age=773s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:58.274368428 lock=none beat_age=774s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:58.808325742 lock=none beat_age=774s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:59.344646012 lock=none beat_age=775s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:44:59.881909847 lock=none beat_age=775s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:00.416137207 lock=none beat_age=776s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:00.949447413 lock=none beat_age=776s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:01.482911605 lock=none beat_age=777s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:02.016243674 lock=none beat_age=777s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:02.548341128 lock=none beat_age=778s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:03.083948615 lock=none beat_age=779s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:03.620876356 lock=none beat_age=779s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:04.155030373 lock=none beat_age=780s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:04.689938803 lock=none beat_age=780s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:05.222859991 lock=none beat_age=781s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:05.755931374 lock=none beat_age=781s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:06.291416488 lock=none beat_age=782s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:06.823952557 lock=none beat_age=782s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:07.355780971 lock=none beat_age=783s rows=3 arms=703857, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:07.890225259 lock=none beat_age=783s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:08.425676623 lock=2488732 beat_age=0s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:08.964576859 lock=2488732 beat_age=0s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:09.498424228 lock=2488732 beat_age=1s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:10.033929279 lock=2488732 beat_age=2s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:10.567806629 lock=2488732 beat_age=2s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:11.100812140 lock=2488732 beat_age=3s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:11.634933397 lock=2488732 beat_age=3s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:12.167119490 lock=2488732 beat_age=4s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:12.699696450 lock=2488732 beat_age=4s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:13.232897333 lock=2488732 beat_age=5s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:13.768757993 lock=2488732 beat_age=5s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:14.303441506 lock=2488732 beat_age=6s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:14.841324662 lock=2488732 beat_age=6s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:15.375569573 lock=2488732 beat_age=7s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:15.907936334 lock=2488732 beat_age=7s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:16.442102129 lock=2488732 beat_age=8s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:16.975196124 lock=2488732 beat_age=8s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:17.506983020 lock=2488732 beat_age=9s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:18.040704252 lock=2488732 beat_age=10s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:18.577779627 lock=2488732 beat_age=10s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:19.112393784 lock=2488732 beat_age=11s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:19.647985322 lock=2488732 beat_age=11s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:20.183648582 lock=2488732 beat_age=12s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:20.717961130 lock=2488732 beat_age=12s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:21.251314186 lock=2488732 beat_age=13s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:21.785065231 lock=2488732 beat_age=13s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:22.317691015 lock=2488732 beat_age=14s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:22.852158471 lock=2488732 beat_age=14s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:23.387566000 lock=2488732 beat_age=15s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:23.922765654 lock=2488732 beat_age=15s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:24.457088744 lock=2488732 beat_age=16s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:24.993694234 lock=2488732 beat_age=16s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:25.528288236 lock=2488732 beat_age=17s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:26.061402436 lock=2488732 beat_age=18s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:26.595151041 lock=2488732 beat_age=18s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:27.127947073 lock=2488732 beat_age=19s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:27.663724243 lock=2488732 beat_age=19s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:28.202617059 lock=2488732 beat_age=20s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:28.740310424 lock=2488732 beat_age=20s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:29.276517378 lock=2488732 beat_age=21s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:29.809805264 lock=2488732 beat_age=21s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:30.342568947 lock=2488732 beat_age=22s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:30.877674924 lock=2488732 beat_age=22s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:31.415778274 lock=2488732 beat_age=23s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:31.949905626 lock=2488732 beat_age=23s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:32.484143613 lock=2488732 beat_age=24s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:33.020442747 lock=2488732 beat_age=24s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:33.555368514 lock=2488732 beat_age=25s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:34.089660692 lock=2488732 beat_age=26s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:34.623776029 lock=2488732 beat_age=26s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:35.162019037 lock=2488732 beat_age=27s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:35.696522018 lock=2488732 beat_age=27s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:36.228737712 lock=2488732 beat_age=28s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:36.762247801 lock=2488732 beat_age=28s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:37.295054852 lock=2488732 beat_age=29s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:37.828534088 lock=2488732 beat_age=29s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:38.367233234 lock=2488732 beat_age=30s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:38.904726000 lock=2488732 beat_age=30s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:39.438905870 lock=2488732 beat_age=31s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:39.974240103 lock=2488732 beat_age=31s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:40.509454756 lock=2488732 beat_age=32s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:41.042545393 lock=2488732 beat_age=33s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:41.576660711 lock=2488732 beat_age=33s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:42.120087623 lock=2488732 beat_age=34s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:42.656099541 lock=2488732 beat_age=34s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:43.190714873 lock=2488732 beat_age=35s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+11:45:43.729931220 lock=2488732 beat_age=35s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms

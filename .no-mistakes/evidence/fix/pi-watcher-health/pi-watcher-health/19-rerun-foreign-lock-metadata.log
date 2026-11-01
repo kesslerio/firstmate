@@ -1,0 +1,6 @@
+== foreign fm-home lock metadata with stale beacon: expect withheld replacement + metadata untouched
+ Warning: watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+ Warning: watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+12:13:51.690905013 lock=377591 arm=377524 beat=705s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+-- lock metadata now: fm-home=/tmp/fm-lab-sibling
+-- extension log rows: 7

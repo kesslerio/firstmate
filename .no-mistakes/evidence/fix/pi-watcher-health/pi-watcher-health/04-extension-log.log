@@ -1,0 +1,6 @@
+2026-11-01T19:35:44.856Z pid=1589300 health monitor retire=timeout arm=1640956 wait=1000ms
+2026-11-01T19:37:33.147Z pid=1589300 restore attempt=0 predecessor=1794822 start=ok pid=1796499
+2026-11-01T19:37:33.862Z pid=1589300 confirm generation=1641190.1793561743.KJrMAg watcherPid=1796581 result=confirmed
+2026-11-01T19:44:02.671Z pid=1589300 health monitor state=retrying arm=1796499
+2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+2026-11-01T19:47:51.205Z pid=1589300 health monitor retire=timeout arm=2488628 wait=1000ms

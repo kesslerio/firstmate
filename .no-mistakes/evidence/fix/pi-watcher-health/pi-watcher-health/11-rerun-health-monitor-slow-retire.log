@@ -1,0 +1,47 @@
+== long-poll lab home (FM_POLL=600, grace 660s), beacon backdated to 700s PAST grace
+== no tool call: only the extension's own 30s health monitor may act
+12:10:21.816578148 lock=99174 arm=99109 beat=700s rows=0 log=-
+12:10:23.830530518 lock=99174 arm=99109 beat=702s rows=0 log=-
+12:10:25.844633522 lock=99174 arm=99109 beat=704s rows=0 log=-
+12:10:27.858486678 lock=99174 arm=99109 beat=706s rows=0 log=-
+12:10:29.872533404 lock=99174 arm=99109 beat=708s rows=0 log=-
+12:10:31.886391528 lock=99174 arm=99109 beat=710s rows=0 log=-
+12:10:33.900749750 lock=99174 arm=99109 beat=712s rows=0 log=-
+12:10:35.917177835 lock=99174 arm=99109 beat=714s rows=0 log=-
+12:10:37.931309480 lock=99174 arm=99109 beat=716s rows=0 log=-
+12:10:39.947705648 lock=258870 arm=258819 beat=0s rows=2 log=2026-11-01T20:10:39.506Z pid=98401 restore attempt=0 predecessor=257361 start=ok pid=258819
+12:10:41.965398045 lock=258870 arm=258819 beat=2s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:10:43.981433187 lock=258870 arm=258819 beat=4s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:10:45.997774570 lock=258870 arm=258819 beat=7s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:10:48.015367212 lock=258870 arm=258819 beat=9s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:10:50.031987551 lock=258870 arm=258819 beat=11s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:10:52.049232821 lock=258870 arm=258819 beat=13s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:10:54.067222664 lock=258870 arm=258819 beat=15s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:10:56.086232097 lock=258870 arm=258819 beat=17s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:10:58.102445596 lock=258870 arm=258819 beat=19s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:00.116880305 lock=258870 arm=258819 beat=21s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:02.132825603 lock=258870 arm=258819 beat=23s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:04.150240383 lock=258870 arm=258819 beat=25s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:06.171292651 lock=258870 arm=258819 beat=27s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:08.188622454 lock=258870 arm=258819 beat=29s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:10.205434789 lock=258870 arm=258819 beat=31s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:12.220477828 lock=258870 arm=258819 beat=33s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:14.236536405 lock=258870 arm=258819 beat=35s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:16.253669311 lock=258870 arm=258819 beat=37s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:18.271824487 lock=258870 arm=258819 beat=39s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:20.295379850 lock=258870 arm=258819 beat=41s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:22.315557628 lock=258870 arm=258819 beat=43s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:24.334287898 lock=258870 arm=258819 beat=45s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:26.350297313 lock=258870 arm=258819 beat=47s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:28.366306005 lock=258870 arm=258819 beat=49s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:30.386271495 lock=258870 arm=258819 beat=51s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:32.405849879 lock=258870 arm=258819 beat=53s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:34.422843953 lock=258870 arm=258819 beat=55s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:36.439768000 lock=258870 arm=258819 beat=57s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:38.457937641 lock=258870 arm=258819 beat=59s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:40.473273114 lock=258870 arm=258819 beat=61s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:42.489607949 lock=258870 arm=258819 beat=63s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:44.505183230 lock=258870 arm=258819 beat=65s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:46.521299853 lock=258870 arm=258819 beat=67s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:48.536534263 lock=258870 arm=258819 beat=69s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:11:50.554534693 lock=258870 arm=258819 beat=71s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed

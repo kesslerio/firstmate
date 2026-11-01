@@ -1,0 +1,4 @@
+2026-11-01T20:10:37.939Z pid=98401 health monitor state=retrying arm=99109
+2026-11-01T20:10:38.940Z pid=98401 health monitor retire=timeout arm=99109 wait=1000ms
+2026-11-01T20:10:39.506Z pid=98401 restore attempt=0 predecessor=257361 start=ok pid=258819
+2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed

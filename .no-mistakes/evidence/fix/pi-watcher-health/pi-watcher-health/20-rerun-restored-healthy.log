@@ -1,0 +1,4 @@
+== restored identity + fresh beacon: expect verified unchanged, established arm untouched
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+12:14:02.533238693 lock=377591 arm=377524 beat=5s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+-- lock metadata: fm-home=/tmp/fm-lab.u4kLMm

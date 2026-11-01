@@ -1,0 +1,7 @@
+== healthy fresh-beacon repair call on the long-poll home: expect verified-unchanged, no retirement
+12:13:12.306722413 lock=377591 arm=377524 beat=61s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:13:14.324731925 lock=377591 arm=377524 beat=63s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:13:16.340772116 lock=377591 arm=377524 beat=65s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:13:18.355078867 lock=377591 arm=377524 beat=67s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:13:20.370851750 lock=377591 arm=377524 beat=69s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:13:22.386267088 lock=377591 arm=377524 beat=71s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed

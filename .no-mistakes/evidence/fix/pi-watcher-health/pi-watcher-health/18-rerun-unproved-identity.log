@@ -1,0 +1,10 @@
+== identity-proved? corrupt pid-identity to a reused-pid marker, backdate beacon to 700s, then repair call
+-- original identity: linux-starttime=5550133 cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d3643394237434d43523956513048443534354e464434382f62696e2f666d2d77617463682e736800
+-- original fm-home: /tmp/fm-lab.u4kLMm
+-- after repair call:
+ Warning: watcher: unhealthy - existing arm owns this home's identity-verified watcher but progress is stale; Pi extension is retiring that arm and replacing the watcher
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+ Warning: watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+12:13:39.689661535 lock=377591 arm=377524 beat=705s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+-- lock metadata now: identity=reused-pid fm-home=/tmp/fm-lab.u4kLMm
+-- extension log rows: 7

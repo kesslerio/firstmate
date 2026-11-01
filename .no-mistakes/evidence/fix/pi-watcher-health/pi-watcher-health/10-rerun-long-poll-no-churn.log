@@ -1,0 +1,17 @@
+== long-poll lab home: config/watch.env export FM_POLL=600, derived grace max(300,600+60)=660s
+== beacon backdated to 400s (inside grace): expect NO retirement across two 30s monitor ticks
+12:09:00.082029649 lock=99174 arm=99109 beat=400s rows=0 log=-
+12:09:05.096014325 lock=99174 arm=99109 beat=405s rows=0 log=-
+12:09:10.108797162 lock=99174 arm=99109 beat=410s rows=0 log=-
+12:09:15.121423266 lock=99174 arm=99109 beat=415s rows=0 log=-
+12:09:20.135758930 lock=99174 arm=99109 beat=420s rows=0 log=-
+12:09:25.151717299 lock=99174 arm=99109 beat=425s rows=0 log=-
+12:09:30.168236369 lock=99174 arm=99109 beat=430s rows=0 log=-
+12:09:35.183304369 lock=99174 arm=99109 beat=435s rows=0 log=-
+12:09:40.197455326 lock=99174 arm=99109 beat=440s rows=0 log=-
+12:09:45.211013506 lock=99174 arm=99109 beat=445s rows=0 log=-
+12:09:50.228238164 lock=99174 arm=99109 beat=450s rows=0 log=-
+12:09:55.243492653 lock=99174 arm=99109 beat=455s rows=0 log=-
+12:10:00.259858962 lock=99174 arm=99109 beat=460s rows=0 log=-
+12:10:05.273182570 lock=99174 arm=99109 beat=465s rows=0 log=-
+12:10:10.288361572 lock=99174 arm=99109 beat=470s rows=0 log=-

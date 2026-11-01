@@ -1,0 +1,22 @@
+== repair call /fm-watch-arm-pi on identity-proved stalled watcher in long-poll home
+== old watcher pid=258870 arm=258819
+12:12:09.771326943 lock=258870 arm=258819 beat=700s rows=2 log=2026-11-01T20:10:39.983Z pid=98401 confirm generation=99174.1793563837.Ekz0bm watcherPid=258870 result=confirmed
+12:12:11.786823171 lock=377591 arm=377524 beat=0s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:13.802073457 lock=377591 arm=377524 beat=2s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:15.816015560 lock=377591 arm=377524 beat=4s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:17.832963900 lock=377591 arm=377524 beat=6s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:19.849609038 lock=377591 arm=377524 beat=8s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:21.867677005 lock=377591 arm=377524 beat=10s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:23.881561702 lock=377591 arm=377524 beat=12s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:25.895795479 lock=377591 arm=377524 beat=14s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:27.910466962 lock=377591 arm=377524 beat=16s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:29.927186344 lock=377591 arm=377524 beat=18s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:31.942505693 lock=377591 arm=377524 beat=20s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:33.959629393 lock=377591 arm=377524 beat=22s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:35.973061738 lock=377591 arm=377524 beat=24s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:37.987847785 lock=377591 arm=377524 beat=26s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:40.002004995 lock=377591 arm=377524 beat=29s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:42.015715549 lock=377591 arm=377524 beat=31s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:44.030416790 lock=377591 arm=377524 beat=33s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:46.043819708 lock=377591 arm=377524 beat=35s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed
+12:12:48.058164194 lock=377591 arm=377524 beat=37s rows=4 log=2026-11-01T20:12:11.630Z pid=98401 confirm generation=258870.1793563929.hjPolu watcherPid=377591 result=confirmed

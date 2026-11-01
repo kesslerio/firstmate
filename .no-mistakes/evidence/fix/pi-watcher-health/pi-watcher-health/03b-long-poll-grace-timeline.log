@@ -1,0 +1,25 @@
+== long-poll home (config/watch.env: export FM_POLL=600), no tool call, no beacon backdate
+== beacon legitimately ages past the old 300s floor while the watcher sleeps a 600s poll cycle.
+== Monitor ticks land every 30s; no churn while age < poll-derived grace max(300, 600+60)=660.
+
+-- samples crossing 300s (11:42:38 onward): lock pid unchanged, cycle rows unchanged --
+11:42:33 lock=1796581 beat_age=300s arms=703857,1796499, cycrows=2
+11:42:38 lock=1796581 beat_age=305s arms=703857,1796499, cycrows=2
+11:42:43 lock=1796581 beat_age=310s arms=703857,1796499, cycrows=2
+11:42:48 lock=1796581 beat_age=315s arms=703857,1796499, cycrows=2
+11:42:53 lock=1796581 beat_age=320s arms=703857,1796499, cycrows=2
+11:42:59 lock=1796581 beat_age=326s arms=703857,1796499, cycrows=2
+11:43:04 lock=1796581 beat_age=331s arms=703857,1796499, cycrows=2
+11:43:09 lock=1796581 beat_age=336s arms=703857,1796499, cycrows=2
+   ...
+
+-- extension log rows before the 11:43:44 backdate: none after 11:37:33, so no monitor
+   checked an arm past 300s and retired it while the beacon was still inside the 660s
+   poll-derived grace (rows at 11:44:02+ are the post-backdate retirement) --
+
+-- after backdating the beacon to 700s (past 660s grace), the same monitor retired and replaced it --
+2026-11-01T19:35:44.856Z pid=1589300 health monitor retire=timeout arm=1640956 wait=1000ms
+2026-11-01T19:44:02.671Z pid=1589300 health monitor state=retrying arm=1796499
+2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms
+2026-11-01T19:47:51.205Z pid=1589300 health monitor retire=timeout arm=2488628 wait=1000ms
+new watcher pid observed: 11:45:08.425676623 lock=2488732 beat_age=0s rows=3 arms=703857,2488628, log=2026-11-01T19:44:03.671Z pid=1589300 health monitor retire=timeout arm=1796499 wait=1000ms

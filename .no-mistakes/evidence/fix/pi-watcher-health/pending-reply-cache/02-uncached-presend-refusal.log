@@ -1,0 +1,22 @@
+held corr=820b9ae077fe49d5
+lock held at 11:51:15.840236681
+tick blocked at its pre-send lock wait: 1 (detected 11:51:47.900462444)
+decision opened at 11:51:47.902581689; status now:
+working: preparing the report
+needs-decision [key=late]: which build?
+tick rc=0
+sends=0
+820b9ae077fe49d5 phase=awaiting_report attempted=
+9edf1e4df92e2133 phase=awaiting_report attempted=
+aeeac4f5c6980c2b phase=awaiting_report attempted=
+cacffac219212ec2 phase=awaiting_report attempted=
+folds=3
+--- trace after the send_recovery call for the held record ---
+1:+ fm_pending_reply_send_recovery /tmp/fm-pr-race.qXxFhX/state 820b9ae077fe49d5
+119:++ status_own_open_decisions /tmp/fm-pr-race.qXxFhX/state/hibit.status
+284:+ fm_lock_acquire_wait /tmp/fm-pr-race.qXxFhX/state/.pending-reply-820b9ae077fe49d5.lock
+490:++ status_own_open_decisions /tmp/fm-pr-race.qXxFhX/state/hibit.status
+2074:+ fm_pending_reply_send_recovery /tmp/fm-pr-race.qXxFhX/state 9edf1e4df92e2133
+2192:++ status_own_open_decisions /tmp/fm-pr-race.qXxFhX/state/hibit.status
+3772:+ fm_pending_reply_send_recovery /tmp/fm-pr-race.qXxFhX/state aeeac4f5c6980c2b
+5275:+ fm_pending_reply_send_recovery /tmp/fm-pr-race.qXxFhX/state cacffac219212ec2
