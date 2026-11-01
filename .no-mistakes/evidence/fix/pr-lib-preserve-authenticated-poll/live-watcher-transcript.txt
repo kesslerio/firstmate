@@ -1,0 +1,153 @@
+
+=== A. armed poll survives a repository template update (new release)
+PASS: A: poll armed
+registered template hash: b593f150bebb690e819063b53eeb0561a52c939a1c070fb0134aeb3681df3634
+PASS: A: arming executed nothing
+PASS: A: repository update changed bin/fm-pr-poll.sh (state check is now the old generation)
+watcher rc=0
+--- watcher stdout
+check: /tmp/fm-live-lab2/A/home/state/task-a.check.sh: merged
+--- watcher stderr
+--- forge CLI calls
+host=
+api repos/o/r/pulls/1
+host=
+api repos/o/r/pulls/1/reviews?per_page=100 --paginate --slurp
+host=
+api repos/o/r/pulls/1/comments?per_page=100 --paginate --slurp
+host=
+api repos/o/r
+host=
+host=
+api repos/o/r/commits/0123456789abcdef0123456789abcdef01234567/statuses?per_page=100 --paginate --slurp
+api repos/o/r/commits/0123456789abcdef0123456789abcdef01234567/check-runs?filter=all&per_page=100 --paginate --slurp
+host=
+api repos/o/r/issues/1/comments?per_page=100 --paginate --slurp
+host=
+pr view https://github.com/o/r/pull/1 --json headRefOid,reviewDecision
+host=github.com
+pr view https://github.com/o/r/pull/1 --json state -q .state
+PASS: A: watcher cycle completed
+PASS: A: merge detected and reported after the update
+PASS: A: the intact generation was not rejected
+PASS: A: the current repository poll ran
+PASS: A: the registered state-file bytes never executed
+PASS: A: poll dispatched the registered PR identity
+surviving poll artifacts: 
+PASS: A: merged poll retired its artifacts
+PASS: A: task PR identity preserved
+--- wake queue
+1793556793	1	check	merged-task-a-https://github.com/o/r/pull/1	check: merge landed: task-a https://github.com/o/r/pull/1 external
+
+=== A-base. control: base commit rejects the same intact registered generation
+watcher rc=0
+--- watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-lab2/A-base/home/state/task-a.check.sh
+surviving poll artifacts: check.sh pr-poll pr-poll-registration 
+PASS: A-base: base code lost the merge (reproduces the reported failure)
+PASS: A-base: base code rejected the intact generation
+
+=== B. armed poll survives control_relaunch_tx metadata appended after the PR identity
+PASS: B: poll armed with PR identity
+--- task record after relaunch
+window=fm-task-a
+endpoint_task_id=task-a
+worktree=/tmp/fm-live-lab2/B/wt
+project=/tmp/fm-live-lab2/B/project
+kind=ship
+mode=no-mistakes
+pr=https://github.com/o/r/pull/1
+pr_head=0123456789abcdef0123456789abcdef01234567
+control_relaunch_tx=114614.20261024T230110Z.26328
+watcher rc=0
+--- watcher stdout
+check: /tmp/fm-live-lab2/B/home/state/task-a.check.sh: merged
+--- watcher stderr
+PASS: B: watcher cycle completed
+PASS: B: merge detected after the control relaunch
+PASS: B: poll was not rejected for relaunch metadata
+surviving poll artifacts: 
+PASS: B: merged poll retired its artifacts
+PASS: B: relaunch transaction preserved in the task record
+
+=== B-adversarial. forged trailing metadata refused: injected=value
+watcher rc=0
+--- watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-lab2/B-forged-injected-value/home/state/task-a.check.sh
+surviving poll artifacts: check.sh pr-poll pr-poll-registration 
+PASS: B-forged-injected-value: forged metadata rejected
+PASS: B-forged-injected-value: no merge notification from forged metadata
+PASS: B-forged-injected-value: poll stayed armed for a later honest cycle
+PASS: B-forged-injected-value: trust was not rewritten
+
+=== B-adversarial. forged trailing metadata refused: pr=https://github.com/o/r/pull/2
+watcher rc=0
+--- watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-lab2/B-forged-pr-https-github-com-o-r-pull-2/home/state/task-a.check.sh
+surviving poll artifacts: check.sh pr-poll pr-poll-registration 
+PASS: B-forged-pr-https-github-com-o-r-pull-2: forged metadata rejected
+PASS: B-forged-pr-https-github-com-o-r-pull-2: no merge notification from forged metadata
+PASS: B-forged-pr-https-github-com-o-r-pull-2: poll stayed armed for a later honest cycle
+PASS: B-forged-pr-https-github-com-o-r-pull-2: trust was not rewritten
+
+=== B-adversarial. forged trailing metadata refused: pr_head=not-a-sha
+watcher rc=0
+--- watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-lab2/B-forged-pr-head-not-a-sha/home/state/task-a.check.sh
+surviving poll artifacts: check.sh pr-poll pr-poll-registration 
+PASS: B-forged-pr-head-not-a-sha: forged metadata rejected
+PASS: B-forged-pr-head-not-a-sha: no merge notification from forged metadata
+PASS: B-forged-pr-head-not-a-sha: poll stayed armed for a later honest cycle
+PASS: B-forged-pr-head-not-a-sha: trust was not rewritten
+
+=== C. tampered registered check bytes refused and never executed
+watcher rc=0
+--- watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-lab2/C/home/state/task-a.check.sh
+surviving poll artifacts: check.sh pr-poll pr-poll-registration 
+PASS: C: tampered check bytes rejected
+PASS: C: no merge notification from tampered bytes
+PASS: C: forged check bytes never executed
+PASS: C: poll stayed armed after the refusal
+PASS: C: trust registration unchanged
+
+=== A2. re-arming after a repository update registers the new generation
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+armed: state/task-a.check.sh
+PASS: A2: re-arm registered the new generation
+PASS: A2: published check is byte-identical to the current repository poll
+watcher rc=0
+--- watcher stdout
+check: /tmp/fm-live-lab2/A2/home/state/task-a.check.sh: merged
+PASS: A2: merge detected after re-arm
+PASS: A2: the newly armed generation ran
+
+=== E. repository update and control relaunch together keep the poll armed
+watcher rc=0
+--- watcher stdout
+check: /tmp/fm-live-lab2/E/home/state/task-a.check.sh: merged
+PASS: E: watcher cycle completed
+PASS: E: merge detected after update plus relaunch
+PASS: E: poll not rejected
+PASS: E: the current repository poll ran
+PASS: E: registered state-file bytes never executed
+PASS: E: merged poll retired its artifacts
+--- wake queue
+1793556810	1	check	merged-task-a-https://github.com/o/r/pull/1	check: merge landed: task-a https://github.com/o/r/pull/1 external
+
+=== F. symlinked repository poll refused, never executed
+watcher rc=0
+--- watcher stdout
+check: rejected unauthenticated state checks: /tmp/fm-live-lab2/F/home/state/task-a.check.sh
+PASS: F: symlinked repository poll refused
+PASS: F: symlink target never executed
+PASS: F: no merge reported from the symlinked template
+PASS: F: poll stayed armed
+
+=== D. real forge read-only: validated poll dispatch against github.com/cli/cli
+live forge state for https://github.com/cli/cli/pull/1: MERGED
+poll output: merged
+PASS: D: validated poll reported the live merged state
+PASS: D: an identity that does not reconstruct its URL stayed silent
+
+=== SUMMARY: 0 failing assertion(s)

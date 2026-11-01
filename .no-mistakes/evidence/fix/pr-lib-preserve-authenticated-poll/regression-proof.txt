@@ -1,0 +1,9 @@
+### base code (41a47c0) + the new test:
+1..1
+not ok - template-update rejected an intact registered generation
+rc=1
+### change code (46f21b4) + the new test:
+1..1
+ok - registered generations survive template updates and relaunch metadata without executing sidecar code or trusting forged bytes
+FM_TEST_COMPLETE
+rc=0
