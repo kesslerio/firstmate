@@ -1,0 +1,7 @@
+# Live Pi primary: adversarial foreign watcher identity (real extension, real fm_watch_arm_pi, real watcher)
+# probe 1 (seed): state=healthy, watcher pid 3575459
+# then lock fm-home rewritten to <lab>/sibling and beacon aged 900s
+# probe 2: state=unhealthy, ok=false, "replacement withheld because watcher identity is not proved"
+#          watcher 3575459 still alive, exactly one arm (3575431), foreign fm-home metadata untouched, no retire log
+# then fm-home restored and the beacon refreshed by the watcher
+# probe 3: state=healthy, same watcher 3575459, still exactly one arm, no retire log

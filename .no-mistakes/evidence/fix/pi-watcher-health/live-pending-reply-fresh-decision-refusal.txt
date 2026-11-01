@@ -1,0 +1,50 @@
+# Live watcher: a decision opened between the eligibility fold and the locked, uncached pre-send read
+# driver waits for the real tick's '+ decisions=' trace (the eligibility fold returned empty),
+# then appends 'needs-decision [key=late]: choose' to the task status before the send path reads again.
+
+## interleave log
+eligibility-fold-returned 2026-11-01T10:28:47-08:00 line=+ decisions=
+decision-opened 2026-11-01T10:28:47-08:00
+
+## recovery sends (0 = the pre-send read refused)
+sends_log_lines=0
+phase=awaiting_report recovery_attempted_epoch=
+
+## task status file
+done: no pending decision
+needs-decision [key=late]: choose
+
+## trace of the single send_recovery invocation in that tick
+  3267  + _fm_pending_reply_decision_denied /tmp/fm-lab.RQ2aY2/state/hibit.status
+  3300  ++ status_own_open_decisions /tmp/fm-lab.RQ2aY2/state/hibit.status
+  3340  +++ _fm_decision_fold_line '' 'done: no pending decision' resolved captain-held secondmate
+  3371  + decisions=
+  3373  + return 1
+  3437  + sender_pid=98276
+  3491  + fm_lock_acquire_wait /tmp/fm-lab.RQ2aY2/state/.pending-reply-1229b56690ae1f16.lock
+  3606  + return 1
+  3611  + _fm_pending_reply_try_resolve_locked /tmp/fm-lab.RQ2aY2/state 1229b56690ae1f16 /tmp/fm-lab.RQ2aY2/state/hibit.status
+  3669  ++ '[' -n 'needs-decision [key=late]: choose' ']'
+  3670  ++ fm_pending_reply_line_resolves 'needs-decision [key=late]: choose' 1229b56690ae1f16
+  3671  ++ local 'line=needs-decision [key=late]: choose' corr=1229b56690ae1f16
+  3672  ++ '[' -n 'needs-decision [key=late]: choose' ']'
+  3675  ++ fm_pending_reply_text_has_corr 'needs-decision [key=late]: choose' 1229b56690ae1f16
+  3676  ++ local 'text=needs-decision [key=late]: choose' corr=1229b56690ae1f16 re
+  3680  ++ [[ needs-decision [key=late]: choose =~ (^|[^[:alnum:]_])corr=1229b56690ae1f16([^[:alnum:]_]|$) ]]
+  3688  + return 1
+  3697  ++ status_own_open_decisions /tmp/fm-lab.RQ2aY2/state/hibit.status
+  3737  +++ _fm_decision_fold_line '' 'done: no pending decision' resolved captain-held secondmate
+  3765  ++ status_line_verb 'needs-decision [key=late]: choose' verb
+  3766  ++ local 'v=needs-decision [key=late]' out= word
+  3775  +++ _fm_decision_fold_line '' 'needs-decision [key=late]: choose' resolved captain-held secondmate
+  3776  +++ local open= 'line=needs-decision [key=late]: choose' resolve=resolved held=captain-held kind=secondmate verb key note unstamped
+  3778  +++ _fm_status_unstamped 'needs-decision [key=late]: choose' unstamped
+  3779  +++ local '__fm_unstamped_rest=needs-decision [key=late]: choose' __fm_unstamped_keep= __fm_unstamped_before
+  3783  +++ printf -v unstamped %s 'needs-decision [key=late]: choose'
+...
+  4332  + fm_lock_acquire_wait /tmp/fm-lab.RQ2aY2/state/.watcher-down.lock
+  4427  + return 1
+  4436  + fm_lock_release /tmp/fm-lab.RQ2aY2/state/.watcher-down.lock
+  4471  + fm_lock_release /tmp/fm-lab.RQ2aY2/state/.wake-queue.lock
+
+recovery_attempted_epoch writes inside the invocation: 0

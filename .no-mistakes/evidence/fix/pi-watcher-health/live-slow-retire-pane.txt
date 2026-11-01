@@ -1,0 +1,40 @@
+[Extensions]
+  fm-primary-pi-watch.ts, watch-probe.ts
+
+[Skill conflicts]
+  ~/.agents/skills/runtime-provisioner/SKILL.md
+    Nested mappings are not allowed in compact mappings at line 2, column 14:
+
+description: VulnHunter sandbox-depth decision procedure. For every 2b verdict …
+             ^
+
+
+
+ WATCH_PROBE_PROMPT_1
+
+
+
+ fm_watch_arm_pi
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed;
+ call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy
+
+
+ WATCH_PROBE_DONE_1
+
+
+ WATCH_PROBE_PROMPT_2
+
+
+
+ fm_watch_arm_pi
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed;
+ call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy
+
+
+ WATCH_PROBE_DONE_2
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M6C436AVKQ6N9JRHZ44XH2NB (detached)
+↑20k ↓20 R61k W20k CH99.3% 249.7%/8.2k (auto)                                                              deterministic

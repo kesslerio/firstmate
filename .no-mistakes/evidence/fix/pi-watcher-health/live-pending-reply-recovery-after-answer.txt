@@ -1,0 +1,34 @@
+# Live watcher recovery phase: same 6 records after the task's decision was answered
+# appended: 'resolved [key=scope]: chosen' then one more real watcher cycle
+
+## recovery sends observed through the library's send hook
+--
+hibit
+[fm-from-firstmate]⁣corr=04bc7db8c8964aa6 REPOST REQUIRED: previous marked request had no correlated parent report. Reply on the parent status channel including corr=04bc7db8c8964aa6. Original request: request 2
+--
+hibit
+[fm-from-firstmate]⁣corr=07e4289c8072989f REPOST REQUIRED: previous marked request had no correlated parent report. Reply on the parent status channel including corr=07e4289c8072989f. Original request: request 5
+--
+hibit
+[fm-from-firstmate]⁣corr=1934f17c02990ea8 REPOST REQUIRED: previous marked request had no correlated parent report. Reply on the parent status channel including corr=1934f17c02990ea8. Original request: request 1
+--
+hibit
+[fm-from-firstmate]⁣corr=475ded18709cbfb1 REPOST REQUIRED: previous marked request had no correlated parent report. Reply on the parent status channel including corr=475ded18709cbfb1. Original request: request 6
+--
+hibit
+[fm-from-firstmate]⁣corr=9f6e2859afc92a62 REPOST REQUIRED: previous marked request had no correlated parent report. Reply on the parent status channel including corr=9f6e2859afc92a62. Original request: request 3
+--
+hibit
+[fm-from-firstmate]⁣corr=cc3ef3106a790669 REPOST REQUIRED: previous marked request had no correlated parent report. Reply on the parent status channel including corr=cc3ef3106a790669. Original request: request 4
+
+## per-correlation send count and record state
+1934f17c02990ea8 sends=1 phase=recovery_sent attempted=1793557428 outcome=confirmed
+04bc7db8c8964aa6 sends=1 phase=recovery_sent attempted=1793557427 outcome=confirmed
+9f6e2859afc92a62 sends=1 phase=recovery_sent attempted=1793557430 outcome=confirmed
+cc3ef3106a790669 sends=1 phase=recovery_sent attempted=1793557430 outcome=confirmed
+07e4289c8072989f sends=1 phase=recovery_sent attempted=1793557428 outcome=confirmed
+475ded18709cbfb1 sends=1 phase=recovery_sent attempted=1793557429 outcome=confirmed
+
+## task status after the answer
+needs-decision [key=scope]: choose
+resolved [key=scope]: chosen

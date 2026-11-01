@@ -1,0 +1,12 @@
+# Follow-up probe of the slow-retire fix under a long poll cadence
+# Same live Pi primary + real watcher as the passing scenario, but FM_POLL=600 and
+# FM_WATCH_ARM_RETIRE_TIMEOUT_MS=1, with the beacon held 900s old until the 30s health
+# monitor retired the established, identity-proved watcher.
+# Extension log: "health monitor retire=timeout arm=... wait=1ms" (the fixed branch), no alarm.
+# Timeline (live-longpoll-no-replacement-timeline.txt): after the arm-interrupted cycle the
+# watcher lock stays empty for the full 50s observation window (t=25..75); no successor arm
+# and no user-visible failure.
+# Cause confirmed separately at FM_POLL=20: the exiting watch cycle leaves an orphaned
+# poll child (`sleep 20`, ppid 1) holding the arm's inherited stderr pipe, so Node's child
+# 'close' event that owns the bounded retry does not fire until that child exits
+# (successor appeared only t+10s after retirement). At FM_POLL=600 that window is minutes.

@@ -1,0 +1,5 @@
+trial=1 watcher=3997094 arm=3997066 retire_ms=168
+trial=2 watcher=3997971 arm=3997943 retire_ms=1
+trial=3 watcher=3998569 arm=3998537 retire_ms=155
+trial=4 watcher=3999465 arm=3999437 retire_ms=155
+trial=5 watcher=4000231 arm=4000203 retire_ms=169

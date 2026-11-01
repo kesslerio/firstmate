@@ -1,0 +1,13 @@
+# Live Pi primary (pi 1.4.0, faux local provider) with the real fm_watch_arm_pi tool and the real bin/fm-watch-arm.sh + bin/fm-watch.sh supervisor
+# lab home: /tmp/fm-lab.H7onxG ; run worktree: /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C436AVKQ6N9JRHZ44XH2NB
+# controlled slow-retire condition: FM_WATCH_ARM_RETIRE_TIMEOUT_MS=1 (the extension's documented retire bound), FM_POLL=5
+# seed: an established, identity-verified watcher whose beacon was held 900s old until the health monitor acted
+
+retire_branch_hit: 1 (extension log line proves the bounded retire missed, the branch this change fixed)
+replacement_arms_running: 1
+old_arm=3068894 old_watcher=3068966
+new_arm=3110051 new_watcher=3110170
+new_beacon_age_s=4
+user_visible_retire_alarm: 0 occurrences in the live TUI transcript
+tool_states: "state":"healthy" "state":"healthy" 
+downtime_seconds: ~0.3 (retire timeout at 19:05:29.402, successor arm started 19:05:29)

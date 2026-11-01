@@ -1,0 +1,20 @@
+old_watcher=3221903 old_arm=3221875 started=2026-11-01T11:07:17-08:00
+t=01s lock=3221903 beacon_age=900s alarm=none
+t=02s lock=3221903 beacon_age=900s alarm=none
+t=03s lock=3221903 beacon_age=900s alarm=none
+t=04s lock=3221903 beacon_age=900s alarm=none
+t=05s lock=3221903 beacon_age=900s alarm=none
+t=06s lock=3221903 beacon_age=900s alarm=none
+t=07s lock=3221903 beacon_age=900s alarm=none
+t=08s lock=3221903 beacon_age=900s alarm=none
+t=09s lock=3221903 beacon_age=900s alarm=none
+t=10s lock=3221903 beacon_age=900s alarm=none
+t=11s lock=3221903 beacon_age=900s alarm=none
+t=12s lock=3221903 beacon_age=900s alarm=none
+t=13s lock=3221903 beacon_age=900s alarm=none
+t=14s lock=3221903 beacon_age=900s alarm=none
+t=15s lock=3221903 beacon_age=901s alarm=none
+t=16s lock=3221903 beacon_age=901s alarm=none
+t=17s lock=3221903 beacon_age=901s alarm=none
+t=18s lock=none beacon_age=900s alarm=could not retire the arm for an
+observed at t=18s

@@ -1,0 +1,50 @@
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.
+
+
+ Error: No more faux responses queued
+ If this looks like a pi bug, /bug sends a report to the developers.
+
+
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: watcher: FAILED - Pi extension could not retire the arm for an identity-verified unhealthy watcher within 1000ms
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.
+
+
+ Error: No more faux responses queued
+
+
+ FM_WATCH_ARM_PROBE
+
+
+
+ fm_watch_arm_pi
+ watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+
+
+ ARM_PROBE_DONE
+
+
+ FM_WATCH_ARM_PROBE
+
+
+
+ fm_watch_arm_pi
+ watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+
+
+ ARM_PROBE_DONE
+
+
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: watcher: FAILED - Pi extension could not retire the arm for an identity-verified unhealthy watcher within 1000ms
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.
+
+
+ Error: No more faux responses queued
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M6C436AVKQ6N9JRHZ44XH2NB (detached)
+↑2.4k ↓36 R22k W2.4k CH94.1% 60.5%/4.1k (auto)                                                                                                                                             deterministic

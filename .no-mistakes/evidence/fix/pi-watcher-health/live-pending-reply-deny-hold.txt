@@ -1,0 +1,23 @@
+# Live watcher deny phase: 8 pending-reply records, task 'hibit' holding an open decision, config/wait-no-turns present
+# command: env FM_HOME=<lab> FM_POLL=5 FM_PENDING_REPLY_GRACE_SECS=0 FM_PENDING_REPLY_SEND_HOOK='printf ... >> sends.log --' BASH_XTRACEFD=3 bash -x bin/fm-watch.sh
+# (xtrace only observes the real run; the send hook is the library's documented transport seam)
+
+## recovery sends during the deny run
+sends_log_lines=0 (0 means no recovery was sent)
+
+## per-record state after the tick
+9618bd786afbf1fe phase=awaiting_report recovery_attempted_epoch=
+a0292723e367b595 phase=awaiting_report recovery_attempted_epoch=
+629dab084ce58c90 phase=awaiting_report recovery_attempted_epoch=
+a588fb8799217cd6 phase=awaiting_report recovery_attempted_epoch=
+50b7bac41e9a1a89 phase=awaiting_report recovery_attempted_epoch=
+d9c7b922463aa66f phase=awaiting_report recovery_attempted_epoch=
+43d1b986f0738c8e phase=awaiting_report recovery_attempted_epoch=
+1ef67407eb524868 phase=awaiting_report recovery_attempted_epoch=
+
+## decision folds inside the production tick (bin/fm-watch.sh -> fm_pending_reply_tick)
+tick_invocations=1
+tick1: send_recovery_calls=8 decision_denied_calls=8 status_own_open_decisions_folds=1
+
+## task status file (unchanged by the deny tick)
+needs-decision [key=scope]: choose
