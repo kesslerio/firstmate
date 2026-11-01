@@ -1,0 +1,98 @@
+########## Scenario 1: one pool across the primary home and its local secondmate; a pre-pool ship counts once
+$ # live launch owner pid 2221164
+$ fm-fleet-seats.sh reserve r1 --generation g-r1 --kind ship --harness claude --model demo/model-a --holder-pid 2221164   (FM_HOME=primary)
+fleet-seats: reserved pool=shared id=r1 generation=g-r1 used=2 capacity=2
+exit=0
+
+$ fm-fleet-seats.sh reserve a1 --generation g-a1 --kind ship --harness claude --model demo/model-a --holder-pid 2221615   (FM_HOME=android, the local secondmate)
+fleet-seats: pool shared is full (2 of 2 seats held); a1 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.GP3Ei2/s1/primary/state legacy-agent
+  holder /tmp/fm-seat-live.GP3Ei2/s1/primary/state r1
+exit=4
+
+$ fm-fleet-seats.sh release r1 --generation g-r1 --reason prelaunch   (FM_HOME=primary)
+fleet-seats: released id=r1 generation=g-r1 reason=prelaunch
+exit=0
+$ fm-fleet-seats.sh reserve a1 ... (retry from android)
+fleet-seats: reserved pool=shared id=a1 generation=g-a1 used=2 capacity=2
+exit=0
+
+$ fm-fleet-seats.sh show legacy-agent   (FM_HOME=primary, read-only)
+exit=0
+
+########## Scenario 2 (adversarial): six simultaneous launches from two homes never overbook a capacity-two pool
+contender c1 (home=primary): exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c1 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.GP3Ei2/s2/primary/state c3
+  holder /tmp/fm-seat-live.GP3Ei2/s2/primary/state c5
+contender c2 (home=android): exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c2 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.GP3Ei2/s2/primary/state c3
+  holder /tmp/fm-seat-live.GP3Ei2/s2/primary/state c5
+contender c3 (home=primary): exit=0  fleet-seats: reserved pool=shared id=c3 generation=g-c3 used=2 capacity=2
+contender c4 (home=android): exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c4 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.GP3Ei2/s2/primary/state c3
+  holder /tmp/fm-seat-live.GP3Ei2/s2/primary/state c5
+contender c5 (home=primary): exit=0  fleet-seats: reserved pool=shared id=c5 generation=g-c5 used=1 capacity=2
+contender c6 (home=android): exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c6 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.GP3Ei2/s2/primary/state c3
+  holder /tmp/fm-seat-live.GP3Ei2/s2/primary/state c5
+granted=2 refused_full=4
+
+########## Scenario 3: real fm-spawn.sh refuses a pooled launch into a full pool and publishes no record
+$ fm-spawn.sh spawn-live-t1 <project> --mode local-only --yolo off --harness claude --model demo/model-a
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-seat-live.GP3Ei2/s3/home
+fleet-seats: pool shared is full (1 of 1 seats held); spawn-live-t1 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.GP3Ei2/s3/home/state busy
+error: spawn refused - spawn-live-t1 has no fleet seat for model demo/model-a (see the fleet-seats line above)
+exit=1
+task record published: no
+
+########## Scenario 4: a replacement launch names the generation the host actually records after a cancelled-before-startup launch
+fleet-seats: confirmed id=ios generation=A
+$ fm-fleet-seats.sh reconcile-remote ios --generation B   (host: cancelled, predecessor A stopped, never submitted)
+fleet-seats: released id=ios generation=B reason=cancelled
+exit=0
+$ fm-fleet-seats.sh show ios
+{"generation":"A","previous_generation":null,"lifecycle":"released","startup_confirmed":true,"target":"shop:p1","disposition":"old-stopped"}
+{"generation":"B","previous_generation":"A","lifecycle":"released","startup_confirmed":false,"target":null,"disposition":"cancelled"}
+$ fm_remote_launch_predecessor <(fm-fleet-seats.sh show ios) shop-host /srv/fm /tmp/fm-seat-live.GP3Ei2/s4/home   (real bin/fm-remote-generation-lib.sh)
+predecessor=A
+$ fm-fleet-seats.sh reconcile-remote ios --generation C   (host: submitted, then cancelled)
+fleet-seats: released id=ios generation=C reason=cancelled
+exit=0
+predecessor=C
+
+########## Scenario 5: a launch that found a supervisor already running on another model is recognized by the receipt that observed it
+$ fm-fleet-seats.sh reserve ios --generation op5 --model demo/model-b   (the launch asks for model-b)
+fleet-seats: reserved pool=pool-b id=ios generation=op5 (already held) used=1 capacity=1
+exit=0
+$ fm-fleet-seats.sh reconcile-remote ios --generation op5   (host: an already-running supervisor on demo/model-a)
+fleet-seats: existing id=ios generation=host.9 (candidate op5 released)
+exit=0
+$ fm-fleet-seats.sh show ios
+{"generation":"op5","lifecycle":"released","model":"demo/model-b","requested_model":null,"generation_from_host":null,"target":null}
+{"generation":"host.9","lifecycle":"confirmed","model":"demo/model-a","requested_model":null,"generation_from_host":"host.9","target":"shop:p1"}
+$ cat state/ios.meta   (the parent published the host-confirmed model and generation)
+remote_host=shop-host
+remote_root=/srv/fm
+home=/tmp/fm-seat-live.GP3Ei2/s5/home
+model=demo/model-a
+remote_spawn_gen=host.9
+fleet_seat_generation=host.9
+$ fm-fleet-seats.sh reserve other-a --model demo/model-a   (the imported supervisor must hold pool-a)
+fleet-seats: pool pool-a is full (1 of 1 seats held); other-a gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.GP3Ei2/s5/home/state ios
+exit=4
+$ fm-fleet-seats.sh reserve other-b --model demo/model-b   (the model the launch asked for must hold no seat)
+fleet-seats: reserved pool=pool-b id=other-b generation=g-ob used=1 capacity=1
+exit=0
+
+########## Scenario 6: a supervisor already running on a remote host before pools existed is counted exactly once
+$ fm-fleet-seats.sh reserve spare --model demo/model-a   (capacity 2; the adopted supervisor must spend exactly one seat)
+fleet-seats: reserved pool=shared id=spare generation=g-spare used=2 capacity=2
+exit=0
+$ fm-fleet-seats.sh reserve over --model demo/model-a   (the third seat must be refused)
+fleet-seats: pool shared is full (2 of 2 seats held); over gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-live.GP3Ei2/s6/primary/state spare
+  holder /tmp/fm-seat-live.GP3Ei2/s6/primary/state theshop
+exit=4
+DONE
