@@ -1,0 +1,5 @@
+ok - local retirement resumes top-level and descendant staged deletion and fences successors
+ok - retirement restores registrations and rearms after sweep, rename, and signal failures
+ok - retirement adopts empty staging after normal checks and refuses nonempty or linked staging
+ok - direct and recursive retirement retain lost-slot outcomes before child evidence disappears
+ok - local retirement retains retry identity until registry publication succeeds

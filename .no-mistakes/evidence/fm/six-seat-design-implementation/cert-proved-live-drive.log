@@ -1,0 +1,42 @@
+
+### LAB=/tmp/fm-lab.dKrN1f (disposable marked lab home)
+
+### Register remote secondmate 'shop' on host shop-host; declare a two-seat pool
+$ durable serve certificate published by an earlier serve pass:
+{
+  "complete": true,
+  "epoch": "live.1",
+  "holders": [
+    {
+      "generation": "host.1",
+      "model": "pool-model-a",
+      "state_dir": "/tmp/fm-lab.dKrN1f/remote-shop/state/parent-route",
+      "task": "shop"
+    }
+  ],
+  "policy_digest": "3130302336-69",
+  "schema": "fm-fleet-seats-serve.v2"
+}
+
+### Seed state: shop runs host.1 on the host, and an earlier spawn of shop failed after reserving
+fleet-seats: reserved pool=shared id=shop generation=g-abandoned used=2 capacity=2
+fleet-seats: released id=shop generation=g-abandoned reason=prelaunch
+$ state/shop.meta (the parent record) names remote_spawn_gen=host.1 - the generation the certificate proves
+
+### Scenario 1: the certificate-proved supervisor occupies exactly one of the two seats
+fleet-seats: reserved pool=shared id=worker-a generation=g-worker-a used=2 capacity=2
+exit=0   <- used=2 capacity=2 means the adopted supervisor counted once, not twice
+fleet-seats: pool shared is full (2 of 2 seats held); worker-b gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.dKrN1f/state shop
+  holder /tmp/fm-lab.dKrN1f/state worker-a
+exit=4   <- the full pool refuses: no over-dispatch
+
+### Scenario 2: the relaunch that persists the certificate-proved generation is admitted
+fleet-seats: reserved pool=shared id=shop generation=g-relaunch (already held) used=1 capacity=2
+exit=0   <- expected 0: the certificate, not a ledger row, issued host.1
+
+### Scenario 3 (adversarial): an invented generation no certificate proves is still refused
+fleet-seats: no seat - task record /tmp/fm-lab.dKrN1f/state/shop.meta names generation host.unissued, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5   <- expected 5: ledger history cannot be bypassed by an unproved identity
+fleet-seats: reserved pool=shared id=shop generation=g-relaunch2 (already held) used=1 capacity=2
+exit=0   <- the proved generation is admitted again once the record is truthful

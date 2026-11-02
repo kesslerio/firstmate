@@ -1,0 +1,54 @@
+
+### LAB=/tmp/fm-lab.88fPsn  lab session=fm-lab-retirelive-2805109-9619
+lab session provisioned (isolated, non-default):
+{"name":"fm-lab-retirelive-2805109-9619","default":false,"running":true}
+
+### Create a real workspace/tab/pane in the lab session to act as the endpoint
+{"id":"cli:workspace:create","result":{"root_pane":{"agent_status":"unknown","cwd":"/tmp/fm-lab.88fPsn/remote","focused":true,"foreground_cwd":"/tmp/fm-lab.88fPsn/remote","pane_id":"w1:p1","revision":0,"scroll":{"max_offset_from_bottom":0,"offset_from_bottom":0,"viewport_rows":40},"tab_id":"w1:t1","terminal_id":"term_65f4c87b7f1cc1","workspace_id":"w1"},"tab":{"agent_status":"unknown","focused":tr
+workspace=w1 pane=w1:p1 tab=w1:t1
+
+### Recorded endpoint under the lab session:
+window=fm-lab-retirelive-2805109-9619:w1:p1
+backend=herdr
+endpoint_task_id=lab
+herdr_session=fm-lab-retirelive-2805109-9619
+herdr_workspace_id=w1
+herdr_tab_id=w1:t1
+herdr_pane_id=w1:p1
+worktree=/tmp/fm-lab.88fPsn/remote
+project=/tmp/fm-lab.88fPsn/remote
+home=/tmp/fm-lab.88fPsn/remote
+harness=claude
+kind=secondmate
+mode=secondmate
+spawn_gen=lab.g1
+
+### Scenario A: the recorded lab session resolves the route
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-retirelive-2805109-9619:w1:p1
+herdr_session=fm-lab-retirelive-2805109-9619
+harness=claude
+model=
+effort=
+spawn_gen=lab.g1
+exit=0   <- expected 0 with target=fm-lab-retirelive-2805109-9619:w1:p1
+
+### Scenario B (adversarial): without its recorded session the same endpoint is refused before any Herdr effect
+error: remote secondmate lab endpoint is recorded in Herdr session 'fm-lab-retirelive-2805109-9619', expected 'fm-remote'; refusing access until it is explicitly migrated
+exit=1   <- expected 1
+error: remote secondmate lab endpoint is recorded in Herdr session 'fm-lab-retirelive-2805109-9619', expected 'fm-remote'; refusing access until it is explicitly migrated
+exit=1   <- expected 1, records untouched
+endpoint record still present: yes
+
+### Scenario C: retirement on the recorded lab session closes the real pane and publishes evidence
+teardown lab complete (window fm-lab-retirelive-2805109-9619:w1:p1, worktree /tmp/fm-lab.88fPsn/remote)
+seat_retirement={"task":"lab","generation":"lab.g1","home":"/tmp/fm-lab.88fPsn/remote","backend":"herdr","target":"fm-lab-retirelive-2805109-9619:w1:p1","destroyed":true,"exit_code":0}
+exit=0   <- expected 0
+endpoint record after retirement:
+retirement evidence:
+lab.retirement.lab.g1.json
+published proof:
+{"task":"lab","generation":"lab.g1","home":"/tmp/fm-lab.88fPsn/remote","backend":"herdr","target":"fm-lab-retirelive-2805109-9619:w1:p1","destroyed":true,"exit_code":0}
+
+### Live drive done; tearing down the lab session

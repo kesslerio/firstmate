@@ -17,6 +17,7 @@ ok - the primary requires a current policy and readable snapshot for every remot
 ok - primary, local, and remote homes share one capacity; remote grants, denials, retries, and proven release hold
 ok - an unreachable remote keeps its counted seats and an unanswered remote request refuses
 ok - a lost serve reply keeps the published certificate as the supervisor's binding
+ok - an observing receipt's model decides seating instead of the requested model
 ok - declared remote launches require current confirmation and clearing restores opt-out
 ok - newly pooled and moved models refuse stale remote requests before a current grant
 ok - an in-flight remote seat follows its model across pools and frees only on proven release

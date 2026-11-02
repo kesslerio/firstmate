@@ -1,0 +1,37 @@
+ok - a successful remote relaunch republishes the parent's harness, model, and effort
+ok - a remote relaunch records the identity the host confirmed
+ok - a refused remote relaunch preserves the parent record with its verified host identity
+ok - a local secondmate is refused by the remote relaunch tool
+ok - a remote relaunch keeps an already-armed PR poll authenticating
+ok - a full fleet pool refuses a remote supervisor relaunch
+ok - a certificate-proved supervisor relaunches past a released failed candidate
+ok - remote relaunch retains unresolved predecessors until explicit reconciliation
+ok - a successful remote relaunch confirms and keeps its fleet seat
+ok - a same-pool remote relaunch replaces one seat without dropping the count
+ok - a prelaunch refusal releases only its own candidate and keeps the old seat
+ok - unmarked, wrong-token, and unknown outcomes keep the candidate counted until its own disposition arrives
+ok - a failed replacement frees both proven generations and recovery restores the seat
+ok - a stale parent record neither hides a started generation nor resurrects it after its exact death
+ok - an expected-generation mismatch refuses before any seat or host effect
+ok - remote relaunch publishes and fences its host generation without pools
+ok - a newer host incarnation refuses a stale parent restart binding
+ok - remote opt-out handoffs record their successor and release the proven predecessor
+ok - an imported existing remote generation reconciles through its original operation without rebinding
+ok - an existing generation dying before import retains its terminal history
+ok - existing host receipts re-probe their actual generation and preserve its terminal outcome
+ok - fresh launch and relaunch refusals persist prelaunch without changing predecessor or control evidence
+ok - the host answers each operation from its own receipt and journal, and uncertainty stays unknown
+ok - a pooled host refuses unaccounted relaunches and binds its refusals to the operation
+ok - host and parent transport refuse invented launch and relaunch tokens before lifecycle effects
+ok - lost and foreign receipts remain unknown across launch and relaunch retries without repeating effects
+ok - a manual remote relaunch waits out, then refuses, a running recovery episode
+ok - host receipts survive successive operations and delayed retries never dispatch again
+ok - remote predecessor release requires startup confirmation or endpoint destruction proof
+ok - host lifecycle fencing refuses mismatched and missing incarnation bindings before effects
+ok - remote terminal-holder readmission publishes its new binding and stays counted when policy returns
+ok - unpooled host launch, relaunch, and disposition serialize and adopt without releasing their owner's episode
+ok - host retirement publishes pending evidence before destruction and finishes interrupted retries
+ALL TESTS PASSED
+ok - pending retirement reconciles partial homes and refuses successors, foreign homes, and live endpoints
+ok - pending evidence does not bypass teardown checks for intact homes
+ok - retirement proof replay and invalid arguments keep the retired home absent

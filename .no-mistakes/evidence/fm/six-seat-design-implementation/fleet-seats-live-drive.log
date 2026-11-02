@@ -1,0 +1,46 @@
+
+### LAB=/tmp/fm-lab.C8cre0 (disposable marked lab home; removed at end)
+
+### Scenario 1: capacity=1 declared only in the primary; primary and mate1 share it
+$ fm-fleet-seats.sh reserve mate-one (FM_HOME=mate1, the local secondmate home)
+fleet-seats: reserved pool=shared id=mate-one generation=g-mate-one used=1 capacity=1
+exit=0
+$ fm-fleet-seats.sh reserve primary-one (FM_HOME=primary)
+fleet-seats: pool shared is full (1 of 1 seats held); primary-one gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.C8cre0/mate1/state mate-one
+exit=4
+$ holder record written for primary-one? (must be none: no over-dispatch)
+show exit=0
+$ ledger holder files:
+417021872-39.json
+
+### Scenario 1b: releasing the mate generation frees the one seat for the primary
+fleet-seats: released id=mate-one generation=g-mate-one reason=prelaunch
+exit=0
+fleet-seats: reserved pool=shared id=primary-one generation=g-primary-one used=1 capacity=1
+exit=0
+
+### Scenario 2: a ship that ran before the pool existed is counted exactly once, and its home refuses the next launch
+$ unmanaged pre-pool record seeded: state/legacy-ship.meta model=pool-model-a
+$ reserve after the pool was enabled (used must be 2 of 2: the legacy ship counted once + this launch)
+fleet-seats: reserved pool=shared id=primary-two generation=g-primary-two used=2 capacity=2
+exit=0
+$ a third launch must be refused as full
+fleet-seats: pool shared is full (2 of 2 seats held); primary-three gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.C8cre0/state legacy-ship
+  holder /tmp/fm-lab.C8cre0/state primary-two
+exit=4
+
+### Adversarial: a home with no pool declaration stays inert and writes no ledger
+
+exit=0
+$ ledger directory in the undeclared home (must not exist):
+ls: cannot access '/tmp/fm-lab.C8cre0/inert-home/state/fleet-seats': No such file or directory
+absent
+
+### Adversarial: an unreachable/unconfirmed authority refuses rather than granting a seat
+fleet-seats: no seat - remote secondmate(s) ghost have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+show exit=0 (no holder published)
+
+### teardown
