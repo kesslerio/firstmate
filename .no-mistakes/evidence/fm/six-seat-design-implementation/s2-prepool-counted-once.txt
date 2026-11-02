@@ -1,0 +1,18 @@
+=== 0. no pool declared yet: the pre-pool launch path is uncapped
+rc=0
+=== 1. enable pools with capacity 2 (one seat already occupied by the pre-pool supervisor)
+=== 2. first new launch sees used=2/2 (the pre-pool supervisor counted exactly once)
+fleet-seats: reserved pool=shared id=worker-new generation=g-new used=2 capacity=2
+rc=0
+=== 3. idempotent same-generation retry does not take a second seat
+fleet-seats: reserved pool=shared id=worker-new generation=g-new (already reserved) used=2 capacity=2
+rc=0
+=== 4. the next launch is refused: the pool is exactly full
+fleet-seats: pool shared is full (2 of 2 seats held); worker-next gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-s2.Di4Xfi/root/state legacy-scout
+  holder /tmp/fm-seat-s2.Di4Xfi/root/state worker-new
+rc=4
+=== 5. release the pre-pool supervisor's record (cleanup of the record counts nothing)
+fleet-seats: reserved pool=shared id=worker-next generation=g-next used=2 capacity=2
+rc=0
+TMP=/tmp/fm-seat-s2.Di4Xfi

@@ -1,0 +1,9 @@
+== first attempt left the staged copy: /tmp/fm-retire2.mf129B/mate.retiring.tLcwJq/home
+== reseed a successor home at the same path with private data
+== retry rc=1 (expected non-zero refusal)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-retire2.mf129B/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+== reseeded home data: successor private data
+== staged copy still owned: /tmp/fm-retire2.mf129B/mate.retiring.tLcwJq/home
+== evidence still names the interrupted copy: /tmp/fm-retire2.mf129B/mate.retiring.tLcwJq
+TMP=/tmp/fm-retire2.mf129B

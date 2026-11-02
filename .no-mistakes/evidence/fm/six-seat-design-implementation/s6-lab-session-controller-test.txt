@@ -1,0 +1,7 @@
+ok - unset session retains fm-remote
+ok - helper-named lab route is accepted without endpoint effects
+ok - default, shared, empty and malformed overrides refuse before effects
+ok - lab selection cannot retire a shared-session endpoint
+ok - lab selection refuses targets outside the selected session
+ok - Rex retirement retry retains server ownership after home deletion
+ok - lab retirement evidence binds pending retries and completion replay to the selected session

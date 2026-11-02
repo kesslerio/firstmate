@@ -1,0 +1,21 @@
+== policy digest 3130302336-69
+serve rc=0
+{"schema":"fm-fleet-seats-serve.v2","policy_digest":"3130302336-69","epoch":"rootissuer.1","complete":true,"holders":[{"task":"theshop","generation":"host.1","model":"pool-model-a","state_dir":"/tmp/fm-seat-s5.o0pnIN/theshop/state/parent-route"}]}
+== a failed first spawn leaves g-abandoned released
+fleet-seats: reserved pool=shared id=theshop generation=g-abandoned used=2 capacity=2
+rc=0
+fleet-seats: released id=theshop generation=g-abandoned reason=prelaunch
+rc=0
+== the parent record persists the host generation the relaunch observed
+== a relaunch on the certificate-proved generation is admitted and counted once
+fleet-seats: reserved pool=shared id=worker-relaunch generation=g-relaunch used=2 capacity=2
+rc=0
+== the pool is exactly full: adopted supervisor + relaunch candidate
+fleet-seats: pool shared is full (2 of 2 seats held); worker-next gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-s5.o0pnIN/root/state theshop
+  holder /tmp/fm-seat-s5.o0pnIN/root/state worker-relaunch
+rc=4
+== adversarial: a record naming a generation no certificate proves stays subject to ledger history
+fleet-seats: no seat - task record /tmp/fm-seat-s5.o0pnIN/root/state/theshop.meta names generation host.unissued, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+rc=5
+TMP=/tmp/fm-seat-s5.o0pnIN

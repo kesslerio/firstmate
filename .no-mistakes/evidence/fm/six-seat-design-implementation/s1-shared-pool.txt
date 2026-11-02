@@ -1,0 +1,25 @@
+=== 1. primary reserves the only seat
+fleet-seats: reserved pool=shared id=worker-a generation=g-a used=1 capacity=1
+rc=0
+=== 2. local secondmate tries a second seat in the same pool
+fleet-seats: pool shared is full (1 of 1 seats held); worker-b gets no seat for model pool-model-b - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-s1.WSTPE7/root/state worker-a
+rc=4
+=== 3. secondmate tries the last seat on the other pooled model spelling
+fleet-seats: pool shared is full (1 of 1 seats held); worker-b gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-s1.WSTPE7/root/state worker-a
+rc=4
+=== 4. primary releases its seat
+fleet-seats: released id=worker-a generation=g-a reason=prelaunch
+rc=0
+=== 5. local secondmate now gets that seat
+fleet-seats: reserved pool=shared id=worker-b generation=g-b used=1 capacity=1
+rc=0
+=== 6. primary is now refused at the shared capacity
+fleet-seats: pool shared is full (1 of 1 seats held); worker-c gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-s1.WSTPE7/android/state worker-b
+rc=4
+=== holders
+/tmp/fm-seat-s1.WSTPE7/root/state/fleet-seats/holders/4185062345-42.json
+/tmp/fm-seat-s1.WSTPE7/root/state/fleet-seats/holders/589563539-45.json
+TMP=/tmp/fm-seat-s1.WSTPE7

@@ -1,0 +1,27 @@
+== live agent state in the lab session
+{"agent":"claude","status":"blocked"}
+== controller launch: the host finds the running supervisor and reports what it observed
+launch rc=0
+{"disposition":"existing","actual_generation":"host.old","actual_model":"pool-model-a","requested_generation":"req.op1","startup_confirmed":true}
+== the durable observing receipt (real host controller output)
+schema=fm-remote-seat-receipt.v1
+operation=req.op1
+verb=launch
+requested_generation=req.op1
+previous_generation=-
+phase=existing
+actual_generation=host.old
+route_backend=herdr
+route_target=fm-lab-remote-lab-462188-9289:w1:p1
+actual_model=pool-model-a
+== root serve of the pool policy for this registered remote
+serve rc=0
+{"complete":true,"holders":[{"task":"mate","generation":"host.old","model":"pool-model-a"}]}
+== the pool the supervisor actually runs on is occupied by it
+fleet-seats: pool a-pool is full (1 of 1 seats held); other-a gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder remote:mate:/tmp/fm-observe.B5JuQP/mate/state/parent-route mate
+rc=4
+== the model the launch asked for never takes a seat
+fleet-seats: reserved pool=b-pool id=other-b generation=g-other-b used=1 capacity=1
+rc=0
+TMP=/tmp/fm-observe.B5JuQP

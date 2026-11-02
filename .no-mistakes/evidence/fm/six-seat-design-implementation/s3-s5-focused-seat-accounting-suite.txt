@@ -1,0 +1,1 @@
+ok - remote serve adopts an unrecorded supervisor once, binds observed generations, and honors parent accounting

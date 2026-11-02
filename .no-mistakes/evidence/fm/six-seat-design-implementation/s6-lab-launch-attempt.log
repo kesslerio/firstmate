@@ -1,0 +1,6 @@
+== controller launch into lab session fm-lab-remote-lab-462188-9289
+error: no-mistakes gate agent must not drive the fleet (NO_MISTAKES_GATE set)
+error: remote host-local secondmate launch failed
+== exit above; herdr log
+
+TMP=/tmp/fm-lab6.uIkHU5

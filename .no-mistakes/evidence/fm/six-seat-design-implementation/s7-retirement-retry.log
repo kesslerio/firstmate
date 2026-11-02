@@ -1,30 +1,29 @@
-== lab: /tmp/fm-lab.unwj4R
-
-== case A: pre-fix teardown fails mid-removal, then the operator retries
-fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.unwj4R/caseA/primary
-cp: cannot open '/tmp/fm-lab.unwj4R/caseA/mate/state/procevent/wait.source' for reading: Permission denied
-REFUSED: cannot preserve process-event registrations for secondmate home /tmp/fm-lab.unwj4R/caseA/mate
-pre-fix first attempt rc=1
-after the pre-fix failure: home present; meta present; removal evidence PRESENT
-fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.unwj4R/caseA/primary
+== private tmux panes
+1: fm-mate* (1 panes) [80x24] [layout b25d,80x24,0,0,0] @0 (active)
+== first attempt rc=1
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6E3BX9TQYSPBH58XBYZ5TS7/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6E3BX9TQYSPBH58XBYZ5TS7/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+injected: staged deletion interrupted
+== interrupted state after the rename
+public home: absent (renamed into staging)
+/tmp/fm-retire.oNOavq/mate.retiring.CqCSxB
+/tmp/fm-retire.oNOavq/mate.retiring.CqCSxB/home
+== removal evidence
+home_removal_source=/tmp/fm-retire.oNOavq/mate
+home_removal_generation=g1
+home_removal_stage=/tmp/fm-retire.oNOavq/mate.retiring.CqCSxB
+== retry with the same command, no stub
+== retry rc=0
+teardown mate complete (window isolated:fm-mate, worktree /tmp/fm-retire.oNOavq/mate)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-retire.oNOavq/home
 WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
-REFUSED: retirement retry cannot prove public home ownership for /tmp/fm-lab.unwj4R/caseA/mate
-retry with this change rc=1
-after the retry: home present; meta present; removal evidence PRESENT
-
-== case B: this change's teardown fails mid-removal, then the operator retries
-fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.unwj4R/caseB/primary
-cp: cannot open '/tmp/fm-lab.unwj4R/caseB/mate/state/procevent/wait.source' for reading: Permission denied
-REFUSED: cannot preserve process-event registrations for secondmate home /tmp/fm-lab.unwj4R/caseB/mate
-first attempt rc=1
-after the failed attempt: home present; meta present; removal evidence withdrawn
-fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.unwj4R/caseB/primary
-WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
-retired: wait
-swept: attempted=1
-teardown mate1 complete (window fmlabretire:fm-mate1, worktree /tmp/fm-lab.unwj4R/caseB/mate)
-retry after the fix rc=0
-after the retry: home retired; meta removed; removal evidence withdrawn
-no staging directory left behind
-registry after retirement: []
-== done
+== post-retry state
+public home: absent
+staged copy: absent
+removal evidence: absent
+task record: absent
+1: fm-mate* (1 panes) [80x24] [layout b25d,80x24,0,0,0] @0 (active)
+TMP=/tmp/fm-retire.oNOavq

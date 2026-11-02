@@ -1,0 +1,33 @@
+== real parent relaunch wrapper against a host that only answers on the recorded lab session
+rc=0
+herdr_session=fm-lab-remote-lab-462188-9289
+harness=claude
+model=pool-model-a
+effort=medium
+spawn_gen=lab.new
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"lab.new","requested_generation":"lab.new","actual_generation":"lab.new","previous_generation":"host.lab","disposition":"started","startup_confirmed":true,"old_stopped":true,"route":{"placement":"remote","backend":"herdr","target":"fm-lab-remote-lab-462188-9289:w1:p1","home":"/tmp/fm-labresolve.tBbDUG/remote","host":null,"remote_root":null,"spawn_gen":"lab.new"},"actual_model":"pool-model-a","complete":true}
+== parent record after the confirmed relaunch
+harness=claude
+model=pool-model-a
+effort=medium
+remote_spawn_gen=lab.new
+remote_target=fm-lab-remote-lab-462188-9289:w1:p1
+== the route lookup and relaunch the parent actually sent
+--- argv ---
+fm-remote-secondmate-control.sh
+route
+ios
+--herdr-session
+fm-lab-remote-lab-462188-9289
+host=shop-host entry=fm-remote-entrypoint.sh proto=1
+--- argv ---
+fm-remote-secondmate-control.sh
+relaunch
+ios
+claude
+pool-model-a
+medium
+--expect-generation
+host.lab
+--herdr-session
+fm-lab-remote-lab-462188-9289
