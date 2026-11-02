@@ -1,0 +1,48 @@
+== first retirement attempt, killed uncatchably inside the rename window
+rename window reached: 1 time(s)
+./s5-interrupted-retirement.sh: line 68: 969892 Killed                     setsid env -u FM_STATE_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_DATA_OVERRIDE -u FM_ROOT_OVERRIDE -u TMUX TMUX_TMPDIR="$C/tmux" FM_HOME="$C/home" PATH="$C/shim:$PATH" MV_KIND="${MV_KIND:-before}" "$W/bin/fm-teardown.sh" mate --force > "$C/first.out" 2> "$C/first.err"
+first attempt exit: killed -9 (no EXIT trap could run)
+-- leftover removal evidence:
+   home_removal_source=/tmp/fmlab.bAgUGV/s5-retire-before/mate
+   home_removal_generation=g1
+   home_removal_stage=/tmp/fmlab.bAgUGV/s5-retire-before/mate.retiring.sRRFKk
+-- leftover staging directory (must be empty):
+   stage=/tmp/fmlab.bAgUGV/s5-retire-before/mate.retiring.sRRFKk exists=yes entries=
+-- the home itself is still present: yes
+-- task metadata still present: yes
+-- staged copy holds the home: no
+== retry after the interruption, no shim
+retry rc=0
+   out: teardown mate complete (window isolated:fm-mate, worktree /tmp/fmlab.bAgUGV/s5-retire-before/worktree)
+   err: fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlab.bAgUGV/s5-retire-before/home
+   err: WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+-- the first attempt's last stderr line (the interruption window):
+   interruption window: about to rename the home into /tmp/fmlab.bAgUGV/s5-retire-before/mate.retiring.sRRFKk/home
+-- home removed: yes
+-- removal evidence withdrawn: yes
+-- staged copy stranded: no
+-- metadata removed: yes
+== first retirement attempt, killed uncatchably inside the rename window
+rename window reached: 2 time(s)
+./s5-interrupted-retirement.sh: line 68: 974516 Killed                     setsid env -u FM_STATE_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_DATA_OVERRIDE -u FM_ROOT_OVERRIDE -u TMUX TMUX_TMPDIR="$C/tmux" FM_HOME="$C/home" PATH="$C/shim:$PATH" MV_KIND="${MV_KIND:-before}" "$W/bin/fm-teardown.sh" mate --force > "$C/first.out" 2> "$C/first.err"
+first attempt exit: killed -9 (no EXIT trap could run)
+-- leftover removal evidence:
+   home_removal_source=/tmp/fmlab.bAgUGV/s5-retire-after/mate
+   home_removal_generation=g1
+   home_removal_stage=/tmp/fmlab.bAgUGV/s5-retire-after/mate.retiring.YK6c3H
+-- leftover staging directory (must be empty):
+   stage=/tmp/fmlab.bAgUGV/s5-retire-after/mate.retiring.YK6c3H exists=yes entries=home 
+-- the home itself is still present: no
+-- task metadata still present: yes
+-- staged copy holds the home: yes
+== retry after the interruption, no shim
+retry rc=0
+   out: teardown mate complete (window isolated:fm-mate, worktree /tmp/fmlab.bAgUGV/s5-retire-after/worktree)
+   err: fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlab.bAgUGV/s5-retire-after/home
+   err: WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+-- the first attempt's last stderr line (the interruption window):
+   interruption window: home renamed, staged copy now holds it
+-- home removed: yes
+-- removal evidence withdrawn: yes
+-- staged copy stranded: no
+-- metadata removed: yes

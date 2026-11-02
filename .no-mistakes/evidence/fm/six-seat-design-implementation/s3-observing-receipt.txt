@@ -1,0 +1,26 @@
+-- the launch asked for pool-model-b but found a running supervisor on pool-model-a:
+   schema=fm-remote-seat-receipt.v1
+   operation=op1
+   verb=launch
+   actual_generation=host.1
+   actual_model=pool-model-a
+-- pools: a=1 seat on pool-model-a, b=1 seat on pool-model-b
+-- first serve
+served theshop policy=3620414338-116 epoch=r179363492428548134430.1 holders=1
+serve rc=0
+-- the certificate must charge the model the receipt observed, not the one requested:
+[{"task":"theshop","generation":"host.1","model":"pool-model-a"}]
+-- a pool-model-a launch must not see that seat as free
+fleet-seats: pool a is full (1 of 1 seats held); lost-observation-contender gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder remote:theshop:/tmp/fmlab.bAgUGV/remote/home/state/parent-route theshop
+contender rc=4
+== reconciliation with the parent's own confirmed seat for the observed generation
+served theshop policy=3130302336-69 epoch=r179363492428548134430.2 holders=1
+serve rc=0
+-- certificate after the parent recorded the same generation:
+[{"task":"theshop","generation":"host.1","model":"pool-model-a"}]
+-- a pooled remote worker must still get the free seat (the parent's seat is not re-charged)
+serve rc=0
+remote worker rc=0: fleet-seats: reserved pool=shared id=mismatch-worker generation=w-mismatch (granted by the fleet root)
+-- observed generation still counted exactly once:
+[{"task":"mismatch-worker","generation":"w-mismatch","model":"pool-model-a"},{"task":"theshop","generation":"host.1","model":"pool-model-a"}]

@@ -1,0 +1,54 @@
+################ Scenario A: a pre-pool remote supervisor behind a symlinked state
+-- remote home state is a symlink: /tmp/fmlab.bAgUGV/remote/home/state -> /tmp/fmlab.bAgUGV/remote/home/state-real
+-- the supervisor that predates the pool, recorded on the host:
+kind=secondmate
+model=pool-model-a
+spawn_gen=host.1
+harness=claude
+-- the primary's own route record for that remote secondmate (no generation yet):
+kind=secondmate
+model=pool-model-a
+harness=claude
+remote_host=labshop
+remote_root=/tmp/fmlab.bAgUGV/remote/root
+home=/tmp/fmlab.bAgUGV/remote/home
+-- first pooled serve
+served theshop policy=866016619-84 epoch=r179363487327338651637.1 holders=1
+serve rc=0
+-- the host certificate the primary now counts:
+[{"state_dir":"/tmp/fmlab.bAgUGV/remote/home/state-real/parent-route","task":"theshop","generation":"host.1","model":"pool-model-a","lifecycle":"confirmed"}]
+-- how many seats the primary counts before anything launches:
+remote reservation never filed its request: 
+remote worker reserve rc=0: fleet-seats: reserved pool=shared id=worker1 generation=w1 (granted by the fleet root)
+-- the same remote home's certificate after the grant:
+[{"task":"worker1","generation":"w1","model":"pool-model-a","lifecycle":"reserved"},{"task":"theshop","generation":"host.1","model":"pool-model-a","lifecycle":"confirmed"}]
+-- a second remote worker past capacity 2
+remote reservation never filed its request: 
+second remote worker rc=4: fleet-seats: pool shared is full (2 of 2 seats held); worker2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+################ Scenario B: a certificate-proved generation is not ledger history
+baseline serve rc=0
+-- the failed first spawn leaves a released candidate the ledger never confirms:
+fleet-seats: reserved pool=shared id=theshop generation=g-abandoned (already held) used=1 capacity=2
+reserve rc=0
+fleet-seats: released id=theshop generation=g-abandoned reason=prelaunch
+release rc=0
+-- the relaunch persisted the host generation the certificate proves
+kind=secondmate
+model=pool-model-a
+harness=claude
+remote_host=labshop
+remote_root=/tmp/fmlab.bAgUGV/remote/root
+home=/tmp/fmlab.bAgUGV/remote/home
+remote_spawn_gen=host.1
+fleet-seats: reserved pool=shared id=relaunch-admitted generation=g-relaunch used=2 capacity=2
+admitted reserve rc=0
+-- a named generation no certificate proves
+kind=secondmate
+model=pool-model-a
+harness=claude
+remote_host=labshop
+remote_root=/tmp/fmlab.bAgUGV/remote/root
+home=/tmp/fmlab.bAgUGV/remote/home
+remote_spawn_gen=host.unissued
+fleet-seats: no seat - task record /tmp/fmlab.bAgUGV/primary/state/theshop.meta names generation host.unissued, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+unproved reserve rc=5

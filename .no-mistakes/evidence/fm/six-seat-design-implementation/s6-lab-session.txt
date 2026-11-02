@@ -1,0 +1,30 @@
+-- herdr lab session from bin/fm-herdr-lab.sh: fm-lab-remote-session-883363-2420
+{"session":"fm-lab-remote-session-883363-2420","running":true}
+-- lab endpoint created on the isolated session: workspace=w1 tab=w1:t1 pane=w1:p1 target=fm-lab-remote-session-883363-2420:w1:p1
+-- the parent's record names the isolated lab session:
+herdr_session=fm-lab-remote-session-883363-2420
+remote_herdr_session=fm-lab-remote-session-883363-2420
+remote_target=fm-lab-remote-session-883363-2420:w1:p1
+== route resolution on the recorded lab session
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-remote-session-883363-2420:w1:p1
+herdr_session=fm-lab-remote-session-883363-2420
+harness=claude
+model=pool-model-a
+effort=
+spawn_gen=synthetic.g0
+route rc=0
+== parent retirement of the remote secondmate
+teardown rc=0
+   /tmp/fmlab.bAgUGV/s6-teardown.out:teardown lab complete (window fm-lab-remote-session-883363-2420:w1:p1, worktree /tmp/fmlab.bAgUGV/remote/home)
+   /tmp/fmlab.bAgUGV/s6-teardown.err:●  This is a supervision warning only; the guarded operation WILL still run.
+   /tmp/fmlab.bAgUGV/s6-teardown.err:error: refusing fleet lifecycle from inside a no-mistakes gate worktree (/home/art/.no-mistakes/repos/9f75ec418609.git)
+-- every remote call the parent made, as the host received it:
+   argv=fm-remote-secondmate-control.sh route lab --herdr-session fm-lab-remote-session-883363-2420 
+   argv=fm-remote-secondmate-control.sh route lab --herdr-session fm-lab-remote-session-883363-2420 
+   argv=fm-remote-secondmate-control.sh retire lab --force --expect-generation synthetic.g0 --herdr-session fm-lab-remote-session-883363-2420 
+-- the lab session's workspace is destroyed: []
+-- remote home removed: yes
+-- parent task record removed: yes
+-- parent registry entry removed: yes

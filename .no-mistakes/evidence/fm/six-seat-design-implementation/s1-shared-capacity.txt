@@ -1,0 +1,36 @@
+== pool declaration
+{"pools":[{"name":"shared","capacity":2,"models":["pool-model-a"]}]}
+-- primary reserves t1
+fleet-seats: reserved pool=shared id=t1 generation=g1 used=1 capacity=2
+rc=0
+-- primary reserves t2
+fleet-seats: reserved pool=shared id=t2 generation=g2 used=2 capacity=2
+rc=0
+-- local secondmate atlas reserves t3 into the full shared pool
+fleet-seats: pool shared is full (2 of 2 seats held); t3 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fmlab.bAgUGV/s1-primary/state t1
+  holder /tmp/fmlab.bAgUGV/s1-primary/state t2
+rc=4
+-- primary releases t2 (seat freed)
+fleet-seats: released id=t2 generation=g2 reason=prelaunch
+rc=0
+-- local secondmate atlas reserves t3 (one seat free)
+fleet-seats: reserved pool=shared id=t3 generation=g3 used=2 capacity=2
+rc=0
+== simultaneous launches for the last seat
+fleet-seats: released id=t3 generation=g3 reason=prelaunch
+race-a rc=0: fleet-seats: reserved pool=shared id=race-a generation=gra used=2 capacity=2
+race-b rc=4: fleet-seats: pool shared is full (2 of 2 seats held); race-b gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fmlab.bAgUGV/s1-primary/state race-a
+  holder /tmp/fmlab.bAgUGV/s1-primary/state t1
+granted=1 of 2
+== one shared ledger under the primary authority
+1430906422-41
+2607824988-37
+3919257487-37
+597671255-34
+== every holder, from the primary
+-- show t1: [{"generation":"g1","lifecycle":"reserved","model":"pool-model-a"}]
+-- show t3: 
+-- show race-a: [{"generation":"gra","lifecycle":"reserved","model":"pool-model-a"}]
+-- show race-b: 
