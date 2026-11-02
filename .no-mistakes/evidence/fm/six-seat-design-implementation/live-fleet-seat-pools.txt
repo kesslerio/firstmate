@@ -1,0 +1,39 @@
+## pool declaration in the primary home
+{"pools":[{"name":"shared","capacity":2,"models":["pool-model-a"]}]}
+
+## primary reserves two ship seats on pool-model-a
+-- reserve t1 rc=0: fleet-seats: reserved pool=shared id=t1 generation=g1 used=1 capacity=2
+-- reserve t2 rc=0: fleet-seats: reserved pool=shared id=t2 generation=g2 used=2 capacity=2
+
+## the local secondmate atlas asks for a third seat in the same shared pool
+-- reserve t3 from atlas rc=4
+   fleet-seats: pool shared is full (2 of 2 seats held); t3 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+     holder /tmp/fm-seats.VxZKUd/primary/state t1
+     holder /tmp/fm-seats.VxZKUd/primary/state t2
+
+## holders the refusal reported, as the primary can show them
+-- t1: [{"generation":"g1","lifecycle":"reserved","model":"pool-model-a"}]
+-- t2: [{"generation":"g2","lifecycle":"reserved","model":"pool-model-a"}]
+-- t3: 
+## the primary frees one seat (t2 released before launch)
+-- release t2 rc=0: fleet-seats: released id=t2 generation=g2 reason=prelaunch
+
+## atlas retries the third seat
+-- reserve t3 from atlas rc=0: fleet-seats: reserved pool=shared id=t3 generation=g3 used=2 capacity=2
+
+## every holder, each home reading its own record
+-- t1: [{"generation":"g1","lifecycle":"reserved","model":"pool-model-a"}]
+-- t2: [{"generation":"g2","lifecycle":"released","model":"pool-model-a"}]
+-- t3: [{"generation":"g3","lifecycle":"reserved","model":"pool-model-a"}]
+
+## where the shared ledger lives
+   2849898315-35.json
+   3115314639-37.json
+   3410276892-37.json
+
+## a malformed declaration refuses instead of counting the pool as free
+-- reserve t4 from atlas with a malformed pool file rc=5
+   fleet-seats: no seat - /tmp/fm-seats.VxZKUd/primary/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+
+## a model outside the declaration still records but takes no pool seat
+-- reserve u1 (other-model) rc=0: fleet-seats: recorded id=u1 generation=gu1 (model other-model is in no pool)

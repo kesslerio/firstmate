@@ -1,0 +1,61 @@
+
+== Pre-fix teardown (4f062c24): parent asks the host to retire a Rex secondmate
+   retire rc=1
+   
+   host home present: yes
+   rex block still on the server: no
+   host history records: mate.retirement.rex.g1.pending.json 
+   mate.retirement.rex.g1.pending.json: {"schema":"fm-remote-retirement-pending.v1","task":"mate","generation":"rex.g1","home":"/tmp/fm-lab.dTbPFh/prefix/host-home","backend":"rex","target":"00000001-0000-7000-8000-000000000001:00000003-0000-7000-8000-000000000003","rex_server":"unix:///fake/rex.sock","phase":"pending","destroyed":false,"exit_code":null}
+
+== Change under test: parent asks the host to retire the same Rex secondmate
+   retire rc=0
+   teardown mate complete (window 00000001-0000-7000-8000-000000000001:00000003-0000-7000-8000-000000000003, worktree /tmp/fm-lab.dTbPFh/head/host-home)
+   seat_retirement={"task":"mate","generation":"rex.g1","home":"/tmp/fm-lab.dTbPFh/head/host-home","backend":"rex","target":"00000001-0000-7000-8000-000000000001:00000003-0000-7000-8000-000000000003","destroyed":true,"exit_code":0}
+   host home present: no
+   rex block still on the server: no
+   host history records: mate.retirement.rex.g1.json 
+   mate.retirement.rex.g1.json: {"task":"mate","generation":"rex.g1","home":"/tmp/fm-lab.dTbPFh/head/host-home","backend":"rex","target":"00000001-0000-7000-8000-000000000001:00000003-0000-7000-8000-000000000003","destroyed":true,"exit_code":0}
+
+== Adversarial: pending retirement evidence names a different backend than the host record
+   crafted pending evidence: {
+  "schema": "fm-remote-retirement-pending.v1",
+  "task": "mate",
+  "home": "/tmp/fm-lab.dTbPFh/mismatch/host-home",
+  "generation": "rex.g1",
+  "backend": "herdr",
+  "target": "00000001-0000-7000-8000-000000000001:00000003-0000-7000-8000-000000000003",
+  "phase": "pending",
+  "destroyed": false,
+  "exit_code": null
+}
+   host teardown rc=1
+   ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ●  WATCHER DOWN - SUPERVISION IS OFF
+   ●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+   ●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+   ●  This is a supervision warning only; the guarded operation WILL still run.
+   ●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-lab.dTbPFh/mismatch/host-root/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-lab.dTbPFh/mismatch/host-root/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+   ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   home preserved: yes
+   pending exit_code retained: null
+   pending backend: herdr
+
+== The same host retirement once its pending evidence names the host's own backend (rex)
+   host teardown rc=0
+   WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+   teardown mate complete (window 00000001-0000-7000-8000-000000000001:00000003-0000-7000-8000-000000000003, worktree /tmp/fm-lab.dTbPFh/mismatch/host-home)
+   home preserved: no
+   pending exit_code retained: 0
+
+== Adversarial: the host control plane sees pending evidence naming another backend
+   retire rc=1
+   error: remote retirement pending history does not match this route
+   home preserved: yes
+   pending exit_code retained: null
+
+== Retry: the same mate whose pre-fix retirement refused, now retired by the change
+   retry rc=0
+   teardown mate complete (window 00000001-0000-7000-8000-000000000001:00000003-0000-7000-8000-000000000003, worktree /tmp/fm-lab.dTbPFh/prefix/host-home)
+   seat_retirement={"task":"mate","generation":"rex.g1","home":"/tmp/fm-lab.dTbPFh/prefix/host-home","backend":"rex","target":"00000001-0000-7000-8000-000000000001:00000003-0000-7000-8000-000000000003","destroyed":true,"exit_code":0}
+   host home present: no
+   mate.retirement.rex.g1.json: {"task":"mate","generation":"rex.g1","home":"/tmp/fm-lab.dTbPFh/prefix/host-home","backend":"rex","target":"00000001-0000-7000-8000-000000000001:00000003-0000-7000-8000-000000000003","destroyed":true,"exit_code":0}

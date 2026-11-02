@@ -1,0 +1,19 @@
+## isolated Herdr lab session
+-- session=fm-lab-retire-live-90022-11393
+-- keeper pane=w1:p1
+-- task endpoint: workspace=w2 tab=w2:t1 pane=w2:p1 target=fm-lab-retire-live-90022-11393:w2:p1
+
+## the parent asks the host to retire the Herdr secondmate
+   retire rc=0
+   teardown mate complete (window fm-lab-retire-live-90022-11393:w2:p1, worktree /tmp/fm-herdr-ret.caaS3n/host-home)
+   seat_retirement={"task":"mate","generation":"herdr.g1","home":"/tmp/fm-herdr-ret.caaS3n/host-home","backend":"herdr","target":"fm-lab-retire-live-90022-11393:w2:p1","destroyed":true,"exit_code":0}
+   host home present: no
+   host history records:
+      mate.retirement.herdr.g1.json
+   mate.retirement.herdr.g1.json: {"task":"mate","generation":"herdr.g1","home":"/tmp/fm-herdr-ret.caaS3n/host-home","backend":"herdr","target":"fm-lab-retire-live-90022-11393:w2:p1","destroyed":true,"exit_code":0}
+   panes left in the lab session (the retired pane must be absent, the keeper present):
+      workspace w1 label=~
+      pane w1:p1 workspace=w1
+   retired pane w2:p1 present: false
+   keeper pane w1:p1 present: true
+
