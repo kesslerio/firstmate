@@ -1,0 +1,32 @@
+Fleet seat pool: capacity 1, models [pool-model-a, pool-model-b] (config/fleet-seats)
+Occupying holder: a live task record on a pooled model (state/legacy.meta, model=pool-model-a)
+
+### scenario A: a pooled spawn into a full pool refuses before creating an endpoint, worktree, or task record
+$ bin/fm-spawn.sh newtask /tmp/fm-lab-project --mode local-only --yolo off --harness claude --model pool-model-a
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.2UnDsD
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fleet-seats: pool shared is full (1 of 1 seats held); newtask gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.2UnDsD/state legacy
+error: spawn refused - newtask has no fleet seat for model pool-model-a (see the fleet-seats line above)
+exit=1
+
+task record created? no
+tmux window created? no tmux server
+
+### scenario B: an unverified default model is refused while pools are configured
+$ bin/fm-spawn.sh defaultmodel /tmp/fm-lab-project --mode local-only --yolo off --harness claude
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.2UnDsD
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fleet-seats: no seat - harness claude launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+error: spawn refused - defaultmodel has no fleet seat for model default (see the fleet-seats line above)
+exit=1
+
+### scenario B2: a raw launch command is refused while pools are configured
+$ bin/fm-spawn.sh rawlaunch /tmp/fm-lab-project "claude --model pool-model-a" --mode local-only --yolo off --model pool-model-a
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.2UnDsD
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fleet-seats: no seat - a raw launch command cannot verify its actual model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+error: spawn refused - rawlaunch has no fleet seat for model pool-model-a (see the fleet-seats line above)
+exit=1
+
+no refused launch published a task record: confirmed none

@@ -1,0 +1,26 @@
+LAB_ROOT=/tmp/fm-lab.GHePVX
+
+=== scenario H1: a malformed pool declaration refuses admission instead of counting seats free
+config/fleet-seats names one model in two pools (the schema forbids it)
+fleet-seats: no seat - /tmp/fm-lab.GHePVX/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+reserve exit=5
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.GHePVX
+fleet-seats: no seat - /tmp/fm-lab.GHePVX/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+error: spawn refused - probe has no fleet seat for model pool-model-a (see the fleet-seats line above)
+
+=== scenario H2: an unreadable declaration (symlink) is refused
+fleet-seats: no seat - /tmp/fm-lab.GHePVX/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+reserve exit=5
+
+=== scenario H3: removing the declaration returns the home to uncapped launches
+$ fm-spawn.sh plain <nonexistent project> --mode local-only --yolo off --harness claude
+(no --model and no pool declaration: the seat guard is inert, so the spawn reaches its brief/project work)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.GHePVX
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M6F7B16CC6GQFAM2PR6M5974/bin/fm-spawn.sh: line 4326: cd: /tmp/fm-no-such-project: No such file or directory
+
+=== scenario H3b: with no pool declaration the guard is inert (no explicit model required)
+$ fm-fleet-seats.sh reserve plain --generation g-plain --harness claude --model default   (no config/fleet-seats)
+exit=0  (empty output with exit 0 means: no declaration, no accounting, launch not capped)
+-- and declaring a pool then makes the same default-model launch refuse:
+fleet-seats: no seat - harness claude launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5

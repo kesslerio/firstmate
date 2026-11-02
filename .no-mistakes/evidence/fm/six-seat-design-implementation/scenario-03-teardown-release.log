@@ -1,0 +1,13 @@
+### scenario: teardown of the pooled worker releases exactly its generation
+$ fm-teardown.sh t1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.2UnDsD
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown: reaping leaked worktree process group for t1: 3812526
+teardown: force-killing leaked worktree process group for t1: 3812526
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown t1 complete (window firstmate:fm-t1, worktree /home/art/.treehouse/fm-lab-project-84e54e/1/fm-lab-project)
+Backlog: t1 just finished (this home keeps no markdown backlog at /tmp/fm-lab.2UnDsD/data/backlog.md). Update /tmp/fm-lab.2UnDsD/data/backlog.md - move t1 to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+exit=0

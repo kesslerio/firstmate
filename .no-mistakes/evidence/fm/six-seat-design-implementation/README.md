@@ -1,27 +1,37 @@
-# Live validation evidence - fleet seat pools (fm/six-seat-design-implementation)
+# Live validation: fleet seat pools (fm/six-seat-design-implementation, e8118e5e)
 
-All runs are from the gate worktree at HEAD 38d61765 (base a4bf5f86). Nothing
-outside a disposable `/tmp` lab, fixture directory, or this evidence directory
-was written.
+All live drives used a disposable marked lab home (`bin/fm-lab-home.sh create`) with
+`FM_HOME` pointing at it, a throwaway git project, real `bin/fm-spawn.sh`,
+`bin/fm-fleet-seats.sh`, `bin/fm-teardown.sh`, and a real private tmux server
+(`TMUX_TMPDIR=$LAB/tmux`) launching the machine's real `claude` harness. Every lab was
+removed in the same turn; no fleet state or operator home was touched.
 
-## Manual lab drives (no test harness, real product entrypoints)
+| # | Scenario | Result | Artifact |
+| --- | --- | --- | --- |
+| 1 | Pooled worker spawn into a full pool refuses before any endpoint/worktree/record, naming the holder | pass | `scenario-01-capacity-and-model-refusals.log` |
+| 2 | Harness-default model and raw launch command refused while pools are configured | pass | `scenario-01-capacity-and-model-refusals.log` |
+| 3 | Real spawned worker holds seat 1 of 1, second pooled launch refused, teardown frees the generation, next launch admitted | pass | `scenario-02-second-launch-refused.log`, `scenario-03-teardown-release.log`, `scenario-04-release-admits-next.log` |
+| 4 | A local second mate home's pooled record spends the fleet root's seat | pass | `scenario-05-shared-capacity-remote-and-generations.log` |
+| 5 | An unresolved legacy model occupies every declared pool | pass | `scenario-05-shared-capacity-remote-and-generations.log` |
+| 6 | A registered remote with no served certificate refuses admission; removing it restores admission | pass | `scenario-05-shared-capacity-remote-and-generations.log` |
+| 7 | Released generations never revive; a successor is admitted on the freed seat | pass | `scenario-05-shared-capacity-remote-and-generations.log` |
+| 8 | A live primary session lock holds the pooled seat; after it ends the launch is admitted | pass | `scenario-06-primary-seat.log` |
+| 9 | Malformed/unreadable pool declaration refuses admission; no declaration leaves launches uncapped | pass | `scenario-07-authority-boundaries.log` |
+| 10 | Remote serve/adoption and Rex ownership across a real home | pass (e2e suite) | `suite-fm-fleet-seats.log`, `suite-t3-teardown-remote-seat.log` |
+| 11 | A reclaimed pooled T3 generation cannot resume beside its replacement | pass (e2e suite) | `suite-t3-teardown-remote-seat.log` |
+| 12 | Lab-session and Rex retirement retry identity | pass (e2e suite) | `suite-fm-remote-secondmate-session.log` |
+| 13 | Archive generation naming from `remote_spawn_gen`/`fleet_seat_generation` | pass (e2e suite) | `suite-fm-record-export.log` |
+| 14 | Malformed Rex route reply refused at the parent boundary with a host endpoint already recorded (HEAD fixture fix) | untested | `suite-fm-remote-secondmate-lifecycle-e2e.log` |
 
-| File | What it shows |
-| --- | --- |
-| `lab-local-pools.log` | Disposable lab primary (`bin/fm-lab-home.sh create`) with `config/fleet-seats` capacity 2 and a registered local secondmate home. A pre-pool worker record in the mate is counted once (`reserved ... used=2 capacity=2`), the secondmate's own reserve sees the primary's holder (shared capacity), a real `bin/fm-spawn.sh` ship launch is refused with the holder list and publishes no task record, and releasing the primary's seat grants the secondmate's launch. |
-| `lab-session-relaunch.log` | A remote secondmate recorded under `remote_herdr_session=fm-lab-relaunch-proof` driven through the real `bin/fm-remote-secondmate-relaunch.sh`. The parent calls its route lookup with `--herdr-session fm-lab-relaunch-proof`, resolves the host-recorded predecessor (`expect=host-old`), relaunches on that same session, and republishes the parent route with the same session. SSH here is the disposable remote-host boundary fixture. |
-| `repro-endpoint-refusal.log` | Failure repro: a remote launch whose recorded endpoint does not validate should refuse as `prelaunch`. The host controller instead aborts with `line 706: REMOTE_ENDPOINT_BACKEND: unbound variable`, leaves the receipt at `phase=received`, and the primary reads back `disposition=unknown`, so the candidate seat stays counted. |
+## Local environment limits observed (reproduced on the base commit or host-specific)
 
-## Executable suites (real `bin/` scripts and state, disposable fixtures)
-
-| File | Result |
-| --- | --- |
-| `fleet-seats-suite.log` | `tests/fm-fleet-seats.test.sh` - 55 cases pass, including shared one-capacity across homes, remote adoption of a pre-pool host supervisor, the observing-receipt/model proof, and the certificate-vs-ledger-history exemption. |
-| `remote-seat-adoption-suite.log` | `tests/fm-remote-seat-adoption.test.sh` - host-side adoption, receipt and generation fencing. |
-| `remote-generation-suite.log` | `tests/fm-remote-generation.test.sh` - predecessor resolution, lab-session forwarding. |
-| `remote-secondmate-session-suite.log` | `tests/fm-remote-secondmate-session.test.sh` - lab-session route/retire APIs and lab retirement evidence replay. |
-| `remote-secondmate-relaunch-suite.log` | `tests/fm-remote-secondmate-relaunch.test.sh` - FAILS at `fresh refusal remained unknown: refusal.launch.endpoint` (see `repro-endpoint-refusal.log`). Cases after it do not run. |
-| `retirement-retry-cases.log` | The four retirement cases of `tests/fm-teardown-endpoint-safety.test.sh`, run alone (the suite aborts earlier on a host-specific case, see below). |
-| `remote-finalization-suite.log` | `tests/fm-teardown-remote-finalization.test.sh`. |
-| `teardown-endpoint-safety-suite.log` | Full `tests/fm-teardown-endpoint-safety.test.sh`: fails at `teardown reported success after a close that failed`. |
-| `teardown-endpoint-safety-base-comparison.log` | The same suite extracted from base `a4bf5f86` fails at the identical case, so that failure is host-specific and predates this change. |
+- `tests/fm-teardown-endpoint-safety.test.sh` case
+  `teardown reported success after a close that failed` fails identically on the
+  unmodified base tree (`git archive 9224c90` in `/tmp`), so it is pre-existing here.
+- `tests/fm-backend-t3code.test.sh` case `installed Codex failed the tracked
+  configuration guard` fails because it calls `/usr/bin/printenv`, which this host
+  does not have (the branch's base tree fails earlier in that suite).
+- `tests/fm-remote-secondmate-lifecycle-e2e.test.sh` aborts with exit 127 after the
+  unreachable-remote case because its remote-job PATH (`/usr/bin:/bin`) lacks the
+  standard toolchain on this host (`/usr/bin` has 2 entries, `/bin` a 12-tool subset),
+  so the later Rex-reply section never runs.

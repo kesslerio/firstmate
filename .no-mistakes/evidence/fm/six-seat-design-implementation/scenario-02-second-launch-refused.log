@@ -1,0 +1,14 @@
+### scenario: pooled worker holds the only seat; a second pooled launch is refused
+$ fm-spawn.sh t2 fm-lab-project --mode local-only --yolo off --harness claude --model pool-model-a
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.2UnDsD
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6F7B16CC6GQFAM2PR6M5974/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6F7B16CC6GQFAM2PR6M5974/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fleet-seats: pool shared is full (1 of 1 seats held); t2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.2UnDsD/state t1
+error: spawn refused - t2 has no fleet seat for model pool-model-a (see the fleet-seats line above)
+exit=1

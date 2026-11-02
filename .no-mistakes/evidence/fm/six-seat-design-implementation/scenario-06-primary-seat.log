@@ -1,0 +1,18 @@
+LAB_ROOT=/tmp/fm-lab.JGBdyc
+primary_model=pool-model-a, pool shared capacity 1
+state/.lock names a live process (2682497) - the primary session lock a running first mate writes
+
+=== scenario G: a live primary session occupies the pooled seat, so a new pooled launch refuses
+fleet-seats: pool shared is full (1 of 1 seats held); worker gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.JGBdyc/state .primary
+exit=4
+
+-- spawn this task via the real fm-spawn.sh
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.JGBdyc
+fleet-seats: pool shared is full (1 of 1 seats held); worker gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.JGBdyc/state .primary
+error: spawn refused - worker has no fleet seat for model pool-model-a (see the fleet-seats line above)
+
+=== the primary session ends (lock holder exits), and the same launch is admitted
+fleet-seats: reserved pool=shared id=worker generation=g-worker used=1 capacity=1
+exit=0

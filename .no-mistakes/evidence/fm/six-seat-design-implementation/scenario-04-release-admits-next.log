@@ -1,0 +1,9 @@
+### after teardown the seat is free: the next pooled launch is admitted and reserves the only seat
+$ fm-spawn.sh t3 fm-lab-project --mode local-only --yolo off --harness claude --model pool-model-b
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.2UnDsD
+fleet-seats: reserved pool=shared id=t3 generation=s1793661216.4042259.5930 used=1 capacity=1
+warning: /tmp/fm-lab.2UnDsD/data/t3/launch-brief.md records no ship branch; defaulting to legacy branch fm/t3
+warning: /tmp/fm-lab.2UnDsD/data/t3/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+notice: t3 ships mode=local-only while the standing posture for fm-lab-project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned t3 harness=claude kind=ship mode=local-only yolo=off window=firstmate:fm-t3 worktree=/home/art/.treehouse/fm-lab-project-84e54e/1/fm-lab-project
+exit=0

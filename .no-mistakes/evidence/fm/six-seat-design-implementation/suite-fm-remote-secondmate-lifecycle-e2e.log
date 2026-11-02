@@ -1,0 +1,64 @@
+FM_TEST_BEGIN 2026-11-02T23:27:05Z tests/fm-remote-secondmate-lifecycle-e2e.test.sh family=secondmate expected_gate_skip=none
+tests/fm-remote-secondmate-lifecycle-e2e.test.sh: line 98: 2863402 Killed                     bash -c '
+  . "$1/bin/fm-timeout-lib.sh"
+  fm_run_timed 120 bash "$2/recovery.sh" "$2/recovery.pid"
+' _ "$ROOT" "$TMP_ROOT"
+ok - watcher cleanup stops a separate timeout recovery process group
+tests/fm-remote-secondmate-lifecycle-e2e.test.sh: line 98: 2873475 Killed                     bash -c '
+  printf ready >"$2/recovery-launch.ready"
+  while [ ! -e "$2/recovery-launch.release" ]; do sleep 0.02; done
+  . "$1/bin/fm-timeout-lib.sh"
+  fm_run_timed 120 bash "$2/recovery.sh" "$2/recovery-late.pid"
+' _ "$ROOT" "$TMP_ROOT"
+ok - watcher cleanup prevents a pending timeout recovery launch
+ok - overlapping remote home provisioning serializes through publication and rollback
+ok - competing cleanup of the public home cannot reach a live provisioning clone
+ok - a home that appears mid-provision makes the provision die without touching it
+ok - remote seed rollback preserves serialized competing routes
+ok - unknown readiness preserves its route and brief for reconciliation
+ok - remote seeding checks, repairs, and re-checks readiness, then stops on a remaining gap
+ok - remote seeding proceeds once the repair closes every gap
+ok - remote seeding provisions a supplied origin without touching the primary project tree
+ok - remote provisioning re-validates a supplied origin at the receiving host
+ok - seeding carries bitbucket, self-hosted, and scp-like origins through to the remote clone
+ok - remote seed registers the route and provisions the whole home and project clone on that host
+ok - remote inheritance rejects incomplete and superseded payload generations
+ok - mixed local and remote routes validate without migration
+ok - host launch validation confirms refusal before any agent starts
+ok - remote initial launch accounts started, refused, unconfirmed, and republished generations exactly
+ok - undeclared unpinned remote spawn preserves default-model behavior
+ok - remote spawn launches on the remote-local backend and records a host-qualified route
+ok - legacy and mismatched remote endpoints fail closed before backend access
+ok - non-herdr remote endpoints are refused without changing either route
+ok - remote spawn serializes inheritance through launch publication
+ok - marked send and routed reply complete through the existing parent correlation owner
+ok - partial remote inheritance retains reread intent through bootstrap convergence
+ok - config push and bootstrap serialize remote inheritance convergence
+WARNING: watcher still down (same stale episode; last beat: 161s ago, grace 300s) - full banner already printed this episode.
+ok - remote inherited config retains and retries a failed live reread nudge
+ok - fleet snapshot projects mixed local and remote structured state
+ok - remote update imports and fast-forwards the persistent home on its configured host
+ok - the remote restart verb delegates to the host-local control plane and refuses before stopping anything
+ok - startup repairs remote readiness before probing without relaunching
+ok - watch liveness: a dead remote secondmate is auto-relaunched on its own host with one wake
+tests/fm-remote-secondmate-lifecycle-e2e.test.sh: line 98: 681175 Killed                     FM_FAKE_SSH_MODE=unreachable FM_STATE_OVERRIDE="$WATCH_STATE_UNREACHABLE" FM_SECONDMATE_LIVENESS_SECS=1 FM_POLL=1 FM_SIGNAL_GRACE=0 FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 remote_env exec "$ROOT/bin/fm-watch.sh" > "$TMP_ROOT/watch-unreachable.out" 2> "$TMP_ROOT/watch-unreachable.err"
+ok - watch liveness: an unreachable remote secondmate is probed, preserved, and never failed over
+diagnostic: spawn-concurrent.out
+WARNING: watcher still down (same stale episode; last beat: 80s ago, grace 300s) - full banner already printed this episode.
+fleet-seats: confirmed id=ios generation=s1793662143.3293062.15831
+fleet-seats: recorded id=ios generation=s1793662389.3876113.29721 (existing holder successor during policy opt-out)
+fleet-seats: existing id=ios generation=s1793662143.3293062.15831 (candidate s1793662389.3876113.29721 released)
+warning: remote secondmate ios remains on confirmed model pool-model-a; requested model default was not launched
+spawned ios harness=codex kind=secondmate mode=secondmate yolo=off window=remote:ios worktree=/tmp/fm-remote-secondmate-e2e.F71P6q/remote-home remote=remote-mac backend=herdr
+diagnostic: watch-liveness.out
+check: secondmate ios auto-relaunched after remote endpoint dead on its configured host (host=remote-mac)
+diagnostic: watch-liveness.err
+diagnostic: watch-unreachable.err
+FM_TEST_END 2026-11-02T23:39:32Z tests/fm-remote-secondmate-lifecycle-e2e.test.sh exit=127 duration_ms=746979 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=1 skipped_gate=0 duration_ms=747081
+FM_TEST_SUMMARY_FAMILY family=secondmate count=1 duration_ms=746979 failed=1
+FM_TEST_SLOWEST rank=1 script=tests/fm-remote-secondmate-lifecycle-e2e.test.sh duration_ms=746979
+
+real	12m27.112s
+user	2m33.626s
+sys	3m18.588s

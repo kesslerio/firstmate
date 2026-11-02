@@ -1,0 +1,71 @@
+LAB_ROOT=/tmp/fm-lab.NtXPEQ
+LAB_MATE=/tmp/fm-lab.t0qRLF
+pools: pa=[pool-model-a] capacity 1, pb=[pool-model-b] capacity 1
+
+=== scenario C: a pooled record in a local second mate home spends the fleet root seat
+-- spawn from the SECOND MATE home on pool-model-a (root pool is full because the mate home holds its seat)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.t0qRLF
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6F7B16CC6GQFAM2PR6M5974/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6F7B16CC6GQFAM2PR6M5974/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fleet-seats: pool pa is full (1 of 1 seats held); mate-task gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.t0qRLF/state legacy
+error: spawn refused - mate-task has no fleet seat for model pool-model-a (see the fleet-seats line above)
+exit=1
+
+-- spawn from the ROOT home on the same pool
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.NtXPEQ
+fleet-seats: pool pa is full (1 of 1 seats held); root-task gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.t0qRLF/state legacy
+error: spawn refused - root-task has no fleet seat for model pool-model-a (see the fleet-seats line above)
+exit=1
+
+
+=== scenario D: an unresolved legacy model occupies every declared pool
+-- model pool-model-b (the record names no model at all)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.NtXPEQ
+fleet-seats: pool pb is full (1 of 1 seats held); unresolved-task gets no seat for model pool-model-b - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.t0qRLF/state legacy
+error: spawn refused - unresolved-task has no fleet seat for model pool-model-b (see the fleet-seats line above)
+exit=1
+-- model pool-model-a
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.NtXPEQ
+fleet-seats: pool pa is full (1 of 1 seats held); unresolved-task-a gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.t0qRLF/state legacy
+error: spawn refused - unresolved-task-a has no fleet seat for model pool-model-a (see the fleet-seats line above)
+exit=1
+
+-- now the legacy record names pool-model-a, so pool-model-b must be free
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.NtXPEQ
+fleet-seats: reserved pool=pb id=poolb-task generation=s1793661280.137304.9495 used=1 capacity=1
+error: task poolb-task has no brief at inaccessible data path /tmp/fm-lab.NtXPEQ/data/poolb-task/brief.md
+exit=1
+
+
+=== scenario E: a registered remote with no served certificate refuses admission instead of counting it free
+-- an otherwise free pool, but the registered remote has never been served
+fleet-seats: no seat - remote secondmate(s) mate2 have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+
+-- the operator removes the unreachable remote registration
+fleet-seats: reserved pool=pa id=free-task generation=g-free used=1 capacity=1
+exit=0
+
+
+=== scenario F: generation transitions free exactly the released seat
+-- released generation, then a retry of that same terminal generation
+fleet-seats: released id=free-task generation=g-free reason=teardown
+release exit=0
+fleet-seats: refused - generation g-free of free-task is already terminal; a new episode needs a new generation
+terminal-generation retry exit=5
+
+-- a successor generation on the same holder is admitted on the freed seat
+fleet-seats: reserved pool=pa id=free-task generation=g2 used=1 capacity=1
+successor exit=0
+
+-- holder record after the transitions
+{"task":"free-task","incarnations":[{"generation":"g-free","previous_generation":null,"lifecycle":"released"},{"generation":"g2","previous_generation":"g-free","lifecycle":"reserved"}]}
