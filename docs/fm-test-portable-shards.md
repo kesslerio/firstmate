@@ -128,7 +128,7 @@ No fast mode, path skips, or paid runner provisioning is part of this layout.
 
 The longer-term performance objective remains a complete green run under fifteen minutes including start delay, but the three watch-triage members still sum to about 26 minutes of CI test time.
 The immediate packing target is the runner's modeled script budget, not a claim that more shards alone can make an indivisible script faster.
-The layout uses fifteen long-lived Linux jobs (ten serial, two parallel, Herdr, two lint), plus short checks and macOS; insufficient shared account capacity can erase the packing gain.
+The layout uses seventeen long-lived Linux jobs (twelve serial, two parallel, Herdr, two lint), plus short checks and macOS; insufficient shared account capacity can erase the packing gain.
 Compare complete before/after runs, preserve cancelled and partial-run evidence, and measure a representative normal-run sample before claiming a P95 improvement.
 The workflow retains per-PR supersession and keeps only the newest of close main pushes' runs, without changing the compliance workflow's event semantics.
 
@@ -156,4 +156,6 @@ A passing coverage guard does not establish a healthy job duration; refresh the 
 The fork retains its supervision-host split at the latch boundary while carrying current upstream case bodies and call order unchanged.
 `tests/fm-supervision-host.test.sh` and `tests/fm-supervision-host-latch-park.test.sh` retain the fork's conservative 915025 ms and 852175 ms packing weights from the completed 1767200 ms pre-split run.
 These inherited weights are not fresh measurements of the reconciled suites; subsequent green CI measurements must establish their current variance.
-The combined inventory uses ten serial shards to retain those conservative weights within the unchanged 1200000 ms packing target.
+The OpenCode model-selection suite this change adds, `tests/fm-spawn-opencode-model.test.sh`, carries a provisional 122124 ms weight from its successful shard sample in [run 41516411871](https://github.com/kesslerio/firstmate/actions/runs/41516411871), replacing the 31794 ms the 2026-09-30 baseline measured for a much smaller body.
+That weight takes the serial remainder to 13113156 ms, more than the 12000000 ms ten shards could hold, so the inventory uses twelve serial shards and packs the largest to 1092777 ms against the unchanged 1200000 ms target.
+Refresh that provisional weight and the two inherited supervision weights from `fm-test-timing-portable-serial-*` artifacts on the next fully green run of the reconciled suites.
