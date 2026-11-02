@@ -1,0 +1,46 @@
+Scenario: a failed secondmate-home retirement is retryable once the original failure is fixed.
+
+Real product: bin/fm-teardown.sh <id> --force for a kind=secondmate task whose home is a full
+secondmate layout (real bin/ copied from this checkout, AGENTS-free, .fm-secondmate-home
+marker, state/procevent registration, tmux backend endpoint on a private TMUX_TMPDIR).
+Fault a real operator can also cause and fix: a process-event registration the account cannot
+read (mode 000), so staging its recovery backup fails after the removal evidence is published.
+
+POST-FIX (HEAD):
+$ chmod 000 $T9/mate/state/procevent/wait.source
+$ FM_HOME=$T9/home bin/fm-teardown.sh mate --force
+cp: cannot open '$T9/mate/state/procevent/wait.source' for reading: Permission denied
+REFUSED: cannot preserve process-event registrations for secondmate home $T9/mate
+[exit 1]
+# the rollback withdrew this attempt's evidence, so the home is retryable:
+$ ls $T9/home/state/mate.home-removal
+ls: cannot access '...': No such file or directory
+$ ls -d $T9/mate
+$T9/mate
+$ ls -d $T9/mate.retiring.*
+ls: cannot access '...': No such file or directory
+
+$ chmod 600 $T9/mate/state/procevent/wait.source        # the operator fixes the failure
+$ FM_HOME=$T9/home bin/fm-teardown.sh mate --force
+retired: wait
+swept: attempted=1
+teardown mate complete (window isolated:fm-mate, worktree $T9/mate)
+[exit 0]
+$ ls -d $T9/mate $T9/home/state/mate.meta $T9/home/state/mate.home-removal
+(all absent; the parent registry line was removed too)
+
+PRE-FIX CONTROL (bin/fm-teardown.sh from c86c53fc, the parent of the fix commit, run from an
+otherwise identical lab root with the same fault):
+$ chmod 000 $PRE/mate/state/procevent/wait.source
+$ FM_HOME=$PRE/home bin/fm-teardown.sh mate --force
+cp: cannot open '$PRE/mate/state/procevent/wait.source' for reading: Permission denied
+REFUSED: cannot preserve process-event registrations for secondmate home $PRE/mate
+[exit 1]
+$ ls $PRE/home/state/mate.home-removal
+-rw------- 1 art users 138 ... $PRE/home/state/mate.home-removal      <-- stranded evidence
+$ chmod 600 $PRE/mate/state/procevent/wait.source
+$ FM_HOME=$PRE/home bin/fm-teardown.sh mate --force
+REFUSED: retirement retry cannot prove public home ownership for $PRE/mate
+[exit 1]
+$ ls -d $PRE/mate
+$PRE/mate                                                             <-- permanently unretireable

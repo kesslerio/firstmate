@@ -1,0 +1,30 @@
+== lab: /tmp/fm-lab.unwj4R
+
+== case A: pre-fix teardown fails mid-removal, then the operator retries
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.unwj4R/caseA/primary
+cp: cannot open '/tmp/fm-lab.unwj4R/caseA/mate/state/procevent/wait.source' for reading: Permission denied
+REFUSED: cannot preserve process-event registrations for secondmate home /tmp/fm-lab.unwj4R/caseA/mate
+pre-fix first attempt rc=1
+after the pre-fix failure: home present; meta present; removal evidence PRESENT
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.unwj4R/caseA/primary
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: retirement retry cannot prove public home ownership for /tmp/fm-lab.unwj4R/caseA/mate
+retry with this change rc=1
+after the retry: home present; meta present; removal evidence PRESENT
+
+== case B: this change's teardown fails mid-removal, then the operator retries
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.unwj4R/caseB/primary
+cp: cannot open '/tmp/fm-lab.unwj4R/caseB/mate/state/procevent/wait.source' for reading: Permission denied
+REFUSED: cannot preserve process-event registrations for secondmate home /tmp/fm-lab.unwj4R/caseB/mate
+first attempt rc=1
+after the failed attempt: home present; meta present; removal evidence withdrawn
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.unwj4R/caseB/primary
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+retired: wait
+swept: attempted=1
+teardown mate1 complete (window fmlabretire:fm-mate1, worktree /tmp/fm-lab.unwj4R/caseB/mate)
+retry after the fix rc=0
+after the retry: home retired; meta removed; removal evidence withdrawn
+no staging directory left behind
+registry after retirement: []
+== done

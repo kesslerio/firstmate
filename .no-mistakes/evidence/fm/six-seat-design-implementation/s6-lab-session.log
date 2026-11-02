@@ -1,0 +1,61 @@
+== lab: /tmp/fm-lab.5wx4UI
+trusted: /tmp/fm-lab.5wx4UI/remote
+== setup: real host-side launch of mate1 into the lab session
+  schema=fm-remote-secondmate-control.v1
+  backend=herdr
+  target=fm-lab-live-session-173660-3405:w1:p2
+  herdr_session=fm-lab-live-session-173660-3405
+  harness=claude
+  model=haiku
+  effort=default
+  spawn_gen=s1793602715.174077.8815
+  endpoint=fm-lab-live-session-173660-3405:w1:p2 generation=s1793602715.174077.8815 pane-status=working
+
+== 6a: negative control - the wrapper before the lab-session route fix
+error: remote secondmate mate1 endpoint is recorded in Herdr session 'fm-lab-live-session-173660-3405', expected 'fm-remote'; refusing access until it is explicitly migrated
+error: remote secondmate mate1's predecessor is unresolved; nothing was relaunched
+  pre-fix record unchanged: yes
+
+== 6b: this change's wrapper relaunches mate1 on its recorded lab session
+  (operator step: closing the old agent from its pane)
+  relaunched mate1 harness=claude from=claude model=sonnet effort=default backend=herdr endpoint=fm-lab-live-session-173660-3405:w1:p2 worktree=/tmp/fm-lab.5wx4UI/remote
+  schema=fm-remote-secondmate-control.v1
+  backend=herdr
+  target=fm-lab-live-session-173660-3405:w1:p2
+  herdr_session=fm-lab-live-session-173660-3405
+  harness=claude
+  model=sonnet
+  effort=default
+  spawn_gen=s1793602733.188950.20283
+  parent record now: harness=claude model=sonnet generation=s1793602733.188950.20283 session=fm-lab-live-session-173660-3405
+  endpoint after relaunch: target=fm-lab-live-session-173660-3405:w1:p2 pane-status=working
+  host calls this relaunch made (decoded argv):
+    fm-remote-secondmate-control.sh route mate1 --herdr-session fm-lab-live-session-173660-3405 
+    fm-remote-secondmate-control.sh relaunch mate1 claude sonnet - --expect-generation s1793602715.174077.8815 --herdr-session fm-lab-live-session-173660-3405 
+
+== 3a: enable pools and let the real serve pass certify the fleet
+  served mate1 policy=336508636-71 epoch=r17936027391969291146.1 holders=1
+  {"epoch":"r17936027391969291146.1","holders":[{"state_dir":"/tmp/fm-lab.5wx4UI/remote/state/parent-route","task":"mate1","generation":"s1793602733.188950.20283","model":"sonnet","lifecycle":"confirmed"}]}
+== 3b: a pooled launch asks for a DIFFERENT model than the one running (sonnet)
+  fleet-seats: reserved pool=shared id=mate1 generation=s1793602741.173658.1 (already held) used=1 capacity=2
+  fleet-seats: dispatched id=mate1 generation=s1793602741.173658.1
+  host launch rc=0 pane-status=working
+  host: seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"mate1","operation":"s1793602741.173658.1","requested_generation":"s1793602741.173658.1","actual_generation":"s1793602733.188950.20283","previous_generation":"s1793602733.188950.20283","disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-lab-live-session-173660-3405:w1:p2","home":"/tmp/fm-lab.5wx4UI/remote","host":null,"remote_root":null,"spawn_gen":"s1793602733.188950.20283"},"actual_model":"sonnet","complete":true}
+  host: schema=fm-remote-secondmate-control.v1
+  host: backend=herdr
+  host: target=fm-lab-live-session-173660-3405:w1:p2
+  host: herdr_session=fm-lab-live-session-173660-3405
+  host: harness=claude
+  host: model=sonnet
+  host: effort=default
+  host: spawn_gen=s1793602733.188950.20283
+  host: seat_operation=s1793602741.173658.1
+  receipt: {"disposition":"existing","requested_generation":"s1793602741.173658.1","actual_generation":"s1793602733.188950.20283","actual_model":"sonnet","startup_confirmed":true}
+== 3c: the parent applies the receipt the host observed
+  fleet-seats: existing id=mate1 generation=s1793602733.188950.20283 (candidate s1793602741.173658.1 released)
+  reconcile rc=0
+  ledger: {"generation":"s1793602741.173658.1","lifecycle":"released","model":"haiku","startup_confirmed":false,"target":null}
+  ledger: {"generation":"s1793602733.188950.20283","lifecycle":"confirmed","model":"sonnet","startup_confirmed":true,"target":"fm-lab-live-session-173660-3405:w1:p2"}
+== 3d: the pool now holds one seat for the running supervisor, not a phantom
+  fleet-seats: reserved pool=shared id=other generation=s1793602744.173658.2 used=2 capacity=2
+== done

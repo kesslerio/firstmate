@@ -1,0 +1,47 @@
+Scenario: a remote secondmate recorded under an isolated fm-lab-* Herdr session resolves its
+predecessor and relaunches on that same session.
+
+Lab: real isolated session provisioned and torn down with the supported helper:
+  $ SES=$(bin/fm-herdr-lab.sh name relaunch...) ; bin/fm-herdr-lab.sh provision "$SES"
+  -> {"name":"fm-lab-relaunch-1473918-20645","running":true,"default":false}
+Remote secondmate labsm recorded in the primary and on its remote home as
+  state/parent-route/labsm.meta: herdr_session=$SES, herdr_pane_id=w1:p1, spawn_gen=gen-labsm
+The default Herdr session stayed untouched (helper tripwire verified at teardown).
+
+# the exact pre-fix call shape (no --herdr-session) is refused by the host, which is what made
+# a lab-recorded secondmate unrelaunchable before this change:
+$ FM_HOME=$LAB/primary bin/fm-on.sh labsm fm-remote-secondmate-control.sh route labsm
+error: remote secondmate labsm endpoint is recorded in Herdr session 'fm-lab-relaunch-1473918-20645', expected 'fm-remote'; refusing access until it is explicitly migrated
+
+# the fixed route lookup carries the recorded session:
+$ FM_HOME=$LAB/primary bin/fm-on.sh labsm fm-remote-secondmate-control.sh route labsm --herdr-session "$SES"
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-relaunch-1473918-20645:w1:p1
+herdr_session=fm-lab-relaunch-1473918-20645
+harness=claude
+model=pool-model-a
+spawn_gen=gen-labsm
+
+# the real parent wrapper resolves the predecessor from that same session and issues the
+# relaunch on it; the host runs the seat operation and reports its disposition:
+$ FM_HOME=$LAB/primary FM_SSH_BIN=<lab ssh> bin/fm-remote-secondmate-relaunch.sh labsm claude pool-model-a medium
+fleet-seats: reserved pool=shared id=labsm generation=s1793600350.2037318.9557 (already held) used=3 capacity=3
+fleet-seats: released id=labsm generation=s1793600350.2037318.9557 reason=prelaunch
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"labsm","operation":"s1793600350.2037318.9557",
+ "requested_generation":"s1793600350.2037318.9557","actual_generation":null,"previous_generation":"gen-labsm",
+ "disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,
+ "actual_model":null,"complete":true}
+error: task labsm's recorded worktree ... is not a git worktree; refusing to relaunch without a checkout whose unlanded work can be accounted for
+error: the host refused the relaunch of labsm before touching its agent; its fleet seat candidate was released
+
+After making the recorded home a real git checkout the same wrapper reached the endpoint step:
+seat_disposition={..., "previous_generation":"gen-labsm", "disposition":"cancelled", "old_stopped":true, "old_destroyed":true, ...}
+error: secondmate labsm's recorded endpoint is gone; its recovery is owned by the secondmate respawn path, not by relaunch (run bin/fm-spawn.sh labsm --secondmate, or let the session-start liveness sweep do it)
+
+What this proves live: predecessor resolution and the relaunch delivery are addressed to the
+recorded fm-lab-* session (the pre-fix shape is refused by the host, the fixed shape is not),
+and the host processed the parent's seat operation for that generation on that session.
+What it does not prove: a completed agent replacement. The fixture endpoint has no live agent,
+and the relaunch path deliberately refuses to recreate a destroyed endpoint; standing up a live
+agent requires a full secondmate spawn whose remote path still hardcodes the fm-remote session.

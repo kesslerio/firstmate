@@ -1,0 +1,40 @@
+Scenario: a supervisor already running on a registered remote host before pools existed is
+counted exactly once after pools are enabled, so enabling pools around it does not spend the
+fleet's capacity twice and does not block pooled launches.
+
+Lab: primary $LAB/primary; remote $LAB/remote registered in the primary's
+data/secondmates.md (host: localhost; root: <gate worktree>; home: $LAB/remote) and reached
+through bin/fm-on.sh over real SSH. The remote home records its pre-pool supervisor in
+state/parent-route/ios.meta (model=pool-model-a, spawn_gen=gen-ios). The primary's own route
+record state/ios.meta predates generation recording (no remote_spawn_gen/fleet_seat_generation).
+The local secondmate mate1 also holds one seat.
+
+$ FM_HOME=$LAB/primary FM_SSH_BIN=<lab ssh> bin/fm-fleet-seats.sh serve-remotes
+served ios policy=3130302336-69 epoch=r17935999991714872872.1 holders=1
+
+$ jq . $LAB/primary/state/fleet-seats/remote-ios.cert
+{"schema":"fm-fleet-seats-serve.v2","policy_digest":"3130302336-69","epoch":"r17935999991714872872.1",
+ "complete":true,
+ "holders":[{"state_dir":"$LAB/remote/state/parent-route","task":"ios","generation":"gen-ios",
+             "model":"pool-model-a","lifecycle":"confirmed"}]}
+
+# capacity 2 = mate1 + the adopted remote supervisor. It refuses at exactly 2, not 3:
+$ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve task-b --generation g-b1 ...
+fleet-seats: pool shared is full (2 of 2 seats held); task-b gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder $LAB/mate1/state mate1
+  holder $LAB/primary/state ios
+[exit 4]
+
+# raising the declaration to 3 invalidates the certificate, and the product refuses until
+# the remote confirms the new declaration (no launch without a counted seat):
+$ (capacity 3) FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve task-b ...
+fleet-seats: no seat - remote secondmate(s) ios have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+[exit 5]
+
+# after the next serve the same reservation is admitted at 3 of 3: the adopted supervisor
+# is one seat, and enabling pools around it did not block the launch:
+$ FM_HOME=$LAB/primary FM_SSH_BIN=<lab ssh> bin/fm-fleet-seats.sh serve-remotes
+served ios policy=4092903195-69 epoch=r17935999991714872872.2 holders=1
+$ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve task-b --generation g-b1 ...
+fleet-seats: reserved pool=shared id=task-b generation=g-b1 used=3 capacity=3
+[exit 0]

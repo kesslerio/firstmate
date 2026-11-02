@@ -1,0 +1,31 @@
+Scenario: a pooled launch filed from a remote secondmate home waits for the primary's next
+serve and is refused when the shared pool is full, and granted when there is capacity; the
+granted generation is then counted at the root.
+
+Lab: as in 02, capacity 2 (mate1 + the remote's own supervisor ios = full).
+
+# the remote home files its seat request and waits:
+$ FM_HOME=$LAB/remote bin/fm-fleet-seats.sh reserve task-r --generation g-r1 --kind ship \
+    --harness claude --model pool-model-a --holder-pid <live pid>   &
+# the primary's watcher pass answers it:
+$ FM_HOME=$LAB/primary FM_SSH_BIN=<lab ssh> bin/fm-fleet-seats.sh serve-remotes
+served ios policy=3130302336-69 epoch=r17935999991714872872.4 holders=1
+fleet-seats: pool shared is full (2 of 2 seats held); task-r gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+remote-reserve rc=4
+
+# capacity raised to 3, served, then the same remote request is granted by the root:
+$ (capacity 3) FM_HOME=$LAB/primary FM_SSH_BIN=<lab ssh> bin/fm-fleet-seats.sh serve-remotes
+served ios policy=4092903195-69 epoch=r17935999991714872872.5 holders=1
+$ FM_HOME=$LAB/remote bin/fm-fleet-seats.sh reserve task-r --generation g-r1 ... &
+$ FM_HOME=$LAB/primary FM_SSH_BIN=<lab ssh> bin/fm-fleet-seats.sh serve-remotes
+served ios policy=4092903195-69 epoch=r17935999991714872872.6 holders=2
+fleet-seats: reserved pool=shared id=task-r generation=g-r1 (granted by the fleet root)
+remote-reserve rc=0
+
+# the granted remote generation is part of the root's shared capacity:
+$ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve task-x --generation g-x1 ...
+fleet-seats: pool shared is full (3 of 3 seats held); task-x gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder remote:ios:$LAB/remote/state task-r
+  holder $LAB/mate1/state mate1
+  holder $LAB/primary/state ios
+[exit 4]

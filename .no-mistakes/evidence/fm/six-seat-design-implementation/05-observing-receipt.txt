@@ -1,0 +1,32 @@
+Scenario: a launch that found a supervisor already running on another model is recognized by
+the receipt that observed it, so the requested model never takes a seat and enabling pools
+does not block pooled launches fleet-wide.
+
+Lab: remote $LAB/remote2 served by the primary. The host holds the durable records such a
+launch leaves behind (the documented host-side contract of
+bin/fm-remote-secondmate-control.sh):
+  state/parent-route/obs.meta                     model=model-b spawn_gen=obs-gen
+  state/parent-route/obs.seat-operation.op-obs    actual_generation=obs-gen actual_model=model-b
+  state/parent-route/obs.seat-reservation.op-obs  immutable holder, model=model-a (the model asked for)
+The parent's ledger holds the reserved candidate for operation op-obs on model-a.
+Both models are in the one declared pool, as they would be for one shared endpoint.
+
+# positive: the receipt proves the generation and model that run, so the serve completes and
+# the supervisor is parent-accounted instead of adopted a second time:
+$ FM_HOME=$LAB/primary FM_SSH_BIN=<lab ssh> bin/fm-fleet-seats.sh serve-remotes
+served ios policy=1827240823-89 epoch=r17935999991714872872.11 holders=1
+served labsm policy=1827240823-89 epoch=r17935999991714872872.4 holders=1
+$ jq -c '[.holders[].task]' $LAB/primary/state/fleet-seats/remote-labsm.cert
+["labsm"]
+
+# adversarial: the receipt names a model other than the one the host records for that
+# generation. The serve refuses instead of counting the request model:
+$ (receipt actual_model=model-c) FM_HOME=$LAB/remote2 bin/fm-fleet-seats.sh serve \
+    --digest 1827240823-89 --epoch r17935999991714872872.300 --allowance shared=2
+fleet-seats: no seat - host supervisor obs has unaccounted occupancy (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+[exit 5]
+
+# and the matching receipt serves a complete certificate:
+$ (receipt actual_model=model-b) FM_HOME=$LAB/remote2 bin/fm-fleet-seats.sh serve ...
+{"schema":"fm-fleet-seats-serve.v2","policy_digest":"1827240823-89","epoch":"r17935999991714872872.301","complete":true,"holders":[{"state_dir":"$LAB/remote2/state/parent-route","task":"labsm","generation":"gen-labsm","model":"pool-model-a","lifecycle":"confirmed"}]}
+[exit 0]

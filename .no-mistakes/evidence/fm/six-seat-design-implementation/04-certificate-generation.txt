@@ -1,0 +1,28 @@
+Scenario: a generation proved by the remote's serve certificate must not be mistaken for one
+the seat ledger failed to issue. Two halves: the positive (cert-derived generation with a
+released, never-issued candidate in the ledger still counts) and the adversarial guard (a
+record that names a generation the ledger never issued is refused).
+
+Lab: primary $LAB/primary with remote ios served (certificate holder task=ios generation=gen-ios).
+The ledger was seeded with a real failed first spawn through the product:
+  $ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve ios --generation gen-old --kind secondmate --harness claude --model pool-model-a --holder-pid $$
+  $ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh release ios --generation gen-old --reason prelaunch
+so the only ledger incarnation is a released candidate gen-old, and the running supervisor's
+generation gen-ios exists only in the serve certificate.
+
+PASS half (the intent clause): the primary's route record carries no generation; the product
+derives gen-ios from the certificate and counts it once:
+  $ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve task-y --generation g-y1 ...
+  fleet-seats: reserved pool=shared id=task-y generation=g-y1 used=3 capacity=3
+  [exit 0]
+
+Adversarial guard: a record that names a generation its ledger never issued still fails closed
+rather than silently counting:
+  $ (append remote_spawn_gen=gen-bogus to the primary route record)
+  $ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve task-z --generation g-z1 ...
+  fleet-seats: no seat - task record $LAB/primary/state/ios.meta names generation gen-bogus, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+  [exit 5]
+
+FAIL half (see evidence-finding-persisted-cert-generation.txt): once the product's own remote
+generation resolver persists the certificate-derived generation into the route record, the same
+exemption no longer applies and the fleet refuses admission.

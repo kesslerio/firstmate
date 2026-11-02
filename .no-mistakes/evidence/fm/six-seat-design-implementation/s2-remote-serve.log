@@ -1,0 +1,26 @@
+== lab: /tmp/fm-lab.6cXeDj
+== 2-pre: an agent already running on the remote before pools were enabled
+== 2a: primary grant before the remote confirmed the policy must refuse
+fleet-seats: no seat - remote secondmate(s) theshop have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+rc=5
+== 2b: first real serve pass
+served theshop policy=2290481974-84 epoch=r179360209037424274660.1 holders=1
+rc=0
+== 2c: the certificate the root published
+{"epoch":"r179360209037424274660.1","complete":true,"holders":[{"state_dir":"/tmp/fm-lab.6cXeDj/theshop/state","task":"shop-legacy","generation":"unmanaged","model":"live-model-a","lifecycle":"confirmed"}]}
+== 2d: a primary launch now sees the pre-pool supervisor exactly once
+fleet-seats: reserved pool=shared id=p1 generation=g-p1 used=2 capacity=3
+rc=0
+== 2e: a second serve pass does not double-charge that supervisor
+served theshop policy=2290481974-84 epoch=r179360209037424274660.2 holders=1
+rc=0
+{"epoch":"r179360209037424274660.2","holders":1}
+fleet-seats: reserved pool=shared id=p2 generation=g-p2 used=3 capacity=3
+rc=0
+== 2f: the full pool refuses the next launch across all three homes
+fleet-seats: pool shared is full (3 of 3 seats held); p3 gets no seat for model live-model-b - choose an overflow route or wait for a holder to finish
+  holder remote:theshop:/tmp/fm-lab.6cXeDj/theshop/state shop-legacy
+  holder /tmp/fm-lab.6cXeDj/primary/state p1
+  holder /tmp/fm-lab.6cXeDj/primary/state p2
+rc=4
+== done

@@ -1,0 +1,54 @@
+FAILING SCENARIO: after a routine remote relaunch of a certificate-adopted supervisor, a
+certificate-proved generation becomes indistinguishable from a ledger-unissued one and the
+whole fleet refuses admission.
+
+Reproduction (all product verbs unless noted):
+
+1. Ledger: a real failed first spawn left only a released candidate (the case the product's own
+   comment calls out: "a failed first spawn can leave a released candidate as the only row and
+   never issue the generation the running supervisor reports"):
+     $ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve ios --generation gen-old --kind secondmate --harness claude --model pool-model-a --holder-pid $$
+     $ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh release ios --generation gen-old --reason prelaunch
+   $ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh show ios | jq -c '.incarnations[]|{generation,lifecycle}'
+   {"generation":"gen-old","lifecycle":"released"}
+
+2. The pre-pool supervisor on the remote host is adopted into the serve certificate (gen-ios):
+   $ jq -c '.holders' $LAB/primary/state/fleet-seats/remote-ios.cert
+   [{"state_dir":"$LAB/remote/state/parent-route","task":"ios","generation":"gen-ios","model":"pool-model-a","lifecycle":"confirmed"}]
+
+3. With the parent record left to derive that generation from the certificate, admission works:
+   $ (primary state/ios.meta has no remote_spawn_gen/remote_target)
+   $ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve ctl-b --generation g-ctl-b --harness claude --model pool-model-a --holder-pid $$
+   fleet-seats: reserved pool=shared id=ctl-b generation=g-ctl-b used=4 capacity=4
+   [exit 0]
+
+4. A routine remote relaunch runs bin/fm-remote-secondmate-relaunch.sh, whose
+   fm_remote_generation_resolve (new in this change) persists the resolved generation into the
+   parent record:
+   $ FM_HOME=$LAB/primary bin/fm-remote-secondmate-relaunch.sh ios claude pool-model-a medium
+   ... error: remote secondmate ios has no fleet seat for model pool-model-a
+   $ cat $LAB/primary/state/ios.meta
+   remote_spawn_gen=gen-ios
+   remote_target=fm-remote:w1:p1
+   ...
+
+5. Now the same fleet refuses every pooled launch AND cannot confirm any remote:
+   $ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve ctl-a --generation g-ctl-a --harness claude --model pool-model-a --holder-pid $$
+   fleet-seats: no seat - task record .../primary/state/ios.meta names generation gen-ios, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+   [exit 5]
+
+   $ FM_HOME=$LAB/primary FM_SSH_BIN=<lab ssh> bin/fm-fleet-seats.sh serve-remotes
+   fleet-seats: no seat - task record .../primary/state/ios.meta names generation gen-ios, which its seat holder never issued (...)
+   [exit 5]
+
+   (Removing only remote_spawn_gen/remote_target from the record restores admission:
+    the same fleet then serves and reserves again: "served ios ... holders=1",
+    "fleet-seats: reserved pool=shared id=ctl-b generation=g-ctl-b used=4 capacity=4".)
+
+Why this contradicts the intent: "a certificate-proved generation should never be mistaken for
+one the seat ledger failed to issue". gen-ios is proved by the serve certificate for exactly
+that state_dir/task, but bin/fm-fleet-seats.sh's pooled_records only exempts a certificate-derived
+generation when the record does NOT name a generation (derived=1 branch). Once
+fm_remote_generation_resolve writes the certificate-adopted generation into the record, the
+history check fails closed, no product verb clears it, and both the reserve path and
+serve-remotes refuse fleet-wide.

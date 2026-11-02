@@ -1,0 +1,29 @@
+Scenario: the primary home and a local secondmate home share one generation-bound capacity,
+so a full pool refuses an over-dispatch from either home.
+
+Lab:
+  primary = $LAB/primary, config/fleet-seats = {"pools":[{"name":"shared","capacity":1,"models":["pool-model-a"]}]}
+  mate1   = $LAB/mate1, .fm-secondmate-parent route=local parent_home=$LAB/primary
+            state/mate1.meta: kind=secondmate model=pool-model-a spawn_gen=gen-mate1
+  primary data/secondmates.md: - mate1 - Fixture local secondmate. (home: $LAB/mate1; ...)
+
+# with the mate holding the fleet's only seat, the primary cannot dispatch another:
+$ FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve task-b --generation g-b1 \
+    --harness claude --model pool-model-a --holder-pid $$
+fleet-seats: unmanaged pooled supervisor mate1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+fleet-seats: pool shared is full (1 of 1 seats held); task-b gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder $LAB/mate1/state mate1
+[exit 4]
+
+# and the local secondmate cannot dispatch when the root's pool is full:
+$ FM_HOME=$LAB/mate1 bin/fm-fleet-seats.sh reserve task-c --generation g-c1 \
+    --harness claude --model pool-model-a --holder-pid $$
+fleet-seats: unmanaged pooled supervisor mate1 stays counted without confirmed startup or proven endpoint destruction; reconcile or retire its endpoint explicitly
+fleet-seats: pool shared is full (1 of 1 seats held); task-c gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder $LAB/mate1/state mate1
+[exit 4]
+
+# the same fleet with capacity 2 admits the primary's launch and reports the shared state:
+$ (capacity 2) FM_HOME=$LAB/primary bin/fm-fleet-seats.sh reserve task-a --generation g-a1 ...
+fleet-seats: reserved pool=shared id=task-a generation=g-a1 used=2 capacity=2
+[exit 0]

@@ -1,0 +1,27 @@
+== lab: /tmp/fm-lab.QEkz2l
+== 1a: primary reserves seat 1 (capacity 2)
+fleet-seats: reserved pool=shared id=p1 generation=g-p1 used=1 capacity=2
+rc=0
+== 1b: local secondmate reserves seat 2 from its own home
+fleet-seats: reserved pool=shared id=m1 generation=g-m1 used=2 capacity=2
+rc=0
+== 1c: nested secondmate's third launch must be refused at capacity
+fleet-seats: pool shared is full (2 of 2 seats held); g1 gets no seat for model live-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.QEkz2l/mate/state m1
+  holder /tmp/fm-lab.QEkz2l/primary/state p1
+rc=4
+== 1d: ledger at the root (authority) and in the secondmate home
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/tmp/fm-lab.QEkz2l/primary/state","task":"p1","revision":1,"incarnations":[{"generation":"g-p1","previous_generation":null,"kind":"ship","model":"live-model-a","policy_digest_at_reserve":"2492091372-84","lifecycle":"reserved","launch_phase":"prepared","owner_pid":3699251,"owner_pid_identity":"linux-starttime=9359564 cmdline-hex=736c6565700036303000","route":null,"startup_confirmed":false,"disposition":null}]}
+--
+--
+secondmate-home p1 record: []
+== 1e: same-generation retry of the secondmate's own seat
+fleet-seats: reserved pool=shared id=m1 generation=g-m1 (already reserved) used=2 capacity=2
+rc=0
+== 1f: a pre-existing (unmanaged) agent in the secondmate home is counted
+fleet-seats: pool shared is full (3 of 2 seats held); p2 gets no seat for model live-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.QEkz2l/mate/state legacy
+  holder /tmp/fm-lab.QEkz2l/mate/state m1
+  holder /tmp/fm-lab.QEkz2l/primary/state p1
+rc=4
+== done: /tmp/fm-lab.QEkz2l

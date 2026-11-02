@@ -1,0 +1,16 @@
+== lab: /tmp/fm-lab.4M7Nar
+== 5a: real serve pass publishes the certificate
+served theshop policy=3231996394-84 epoch=r1793602128379744425999.1 holders=1
+rc=0
+{"holders":[{"task":"theshop","generation":"cert-only.4104.1","model":"live-model-a"}]}
+== 5b: the parent's own route record for that remote names no generation
+== 5c: the certificate-derived generation is admitted, not read as a failed issue
+fleet-seats: reserved pool=shared id=p1 generation=g-p1 used=2 capacity=5
+rc=0
+== 5d: the same remote now holds a real ledger seat of its own
+fleet-seats: reserved pool=shared id=theshop generation=g-theshop (already held) used=2 capacity=5
+rc=0
+== 5e: adversarial - a generation no ledger incarnation issued still fails closed
+fleet-seats: no seat - task record /tmp/fm-lab.4M7Nar/primary/state/theshop.meta names generation never-issued.1, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+rc=5
+== done
