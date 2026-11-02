@@ -503,7 +503,9 @@ fm_control_endpoint_absence_verdict() {  # <backend> <target> [meta]
 # table for Polytoken; both consumers preserve git-tracked Polytoken layers.
 # Prints zero or more absolute paths, one per line: worktree-resident
 # hook files and firstmate-owned state tokens only, never a harness's own
-# managed config.
+# managed config. An OpenCode model pin follows the same ownership rule: only
+# the pin this task's own record names is returned, so a project's own
+# .opencode/opencode.jsonc is never listed.
 fm_control_harness_wiring_paths() {  # <harness> <worktree> <state-dir> <id> [kind]
   local harness=${1-} wt=${2-} state=${3-} id=${4-} kind=${5-}
   [ -n "$wt" ] && [ -n "$state" ] && [ -n "$id" ] || return 1
