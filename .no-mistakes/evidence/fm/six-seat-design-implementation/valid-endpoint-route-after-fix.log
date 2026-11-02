@@ -1,0 +1,9 @@
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-remote:w1:p1
+herdr_session=fm-remote
+harness=claude
+model=pool-model-a
+effort=
+spawn_gen=s-valid
+route exit=0

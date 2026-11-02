@@ -1,0 +1,4 @@
+error: remote generations are unresolved or do not match the registered route; preserving the host home
+cat: /tmp/fm-remote-generation.oM1kRQ/route: No such file or directory
+cat: /tmp/fm-remote-generation.oM1kRQ/route: No such file or directory
+remote generation regressions passed

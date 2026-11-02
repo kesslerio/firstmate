@@ -1,0 +1,12 @@
+=== test_retirement_reuses_only_empty_staging
+ok - retirement adopts empty staging after normal checks and refuses nonempty or linked staging
+rc=0
+=== test_local_retirement_resumes_recorded_staging
+ok - local retirement resumes top-level and descendant staged deletion and fences successors
+rc=0
+=== test_retirement_rollback_rearms_on_failure
+ok - retirement restores registrations and rearms after sweep, rename, and signal failures
+rc=0
+=== test_retirement_retains_child_loss_before_metadata_removal
+ok - direct and recursive retirement retain lost-slot outcomes before child evidence disappears
+rc=0

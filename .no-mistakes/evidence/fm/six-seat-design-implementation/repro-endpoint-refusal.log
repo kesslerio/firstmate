@@ -1,0 +1,15 @@
+=== host-side launch with the dispatch token
+/home/art/.no-mistakes/worktrees/9f75ec418609/01M6DNAHQFTC6B3FVF4389HWG4/bin/fm-remote-secondmate-control.sh: line 706: REMOTE_ENDPOINT_BACKEND: unbound variable
+launch exit=1
+
+=== receipt the host kept
+schema=fm-remote-seat-receipt.v1
+operation=op1
+verb=launch
+requested_generation=op1
+previous_generation=s-newer
+phase=received
+
+=== disposition the primary reads back
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"op1","requested_generation":"op1","actual_generation":null,"previous_generation":"s-newer","disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+disposition exit=0

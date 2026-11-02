@@ -1,0 +1,38 @@
+=== 1. declare a one-seat pool on the primary
+{"pools":[{"name":"endpoint","capacity":2,"models":["pool-a/model-x"]}]}
+
+=== 2. a supervisor that was already running before pools existed (pre-pool record in the local secondmate)
+legacy-worker.meta
+
+=== 3. a live pooled launch in the primary reserves a seat through the real CLI
+fleet-seats: reserved pool=endpoint id=busy-1 generation=g-busy1 used=2 capacity=2
+reserve exit=0
+
+=== 4. the local secondmate sees the same full capacity and refuses, naming both holders
+fleet-seats: pool endpoint is full (2 of 2 seats held); mate-1 gets no seat for model pool-a/model-x - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.ACLq5z/mates/android/state legacy-worker
+  holder /tmp/fm-lab.ACLq5z/state busy-1
+mate reserve exit=4
+
+=== 5. a real end-user spawn in the primary is refused instead of over-dispatching
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ACLq5z
+fleet-seats: pool endpoint is full (2 of 2 seats held); demo-t1 gets no seat for model pool-a/model-x - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.ACLq5z/mates/android/state legacy-worker
+  holder /tmp/fm-lab.ACLq5z/state busy-1
+error: spawn refused - demo-t1 has no fleet seat for model pool-a/model-x (see the fleet-seats line above)
+spawn exit=1
+task record published? no
+
+=== 6. release the primary's seat; the secondmate's launch is granted from the freed capacity
+fleet-seats: released id=busy-1 generation=g-busy1 reason=prelaunch
+release exit=0
+fleet-seats: reserved pool=endpoint id=mate-1 generation=g-mate1 used=2 capacity=2
+mate reserve exit=0
+
+=== 7. persisted ledger state (shared root ledger, one holder per generation)
+/tmp/fm-lab.ACLq5z/state/fleet-seats/holders/1914496584-31.json
+/tmp/fm-lab.ACLq5z/state/fleet-seats/holders/554570281-45.json
+{"task":"busy-1","incarnations":[{"generation":"g-busy1","lifecycle":"released","model":"pool-a/model-x"}]}
+{"task":"mate-1","incarnations":[{"generation":"g-mate1","lifecycle":"reserved","model":"pool-a/model-x"}]}
+
+=== 8. cleanup

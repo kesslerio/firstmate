@@ -1,0 +1,21 @@
+ok - a successful remote relaunch republishes the parent's harness, model, and effort
+ok - a remote relaunch records the identity the host confirmed
+ok - a refused remote relaunch preserves the parent record with its verified host identity
+ok - a local secondmate is refused by the remote relaunch tool
+ok - a remote relaunch keeps an already-armed PR poll authenticating
+ok - a full fleet pool refuses a remote supervisor relaunch
+ok - remote relaunch retains unresolved predecessors until explicit reconciliation
+ok - a successful remote relaunch confirms and keeps its fleet seat
+ok - a same-pool remote relaunch replaces one seat without dropping the count
+ok - a prelaunch refusal releases only its own candidate and keeps the old seat
+ok - unmarked, wrong-token, and unknown outcomes keep the candidate counted until its own disposition arrives
+ok - a failed replacement frees both proven generations and recovery restores the seat
+ok - a stale parent record neither hides a started generation nor resurrects it after its exact death
+ok - an expected-generation mismatch refuses before any seat or host effect
+ok - remote relaunch publishes and fences its host generation without pools
+ok - a newer host incarnation refuses a stale parent restart binding
+ok - remote opt-out handoffs record their successor and release the proven predecessor
+ok - an imported existing remote generation reconciles through its original operation without rebinding
+ok - an existing generation dying before import retains its terminal history
+ok - existing host receipts re-probe their actual generation and preserve its terminal outcome
+not ok - fresh refusal remained unknown: refusal.launch.endpoint (expected 'prelaunch false', got 'unknown false')

@@ -1,0 +1,10 @@
+ok - failed existing-generation persistence is unknown and retains its receipt
+ok - an owned-process crash before binding leaves received retries unknown
+ok - received crash and retries retain parent capacity without repeating lifecycle effects
+ok - successful existing-generation import keeps the legacy supervisor counted
+ok - foreign operations and stale generation evidence stay unknown
+ok - captured stale launch and relaunch operations cannot control a successor
+ok - host operation fences survive removal of home-local receipts
+ok - damaged-home retries preserve started receipts and proven absence reclaims the exact generation
+ok - verified fresh refusals remain prelaunch before opening a receipt
+ok - retirement retries preserve exact generation and clean/residue exits without touching reused homes

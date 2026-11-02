@@ -1,0 +1,26 @@
+=== recorded parent route (isolated lab session)
+remote_herdr_session=fm-lab-relaunch-proof
+remote_target=fm-lab-relaunch-proof:w1:p1
+
+=== operator relaunch of the lab-session mate
+relaunched ios harness=claude from=pi model=pool-model-a effort=medium backend=herdr endpoint=fm-lab-relaunch-proof:w1:p1 worktree=/srv/fm-home
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-relaunch-proof:w1:p1
+herdr_session=fm-lab-relaunch-proof
+harness=claude
+model=pool-model-a
+effort=medium
+spawn_gen=host-new
+relaunch exit=0
+
+=== remote calls the parent made
+ssh-argv: cmd=fm-remote-secondmate-control.sh action=route id=ios op=- prev=- expect=- session=fm-lab-relaunch-proof
+ssh-argv: cmd=fm-remote-secondmate-control.sh action=relaunch id=ios op=- prev=- expect=host-old session=fm-lab-relaunch-proof
+
+=== republished parent route
+harness=claude
+model=pool-model-a
+effort=medium
+remote_target=fm-lab-relaunch-proof:w1:p1
+remote_herdr_session=fm-lab-relaunch-proof
