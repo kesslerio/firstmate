@@ -1,0 +1,10 @@
+== worktree pin written by the launcher
+{"model":{"providerID":"john-remote","model":"qwen3.8-flash-next"}}
+
+== task meta
+window=firstmate:fm-sm-model-live
+worktree=/tmp/fm-sm-live.ysyPvX/secondmate
+harness=pi
+kind=secondmate
+model=default
+effort=default

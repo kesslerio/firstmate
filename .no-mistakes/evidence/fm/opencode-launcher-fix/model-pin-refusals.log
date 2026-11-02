@@ -1,0 +1,27 @@
+# Live OpenCode model-pin refusal drive (2026-11-02T11:59:59-08:00)
+# installed: opencode v2.2.2 (/home/art/.opencode/bin/opencode)
+# lab home: /tmp/fm-lab.gXjrPp
+
+## Scenario: request an inline provider/model#variant
+  fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.gXjrPp
+  error: inline OpenCode model variants are unsupported: 'john-remote/qwen3.8-flash-next#high'; use provider/model with --effort instead
+  exit=1
+  launched task records: 0
+
+
+## Scenario: a project-owned .opencode/opencode.jsonc must not be overwritten
+  fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.gXjrPp
+  notice: opencode v2.2.2 has no top-level --model flag; model 'john-remote/qwen3.8-flash-next' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+  error: this local copy already carries an OpenCode project configuration at /tmp/fm-sm.13dkSQ/secondmate/.opencode/opencode.jsonc whose model is 'qualitycorp-glm/glm-5.3', not the requested 'john-remote/qwen3.8-flash-next'; refusing to overwrite a project-owned file - remove that file or drop --model for this task
+  SPAWN_EXIT:1
+  project config after the refusal: {"model":{"providerID":"qualitycorp-glm","model":"glm-5.3"}}
+  task records written: 0
+
+## Scenario: a second identical attempt after the refusal
+  fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.gXjrPp
+  notice: opencode v2.2.2 has no top-level --model flag; model 'john-remote/qwen3.8-flash-next' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+  error: window driver:fm-sm-owned-pin already exists
+  SPAWN_EXIT:1
+  tmux windows on the private lab server:
+    1 name=bash cmd=bash
+    2 name=fm-sm-owned-pin cmd=bash

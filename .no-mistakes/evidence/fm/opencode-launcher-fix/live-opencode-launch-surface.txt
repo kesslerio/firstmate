@@ -1,0 +1,89 @@
+# Live OpenCode launch-surface drive (2026-11-02T11:13:39-08:00)
+installed opencode: /home/art/.opencode/bin/opencode opencode v2.2.2
+lab home: /tmp/fm-lab.FtAuJf   project: /tmp/fm-proj.gXCmpb
+
+## Scenario: request an inline model variant (provider/model#variant)
+exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.FtAuJf
+error: inline OpenCode model variants are unsupported: 'ollama-cloud/glm-5.3#high'; use provider/model with --effort instead
+
+## Scenario: request a supported model with --effort high on the installed 2.2.2 build
+exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.FtAuJf
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+notice: opencode v2.2.2 has no top-level --model flag; model 'ollama-cloud/glm-5.3' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+error: task live-supported-model has no brief at inaccessible data path /tmp/fm-lab.FtAuJf/data/live-supported-model/brief.md
+
+## Scenario: request a supported model with --effort high on the installed 2.2.2 build (existing brief)
+exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.FtAuJf
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+notice: opencode v2.2.2 has no top-level --model flag; model 'ollama-cloud/glm-5.3' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+notice: test-opencode-probe ships mode=local-only while the standing posture for fm-proj.gXCmpb is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+error: opencode v2.2.2 did not report the pinned model back from /home/art/.treehouse/fm-proj.gXCmpb-40c1eb/2/fm-proj.gXCmpb/.opencode/opencode.jsonc: '/home/art/.opencode/bin/opencode debug config' reported 'nothing' for the requested 'ollama-cloud/glm-5.3'; refusing to launch a worker that would run on this build's default model instead
+warning: leaving task test-opencode-probe's slot claim on /home/art/.treehouse/fm-proj.gXCmpb-40c1eb/2/fm-proj.gXCmpb in place; the Treehouse project lock is no longer held, so the next spawn's claim replaces it
+
+## Scenario: same supported-model launch with the vendor's managed service isolated to a disposable XDG config/state (private port 49399)
+host note: a resident 'opencode serve' (pid 1199) already holds the vendor default port 49374, so the launcher's plain 'opencode debug config' probe cannot start a managed service; XDG_CONFIG_HOME/XDG_STATE_HOME redirect the probe's service registration into the disposable lab.
+exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.FtAuJf
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+notice: opencode v2.2.2 has no top-level --model flag; model 'ollama-cloud/glm-5.3' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+notice: test-opencode-probe ships mode=local-only while the standing posture for fm-proj.gXCmpb is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+error: window firstmate:fm-test-opencode-probe already exists
+
+## pin readback proof: the real build parses the written project config (isolated service)
+
+## Scenario: supported-model launch with the disposable managed service, rerun after clearing the leftover tmux window
+exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.FtAuJf
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+notice: opencode v2.2.2 has no top-level --model flag; model 'ollama-cloud/glm-5.3' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+notice: test-opencode-probe ships mode=local-only while the standing posture for fm-proj.gXCmpb is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+error: opencode v2.2.2 did not report the pinned model back from /home/art/.treehouse/fm-proj.gXCmpb-40c1eb/2/fm-proj.gXCmpb/.opencode/opencode.jsonc: '/home/art/.opencode/bin/opencode debug config' reported 'nothing' for the requested 'ollama-cloud/glm-5.3'; refusing to launch a worker that would run on this build's default model instead
+warning: leaving task test-opencode-probe's slot claim on /home/art/.treehouse/fm-proj.gXCmpb-40c1eb/2/fm-proj.gXCmpb in place; the Treehouse project lock is no longer held, so the next spawn's claim replaces it
+
+## launcher-written pin captured while the launch ran:
+captured pin: /home/art/.treehouse/fm-proj.gXCmpb-40c1eb/2/fm-proj.gXCmpb/.opencode/opencode.jsonc
+{"model":{"providerID":"ollama-cloud","model":"glm-5.3"}}
+
+## Scenario: supported model+effort launch on the installed 2.2.2 build, worker model served by a disposable local OpenAI-compatible endpoint
+isolation: XDG config/state/data for the vendor CLI are all inside the disposable lab; the resident operator service on the vendor default port is never touched.
+provider in the disposable lab config: labfake -> http://127.0.0.1:49391/v1 (local disposable model server)
+request: --harness opencode --model labfake/m1 --effort high
+exit=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.FtAuJf
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+bin/fm-spawn.sh: line 2696: json_escape: command not found
+notice: opencode v2.2.2 has no top-level --model flag; model 'labfake/m1' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+notice: test-opencode-probe ships mode=local-only while the standing posture for fm-proj.gXCmpb is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+notice: opencode v2.2.2 confirmed the model pin: requested=labfake/m1 observed=labfake/m1
+notice: 2.2.2 model assertion passed for test-opencode-probe: requested=labfake/m1 observed=labfake/m1#default
+spawned test-opencode-probe harness=opencode kind=ship mode=local-only yolo=off window=firstmate:fm-test-opencode-probe worktree=/home/art/.treehouse/fm-proj.gXCmpb-40c1eb/2/fm-proj.gXCmpb
+
+## launcher-written project pin:
+captured pin: /home/art/.treehouse/fm-proj.gXCmpb-40c1eb/2/fm-proj.gXCmpb/.opencode/opencode.jsonc
+{"model":{"providerID":"labfake","model":"m1"}}
+
+## fake model server request log:
+fake-openai: "POST /v1/chat/completions HTTP/1.1" 200 -
+fake-openai: "POST /v1/chat/completions HTTP/1.1" 200 -
+fake-openai: "POST /v1/chat/completions HTTP/1.1" 200 -
+
+## Live worker pane (real opencode 2.2.2 TUI in the spawned tmux window, pinned model visible)
+
+     LAB_FAKE_OK
+
+     Build · Lab Fake m1 · 64ms
+
+  ┃
+  ┃
+  ┃
+  ┃  Build · Lab Fake m1 Lab Fake OpenAI-compatible
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  …/fm-proj.gXCmpb-40c1eb/2/fm-proj.gXCmpb   shift+tab agents  ctrl+p commands
+

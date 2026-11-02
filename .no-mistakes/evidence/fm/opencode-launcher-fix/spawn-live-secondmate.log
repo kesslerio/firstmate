@@ -1,0 +1,6 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.35j3YL
+notice: opencode v2.2.2 has no top-level --model flag; model 'john-remote/qwen3.8-flash-next' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+notice: opencode v2.2.2 confirmed the model pin: requested=john-remote/qwen3.8-flash-next observed=john-remote/qwen3.8-flash-next
+notice: 2.2.2 model assertion passed for sm-model-live: requested=john-remote/qwen3.8-flash-next observed=john-remote/qwen3.8-flash-next#default
+spawned sm-model-live harness=opencode kind=secondmate mode=secondmate yolo=off window=driver:fm-sm-model-live worktree=/tmp/fm-sm-live.ysyPvX/secondmate
+SPAWN_EXIT:0

@@ -1,0 +1,78 @@
+# Targeted suite tails on this change (2026-11-02T11:21:34-08:00)
+
+## tests/fm-watch-checkpoint.test.sh
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 3176619.1793647168.yhl2ZW
+ok - checkpoint passes through a real watcher wake and leaves the queue for drain
+ok - checkpoint preserves watcher environment for registered custom checks
+ok - checkpoint rejects an existing watcher singleton as unowned
+ok - checkpoint: an opted-in home runs the host for the checkpoint's bound, raised only while away
+ok - checkpoint: a handed-back wake passes through, and a host stand-down is a failure
+ok - checkpoint: a Codex home without config/supervision-host, or with an off file, never runs the host
+ok - checkpoint: the real host ends its park at the checkpoint bound as a quiet checkpoint
+
+## tests/fm-pr-health.test.sh
+ok - nothing prints while nothing changed
+ok - a merged PR leaves the monitor
+ok - an absent flag leaves the home untouched
+ok - the watcher turns one conflict into one durable wake
+ok - check notifications survive cleanup and repeat only at a new latest commit
+ok - all owned PR reads start in one wave without rotating a backlog
+ok - all check pages contribute to required-check classification
+ok - GitLab ownership and branch discovery make no GitHub reads
+
+## tests/fm-fleet-ledger.test.sh
+ok - flag on: registering a PR records task.pr_ready with its full URL after the task's pending status lines, and the merge-time re-record adds nothing
+ok - flag on: a worker's status command records its line at once, and the watcher backstop does not record it again
+ok - flag on, state override outside the home: the worker's status command records its line at once
+ok - flag on, relative config override: a worker running elsewhere still records its line at once
+ok - append failing: the worker's status command exits nonzero and records nothing
+ok - ledger failing: the worker's status line still lands exactly, quietly, and the backstop records it later
+ok - flag off: the worker's status command is a plain append and leaves no ledger file, offset, or lock
+ok - flag off: the whole lifecycle leaves no ledger file, offset, or lock
+
+## tests/fm-herdr-groups.test.sh
+ok - rules: line order sets group order; task prefix beats repo beats catch-all; bad rules warn
+ok - all-invalid rules: empty RULE_GROUP still plans via project fallback
+ok - sync: reports only drifted tokens, workspace tokens only on the exact projection, view set on change
+ok - sync: an older Herdr protocol warns once and stays inactive
+ok - clear: removes this home's tokens and the agents view after the feature is turned off
+ok - sidebar-config: prints rows; --apply backs up, appends once, never reloads Herdr
+ok - agent view helper: exactly agent.view.set and agent.view.clear for source firstmate
+ok - watcher: one poll cycle reconciles the project-group tags
+
+## tests/fm-contributions.test.sh
+/tmp/fm-contributions.PK9swC/reraise-off/fakebin/date: line 2: /bin/date: No such file or directory
+/tmp/fm-contributions.PK9swC/reraise-off/fakebin/date: line 2: /bin/date: No such file or directory
+/tmp/fm-contributions.PK9swC/reraise-off/fakebin/date: line 2: /bin/date: No such file or directory
+/tmp/fm-contributions.PK9swC/reraise-off/fakebin/date: line 2: /bin/date: No such file or directory
+not ok - first poll without a reply age failed
+ok - arm copies a configured reply age into the generated check
+ok - a many-review PR stores only classified review fields and stays readable
+not ok - 26 contribution regressions
+
+## tests/fm-spawn-opencode-model.test.sh
+ok - a wrong-model lane surfaces at once instead of looking healthy
+ok - an unread model assertion refuses rather than passing silently
+ok - a mapped effort rides the same native model selection the model does
+ok - an effort outside a verified provider list is recorded and omitted
+ok - a project-owned OpenCode config is refused, never overwritten
+ok - a project config that already selects the requested model is kept untouched
+ok - an OpenCode model id without its provider refuses with the accepted shape
+ok - pin retirement removes only the file firstmate recorded as its own
+
+## tests/fm-spawn-dispatch-profile.test.sh
+
+unset
+/tmp/fm-spawn-dispatch-profile.iMgL8d/env-absent/home/user-home
+/usr/bin:/bin
+xterm
+synthetic-pane
+/synthetic/gotmp
+hooksPath=
+
+## tests/fm-contributions.test.sh: the case this change modified
+40:ok - watcher surfaces one newly durable contribution signal without re-ringing it
+
+## tests/fm-spawn-dispatch-profile.test.sh: host limitation (no sed on this NixOS host in the fixture's synthetic /usr/bin:/bin worker PATH)
+1:/home/art/.no-mistakes/worktrees/215a10a6db23/01M6ESPRBW0YANDGK1B4PY2YPT/bin/fm-git-strip-ai-trailers.sh: line 167: sed: command not found
+2:not ok - allowlist=absent worker environment mismatch: synthetic-unrelated

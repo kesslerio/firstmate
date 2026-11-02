@@ -1,0 +1,25 @@
+# Live watcher-checkpoint drive (2026-11-02T11:13:08-08:00)
+repo: /home/art/.no-mistakes/worktrees/215a10a6db23/01M6ESPRBW0YANDGK1B4PY2YPT
+checkpoint script: bin/fm-watch-checkpoint.sh
+
+## Scenario: quiet checkpoint --seconds 12
+exit=124 elapsed_ms=12069
+stdout: checkpoint: no actionable wake within 12s
+stderr: 
+lock: released (state/.watch.lock/pid absent)
+
+## Scenario: quiet checkpoint --seconds 1
+exit=124 elapsed_ms=1067
+stdout: checkpoint: no actionable wake within 1s
+stderr: 
+lock: released (state/.watch.lock/pid absent)
+
+## Scenario: actionable durable wake passes through before the 12s bound
+queued wake rows: 1
+exit=0 elapsed_ms=301
+stdout:
+check: rearm-resurface
+stderr:
+
+## Scenario: invalid bound is refused
+exit=2 stdout= stderr=error: --seconds must be greater than zero

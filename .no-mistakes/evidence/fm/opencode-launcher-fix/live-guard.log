@@ -1,0 +1,3 @@
+ok - installed opencode (opencode v2.2.2): /home/art/.opencode/bin/opencode
+ok - opencode (opencode v2.2.2): the build parses the pinned model selection (requested=john-remote/qwen3.8-flash-next)
+ok - opencode (opencode v2.2.2): a real TUI launch ran the requested model (requested=john-remote/qwen3.8-flash-next observed=john-remote/qwen3.8-flash-next)

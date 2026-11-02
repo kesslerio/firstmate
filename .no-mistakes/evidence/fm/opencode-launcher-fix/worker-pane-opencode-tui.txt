@@ -1,0 +1,50 @@
+ • Secondmate v1 model pin probe +
+
+  ┃                                                                                                                                                                                 Secondmate v1 model pin probe
+  ┃  FIRSTMATE_OP: v1 launch-brief: # Secondmate charter (live model-pin probe)
+  ┃                                                                                                                                                                                 Context
+  ┃  You are a disposable secondmate used to prove a model pin. Do nothing else.                                                                                                    41,980 tokens
+  ┃                                                                                                                                                                                 16% used
+  ┃  Reply with exactly this one word and no other text:
+  ┃
+  ┃  MODEL_PIN_OK
+  ┃
+
+     + Thought · 5.4s
+
+     MODEL_PIN_OK
+
+     Build · Qwen3.8 Flash Next FP4-Local v5.3.1 · 24.6s · 8.2 tok/s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Build · Qwen3.8 Flash Next FP4-Local v5.3.1 JohnOfUs DeepSeek V4 Flash (Remote)
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /tmp/fm-sm-live.ysyPvX/secondmate                                                                                                                 42.0K (16%)  ctrl+p commands    /tmp/fm-sm-live.ysyPvX/secondmate
+
