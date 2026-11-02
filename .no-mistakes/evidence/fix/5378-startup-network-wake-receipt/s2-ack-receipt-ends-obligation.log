@@ -1,0 +1,43 @@
+=== S2: the captain handles the startup wake; the acknowledgement receipts its generation and ends the obligation ===
+generation=1793657951.1474022.manual
+
+--- primary supervision guard while the startup result is unhandled (fm-guard.sh) ---
+guard rc=0
+==> /tmp/fm-lab.bgrR2J/guard-before.out <==
+
+==> /tmp/fm-lab.bgrR2J/guard-before.err <==
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  X-mode relay polling needs supervision, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-lab.bgrR2J/root/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-lab.bgrR2J/root/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+
+--- present the durable wake (real fm-wake-drain.sh) ---
+drain rc=0
+1793657952	1	check	startup-network:1793657951.1474022.manual	check: startup-network: deferred startup network checks finished (done); read them with /tmp/fm-lab.bgrR2J/root/bin/fm-startup-network.sh report --generation 1793657951.1474022.manual
+--- drain stderr (acknowledgement request) ---
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1474821.1793657952.hXjMA6
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+ack-through=1 recovery-generation=1474821.1793657952.hXjMA6
+
+--- captain acknowledges: drain --ack-through 1 --recovery-generation 1474821.1793657952.hXjMA6 ---
+ack rc=0
+
+--- persisted delivery receipt ---
+total 4
+-rw------- 1 art users 26 Nov  2 14:19 1793657951.1474022.manual
+receipt content: 1793657951.1474022.manual
+--- queue after acknowledgement ---
+startup wake rows: 0
+
+--- producer replay after real consumption must stay silent (per-generation receipt) ---
+recover rc=0
+startup wake rows after replay: 0
+
+--- supervision obligation after handling (fm-guard.sh) ---
+guard rc=0
+guard stdout bytes: 0, stderr bytes: 0

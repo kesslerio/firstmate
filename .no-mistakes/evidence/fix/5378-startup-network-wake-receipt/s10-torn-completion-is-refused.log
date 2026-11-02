@@ -1,0 +1,20 @@
+=== S10 (adversarial): a torn or symlinked completion cannot be read, woken, or supervised ===
+fixture: results/torn1/report exists but its status completion boundary was never written
+NETWORK_CHECKS: requested generation has no valid retained completion.
+report --generation torn1 -> rc=1
+recover --generation torn1 -> rc=0
+startup wake rows: 0
+
+fixture: a result directory reached through a symlink, with matching inner status
+mkdir: cannot create directory ‘/tmp/fm-lab.w2l6fu/home/state/.startup-network-results’: File exists
+NETWORK_CHECKS: requested generation has no valid retained completion.
+report --generation torn2 (symlinked result dir) -> rc=1
+recover --generation torn2 -> rc=0
+startup wake rows: 0
+
+--- neither torn artifact counts as a supervision obligation ---
+FM_SUP_STARTUP_PENDING=false FM_SUP_NEEDED=false
+--- the shared report path still answers without crashing ---
+completed off the startup path in unknowns: the deferred network checks.
+(silent - no problems found)
+startup wake rows at end: 0

@@ -1,0 +1,47 @@
+=== S3b: the existing watcher cycle recovers the retained completion and wakes once ===
+lab home: /tmp/fm-lab.K8YLqh/home ; generation=1793658019.1742471.manual
+watch invocation: env FM_HOME=$LAB/home FM_ROOT_OVERRIDE=$LAB/root FM_POLL=1 FM_SESSION_START_TIMEOUT=30 bash $LAB/root/bin/fm-watch.sh
+
+--- watcher stdout/stderr ---
+check: rearm-resurface
+
+--- shared report after recovery (was refused before) ---
+NEEDS_GH_AUTH
+--- shared status after recovery ---
+state=done
+generation=1793658019.1742471.manual
+report_published=1
+
+--- wake queue: exactly one row for the retained generation ---
+1793658025	1	check	startup-network:1793658019.1742471.manual	check: startup-network: deferred startup network checks finished (done); read them with /tmp/fm-lab.K8YLqh/root/bin/fm-startup-network.sh report --generation 1793658019.1742471.manual
+startup wake rows: 1
+--- the watcher did not rerun the checks: one retained generation only ---
+/tmp/fm-lab.K8YLqh/home/state/.startup-network-results/1793658019.1742471.manual
+
+--- captain reads the recovered finding ---
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+120     elapsed=51
+  stage       network-checks probe                       start=+43      elapsed=136
+  slowest: stage network-checks probe 136ms, phase gh-auth 51ms
+
+--- ordinary acknowledgement ---
+drain rc=0
+1793658025	1	check	startup-network:1793658019.1742471.manual	check: startup-network: deferred startup network checks finished (done); read them with /tmp/fm-lab.K8YLqh/root/bin/fm-startup-network.sh report --generation 1793658019.1742471.manual
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 1769107.1793658025.f0lDMG
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  X-mode relay polling needs supervision, but no live watcher process holds this home lock (last beat: 18s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-lab.K8YLqh/root/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-lab.K8YLqh/root/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+ack rc=0
+receipt: 1793658019.1742471.manual
+startup wake rows after ack: 0
+--- producer replay after recovery+ack stays silent ---
+recover rc=0
+startup wake rows: 0

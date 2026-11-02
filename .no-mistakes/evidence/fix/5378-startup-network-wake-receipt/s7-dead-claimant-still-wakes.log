@@ -1,0 +1,17 @@
+=== S7: a session-start claimant that dies before printing cannot lose the finding ===
+claimant pid 2114916 has already exited before the stage publishes
+
+start rc=0
+generation=1793658120.2114927.2114916
+--- durable wake queue ---
+1793658121	1	check	startup-network:1793658120.2114927.2114916	check: startup-network: deferred startup network checks finished (done); read them with /tmp/fm-lab.A0ZuXg/root/bin/fm-startup-network.sh report --generation 1793658120.2114927.2114916
+startup wake rows: 1
+--- dead claim was reaped, result not duplicated ---
+claim file: (reaped)
+shared report: NEEDS_GH_AUTH
+
+--- the captain can read and acknowledge it normally ---
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+ack rc=0
+receipt: 1793658120.2114927.2114916  startup wake rows: 0

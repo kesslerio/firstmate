@@ -1,0 +1,25 @@
+=== S8 (adversarial): the existing watcher retries a retained completion without wedging on a held publication lock ===
+generation=1793658135.2176842.manual (retained, not yet published, no wake row)
+
+--- a real process holds state/.startup-network.lock through the production lock interface ---
+holder pid=2207785
+
+--- sample the watcher's recovery attempts while the lock stays held ---
+watcher pid=2208231
+watcher alive after 1s: yes
+watcher alive after 14s with the lock held: yes
+wake rows while contended: 0
+
+--- recovery attempt lifetimes (seconds) measured by process sampling ---
+attempt pid 2209505: observed 4.70s
+attempt pid 2225171: observed 4.73s
+attempt pid 2243673: observed 0.29s
+completed attempts observed: 3
+
+--- release the lock: the same watcher delivers without a rerun ---
+startup wake rows after release: 1
+1793658158	1	check	startup-network:1793658135.2176842.manual
+shared report published: NEEDS_GH_AUTH
+shared status: report_published=1
+retained generations (no rerun): 1
+watcher stopped for teardown

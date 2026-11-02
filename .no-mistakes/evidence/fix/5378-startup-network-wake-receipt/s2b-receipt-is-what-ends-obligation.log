@@ -1,0 +1,17 @@
+=== S2b (adversarial causality): the generation receipt itself - not the removed row - ends the obligation ===
+generation=1793657951.1474022.manual
+--- hold the delivery receipt aside, then ask the guard again ---
+guard rc=0
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  X-mode relay polling needs supervision, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+
+--- prove the retained completion is the reason through the product state predicate ---
+FM_SUP_STARTUP_PENDING=true FM_SUP_NEEDED=true
+
+--- restore the receipt: obligation ends again with no new row ---
+FM_SUP_STARTUP_PENDING=false FM_SUP_NEEDED=false
+guard rc=0 stdout=0B stderr=0B
+startup wake rows: 0

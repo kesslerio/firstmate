@@ -1,0 +1,18 @@
+=== S5: a clean startup result stays silent (no captain wake, no supervision obligation) ===
+real bin/fm-bootstrap.sh against the machine's normal gh login (no finding expected)
+
+--- $ fm-startup-network.sh run --locked 0 ---
+stage rc=0
+generation=1793658078.1955473.manual
+startup wake rows: 0
+--- completion settled clean ---
+clean:1793658078.1955473.manual
+--- durable report for on-demand reading ---
+completed off the startup path in 0s: GitHub authentication.
+(silent - no problems found)
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+147     elapsed=355
+
+--- no supervision obligation is retained for a clean completion ---
+FM_SUP_STARTUP_PENDING=false FM_SUP_NEEDED=false
+guard rc=0 stdout=0B stderr=0B

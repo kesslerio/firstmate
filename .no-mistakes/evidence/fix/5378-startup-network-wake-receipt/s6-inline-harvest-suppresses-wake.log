@@ -1,0 +1,25 @@
+=== S6: a finding printed inline by the session-start harvest does not also wake ===
+live harvest claimant pid=1995013 (stands in for the session-start process)
+
+--- $ fm-startup-network.sh start --locked 0 --harvest-pid <claimant> ---
+start rc=0
+generation=1793658090.1995015.1995013 state=done claim=1793658090.1995015.1995013	1995013
+
+--- session start prints the finished result inline ---
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+harvest rc=0
+durable inline acknowledgement: 1793658090.1995015.1995013
+
+completed-generation settlement: none
+startup wake rows: 0  (an inline-printed result must not also wake)
+
+--- replay of the inline-acknowledged generation stays silent too ---
+recover rc=0
+startup wake rows: 0
+
+--- the delivered generation IS the settlement record (no separate settled file needed) ---
+generation 1793658090.1995015.1995013 is settled by its inline acknowledgement
+delivery worker 1996448 exited after the inline acknowledgement
+startup wake rows: 0

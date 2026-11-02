@@ -1,0 +1,54 @@
+=== S1: a late actionable startup result is retained durably and wakes exactly once ===
+lab home: /tmp/fm-lab.bgrR2J/home ; code root: /tmp/fm-lab.bgrR2J/root (real bin/ symlinks)
+network dependency: real bin/fm-bootstrap.sh with real gh, isolated empty GH_CONFIG_DIR -> NEEDS_GH_AUTH
+
+--- $ fm-startup-network.sh run --locked 0 (real stage, real bootstrap) ---
+stage rc=0
+generation=1793657951.1474022.manual
+
+--- retained completion directory (status written last) ---
+/tmp/fm-lab.bgrR2J/home/state/.startup-network-results/1793657951.1474022.manual
+/tmp/fm-lab.bgrR2J/home/state/.startup-network-results/1793657951.1474022.manual/report
+/tmp/fm-lab.bgrR2J/home/state/.startup-network-results/1793657951.1474022.manual/status
+/tmp/fm-lab.bgrR2J/home/state/.startup-network-results/1793657951.1474022.manual/timings
+
+--- retained status record ---
+state=done
+phases=probe
+locked=0
+started=1793657951
+rc=0
+generation=1793657951.1474022.manual
+finished=1793657951
+report_published=1
+claim_deadline=1793658071
+--- retained report ---
+NEEDS_GH_AUTH
+--- retained timings (first 6 lines) ---
+v1	phase	gh-auth	112	51	
+v1	stage	network-checks	48	123	probe
+--- write order by mtime (report -> timings -> status) ---
+2026-11-02 14:19:11.835357082 -0800 /tmp/fm-lab.bgrR2J/home/state/.startup-network-results/1793657951.1474022.manual/report
+2026-11-02 14:19:11.836663136 -0800 /tmp/fm-lab.bgrR2J/home/state/.startup-network-results/1793657951.1474022.manual/timings
+2026-11-02 14:19:11.842787101 -0800 /tmp/fm-lab.bgrR2J/home/state/.startup-network-results/1793657951.1474022.manual/status
+
+--- promoted shared report ---
+NEEDS_GH_AUTH
+
+--- durable wake queue ---
+1793657952^I1^Icheck^Istartup-network:1793657951.1474022.manual^Icheck: startup-network: deferred startup network checks finished (done); read them with /tmp/fm-lab.bgrR2J/root/bin/fm-startup-network.sh report --generation 1793657951.1474022.manual
+startup wake rows: 1
+
+--- operator read path: report --generation 1793657951.1474022.manual ---
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+112     elapsed=51
+  stage       network-checks probe                       start=+48      elapsed=123
+  slowest: stage network-checks probe 123ms, phase gh-auth 51ms
+
+--- producer replay: recover --generation twice must not duplicate the row ---
+recover rc=0
+recover rc=0
+startup wake rows after replay: 1

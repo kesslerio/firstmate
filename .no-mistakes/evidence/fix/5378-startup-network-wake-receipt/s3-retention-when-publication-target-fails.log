@@ -1,0 +1,39 @@
+=== S3a: a completed startup result is retained when shared publication cannot be promoted ===
+lab home: /tmp/fm-lab.K8YLqh/home
+publication target state/.startup-network.report is a directory (unreadable report target)
+
+--- $ fm-startup-network.sh run --locked 0 ---
+stage rc=1
+generation=1793658019.1742471.manual
+
+--- retained completion (immutable, status last) ---
+/tmp/fm-lab.K8YLqh/home/state/.startup-network-results
+/tmp/fm-lab.K8YLqh/home/state/.startup-network-results/1793658019.1742471.manual
+/tmp/fm-lab.K8YLqh/home/state/.startup-network-results/1793658019.1742471.manual/report
+/tmp/fm-lab.K8YLqh/home/state/.startup-network-results/1793658019.1742471.manual/status
+/tmp/fm-lab.K8YLqh/home/state/.startup-network-results/1793658019.1742471.manual/timings
+state=done
+phases=probe
+locked=0
+started=1793658019
+rc=0
+generation=1793658019.1742471.manual
+finished=1793658019
+report_published=1
+claim_deadline=1793658139
+NEEDS_GH_AUTH
+
+--- shared status still says the promotion failed ---
+state=failed
+report_published=0
+startup wake rows: 
+
+--- operator read path surfaces the retained findings instead of losing them ---
+NETWORK_CHECKS: completed findings retained pending publication or delivery.
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+120     elapsed=51
+  stage       network-checks probe                       start=+43      elapsed=136
+  slowest: stage network-checks probe 136ms, phase gh-auth 51ms

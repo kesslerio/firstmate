@@ -1,0 +1,38 @@
+=== S4 (adversarial): a superseded generation cannot publish, wake, or traverse paths ===
+
+--- generation 1: actionable late result ---
+run1 rc=0
+gen1=1793658061.1898179.manual rows=1
+--- captain acknowledges generation 1 ---
+ack1 rc=0 rows=0
+
+--- a fresh startup reserves generation 2 (clean run, no finding) ---
+run2 rc=0
+gen2=1793658062.1902280.manual
+shared report now: 
+
+--- stale delivery attempt: recover --generation 1793658061.1898179.manual against the successor ---
+stale recover rc=0
+startup wake rows after stale recover: 0  (gen1 must not reappear)
+shared report unchanged: yes  (2026-11-02 14:21:03.176387396 -0800)
+shared status generation still: 1793658062.1902280.manual
+
+--- the old generation stays readable from its immutable retained record ---
+completed off the startup path in 0s: GitHub authentication.
+NEEDS_GH_AUTH
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+
+--- direct producer append for the superseded key is refused ---
+append rc=1
+startup wake rows after stale append: 0
+
+--- malformed / traversal generation names are refused ---
+append startup-network:../escape -> rc=2
+append startup-network:a/b -> rc=2
+append startup-network:.. -> rc=2
+append startup-network:. -> rc=2
+NETWORK_CHECKS: requested generation has no valid retained completion.
+report --generation ../escape -> rc=1
+NETWORK_CHECKS: requested generation has no valid retained completion.
+report --generation does-not-exist -> rc=1
+startup wake rows at end: 0

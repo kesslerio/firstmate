@@ -1,0 +1,31 @@
+=== S9 (structural): the re-raise is the same four commits with no scope change ===
+
+--- old series (previous head 89220fff) vs new series on current main ---
+  old 89220fff no-mistakes(document): Document startup network completion recovery
+  old dc4ba3c8 fix(review): preserve startup completion and bound supervision
+  old 36c6dd66 fix(startup): receipt wakes and recover through existing supervision
+  old f183bcf5 fix(startup): retain completed generations before publication
+
+  new 515503ee no-mistakes(document): Document startup network completion recovery
+  new 64afa873 fix(review): preserve startup completion and bound supervision
+  new 071bd7bc fix(startup): receipt wakes and recover through existing supervision
+  new 9990fa1c fix(startup): retain completed generations before publication
+
+--- git range-diff 3847411b..89220fff 9224c902..HEAD (one line per commit) ---
+1:  f183bcf5 = 1:  9990fa1c fix(startup): retain completed generations before publication
+2:  36c6dd66 ! 2:  071bd7bc fix(startup): receipt wakes and recover through existing supervision
+3:  dc4ba3c8 = 3:  64afa873 fix(review): preserve startup completion and bound supervision
+4:  89220fff ! 4:  515503ee no-mistakes(document): Document startup network completion recovery
+
+--- changed-line set equivalence (old patch vs new patch) ---
+old added+removed lines: 1301, new added+removed lines: 1301
+delta between the two line sets:
+
+--- both sides of the tests/fm-wake-queue.test.sh conflict are kept ---
+3740:test_branch_grant_requires_lock_acquisition
+3966:test_startup_generation_enqueue_is_once_after_consumption
+38
+
+--- the branch is based on current origin/main ---
+base commit: 9224c9021131b63ff04f4481e573eae7d215a412
+origin/main:  9224c9021131b63ff04f4481e573eae7d215a412
