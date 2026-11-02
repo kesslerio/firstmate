@@ -1,0 +1,3 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-live-pin.gy7KI5/home
+warning: secondmate live-pin-17764-claudemodelcla sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin unverified: pin 'claude-haiku-4-5-20251001' could not be addressed for this raw Claude launch (no session address exists for this path)

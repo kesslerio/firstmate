@@ -1,0 +1,61 @@
+# case=claude --model claude-haiku-4-5-20251001 --print "say hi" model=claude-haiku-4-5-20251001 id=live-pin-17764-claudemodelcla
+# root=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6EFXY6ZJBKY8E466BNYPY0R
+# lab=/tmp/fm-live-pin.gy7KI5/home tmuxdir=/tmp/fml.Jac3hS
+# spawn exit=0
+=== stdout ===
+spawned live-pin-17764-claudemodelcla harness=claude kind=secondmate mode=secondmate yolo=off window=firstmate:fm-live-pin-17764-claudemodelcla worktree=/tmp/fm-live-pin.gy7KI5/sm
+=== stderr ===
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-live-pin.gy7KI5/home
+warning: secondmate live-pin-17764-claudemodelcla sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin unverified: pin 'claude-haiku-4-5-20251001' could not be addressed for this raw Claude launch (no session address exists for this path)
+=== pin verdict lines on stderr ===
+model pin unverified: pin 'claude-haiku-4-5-20251001' could not be addressed for this raw Claude launch (no session address exists for this path)
+=== pin line count on stderr ===
+1
+=== pin text on stdout? ===
+0
+=== status file ===
+(no status file)
+=== status file has model pin text? ===
+(no match)
+=== meta ===
+window=firstmate:fm-live-pin-17764-claudemodelcla
+endpoint_task_id=live-pin-17764-claudemodelcla
+worktree=/tmp/fm-live-pin.gy7KI5/sm
+project=/tmp/fm-live-pin.gy7KI5/sm
+harness=claude
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-live-pin-17764-claudemodelcla
+model=claude-haiku-4-5-20251001
+effort=default
+spawn_gen=s1793635955.17833.3158
+home=/tmp/fm-live-pin.gy7KI5/sm
+projects=
+=== pane tail ===
+
+[art@zeppola:/tmp/fm-live-pin.gy7KI5/sm]$ export GOTMPDIR=/tmp/fm-live-pin-17764
+-claudemodelcla/gotmp
+export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-live-pin.gy7KI5/sm]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-live-pin.gy7KI5/sm]$ . '/tmp/fm-live-pin-17764-claudemodelc
+la+3f1ea74b0246b4d979b09d8359b501da3664888c388ebd8a3aa40f062efbe0bc/launch.s1793
+635955.17833.3158.sh'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=== harness session records under the isolated config ===

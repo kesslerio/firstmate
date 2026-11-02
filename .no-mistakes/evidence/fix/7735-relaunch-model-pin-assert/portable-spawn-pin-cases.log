@@ -1,0 +1,8 @@
+FM_TEST_BEGIN 2026-11-02T16:24:43Z tests/fm-spawn-dispatch-profile.test.sh family=backend-dispatch expected_gate_skip=none
+ok - Claude pin evidence never displaces the worker's own reported state
+ok - Claude pin match: collision-checked session id and a recorded assertion
+ok - Raw Claude launch: no session id allocated, pin recorded unverified
+FM_TEST_END 2026-11-02T16:24:54Z tests/fm-spawn-dispatch-profile.test.sh exit=0 duration_ms=11214 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=0 skipped_gate=0 duration_ms=11315
+FM_TEST_SUMMARY_FAMILY family=backend-dispatch count=1 duration_ms=11214 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-spawn-dispatch-profile.test.sh duration_ms=11214

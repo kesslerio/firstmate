@@ -1,0 +1,70 @@
+# case=claude model=claude-haiku-4-5 id=live-pin-claude-3648
+# root=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6EFXY6ZJBKY8E466BNYPY0R
+# lab=/tmp/fm-live-pin.F42TLR/home tmuxdir=/tmp/fml.0wFRn3
+# spawn exit=0
+=== stdout ===
+spawned live-pin-claude-3648 harness=claude kind=secondmate mode=secondmate yolo=off window=firstmate:fm-live-pin-claude-3648 worktree=/tmp/fm-live-pin.F42TLR/sm
+=== stderr ===
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-live-pin.F42TLR/home
+warning: secondmate live-pin-claude-3648 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin unverified: pin 'claude-haiku-4-5' was not confirmed by pinned Claude session da0faad1-caab-4c5b-991d-1ed3ef5f3791 (no session-reported model)
+=== pin verdict lines on stderr ===
+model pin unverified: pin 'claude-haiku-4-5' was not confirmed by pinned Claude session da0faad1-caab-4c5b-991d-1ed3ef5f3791 (no session-reported model)
+=== pin line count on stderr ===
+1
+=== pin text on stdout? ===
+0
+=== status file ===
+(no status file)
+=== status file has model pin text? ===
+(no match)
+=== meta ===
+window=firstmate:fm-live-pin-claude-3648
+endpoint_task_id=live-pin-claude-3648
+worktree=/tmp/fm-live-pin.F42TLR/sm
+project=/tmp/fm-live-pin.F42TLR/sm
+harness=claude
+approval_mode=bypass
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-live-pin-claude-3648
+model=claude-haiku-4-5
+effort=default
+busy_gen=g1793635935.4370.8607
+spawn_gen=s1793635935.3716.9447
+home=/tmp/fm-live-pin.F42TLR/sm
+projects=
+=== pane tail ===
+
+[art@zeppola:/tmp/fm-live-pin.F42TLR/sm]$ export GOTMPDIR=/tmp/fm-live-pin-claud
+e-3648/gotmp
+export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-live-pin.F42TLR/sm]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-live-pin.F42TLR/sm]$ . '/tmp/fm-live-pin-claude-3648+87e4b0
+955067f9a5655994b352b185c3fba64d80c903c272aa195eef26a6dfd1/launch.s1793635935.37
+16.9447.sh'
+ ▐▛███▛█   Claude Code v2.1.316
+▝▜██████▀  Haiku 4.5 · API Usage Billing
+ ▝▝   ▝▝   /tmp/fm-live-pin.F42TLR/sm
+
+
+❯ : Firstmate operational input waiting: read '/tmp/fm-live-pin.F42TLR/sm/state
+  /operational-inbox/1793635936-7024166bc626c483.msg' and handle its contents
+  as Firstmate operational input.
+
+● API Error: 400 unknown provider for model claude-haiku-4-5
+
+✻ Brewed for 0s · done 8:12 AM
+
+────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ bypass permissions on (shift+tab to cycle) · ← for agents
+  ⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another au…
+
+=== harness session records under the isolated config ===
+-- /tmp/fm-live-pin.F42TLR/claude-cfg/projects/-tmp-fm-live-pin-F42TLR-sm/da0faad1-caab-4c5b-991d-1ed3ef5f3791.jsonl
+<synthetic>

@@ -1,0 +1,62 @@
+# case=pi model=openai-codex/gpt-5.6-luna id=live-pin-pi-3961007
+# root=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6EFXY6ZJBKY8E466BNYPY0R
+# lab=/tmp/fm-live-pin.J2V0wJ/home tmuxdir=/tmp/fml.qg9RAi
+# spawn exit=0
+=== stdout ===
+spawned live-pin-pi-3961007 harness=pi kind=secondmate mode=secondmate yolo=off window=firstmate:fm-live-pin-pi-3961007 worktree=/tmp/fm-live-pin.J2V0wJ/sm
+=== stderr ===
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-live-pin.J2V0wJ/home
+warning: secondmate live-pin-pi-3961007 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin unverified: pin 'openai-codex/gpt-5.6-luna' has no session record this launcher can read back for a fresh pi launch
+=== pin verdict lines on stderr ===
+model pin unverified: pin 'openai-codex/gpt-5.6-luna' has no session record this launcher can read back for a fresh pi launch
+=== pin line count on stderr ===
+1
+=== pin text on stdout? ===
+0
+=== status file ===
+(no status file)
+=== status file has model pin text? ===
+(no match)
+=== meta ===
+window=firstmate:fm-live-pin-pi-3961007
+endpoint_task_id=live-pin-pi-3961007
+worktree=/tmp/fm-live-pin.J2V0wJ/sm
+project=/tmp/fm-live-pin.J2V0wJ/sm
+harness=pi
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-live-pin-pi-3961007
+model=openai-codex/gpt-5.6-luna
+effort=default
+busy_gen=g1793635784.3970805.4167
+spawn_gen=s1793635784.3961156.23982
+home=/tmp/fm-live-pin.J2V0wJ/sm
+projects=
+=== pane tail ===
+
+[art@zeppola:/tmp/fm-live-pin.J2V0wJ/sm]$ export GOTMPDIR=/tmp/fm-live-pin-pi-39
+61007/gotmp
+export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-live-pin.J2V0wJ/sm]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-live-pin.J2V0wJ/sm]$ . '/tmp/fm-live-pin-pi-3961007+b2fadb8
+13c77669e43df08aed2cf4b20409dc57f86ca0af9f403333ecc4134c4/launch.s1793635784.396
+1156.23982.sh'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=== harness session records under the isolated config ===

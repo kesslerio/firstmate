@@ -1,0 +1,72 @@
+# case=claude model=claude-haiku-4-5-20251001 id=live-pin-claude-3939088
+# root=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6EFXY6ZJBKY8E466BNYPY0R
+# lab=/tmp/fm-live-pin.VODhwo/home tmuxdir=/tmp/fml.hJh2qw
+# spawn exit=0
+=== stdout ===
+spawned live-pin-claude-3939088 harness=claude kind=secondmate mode=secondmate yolo=off window=firstmate:fm-live-pin-claude-3939088 worktree=/tmp/fm-live-pin.VODhwo/sm
+=== stderr ===
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-live-pin.VODhwo/home
+warning: secondmate live-pin-claude-3939088 sync skipped before launch: cee6c84f1afa5cf235a59a6b2576ce924e27913d does not exist
+model pin asserted: pin 'claude-haiku-4-5-20251001' actual 'claude-haiku-4-5-20251001' (pinned Claude session c674484a-608d-400a-9e87-17408162ebdf)
+=== pin verdict lines on stderr ===
+model pin asserted: pin 'claude-haiku-4-5-20251001' actual 'claude-haiku-4-5-20251001' (pinned Claude session c674484a-608d-400a-9e87-17408162ebdf)
+=== pin line count on stderr ===
+1
+=== pin text on stdout? ===
+0
+=== status file ===
+(no status file)
+=== status file has model pin text? ===
+(no match)
+=== meta ===
+window=firstmate:fm-live-pin-claude-3939088
+endpoint_task_id=live-pin-claude-3939088
+worktree=/tmp/fm-live-pin.VODhwo/sm
+project=/tmp/fm-live-pin.VODhwo/sm
+harness=claude
+approval_mode=bypass
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=/tmp/fm-live-pin-claude-3939088
+model=claude-haiku-4-5-20251001
+effort=default
+busy_gen=g1793635751.3941707.24402
+spawn_gen=s1793635752.3939253.10558
+home=/tmp/fm-live-pin.VODhwo/sm
+projects=
+=== pane tail ===
+
+[art@zeppola:/tmp/fm-live-pin.VODhwo/sm]$ export GOTMPDIR=/tmp/fm-live-pin-claud
+e-3939088/gotmp
+export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-live-pin.VODhwo/sm]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:/tmp/fm-live-pin.VODhwo/sm]$ . '/tmp/fm-live-pin-claude-3939088+6c9
+579225bac72f8aee66077c906911f6ef6bd0e179882e4558e85d13c1149f9/launch.s1793635752
+.3939253.10558.sh'
+ ▐▛███▛█   Claude Code v2.1.316
+▝▜██████▀  Haiku 4.5 · API Usage Billing
+ ▝▝   ▝▝   /tmp/fm-live-pin.VODhwo/sm
+
+
+❯ : Firstmate operational input waiting: read '/tmp/fm-live-pin.VODhwo/sm/state
+  /operational-inbox/1793635753-1b41e3b2766d56bc.msg' and handle its contents
+  as Firstmate operational input.
+
+● Reading 1 file… (ctrl+o to expand)
+  ⎿  state/operational-inbox/1793635753-1b41e3b2766d56bc.msg
+
+✢ Catapulting… (3s · ↓ 204 tokens · thought for 1s)
+
+────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ bypass permissions on (shift+tab to cycle) · ← for agents
+  ⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another au…
+
+=== harness session records under the isolated config ===
+-- /tmp/fm-live-pin.VODhwo/claude-cfg/projects/-tmp-fm-live-pin-VODhwo-sm/c674484a-608d-400a-9e87-17408162ebdf.jsonl
+claude-haiku-4-5-20251001
+claude-haiku-4-5-20251001
