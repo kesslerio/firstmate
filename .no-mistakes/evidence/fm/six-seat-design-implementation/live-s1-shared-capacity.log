@@ -1,0 +1,95 @@
+
+--- tmux server: /tmp/fm-lab.tbjXPg/tmux/seatlab pid=1298444
+
+--- capacity 3, eight simultaneous reservations across both homes, expect exactly 3 grants
+reservation outcomes:
+  0	fleet-seats: reserved pool=shared id=wide3 generation=gw3 used=3 capacity=3
+  0	fleet-seats: reserved pool=shared id=wide6 generation=gw6 used=2 capacity=3
+  0	fleet-seats: reserved pool=shared id=wide7 generation=gw7 used=1 capacity=3
+  4	fleet-seats: pool shared is full (3 of 3 seats held); wide1 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  4	fleet-seats: pool shared is full (3 of 3 seats held); wide2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  4	fleet-seats: pool shared is full (3 of 3 seats held); wide4 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  4	fleet-seats: pool shared is full (3 of 3 seats held); wide5 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  4	fleet-seats: pool shared is full (3 of 3 seats held); wide8 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+    holder /tmp/fm-lab.tbjXPg/android/state wide6
+    holder /tmp/fm-lab.tbjXPg/android/state wide6
+    holder /tmp/fm-lab.tbjXPg/android/state wide6
+    holder /tmp/fm-lab.tbjXPg/android/state wide6
+    holder /tmp/fm-lab.tbjXPg/android/state wide6
+    holder /tmp/fm-lab.tbjXPg/primary/state wide3
+    holder /tmp/fm-lab.tbjXPg/primary/state wide3
+    holder /tmp/fm-lab.tbjXPg/primary/state wide3
+    holder /tmp/fm-lab.tbjXPg/primary/state wide3
+    holder /tmp/fm-lab.tbjXPg/primary/state wide3
+    holder /tmp/fm-lab.tbjXPg/primary/state wide7
+    holder /tmp/fm-lab.tbjXPg/primary/state wide7
+    holder /tmp/fm-lab.tbjXPg/primary/state wide7
+    holder /tmp/fm-lab.tbjXPg/primary/state wide7
+    holder /tmp/fm-lab.tbjXPg/primary/state wide7
+granted=3 of 8 with capacity 3
+
+### S1: primary and local second mate share ONE seat
+
+--- pool declaration: {"pools":[{"name":"shared","capacity":1,"models":["pool-model-a"]}]}
+
+--- bin/fm-spawn.sh s1-alpha (primary, model pool-model-a)
+rc=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.tbjXPg/primary
+fleet-seats: reserved pool=shared id=s1-alpha generation=s1793627666.1303153.406 used=1 capacity=1
+warning: /tmp/fm-lab.tbjXPg/primary/data/s1-alpha/launch-brief.md records no ship branch; defaulting to legacy branch fm/s1-alpha
+notice: s1-alpha ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned s1-alpha harness=claude kind=ship mode=local-only yolo=off window=primary:fm-s1-alpha worktree=/tmp/fm-lab.tbjXPg/wt/s1-alpha
+
+--- seat ledger for s1-alpha
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/tmp/fm-lab.tbjXPg/primary/state","task":"s1-alpha","revision":2,"incarnations":[{"generation":"s1793627666.1303153.406","previous_generation":null,"kind":"ship","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"reserved","launch_phase":"dispatching","owner_pid":1303153,"owner_pid_identity":"linux-starttime=11923635 cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d3645354b5046444b484334505158313857314d415032542f62696e2f666d2d737061776e2e73680073312d616c706861002f746d702f666d2d6c61622e74626a5850672f70726f6a656374002d2d6d6f6465006c6f63616c2d6f6e6c79002d2d796f6c6f006f6666002d2d6861726e65737300636c61756465002d2d6d6f64656c00706f6f6c2d6d6f64656c2d6100","route":{"placement":"local","backend":"tmux","target":"primary:fm-s1-alpha","home":null,"host":null,"remote_root":null,"spawn_gen":"s1793627666.1303153.406","operation":null,"server_identity":"","socket_path":"/tmp/fm-lab.tbjXPg/tmux/seatlab"},"startup_confirmed":false,"disposition":null}]}
+generation=s1793627666.1303153.406 lifecycle=reserved phase=dispatching model=pool-model-a kind=ship
+
+--- bin/fm-spawn.sh s1-beta (local second mate android, model pool-model-a)
+rc=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.tbjXPg/android
+fleet-seats: pool shared is full (1 of 1 seats held); s1-beta gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.tbjXPg/primary/state s1-alpha
+error: spawn refused - s1-beta has no fleet seat for model pool-model-a (see the fleet-seats line above)
+
+--- 6 concurrent bin/fm-fleet-seats.sh reserve calls across both homes (capacity 1, one seat already held)
+reservation outcomes:
+  4	fleet-seats: pool shared is full (1 of 1 seats held); race1 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  4	fleet-seats: pool shared is full (1 of 1 seats held); race2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  4	fleet-seats: pool shared is full (1 of 1 seats held); race3 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  4	fleet-seats: pool shared is full (1 of 1 seats held); race4 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  4	fleet-seats: pool shared is full (1 of 1 seats held); race5 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  4	fleet-seats: pool shared is full (1 of 1 seats held); race6 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+    holder /tmp/fm-lab.tbjXPg/primary/state s1-alpha
+    holder /tmp/fm-lab.tbjXPg/primary/state s1-alpha
+    holder /tmp/fm-lab.tbjXPg/primary/state s1-alpha
+    holder /tmp/fm-lab.tbjXPg/primary/state s1-alpha
+    holder /tmp/fm-lab.tbjXPg/primary/state s1-alpha
+    holder /tmp/fm-lab.tbjXPg/primary/state s1-alpha
+
+--- bin/fm-teardown.sh s1-alpha (primary)
+rc=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.tbjXPg/primary
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 7s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6E5KPFDKHC4PQX18W1MAP2T/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6E5KPFDKHC4PQX18W1MAP2T/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown: reaping leaked worktree process group for s1-alpha: 1304298
+teardown: force-killing leaked worktree process group for s1-alpha: 1304298
+teardown s1-alpha complete (window primary:fm-s1-alpha, worktree /tmp/fm-lab.tbjXPg/wt/s1-alpha)
+Backlog: s1-alpha just finished (this home keeps no markdown backlog at /tmp/fm-lab.tbjXPg/primary/data/backlog.md). Update /tmp/fm-lab.tbjXPg/primary/data/backlog.md - move s1-alpha to Done, keep Done to the 10 most recent, then re-scan Queued and dispatch only work whose blockers are gone and date is due.
+
+--- seat ledger for s1-alpha after teardown
+{"generation":"s1793627666.1303153.406","lifecycle":"released"}
+
+--- bin/fm-spawn.sh s1-beta (local second mate android) after the seat freed
+rc=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.tbjXPg/android
+fleet-seats: reserved pool=shared id=s1-beta generation=s1793627673.1308426.12827 used=1 capacity=1
+warning: /tmp/fm-lab.tbjXPg/android/data/s1-beta/launch-brief.md records no ship branch; defaulting to legacy branch fm/s1-beta
+notice: s1-beta ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned s1-beta harness=claude kind=ship mode=local-only yolo=off window=primary:fm-s1-beta worktree=/tmp/fm-lab.tbjXPg/wt/s1-beta
+
+### PASS: one seat spanned the primary and its local second mate; the mate was refused at capacity and admitted after teardown released it

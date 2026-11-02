@@ -1,0 +1,56 @@
+Note: switching to 'f7454541689c8a5859c7c08f5d13bb59767ef759'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+
+--- provision a real Herdr lab session and start this mate's real Claude supervisor
+herdr session=fm-lab-retiree-1097692-18248 pane=w1:p1 agent=claude state=unknown
+
+### S3: a lab-session remote second mate resolves and retires on its recorded session
+
+--- host route resolution without and with the recorded session
+without --herdr-session rc=1
+error: remote secondmate labmate endpoint is recorded in Herdr session 'fm-lab-retiree-1097692-18248', expected 'fm-remote'; refusing access until it is explicitly migrated
+with --herdr-session rc=0
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-retiree-1097692-18248:w1:p1
+herdr_session=fm-lab-retiree-1097692-18248
+harness=claude
+model=pool-model-b
+effort=
+spawn_gen=lab.gen.1
+
+--- primary-driven retirement: bin/fm-teardown.sh labmate
+rc=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.Dwfxpu/primary
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6E5KPFDKHC4PQX18W1MAP2T/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6E5KPFDKHC4PQX18W1MAP2T/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown labmate complete (remote labhost:/tmp/fm-lab.Dwfxpu/shop)
+
+--- the real endpoint, home, and both sides' destruction evidence
+herdr pane get: {"error":{"code":"pane_not_found","message":"pane w1:p1 not found"},"id":"cli:pane:get"}
+host destruction proof /tmp/fm-lab.Dwfxpu/remote-root/state/remote-secondmate-history/labmate.retirement.lab.gen.1.json:
+{"task":"labmate","generation":"lab.gen.1","home":"/tmp/fm-lab.Dwfxpu/shop","backend":"herdr","target":"fm-lab-retiree-1097692-18248:w1:p1","destroyed":true,"exit_code":0}
+
+--- no staged copy or pending evidence survives
+
+### PASS: the lab-session mate refused the shared session, resolved on the recorded one, and retired there with the pane, home, records, and a matching destruction proof

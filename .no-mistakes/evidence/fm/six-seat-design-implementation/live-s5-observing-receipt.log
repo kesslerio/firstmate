@@ -1,0 +1,74 @@
+Note: switching to 'f7454541689c8a5859c7c08f5d13bb59767ef759'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+
+--- real Herdr lab session with a real Claude supervisor already running
+herdr session=fm-lab-observe-1157927-10060 pane=w1:p1 agent=claude state=unknown
+
+### S5: an observing receipt counts the model the host actually runs, and a replacement binds the host generation
+
+--- first serve: the pre-existing supervisor is certified
+served theshop policy=866016619-84 epoch=r1793627530116418024347.1 holders=1
+
+--- parent reserves a launch asking for pool-model-a, then the host observes the running supervisor
+fleet-seats: reserved pool=shared id=theshop generation=op1793627531.1157659.1 (already held) used=1 capacity=2
+fleet-seats: dispatched id=theshop generation=op1793627531.1157659.1
+host launch rc=0
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"theshop","operation":"op1793627531.1157659.1","requested_generation":"op1793627531.1157659.1","actual_generation":"host.7","previous_generation":null,"disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-lab-observe-1157927-10060:w1:p1","home":"/tmp/fm-lab.t7noN4/shop","host":null,"remote_root":null,"spawn_gen":"host.7"},"actual_model":"pool-model-b","complete":true}
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-observe-1157927-10060:w1:p1
+herdr_session=fm-lab-observe-1157927-10060
+harness=claude
+model=pool-model-b
+effort=
+spawn_gen=host.7
+seat_operation=op1793627531.1157659.1
+observed disposition: {"schema":"fm-remote-seat-operation.v2","task":"theshop","operation":"op1793627531.1157659.1","requested_generation":"op1793627531.1157659.1","actual_generation":"host.7","previous_generation":null,"disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-lab-observe-1157927-10060:w1:p1","home":"/tmp/fm-lab.t7noN4/shop","host":null,"remote_root":null,"spawn_gen":"host.7"},"actual_model":"pool-model-b","complete":true}
+
+--- the parent applies that receipt
+reconcile-remote rc=0
+fleet-seats: existing id=theshop generation=host.7 (candidate op1793627531.1157659.1 released)
+{"generation":"op1793627531.1157659.1","lifecycle":"released","model":"pool-model-a","previous_generation":null}
+{"generation":"host.7","lifecycle":"confirmed","model":"pool-model-b","previous_generation":null}
+
+--- the requested model never took a seat: pool occupancy
+reserve on pool-model-a rc=0
+fleet-seats: reserved pool=shared id=probe-occupancy generation=g-probe-occ used=2 capacity=2
+
+### S5b: a replacement binds the generation the host actually records
+
+--- the host now records host.8 while the primary still names host.7 (a lost reply): the stale replacement must be refused
+fleet-seats: reserved pool=shared id=theshop generation=op1793627534.1157659.a (already held) used=1 capacity=2
+fleet-seats: dispatched id=theshop generation=op1793627534.1157659.a
+host launch rc=6
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"theshop","operation":"op1793627534.1157659.a","requested_generation":"op1793627534.1157659.a","actual_generation":null,"previous_generation":"host.7","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: generation-mismatch: the host incarnation is not the reserved predecessor; nothing was changed
+
+--- with the host recording host.7 again, a replacement naming it is accepted and bound to it
+fleet-seats: reserved pool=shared id=theshop generation=op1793627536.1157659.b (already held) used=1 capacity=2
+fleet-seats: dispatched id=theshop generation=op1793627536.1157659.b
+host launch rc=0
+replacement disposition: {"schema":"fm-remote-seat-operation.v2","task":"theshop","operation":"op1793627536.1157659.b","requested_generation":"op1793627536.1157659.b","actual_generation":"host.7","previous_generation":"host.7","disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-lab-observe-1157927-10060:w1:p1","home":"/tmp/fm-lab.t7noN4/shop","host":null,"remote_root":null,"spawn_gen":"host.7"},"actual_model":"pool-model-b","complete":true}
+reconcile-remote rc=0
+fleet-seats: existing id=theshop generation=host.7 (candidate op1793627536.1157659.b released)
+{"generation":"op1793627531.1157659.1","lifecycle":"released","model":"pool-model-a","previous_generation":null}
+{"generation":"host.7","lifecycle":"confirmed","model":"pool-model-b","previous_generation":null}
+{"generation":"op1793627534.1157659.a","lifecycle":"released","model":"pool-model-a","previous_generation":"host.7"}
+{"generation":"op1793627536.1157659.b","lifecycle":"released","model":"pool-model-a","previous_generation":"host.7"}
+
+### PASS: the observing receipt carried the host generation and model (never the requested model), the pool charged it once, a replacement of a generation the host no longer records was refused untouched, and a replacement naming the host generation was bound to it

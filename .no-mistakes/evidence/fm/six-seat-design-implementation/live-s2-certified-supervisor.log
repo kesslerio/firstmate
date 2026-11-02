@@ -1,0 +1,64 @@
+
+--- git clone the run worktree as the remote code root
+Note: switching to 'f7454541689c8a5859c7c08f5d13bb59767ef759'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+f7454541 no-mistakes(review): Canonicalize fleet owner state paths before identity comparisons
+
+--- provision a real Herdr lab session and start a real Claude supervisor in it
+herdr session=fm-lab-poolsuper-1088033-12594 pane=w1:p1 agent=claude/unknown status=unknown foreground=claude
+
+### S2: a pre-pool remote supervisor is counted exactly once, and a certificate-proved generation is not refused
+
+--- before the first serve the remote cannot be counted (no certificate)
+rc=5
+fleet-seats: no seat - remote secondmate(s) theshop have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+
+--- bin/fm-fleet-seats.sh serve-remotes (real on -> entrypoint -> worker -> host control)
+rc=0
+served theshop policy=2596559099-69 epoch=r1793627496109116111391.1 holders=1
+
+--- published serve certificate /tmp/fm-lab.5nkIYG/primary/state/fleet-seats/remote-theshop.cert
+{"epoch":"r1793627496109116111391.1","complete":true,"holders":[{"state_dir":"/tmp/fm-lab.5nkIYG/shop/state/parent-route","task":"theshop","generation":"host.1","model":"pool-model-b","lifecycle":"confirmed"}]}
+
+--- a second seat on the same model is refused, with the one held seat named
+rc=4
+fleet-seats: pool shared is full (1 of 1 seats held); contender gets no seat for model pool-model-b - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.5nkIYG/primary/state theshop
+
+### S2b: a certificate-proved generation replaces the recorded one instead of tripping ledger history
+
+--- parent record now names the certificate-proved generation host.1; reserve its replacement on the full pool
+rc=0
+fleet-seats: reserved pool=shared id=theshop generation=g-replacement (already held) used=1 capacity=1
+
+--- a generation no certificate proves is still refused as one the ledger never issued
+rc=5
+fleet-seats: no seat - task record /tmp/fm-lab.5nkIYG/primary/state/theshop.meta names generation host.gone, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+
+### S2c: the same primary reached through a symlinked home alias keeps one identity
+
+--- FM_HOME=/tmp/fm-lab.5nkIYG/primary-alias (symlink) reserve + show + reconcile-remote
+reserve rc=4
+fleet-seats: pool shared is full (1 of 1 seats held); alias-probe gets no seat for model pool-model-b - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.5nkIYG/primary/state theshop
+show through the alias matches the direct read:
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/tmp/fm-lab.5nkIYG/primary/state","task":"theshop","revision":2,"incarnations":[{"generation":"g-replacement","previous_generation":"host.1","kind":"secondmate","model":"pool-model-b","policy_digest_at_reserve":"2596559099-69","lifecycle":"released","launch_phase":"prepared","owner_pid":1094344,"owner_pid_identity":"linux-starttime=11906791 cmdline-hex=736c6565700036303000","route":null,"startup_confirmed":false,"disposition":{"reason":"prelaunch","source":"release","generation":"g-replacement","route":null,"operation":null}}]}
+reconcile-remote rc=5
+fleet-seats: refused - no seat is reserved for theshop generation missing
+
+### PASS: the pre-pool supervisor counted exactly once from the serve certificate, a certificate-proved generation was admitted as a replacement, and an unproved one was refused

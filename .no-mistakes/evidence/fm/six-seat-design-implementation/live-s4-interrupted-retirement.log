@@ -1,0 +1,67 @@
+Note: switching to 'f7454541689c8a5859c7c08f5d13bb59767ef759'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+
+--- real Herdr lab session with a real Claude supervisor
+herdr session=fm-lab-retrymate-1111672-31300 agent=claude
+
+### S4: an interrupted remote retirement stays retryable
+
+--- start the host retirement and interrupt it once its durable intent exists
+pending record published=1
+
+--- interrupted state
+pending exists: yes
+{"schema":"fm-remote-retirement-pending.v1","task":"labtwo","generation":"lab.gen.2","home":"/tmp/fm-lab.m6Z7Kw/shop","backend":"herdr","target":"fm-lab-retrymate-1111672-31300:w1:p1","rex_server":null,"phase":"pending","destroyed":false,"exit_code":null}
+home exists: yes
+pane: pane_not_found
+
+--- retry through the primary's own bin/fm-teardown.sh
+rc=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.m6Z7Kw/primary
+error: remote secondmate home is unavailable or unsafe
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6E5KPFDKHC4PQX18W1MAP2T/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6E5KPFDKHC4PQX18W1MAP2T/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown labtwo complete (remote labhost:/tmp/fm-lab.m6Z7Kw/shop)
+
+--- retry outcome
+herdr pane get: {"error":{"code":"pane_not_found","message":"pane w1:p1 not found"},"id":"cli:pane:get"}
+{"task":"labtwo","generation":"lab.gen.2","home":"/tmp/fm-lab.m6Z7Kw/shop","backend":"herdr","target":"fm-lab-retrymate-1111672-31300:w1:p1","destroyed":true,"exit_code":0}
+
+### S4b: interruption after the endpoint closes (home removal / proof window)
+second supervisor pane=w2:p1 agent=claude
+endpoint closed by the first attempt=1
+
+--- interrupted state after the endpoint closed
+pending exists: yes
+home exists: no
+proof exists: no
+
+--- retry the second interruption through bin/fm-teardown.sh
+rc=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.m6Z7Kw/primary
+error: remote secondmate home is unavailable or unsafe
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+teardown labthree complete (remote labhost:/tmp/fm-lab.m6Z7Kw/shop-labthree)
+{"task":"labthree","generation":"lab.gen.3","home":"/tmp/fm-lab.m6Z7Kw/shop-labthree","backend":"herdr","target":"fm-lab-retrymate-1111672-31300:w2:p1","destroyed":true,"exit_code":0}
+
+### PASS: the interrupted retirement kept its durable intent, the retry finished it, and no staged copy or pending record was stranded
