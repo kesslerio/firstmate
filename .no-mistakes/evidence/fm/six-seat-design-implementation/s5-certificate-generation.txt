@@ -1,0 +1,34 @@
+### fixture
+  pool: shared capacity=2 model pool-model-a
+  host certificate proves supervisor ios generation host.legacy on pool-model-a
+  the ledger's only row for ios is the RELEASED failed candidate g-abandoned
+
+### 1) a launch now needs one of the two seats: the certificate-proved supervisor counts once
+  $ fm-fleet-seats.sh reserve contender --model pool-model-a   -> exit=0
+  | fleet-seats: reserved pool=shared id=contender generation=g-contender used=2 capacity=2
+
+### 2) the pool is now full: the host supervisor is charged exactly once, not per surface
+  $ fm-fleet-seats.sh reserve contender2 --model pool-model-a   -> exit=4
+  | fleet-seats: pool shared is full (2 of 2 seats held); contender2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  |   holder /tmp/fm-lab.MHhQFE/parent/state contender
+  |   holder /tmp/fm-lab.MHhQFE/parent/state ios
+
+### 3) the operator relaunches ios onto codex: the persisted certificate must not block it
+  $ fm-remote-secondmate-relaunch.sh ios codex pool-model-a high   -> exit=1
+  | fleet-seats: no seat - task record /tmp/fm-lab.MHhQFE/parent/state/ios.meta names generation host.legacy, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+  | relaunch_failure=prelaunch
+  | error: remote secondmate ios has no fleet seat for model pool-model-a
+
+### 4) the parent record now names the confirmed replacement generation
+  remote_spawn_gen=host.legacy
+  remote_target=/tmp/fm-lab.MHhQFE/host-home:w1:p1
+  harness=pi
+  model=pool-model-a
+  effort=low
+  remote_herdr_session=fm-remote
+
+### 5) every host call the relaunch made
+  === fm-remote-secondmate-control.sh route ios
+
+### 6) the ledger keeps the certificate-proved generation and the fresh candidate apart
+  [{"generation":"g-abandoned","previous_generation":null,"lifecycle":"released"}]

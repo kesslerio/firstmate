@@ -1,0 +1,39 @@
+### fixture /tmp/fm-lab-r2s12.N4kfF2: primary + local secondmate 'android' share one pool (capacity 3)
+### a worker launched BEFORE pools existed sits in the primary's state as legacy-r1.meta
+live holder pids: 750354 750355 750356
+
+### 1) the secondmate reserves a seat; the pre-pool worker is counted in the same pool
+$ FM_HOME=.../android fm-fleet-seats.sh reserve a1 --generation g-a1 --model pool-model-a
+exit=0
+fleet-seats: reserved pool=shared id=a1 generation=g-a1 used=2 capacity=3
+
+### 2) the primary takes the next seat; the mate seat is counted by the primary too
+$ FM_HOME=.../primary fm-fleet-seats.sh reserve r2 --generation g-r2 --model pool-model-b
+exit=0
+fleet-seats: reserved pool=shared id=r2 generation=g-r2 used=3 capacity=3
+
+### 3) a third launch is refused before dispatch, and names each holder once
+$ FM_HOME=.../android fm-fleet-seats.sh reserve a2 --generation g-a2 --model pool-model-a
+exit=4
+fleet-seats: pool shared is full (3 of 3 seats held); a2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab-r2s12.N4kfF2/android/state a1
+  holder /tmp/fm-lab-r2s12.N4kfF2/primary/state legacy-r1
+  holder /tmp/fm-lab-r2s12.N4kfF2/primary/state r2
+
+### 4) releasing exactly the mate generation frees exactly one seat
+$ ... release a1 --generation g-a1 --reason prelaunch
+fleet-seats: released id=a1 generation=g-a1 reason=prelaunch
+exit=0
+$ ... reserve a2 --generation g-a2 (retry after release)
+fleet-seats: reserved pool=shared id=a2 generation=g-a2 used=3 capacity=3
+exit=0
+
+### 5) the primary home owns the single shared ledger every home writes to
+shared ledger: /tmp/fm-lab-r2s12.N4kfF2/primary/state/fleet-seats/holders
+mate ledger dir: (absent - the mate holds no authority of its own)
+holder records in the shared ledger: 3
+
+### 6) the released generation stays terminal: replaying it does not revive a seat
+$ ... reserve a1 --generation g-a1 (a terminal generation)
+exit=5
+fleet-seats: refused - generation g-a1 of a1 is already terminal; a new episode needs a new generation

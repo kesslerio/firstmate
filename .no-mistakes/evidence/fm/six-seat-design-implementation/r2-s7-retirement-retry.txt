@@ -1,0 +1,24 @@
+### fixture: lab home /tmp/fm-lab-r2s7b.kdMA3o/case/home (minted by bin/fm-lab-home.sh create), secondmate home /tmp/fm-lab-r2s7b.kdMA3o/case/mate
+### the mate's agent endpoint is already absent; its private data must survive any interruption
+### parent record: kind=secondmate home=/tmp/fm-lab-r2s7b.kdMA3o/case/mate spawn_gen=g1
+
+### attempt 1 - the home is moved into retirement staging, then the staged deletion fails
+$ bin/fm-teardown.sh mate --force        exit=1
+  | fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab-r2s7b.kdMA3o/case/home
+  public home present: no (moved into staging)
+  removal evidence:    home_removal_source=/tmp/fm-lab-r2s7b.kdMA3o/case/mate home_removal_generation=g1 home_removal_stage=/tmp/fm-lab-r2s7b.kdMA3o/case/mate.retiring.IFXmZf 
+  staged private data: mate private data that must never be lost
+
+### attempt 2 - a successor generation (g2) owns that path now, so the retry must refuse
+$ bin/fm-teardown.sh mate --force        exit=1
+  | fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab-r2s7b.kdMA3o/case/home
+  removal evidence:    /tmp/fm-lab-r2s7b.kdMA3o/case/home/state/mate.home-removal
+  staged private data: mate private data that must never be lost
+
+### attempt 3 - the original generation retries once the failure clears
+$ bin/fm-teardown.sh mate --force        exit=0
+  | teardown mate complete (window isolated:fm-mate, worktree /tmp/fm-lab-r2s7b.kdMA3o/case/mate)
+  public home:        absent
+  retirement staging: none
+  removal evidence:   none
+  parent metadata:    absent

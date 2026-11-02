@@ -1,0 +1,14 @@
+### (a) no ledger row at all -> exit=0
+  | fleet-seats: reserved pool=shared id=ios generation=s1793613439.838473.11464 (already held) used=1 capacity=2
+  | fleet-seats: confirmed id=ios generation=s1793613439.838473.11464
+  | seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"s1793613439.838473.11464","requested_generation":"s1793613439.838473.11464","actual_generation":"s1793613439.838473.11464","previous_generation":"host.legacy","disposition":"started","startup_confirmed":true,"old_stopped":true,"route":{"placement":"remote","backend":"herdr","target":"/tmp/fm-lab.N9kUvX/host-home:w1:p1","home":"/tmp/fm-lab.N9kUvX/host-home","host":null,"remote_root":null,"spawn_gen":"s1793613439.838473.11464"},"actual_model":"pool-model-a","complete":true}
+  | schema=fm-remote-secondmate-control.v1
+### (b) released candidate names host.legacy as its predecessor -> exit=0
+  | fleet-seats: reserved pool=shared id=ios generation=s1793613440.839569.7805 (already held) used=1 capacity=2
+  | fleet-seats: confirmed id=ios generation=s1793613440.839569.7805
+  | seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"s1793613440.839569.7805","requested_generation":"s1793613440.839569.7805","actual_generation":"s1793613440.839569.7805","previous_generation":"host.legacy","disposition":"started","startup_confirmed":true,"old_stopped":true,"route":{"placement":"remote","backend":"herdr","target":"/tmp/fm-lab.eWZ0j0/host-home:w1:p1","home":"/tmp/fm-lab.eWZ0j0/host-home","host":null,"remote_root":null,"spawn_gen":"s1793613440.839569.7805"},"actual_model":"pool-model-a","complete":true}
+  | schema=fm-remote-secondmate-control.v1
+### (c) released failed candidate names no predecessor (the shape a failed first spawn leaves) -> exit=1
+  | fleet-seats: no seat - task record /tmp/fm-lab.zfcsjN/parent/state/ios.meta names generation host.legacy, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+  | relaunch_failure=prelaunch
+  | error: remote secondmate ios has no fleet seat for model pool-model-a

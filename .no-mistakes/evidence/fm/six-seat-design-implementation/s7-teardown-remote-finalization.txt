@@ -1,0 +1,2 @@
+ok - remote finalization recovers without metadata and rejects mismatched routes
+exit=0

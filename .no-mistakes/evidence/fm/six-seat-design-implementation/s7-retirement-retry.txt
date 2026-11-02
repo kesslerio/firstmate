@@ -1,0 +1,35 @@
+### fixture: primary=$LAB (lab home), secondmate=/tmp/fm-lab.iDjY5R/case/mate, agent endpoint already absent
+  private data in the mate home: mate private data that must never be lost
+  parent metadata: /tmp/fm-lab.iDjY5R/case/home/state/mate.meta (spawn_gen=g1)
+
+### attempt 1 - the agent is stopped and the home is moved into retirement staging, then the staged removal fails
+  $ FM_HOME=<lab> bin/fm-teardown.sh mate --force   -> exit=1
+  | /tmp/fm-lab.iDjY5R/case/first.err:fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.iDjY5R/case/home
+  public home present: no (moved to staging)
+  removal evidence:    present
+  recorded stage:      /tmp/fm-lab.iDjY5R/case/mate.retiring.JrpqtD
+  staged contents:     bin config data sentinel state 
+  staged private data: mate private data that must never be lost
+  parent metadata:     present
+  process-event registration survived for the retry: renamed into the staged copy
+
+### attempt 2 - a successor generation now owns that path, so the retry must refuse and keep the staged copy
+  $ ... (metadata now spawn_gen=g2)   -> exit=1
+  | /tmp/fm-lab.iDjY5R/case/successor.err:fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.iDjY5R/case/home
+  | /tmp/fm-lab.iDjY5R/case/successor.err:WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+  removal evidence:    present
+  recorded stage:      /tmp/fm-lab.iDjY5R/case/mate.retiring.JrpqtD
+  staged contents:     bin config data sentinel state 
+  staged private data: mate private data that must never be lost
+
+### attempt 3 - the original generation retries after the failure clears
+  $ ... (spawn_gen=g1 again, failure cleared)   -> exit=0
+  | /tmp/fm-lab.iDjY5R/case/retry.out:teardown mate complete (window isolated:fm-mate, worktree /tmp/fm-lab.iDjY5R/case/mate)
+  | /tmp/fm-lab.iDjY5R/case/retry.err:fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.iDjY5R/case/home
+  | /tmp/fm-lab.iDjY5R/case/retry.err:WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+
+### final state
+  public home present: no
+  retirement staging:  none
+  removal evidence:    none
+  parent metadata:     absent

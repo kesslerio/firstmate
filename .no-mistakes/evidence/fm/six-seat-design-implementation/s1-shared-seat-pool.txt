@@ -1,0 +1,47 @@
+### fixture: primary=/tmp/fm-lab.ATiepC/primary mate=/tmp/fm-lab.ATiepC/android pool=shared capacity=3
+### the mate is registered in the primary's data/secondmates.md and bound by .fm-secondmate-parent
+
+### a worker launched BEFORE pools existed holds a seat with no reservation
+  wrote /tmp/fm-lab.ATiepC/primary/state/legacy-r1.meta (kind=ship model=pool-model-a)
+
+### 1) the secondmate reserves a seat; the pre-pool worker is counted in the same pool
+  $ FM_HOME=.../android fm-fleet-seats.sh reserve a1 --generation g-a1 --model pool-model-a
+  exit=0
+  fleet-seats: reserved pool=shared id=a1 generation=g-a1 used=2 capacity=3
+
+### 2) the primary takes the next seat; the mate seat is counted by the primary too
+  $ FM_HOME=.../primary fm-fleet-seats.sh reserve r2 --generation g-r2 --model pool-model-b
+  exit=0
+  fleet-seats: reserved pool=shared id=r2 generation=g-r2 used=3 capacity=3
+
+### 3) a third launch from the mate is refused before dispatch; holders are named
+  $ FM_HOME=.../android fm-fleet-seats.sh reserve a2 --generation g-a2 --model pool-model-a
+  exit=4
+  fleet-seats: pool shared is full (3 of 3 seats held); a2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+    holder /tmp/fm-lab.ATiepC/android/state a1
+    holder /tmp/fm-lab.ATiepC/primary/state legacy-r1
+    holder /tmp/fm-lab.ATiepC/primary/state r2
+  ledger holder records now: 2 (refused launch recorded none)
+  counted holders: 2
+
+### 4) releasing exactly the mate generation frees exactly one seat
+  $ ... release a1 --generation g-a1 --reason prelaunch
+  exit=0
+  fleet-seats: released id=a1 generation=g-a1 reason=prelaunch
+  counted holders: 1
+  $ ... reserve a2 --generation g-a2 --model pool-model-a (retry after release)
+  exit=0
+  fleet-seats: reserved pool=shared id=a2 generation=g-a2 used=3 capacity=3
+
+### 5) the mate generation the launch recorded (per-home holder view)
+  {"schema":"fm-fleet-seat-holder.v2","state_dir":"/tmp/fm-lab.ATiepC/android/state","task":"a2","revision":1,"incarnations":[{"generation":"g-a2","previous_generation":null,"kind":"ship","model":"pool-model-a","policy_digest_at_reserve":"798092721-84","lifecycle":"reserved","launch_phase":"prepared","owner_pid":3936902,"owner_pid_identity":"linux-starttime=10406793 cmdline-hex=736c6565700036303000","route":null,"startup_confirmed":false,"disposition":null}]}
+
+### 6) the primary home owns the single shared ledger every home writes to
+  /tmp/fm-lab.ATiepC/primary/state/fleet-seats
+  /tmp/fm-lab.ATiepC/primary/state/fleet-seats/holders
+  mate ledger directory: (absent - the mate holds no authority of its own)
+
+### 7) the released generation stays terminal: replaying it does not revive the seat
+  $ ... reserve a1 --generation g-a1 (a terminal generation)
+  exit=5
+  fleet-seats: refused - generation g-a1 of a1 is already terminal; a new episode needs a new generation

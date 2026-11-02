@@ -1,0 +1,35 @@
+### fixture
+  parent home:            $LAB (marked lab home)
+  host home stand-in:     /tmp/fm-lab.J8T8fH/host-home
+  recorded host session:  fm-lab-livecut
+  parent record:          state/ios.meta names remote_herdr_session=fm-lab-livecut, remote_spawn_gen=lab.g1
+
+### the operator relaunches the mate onto claude / pool-model-a / medium
+  | seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"-","requested_generation":"-","actual_generation":"lab.g2","previous_generation":"lab.g1","disposition":"started","startup_confirmed":true,"old_stopped":true,"route":null,"actual_model":"pool-model-a","complete":true}
+  | relaunched ios on claude
+  | schema=fm-remote-secondmate-control.v1
+  | backend=herdr
+  | harness=claude
+  | model=pool-model-a
+  | effort=medium
+  | spawn_gen=lab.g2
+  | target=fm-lab-livecut:w1:p1
+  exit=0
+
+### every host call the wrapper made (decoded from the ssh payload)
+  === ssh call: fm-remote-secondmate-control.sh route ios --herdr-session fm-lab-livecut
+  === ssh call: fm-remote-secondmate-control.sh relaunch ios claude pool-model-a medium --expect-generation lab.g1 --herdr-session fm-lab-livecut
+
+### the parent record after the relaunch
+  harness=claude
+  model=pool-model-a
+  effort=medium
+  remote_spawn_gen=lab.g2
+  kind=secondmate
+  mode=secondmate
+  home=/tmp/fm-lab.J8T8fH/host-home
+  remote_host=labhost
+  remote_root=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6DS3R5D4PAKYRM9MM2B89GA
+  remote_backend=herdr
+  remote_herdr_session=fm-lab-livecut
+  remote_target=fm-lab-livecut:w1:p1

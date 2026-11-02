@@ -1,0 +1,32 @@
+### real Herdr lab session: fm-lab-liveprobe2-351041-26658  (workspace w1, tab w1:t1, pane w1:p1)
+  {"workspace_id":"w1","label":"01M6DS3R5D4PAKYRM9MM2B89GA","active_tab_id":"w1:t1","pane_count":1}
+### recorded endpoint: fm-lab-liveprobe2-351041-26658:w1:p1
+
+### route the recorded lab session (the call bin/fm-remote-generation-lib.sh makes)
+  $ fm-remote-secondmate-control.sh route lab --herdr-session fm-lab-liveprobe2-351041-26658
+  exit=0
+  | schema=fm-remote-secondmate-control.v1
+  | backend=herdr
+  | target=fm-lab-liveprobe2-351041-26658:w1:p1
+  | herdr_session=fm-lab-liveprobe2-351041-26658
+  | harness=claude
+  | model=
+  | effort=
+  | spawn_gen=lab.g1
+
+### the same route without the session would address the shared fm-remote default
+  $ fm-remote-secondmate-control.sh route lab
+  exit=1
+  | error: remote secondmate lab endpoint is recorded in Herdr session 'fm-lab-liveprobe2-351041-26658', expected 'fm-remote'; refusing access until it is explicitly migrated
+
+### a lab session that is not the recorded one is refused before any endpoint access
+  $ fm-remote-secondmate-control.sh route lab --herdr-session fm-lab-nottheresession
+  exit=1
+  | error: remote secondmate lab endpoint is recorded in Herdr session 'fm-lab-liveprobe2-351041-26658', expected 'fm-lab-nottheresession'; refusing access until it is explicitly migrated
+
+### the shared default session name is not a legal lab override
+  $ fm-remote-secondmate-control.sh retire lab --herdr-session fm-remote
+  exit=1
+  | error: invalid remote Herdr lab session: fm-remote; expected an owned fm-lab-* name
+
+### endpoint record still intact: 13 fields, spawn_gen=lab.g1

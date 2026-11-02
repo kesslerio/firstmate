@@ -1,0 +1,52 @@
+### disposable lab fixture: /tmp/fm-lab-r2s5.ogI8gT
+###   parent home /tmp/fm-lab-r2s5.ogI8gT/parent  pool shared capacity=2 model pool-model-a
+###   host home   /tmp/fm-lab-r2s5.ogI8gT/remote-home  live supervisor 'ios', endpoint fm-remote:w1:p1
+###   host code   /tmp/fm-lab-r2s5.ogI8gT/remote-root  (this worktree copied into the lab; stateful herdr pane)
+###   host transport: bin/fm-on.sh -> the real bin/fm-remote-entrypoint.sh -> the real remote job worker
+
+### the parent's certificate, produced by a real 'fm-fleet-seats.sh serve-remotes' run:
+###   {"schema":"fm-fleet-seats-serve.v2","policy_digest":"3130302336-69","epoch":"r1793616853144231123156.1","complete":true,"holders":[{"state_dir":"/tmp/fm-lab-r2s5.ogI8gT/remote-home/state/parent-route","task":"ios","generation":"host.legacy","model":"pool-model-a","lifecycle":"confirmed"}]}
+### the parent task record names the host route, and no generation yet:
+###   model=pool-model-a home=/tmp/fm-lab-r2s5.ogI8gT/remote-home remote_host=lab-host remote_root=/tmp/fm-lab-r2s5.ogI8gT/remote-root remote_backend=herdr
+### the seat ledger holds one row for ios - the RELEASED failed candidate:
+###   [{"generation":"g-abandoned","lifecycle":"released","previous_generation":null}]
+
+=== A) BEFORE the fix (fm-fleet-seats.sh at f0f8a512^): relaunch ios onto claude / pool-model-a / high
+  exit=1
+  | fleet-seats: no seat - task record /tmp/fm-lab-r2s5.ogI8gT/parent/state/ios.meta names generation host.legacy, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+  | relaunch_failure=prelaunch
+  | error: remote secondmate ios has no fleet seat for model pool-model-a
+  parent record now names: remote_spawn_gen=host.legacy
+
+=== B) AT the fix (HEAD f0f8a512): the same operator, the same fixture, the same relaunch
+  exit=0
+  | fleet-seats: reserved pool=shared id=ios generation=s1793616862.1453723.18032 (already held) used=1 capacity=2
+  | fleet-seats: confirmed id=ios generation=s1793616862.1453723.18032
+  | relaunched ios harness=claude from=pi model=pool-model-a effort=high backend=herdr endpoint=fm-remote:w1:p1 worktree=/tmp/fm-lab-r2s5.ogI8gT/remote-home
+  | seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"s1793616862.1453723.18032","requested_generation":"s1793616862.1453723.18032","actual_generation":"s1793616862.1453723.18032","previous_generation":"host.legacy","disposition":"started","startup_confirmed":true,"old_stopped":true,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w1:p1","home":"/tmp/fm-lab-r2s5.ogI8gT/remote-home","host":null,"remote_root":null,"spawn_gen":"s1793616862.1453723.18032"},"actual_model":"pool-model-a","complete":true}
+  | schema=fm-remote-secondmate-control.v1
+  | backend=herdr
+  | target=fm-remote:w1:p1
+  | herdr_session=fm-remote
+  | harness=claude
+  | model=pool-model-a
+  | effort=high
+  | spawn_gen=s1793616862.1453723.18032
+  | seat_operation=s1793616862.1453723.18032
+
+### parent record after the relaunch:
+###   harness=claude model=pool-model-a effort=high fleet_seat_generation=s1793616862.1453723.18032 remote_spawn_gen=s1793616862.1453723.18032
+### ledger: the released candidate plus the confirmed replacement
+###   [{"generation":"g-abandoned","lifecycle":"released","previous_generation":null},{"generation":"s1793616862.1453723.18032","lifecycle":"confirmed","previous_generation":"host.legacy"}]
+### host endpoint record:
+###   harness=claude model=pool-model-a effort=high spawn_gen=s1793616862.1453723.18032
+
+### C) adversarial: the host now reports a generation the parent's certificate does not prove
+###    (certificate still proves host.legacy; the host record now says host.unissued)
+  exit=1
+  parent record: remote_spawn_gen=host.unissued
+  | fleet-seats: no seat - task record /tmp/fm-lab-r2s5.ogI8gT/parent/state/ios.meta names generation host.unissued, which its seat holder never issued (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+  | relaunch_failure=prelaunch
+  | error: remote secondmate ios has no fleet seat for model pool-model-a
+
+### verdict: A=1 B=0 C=1

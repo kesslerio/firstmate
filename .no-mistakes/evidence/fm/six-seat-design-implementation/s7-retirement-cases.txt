@@ -1,0 +1,5 @@
+test_retirement_reuses_only_empty_staging -> exit=0: ok - retirement adopts empty staging after normal checks and refuses nonempty or linked staging|
+test_local_retirement_resumes_recorded_staging -> exit=0: ok - local retirement resumes top-level and descendant staged deletion and fences successors|
+test_retirement_rollback_rearms_on_failure -> exit=0: ok - retirement restores registrations and rearms after sweep, rename, and signal failures|
+test_retirement_retains_child_loss_before_metadata_removal -> exit=0: ok - direct and recursive retirement retain lost-slot outcomes before child evidence disappears|
+test_local_retirement_registry_failure_preserves_retry -> exit=0: ok - local retirement retains retry identity until registry publication succeeds|

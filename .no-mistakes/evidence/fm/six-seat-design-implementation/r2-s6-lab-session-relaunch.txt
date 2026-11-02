@@ -1,0 +1,84 @@
+### fixture: parent home /tmp/fm-lab-r2s6.1cuzzD/parent, host home /tmp/fm-lab-r2s6.1cuzzD/host, host code /tmp/fm-lab-r2s6.1cuzzD/remote-root
+### recorded host session: fm-lab-r2s6b-1533050-17521 (a real Herdr lab session created by bin/fm-herdr-lab.sh)
+{"name":"fm-lab-r2s6b-1533050-17521","default":false,"running":true}
+unknown option: --json
+### recorded endpoint in the host home: spawn_gen=s1793617004.1595074.11929 herdr_session=fm-lab-r2s6b-1533050-17521 herdr_pane_id=w1:p1
+
+### the route the relaunch wrapper resolves the predecessor with
+$ fm-remote-secondmate-control.sh route lab --herdr-session fm-lab-r2s6b-1533050-17521
+  schema=fm-remote-secondmate-control.v1
+  backend=herdr
+  target=fm-lab-r2s6b-1533050-17521:w1:p1
+  herdr_session=fm-lab-r2s6b-1533050-17521
+  harness=claude
+  model=pool-model-a
+  effort=medium
+  spawn_gen=s1793617004.1595074.11929
+
+### the same route without the recorded session addresses the shared default and is refused
+$ fm-remote-secondmate-control.sh route lab
+  error: remote secondmate lab endpoint is recorded in Herdr session 'fm-lab-r2s6b-1533050-17521', expected 'fm-remote'; refusing access until it is explicitly migrated
+  exit=1
+
+### a different lab session is refused before any endpoint access
+$ fm-remote-secondmate-control.sh route lab --herdr-session fm-lab-nottheresession
+  error: remote secondmate lab endpoint is recorded in Herdr session 'fm-lab-r2s6b-1533050-17521', expected 'fm-lab-nottheresession'; refusing access until it is explicitly migrated
+  exit=1
+
+### the operator relaunches the mate onto claude / pool-model-a / medium
+  before: harness=claude
+  before: model=pool-model-a
+  before: effort=medium
+  before: remote_spawn_gen=s1793617004.1595074.11929
+  before: remote_target=fm-lab-r2s6b-1533050-17521:w1:p1
+  before: remote_herdr_session=fm-lab-r2s6b-1533050-17521
+  ssh calls the wrapper made:
+    === ssh call: fm-remote-secondmate-control.sh route lab --herdr-session fm-lab-r2s6b-1533050-17521 
+    === ssh call: fm-remote-secondmate-control.sh relaunch lab claude pool-model-a medium --expect-generation lab.g1 --herdr-session fm-lab-r2s6b-1533050-17521 
+  parent record after:
+    harness=claude
+    model=pool-model-a
+    effort=medium
+    remote_spawn_gen=s1793617004.1595074.11929
+    remote_target=fm-lab-r2s6b-1533050-17521:w1:p1
+    remote_herdr_session=fm-lab-r2s6b-1533050-17521
+  host endpoint record after:
+    harness=claude
+    model=pool-model-a
+    effort=medium
+    spawn_gen=s1793617004.1595074.11929
+    herdr_session=fm-lab-r2s6b-1533050-17521
+
+### the operator relaunches the mate onto claude / pool-model-a / medium
+  before:
+    model=pool-model-a
+    remote_target=fm-lab-r2s6b-1533050-17521:w1:p1
+    remote_herdr_session=fm-lab-r2s6b-1533050-17521
+    harness=pi
+    effort=medium
+  | relaunched lab harness=claude from=pi model=pool-model-a effort=medium backend=herdr endpoint=fm-lab-r2s6b-1533050-17521:w1:p1 worktree=/tmp/fm-lab-r2s6.1cuzzD/host
+  | schema=fm-remote-secondmate-control.v1
+  | backend=herdr
+  | target=fm-lab-r2s6b-1533050-17521:w1:p1
+  | herdr_session=fm-lab-r2s6b-1533050-17521
+  | harness=claude
+  | model=pool-model-a
+  | effort=medium
+  | spawn_gen=s1793617188.1800377.30794
+  exit=0
+  ssh calls:
+    === ssh call: fm-remote-secondmate-control.sh route lab --herdr-session fm-lab-r2s6b-1533050-17521 
+    === ssh call: fm-remote-secondmate-control.sh relaunch lab claude pool-model-a medium --expect-generation lab.g1 --herdr-session fm-lab-r2s6b-1533050-17521 
+  parent record after:
+    harness=claude
+    model=pool-model-a
+    effort=medium
+    remote_spawn_gen=s1793617188.1800377.30794
+    remote_target=fm-lab-r2s6b-1533050-17521:w1:p1
+    remote_herdr_session=fm-lab-r2s6b-1533050-17521
+  host endpoint record after:
+    harness=claude
+    model=pool-model-a
+    effort=medium
+    spawn_gen=s1793617188.1800377.30794
+    herdr_session=fm-lab-r2s6b-1533050-17521

@@ -1,0 +1,34 @@
+### case 1: the host records host.A; cand.B was submitted to that host and cancelled before confirming startup
+  seeded ledger: [{"generation":"host.A","previous_generation":null,"lifecycle":"released","reason":"old-stopped","target":"/tmp/fm-lab.wn1p9T/host-home:w1:p1"},{"generation":"cand.B","previous_generation":"host.A","lifecycle":"released","reason":"cancelled","target":"/tmp/fm-lab.wn1p9T/host-home:w1:p1"}]
+  $ fm-spawn.sh ios --secondmate --harness claude --model pool-model-a   -> exit=1
+  | fleet-seats: reserved pool=shared id=ios generation=s1793613336.762231.10013 used=1 capacity=4
+  | fleet-seats: confirmed id=ios generation=s1793613336.762231.10013
+  | error: remote launch returned Herdr session 'missing', expected 'fm-remote'; preserving the remote route for reconciliation
+  successor reserved by the launch: generation=s1793613336.762231.10013 previous_generation=cand.B
+
+### case 2: the same plus cand.C, which never reached the host (its route has no target)
+  seeded ledger: [{"generation":"host.A","previous_generation":null,"lifecycle":"released","reason":"old-stopped","target":"/tmp/fm-lab.wn1p9T/host-home:w1:p1"},{"generation":"cand.B","previous_generation":"host.A","lifecycle":"released","reason":"cancelled","target":"/tmp/fm-lab.wn1p9T/host-home:w1:p1"},{"generation":"cand.C","previous_generation":null,"lifecycle":"released","reason":"cancelled","target":null}]
+  $ fm-spawn.sh ios2 --secondmate --harness claude --model pool-model-a   -> exit=1
+  | fleet-seats: reserved pool=shared id=ios2 generation=s1793613338.765403.24855 used=2 capacity=4
+  | fleet-seats: confirmed id=ios2 generation=s1793613338.765403.24855
+  | error: remote launch returned Herdr session 'missing', expected 'fm-remote'; preserving the remote route for reconciliation
+  successor reserved by the launch: generation=s1793613338.765403.24855 previous_generation=cand.B
+
+### case 3: the host records host.A and the only later candidate never reached the host
+  seeded ledger: [{"generation":"host.A","previous_generation":null,"lifecycle":"released","reason":"old-stopped","target":"/tmp/fm-lab.wn1p9T/host-home:w1:p1"},{"generation":"cand.C","previous_generation":null,"lifecycle":"released","reason":"cancelled","target":null}]
+  $ fm-spawn.sh ios3 --secondmate --harness claude --model pool-model-a   -> exit=1
+  | fleet-seats: reserved pool=shared id=ios3 generation=s1793613339.768440.27859 used=3 capacity=4
+  | fleet-seats: confirmed id=ios3 generation=s1793613339.768440.27859
+  | error: remote launch returned Herdr session 'missing', expected 'fm-remote'; preserving the remote route for reconciliation
+  successor reserved by the launch: generation=s1793613339.768440.27859 previous_generation=host.A
+
+### host calls the launches made
+  === fm-remote-doctor.sh --backend herdr
+  === fm-remote-secondmate-control.sh sync ios cee6c84f1afa5cf235a59a6b2576ce924e27913d
+  === fm-remote-secondmate-control.sh launch ios claude pool-model-a - herdr --operation s1793613336.762231.10013 --previous cand.B
+  === fm-remote-doctor.sh --backend herdr
+  === fm-remote-secondmate-control.sh sync ios2 cee6c84f1afa5cf235a59a6b2576ce924e27913d
+  === fm-remote-secondmate-control.sh launch ios2 claude pool-model-a - herdr --operation s1793613338.765403.24855 --previous cand.B
+  === fm-remote-doctor.sh --backend herdr
+  === fm-remote-secondmate-control.sh sync ios3 cee6c84f1afa5cf235a59a6b2576ce924e27913d
+  === fm-remote-secondmate-control.sh launch ios3 claude pool-model-a - herdr --operation s1793613339.768440.27859 --previous host.A

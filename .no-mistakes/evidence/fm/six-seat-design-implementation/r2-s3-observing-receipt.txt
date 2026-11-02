@@ -1,0 +1,43 @@
+### fixture: parent home $LAB/parent, pool shared capacity=4 models [pool-model-a, pool-model-b]
+### host home $LAB/host5 runs supervisor ios5 at generation host.9 on model pool-model-a
+### the host certificate (produced by a real bin/fm-fleet-seats.sh serve-remotes run) proves it:
+  {"state_dir":"/tmp/fm-lab-r2s5.ogI8gT/host5/state/parent-route","task":"ios5","generation":"host.9","model":"pool-model-a","lifecycle":"confirmed"}
+
+### the operator's launch asks for the OTHER model (pool-model-b)
+  $ fm-fleet-seats.sh reserve ios5 --generation op.obs6 --kind secondmate --harness claude --model pool-model-b
+  | fleet-seats: reserved pool=shared id=ios5 generation=op.obs6 used=4 capacity=4
+  $ fm-fleet-seats.sh dispatch ios5 --generation op.obs6 --route-file <remote route>
+  | fleet-seats: dispatched id=ios5 generation=op.obs6
+
+### the host-side launch runs the real fm-on -> fm-remote-entrypoint -> remote job worker -> control plane
+  $ fm-on.sh ios5 fm-remote-secondmate-control.sh launch ios5 claude pool-model-b - herdr --operation op.obs6 --previous -
+  | seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios5","operation":"op.obs6","requested_generation":"op.obs6","actual_generation":"host.9","previous_generation":null,"disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-remote:w1:p1","home":"/tmp/fm-lab-r2s5.ogI8gT/host5","host":null,"remote_root":null,"spawn_gen":"host.9"},"actual_model":"pool-model-a","complete":true}
+  | schema=fm-remote-secondmate-control.v1
+  | backend=herdr
+  | target=fm-remote:w1:p1
+  | harness=pi
+  | model=pool-model-a
+  | effort=medium
+  | spawn_gen=host.9
+  exit=0
+### the receipt names the generation AND the model it actually found (pool-model-a), not the requested pool-model-b
+
+### the parent applies that token-scoped disposition
+  $ fm-fleet-seats.sh reconcile-remote ios5 --generation op.obs6 --response-file <that seat_disposition>
+  | fleet-seats: existing id=ios5 generation=host.9 (candidate op.obs6 released)
+  $ fm-fleet-seats.sh show ios5
+  | [{"generation":"op.obs4","lifecycle":"released","previous_generation":null,"model":"pool-model-b"},
+  |  {"generation":"op.obs6","lifecycle":"released","previous_generation":null,"model":"pool-model-b"},
+  |  {"generation":"host.9","lifecycle":"confirmed","previous_generation":null,"model":"pool-model-a"}]
+
+### accounting follows the model the receipt observed: the supervisor is charged once, under pool-model-a
+  $ fm-fleet-seats.sh reserve contender-b --generation g-cb --model pool-model-b
+  | fleet-seats: reserved pool=shared id=contender-b generation=g-cb used=4 capacity=4
+  $ fm-fleet-seats.sh reserve contender-a --generation g-ca --model pool-model-a
+  | fleet-seats: pool shared is full (4 of 4 seats held); contender-a gets no seat for model pool-model-a
+  |   holder .../parent/state contender-b
+  |   holder .../parent/state ios
+  |   holder .../parent/state ios4
+  |   holder .../parent/state ios5
+  exit=4
+  (the observed supervisor appears exactly once, as ios5, and the pool-model-b request never displaced it)
