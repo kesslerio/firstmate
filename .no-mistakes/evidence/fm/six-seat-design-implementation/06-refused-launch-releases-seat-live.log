@@ -1,0 +1,26 @@
+== spawn refused by the host before launch: exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-seat-refused.tdqxTe/parent
+fleet-seats: reserved pool=main id=theshop generation=s1793657399.3761166.11660 used=1 capacity=6
+fleet-seats: released id=theshop generation=s1793657399.3761166.11660 reason=prelaunch
+schema=fm-remote-secondmate-control.v1
+backend=rex
+target=00000001-0000-7000-8000-000000000002:00000002-0000-7000-8000-000000000003
+rex_session_id=session:00000001-0000-7000-8000-000000000002
+rex_server=unix:///tmp/fake-rex.sock
+harness=codex
+model=pool-model-a
+seat_disposition={"schema":"fm-remote-seat-operation.v2","complete":true,"task":"theshop","operation":"s1793657399.3761166.11660","requested_generation":"s1793657399.3761166.11660","disposition":"prelaunch","actual_generation":null,"previous_generation":null,"old_stopped":false,"startup_confirmed":false,"actual_model":null,"route":null}
+error: remote secondmate theshop was not launched; its fleet seat candidate was released
+== parent holder record after the prelaunch refusal
+{"task":"theshop","incarnations":[{"generation":"s1793657399.3761166.11660","lifecycle":"released","disposition":{"reason":"prelaunch","source":"reconcile-remote","generation":"s1793657399.3761166.11660","route":{"placement":"remote","backend":"herdr","target":null,"home":"/tmp/fm-seat-refused.tdqxTe/shop","host":"shop-host","remote_root":"/home/art/.no-mistakes/worktrees/9f75ec418609/01M6F3JMSSTNEYRKPV9XF8AF3P","spawn_gen":null,"operation":"s1793657399.3761166.11660"},"operation":"s1793657399.3761166.11660"},"startup_confirmed":false}]}
+== parent live holders
+0
+== retry after the refusal
+== retry: exit=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-seat-refused.tdqxTe/parent
+fleet-seats: reserved pool=main id=theshop generation=s1793657401.3769205.2908 used=1 capacity=6
+fleet-seats: confirmed id=theshop generation=s1793657401.3769205.2908
+spawned theshop harness=codex kind=secondmate mode=secondmate yolo=off window=remote:theshop worktree=/tmp/fm-seat-refused.tdqxTe/shop remote=shop-host backend=rex
+== parent holder record after the retry
+{"task":"theshop","incarnations":[{"generation":"s1793657399.3761166.11660","lifecycle":"released","launch_phase":"dispatching","model":"pool-model-a","startup_confirmed":false},{"generation":"s1793657401.3769205.2908","lifecycle":"confirmed","launch_phase":"started","model":"pool-model-a","startup_confirmed":true}]}
+1

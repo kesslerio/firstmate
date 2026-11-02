@@ -1,0 +1,30 @@
+== spawn adopting a running host supervisor on another model: exit=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-seat-adopted.0nXzg3/parent
+fleet-seats: reserved pool=main id=theshop generation=s1793657396.3750137.24688 used=1 capacity=6
+fleet-seats: existing id=theshop generation=host.1 (candidate s1793657396.3750137.24688 released)
+spawned theshop harness=codex kind=secondmate mode=secondmate yolo=off window=remote:theshop worktree=/tmp/fm-seat-adopted.0nXzg3/shop remote=shop-host backend=rex
+== parent holder record for theshop
+{"task":"theshop","incarnations":[{"generation":"s1793657396.3750137.24688","lifecycle":"released","launch_phase":"dispatching","model":"pool-model-a","requested_model":null,"startup_confirmed":false},{"generation":"host.1","lifecycle":"confirmed","launch_phase":"started","model":"pool-model-b","requested_model":null,"startup_confirmed":true}]}
+== parent live holders
+1
+== parent task record
+window=remote:theshop
+endpoint_task_id=theshop
+worktree=/tmp/fm-seat-adopted.0nXzg3/shop
+project=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6F3JMSSTNEYRKPV9XF8AF3P
+harness=codex
+kind=secondmate
+mode=secondmate
+yolo=off
+tasktmp=
+model=pool-model-a
+effort=
+home=/tmp/fm-seat-adopted.0nXzg3/shop
+projects=
+remote_host=shop-host
+remote_root=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6F3JMSSTNEYRKPV9XF8AF3P
+remote_backend=rex
+remote_rex_session_id=session:00000001-0000-7000-8000-000000000002
+remote_rex_server=unix:///tmp/fake-rex.sock
+remote_target=00000001-0000-7000-8000-000000000002:00000002-0000-7000-8000-000000000003
+fleet_seat_generation=host.1

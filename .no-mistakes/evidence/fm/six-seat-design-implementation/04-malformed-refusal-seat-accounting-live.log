@@ -1,0 +1,24 @@
+== serve: served theshop policy=2223651920-82 epoch=r17936573843698654839.1 holders=0
+== spawn with a non-local Rex server: exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-seat-malformed.f3iipe/parent
+fleet-seats: reserved pool=main id=theshop generation=s1793657385.3699892.10954 used=1 capacity=6
+error: remote launch returned malformed Rex route metadata (session 'session:00000001-0000-7000-8000-000000000002', server 'tcp://127.0.0.1:7299', target '00000001-0000-7000-8000-000000000002:00000002-0000-7000-8000-000000000003'); preserving the remote route for reconciliation
+== holders after the refused reply: 1 live
+== the refused candidate is retained as s1793657385.3699892.10954 until the host accounts for it
+== retry before host evidence
+== retry: exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-seat-malformed.f3iipe/parent
+fleet-seats: retained - the host did not report a disposition for theshop operation s1793657385.3699892.10954 (the seat stays counted until evidence resolves it)
+error: remote secondmate theshop's ledger predecessor is unresolved; no replacement was reserved
+== host evidence: the host reports the malformed operation never launched
+fleet-seats: released id=theshop generation=s1793657385.3699892.10954 reason=prelaunch
+== live holders after host evidence: 0
+== retry with a good reply after reconciliation
+== retry: exit=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-seat-malformed.f3iipe/parent
+fleet-seats: reserved pool=main id=theshop generation=s1793657388.3718076.5132 used=1 capacity=6
+fleet-seats: confirmed id=theshop generation=s1793657388.3718076.5132
+spawned theshop harness=codex kind=secondmate mode=secondmate yolo=off window=remote:theshop worktree=/tmp/fm-seat-malformed.f3iipe/shop remote=shop-host backend=rex
+== holders after the retry
+{"task":"theshop","incarnations":[{"generation":"s1793657385.3699892.10954","lifecycle":"released","launch_phase":"dispatching","model":"pool-model-a","startup_confirmed":false},{"generation":"s1793657388.3718076.5132","lifecycle":"confirmed","launch_phase":"started","model":"pool-model-a","startup_confirmed":true}]}
+== live holders: 1

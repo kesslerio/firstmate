@@ -1,0 +1,19 @@
+reserve seat1: exit=0 fleet-seats: reserved pool=main id=seat1 generation=g-seat1 used=1 capacity=6
+reserve seat2: exit=0 fleet-seats: reserved pool=main id=seat2 generation=g-seat2 used=2 capacity=6
+reserve seat3: exit=0 fleet-seats: reserved pool=main id=seat3 generation=g-seat3 used=3 capacity=6
+reserve seat4: exit=0 fleet-seats: reserved pool=main id=seat4 generation=g-seat4 used=4 capacity=6
+reserve seat5: exit=0 fleet-seats: reserved pool=main id=seat5 generation=g-seat5 used=5 capacity=6
+reserve seat6: exit=0 fleet-seats: reserved pool=main id=seat6 generation=g-seat6 used=6 capacity=6
+== live holders after filling the pool: 6 of 6
+reserve overflow: exit=4 fleet-seats: pool main is full (6 of 6 seats held); overflow gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-capacity.vBRdPE/parent/state seat1
+  holder /tmp/fm-seat-capacity.vBRdPE/parent/state seat2
+  holder /tmp/fm-seat-capacity.vBRdPE/parent/state seat3
+  holder /tmp/fm-seat-capacity.vBRdPE/parent/state seat4
+  holder /tmp/fm-seat-capacity.vBRdPE/parent/state seat5
+  holder /tmp/fm-seat-capacity.vBRdPE/parent/state seat6
+== live holders after the overflow refusal: 6 of 6
+fleet-seats: released id=seat1 generation=g-seat1 reason=teardown
+== live holders after retiring seat1: 5 of 6
+reserve seat7 after retirement: exit=0 fleet-seats: reserved pool=main id=seat7 generation=g-seat7 used=6 capacity=6
+== live holders: 6 of 6

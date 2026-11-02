@@ -1,0 +1,22 @@
+== serve-remotes
+serve_rc=0
+served theshop policy=506449771-67 epoch=r1793657359361196611960.1 holders=0
+== spawn (mismatch)
+spawn_rc=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-rex-refusal.c0ZkWJ/parent
+fleet-seats: reserved pool=main id=theshop generation=s1793657360.3612710.14820 used=1 capacity=2
+error: remote launch returned malformed Rex route metadata (session 'session:00000001-0000-7000-8000-000000000002', server 'unix:///tmp/fake-rex.sock', target '99999999-0000-7000-8000-000000000009:00000002-0000-7000-8000-000000000003'); preserving the remote route for reconciliation
+== seat holder records
+-- /tmp/fm-rex-refusal.c0ZkWJ/parent/state/fleet-seats/holders/3040122877-47.json
+{"task":"theshop","incarnations":[{"generation":"s1793657360.3612710.14820","lifecycle":"reserved","launch_phase":"dispatching","model":"pool-model-a","disposition":null,"startup_confirmed":false}]}
+== parent task record
+(none)
+== ssh log
+fake-ssh host=shop-host cmd=fm-remote-inherit.sh verb=absent
+fake-ssh host=shop-host cmd=fm-remote-inherit.sh verb=absent
+fake-ssh host=shop-host cmd=fm-remote-inherit.sh verb=absent
+fake-ssh host=shop-host cmd=fm-remote-inherit.sh verb=absent
+fake-ssh host=shop-host cmd=fm-remote-inherit.sh verb=absent
+fake-ssh host=shop-host cmd=fm-remote-inherit.sh verb=absent
+fake-ssh host=shop-host cmd=fm-remote-inherit.sh verb=absent
+fake-ssh host=shop-host cmd=fm-remote-secondmate-control.sh verb=launch
