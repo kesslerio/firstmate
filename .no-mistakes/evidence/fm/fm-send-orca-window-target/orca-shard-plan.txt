@@ -1,0 +1,14 @@
+$ bin/fm-test-run.sh --check-coverage
+FM_TEST_COVERAGE ok total=319 parallel=26 parallel_max_ms=814249 parallel_imbalance_ms=552 parallel_unhinted=0 serial=277 serial_shards=11 serial_unhinted=36 serial_max_ms=1149814 serial_budget_ms=1200000 herdr=16
+$ bin/fm-test-run.sh --list-scheduled --lane portable-serial-6of11 | grep orca
+tests/fm-orca-submit-restart.test.sh
+$ ... | head -1
+tests/fm-supervision-host-hook.test.sh
+$ bin/fm-test-run.sh --list-scheduled --lane portable-serial-7of11 | grep orca
+tests/fm-orca-typed-restart.test.sh
+$ ... | head -1
+tests/fm-public-followup.test.sh
+$ bin/fm-test-run.sh --list-scheduled --lane portable-serial-8of11 | grep orca
+tests/fm-backend-orca.test.sh
+$ ... | head -1
+tests/fm-watch-wedge-cap.test.sh
