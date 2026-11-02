@@ -1,0 +1,185 @@
+# Live away-mode refusal + arming scenarios (repo 01M6DNHMN8FXJ4SGYKKDM3F3MD)
+# Disposable marked lab home: /tmp/fm-lab.AAVndl, private tmux socket (tmux -L fm-lab), harness detection: unknown,
+# config/supervision-host-off so the away daemon is the posture. Real bin/fm-afk-launch.sh and
+# bin/fm-afk-start.sh driven from inside a real tmux pane on that private socket.
+
+########## drive: refusal scenarios and live-pane arming ##########
+
+===== [01] environment inside the lab primary pane =====
+TMUX=/tmp/fm-lab.AAVndl/tmux/tmux-1000/fm-lab,3652640,0
+TMUX_PANE=%0
+FM_HOME=/tmp/fm-lab.AAVndl
+tmux server: primary: 1 windows (created Mon Nov  2 00:34:16 2026) 
+state: afk=ABSENT terminal=ABSENT contract=ABSENT
+
+===== [02] away-posture enter (/afk entry) =====
+Away posture recorded at 2026-11-02T08:34:42Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: 4 concurrent workers.
+Away posture (recorded):
+  entered: 2026-11-02T08:34:42Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    live validation
+rc=0
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [03] A1 start-native with no verifiable operator session =====
+fm-afk-launch: could not resolve a verifiable operator session for away supervision (no FM_SUPERVISOR_TARGET, TMUX_PANE, herdr, Rex, T3 thread, or Orca terminal in this session); refusing to arm away mode
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [04] A2 start with no verifiable operator session =====
+fm-afk-launch: could not resolve a verifiable operator session for away supervision (no FM_SUPERVISOR_TARGET, TMUX_PANE, herdr, Rex, T3 thread, or Orca terminal in this session); refusing to arm away mode
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [05] B1 start-native with an Orca operator session (ORCA_TERMINAL_HANDLE) =====
+fm-afk-launch: away supervision does not support supervisor backend 'orca' yet (supported: tmux herdr rex t3code); refusing to arm away mode. Run firstmate inside a supported session, or set FM_SUPERVISOR_BACKEND/FM_SUPERVISOR_TARGET explicitly
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [06] B2 start with an Orca operator session =====
+fm-afk-launch: away supervision does not support supervisor backend 'orca' yet (supported: tmux herdr rex t3code); refusing to arm away mode. Run firstmate inside a supported session, or set FM_SUPERVISOR_BACKEND/FM_SUPERVISOR_TARGET explicitly
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [07] C1 start-native with an hc operator session (HC_TERMINAL_ID/HC_TERMINAL_SOCKET) =====
+fm-afk-launch: away supervision does not support supervisor backend 'hc' yet (supported: tmux herdr rex t3code); refusing to arm away mode. Run firstmate inside a supported session, or set FM_SUPERVISOR_BACKEND/FM_SUPERVISOR_TARGET explicitly
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [08] C2 start with an hc operator session =====
+fm-afk-launch: away supervision does not support supervisor backend 'hc' yet (supported: tmux herdr rex t3code); refusing to arm away mode. Run firstmate inside a supported session, or set FM_SUPERVISOR_BACKEND/FM_SUPERVISOR_TARGET explicitly
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [09] D1 start-native with a mistyped supervisor target (tmux:no-such-session:0) =====
+fm-afk-launch: supervisor target 'no-such-session:0' does not resolve to a tmux endpoint; refusing to arm away mode. Set FM_SUPERVISOR_TARGET to firstmate's own pane
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [10] D2 start with an unresolvable tmux pane id (%99999) =====
+fm-afk-launch: supervisor target '%99999' does not resolve to a tmux endpoint; refusing to arm away mode. Set FM_SUPERVISOR_TARGET to firstmate's own pane
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [11] E1 start-native against this real live pane (%0) =====
+rc=0
+state: afk=away terminal=none - native contract=version: 2
+
+===== [12] E2 stop the armed native posture =====
+fm-afk-launch: away-posture record archived at /tmp/fm-lab.AAVndl/state/afk-contracts/1793608482.afk-contract
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+rc=0
+state: afk=ABSENT terminal=ABSENT contract=ABSENT
+
+===== [13] F1 start (daemon entry) against this real live pane =====
+fm-afk-launch: an away-posture record is required; run enter before starting the daemon
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=ABSENT
+daemon tmux sessions on the lab socket: primary: 1 windows (created Mon Nov  2 00:34:16 2026) 
+daemon log:
+
+===== [14] F2 stop the daemon posture =====
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+rc=0
+state: afk=ABSENT terminal=ABSENT contract=ABSENT
+daemon tmux sessions on the lab socket after stop: primary: 1 windows (created Mon Nov  2 00:34:16 2026) 
+
+===== [15] G tmux pane nested inside an Orca terminal keeps its own transport =====
+fm-afk-launch: an away-posture record is required; run enter before starting the daemon
+rc=1
+state: afk=ABSENT terminal=ABSENT contract=ABSENT
+stop rc=0
+state: afk=ABSENT terminal=ABSENT contract=ABSENT
+
+===== [16] H daemon startup refuses an Orca operator session instead of the tmux fallback =====
+afk: starting supervise daemon in foreground; keep this command as a tracked background session
+error: away-mode daemon does not support supervisor backend 'orca' yet (supported: tmux herdr rex t3code); set FM_SUPERVISOR_BACKEND=tmux|herdr|rex|t3code and FM_SUPERVISOR_TARGET to run firstmate's own pane under a supported backend
+rc=1
+daemon log refusal line:
+[2026-11-02T00:34:47-0800] startup failed: unsupported supervisor backend 'orca' (source=ORCA_TERMINAL_HANDLE)
+firstmate fallback touched? sessions on lab socket: primary: 1 windows (created Mon Nov  2 00:34:16 2026) 
+
+DONE
+
+########## drive2: real daemon entry end-to-end + nested Orca ##########
+
+===== [01] F0 enter the away posture again (stop archived the record) =====
+rc=0
+state: afk=away terminal=ABSENT contract=version: 2
+
+===== [02] F1 start (daemon entry) against this real live pane (%0) =====
+fm-afk-launch: daemon launched in detached tmux session 'fm-afk-daemon-586868483-3688408-3121-1793608496', supervising %0
+rc=0
+state: afk=away terminal=tmux fm-afk-daemon-586868483-3688408-3121-1793608496  contract=version: 2
+tmux sessions on the lab socket: fm-afk-daemon-586868483-3688408-3121-1793608496: 1 windows (created Mon Nov  2 00:34:57 2026) primary: 1 windows (created Mon Nov  2 00:34:16 2026) 
+daemon log:
+[2026-11-02T00:34:47-0800] startup failed: unsupported supervisor backend 'orca' (source=ORCA_TERMINAL_HANDLE)
+[2026-11-02T00:34:57-0800] daemon starting (pid 3688815); target=%0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=240s; batch=90s
+
+===== [03] F2 stop the daemon posture =====
+fm-afk-launch: terminal close command failed, but exact absence was confirmed
+fm-afk-launch: away-posture record archived at /tmp/fm-lab.AAVndl/state/afk-contracts/1793608496.afk-contract
+fm-afk-launch: away mode stopped; daemon terminal torn down, .afk cleared, and the posture record archived
+rc=0
+state: afk=ABSENT terminal=ABSENT contract=ABSENT
+tmux sessions on the lab socket after stop: primary: 1 windows (created Mon Nov  2 00:34:16 2026) 
+
+===== [04] G0 enter the away posture again =====
+rc=0
+state: afk=ABSENT terminal=ABSENT contract=version: 2
+
+===== [05] G1 start-native from this tmux pane while an Orca terminal hosts it (ORCA_TERMINAL_HANDLE set) =====
+rc=0
+state: afk=away terminal=none - native contract=version: 2
+
+===== [06] G2 stop the nested-Orca native posture =====
+rc=0
+state: afk=ABSENT terminal=ABSENT contract=ABSENT
+
+DONE
+
+########## drive3: hc daemon startup refusal (main auto-detection preserved) ##########
+=== daemon startup with an hc operator session (main auto-detection preserved) ===
+afk: starting supervise daemon in foreground; keep this command as a tracked background session
+error: away-mode daemon does not support supervisor backend 'hc' yet (supported: tmux herdr rex t3code); set FM_SUPERVISOR_BACKEND=tmux|herdr|rex|t3code and FM_SUPERVISOR_TARGET to run firstmate's own pane under a supported backend
+rc=1
+[2026-11-02T00:35:27-0800] startup failed: unsupported supervisor backend 'hc' (source=FALLBACK(tmux))
+
+--- discovery as the real lib resolves it ---
+HC only:      backend=tmux target=%0
+HC+tmux pane: backend=tmux target=%3
+HC+Orca:      backend=tmux target=%0
+tmux supported
+herdr supported
+rex supported
+t3code supported
+hc NOT supported (refused)
+orca NOT supported (refused)
+
+DONE
+
+########## drive4: discovery precedence + supported-backend predicate ##########
+=== discovery precedence through the real library (no inherited markers) ===
+nothing                       -> backend=tmux target=firstmate:0
+hc markers only              -> backend=hc target=iso1:7
+hc + Orca handle             -> backend=hc target=default:7
+Orca handle only             -> backend=orca target=term_x
+Orca + tmux pane             -> backend=tmux target=%7
+Orca + explicit override     -> backend=herdr target=explicit:tgt
+hc + tmux pane               -> backend=tmux target=%7
+
+=== supported-backend predicate (single owner read by daemon + launcher) ===
+tmux: supported
+herdr: supported
+rex: supported
+t3code: supported
+hc: REFUSED
+orca: REFUSED
+zellij: REFUSED
+cmux: REFUSED
+tern: REFUSED
+
+DONE
