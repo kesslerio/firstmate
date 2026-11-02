@@ -1,0 +1,13 @@
+# Live drive: unsupported inline provider/model#variant refused, keeping --effort as the only effort interface
+# date: 2026-11-02T15:35:02-08:00
+# command: bin/fm-spawn.sh sm-inline-variant <seeded-secondmate-home> --secondmate --harness opencode --model 'john-remote/qwen3.8-flash-next#high' --effort low
+
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.z4MTqf
+error: inline OpenCode model variants are unsupported: 'john-remote/qwen3.8-flash-next#high'; use provider/model with --effort instead
+SPAWN_EXIT:1
+task records written: 0
+pin files present: 0
+
+# tmux windows on the private lab server after the refusal (no worker window was created):
+driver:1: bash* (1 panes) [180x50] 
+driver:2: fm-sm-live (1 panes) [180x50] 

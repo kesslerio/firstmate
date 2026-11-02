@@ -1,0 +1,27 @@
+# Live drive: supported OpenCode model + effort through the real launcher (installed opencode v2.2.2, disposable lab home)
+# date: 2026-11-02T15:35:02-08:00
+# command: FM_HOME=<lab> bin/fm-spawn.sh sm-live <seeded-secondmate-home> --secondmate --harness opencode --model john-remote/qwen3.8-flash-next --effort high
+# worktree under test: /home/art/.no-mistakes/worktrees/215a10a6db23/01M6ESPRBW0YANDGK1B4PY2YPT (commit 70394f88)
+
+2026-11-02T15:33:51-08:00
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.z4MTqf
+notice: opencode v2.2.2 has no top-level --model flag; model 'john-remote/qwen3.8-flash-next' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+warning: secondmate sm-live sync skipped before launch: primary default-branch commit cannot be resolved
+notice: opencode v2.2.2 confirmed the model pin: requested=john-remote/qwen3.8-flash-next observed=john-remote/qwen3.8-flash-next
+notice: 2.2.2 model assertion passed for sm-live: requested=john-remote/qwen3.8-flash-next observed=john-remote/qwen3.8-flash-next#default
+spawned sm-live harness=opencode kind=secondmate mode=secondmate yolo=off window=driver:fm-sm-live worktree=/tmp/fm-sm-live.LDuAdD/secondmate
+SPAWN_EXIT:0
+2026-11-02T15:34:33-08:00
+== pin written by the launcher:
+{"model":{"providerID":"john-remote","model":"qwen3.8-flash-next"}}
+== ownership record:
+/tmp/fm-lab.z4MTqf/state/sm-live.opencode-model-config
+/tmp/fm-sm-live.LDuAdD/secondmate/.opencode/opencode.jsonc
+== task meta:
+window=driver:fm-sm-live
+worktree=/tmp/fm-sm-live.LDuAdD/secondmate
+harness=opencode
+kind=secondmate
+model=john-remote/qwen3.8-flash-next
+effort=high
+opencode_version=2.2.2

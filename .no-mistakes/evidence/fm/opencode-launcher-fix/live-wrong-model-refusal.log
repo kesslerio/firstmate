@@ -1,0 +1,18 @@
+# Live drive: a worker that does not run the requested model is refused and stopped, and the parent home is left intact
+# date: 2026-11-02T15:52:04-08:00  commit: 70394f88
+# command: bin/fm-spawn.sh sm-fail <seeded-secondmate-home> --secondmate --harness opencode --model openai/m1 --effort high
+# setup: the disposable lab has no provider named 'openai', so the build runs its own default model
+
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.1qbaYS
+notice: opencode v2.2.2 has no top-level --model flag; model 'openai/m1' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+warning: secondmate sm-fail sync skipped before launch: primary default-branch commit cannot be resolved
+notice: opencode v2.2.2 confirmed the model pin: requested=openai/m1#high observed=openai/m1#high
+error: OpenCode ran sm-fail's first message on model 'opencode/pulse-alpha-free#default', not the requested 'openai/m1' (2.2.2); refusing the launch rather than leaving a wrong-model worker running; stopped task endpoint driver:fm-sm-fail
+SPAWN_EXIT:1
+== lab home after the failed launch:
+. .. config data .fm-lab-home projects state tmux 
+== lab state:
+home-summary.json sm-fail.status 
+
+== tmux windows on the private lab server after the refusal (worker endpoint closed):
+driver:1: bash* (1 panes) [180x50] 

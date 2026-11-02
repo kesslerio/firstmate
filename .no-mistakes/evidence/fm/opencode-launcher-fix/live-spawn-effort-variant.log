@@ -1,0 +1,47 @@
+# Live drive: provider effort mapped to the OpenCode model variant, end-to-end on the installed build
+# date: 2026-11-02T15:46:30-08:00
+# installed build: opencode v2.2.2 (/home/art/.opencode/bin/opencode)
+# command: bin/fm-spawn.sh sm-effort <seeded-secondmate-home> --secondmate --harness opencode --model openai/m1 --effort high
+# upstream: disposable OpenAI-compatible endpoint at 127.0.0.1:49391 (fake, answers MODEL_PIN_EFFORT_OK); the worker's project config carries provider openai -> that endpoint
+# worktree under test: /home/art/.no-mistakes/worktrees/215a10a6db23/01M6ESPRBW0YANDGK1B4PY2YPT (commit 70394f88)
+
+2026-11-02T15:43:58-08:00
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ePLMhG
+notice: opencode v2.2.2 has no top-level --model flag; model 'openai/m1' rides the worktree's .opencode/opencode.jsonc, which this launch writes and verifies
+warning: secondmate sm-effort sync skipped before launch: primary default-branch commit cannot be resolved
+notice: the project's own /tmp/fm-sm2.wlb17t/secondmate/.opencode/opencode.jsonc already selects 'openai/m1#high'; keeping it as it is
+notice: 2.2.2 model assertion passed for sm-effort: requested=openai/m1 observed=openai/m1#high
+spawned sm-effort harness=opencode kind=secondmate mode=secondmate yolo=off window=driver:fm-sm-effort worktree=/tmp/fm-sm2.wlb17t/secondmate
+SPAWN_EXIT:0
+== project-owned config left in place:
+{
+  "model": {"providerID": "openai", "model": "m1", "variant": "high"},
+  "provider": {
+    "openai": {
+      "options": { "baseURL": "http://127.0.0.1:49391/v1", "apiKey": "lab-key" },
+      "models": { "m1": { "name": "Lab m1" } }
+    }
+  }
+}
+== ownership record (absent = the file is the project's):
+none
+== task meta:
+window=driver:fm-sm-effort
+worktree=/tmp/fm-sm2.wlb17t/secondmate
+harness=opencode
+kind=secondmate
+model=openai/m1
+effort=high
+opencode_version=2.2.2
+2026-11-02T15:45:27-08:00
+
+== live opencode TUI footer in the spawned worker pane (model + variant):
+     Build · Lab m1 · 1m 25s
+  ┃  Build · Lab m1 OpenAI · high
+
+== the build's own session record for the worker's first message:
+{"id":"m1","providerID":"openai","variant":"high"}
+
+== requests the real build made to the disposable upstream:
+      1 listening on 49391
+      1 POST /v1/responses model=m1 stream=True
