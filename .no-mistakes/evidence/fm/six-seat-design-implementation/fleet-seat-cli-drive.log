@@ -1,0 +1,80 @@
+=== A. one shared seat: the second pooled launch is refused and the holder is named ===
+fleet-seats: reserved pool=endpoint id=crew-a generation=g-a used=1 capacity=1
+rc=0
+fleet-seats: pool endpoint is full (1 of 1 seats held); crew-b gets no seat for model provider-b/model-x - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-lab.9rIewf/primary/state crew-a
+rc=4
+
+=== B. a prefix of the model string is not the pooled model (exact match only) ===
+fleet-seats: recorded id=crew-c generation=g-c (model provider-a/model is in no pool)
+rc=0
+
+=== C. the unpooled model is recorded and takes no seat ===
+fleet-seats: recorded id=crew-d generation=g-d (model other/model-z is in no pool)
+rc=0
+
+=== D. releasing the WRONG generation leaves the held seat counted ===
+fleet-seats: no seat held id=crew-a generation=g-wrong
+rc=0
+fleet-seats: pool endpoint is full (1 of 1 seats held); crew-b gets no seat for model provider-b/model-x - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-lab.9rIewf/primary/state crew-a
+rc=4
+
+=== E. releasing the exact generation frees the seat for the next launch ===
+fleet-seats: released id=crew-a generation=g-a reason=prelaunch
+rc=0
+fleet-seats: reserved pool=endpoint id=crew-b generation=g-b used=1 capacity=1
+rc=0
+{"generation":"g-a","lifecycle":"released"}
+{"generation":"g-b","lifecycle":"reserved"}
+
+=== F. a same-generation retry is idempotent, a different generation is not granted ===
+fleet-seats: reserved pool=endpoint id=crew-b generation=g-b (already reserved) used=1 capacity=1
+rc=0
+
+=== G. while pools exist a harness default model is refused before any endpoint work ===
+fleet-seats: no seat - harness claude launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+rc=5
+fleet-seats: no seat - a raw launch command cannot verify its actual model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+rc=5
+holders written: 0
+no declaration means no model requirement:
+rc=0
+
+=== H. an unreadable, symlinked, duplicated, or fractional policy refuses instead of launching uncapped ===
+fleet-seats: no seat - /tmp/fm-seat-lab.9rIewf/primary2/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+policy={"pools":[{"name":"a","capacity":1,"models":["m"]},{"name":"b","capacity":1,"models":["m"]}]} rc=5
+fleet-seats: no seat - /tmp/fm-seat-lab.9rIewf/primary2/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+policy={"pools":[{"name":"a","capacity":1.5,"models":["m"]}]} rc=5
+fleet-seats: no seat - /tmp/fm-seat-lab.9rIewf/primary2/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+policy={"pools":[{"name":"..","capacity":1,"models":["m"]}]} rc=5
+fleet-seats: no seat - /tmp/fm-seat-lab.9rIewf/primary2/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+symlinked policy rc=5
+holders written: 0
+
+=== I. capacity 0 refuses every launch instead of granting one ===
+fleet-seats: pool a is full (0 of 0 seats held); crew-i gets no seat for model m - choose an overflow route or wait for a holder to finish
+rc=4
+
+=== I2. an empty pools list is a valid declaration that caps nothing ===
+fleet-seats: recorded id=crew-i2 generation=g-i2 (model m is in no pool)
+rc=0
+
+=== J. a local secondmate home spends the primary's seat, never its own ledger ===
+fleet-seats: reserved pool=endpoint id=crew-j generation=g-j used=1 capacity=1
+primary seat rc=0
+fleet-seats: pool endpoint is full (1 of 1 seats held); mate-job gets no seat for model provider-b/model-x - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-lab.9rIewf/primary/state crew-j
+mate launch rc=4
+mate ledger: 0
+mate authority record: /tmp/fm-seat-lab.9rIewf/primary
+fleet-seats: reserved pool=endpoint id=mate-job generation=g-m used=1 capacity=1
+mate launch after release rc=0
+primary holders: crew-a crew-b crew-c crew-d crew-j mate-job 
+
+=== K. a marked home whose parent binding vanished still counts against its recorded root ===
+fleet-seats: pool endpoint is full (1 of 1 seats held); mate-job-2 gets no seat for model provider-b/model-x - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-lab.9rIewf/mate/state mate-job
+with authority record rc=4
+without authority record rc=0
+mate ledger: 0

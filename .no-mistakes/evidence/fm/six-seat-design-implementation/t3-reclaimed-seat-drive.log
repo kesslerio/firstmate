@@ -1,0 +1,54 @@
+lab=/tmp/fm-t3seat-lab.wRx4jb
+t3-server=http://127.0.0.1:42129
+recorded-server-identity=["http://127.0.0.1:42129","env-lab"]
+
+=== 1. reserve + dispatch + confirm the secondmate's pooled T3 generation ===
+fleet-seats: reserved pool=t3pool id=t3mate generation=g-fail (already held) used=1 capacity=1
+fleet-seats: dispatched id=t3mate generation=g-fail
+fleet-seats: confirmed id=t3mate generation=g-fail
+seat lifecycle: confirmed
+show-t3 finds the guarded endpoint: t3mate
+
+=== 2. a confirmed generation still receives its turn (positive control) ===
+fm-send rc=0 out=fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-t3seat-lab.wRx4jb/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6EY3T68K4D76QSTVC6ZRV68/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6EY3T68K4D76QSTVC6ZRV68/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+t3_thread_send calls: before=0 after=1
+
+=== 3. the failed run's recovery resumes the still-counted generation (positive control) ===
+probe=relaunchable resume=1
+relaunched=yes
+t3_thread_send calls: before=1 after=2
+
+=== 4. reconciliation reclaims the failed generation (dead-after-start) ===
+fleet-seats: reclaimed id=t3mate generation=g-fail (dead-after-start)
+reclaim rc=0
+seat lifecycle: reclaimed
+
+=== 5. recovery must not resume the reclaimed generation ===
+probe=skipped|the T3 incarnation is terminal; normal capacity admission is required before resuming
+relaunched=no
+t3_thread_send calls: before=2 after=2
+
+=== 6. the shared T3 turn-start boundary refuses the reclaimed generation ===
+send_text_submit rc=0 out=error: T3 turn refused for t3mate; normal capacity admission is required send-failed
+t3_thread_send calls: before=2 after=2
+resume_failed rc=1 out=error: T3 turn refused for t3mate; normal capacity admission is required
+t3_thread_send calls: before=2 after=2
+
+=== 7. removing the task record does not unlock the reclaimed thread ===
+no-meta send rc=0 out=error: T3 turn refused for t3mate; normal capacity admission is required send-failed
+t3_thread_send calls: before=2 after=2
+
+=== 8. another local caller state cannot bypass the reclaimed thread ===
+other-home send rc=0 out=error: T3 turn refused for t3mate; normal capacity admission is required send-failed
+t3_thread_send calls: before=2 after=2
+
+=== 9. capacity is genuinely free for a replacement seat ===
+fleet-seats: reserved pool=t3pool id=contender generation=g-other used=1 capacity=1
+reserve contender rc=0
