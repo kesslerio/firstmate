@@ -1,0 +1,10 @@
+== relaunched pane
+lab|%0|0
+fm-labcf9b9914fd6d-worker|%1|0
+main|%2|0
+== status after relaunch
+paused [at=1793640586]: waiting for gate file /tmp/fmlab.IXG3Xr/home/data/labcf9b9914fd6d-worker/gate and a resume message
+== model pin lines in status: 0
+== default session id in status: 0
+== meta model line
+model=sonnet

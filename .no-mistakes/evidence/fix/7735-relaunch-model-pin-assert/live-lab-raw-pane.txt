@@ -1,0 +1,60 @@
+treehouse get
+
+[art@zeppola:/tmp/fmlab.IXG3Xr/home/projects/notes]$ treehouse get
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Entered worktree at ~/.treehouse/notes-623b06/2/notes. Type 'exit' to return.
+
+[art@zeppola:~/.treehouse/notes-623b06/2/notes]$ cd -- '/home/art/.treehouse/notes-623b06/2/notes'
+
+[art@zeppola:~/.treehouse/notes-623b06/2/notes]$ export GOTMPDIR=/tmp/fm-labraw-cf9b9914fd6d/gotmp
+export COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=labraw-cf9b9914fd6d
+
+[art@zeppola:~/.treehouse/notes-623b06/2/notes]$ export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:~/.treehouse/notes-623b06/2/notes]$ export FM_TASK_ID=labraw-cf9b9914fd6d
+
+[art@zeppola:~/.treehouse/notes-623b06/2/notes]$ . '/tmp/fm-labraw-cf9b9914fd6d+83fd9511c938a16be81f30dacf52528bf6860acd42643a0eeceb0f5bf8b360a1/launch.s1793640985.1862244.31453.sh'
+ ▐▛███▛█   Claude Code v2.1.316
+▝▜██████▀  Opus 5.5 · API Usage Billing
+ ▝▝   ▝▝   ~/.treehouse/notes-623b06/2/notes
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ Try "write a test for <filepath>"
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ bypass permissions on (shift+tab to cycle)
+                              ⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

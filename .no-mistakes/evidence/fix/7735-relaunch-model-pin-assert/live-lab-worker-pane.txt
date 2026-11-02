@@ -1,0 +1,60 @@
+treehouse get
+
+[art@zeppola:/tmp/fmlab.IXG3Xr/home/projects/notes]$ treehouse get
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Entered worktree at ~/.treehouse/notes-623b06/1/notes. Type 'exit' to return.
+
+[art@zeppola:~/.treehouse/notes-623b06/1/notes]$ cd -- '/home/art/.treehouse/notes-623b06/1/notes'
+
+[art@zeppola:~/.treehouse/notes-623b06/1/notes]$ export GOTMPDIR=/tmp/fm-labcf9b9914fd6d-worker/gotmp
+export COMPACT_ADVISER_DISABLE=1
+
+[art@zeppola:~/.treehouse/notes-623b06/1/notes]$ export COMPACT_ADVISER_DISABLE=1
+export FM_TASK_ID=labcf9b9914fd6d-worker
+
+[art@zeppola:~/.treehouse/notes-623b06/1/notes]$ export FM_TASK_ID=labcf9b9914fd6d-worker
+
+[art@zeppola:~/.treehouse/notes-623b06/1/notes]$ . '/tmp/fm-labcf9b9914fd6d-worker+83fd9511c938a16be81f30dacf52528bf6860acd42643a0eeceb0f5bf8b360a1/launch.s1793640579.1385470.5040.sh'
+ ▐▛███▛█   Claude Code v2.1.316
+▝▜██████▀  Sonnet 5.5 with low effort · API Usage Billing
+ ▝▝   ▝▝   ~/.treehouse/notes-623b06/1/notes
+
+
+❯ : Firstmate operational input waiting: read '/tmp/fmlab.IXG3Xr/home/state/operational-inbox/1793640579-722dcce015e0465d.msg' and handle its contents as Firstmate operational input.
+
+  Read 1 file (ctrl+o to expand)
+
+● Bash(pwd -P; git rev-parse --show-toplevel; git checkout -b fm/labcf9b9914fd6d-worker -- ; t=$(date +%s); echo "paused [at=$t]: waiting for gate file /tmp/fmlab.IXG3…)
+  ⎿  /home/art/.treehouse/notes-623b06/1/notes
+     /home/art/.treehouse/notes-623b06/1/notes
+     Switched to a new branch 'fm/labcf9b9914fd6d-worker'
+  ⎿  Allowed by auto mode
+
+● I'm paused. I created the branch fm/labcf9b9914fd6d-worker in the isolated worktree and appended a paused status line. I haven't started count_notes().
+
+  I'll resume once I get a resume message and /tmp/fmlab.IXG3Xr/home/data/labcf9b9914fd6d-worker/gate exists. If the gate file is missing when the message arrives, I'll stay paused.
+
+✻ Cogitated for 7s · done 9:29 AM
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

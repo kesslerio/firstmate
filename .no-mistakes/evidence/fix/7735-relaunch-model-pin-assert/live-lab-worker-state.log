@@ -1,0 +1,20 @@
+== worker meta
+window=firstmate:fm-labcf9b9914fd6d-worker
+endpoint_task_id=labcf9b9914fd6d-worker
+worktree=/home/art/.treehouse/notes-623b06/1/notes
+project=/tmp/fmlab.IXG3Xr/home/projects/notes
+harness=claude
+approval_mode=auto
+kind=ship
+mode=local-only
+yolo=on
+branch=fm/labcf9b9914fd6d-worker
+tasktmp=/tmp/fm-labcf9b9914fd6d-worker
+model=sonnet
+effort=low
+busy_gen=g1793640578.1390135.26414
+spawn_gen=s1793640579.1385470.5040
+== worker status
+paused [at=1793640586]: waiting for gate file /tmp/fmlab.IXG3Xr/home/data/labcf9b9914fd6d-worker/gate and a resume message
+== grep model pin in status:
+0

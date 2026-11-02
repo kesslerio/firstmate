@@ -1,0 +1,56 @@
+== pi trust unchanged?
+c15c05e2c565113520e13de5114c170e425b187282821d17cff046c952d3f98f  /home/art/.pi/agent/trust.json
+== kill
+no server running on /tmp/fmlab-pi.MnTRKp/tmux/tmux-1000/default
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/post-rewrite': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/pre-applypatch': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/post-checkout': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/pre-auto-gc': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/pre-push': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/post-applypatch': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/sendemail-validate': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/prepare-commit-msg': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/post-merge': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/pre-commit': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/post-commit': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/pre-rebase': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/pre-merge-commit': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/applypatch-msg': Permission denied
+rm: cannot remove '/tmp/fmlab-pi.MnTRKp/home/state/labpi-1793641254.git-hooks/commit-msg': Permission denied
+/tmp/fmlab-ceiling-up.log
+/tmp/fmlab-driver.sh
+/tmp/fmlab-homelock-trace.sh
+/tmp/fmlab-homelock-trace.txt
+/tmp/fmlab-pi.MnTRKp
+/tmp/fmlab-pr6753-live-r4
+/tmp/fmlab-prefix-check.sh
+/tmp/fm-test-run.1oKdZV
+/tmp/fm-test-run.22RZTJ
+/tmp/fm-test-run.2EaxzJ
+/tmp/fm-test-run.3jSs3g
+/tmp/fm-test-run.5f55Ad
+/tmp/fm-test-run.Ap57Bx
+/tmp/fm-test-run.au3dPe
+/tmp/fm-test-run.BSd7nF
+/tmp/fm-test-run.CX6Wq7
+/tmp/fm-test-run.dgrMbW
+/tmp/fm-test-run.E7X4U0
+/tmp/fm-test-run.egeYAw
+/tmp/fm-test-run.fU9xXf
+/tmp/fm-test-run.g3NWBg
+/tmp/fm-test-run.iATmlJ
+/tmp/fm-test-run.idnZwS
+/tmp/fm-test-run.JbZkjV
+/tmp/fm-test-run.JSlWkl
+/tmp/fm-test-run.Jvbilg
+/tmp/fm-test-run.kw6Wsg
+/tmp/fm-test-run.l5gplt
+/tmp/fm-test-run.out
+/tmp/fm-test-run.PynYhd
+/tmp/fm-test-run.rjaY5W
+/tmp/fm-test-run.S7dnlB
+/tmp/fm-test-run.tlAf2T
+/tmp/fm-test-run.V3nA6l
+/tmp/fm-test-run.w8iGFB
+/tmp/fm-test-run.Wfjwx0
+/tmp/fm-test-run.XOmKmQ

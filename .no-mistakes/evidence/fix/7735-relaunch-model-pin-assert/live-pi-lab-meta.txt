@@ -1,0 +1,3 @@
+ROOT=/tmp/fmlab-pi.MnTRKp
+tree=6f3f0e736fc9db9527af38acdf0eb941c9e63694 tmux=firstmate: 1 windows (created Mon Nov  2 09:40:50 2026)
+MATE=labpi-1793641254

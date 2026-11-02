@@ -1,0 +1,3 @@
+model pin unverified: pin 'sonnet' could not be addressed for this raw Claude launch (no session address exists for this path)
+spawned labraw-cf9b9914fd6d harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labraw-cf9b9914fd6d worktree=/home/art/.treehouse/notes-623b06/2/notes
+EXIT=0 elapsed=4s

@@ -1,0 +1,2 @@
+model pin asserted: pin 'sonnet' actual 'claude-sonnet-5-5' (pinned Claude session 3ac5c1a8-5a21-4cd1-b503-2e79e06f2cfe)
+spawned labcf9b9914fd6d-mate harness=claude kind=secondmate mode=secondmate yolo=off window=firstmate:fm-labcf9b9914fd6d-mate worktree=/tmp/fmlab.IXG3Xr/mate

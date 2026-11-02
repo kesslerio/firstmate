@@ -1,0 +1,15 @@
+lab: /tmp/fmlab.IXG3Xr (tear down with: bin/fm-live-lab.sh down /tmp/fmlab.IXG3Xr)
+tree: 6f3f0e736fc9db9527af38acdf0eb941c9e63694 from /home/art/.no-mistakes/worktrees/9f75ec418609/01M6EFXY6ZJBKY8E466BNYPY0R
+model pin asserted: pin 'sonnet' actual 'claude-sonnet-5-5' (pinned Claude session 7c90002f-ad24-4457-aaa3-c18242a94fd4)
+spawned labcf9b9914fd6d-worker harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labcf9b9914fd6d-worker worktree=/home/art/.treehouse/notes-623b06/1/notes
+gate: /tmp/fmlab.IXG3Xr/home/data/labcf9b9914fd6d-worker/gate (touch, then message the worker to resume)
+primary: claude --setting-sources project,local --model claude-haiku-4-5-20251001 --effort low --permission-mode auto
+ok primary: claude pid 1428930 in /tmp/fmlab.IXG3Xr/home
+ok probe: the primary answered LABREADY-cf9b9914fd6d
+ok trust: /tmp/fmlab.IXG3Xr/home is trusted in the Claude store
+ok mirror: verified writer, check passed, captain=1 main=1
+ok host: supervision host pid 1454687
+ok watcher: live watcher with a fresh beacon
+ok worker: labcf9b9914fd6d-worker parked on /tmp/fmlab.IXG3Xr/home/data/labcf9b9914fd6d-worker/gate
+fail treehouse: new ~/.treehouse entries: notes-623b06
+not ready after 300s; the lab is left up for inspection: bin/fm-live-lab.sh pane /tmp/fmlab.IXG3Xr, then bin/fm-live-lab.sh down /tmp/fmlab.IXG3Xr

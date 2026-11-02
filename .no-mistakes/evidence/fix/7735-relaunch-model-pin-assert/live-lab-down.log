@@ -1,9 +1,9 @@
 stopped: lab tmux server and lab processes
-removed: task temp /tmp/fm-lab21d983ae983e-worker+6bdd44e4bfaebb2a5e74146fa3b66b777b5d6fd8d0c2156e0301e6774b0c2a27
-removed: task temp /tmp/fm-lab21d983ae983e-worker
-removed: task temp /tmp/fm-lab-pin-decorated-probe+6bdd44e4bfaebb2a5e74146fa3b66b777b5d6fd8d0c2156e0301e6774b0c2a27
-removed: task temp /tmp/fm-lab-pin-silent-probe+6bdd44e4bfaebb2a5e74146fa3b66b777b5d6fd8d0c2156e0301e6774b0c2a27
-removed: task temp /tmp/fm-lab-pin-unpinned-probe+6bdd44e4bfaebb2a5e74146fa3b66b777b5d6fd8d0c2156e0301e6774b0c2a27
-removed: 2 Claude project entries under /tmp/fmlab.XZXka1
-warning: ~/.treehouse gained entries during the lab; left as is: notes-4adbff
-removed: /tmp/fmlab.XZXka1
+removed: task temp /tmp/fm-labcf9b9914fd6d-mate+83fd9511c938a16be81f30dacf52528bf6860acd42643a0eeceb0f5bf8b360a1
+removed: task temp /tmp/fm-labcf9b9914fd6d-mate
+removed: task temp /tmp/fm-labcf9b9914fd6d-worker+83fd9511c938a16be81f30dacf52528bf6860acd42643a0eeceb0f5bf8b360a1
+removed: task temp /tmp/fm-labcf9b9914fd6d-worker
+removed: task temp /tmp/fm-labraw-cf9b9914fd6d+83fd9511c938a16be81f30dacf52528bf6860acd42643a0eeceb0f5bf8b360a1
+removed: 3 Claude project entries under /tmp/fmlab.IXG3Xr
+warning: ~/.treehouse gained entries during the lab; left as is: notes-623b06
+removed: /tmp/fmlab.IXG3Xr

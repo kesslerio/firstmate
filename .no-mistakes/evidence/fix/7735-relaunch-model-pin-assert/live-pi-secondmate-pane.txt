@@ -1,0 +1,19 @@
+== panes
+lab|%0|0
+fm-labpi-1793641254|%1|0
+== mate pane
+ This script never starts supervision itself.
+ The digest above is complete for this session start. The READ-ONCE CONTRACT
+ section near the top of it governs what may still be read from disk.
+ Took 1.5s
+ Planning session-start-recovery sequencing
+ [skill] session-start-recovery:1-2000 (ctrl+o to expand)
+ fm_watch_arm_pi
+ watcher: started Pi extension arm child 1; future ordinary re-arms are automatic; call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy
+ Finalizing idle no-op response
+ Captain, shipshape.
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/tmp/fmlab-pi.MnTRKp/mate (main)
+↑30k ↓435 R53k CH94.5% 10.9%/272k (auto)                                                                                                                                                 (openai-codex) gpt-5.6-sol • medium
+Codex · subs | pro | ok | 7d 7% left/1d12h | +3 ready 🚀 TPS: 487.7 tok/s (435 tok in 0.9s · TTFT: 1726 ms)​
