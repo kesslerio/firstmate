@@ -1,0 +1,25 @@
+# Health monitor replaces a non-progressing identity-proved watcher with no tool call
+lab=/tmp/fm-lab.pGzhRz  FM_POLL=5 FM_GUARD_GRACE=25 (config/watch.env)
+wedge: beacon stopped being updated (state/.last-watcher-beat -> read-only /etc/passwd symlink); watcher process itself stays alive and TERM-responsive
+old watcher pid=2866475  15:57:50
+
+t=+10s lock_pid=2866475 beat_age=10s
+t=+20s lock_pid=2866475 beat_age=20s
+t=+30s lock_pid=2866475 beat_age=30s
+t=+40s lock_pid= beat_age=0s
+
+## extension log
+2026-11-01T23:58:28.957Z pid=2847850 health monitor state=retrying arm=2866402
+2026-11-01T23:58:29.957Z pid=2847850 health monitor retire=timeout arm=2866402 wait=1000ms
+2026-11-01T23:58:30.495Z pid=2847850 restore attempt=0 predecessor=3013586 start=ok pid=3014426
+2026-11-01T23:58:30.920Z pid=2847850 confirm generation=2866475.1793577509.tZclba watcherPid=3014500 result=confirmed
+
+## pane messages after replacement (no FAILED alarm expected)
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: rearm-resurface
+
+## final state
+watcher pid=3014500 beat_age=5s beat_is_regular_file=yes
+processes:
+3014426 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CQ2GJCPJKM042SJ7MMNDNP/bin/fm-watch-arm.sh --restart
+3014500 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CQ2GJCPJKM042SJ7MMNDNP/bin/fm-watch.sh

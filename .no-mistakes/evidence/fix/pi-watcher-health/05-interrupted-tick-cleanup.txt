@@ -1,0 +1,18 @@
+# TERM during a real pending-reply tick removes the decision snapshot dir from TMPDIR
+lab=/tmp/fm-lab.j3tuF3  TMPDIR=/tmp/fm-lab.j3tuF3/tmpdir
+
+mid-tick: /tmp/fm-lab.j3tuF3/tmpdir/fm-pending-reply-decisions.3086633.7LIDbz entries=1 bytes=238 (watcher pid 3086633 still alive: yes)
+snapshot files: 0
+
+TMPDIR before TERM:
+total 12
+drwxr-xr-x 3 art users 4096 Nov  1 15:59 .
+drwx------ 8 art users 4096 Nov  1 15:53 ..
+drwx------ 2 art users 4096 Nov  1 15:59 fm-pending-reply-decisions.3086633.7LIDbz
+watcher exited on TERM
+
+TMPDIR after TERM (no fm-pending-reply-decisions.* leftover):
+total 8
+drwxr-xr-x 2 art users 4096 Nov  1 15:59 .
+drwx------ 8 art users 4096 Nov  1 15:53 ..
+leftover decision-cache dirs: 0

@@ -1,0 +1,35 @@
+# Pending-reply decision cache driven by the real watcher (bin/fm-watch.sh)
+lab=/tmp/fm-lab.j3tuF3
+
+Fixture: 8 delivered pending replies for task hibit, parent status carrying an open decision
+`needs-decision [key=scope]: choose`, config/wait-no-turns present, real bin/fm-watch.sh ticking.
+
+## While the decision is open (4 ticks observed over 40s):
+sends=0, all 8 records kept phase=awaiting_report with an empty recovery_attempted_epoch
+(the tick folded the denial once per unchanged snapshot and reused it; no correlation sent)
+
+## After appending 'resolved [key=scope]: chosen' and letting the real watcher tick:
+each of the 8 correlations recovered exactly once (persisted record state below).
+
+## Persisted record state now in the store (phase / recovery_attempted / recovery_sent):
+0620cb8f2d8c3007 phase=recovery_sent attempted=1793577326 sent=1793577326
+0ece51e788ff184f phase=escalated attempted=1793577359 sent=
+1af7e3360b88732d phase=awaiting_report attempted= sent=
+284e387a13d08608 phase=awaiting_report attempted= sent=
+46f466300a514dde phase=awaiting_report attempted= sent=
+4ec1ce7d28adf2fd phase=recovery_sent attempted=1793577327 sent=1793577327
+58060a72fb16ea9a phase=recovery_sent attempted=1793577327 sent=1793577327
+60cd4ae19e6129ee phase=awaiting_report attempted= sent=
+7640ad8435e881ee phase=recovery_sent attempted=1793577328 sent=1793577328
+9e1e7695113c9bae phase=recovery_sent attempted=1793577328 sent=1793577328
+abe74c721f2d0774 phase=recovery_sent attempted=1793577329 sent=1793577329
+b4336068ff5fe07b phase=recovery_sent attempted=1793577329 sent=1793577329
+c8c73a4e97299aa0 phase=recovery_sent attempted=1793577330 sent=1793577330
+dfc0fee26454f79a phase=awaiting_report attempted= sent=
+ec95c9665a76737c phase=awaiting_report attempted= sent=
+f3c6c478dc2a09c2 phase=awaiting_report attempted= sent=
+
+phase totals:
+      7 phase=awaiting_report
+      1 phase=escalated
+      8 phase=recovery_sent

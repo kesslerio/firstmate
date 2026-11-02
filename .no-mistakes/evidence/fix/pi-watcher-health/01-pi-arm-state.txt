@@ -1,0 +1,14 @@
+# Pi primary lab run: arm + healthy-state report + 30s health monitor replacement
+lab=/tmp/fm-lab.pGzhRz
+Sun Nov  1 03:57:13 PM PST 2026
+
+## first /fm-watch-arm-pi
+ watcher: started Pi extension arm child 1; future ordinary re-arms are automatic; call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy
+
+watcher pid=2866475 beat_age=4s
+lock identity: home=/tmp/fm-lab.pGzhRz path=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6CQ2GJCPJKM042SJ7MMNDNP/bin/fm-watch.sh
+
+## second /fm-watch-arm-pi on an established healthy watcher
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+watcher pid before=2866475 after=2866475 (identical => no duplicate arm, no restart)
+running worktree watchers: 4

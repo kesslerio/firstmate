@@ -1,0 +1,31 @@
+# Long-poll home: a 360s-old beacon is healthy under the poll-derived grace, not under a fixed 300s floor
+lab=/tmp/fm-lab.j3tuF3  config/watch.env: FM_POLL=600 (no FM_GUARD_GRACE)
+
+watcher pid=3119005 (SIGSTOPped), beacon age=360s
+derived grace for this home = 660
+
+## fm_watcher_healthy with the pre-fix fixed 300s default:
+rc=1  (1 = stalled => the extension would retire a healthy long-poll watcher)
+
+## fm_watcher_healthy with the extension's poll-derived grace:
+rc=0  (0 = healthy => no replacement)
+
+## Live Pi primary observation from the long-poll lab (FM_POLL=600), real 30s health monitor, 80s window:
+  start 15:49:57 watcher=2139894 beat_age=371s
+  t=+10s lock_pid=2139894 beat_age=381s arms=5
+  t=+20s lock_pid=2139894 beat_age=391s arms=5
+  t=+30s lock_pid=2139894 beat_age=401s arms=5
+  t=+40s lock_pid=2139894 beat_age=411s arms=5
+  t=+50s lock_pid=2139894 beat_age=421s arms=5
+  t=+60s lock_pid=2139894 beat_age=431s arms=5
+  t=+70s lock_pid=2139894 beat_age=441s arms=5
+  t=+80s lock_pid=2139894 beat_age=451s arms=5
+  --- ext log ---
+  --- procs ---
+  2139858 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CQ2GJCPJKM042SJ7MMNDNP/bin/fm-watch-arm.sh --restart
+  2139894 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CQ2GJCPJKM042SJ7MMNDNP/bin/fm-watch.sh
+  --- pane ---
+   watcher: started Pi extension arm child 1; future ordinary re-arms are automatic; call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy
+   Warning: watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+
+  (lock_pid 2139894 stayed unchanged and the extension log stayed empty for the whole window; the live /fm-watch-arm-pi report in that lab read 'watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress')

@@ -1,0 +1,18 @@
+# Unproved watcher identity withholds replacement and preserves the running processes
+lab=/tmp/fm-lab.pGzhRz  15:58:55
+tamper: state/.watch.lock/fm-home := /tmp/foreign-home (was /tmp/fm-lab.pGzhRz), so this home cannot prove the watcher identity
+before: watcher_pid=3014500 arm_pid=3014426
+
+## pane message
+ Warning: watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+
+## after
+watcher_pid=3014500 (unchanged)
+3014426 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CQ2GJCPJKM042SJ7MMNDNP/bin/fm-watch-arm.sh --restart
+3014500 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CQ2GJCPJKM042SJ7MMNDNP/bin/fm-watch.sh
+
+## extension log (no retirement row)
+2026-11-01T23:58:28.957Z pid=2847850 health monitor state=retrying arm=2866402
+2026-11-01T23:58:29.957Z pid=2847850 health monitor retire=timeout arm=2866402 wait=1000ms
+2026-11-01T23:58:30.495Z pid=2847850 restore attempt=0 predecessor=3013586 start=ok pid=3014426
+2026-11-01T23:58:30.920Z pid=2847850 confirm generation=2866475.1793577509.tZclba watcherPid=3014500 result=confirmed
