@@ -1,0 +1,250 @@
+ Possibility: The watcher is doing a foreground read/wait and the Pi harness "pauses" background tasks by SIGSTOP when the agent turn ends (a UI freeze) — plausible; Pi's background bash tasks may be
+ frozen at turn end and SIGCONT'd at turn start. But then the watcher wouldn't work during idle (which defeats supervision). But the extension's own 30s health check replaces unhealthy ones...
+
+ Either way, my pragmatic move: SIGCONT the stopped watcher; verify beacon becomes fresh and it stays alive. If it's frozen again after my turn ends, the extension's health check must handle it
+ (extension-owned). But to leave the system healthy NOW, SIGCONT is exactly "inspect or stop that watcher before re-arming" territory — and it's the narrowest action.
+
+ But hold on: is SIGCONT safe? If a TERM is pending it dies. SigPnd is empty (0), so no pending TERM. So SIGCONT resumes it → it continues polling → beat fresh → healthy.
+
+ Let me SIGCONT and observe 20s.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && kill -CONT 2803347 2>/dev/null && echo "sent SIGCONT"; sleep 15; grep -E '^State' /proc/2803347/status 2>/dev/null ||
+ echo "watcher gone"; echo ---; stat -c 'mtime=%y' "$FM_HOME/state/.last-watcher-beat"; date; echo ---; tail -1 "$FM_HOME/state/.watch-cycle-exits.log" | sed -E
+ 's/arm_pid=([0-9]+).*watcher_pid=([0-9]+).*origin=([a-z]+).*ended_at=([0-9]+).*exit_code=([0-9]+).*signal=([a-z]+).*reason=([a-z-]+).*/arm=\1 pid=\2 origin=\3 exit=\5 sig=\6 reason=\7/'
+
+ ... (2 earlier lines, ctrl+o to expand)
+ ---
+ mtime=2026-11-01 16:48:42.803674551 -0800
+ Sun Nov  1 04:48:57 PM PST 2026
+ ---
+ arm=2801131 pid=2802179 origin=started exit=0 sig=none reason=actionable-check
+
+ Took 15.0s
+
+
+ Warning: watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+
+ Now the watcher is sleeping (running normally), beat fresh at 16:48:42 (matching a poll touch). So SIGCONT fixed it. The watcher is live and healthy, lock held by it.
+
+ Now check .watcher-down: guard banner should clear when beacon fresh on next guard check. Let me check it and wake queue once more, then ack if needed.
+
+ Also: drain may now produce a WAKE_ACK_REQUIRED? The drain already run, acked through 0. If another wake arrives, extension handles its own delivery. Let me run drain once more to be safe (it's
+ cheap and idempotent), then verify banner cleared.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-wake-drain.sh 2>&1; echo "---"; cat "$FM_HOME/state/.watcher-down" 2>/dev/null || echo "watcher-down absent";
+ echo "---"; stat -c '%y' "$FM_HOME/state/.last-watcher-beat"; date; ps -eo pid,etime,stat,args | grep "01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh" | grep -v grep
+
+ ... (2 earlier lines, ctrl+o to expand)
+ announced:handling:2701869.1793580413.O8V4VM
+ ---
+ 2026-11-01 16:48:58.043654223 -0800
+ Sun Nov  1 04:49:04 PM PST 2026
+ 2803347       02:10 S+   bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh
+
+ Took 0.3s
+
+
+ Drain now says ack-through 0 with recovery-generation 2701869.1793580413.O8V4VM (the newer episode). Empty queue again (no rows). Ack it.
+
+ Note: draining with an empty queue still demands ack to consume the downtime marker episode. Run the exact command.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 2701869.1793580413.O8V4VM; echo "exit=$?"; echo ---; cat
+ "$FM_HOME/state/.watcher-down" 2>/dev/null || echo "watcher-down absent"; echo ---; stat -c '%y' "$FM_HOME/state/.last-watcher-beat"; date
+
+ ... (1 earlier lines, ctrl+o to expand)
+ ---
+ acked:handling:2701869.1793580413.O8V4VM
+ ---
+ 2026-11-01 16:48:58.043654223 -0800
+ Sun Nov  1 04:49:07 PM PST 2026
+
+ Took 0.1s
+
+
+ Ack succeeded → marker "acked:handling:...". Good.
+
+ Now, the beat at 16:48:58 was fresh 9s ago; the watcher is sleeping (polling). Healthy now.
+
+ But the underlying recurring problem: watcher gets SIGSTOP'd (T) at some point (turn boundaries?), so continuity breaks repeatedly and the extension can't evict a stopped holder (TERM doesn't take
+ effect). Two candidate fixes:
+ 1. In my session: SIGCONT as needed (manual, unreliable).
+ 2. At the source: eviction should SIGCONT the holder (or treat a stopped holder as stalled-dead) — a real firstmate repo fix in bin/fm-watch.sh's evict_stalled_holder.
+
+ Given hard rule "state the invariant, fix unsafe behavior at its source" but also worker-role caution... This session is a lab fixture of the extension; the repeated failure is exactly what a
+ fixture would expose. However, my instructions say watcher continuity is extension-owned — implying I should not hand-fix the arm mechanics tonight unless notified.
+
+ Given the notifications keep arriving with FAILED, the loop may continue: extension retries 5x → notification → I drain/arm → ... With SIGCONT it now works. But if the extension's arm child TERMs
+ the stopped holder its pending TERM will land on CONT... but I already CONT'd; no TERM pending.
+
+ Actually the deeper question: why does the watcher get stopped? Because of the beat mtime reverting too (Change 16:47:22, Modify 16:27:22) — clearly something external manipulates state: the lab
+ harness restoring state snapshots. Hmm, or... wait, maybe state dir is on tmpfs with statx quirks? No, mtime backward is real.
+
+ Another explanation for both anomalies: the fixture (tmux lab) runs a test that SIGSTOPs the watcher and rewrites state files to simulate downtime — i.e., the lab is exercising recovery paths. The
+ extension then reports FAILED, which is the scenario being tested and the bug we are meant to notice!
+
+ Since this session's cwd is a firstmate worktree (a ship/scout worktree?), the likely task is: debug the Pi extension watcher continuity failure. But I have no explicit brief in this turn — just
+ watcher wakes. Hmm.
+
+ I should not spiral. Current state: wakes drained, ack'd, watcher healthy (sleeping, fresh beacon), marker acked. Report to captain concisely: supervision healthy after recovery; nothing queued; no
+ captain decisions pending.
+
+ Let me do a final verification a bit later (one more check after ~20s) to be reasonably confident it stays live, then reply. Also check fleet is empty so nothing under way.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && sleep 20; stat -c 'beat=%y' "$FM_HOME/state/.last-watcher-beat"; date; ps -eo pid,etime,stat,args | grep
+ "01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh" | grep -v grep; echo ---; cat "$FM_HOME/state/.watcher-down"; echo ---; bin/fm-crew-state.sh 2>/dev/null | head -5
+
+ ... (1 earlier lines, ctrl+o to expand)
+ Sun Nov  1 04:49:38 PM PST 2026
+ 2803347       02:44 S+   bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh
+ ---
+ acked:handling:2701869.1793580413.O8V4VM
+ ---
+
+ Took 20.1s
+
+
+ Watcher alive, beacon updated at 16:49:28 (10s ago), marker acked. Nothing queued. Fleet empty.
+
+ One lingering thought: the watcher had been stopped (T) twice, and TERM-based eviction can't clear a stopped holder — so recurrence is likely at the next turn boundary. But the extension now shows
+ "healthy"? I called fm_watch_arm_pi earlier reporting "started ... child 10". Fine.
+
+ Final answer: Captain-facing outcome. Watcher continuity restored, no queued wake work, nothing awaiting the captain. Since the captain didn't ask anything and nothing needs review/approval — a
+ no-op-ish answer. But there WAS a failure and I repaired it; per section 9, don't surface internal mechanics. "Supervision is running again" in outcome terms: no project work affected; fleet is
+ empty; nothing for the captain.
+
+ I'll say: Captain, supervision is back up. No queued work existed, the fleet is empty, and nothing needs your word. Mention the one risk in plain words: the watcher kept getting frozen between
+ turns, and it now polls normally; if it freezes again I'll revive it. Keep concise.
+
+ Captain, supervision is back up. The monitoring process kept getting frozen between turns instead of running, so its replacement attempts could never take over; it is polling normally again now.
+
+ There was no queued work to handle, the fleet is empty, and nothing is waiting on your word. If it freezes again on the next turn boundary I'll revive it the same way; the durable recovery records
+ are settled.
+
+
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: rearm-resurface
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.
+
+
+ Another rearm-resurface wake. Drain first.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-wake-drain.sh 2>&1; echo "---"; cat "$FM_HOME/state/.watcher-down" 2>/dev/null; echo ---; stat -c 'beat=%y'
+ "$FM_HOME/state/.last-watcher-beat"; date; ps -eo pid,etime,stat,args | grep "01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh" | grep -v grep
+
+ ... (1 earlier lines, ctrl+o to expand)
+ acked:handling:2701869.1793580413.O8V4VM
+ ---
+ beat=2026-11-01 16:49:43.766593233 -0800
+ Sun Nov  1 04:49:48 PM PST 2026
+ 2803347       02:54 S+   bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh
+
+ Took 0.3s
+
+
+ Drain printed nothing at all this time — no WAKE_ACK_REQUIRED line, meaning no pending rows and no unacknowledged episode (marker already acked). The beat is fresh (16:49:43, 5s ago) and watcher
+ sleeping normally. So the "check: rearm-resurface" notification was the extension's own rearm signal, already settled; nothing queued, nothing to ack.
+
+ So this is a genuine no-op → "Captain, shipshape."
+
+ Wait: drain printed nothing — but should a drain with no rows at all print nothing? Yes.
+
+ No further action needed. Reply exactly the no-op line.
+
+ Captain, shipshape.
+
+
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: rearm-resurface
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.
+
+
+ Same wake pattern repeating. Drain again and check liveness. If this keeps looping, I should investigate the cause rather than replying shipshape every turn.
+
+ Let me drain and check the exit log for a repeating actionable-check loop.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-wake-drain.sh 2>&1; echo "---marker:"; cat "$FM_HOME/state/.watcher-down" 2>/dev/null; echo; echo "---beat:";
+ stat -c '%y' "$FM_HOME/state/.last-watcher-beat"; date; echo "---proc:"; ps -eo pid,etime,stat,args | grep "01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch" | grep -v grep; echo "---recent cycles:"; tail -5
+ "$FM_HOME/state/.watch-cycle-exits.log" | sed -E 's/arm_pid=([0-9]+).*watcher_pid=([0-9]+).*origin=([a-z]+).*ended_at=([0-9]+).*exit_code=([0-9]+).*signal=([a-z]+).*reason=([a-z-]+).*/arm=\1 pid=\2
+ origin=\3 exit=\5 sig=\6 reason=\7/'
+
+ ... (16 earlier lines, ctrl+o to expand)
+ arm_pid=2701615   watcher_pid=2701869   origin=started   started_at=1793580362   ended_at=1793580413   exit_code=143   signal=TERM   reason=arm-interrupted   beacon_age=1225
+ lock_before=pid:2701869|identity:linux-starttime=7193287
+ cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d36435446444e47445154453348424b473659383532354e2f62696e2f666d2d77617463682e7368
+ 00   lock_after=pid:none|identity:none   successor=none
+ arm=2801131 pid=2802179 origin=started exit=0 sig=none reason=actionable-check
+
+ Took 0.3s
+
+
+ The watcher 2803347 is alive and sleeping; beat mtime 16:49:43 (12s ago, fresh). Marker is acked. No cycles since 2801131.
+
+ But drain printed nothing — no WAKE_ACK_REQUIRED. So the notification's wake had nothing queued. Why does the extension wake me at all?
+
+ Possibly the extension re-arms itself on an actionable check and, when nothing is queued after the ack, delivers... hmm. "check: rearm-resurface" is the reason line, but the queue is empty → drain
+ presents nothing. The wake turns are cheap.
+
+ But wait: this is now the 2nd consecutive rearm-resurface wake with no queued rows. Two explanations:
+ 1. The extension delivered a wake whose rows went to the supervision branch (default-on) → main-only rows remain queued for this conversation; branch took them. Then drain prints nothing because
+    rows were consumed by branch? No — main-only rows would be queued for this conversation.
+ 2. The wake was recorded as delivered but its row was already consumed... "Durable queue" — drain shows nothing because --ack-through bookkeeping already covers it.
+
+ Whatever — the correct response contract: drain first (done, empty), no rows to handle, nothing to ack. Reply shipshape if no consequence.
+
+ But is there something about "check: rearm-resurface" that demands a re-arm? Section 8: for check: wakes, act on the named poll result. The named result here is rearm-resurface = "a downtime episode
+ needed re-announcing; re-arm". The extension already owns re-arm. The supervision instructions step 8 says ordinary check wakes do not require another fm_watch_arm_pi. So nothing.
+
+ Given beat is fresh and watcher healthy, shipshape. But let me confirm the watcher doesn't get frozen again — beat was 16:49:43 and now 16:49:55, so it's ticking every poll (POLL likely small, e.g.
+ 5s?). Fine.
+
+ Reply shipshape.
+
+ Fine again — the watcher is polling on schedule and the recovery record is settled; no queued work existed.
+
+ Captain, shipshape.
+
+
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: watcher: FAILED - Pi extension could not arm before replacement wake delivery
+ watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.
+
+
+ Now a different failure: "unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved".
+
+ Drain first, then inspect: watcher identity not proved. That means lock's pid-identity doesn't match the live process (identity mismatch) — e.g., the watcher process died and lock stale, or lock
+ records pid whose identity (starttime/cmdline hex) no longer matches. Since replacement is withheld, I must repair via fm_watch_arm_pi — but the extension withholds because identity not proved
+ ("unhealthy withholds replacement rather than touching a process or lock record this home cannot prove"). Step 10 says: call fm_watch_arm_pi. If the extension owns an arm child and reports
+ unhealthy, the call reports the arm's own state rather than starting a second one. Hmm — so a call may not help. The instruction says "restart the selected Pi-family executable with both extensions
+ loaded if needed."
+
+ First gather facts: drain, then inspect lock contents vs. live processes.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-wake-drain.sh 2>&1; echo "---marker:"; cat "$FM_HOME/state/.watcher-down" 2>/dev/null; echo; echo "---lock:";
+ ls -la "$FM_HOME/state"/.watch.lock* 2>/dev/null; readlink "$FM_HOME/state/.watch.lock" 2>/dev/null; for f in "$FM_HOME/state"/.watch.lock.owner.*/*; do echo "$f: $(cat "$f" 2>/dev/null | head -c
+ 120)"; done; echo "---beat:"; stat -c '%y' "$FM_HOME/state/.last-watcher-beat" 2>/dev/null; date; echo "---procs:"; ps -eo pid,ppid,etime,stat,args | grep "01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch" |
+ grep -v grep; echo "---cycles:"; tail -3 "$FM_HOME/state/.watch-cycle-exits.log" | sed -E
+ 's/arm_pid=([0-9]+).*watcher_pid=([0-9]+).*origin=([a-z]+).*ended_at=([0-9]+).*exit_code=([0-9]+).*signal=([a-z]+).*reason=([a-z-]+).*/arm=\1 pid=\2 origin=\3 exit=\5 sig=\6 reason=\7/'
+
+ ... (29 earlier lines, ctrl+o to expand)
+ arm_pid=2701615   watcher_pid=2701869   origin=started   started_at=1793580362   ended_at=1793580413   exit_code=143   signal=TERM   reason=arm-interrupted   beacon_age=1225
+ lock_before=pid:2701869|identity:linux-starttime=7193287
+ cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d36435446444e47445154453348424b473659383532354e2f62696e2f666d2d77617463682e7368
+ 00   lock_after=pid:none|identity:none   successor=none
+ arm=2801131 pid=2802179 origin=started exit=0 sig=none reason=actionable-check
+
+ Took 0.4s
+
+
+── ⠙ Working ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N (detached)
+↑39k ↓18k R1.8M CH99.1% 12.9%/500k (auto)                                                                                                       (qualitycorp-oq) DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium

@@ -1,0 +1,6 @@
+ok - an uncached decision check immediately before delivery refuses a newly opened decision
+ok - tick folds unchanged denied decisions once, preserves requests, and recovers each exactly once after resolution
+ok - append, truncation, replacement, same-size rewrite, and kind changes invalidate decision denials
+ok - decision-cache cleanup removes this pid's abandoned dirs only
+ok - recovery never pokes a mate waiting on its own decision, and runs once it closes
+ok - filtered pending-reply tests passed

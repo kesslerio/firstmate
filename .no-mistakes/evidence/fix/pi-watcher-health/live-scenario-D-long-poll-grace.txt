@@ -1,0 +1,22 @@
+16:51:08 healthy: lock_pid=2803347 beat_age=8s arms=2803274 
+16:51:08 home config: FM_POLL=600  (derived grace = max(300, 600+60) = 660s)
+16:51:08 wedged at beacon age 400s (< 660s grace); STOPped every lab watcher pid
+16:51:13 t=5s beat_age=405s lock_pid=2803347 arms=2803274 
+16:51:18 t=10s beat_age=410s lock_pid=2803347 arms=2803274 
+16:51:23 t=15s beat_age=415s lock_pid=2803347 arms=2803274 
+16:51:28 t=20s beat_age=420s lock_pid=2803347 arms=2803274 
+16:51:33 t=25s beat_age=425s lock_pid=2803347 arms=2803274 
+16:51:38 t=30s beat_age=430s lock_pid=2803347 arms=2803274 
+16:51:43 t=35s beat_age=435s lock_pid=2803347 arms=2803274 
+16:51:48 t=40s beat_age=440s lock_pid=2803347 arms=2803274 
+16:51:53 t=45s beat_age=445s lock_pid=2803347 arms=2803274 
+16:51:58 t=50s beat_age=450s lock_pid=2803347 arms=2803274 
+16:52:04 t=55s beat_age=455s lock_pid=2803347 arms=2803274 
+16:52:09 t=60s beat_age=460s lock_pid=2803347 arms=2803274 
+16:52:14 t=65s beat_age=465s lock_pid=2803347 arms=2803274 
+16:52:19 t=70s beat_age=470s lock_pid=2803347 arms=2803274 
+16:52:19 result of 400s window: replacement arms started? 0 (expected 0)
+16:52:19 backdated beacon to 700s (> 660s grace); waiting for the health monitor
+16:52:35 replacement arm appeared: 3285190  - SIGCONT 2803347 so the queued TERM reaches it
+16:52:41 RECOVERED after 21s: lock_pid=3294717 beat_age=0s
+16:52:41 final lock_pid=3294717 beat_age=0s arms=2803274 3294649 

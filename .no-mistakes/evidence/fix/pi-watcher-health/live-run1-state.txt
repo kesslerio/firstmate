@@ -1,0 +1,28 @@
+== lock at run1 end
+fm-home: /tmp/fm-lab.OFteyn
+pid: 2314476
+pid-identity: linux-starttime=7161527 cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d36435446444e47445154453348424b473659383532354e2f62696e2f666d2d77617463682e736800
+pid-start: proc-starttime=7161527
+watcher-path: /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh
+
+== state dir
+total 52
+drwxr-xr-x 4 art users 4096 Nov  1 16:41 .
+drwx------ 7 art users 4096 Nov  1 16:35 ..
+-rw-r--r-- 1 art users    2 Nov  1 16:40 .heartbeat-streak
+-rw------- 1 art users 1013 Nov  1 16:41 home-summary.json
+-rw------- 1 art users   25 Nov  1 16:36 .inactive-outcome-reconcile
+-rw-r--r-- 1 art users    0 Nov  1 16:41 .last-check
+-rw-r--r-- 1 art users    0 Nov  1 16:36 .last-heartbeat
+-rw-r--r-- 1 art users    0 Nov  1 16:41 .last-watcher-beat
+-rw-r--r-- 1 art users    8 Nov  1 16:36 .lock
+-rw------- 1 art users  106 Nov  1 16:40 .pi-watch-extension-loaded
+-rw-r--r-- 1 art users    0 Nov  1 16:41 .secondmate-liveness-tick
+drwxr-xr-x 2 art users 4096 Nov  1 16:36 terminal-outcomes
+-rw------- 1 art users    0 Nov  1 16:41 .wake-queue
+-rw------- 1 art users    0 Nov  1 16:40 .watch-arm-output.ZEe7Pk
+-rw-r--r-- 1 art users 5246 Nov  1 16:39 .watch-cycle-exits.log
+-rw-r--r-- 1 art users  110 Nov  1 16:40 .watch-deliveries.log
+-rw------- 1 art users   41 Nov  1 16:40 .watcher-down
+lrwxrwxrwx 1 art users   49 Nov  1 16:40 .watch.lock -> /tmp/fm-lab.OFteyn/state/.watch.lock.owner.ncy3iG
+drwx------ 2 art users 4096 Nov  1 16:40 .watch.lock.owner.ncy3iG

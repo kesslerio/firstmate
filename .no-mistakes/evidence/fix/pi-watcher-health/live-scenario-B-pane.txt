@@ -1,0 +1,250 @@
+ arm_pid=2669201   watcher_pid=2669270   origin=started   started_at=1793580331   ended_at=1793580361   exit_code=143   signal=TERM   r
+ arm_pid=2699464   watcher_pid=2699502   origin=started   started_at=1793580362   ended_at=1793580362   exit_code=0   signal=none   rea
+
+ Took 2.0s
+
+
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+ missing, failed, or unhealthy
+
+ Now: the watcher 2669270 got TERM (arm-interrupted, exit 143), then a new arm 2699464 started 2699502 which exited 0 within 1s (reason probably actionable-check/signal). So the watcher keeps
+ surfacing wakes and exiting; extension re-arms.
+
+ But state/.watcher-down exists — a liveness guard banner file. And .wake-queue empty. So the watcher surfaces wakes that never get queued? Let's look at .watcher-down and .watch-deliveries.log, plus
+ the full exit log lines for the recent cycles to see reason lines.
+
+ The key question: is this the lab test fixture's own behavior where a "check: rearm-resurface" wake is delivered to the extension, extension re-arms, and the loop continues? The extension is
+ supposed to re-arm automatically. That's fine. But it says FAILED after 5 retries earlier.
+
+ Also state/.watcher-down — the liveness guard writes this when watcher down; then a rearm-resurface check fires. If the watcher keeps dying between re-arms, the guard keeps flagging.
+
+ Let me look at the recent exit reasons in full and at .watcher-down content.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && cat "$FM_HOME/state/.watcher-down"; echo ---; tail -6 "$FM_HOME/state/.watch-cycle-exits.log" | sed -E
+ 's/arm_pid=([0-9]+).*watcher_pid=([0-9]+).*origin=([a-z]+).*ended_at=([0-9]+).*exit_code=([0-9]+).*signal=([a-z]+).*reason=([a-z-]+).*/arm=\1 pid=\2 origin=\3 exit=\5 sig=\6 reason=\7/'; echo ---;
+ cat "$FM_HOME/state/.watch-deliveries.log" | tail -8
+
+ ... (16 earlier lines, ctrl+o to expand)
+ cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d36435446444e47445154453348424b473659383532354e2f62696e2f666d2d77617463682e7368
+ 00   check: rearm-resurface
+ 2699502   linux-starttime=7193210
+ cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d36435446444e47445154453348424b473659383532354e2f62696e2f666d2d77617463682e7368
+ 00   check: rearm-resurface
+
+ Took 0.0s
+
+
+ Now the picture: each cycle exits instantly with check: rearm-resurface, and beacon_age jumped to 1210 (20 min) on the second — meaning beacon is stale relative to cycle start. The watcher writes
+ .last-watcher-beat at cycle start... it's stale (20 min) but watcher just started. Hmm, beacon_age 1210 for cycle started at 1793580331 (16:45:31) while beat mtime 16:46 — inconsistent.
+
+ Hold on. Maybe there are two homes sharing... no, FM_HOME=/tmp/fm-lab.gWwnMv. Beat is .last-watcher-beat.
+
+ Actually, look: a beat file mtime 16:46 exists, latest. The beacon_age=1210 line was for arm 2669201, recorded at ended_at=1793580361 (16:46:01), which computed age of beat at lock_before read time
+ — beat_age=1210 means beat was from 16:26? Hmm.
+
+ Wait, is there clock weirdness? date shows PST 16:46. started_at 1793580331 → let me convert: 1793580331 in epoch... 2026-11-01 16:45:31 PST would be epoch 1793580331 (UTC 00:45:31 Nov 2). Yes
+ consistent.
+
+ beacon 16:26 → 16:46 = 1200s. So beat was 16:26 not 16:45. The state dir mtime list said .last-watcher-beat 16:46. Contradiction... unless find -newermt '-2 minutes' matched because I slept 2s
+ only... -newermt '-2 minutes' means newer than 2 min ago → 16:44+. It listed beat at 16:46. So beat mtime is 16:46.
+
+ Hmm, but arm recorded beacon_age=1210 at 16:46 for its lock_before? That was the pre-existing holder's beacon age. The holder at lock_before was pid 2669270, whose beacon was... the watcher 2669270
+ started at 16:45:31 but never wrote a fresh beat? Perhaps the watcher's beat is written at poll time (POLL interval), and if the watcher exits immediately (actionable-check) it writes beat only at
+ start? The immediate exit means "check: rearm-resurface" surfaced instantly — probably because .watcher-down/rearm-resurface is a startup check.
+
+ Root pattern: the watcher starts, immediately surfaces check: rearm-resurface (because the previous arm was interrupted/TERM'd?), exits 0, extension re-arms, and the new watcher... Also
+ arm-interrupted with TERM at 30s — the arm script TERM'd its child? arm-interrupted reason with signal TERM.
+
+ Why would the arm TERM its own child after 30s? Because... the extension kills the arm after a timeout? Or the arm's CONFIRM_TIMEOUT math. Actually reason=arm-interrupted means a stop signal arrived
+ mid-start. The extension likely kills/restarts.
+
+ Honestly, this is extension-owned continuity. The instruction: "Watcher continuity is extension-owned." My duties: drain wakes, handle queued wake. Queue is empty; drain required ack-through 0
+ recovery-generation 2428411.1793580308.s8dWIY. I must run the exact ack command.
+
+ But careful: drain printed WAKE_ACK_REQUIRED with sequence 0 and recovery-generation. Run exactly:
+ bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 2428411.1793580308.s8dWIY
+
+ Then, is a watcher live and healthy? Currently arm 2699464's watcher exited. Extension re-arms automatically. Let me check if a watcher is live right now and its beacon fresh; if the extension's
+ ongoing retries are failing, I should call fm_watch_arm_pi once more only if notification says failed (it did say FAILED twice). But the notification already reported FAILED 5 retries; and then a
+ rearm-resurface wake. The last arm exit was 0 actionable-check, so the cycle is healthy-ish.
+
+ Let me ack first, then inspect liveness.
+
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+ missing, failed, or unhealthy
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 2428411.1793580308.s8dWIY; echo "exit=$?"
+
+ exit=0
+
+ Took 0.2s
+
+
+ Ack succeeded. Now check the watcher liveness: is there a live watcher with a fresh beacon, and is .watcher-down cleared? Also verify the fleet state (no crew). Let me check guard status.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && ls "$FM_HOME/state/.watcher-down" 2>/dev/null && echo "watcher-down: present" || echo "watcher-down: absent"; echo
+ ---; cat "$FM_HOME/state/.last-watcher-beat" >/dev/null; stat -c '%y %n' "$FM_HOME/state/.last-watcher-beat"; date; echo ---; ps -eo pid,ppid,etime,stat,args | grep -E
+ "01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch" | grep -v grep; echo ---; tail -3 "$FM_HOME/state/.watch-cycle-exits.log" | sed -E
+ 's/arm_pid=([0-9]+).*watcher_pid=([0-9]+).*origin=([a-z]+).*ended_at=([0-9]+).*exit_code=([0-9]+).*signal=([a-z]+).*reason=([a-z-]+).*/arm=\1 pid=\2 origin=\3 exit=\5 sig=\6 reason=\7/'
+
+ ... (10 earlier lines, ctrl+o to expand)
+ arm_pid=2669201   watcher_pid=2669270   origin=started   started_at=1793580331   ended_at=1793580361   exit_code=143   signal=TERM   reason=arm-interrupted   beacon_age=1210
+ lock_before=pid:2669270|identity:linux-starttime=7190172
+ cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d36435446444e47445154453348424b473659383532354e2f62696e2f666d2d77617463682e7368
+ 00   lock_after=pid:none|identity:none   successor=none
+ arm=2699464 pid=2699502 origin=started exit=0 sig=none reason=actionable-check
+
+ Took 0.0s
+
+
+ Now the live watcher 2701869 is in state T+ — stopped again! And beat is 16:26 stale (20 min). So the watcher process gets SIGSTOP'd (state T). That's the real root cause: the watcher's process is
+ stopped, so it can't beat, so arms consider it stale, TERM is ignored while stopped (pending), and the guard refuses.
+
+ Who stops it? T+ foreground. On Linux, T = stopped by SIGSTOP/SIGTSTP or traced. In a tmux-attached pi running the extension... maybe the extension spawns the watcher in a process group and
+ something suspends it. Or... pi harness's bash tool? No — the watcher runs under the extension.
+
+ Wait, could this be the tmux lab session's job control: the arm is started as a foreground task, and when the extension's arm tool call ends, the harness sends SIGSTOP? Hmm.
+
+ Another possibility: this lab fixture is a test where a supervisor sends SIGSTOP deliberately. Note pid 2427380 is tmux pi --no-extensions -e .pi/extensions/fm-primary-pi-watch.ts. The extension
+ likely spawns the arm through its bash tool and, on turn end, stops children? Hmm.
+
+ Actually a well-known pattern: on Pi, the extension runs fm-watch-arm.sh as a background bash task; when the agent's turn ends, the harness stops that background task with SIGSTOP? Or when a
+ foreground task's pgroup is orphaned.
+
+ Regardless of cause, the observable symptom: watcher gets SIGSTOP, beacon goes stale, arms fail. Wait — but the extension reports "FAILED - Pi extension could not restore watcher continuity after 5
+ retries". Since TERM doesn't wake a stopped process, the arm can never evict it. The fix at the source would be SIGCONT (bin/fm-watch-arm.sh could SIGCONT a T-state holder rather than TERM). That's
+ a firstmate-repo bug, but this session is running inside the repo's worktree at 01M6CTFDNGDQTE3HBKG6Y8525N... this is a crewmate worktree of firstmate. Hard rule 1: as a worker I can change project
+ files. And the AGENTS contract says this ship follows worker role contract. Hmm, but am I a worker? "FIRSTMATE_OP: v1 watcher" wakes, and "A ship or scout worker launched by Firstmate into a
+ worktree of this repository follows the current worker role contract at the start of its FIRSTMATE_OP: v1 launch-brief". My brief is a watcher wake, not a launch-brief. Ambiguous.
+
+ But wait — the task at hand: this looks like a test/QA lab for the Pi watcher extension. The repeated FAILED cases are exactly what's being debugged/tested? Or perhaps not: the session is just being
+ exercised by notifications.
+
+ Let me not overreach. The contract: "Watcher continuity is extension-owned." So I shouldn't hand-patch continuity; I drain wakes and handle queued wake, and repair by calling fm_watch_arm_pi when
+ notified failed. I already did. The extension will keep re-arming.
+
+ But the live watcher is currently stopped (T) — continuity broken and beacon stale 20 min. The extension's re-arm will again fail 5 times and notify. So the loop will repeat. Since TERM cannot kill
+ a stopped process, the arm's eviction path fails permanently until someone SIGCONTs or SIGKILLs it.
+
+ Actually wait: .watcher-down exists from the guard's first announcement. Is the guard banner present because the guard itself observed no healthy beacon. The guard is bin/fm-guard.sh. Something must
+ SIGCONT or kill. Let me read the guard/turnend docs for a documented repair path ("home-scoped owner path emitted by supervision instructions"). Let me grep the emitted supervision instructions for
+ repair actions.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-supervision-instructions.sh 2>/dev/null | sed -n '1,200p'
+
+ ... (73 earlier lines, ctrl+o to expand)
+
+ The turn-end guard extension lives at `/home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N/.pi/extensions/fm-primary-turnend-guard.ts`.
+ The watcher extension lives at `/home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N/.pi/extensions/fm-primary-pi-watch.ts`.
+ Both are tracked, project-local `.pi/extensions/*.ts` files that Pi auto-discovers once the project is trusted; `bin/fm-session-start.sh` reports when the running Pi session has not loaded both
+ required extensions.
+
+ Took 0.1s
+
+
+ Step 10: on failure notification, drain, inspect failure text, call fm_watch_arm_pi, restart Pi with both extensions if needed. And "only healthy means verified watcher identity and fresh progress".
+ My fm_watch_arm_pi calls returned "watcher: started Pi extension arm child N" — starts, not healthy proof. The extension then does 30s health check.
+
+ The stopped (T) watcher: because the child is attached to the live Pi process and Pi stops jobs? Hmm.
+
+ Root cause hypothesis: the watcher child is launched by the extension as a background bash task; when the model turn ends, Pi's bash tool suspends remaining background processes with SIGSTOP?
+ Actually many harnesses send SIGTERM/SIGKILL. SIGSTOP is unusual but plausible for "stopped" state after terminal job control signals (SIGTTIN/SIGTTOU). Hmm — T+ foreground... T covers both stop and
+ trace.
+
+ Let me check /proc/<pid>/status SigPnd / State for a live T pid to see if there's a pending signal (TERM pending → yes, the arm sends TERM which stays pending).
+
+ Better: read docs/watcher-continuity.md for the documented state contract and any note about stopped children.
+
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+ missing, failed, or unhealthy
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && grep -n -i "stop\|SIGCONT\|suspend\|T+\|stopped" docs/watcher-continuity.md | head -40
+
+ ... (38 earlier lines, ctrl+o to expand)
+ 550:`FM_CLAUDE_LIVE_E2E=1 tests/fm-claude-stop-autoarm-live-e2e.test.sh`:
+ 574:- Claude normally depends on the Stop `asyncRewake` rewake.
+ 576:- Cursor depends on its awaited stop-hook park.
+ 580:[`verification/supervision.md`](verification/supervision.md#watcher-continuity) records the current cross-harness live evidence, the dated Stop-owned Claude auto-arm results, and exact opt-in
+ commands.
+
+ Took 0.0s
+
+
+ Line 524: "A SIGSTOP counterfactual that distinguishes a live PID from a stale beacon before classifying termination." So SIGSTOP is a known scenario in tests.
+
+ Given the extension owns continuity and its bounded retries, and the current watcher delivered check: rearm-resurface actionable-check (exit 0) — but the live watcher 2701869 is T+ (stopped) and I
+ already handled the wakes and acked. Hmm, but that T+ watcher was started at 16:46:03ish and is stopped since. Its beacon... beat file mtime 16:26 (20 min old) — so the newly started watcher has not
+ written a beat yet? Wait, the watcher writes .last-watcher-beat each poll; a watcher blocked in its first poll for 60s writes beat immediately? The beat mtime 16:26 doesn't match any watcher started
+ after.
+
+ Hmm — actually the beat write might only happen when the watcher writes... maybe fm_watch_beat writes a marker file, and stat mtime 16:26 could be from the very first watcher generation. If watchers
+ since then never wrote it, then beat writes happen... Let me check code for BEAT writes.
+
+ Actually, wait. Simpler interpretation: the watcher child is launched with SIGSTOP immediately?? No.
+
+ Let me look at the actual live watcher: is it currently stopped with a pending signal? Check /proc/2701869/status State and SigPnd.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && for p in $(pgrep -f "01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh"); do echo "pid=$p"; grep -E '^(State|SigPnd|ShdPnd)'
+ /proc/$p/status; done; echo ---; grep -n "BEAT\b\|last-watcher-beat" bin/fm-watch.sh | head -20
+
+ ... (11 earlier lines, ctrl+o to expand)
+ 3552:    if [ -e "$BEAT" ]; then
+ 3553:      beat_age=$(fm_path_age "$BEAT")
+ 3577:rm -f "$BEAT"
+ 3890:  touch "$STATE/.last-watcher-beat"
+ 4499:  hb=$(( HEARTBEAT * (1 << streak) ))
+
+ Took 0.0s
+
+
+ Now two watcher processes are sleeping (S) — pid 2803347 and 2813402. So a live watcher exists and is healthy-ish (sleeping in poll). Beat mtime 16:26 stale though... line 3890: touch
+ "$STATE/.last-watcher-beat" — inside some loop. Let me check around 3890 and at what cadence. Also check the beat now.
+
+ Hmm, and note there are two processes with the same name in this home: watcher singleton lock should prevent two... "direct duplicate invocations still no-op through the watcher singleton lock", so
+ a second would exit. But both are alive (S) — maybe one is a fm-watch.sh sourced-child? Or one is from a nested/duplicate? Let me check their start times, ppid, and lock holders.
+
+ Actually things are changing rapidly because the extension keeps re-arming (each "actionable-check" instant exit triggers rearm-resurface → rearm). Multiple watchers may briefly coexist? No —
+ singleton lock.
+
+ Let me check which one holds the lock and their cmdlines/ppid.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && ps -o pid,ppid,etime,stat,lstart,args -p 2803347,2813402 2>/dev/null; echo ---; readlink
+ "$FM_HOME/state/.watch.lock"; ls "$FM_HOME/state"/.watch.lock.owner.*/ 2>/dev/null; echo ---; stat -c '%y' "$FM_HOME/state/.last-watcher-beat"; date; echo ---; tail -2
+ "$FM_HOME/state/.watch-cycle-exits.log" | sed -E 's/arm_pid=([0-9]+).*watcher_pid=([0-9]+).*origin=([a-z]+).*ended_at=([0-9]+).*exit_code=([0-9]+).*signal=([a-z]+).*reason=([a-z-]+).*/arm=\1 pid=\2
+ origin=\3 exit=\5 sig=\6 reason=\7/'
+
+ ... (13 earlier lines, ctrl+o to expand)
+ arm_pid=2701615   watcher_pid=2701869   origin=started   started_at=1793580362   ended_at=1793580413   exit_code=143   signal=TERM   reason=arm-interrupted   beacon_age=1225
+ lock_before=pid:2701869|identity:linux-starttime=7193287
+ cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d36435446444e47445154453348424b473659383532354e2f62696e2f666d2d77617463682e7368
+ 00   lock_after=pid:none|identity:none   successor=none
+ arm=2801131 pid=2802179 origin=started exit=0 sig=none reason=actionable-check
+
+ Took 0.0s
+
+
+ Now: a live watcher 2803347 (started 16:46:53), beat fresh at 16:46:54. Good — beats are written. So healthy. The 2813402 pid was transient maybe.
+
+ So current state: watcher live, beacon fresh, .watcher-down may now be cleared by guard on next check. Wakes drained and acked.
+
+ Also — the recurring check: rearm-resurface wake: each cycle exits 0 actionable-check immediately, about every second or so. What is rearm-resurface? Let me check the source of that check in
+ fm-watch.sh to understand whether it's benign or a loop.
+
+ Actually, important: an actionable check wake means the extension re-arms; if the watcher immediately surfaces the same check again, that's a churn loop → but the
+
+ Follow-up: ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: rearm-resurface
+ Follow-up: ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: rearm-resurface
+ ↳ Alt+Up to edit all queued messages
+
+── ⠋ Working ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N (detached)
+↑26k ↓10.0k R898k CH98.6% 10.2%/500k (auto)                                                                                                     (qualitycorp-oq) DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium

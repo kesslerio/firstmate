@@ -1,0 +1,14 @@
+16:46:21 healthy state: watcher=2701869 arm=2701615 beat_age=2
+16:46:28 verification call: watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+16:46:28 wedge: SIGSTOP 2701869 (live pid, no beacon progress) and backdate beacon 1200s
+16:46:28 wedged: state=T+ beat_age=1200
+16:46:38 t=10s lock_pid=2701869 beat_age=1210s
+16:46:49 t=20s lock_pid=2701869 beat_age=1221s
+16:46:53 replacement arm appeared: 2801131  - SIGCONT 2701869 so the queued TERM reaches the blocked watcher (real anon_pipe_read wedges run their TERM trap)
+16:46:54 RECOVERED after 25s: lock_pid=2803347 beat_age=0s
+16:46:54 old watcher 2701869 still alive? no
+16:46:54 final lock_pid=2803347 beat_age=0
+16:46:54 arms:
+2803274 2427384 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch-arm
+2803347 2803274 bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh
+16:47:03 post-recovery tool: watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is

@@ -1,0 +1,250 @@
+ identity proved (lock pid = live pid, starttime matches?). Let me verify starttime of /proc/2803347 equals 7198446 (field 22 in /proc/pid/stat). If mismatch, identity not proved.
+
+ Check: read /proc/2803347/stat field 22.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && awk '{print "starttime(field22)=" $22}' /proc/2803347/stat; echo ---; grep -rn "identity is not proved\|watcher
+ identity is not proved\|unhealthy" .pi/extensions/fm-primary-pi-watch.ts | head -20
+
+ ... (10 earlier lines, ctrl+o to expand)
+ 1392:    description: "Start the first required Pi watcher cycle, or repair one only after a notification says the cycle is missing, failed, or unhealthy. Do not call after ordinary work or ordinary
+ notifications; the Pi extension re-arms automatically. Never run bin/fm-watch-arm.sh through bash.",
+ 1393:    promptSnippet: "Start the first required Pi watcher cycle or repair a cycle reported missing, failed, or unhealthy; ordinary re-arming is automatic.",
+ 1395:      "Call fm_watch_arm_pi only for the first required cycle or after a notification says the cycle is missing, failed, or unhealthy. Do not call it after ordinary work, turn completion, or
+ ordinary signal, stale, check, or heartbeat handling because the Pi extension owns re-arming. Never run bin/fm-watch-arm.sh through bash.",
+
+ Took 0.0s
+
+
+ Identity IS proved (starttime matches). So why "no verified home-bound watcher with fresh progress"? The extension's health probe may check the arm child's recorded watcher pid/home, not the lock.
+ Maybe the arm child (2803274) recorded a different watcher pid (2802179?) that exited, while a successor 2803347 holds the lock. Let me read the extension's health-check function around lines
+ 1150-1200 to see what it verifies.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && sed -n '1120,1215p' .pi/extensions/fm-primary-pi-watch.ts
+
+ ... (92 earlier lines, ctrl+o to expand)
+       FM_WATCH_ARM_SCRIPT: armScript,
+       FM_WATCH_PREDECESSOR_ARM_PID: predecessorArmPid,
+     };
+     const armChild = spawn("bash", ["-lc", "config_dir=\"${FM_CONFIG_OVERRIDE:-$FM_HOME/config}\"; [ -f \"$config_dir/x-mode.env\" ] && . \"$config_dir/x-mode.env\"; exec \"$FM_WATCH_ARM_SCRIPT\"
+ --restart"], {
+
+ Took 0.0s
+
+
+ Now I need watcherIdentityOwned() and watcherHealthy() implementations. Let me read them.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && grep -n "function watcherHealthy\|function watcherIdentityOwned\|function lockOwnership\|function liveArmChild"
+ .pi/extensions/fm-primary-pi-watch.ts; echo ---; sed -n '/function watcherHealthy/,/^}/p' .pi/extensions/fm-primary-pi-watch.ts; echo ---; sed -n '/function watcherIdentityOwned/,/^}/p'
+ .pi/extensions/fm-primary-pi-watch.ts
+
+ ... (34 earlier lines, ctrl+o to expand)
+     timeout: 2000,
+     stdio: ["ignore", "pipe", "pipe"],
+   });
+   return result.status === 0;
+ }
+
+ Took 0.0s
+
+
+ Identity check reads $2/.watch.lock/pid — i.e. $STATE/.watch.lock/pid where .watch.lock is the symlink → owner dir → pid exists (2803347). fm_watcher_lock_matches_pid(state, watch_path, pid,
+ FM_HOME) — should match. It returned false apparently? Or watcherHealthy returned false? The message says "no verified home-bound watcher with fresh progress; replacement withheld because watcher
+ identity is not proved". If identityOwned() were false, withheld. If identityOwned() true, it would retire+replace ("retrying"). So identity check failed.
+
+ Why? fm_watcher_lock_matches_pid presumably compares /proc/<pid> starttime/cmdline with lock identity AND requires cmdline == script path and home. Our lock has
+ watcher-path=/home/art/.../bin/fm-watch.sh, starttime matches 7198446. Let me run the exact check manually to see its exit code.
+
+ Also note the spawnSync env passes FM_HOME=fmHome where fmHome is derived from... the extension resolves fmHome maybe from process.env.FM_HOME (/tmp/fm-lab.gWwnMv) — matches lock fm-home.
+
+ Let me replicate the identity and health probes directly.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && ls -la "$FM_HOME/state/.watch.lock/"; echo "--- identity probe:"; bash -c '
+ . bin/fm-wake-lib.sh || exit 1
+ set -u
+ pid=$(cat "$2/.watch.lock/pid" 2>/dev/null) || { echo "no pid"; exit 1; }
+ echo "pid=$pid"
+ fm_watcher_lock_matches_pid "$2" "$3" "$pid" "$1"; echo "identity_match_exit=$?"
+ ' fm-pi-watch-identity "$FM_HOME/state" "$PWD/bin/fm-watch.sh" "$FM_HOME"; echo "--- health probe:"; bash -c '
+ . bin/fm-wake-lib.sh || exit 1
+ set -u
+ fm_watcher_healthy "$2" "$3" "${FM_GUARD_GRACE:-$(fm_poll_derived_grace)}" "$1"; echo "healthy_exit=$?"
+ ' fm-pi-watch-health "$FM_HOME/state" "$PWD/bin/fm-watch.sh" "$FM_HOME"
+
+ ... (7 earlier lines, ctrl+o to expand)
+ -rw-r--r-- 1 art users   89 Nov  1 16:46 watcher-path
+ --- identity probe:
+ no pid
+ --- health probe:
+ healthy_exit=1
+
+ Took 0.0s
+
+
+ "no pid" — the probe cat "$2/.watch.lock/pid" failed! But ls shows pid exists in .watch.lock/. Hmm: .watch.lock is a symlink to the owner dir; cat "$FM_HOME/state/.watch.lock/pid" should work. Let
+ me test directly: maybe .watch.lock symlink is dangling/replaced. ls -la showed the owner dir listing fine (I passed $FM_HOME/state/.watch.lock/ which follows symlink). But cat failed... maybe the
+ symlink target changed between? Let me test cat explicitly.
+
+ Wait — could the probe's $2 be wrong in my manual invocation? I passed args: bash -c script fm-pi-watch-identity "FM_HOME/state" "PWD/bin/fm-watch.sh" "$FM_HOME". Inside, $0=fm-pi-watch-identity,
+ $1=state, $2=watch.sh path, $3=FM_HOME! I mismatched positions: extension passes "$1"=fm-wake-lib path as $1? Look: bash -c "...." "fm-pi-watch-identity" "${fmRoot}/bin/fm-wake-lib.sh", state,
+ "${fmRoot}/bin/fm-watch.sh" — so $0=label, $1=lib, $2=state, 3 = watch path. And env FM_HOME set. So my manual call should be: bash -c script label "PWD/bin/fm-wake-lib.sh" "FM_HOME/state"
+ "PWD/bin/fm-watch.sh".
+
+ I passed fm-pi-watch-identity as $0? No — in bash -c cmd arg0 arg1..., the first string after cmd is $0. I wrote bash -c '...' fm-pi-watch-identity "$FM_HOME/state" "$PWD/bin/fm-watch.sh" "$FM_HOME"
+  → $0=fm-pi-watch-identity, $1=state, $2=watch path, $3=FM_HOME. I omitted the lib as $1. My script used $1 as FM_HOME and $2 as state — wrong. Redo correctly.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && FM_HOME="$FM_HOME" bash -c '
+ . "$1" || exit 1
+ "$3" >/dev/null 2>&1 || true
+ pid=$(cat "$2/.watch.lock/pid" 2>/dev/null) || { echo "no pid"; exit 1; }
+ echo "pid=$pid"
+ fm_watcher_lock_matches_pid "$2" "$4" "$pid" "$FM_HOME"; echo "identity_match_exit=$?"
+ fm_watcher_healthy "$2" "$4" "${FM_GUARD_GRACE:-$(fm_poll_derived_grace)}" "$FM_HOME"; echo "healthy_exit=$?"
+ ' x "$PWD/bin/fm-wake-lib.sh" "$FM_HOME/state" "$PWD/bin/fm-watch.sh" x
+
+ pid=2803347
+ identity_match_exit=1
+ healthy_exit=1
+
+ Took 0.1s
+
+
+ identity_match_exit=1 → identity does NOT match. Let me read fm_watcher_lock_matches_pid to see why.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && sed -n '/^fm_watcher_lock_matches_pid()/,/^}/p' bin/fm-wake-lib.sh
+
+ ... (9 earlier lines, ctrl+o to expand)
+   [ -n "$lock_identity" ] || return 1
+   current_identity=$(fm_pid_identity "$pid") || return 1
+   [ "$current_identity" = "$lock_identity" ] || return 1
+   FM_WATCHER_MATCHED_IDENTITY=$lock_identity
+ }
+
+ Took 0.0s
+
+
+ Let me evaluate each: lock_home=/tmp/fm-lab.gWwnMv (matches FM_HOME), lock_path matches, lock_identity = the recorded hex. current_identity from fm_pid_identity 2803347 should equal lock's. Let me
+ diff them explicitly.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && FM_HOME="$FM_HOME" bash -c '
+ . "$1" || exit 1
+ lockdir="$2/.watch.lock"
+ echo "lock_home=[$(cat "$lockdir/fm-home")]"
+ echo "lock_path=[$(cat "$lockdir/watcher-path")]"
+ echo "lock_identity=[$(cat "$lockdir/pid-identity")]"
+ echo "current=[$(fm_pid_identity $(cat "$lockdir/pid"))]"
+ ' x "$PWD/bin/fm-wake-lib.sh" "$FM_HOME/state"
+
+ ... (3 earlier lines, ctrl+o to expand)
+ cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d36435446444e47445154453348424b473659383532354e2f62696e2f666d2d77617463682e7368
+ 00]
+ current=[linux-starttime=7198446
+ cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d36435446444e47445154453348424b473659383532354e2f62696e2f666d2d77617463682e7368
+ 00]
+
+ Took 0.0s
+
+
+ All fields match! So why identity_match_exit=1? Because in my manual invocation, $home param (arg4) was "x" in the first test and ... in the second... hmm. In the run above with 4 args I passed x as
+ $4 → home="x" → lock_home != home → return 1. My mistake again. In the extension's call: fm_watcher_lock_matches_pid "$2" "$expected_watch_path" "$pid" "$FM_HOME" → args state, path, pid, FM_HOME.
+ Correct.
+
+ But the extension reported identity not proved... So let's replicate exactly, including $expected_watch_path. What is expected_watch_path? Let me read the extension variable definition — maybe it's
+ ${fmRoot}/bin/fm-watch.sh where fmRoot differs from this worktree (e.g., resolvedWatherPath uses a different root, like /home/art/projects/firstmate!). Note the host runs multiple homes:
+ /home/art/projects/firstmate, treehouse, and this worktree. If fmRoot resolves to the installed firstmate at /home/art/projects/firstmate, then
+ expected_watch_path=/home/art/projects/firstmate/bin/fm-watch.sh ≠ lock's worktree path → identity fails!
+
+ But the lock's watcher-path is the worktree path, meaning the arm script used here is the worktree's (FM_WATCH_ARM_SCRIPT from extension). Let me read the extension's
+ fmRoot/expected_watch_path/resolvedWatcherPath definitions.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && grep -n "expected_watch_path\|resolvedWatcherPath\|const fmRoot\|fmRoot =\|armScript\|const fmHome"
+ .pi/extensions/fm-primary-pi-watch.ts | head -25
+
+ ... (6 earlier lines, ctrl+o to expand)
+ 286:    fm_watcher_lock_matches_pid "$2" "$expected_watch_path" "$pid" "$FM_HOME"
+ 303:${resolvedWatcherPath}
+ 306:    fm_watcher_healthy "$2" "$expected_watch_path" "\${FM_GUARD_GRACE:-$(fm_poll_derived_grace)}" "$FM_HOME"
+ 772:        [armScript, "--handling-delivered", recovery.generation, "--watcher-pid", recovery.watcherPid],
+ 1212:      FM_WATCH_ARM_SCRIPT: armScript,
+
+ Took 0.0s
+
+
+ fmRoot = process.env.FM_ROOT_OVERRIDE || root (project root). For our session FM_ROOT_OVERRIDE? The tmux launched pi with -e FM_HOME=/tmp/fm-lab.gWwnMv only, no FM_ROOT_OVERRIDE. So fmRoot = root =
+ cwd = worktree. So expected path = worktree/bin/fm-watch.sh. Matches.
+
+ So identity should match. Yet the extension said "watcher identity is not proved". Hmm, maybe the probe ran when the lock was momentarily absent (watcher exiting at that instant)? Or the extension's
+ check ran while the watcher was T (stopped) — identity doesn't require liveness though; fm_pid_identity works on stopped processes.
+
+ Or fm_watcher_healthy failed (fresh progress false) AND watcherIdentityOwned failed for a transient reason.
+
+ Actually wait: maybe watcherHealthy fails because fm_watcher_healthy requires beacon fresh within grace AND lock owner alive with identity. At the moment of the check the watcher had just been
+ stopped again (T) — beacon stale → unhealthy → identity owned should be true → retire+replace. That path yields "retrying" message, not "unhealthy...identity is not proved". So identity was false at
+ that moment.
+
+ Possibility: at that moment the lock symlink pointed to a different generation owner dir whose pid was the arm pid or a dead watcher... Hmm.
+
+ Since my direct probe now returns matches (with correct args), let me verify the exact extension probe by evaluating it properly (with $1=lib path handled as in the extension: . "$1"). My last probe
+ called fm_watcher_lock_matches_pid with "$4"=x. Let me redo properly and also time it.
+
+ Also fm_watcher_healthy requires fresh beacon; beacon currently fresh (16:50). Let me run both correctly now.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bash -c '
+ . "$1" || exit 1
+ expected_watch_path=$(CDPATH="" cd -- "${3%/*}" 2>/dev/null && pwd)/${3##*/} || exit 1
+ pid=$(cat "$2/.watch.lock/pid" 2>/dev/null) || exit 1
+ fm_watcher_lock_matches_pid "$2" "$expected_watch_path" "$pid" "$FM_HOME"; echo "identity=$?"
+ fm_watcher_healthy "$2" "$expected_watch_path" "${FM_GUARD_GRACE:-$(fm_poll_derived_grace)}" "$FM_HOME"; echo "healthy=$?"
+ ' fm-pi-watch "$PWD/bin/fm-wake-lib.sh" "$FM_HOME/state" "$PWD/bin/fm-watch.sh"; echo ---; date; stat -c 'beat=%y' "$FM_HOME/state/.last-watcher-beat"; ps -eo pid,etime,stat,args | grep
+ "01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh" | grep -v grep
+
+ ... (1 earlier lines, ctrl+o to expand)
+ healthy=0
+ ---
+ Sun Nov  1 04:50:59 PM PST 2026
+ beat=2026-11-01 16:50:59.747193401 -0800
+ 2803347       04:05 S+   bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N/bin/fm-watch.sh
+
+ Took 0.1s
+
+
+ Both probes now succeed: identity=0, healthy=0. So the watcher IS healthy and identity-proved right now. The extension's "unhealthy / identity not proved" was a transient snapshot (likely captured
+ during the instant when the watcher was stopped or the lock was mid-relink after the earlier downtime recovery, or the probe raced the SIGCONT).
+
+ Now what should I do? The notification says FAILED/unhealthy and instructs to drain (done: nothing queued), and says continuity is extension-owned. The extension withheld replacement because it
+ couldn't prove identity, but at its next 30s health check it should see healthy and settle.
+
+ Calling fm_watch_arm_pi is allowed by the notification ("repair one only after a notification says the cycle is missing, failed, or unhealthy"). Calling it now while health is proven should return
+ "watcher: unchanged - ... verified this home's watcher identity and fresh progress". That would re-establish the extension's healthy state and stop the failure surface. Worth doing — it's exactly
+ the sanctioned repair call and its result proves state.
+
+ Let me call fm_watch_arm_pi.
+
+
+ fm_watch_arm_pi
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+ missing, failed, or unhealthy
+
+
+ The extension verified health: "unchanged - verified this home's watcher identity and fresh progress". So continuity is proven now. That resolves the failure.
+
+ Now drain again? Drain printed nothing earlier (no WAKE_ACK_REQUIRED). But notifications had no queued rows. Let me drain once more to confirm nothing pending and nothing to ack. Then reply
+ captain-facing: supervision healthy, nothing queued, nothing needed.
+
+ But there's a
+
+ Operation aborted
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N (detached)
+↑48k ↓22k R2.4M 14.5%/500k (auto)                                                                                                               (qualitycorp-oq) DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium

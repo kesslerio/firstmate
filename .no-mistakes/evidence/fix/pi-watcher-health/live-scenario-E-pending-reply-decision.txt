@@ -1,0 +1,21 @@
+16:53:19 restarting watcher 3294717 so config FM_POLL=5 applies
+16:53:28 watcher restarted: lock_pid=3341482 beat_age=0s
+16:53:28 control record 803978e2ef234dd9: phase=awaiting_report attempted=
+16:53:44 control after tick: attempted=1793580823 phase=escalated
+16:53:46 created 12 requests with an open decision: 3384ee61859d07d7 610fe828d440159b 6539b42a6fb41063 6977fb0dec0933db 5a8ff411c72d757e 40ece10c8c92ed40 ddd05254d2456a42 b3b5085864998cea 3e4f0c1e74656c53 9e792b4902ba45fd 61ad7149e7ebd481 ffcb9297e5cae097 
+16:54:27 after 40s with the decision open: all 12 unattempted and awaiting_report? yes
+16:54:27 snapshot-dir sightings during ticks: 41 distinct dirs, 6941 samples
+16:54:49   3384ee61859d07d7 attempted=1793580875 phase=escalated
+16:54:49   610fe828d440159b attempted=1793580879 phase=escalated
+16:54:49   6539b42a6fb41063 attempted=1793580882 phase=escalated
+16:54:49   6977fb0dec0933db attempted=1793580883 phase=escalated
+16:54:49   5a8ff411c72d757e attempted=1793580878 phase=escalated
+16:54:49   40ece10c8c92ed40 attempted=1793580877 phase=escalated
+16:54:50   ddd05254d2456a42 attempted=1793580887 phase=escalated
+16:54:50   b3b5085864998cea attempted=1793580885 phase=escalated
+16:54:50   3e4f0c1e74656c53 attempted=1793580876 phase=escalated
+16:54:50   9e792b4902ba45fd attempted=1793580884 phase=escalated
+16:54:50   61ad7149e7ebd481 attempted=1793580881 phase=escalated
+16:54:50   ffcb9297e5cae097 attempted=1793580888 phase=escalated
+16:54:50 after resolution: all 12 attempted? yes; per-record attempt authority distinct? yes
+16:55:04 state after a further poll: 3384ee61859d07d7=escalated 610fe828d440159b=escalated 6539b42a6fb41063=escalated 

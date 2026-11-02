@@ -1,0 +1,250 @@
+
+
+ No watcher for this lab home. The Pi extension arm child exited without starting? Note .watcher-down is "pending:downtime:1962984..." — a pending downtime marker, perhaps indicating recovery state pending, which makes
+ next arm exit 1 ("watcher: FAILED - ..."?).
+
+ Let me run the arm/watcher manually to see diagnostics. But instructions say never run bin/fm-watch-arm.sh through bash — that applies to fm-watch-arm.sh; running fm-watch.sh directly for diagnosis is fine? Hmm, "Never
+ run bin/fm-watch-arm.sh through bash." So I can run fm-watch.sh with a timeout to see output, but it would claim the lock and then be killed... Actually the arm is the owner; running fm-watch.sh directly could
+ conflict. Safer: call fm_watch_arm_pi again? It said call again only after a notification says missing/failed/unhealthy. The current state: no watcher, so it IS unhealthy. I could call it again to try.
+
+ But first understand the recurring exit 1. The arm log says watcher_pid exited 1 and no successor. Let me run fm-watch.sh directly with FM_WATCH_ONCE? Check for a one-shot seam.
+
+ Let me look at fm-watch-arm.sh to understand child 8 and how it decides. Also check .watcher-down handling in arm.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && sed -n '1,80p' bin/fm-watch-arm.sh
+
+ ... (75 earlier lines, ctrl+o to expand)
+ # arm/watcher identities, timestamps, exit/signal classification, beacon age,
+ # lock identity before and after close, and successor disposition. The separate
+ # state/.watch-triage.log remains exclusively the watcher's absorbed-wake debug
+ # log and is never written here.
+ #
+
+ Took 0.0s
+
+
+ So failure "cycle ended without an actionable reason" happens when the watcher exits 0? No — exit 1 here. The notification said "watcher cycle exited 1 without an actionable reason", matching "watcher: FAILED - cycle
+ ended without an actionable reason".
+
+ So the child died exit 1 without printing a reason. Why would fm-watch.sh exit 1 silently? Possibly fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK" || exit 1 at line 3088/1450 etc., with no message. Or set -e-ish failure.
+ Since it exits within 6s each time, likely startup recovery lock wait or queue lock contention.
+
+ Look: arm entries show lock_before=pid:1962984 (live at the time) and the watcher child exits 1 quickly. If the holder 1962984 was alive with stale beat 1322 ≥ stall bound 900 → evict_stalled_holder should succeed and
+ continue. Maybe evict failed because the arm held some lock? Or evict attempted TERM of holder, holder exits, then watcher child retried... and then at second iteration lock is dead pid → reclaim... but that seems
+ fine.
+
+ Alternatively the child hit the startup recovery lock bound failure or a queue lock bound. Let me get an actual diagnostic by running fm-watch.sh directly now (no lock held, no watcher). It will claim lock, write beat,
+ and block. That would be the healthy state! But then the arm... hmm running fm-watch.sh directly is fine; watcher is a singleton. But instruction says use fm-watch-arm.sh through the extension.
+
+ Simplest: capture diagnostics by running fm-watch.sh with FM_WATCH_ONCE? Check if such seam exists. Search for "ONCE".
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && grep -n "SET -\|set -e\|FM_WATCH_.*ONCE\|FM_TEST_" bin/fm-watch.sh | head -20; echo ---; sed -n '3060,3110p' bin/fm-watch.sh
+
+ ... (49 earlier lines, ctrl+o to expand)
+   fi
+   reason="check:"
+   [ -z "$captured" ] || reason="$reason process-event result captured:$captured"
+   if [ -n "$stranded" ]; then
+     [ "$reason" = "check:" ] || reason="$reason;"
+
+ Took 0.0s
+
+
+ No direct one-shot. Let me just run the watcher in background via bash? Instruction: never run fm-watch-arm.sh through bash, but fm-watch.sh is fine. However, two watchers competing... there is none now. But the Pi
+ extension owns re-arming, and after my earlier fm_watch_arm_pi call the arm child probably finished (no successor). If I run fm-watch.sh directly it claims the lock and runs; then when a wake occurs it prints a line
+ and exits, and the extension would re-arm later? Risky but let's diagnose first with a bounded run capturing output.
+
+ Actually a cleaner diagnostic: run fm-watch.sh under timeout 20 and see the output. It claims lock, prints "watcher: ..." maybe blocks in event wait; timeout kills it (TERM, cleanup releases lock). Let's try.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && timeout 25 bash bin/fm-watch.sh; echo "exit=$?"; echo "--- beat"; stat -c '%y' "$FM_HOME"/state/.last-watcher-beat; ls
+ "$FM_HOME"/state/.watch.lock 2>/dev/null || echo "lock released"
+
+ check: rearm-resurface
+ exit=0
+ --- beat
+ 2026-11-01 16:40:36.029323505 -0800
+ lock released
+
+ Took 0.5s
+
+
+ Interesting! The watcher ran and immediately surfaced "check: rearm-resurface" and exited 0. That wake went to... the queue? Then drain. So the watcher actually works; it exits on each wake — and the extension re-arms.
+ The repeated "exited 1" failures happened because... hmm.
+
+ Wait, but the queue: fm-wake-drain reported no output earlier. Let's drain now.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-wake-drain.sh 2>&1 | tail -40
+
+ WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 1962984.1793579970.Oz1KLo
+
+ Took 0.5s
+
+
+ No wake lines. Hmm — the "check: rearm-resurface" printed by the watcher but drain shows nothing? Possibly the drain's presentation was consumed... Actually drain with no wakes only prints WAKE_ACK_REQUIRED. Wait, and
+ the recovery-generation references the downtime marker from the TERM'd watcher. Handle by acking through 0.
+
+ Now the check: rearm-resurface wake is a recovery marker resurface; my manual run produced it and exits 0. The extension should re-arm automatically? My manual run exited, so no live cycle now. The extension sees...
+ hmm, the extension's notification came from the arm child. My manual run wasn't tracked by the extension, so after manual exit nothing re-arms.
+
+ Better path: acknowledge the drain, then call fm_watch_arm_pi to arm properly (state: no watcher). Let me ack and arm.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 1962984.1793579970.Oz1KLo 2>&1 | tail -20
+
+ (no output)
+
+ Took 0.2s
+
+
+
+ fm_watch_arm_pi
+ watcher: started Pi extension arm child 9; future ordinary re-arms are automatic; call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy
+
+
+ Now check the watcher is genuinely alive with fresh beacon after a few seconds.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && sleep 12; echo "--- lock"; cat "$FM_HOME"/state/.watch.lock/pid 2>/dev/null; echo "--- alive"; ps -o pid,ppid,etime,args -p "$(cat
+ "$FM_HOME"/state/.watch.lock/pid 2>/dev/null)" 2>/dev/null; echo "--- beat"; stat -c '%y' "$FM_HOME"/state/.last-watcher-beat 2>/dev/null; date '+%T'; echo "--- exits tail"; tail -1
+ "$FM_HOME"/state/.watch-cycle-exits.log | cut -c1-200
+
+ ... (5 earlier lines, ctrl+o to expand)
+ --- beat
+ 2026-11-01 16:40:45.586310772 -0800
+ 16:40:59
+ --- exits tail
+ arm_pid=1962865   watcher_pid=1962984   origin=started   started_at=1793579780   ended_at=1793579970   exit_code=143   signal=TERM   reason=arm-interrupted   beacon_age=1355   lock_before=pid:1962984|identity:linux-sta
+
+ Took 12.0s
+
+
+ Watcher 2314476 alive, beat fresh (14s). Healthy.
+
+ Now — a heartbeat/no-op? The wake queue was empty; the failure was repaired. But there's a question: is supervision required in this lab home, and why did the cycle fail repeatedly?
+
+ Root cause: the previous watcher (1962984) was TERMed by the arm at 16:39:30, but before that, every re-arm attempt failed because the holder's beat was stale past the grace while still... hmm. Actually the pre-16:39
+ failures happened because holder 1962984's beacon was stale (1300s+) while it was alive? Wait its beat remained 16:16:55. That means the holder never touched the beat since 16:16 — so it was stuck/never cycling. And
+ its beacon age 1322s ≥ stall bound 900 → eviction should have happened, but the arm log shows exits 1 with no successor.
+
+ Hmm, maybe the watcher child exited 1 because evict_stalled_holder's TERM landed on the holder and... but then the child should continue. Unless the child was itself refused because after eviction the lock became "live
+ pid held by another"?
+
+ Honestly, root cause detail: the beacon was stale because the lab home's watcher from session start (16:16) had exited but left the lock pointing to a live-but-different process? Actually 1962984 started 16:36, so lock
+ pid 1962984 was live while beat was 16:16 — impossible for a healthy watcher: it removed BEAT on claim at 16:36, yet mtime stayed 16:16:55. Contradiction unless rm -f "$BEAT" failed...
+
+ Wait: 1962984's claim at 16:36 would rm BEAT. Then cycle top touch recreates it → mtime 16:36+. But observed mtime 16:16:55. So 1962984 never got past line 3577! It was stuck in the claim loop. But it holds the lock?
+ The lock file's pid was 1962984 — written by fm_lock_claim. Hmm, if it acquired, it removes BEAT.
+
+ Unless 1962984 was in the claim loop for 3 min because another lock (FM_LOCK_HELD_PATH / startup lock bound) — the loop only exits 1 for live holder or continues. Then at 16:39:30 the arm TERMed it (arm-interrupted).
+
+ Anyway: the current watcher is healthy and the beacon is fresh. The failure was re-armed successfully.
+
+ But wait — why did watcher exit repeatedly at 6-second intervals after each arm? Each arm attempt spawned a child which exited 1 within 6s. That is the "cycle ended without an actionable reason" shape: the child found
+ the stale-beacon live holder, and... At 1322s > stall bound 900, evict_stalled_holder runs. Maybe evict fails because the holder is a process group leader etc. Then prints the stale message; that would be actionable
+ though.
+
+ Hmm, actually: was the child the one holding? No.
+
+ Let me check the triage log for the last few arms. And check whether the arm's child printed a "watcher:" line that got swallowed. The exits log has no message field. Let me look for .watch-triage.log.
+
+ I think we've done enough: the cycle is healthy now, queue empty. But I should not leave a mystery; let me verify the arm's own status line for child 9. Where does extension store arm state? .pi-watch-extension-loaded.
+ Maybe extension logs elsewhere. Let's check the current exits log entry for child 9 once it exits... it's alive.
+
+ Also verify no state of failure persists: .watcher-down should be cleared? Let's check.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && ls "$FM_HOME"/state/ | grep -i "down\|triage" ; echo "--- watcher-down"; cat "$FM_HOME"/state/.watcher-down 2>/dev/null; echo "--- triage
+ tail"; tail -5 "$FM_HOME"/state/.watch-triage.log 2>/dev/null; echo "--- beat"; stat -c '%y' "$FM_HOME"/state/.last-watcher-beat; date '+%T'
+
+ ... (1 earlier lines, ctrl+o to expand)
+ acked:handling:1962984.1793579970.Oz1KLo
+ --- triage tail
+ --- beat
+ 2026-11-01 16:41:16.070270156 -0800
+ 16:41:16
+
+ Took 0.0s
+
+
+ Watcher healthy, beat fresh, downtime marker acked. Wake queue empty.
+
+ Now: is there any fleet work? This lab home is empty (config/data/projects empty). This is a validation-run lab home; there's nothing to supervise. So captain-facing: this was just a watcher repair — a no-op-ish
+ outcome. Per section 9: "Reply exactly Captain, shipshape. only for a true no-op that still needs an answer". The watcher failure was repaired with no captain consequence. But is this session even captain-facing? The
+ wake came from the extension.
+
+ Let me quickly double-check state/.lock and the session digest presence.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && cat "$FM_HOME"/state/.lock 2>/dev/null; echo "--- queue"; wc -l "$FM_HOME"/state/.wake-queue; echo "--- data/config/projects"; ls -a
+ "$FM_HOME"/data "$FM_HOME"/config "$FM_HOME"/projects 2>/dev/null
+
+ ... (10 earlier lines, ctrl+o to expand)
+ ..
+
+ /tmp/fm-lab.OFteyn/projects:
+ .
+ ..
+
+ Took 0.0s
+
+
+ Empty lab home. Lock 1936703 — is that this session's lock? Probably yes (session lock owner), referenced in .pi-watch-extension-loaded as 1936703 generation=1 phase=active.
+
+ Everything is consistent: empty fleet, no pending wakes, supervision cycle restored and healthy (beat fresh).
+
+ Reply: "Captain, shipshape." — true no-op that needed an answer (the failed-watcher notification). Good.
+
+ But the rule "every captain-facing message ... final response must stand alone with all key info". For a pure acknowledgement with no consequence, shipshape is allowed.
+
+ However, the watcher failure was repaired — that's an automatic fix, section 9 says "Do not surface automatic fixes, retries, routine progress, or internal supervision mechanics." So "Captain, shipshape."
+
+ Captain, shipshape.
+
+
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: watcher: FAILED - Pi extension could not restore watcher continuity after 5 retries
+ watcher: FAILED - watcher cycle exited 1 without an actionable reason
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.
+
+
+ Again failed. So the arm retried 5 times and failed. Yet my manual arm succeeded and the watcher was alive with a fresh beat. Something kills it? The arm child apparently TERMs watcher... Let me drain then investigate
+ more deeply.
+
+ Key clue earlier: arm entries showed watcher_pid exits 1 within 6s, lock unchanged (still pointing to the old holder). That means each spawn found the lock held by a live pid whose beacon was stale, tried evict,
+ failed, exited 1 with a message... but no message was captured. Then arm TERM'd holder at 16:39:30 → lock released.
+
+ Now call 9 started watcher 2314476 alive. Then presumably arm child 9... maybe exited/timed out and TERMed it? Let's check current state.
+
+
+ $ cd /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N && bin/fm-wake-drain.sh 2>&1 | tail -30; echo "=== lock"; cat "$FM_HOME"/state/.watch.lock/pid 2>/dev/null || echo "no lock"; echo "===
+ alive"; ps -eo pid,ppid,etime,args | grep "[f]m-watch.sh" | grep 01M6 || echo "no lab watcher"; echo "=== beat"; stat -c '%y' "$FM_HOME"/state/.last-watcher-beat 2>/dev/null; date '+%T'; echo "=== exits"; tail -4
+ "$FM_HOME"/state/.watch-cycle-exits.log | cut -c1-160
+
+ ... (7 earlier lines, ctrl+o to expand)
+ === exits
+ arm_pid=2115233   watcher_pid=2119959   origin=started   started_at=1793579886   ended_at=1793579892   exit_code=1   signal=none   reason=nonzero-exit   beacon_age=1277   lock_be
+ arm_pid=2129490   watcher_pid=2133274   origin=started   started_at=1793579901   ended_at=1793579906   exit_code=1   signal=none   reason=nonzero-exit   beacon_age=1291   lock_be
+ arm_pid=2157922   watcher_pid=2163995   origin=started   started_at=1793579931   ended_at=1793579937   exit_code=1   signal=none   reason=nonzero-exit   beacon_age=1322   lock_be
+ arm_pid=1962865   watcher_pid=1962984   origin=started   started_at=1793579780   ended_at=1793579970   exit_code=143   signal=TERM   reason=arm-interrupted   beacon_age=1355   lo
+
+ Took 0.4s
+
+
+ Watcher 2314476 is alive and beat is fresh at 16:41:16 (13s ago). Drain produced no output.
+
+ Wait — the drain had no WAKE_ACK_REQUIRED line this time? Output empty entirely. Earlier it printed WAKE_ACK_REQUIRED. Now empty means nothing pending.
+
+ But the extension reported failure again after 5 retries. Why would the extension fail while a healthy watcher runs? "watcher: FAILED - Pi extension could not restore watcher continuity after 5 retries" and "watcher
+ cycle exited 1 without an actionable reason".
+
+ Operation aborted
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M6CTFDNGDQTE3HBKG6Y8525N (detached)
+↑50k ↓9.8k R1.3M 10.2%/500k (auto)                                                                                                                                  (qualitycorp-oq) DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium

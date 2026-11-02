@@ -1,0 +1,25 @@
+16:47:22 healthy: watcher=2803347 arm=2803274 beat_age=12 lockdir=/tmp/fm-lab.gWwnMv/state/.watch.lock.owner.YT1iLR
+16:47:22 wedge: SIGSTOP 2803347 + backdate beacon 1200s
+16:47:22 lock fm-home now: /tmp/fm-lab.gWwnMv/sibling  (unproved: not this home)
+16:47:27 t=5s lock_pid=2803347 beat_age=1205s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:47:32 t=10s lock_pid=2803347 beat_age=1210s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:47:37 t=15s lock_pid=2803347 beat_age=1215s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:47:42 t=20s lock_pid=2803347 beat_age=1220s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:47:47 t=25s lock_pid=2803347 beat_age=1225s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:47:52 t=30s lock_pid=2803347 beat_age=1230s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:47:57 t=35s lock_pid=2803347 beat_age=1235s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:03 t=40s lock_pid=2803347 beat_age=1240s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:08 t=45s lock_pid=2803347 beat_age=1245s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:13 t=50s lock_pid=2803347 beat_age=1250s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:18 t=55s lock_pid=2803347 beat_age=1255s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:23 t=60s lock_pid=2803347 beat_age=1260s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:28 t=65s lock_pid=2803347 beat_age=1265s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:33 t=70s lock_pid=2803347 beat_age=1270s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:38 t=75s lock_pid=2803347 beat_age=1275s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:43 t=80s lock_pid=2803347 beat_age=0s new_arms=0 fm-home=/tmp/fm-lab.gWwnMv/sibling
+16:48:51 tool result: watcher: unhealthy - existing arm has no verified home-bound watcher with fresh progress; replacement withheld because watcher identity is not proved
+16:48:51 after 80s: watcher 2803347 alive? yes; lock pid=2803347
+16:48:51 lock fm-home still untouched? /tmp/fm-lab.gWwnMv/sibling
+16:48:51 new arms started during the unproved window: 0 (excluding the live arm 2803274)
+16:48:51 restored lock fm-home: /tmp/fm-lab.gWwnMv
+16:50:11 post-restore supervision: lock_pid=2803347 beat_age=12s

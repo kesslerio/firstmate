@@ -1,0 +1,9 @@
+ok - Pi extension reports external healthy watcher output
+ok - Pi health monitor replaces a wedged watcher without another tool call
+ok - Pi health monitor tolerates a slow retire without a false failure alarm
+ok - Pi repair call re-arms when an arm outlives the bounded retire wait
+ok - Pi health monitor derives its grace from the home's poll cadence
+ok - Pi watcher health matches a shell-spelled root against the recorded watcher path
+ok - Pi unready arm receives bounded start grace without duplicate launch or healthy success
+ok - Pi replaces stale owned watchers and preserves unproved identities
+ok - Pi scheduled retry remains extension-owned after another tool call
