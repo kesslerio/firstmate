@@ -1,0 +1,231 @@
+=== scenario 1: prune mode bounds retained results and keeps live obligations ===
+--- before ---
+d state/.startup-network-results
+d state/.startup-network-results/1000.1.1
+d state/.startup-network-results/1100.1.1
+d state/.startup-network-results/1200.1.1
+d state/.startup-network-results/1300.1.1
+d state/.startup-network-results/1400.1.1
+d state/.startup-network-results/1500.1.1
+d state/.startup-network-results/700.1.1
+d state/.startup-network-results/800.1.1
+d state/.startup-network-results/900.1.1
+d state/.startup-network-wake-receipts
+f state/.startup-network-results/1000.1.1/report
+f state/.startup-network-results/1000.1.1/status
+f state/.startup-network-results/1100.1.1/report
+f state/.startup-network-results/1100.1.1/status
+f state/.startup-network-results/1200.1.1/report
+f state/.startup-network-results/1200.1.1/status
+f state/.startup-network-results/1300.1.1/report
+f state/.startup-network-results/1300.1.1/settled
+f state/.startup-network-results/1300.1.1/status
+f state/.startup-network-results/1400.1.1/report
+f state/.startup-network-results/1400.1.1/settled
+f state/.startup-network-results/1400.1.1/status
+f state/.startup-network-results/1500.1.1/report
+f state/.startup-network-results/1500.1.1/status
+f state/.startup-network-results/700.1.1/report
+f state/.startup-network-results/700.1.1/settled
+f state/.startup-network-results/700.1.1/status
+f state/.startup-network-results/800.1.1/report
+f state/.startup-network-results/800.1.1/status
+f state/.startup-network-results/900.1.1/report
+f state/.startup-network-results/900.1.1/status
+f state/.startup-network-wake-receipts/1500.1.1
+f state/.startup-network-wake-receipts/700.1.1
+f state/.startup-network.status
+f state/.wake-queue
+PASS prune exited 0
+--- after ---
+d state/.startup-network-results
+d state/.startup-network-results/1000.1.1
+d state/.startup-network-results/1100.1.1
+d state/.startup-network-results/1200.1.1
+d state/.startup-network-results/1500.1.1
+d state/.startup-network-results/900.1.1
+d state/.startup-network-wake-receipts
+f state/.startup-network-results/1000.1.1/report
+f state/.startup-network-results/1000.1.1/status
+f state/.startup-network-results/1100.1.1/report
+f state/.startup-network-results/1100.1.1/status
+f state/.startup-network-results/1200.1.1/report
+f state/.startup-network-results/1200.1.1/status
+f state/.startup-network-results/1500.1.1/report
+f state/.startup-network-results/1500.1.1/status
+f state/.startup-network-results/900.1.1/report
+f state/.startup-network-results/900.1.1/status
+f state/.startup-network-wake-receipts/1500.1.1
+f state/.startup-network.status
+f state/.wake-queue
+PASS present: s1/state/.startup-network-results/1500.1.1
+PASS present: s1/state/.startup-network-results/1200.1.1
+PASS present: s1/state/.startup-network-results/1100.1.1
+PASS present: s1/state/.startup-network-results/1000.1.1
+PASS present: s1/state/.startup-network-results/900.1.1
+PASS removed: s1/state/.startup-network-results/1400.1.1
+PASS removed: s1/state/.startup-network-results/1300.1.1
+PASS removed: s1/state/.startup-network-results/800.1.1
+PASS removed: s1/state/.startup-network-results/700.1.1
+PASS removed: s1/state/.startup-network-wake-receipts/700.1.1
+PASS present: s1/state/.startup-network-wake-receipts/1500.1.1
+PASS queued wake row still present for 1200.1.1
+--- second pass (idempotent) ---
+PASS second prune exited 0
+PASS present: s1/state/.startup-network-results/1200.1.1
+PASS present: s1/state/.startup-network-results/1100.1.1
+PASS present: s1/state/.startup-network-results/1000.1.1
+PASS present: s1/state/.startup-network-results/900.1.1
+
+=== scenario 2: malformed, incomplete, and symlinked entries are declined ===
+--- before ---
+d state/.startup-network-results
+d state/.startup-network-results/0600.1.1
+d state/.startup-network-results/0600.2.2
+d state/.startup-network-results/0600.3.3
+f state/.startup-network-results/0600.1.1/status
+f state/.startup-network-results/0600.2.2/report
+f state/.startup-network-results/0600.2.2/status
+f state/.startup-network-results/0600.3.3/report
+f state/.startup-network-results/0600.3.3/settled
+f state/.startup-network-results/0600.3.3/status
+f state/.startup-network.status
+l state/.startup-network-results/0500.1.1
+PASS prune exited 0
+--- after ---
+d state/.startup-network-results
+d state/.startup-network-results/0600.1.1
+d state/.startup-network-results/0600.2.2
+d state/.startup-network-results/0600.3.3
+f state/.startup-network-results/0600.1.1/status
+f state/.startup-network-results/0600.2.2/report
+f state/.startup-network-results/0600.2.2/status
+f state/.startup-network-results/0600.3.3/report
+f state/.startup-network-results/0600.3.3/settled
+f state/.startup-network-results/0600.3.3/status
+f state/.startup-network.status
+l state/.startup-network-results/0500.1.1
+PASS present: s2/state/.startup-network-results/not-a-generation
+PASS present: s2/state/.startup-network-results/0600.1.1
+PASS present: s2/state/.startup-network-results/0600.2.2
+PASS present: s2/state/.startup-network-results/0600.3.3
+PASS symlinked completion left in place
+PASS symlink target untouched
+
+=== scenario 3: a symlinked receipt root is declined, never followed ===
+--- before ---
+d state/.startup-network-results
+d state/.startup-network-results/0300.1.1
+f state/.startup-network-results/0300.1.1/report
+f state/.startup-network-results/0300.1.1/settled
+f state/.startup-network-results/0300.1.1/status
+f state/.startup-network.status
+l state/.startup-network-wake-receipts
+PASS prune exited 0
+--- after ---
+d state/.startup-network-results
+f state/.startup-network.status
+l state/.startup-network-wake-receipts
+PASS foreign receipt outside the home untouched
+PASS symlinked receipt root left in place
+
+=== scenario 4: an interrupted cleanup stays retryable ===
+first prune rc=0
+PASS present: s4/state/.startup-network-results/0900.1.1
+PASS present: s4/state/.startup-network-wake-receipts/0900.1.1
+PASS retry prune exited 0
+PASS removed: s4/state/.startup-network-results/0900.1.1
+PASS removed: s4/state/.startup-network-wake-receipts/0900.1.1
+
+=== scenario 5: a real session reservation prunes retired generations ===
+--- before ---
+d state/.startup-network-results
+d state/.startup-network-results/0950.1.1
+d state/.startup-network-results/1000.1.1
+d state/.startup-network-wake-receipts
+f state/.startup-network-results/0950.1.1/report
+f state/.startup-network-results/0950.1.1/status
+f state/.startup-network-results/1000.1.1/report
+f state/.startup-network-results/1000.1.1/settled
+f state/.startup-network-results/1000.1.1/status
+f state/.startup-network-wake-receipts/1000.1.1
+f state/.wake-queue
+PASS session start reserved a generation
+PASS the reserved run completed and published
+--- after ---
+d state/.startup-network-results
+d state/.startup-network-results/0950.1.1
+d state/.startup-network-results/1793661659.1308697.999999999
+d state/.startup-network-wake-receipts
+f state/.startup-network-results/0950.1.1/report
+f state/.startup-network-results/0950.1.1/status
+f state/.startup-network-results/1793661659.1308697.999999999/report
+f state/.startup-network-results/1793661659.1308697.999999999/settled
+f state/.startup-network-results/1793661659.1308697.999999999/status
+f state/.startup-network-results/1793661659.1308697.999999999/timings
+f state/.startup-network.claim
+f state/.startup-network.report
+f state/.startup-network.status
+f state/.startup-network.timings
+f state/.wake-queue
+PASS removed: s5/state/.startup-network-results/1000.1.1
+PASS removed: s5/state/.startup-network-wake-receipts/1000.1.1
+PASS present: s5/state/.startup-network-results/0950.1.1
+reserved generation: 1793661659.1308697.999999999
+PASS present: s5/state/.startup-network-results/1793661659.1308697.999999999
+PASS queued generation survived the real reservation
+--- retained completion of the run itself ---
+state=done
+phases=probe
+locked=0
+started=1793661659
+rc=0
+generation=1793661659.1308697.999999999
+finished=1793661659
+report_published=1
+claim_deadline=1793661704
+-- report --
+--- operator read of the retained completion ---
+completed off the startup path in 0s: GitHub authentication.
+(silent - no problems found)
+TIMINGS - where the deferred network checks spent their time (ms):
+  phase       gh-auth                                    start=+133     elapsed=302
+  stage       network-checks probe                       start=+47      elapsed=395
+  slowest: stage network-checks probe 395ms, phase gh-auth 302ms
+PASS report --generation read the retained completion
+
+=== scenario 6: repeated session starts keep retained state bounded ===
+after start 1: retained result dirs=1 receipts=0
+after start 2: retained result dirs=1 receipts=0
+after start 3: retained result dirs=1 receipts=0
+after start 4: retained result dirs=1 receipts=0
+after start 5: retained result dirs=1 receipts=0
+after start 6: retained result dirs=1 receipts=0
+--- final state ---
+d state/.startup-network-results
+d state/.startup-network-results/1793661672.1366531.900006
+f state/.startup-network-results/1793661672.1366531.900006/report
+f state/.startup-network-results/1793661672.1366531.900006/settled
+f state/.startup-network-results/1793661672.1366531.900006/status
+f state/.startup-network-results/1793661672.1366531.900006/timings
+f state/.startup-network.claim
+f state/.startup-network.report
+f state/.startup-network.status
+f state/.startup-network.timings
+PASS six starts retained only 1 result dir(s), so growth is bounded
+PASS a retained generation is still readable after six starts
+
+=== scenario 7: the pass runs under the startup publication lock ===
+PASS a live process holds the publication lock (pid 1370749)
+PASS prune refused while a live process held the publication lock (rc=1)
+PASS present: s7/state/.startup-network-results/0800.1.1
+PASS prune proceeded once the lock was released
+PASS removed: s7/state/.startup-network-results/0800.1.1
+PASS present: s7/state/.startup-network-results/1500.1.1
+
+=== scenario 8: a symlinked results root is declined, never followed ===
+PASS prune exited 0 against a symlinked results root
+PASS content outside the home untouched
+PASS symlinked results root left in place
+
+RESULT: all live retention scenarios passed
