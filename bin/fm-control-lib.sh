@@ -107,7 +107,7 @@ fm_control_harness_family() {  # <recorded-harness>
   esac
 }
 
-# Which task kinds an adapter is verified to run. muse, gemini, rovo, agy, devin,
+# Which task kinds an adapter is verified to run. muse, gemini, rovo, devin,
 # commandcode, polytoken, and cortex are crewmate/scout adapters only: none has a primary
 # supervision protocol, and bin/fm-spawn.sh refuses a --secondmate launch on any of them. The control
 # plane asks this BEFORE it stops anything, so an incompatible relaunch target is
@@ -117,7 +117,7 @@ fm_control_harness_supports_kind() {  # <harness> <kind>
   local harness=${1-} kind=${2-}
   fm_control_harness_supported "$harness" || return 1
   case "$harness" in
-    muse|gemini|rovo|agy|devin|commandcode|polytoken|cortex) [ "$kind" != secondmate ] || return 1 ;;
+    muse|gemini|rovo|devin|commandcode|polytoken|cortex) [ "$kind" != secondmate ] || return 1 ;;
   esac
   return 0
 }
@@ -331,7 +331,7 @@ fm_control_relaunch_resume_flag() {  # <harness> <registered-agent>
 fm_control_backend_supports_key() {  # <backend> <key>
   local backend=${1-} key=${2-}
   case "$backend" in
-    tmux|herdr|zellij|cmux|paseo|rex)
+    tmux|herdr|zellij|cmux|paseo|rex|tern)
       case "$key" in Escape|Enter|C-c|C-u) return 0 ;; esac
       ;;
     orca)
@@ -346,9 +346,10 @@ fm_control_backend_supports_key() {  # <backend> <key>
 
 # Whether <backend> has a recovery-grade agent-state classifier. tmux, herdr,
 # rex, and t3code implement fm_backend_agent_state; zellij, orca, cmux, and paseo report
-# `unverified`, so no reading of theirs can prove an agent stopped. The control
-# plane refuses a stop-proving verb there instead of reporting an unprovable
-# transition as success.
+# `unverified`, and tern's `tern process` classifier answers for display but is
+# not promoted to this list, so no reading of theirs can prove an agent stopped.
+# The control plane refuses a stop-proving verb there instead of reporting an
+# unprovable transition as success.
 fm_control_backend_state_verified() {  # <backend>
   case "${1-}" in
     tmux|herdr|rex|t3code) return 0 ;;

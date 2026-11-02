@@ -82,6 +82,20 @@ case "${1:-}" in
           [ -z "${FM_FAKE_EXIT_TRANSPORT_FAIL_AFTER_STOP:-}" ] || exit 1
           ;;
         *'encode launch-brief'* | *'Firstmate operational input waiting: read'*)
+          case "$payload" in
+            *' claude '*)
+              session=$(printf '%s\n' "$payload" | sed -n "s/.*--session-id '\([^']*\)'.*/\1/p")
+              pin=$(printf '%s\n' "$payload" | sed -n "s/.*--model '\([^']*\)'.*/\1/p")
+              if [ -n "$session" ] && [ -n "$pin" ]; then
+                config_dir=${CLAUDE_CONFIG_DIR:-$HOME/.claude}
+                actual=${FM_FAKE_CLAUDE_MODEL:-$pin}
+                mkdir -p "$config_dir/projects/fm-test"
+                jq -cn --arg session "$session" --arg model "$actual" \
+                  '{type:"assistant",sessionId:$session,message:{role:"assistant",model:$model,content:[]}}' \
+                  > "$config_dir/projects/fm-test/$session.jsonl"
+              fi
+              ;;
+          esac
           cat "$D/becomes" > "$D/command"
           [ -z "${FM_FAKE_LAUNCH_TRANSPORT_FAIL_AFTER_START:-}" ] || exit 1
           ;;
@@ -2645,6 +2659,62 @@ test_herdr_relaunch_resumes_only_the_registered_pi_session() {
   pass "fm-spawn --relaunch: resumes the bound Pi session only for a Pi registration"
 }
 
+test_herdr_relaunch_refuses_a_pinned_pi_resume_with_mismatched_model() {
+  local dir out rc=0 session_file id=resume-model-mismatch
+  herdr_case_or_skip "resume-model-mismatch" "$id" || {
+    echo "skip - herdr relaunch needs jq (the herdr adapter parses JSON with it)"
+    return 0
+  }
+  dir=$HERDR_CASE_DIR
+  rm -f "$dir/fake/herdr-stopped"
+  session_file="$dir/fake/pi-bound-session.jsonl"
+  printf '{"result":{"agent":{"agent":"pi","agent_status":"idle","agent_session":{"kind":"path","value":"%s"}}}}\n' \
+    "$session_file" > "$dir/fake/herdr-agent-registration"
+  printf '%s\n' \
+    '{"type":"session","id":"pi-bound-session"}' \
+    '{"type":"message","message":{"role":"assistant","provider":"anthropic","model":"claude-opus-5","content":[]}}' \
+    > "$session_file"
+
+  out=$(run_spawn "$dir" "$id" --relaunch --harness pi --model anthropic/claude-opus-5-5) || rc=$?
+  expect_code 1 "$rc" "a Pi resume with a mismatched pinned model must refuse"$'\n'"$out"
+  assert_contains "$out" "model pin 'anthropic/claude-opus-5-5' differs from the session's reported model 'anthropic/claude-opus-5'" \
+    "the resume refusal must name the pin and the actual session model"
+  assert_contains "$(cat "$dir/home/state/$id.status")" \
+    "blocked [at=" \
+    "the mismatched resume must land as a blocker in the task's status"
+  [ ! -e "$dir/fake/launched-command" ] || fail "a mismatched Pi resume must not deliver the launch brief"
+  pass "fm-spawn --relaunch: a pinned Pi resume refuses before launch when the session model differs"
+}
+
+test_herdr_relaunch_resumes_a_pinned_pi_session_that_matches() {
+  local dir out rc=0 session_root session_file id=resume-model-match
+  herdr_case_or_skip "resume-model-match" "$id" || {
+    echo "skip - herdr relaunch needs jq (the herdr adapter parses JSON with it)"
+    return 0
+  }
+  dir=$HERDR_CASE_DIR
+  rm -f "$dir/fake/herdr-stopped"
+  session_root="$dir/fake/pi-root"
+  session_file="$session_root/sessions/project/pi-bound-session.jsonl"
+  mkdir -p "${session_file%/*}"
+  printf '%s\n' \
+    '{"result":{"agent":{"agent":"pi","agent_status":"idle","agent_session":{"kind":"id","value":"pi-bound-session"}}}}' \
+    > "$dir/fake/herdr-agent-registration"
+  printf '%s\n' \
+    '{"type":"session","id":"pi-bound-session"}' \
+    '{"type":"message","message":{"role":"assistant","provider":"anthropic","model":"claude-opus-5-5","content":[]}}' \
+    > "$session_file"
+
+  out=$(PI_CODING_AGENT_DIR="$session_root" run_spawn "$dir" "$id" --relaunch --harness pi --model anthropic/claude-opus-5-5) || rc=$?
+  expect_code 0 "$rc" "a Pi resume with a matching pin should complete"$'\n'"$out"
+  assert_contains "$(cat "$dir/fake/launched-command")" "--session 'pi-bound-session'" \
+    "the matching pin must keep the Herdr-bound Pi session identity"
+  assert_contains "$(cat "$dir/home/state/$id.status")" \
+    "resumed-session model assertion passed: pin 'anthropic/claude-opus-5-5' actual 'anthropic/claude-opus-5-5'" \
+    "the matching resume assertion must be recorded in task status"
+  pass "fm-spawn --relaunch: a matching pin keeps the Herdr-bound Pi session and records its model"
+}
+
 test_herdr_reclaim_adopts_a_pane_that_outlived_its_server() {
   local dir out rc=0 log stray
   herdr_case_or_skip gone-herdr rl68 || {
@@ -3044,6 +3114,8 @@ test_tmux_refuses_a_session_that_cannot_be_found
 test_tmux_refuses_when_the_server_is_gone
 test_reclaim_refuses_an_unreadable_endpoint
 test_herdr_relaunch_resumes_only_the_registered_pi_session
+test_herdr_relaunch_refuses_a_pinned_pi_resume_with_mismatched_model
+test_herdr_relaunch_resumes_a_pinned_pi_session_that_matches
 test_herdr_reclaim_adopts_a_pane_that_outlived_its_server
 test_herdr_exit_reports_already_stopped_when_the_pane_outlived_its_server
 test_herdr_rebind_stays_in_the_recorded_session
