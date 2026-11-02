@@ -1,0 +1,22 @@
+# SC1091 reproduction on the exact CI configuration (ShellCheck 0.11.0 pinned by bin/fm-lint.sh)
+
+## A. Same file content WITHOUT the '# shellcheck source=tests/lib.sh' directive (pre-fix shape), cwd = repo root
+$ shellcheck --norc --external-sources /tmp/fm-lint-repro.8Qu3RE/tests/no-directive.test.sh
+
+In /tmp/fm-lint-repro.8Qu3RE/tests/no-directive.test.sh line 4:
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+  ^-- SC1091 (info): Not following: ./lib.sh: openBinaryFile: does not exist (No such file or directory)
+
+For more information:
+  https://www.shellcheck.net/wiki/SC1091 -- Not following: ./lib.sh: openBina...
+exit=1
+
+## B. Worktree file WITH the directive (post-fix), cwd = repo root
+$ shellcheck --norc --external-sources tests/fm-assertions.test.sh
+exit=0
+
+## C. CI's own lint owner, explicit path, same config as CI (--external-sources, --norc, extended analysis, pinned version)
+$ bin/fm-lint.sh tests/fm-assertions.test.sh
+fm-lint.sh: ShellCheck 0.11.0 (pinned 0.11.0)
+fm-lint.sh: full ShellCheck extended analysis enabled
+exit=0

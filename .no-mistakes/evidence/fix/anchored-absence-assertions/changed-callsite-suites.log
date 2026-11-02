@@ -1,0 +1,56 @@
+# Converted anchored-absence call sites driven through the real product scripts
+# Each line below is a passing assertion from the suite that owns the changed call site.
+
+## tests/fm-merge-local.test.sh (assert_no_regex '^local_done_head=')
+ok - captured metadata cannot pin a replacement task generation
+ok - ledger and teardown record the first done head without reacquiring or releasing caller locks
+
+## tests/fm-task-delivery.test.sh (assert_no_regex '^mode=' / '^yolo=')
+ok - fm-spawn/fm-promote: authorized intent preserves exact words and refuses operator-address lines
+ok - fm-promote: promotion requires the delivery contract and records it exactly once
+ok - fm-promote: an opted-in home sends a publishing promotion on a project with origin back to origin's default branch
+ok - fm-promote: a symlinked task record is refused and its target is left untouched
+ok - fm-promote: a promoted worker receives the same mode-specific delivery contract a briefed one does
+ok - fm-promote: a selected branch prefix reaches both worker instructions and durable task state
+ok - fm-promote: ref-format-valid shell metacharacters stay literal in promotion branch commands
+ok - forge=external: promoting a scout is refused because only a ship spawn installs the push guard
+ok - fm-promote: a promoted worker receives the project's registered forge contract with no flag to remember
+ok - forge=forgejo: spawn agreement and promotion carry the binding, name tea, and keep yolo
+ok - fm-promote: a promoted no-mistakes worker receives the registered pr=manual contract 
+ok - fm-spawn/fm-promote: leftover Task placeholders are refused until both subsections are filled
+
+## tests/fm-secondmate-restart.test.sh (assert_no_regex '^/exit$')
+ok - T1 persist is a gate, and asks for open records and task status only
+ok - T2 the mate persists before anything is stopped
+ok - T2b an arrived persist answer is resolved before timeout
+ok - T5 a refused restart leaves the mate running and reports an unknown outcome
+ok - T9 the persist gate retains its explicitly allocated correlation
+ok - T10 pending persist answers are polled as one fleet
+ok - T11 post-stop restart failure is never misreported as a nudge
+ok - T12 relaunch waits do not block fleet persistence polling
+ok - T16 an already-current mate with an unprovable runtime keeps the honest nudge path
+
+## tests/fm-public-followup.test.sh (assert_no_regex '^x_request=' / '^x_followups=' / '^x_platform=')
+ok - restart end-to-end: typed result reconciles from disk and delivers one reply to the original thread
+ok - typed terminal cleanup clears the legacy link without posting
+ok - a child home reports typed results but can never become the outward-post owner
+ok - typed delivery refuses to post when its cleanup registration is missing
+ok - typed public-followup records carry only public-safe summaries and deliverables
+ok - brief fails explicitly when typed deliverable keys are unavailable
+ok - a typed terminal result emitted in a remote work home reaches the owning home
+ok - a rejected event records a specific reason and wakes the owning home once
+ok - a rejection collected from a remote secondmate wakes the owning home
+
+## tests/fm-secondmate-harness.test.sh (assert_no_regex '^backend=') - run with FM_TEST_BASE_PATH so this NixOS host exposes coreutils
+ok - B5b spawn: FM_BACKEND wins over inherited config/backend
+ok - B5c spawn: explicit --backend wins over FM_BACKEND and inherited config/backend
+
+## tests/fm-pr-merge.test.sh (restored pre-existing assert_no_grep '^#' help assertion, per the recorded human decision)
+ok - fm-pr-merge --help and -h print the header usage and exit 0
+
+## suite exit statuses
+tests/fm-task-delivery.test.sh rc=0 elapsed=60s
+tests/fm-remote-doctor.test.sh rc=1 elapsed=1s
+tests/fm-secondmate-harness.test.sh rc=1 elapsed=1s
+tests/fm-public-followup.test.sh rc=0 elapsed=810s
+tests/fm-pr-merge.test.sh rc=0 elapsed=387s

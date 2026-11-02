@@ -1,0 +1,11 @@
+# Adversarial: a directive that does not name the real library must still fail (the fix is not a blanket suppression)
+$ awk -> directive changed to tests/does-not-exist.sh
+$ shellcheck --norc --external-sources /tmp/fm-lint-repro.8Qu3RE/tests/wrong-directive.test.sh   # cwd = repo root
+
+In /tmp/fm-lint-repro.8Qu3RE/tests/wrong-directive.test.sh line 5:
+. "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+  ^-- SC1091 (info): Not following: tests/does-not-exist.sh: openBinaryFile: does not exist (No such file or directory)
+
+For more information:
+  https://www.shellcheck.net/wiki/SC1091 -- Not following: tests/does-not-exi...
+exit=1

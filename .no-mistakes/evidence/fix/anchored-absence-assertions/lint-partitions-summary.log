@@ -1,0 +1,43 @@
+# CI Lint partitions driven locally with CI's own environment
+# p1: FM_LINT_REQUIRE_BOUNDS=1 FM_LINT_JOBS=1 bin/fm-lint.sh --partition 1of2   (contains tests/fm-assertions.test.sh)
+# p2: FM_LINT_REQUIRE_BOUNDS=1 FM_LINT_JOBS=1 bin/fm-lint.sh --partition 2of2   (the CI job reported as failing)
+
+## exit status
+p1 result_exit = 0
+p2 result_exit = 0
+
+## root record for the file this change repairs (partition 1, and the p2 tests root)
+begin	127	tests/fm-assertions.test.sh	1	full	1793656081384
+end	127	tests/fm-assertions.test.sh	1	full	1793656081384	1793656081758	374	0	ok	unavailable	1
+begin	281	tests/lib.sh	0	full	1793657035566
+end	281	tests/lib.sh	0	full	1793657035566	1793657035943	377	0	ok	unavailable	1
+(record fields: begin|end, index, root, shard, mode, start_ms, end_ms, duration_ms, rc, reason, rss, final_follow_sources)
+
+## any SC1091 / other findings anywhere in either partition log
+(none above means no ShellCheck diagnostic in either partition)
+
+## documented memory-fallback roots on this 16-core host under load
+bin/fm-spawn.sh
+tests/fm-pending-reply.test.sh
+
+## workflow lint (both partitions run it)
+/tmp/fm-lint-scratch/p1.log:fm-lint-workflows.sh: 3 workflow files valid
+/tmp/fm-lint-scratch/p2.log:fm-lint-workflows.sh: 3 workflow files valid
+
+## telemetry
+p1 git_head	20da8aacf0ef74b9064dfbb4948aa58cbf13e161
+p1 shellcheck_version	0.11.0
+p1 analysis_mode	full
+p1 root_bounds_enforced	1
+p1 root_count	286
+p1 source_directives	571
+p1 source_followed_directives	474
+p1 result_exit	0
+p2 git_head	20da8aacf0ef74b9064dfbb4948aa58cbf13e161
+p2 shellcheck_version	0.11.0
+p2 analysis_mode	full
+p2 root_bounds_enforced	1
+p2 root_count	285
+p2 source_directives	606
+p2 source_followed_directives	488
+p2 result_exit	0

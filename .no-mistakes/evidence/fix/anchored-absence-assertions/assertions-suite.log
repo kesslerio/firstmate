@@ -1,0 +1,2 @@
+# bash tests/fm-assertions.test.sh  (the suite that owns the directive target)
+ok - regex absence distinguishes no match from matches and errors
