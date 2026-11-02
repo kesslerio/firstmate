@@ -1,0 +1,116 @@
+
+### S1 observing receipt recognizes the running model; pools are not blocked fleet-wide
+PASS: a real Herdr pane with a real agent classifies alive (fm-lab-live-seat-2027822-8197:wA:p2)
+served ios policy=798092721-84 epoch=r1793586821247807531744.1 holders=1
+PASS: the primary adopted the pre-pool supervisor once, at generation host.a1
+launch rc=0
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"op2","requested_generation":"op2","actual_generation":"host.a1","previous_generation":"host.a1","disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-lab-live-seat-2027822-8197:wA:p2","home":"/tmp/fm-lab.EHXCd2/s1/host","host":null,"remote_root":null,"spawn_gen":"host.a1"},"actual_model":"pool-model-a","complete":true}
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-live-seat-2027822-8197:wA:p2
+herdr_session=fm-lab-live-seat-2027822-8197
+harness=pi
+model=pool-model-a
+effort=
+spawn_gen=host.a1
+seat_operation=op2
+PASS: the receipt observed generation host.a1 running model pool-model-a (requested pool-model-b)
+PASS: the durable host receipt records the observing phase
+fleet-seats: existing id=ios generation=host.a1 (candidate op2 released)
+served ios policy=798092721-84 epoch=r1793586821247807531744.2 holders=0
+PASS: the primary served the remote after the observing receipt
+fleet-seats: reserved pool=shared id=contender generation=op3 used=2 capacity=3
+PASS: a pooled launch on pool-model-b was granted beside the adopted supervisor
+replacement-of-recorded rc=0
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"op8","requested_generation":"op8","actual_generation":"host.a1","previous_generation":"host.a1","disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-lab-live-seat-2027822-8197:wA:p2","home":"/tmp/fm-lab.EHXCd2/s1/host","host":null,"remote_root":null,"spawn_gen":"host.a1"},"actual_model":"pool-model-a","complete":true}
+schema=fm-remote-secondmate-control.v1
+backend=herdr
+target=fm-lab-live-seat-2027822-8197:wA:p2
+herdr_session=fm-lab-live-seat-2027822-8197
+harness=pi
+model=pool-model-a
+effort=
+spawn_gen=host.a1
+seat_operation=op8
+PASS: a replacement naming the host-recorded generation host.a1 was accepted
+
+### S2 a replacement replaces the host-recorded generation from a cancelled launch
+served ios2 policy=798092721-84 epoch=r1793586830249211413367.1 holders=1
+first launch rc=0 {"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"ops1","requested_generation":"ops1","actual_generation":"host.a1","previous_generation":null,"disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-lab-live-seat-2027822-8197:wA:p3","home":"/tmp/fm-lab.EHXCd2/s2/host","host":null,"remote_root":null,"spawn_gen":"host.a1"},"actual_model":"pool-model-a","complete":true}
+fleet-seats: existing id=ios2 generation=host.a1 (candidate ops1 released)
+fleet-seats: released id=ios2 generation=op4 reason=cancelled
+[{"generation":"ops1","lifecycle":"released","reason":"prelaunch","route":null},{"generation":"host.a1","lifecycle":"confirmed","reason":null,"route":"fm-lab-live-seat-2027822-8197:wA:p3"},{"generation":"op4","lifecycle":"released","reason":"cancelled","route":"fm-lab-live-seat-2027822-8197:wA:p3"}]
+fleet-seats: retained - the host did not report a disposition for ios2 operation ops1 (the seat stays counted until evidence resolves it)
+reclaim opa rc=3: 
+FAIL: the parent could not reclaim its earlier generation: 
+resolved predecessor: op4
+PASS: the parent resolves the cancelled launch as the generation the host records
+fleet-seats: no seat - remote secondmate(s) ios2 have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+FAIL: reserve/dispatch opc failed
+fleet-seats: refused - no seat is reserved for ios2 generation opc
+FAIL: recording the cancelled launch failed
+resolved predecessor (host-recorded): 
+FAIL: the parent offered '' instead of the cancelled host generation opc
+Usage:
+  fm-fleet-seats.sh reserve <id> --generation <gen> [--previous-generation <gen|->]
+      --harness <harness> --model <model|default> --holder-pid <pid>
+      [--kind ship|scout|secondmate] [--raw-launch]
+      Prints nothing and exits 0 with no declaration for a new holder key.
+      Existing holders still record successors during policy opt-out.
+      With a declaration, records the holder and prints
+      "fleet-seats: reserved pool=..." (pooled) or "fleet-seats: recorded ..."
+      (a model in no pool).
+  fm-fleet-seats.sh dispatch <id> --generation <gen> --route-file <private-json>
+      Exit 0 "fleet-seats: dispatched ..." permits the one launch delivery;
+      exit 3 "already-dispatched" forbids delivering again.
+  fm-fleet-seats.sh confirm <id> --generation <gen>
+  fm-fleet-seats.sh release <id> --generation <gen> --reason <prelaunch|cancelled|replaced|teardown>
+  fm-fleet-seats.sh reclaim <id> --generation <gen> [--state-dir <canonical-state>]
+  fm-fleet-seats.sh reconcile-remote <id> --generation <gen> --response-file <private-json>
+  fm-fleet-seats.sh reconcile --limit <n>
+      Bounded maintenance: try reclaim on up to <n> holders whose owner has
+      ended, skipping busy episodes; nothing is killed to free a seat.
+  fm-fleet-seats.sh show <id>
+      Print this home's holder record for <id> (read-only).
+  fm-fleet-seats.sh serve-remotes
+      Root only (a no-op anywhere else): serve every registered remote
+      secondmate and print one "served <id> ..." or "unreachable <id>" line
+      each. A remote that failed is skipped for a fixed backoff.
+  fm-fleet-seats.sh serve --digest <digest> --epoch <epoch> [--allowance <pool>=<n>]...
+      Remote home only; the root runs it through bin/fm-on.sh with the pool
+      declaration on stdin.
+
+FAIL: reserve/dispatch op7 failed
+replacement rc=1
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op7","requested_generation":"op7","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: operation op7 has no verified dispatched parent reservation; nothing was changed
+FAIL: the replacement did not confirm the host-recorded generation: rc=1 {"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op7","requested_generation":"op7","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+fleet-seats: refused - an earlier launch of ios2 (generation host.a1) is still unresolved; reconcile or reclaim it before starting another
+FAIL: reserve op6 failed
+fleet-seats: refused - no seat is reserved for ios2 generation op6
+FAIL: dispatch op6 failed
+pre-fix predecessor rc=1
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op6","requested_generation":"op6","actual_generation":null,"previous_generation":"opa","disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: operation op6 has no verified dispatched parent reservation; nothing was changed
+FAIL: the host accepted a predecessor it does not record: rc=1
+
+### S3 a retirement retry refuses to delete a reseeded public home
+reseeded retry rc=1
+error: remote retirement retry cannot prove public home ownership
+PASS: the retirement retry refused instead of deleting the reseeded home
+PASS: the refusal names the missing ownership proof
+PASS: the reseeded home and its data survived the retry
+successor retry rc=1
+error: generation-mismatch: refusing to retire a successor
+PASS: a successor generation at the same path is refused
+PASS: the successor home survived the refusal
+endpoint-mismatch retry rc=1
+error: remote retirement pending history does not match this endpoint
+PASS: a different endpoint cannot consume the pending retirement evidence
+PASS: the home survived the endpoint-mismatch refusal
+PASS: no Herdr call outside this run's lab session was attempted
+
+===
+RESULT: live remote seat scenarios FAILED

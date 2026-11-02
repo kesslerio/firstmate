@@ -1,0 +1,58 @@
+
+### S1 primary + local secondmate share one capacity
+fleet-seats: reserved pool=shared id=r1 generation=g-r1 used=1 capacity=2
+PASS: primary reserved the first seat (reserved pool=shared id=r1 generation=g-r1 used=1 capacity=2)
+fleet-seats: reserved pool=shared id=a1 generation=g-a1 used=2 capacity=2
+PASS: the local secondmate's launch was counted in the primary's pool
+fleet-seats: pool shared is full (2 of 2 seats held); r2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.gxvPzw/local/android/state a1
+  holder /tmp/fm-lab.gxvPzw/local/primary/state r1
+PASS: a third launch across the two homes was refused, naming the holders
+fleet-seats: reserved pool=shared id=r2 generation=g-r2 used=2 capacity=2
+PASS: the released generation freed exactly one seat for the waiting launch
+fleet-seats: reserved pool=shared id=r1 generation=g-r1-next (already held) used=2 capacity=2
+PASS: a same-pool replacement generation reused its predecessor's seat
+{"generation":"g-r1","lifecycle":"reserved","launch_phase":"prepared"}
+{"generation":"g-r1-next","lifecycle":"reserved","launch_phase":"prepared"}
+PASS: the unproven predecessor generation stays counted beside its replacement
+PASS: an unproven 'replaced' release is refused, so the old seat stays counted
+
+### S2 two simultaneous launches race for the last seat
+primary rc=0: fleet-seats: reserved pool=shared id=racer-a generation=g-a used=1 capacity=1
+secondmate rc=4: fleet-seats: pool shared is full (1 of 1 seats held); racer-b gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.gxvPzw/race/primary/state racer-a
+PASS: exactly one of two simultaneous launches won the single seat
+
+### S3 a pre-pool remote supervisor is counted once; the certificate-proved generation is not treated as unissued
+served theshop policy=798092721-84 epoch=r179358486416762222619.1 holders=1
+PASS: the primary served the remote and adopted the running supervisor
+certificate holders: [{"state_dir":"/tmp/fm-lab.gxvPzw/remote/theshop/state/parent-route","task":"theshop","generation":"host.1","model":"pool-model-a","lifecycle":"confirmed"}]
+PASS: the serve certificate reports the pre-pool supervisor's own generation and model
+fleet-seats: reserved pool=shared id=contender generation=g-contender used=2 capacity=3
+PASS: the adopted supervisor consumed exactly one of three seats
+primary route record added; serve: served theshop policy=798092721-84 epoch=r179358486416762222619.2 holders=1
+fleet-seats: reserved pool=shared id=contender2 generation=g-contender2 used=2 capacity=3
+PASS: the primary's own route record was not charged beside the certificate's holder
+fleet-seats: reserved pool=shared id=filler generation=g-filler used=3 capacity=3
+PASS: the adopted supervisor and two local holders fill exactly three seats
+fleet-seats: pool shared is full (3 of 3 seats held); overflow gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.gxvPzw/remote/primary/state contender2
+  holder /tmp/fm-lab.gxvPzw/remote/primary/state filler
+  holder /tmp/fm-lab.gxvPzw/remote/primary/state theshop
+PASS: a fourth launch is refused, so the adopted supervisor is counted
+abandoned candidate reserve rc=0: fleet-seats: reserved pool=shared id=theshop generation=g-abandoned (already held) used=3 capacity=3
+fleet-seats: reserved pool=shared id=spare generation=g-spare used=3 capacity=3
+PASS: a released candidate did not contradict the certificate-proved generation (the next launch was counted, not refused)
+
+### S4 a remote secondmate launch is granted from the same capacity; an unreachable remote is never free
+fleet-seats: reserved pool=shared id=primary-worker generation=g-primary used=1 capacity=2
+remote launch rc=0: fleet-seats: reserved pool=shared id=ios-worker generation=g-ios (granted by the fleet root)
+PASS: the remote secondmate's launch was granted from the primary's shared capacity
+second remote launch rc=4: fleet-seats: pool shared is full (2 of 2 seats held); ios-worker-2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+PASS: a second remote launch was refused because the shared pool was full
+fleet-seats: no seat - remote secondmate(s) ios have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+PASS: an unreachable remote refused new launches instead of freeing its seats
+last certificate holders: [{"task":"ios-worker","generation":"g-ios","model":"pool-model-a"}]
+
+===
+RESULT: all live seat-pool scenarios passed

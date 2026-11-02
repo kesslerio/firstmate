@@ -1,0 +1,36 @@
+# Live remote seat-pool scenarios (final run)
+# session: disposable fm-lab-* Herdr lab, torn down in the same turn
+### S1 observing receipt recognizes the running model; pools are not blocked fleet-wide
+PASS: a real Herdr pane with a real agent classifies alive (fm-lab-live-seat-2027822-8197:wA:p2)
+PASS: the primary adopted the pre-pool supervisor once, at generation host.a1
+PASS: the receipt observed generation host.a1 running model pool-model-a (requested pool-model-b)
+PASS: the durable host receipt records the observing phase
+PASS: the primary served the remote after the observing receipt
+PASS: a pooled launch on pool-model-b was granted beside the adopted supervisor
+replacement-of-recorded rc=0
+PASS: a replacement naming the host-recorded generation host.a1 was accepted
+### S2 a replacement replaces the host-recorded generation from a cancelled launch
+first launch rc=0 {"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"ops1","requested_generation":"ops1","actual_generation":"host.a1","previous_generation":null,"disposition":"existing","startup_confirmed":true,"old_stopped":false,"old_destroyed":false,"route":{"placement":"remote","backend":"herdr","target":"fm-lab-live-seat-2027822-8197:wA:p3","home":"/tmp/fm-lab.EHXCd2/s2/host","host":null,"remote_root":null,"spawn_gen":"host.a1"},"actual_model":"pool-model-a","complete":true}
+reclaim opa rc=3: 
+FAIL: the parent could not reclaim its earlier generation: 
+resolved predecessor: op4
+PASS: the parent resolves the cancelled launch as the generation the host records
+FAIL: reserve/dispatch opc failed
+FAIL: recording the cancelled launch failed
+resolved predecessor (host-recorded): 
+FAIL: the parent offered '' instead of the cancelled host generation opc
+FAIL: reserve/dispatch op7 failed
+FAIL: the replacement did not confirm the host-recorded generation: rc=1 {"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op7","requested_generation":"op7","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+FAIL: reserve op6 failed
+FAIL: dispatch op6 failed
+FAIL: the host accepted a predecessor it does not record: rc=1
+### S3 a retirement retry refuses to delete a reseeded public home
+PASS: the retirement retry refused instead of deleting the reseeded home
+PASS: the refusal names the missing ownership proof
+PASS: the reseeded home and its data survived the retry
+PASS: a successor generation at the same path is refused
+PASS: the successor home survived the refusal
+PASS: a different endpoint cannot consume the pending retirement evidence
+PASS: the home survived the endpoint-mismatch refusal
+PASS: no Herdr call outside this run's lab session was attempted
+RESULT: live remote seat scenarios FAILED

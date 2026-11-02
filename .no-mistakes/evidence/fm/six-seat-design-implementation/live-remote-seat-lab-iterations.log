@@ -1,0 +1,91 @@
+# Earlier iterations of the same lab script (S2 only, labeled)
+
+# iteration 3: full S2 (all steps) - predecessor + pre-fix host refusal
+### S2 a replacement replaces the host-recorded generation from a cancelled launch
+served ios2 policy=798092721-84 epoch=r1793586675230029616724.1 holders=1
+first launch rc=1 {"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"opa","requested_generation":"opa","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+FAIL: the first (observing) launch failed: rc=1
+fleet-seats: retained - the host cannot yet account for ios2 generation opa (the seat stays counted until evidence resolves it)
+FAIL: confirming the older generation failed
+fleet-seats: released id=ios2 generation=op4 reason=cancelled
+[{"generation":"opa","lifecycle":"reserved","reason":null,"route":null},{"generation":"op4","lifecycle":"released","reason":"cancelled","route":"fm-lab-live-seat-2027822-8197:w6:p3"}]
+fleet-seats: retained - the host did not report a disposition for ios2 operation opa (the seat stays counted until evidence resolves it)
+reclaim opa rc=3: 
+FAIL: the parent could not reclaim its earlier generation: 
+resolved predecessor: op4
+PASS: the parent resolves the cancelled launch as the generation the host records
+fleet-seats: refused - an earlier launch of ios2 (generation opa) is still unresolved; reconcile or reclaim it before starting another
+FAIL: reserve/dispatch op5 failed
+replacement rc=1
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op5","requested_generation":"op5","actual_generation":null,"previous_generation":"op4","disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: operation op5 has no verified dispatched parent reservation; nothing was changed
+FAIL: the replacement did not confirm the host-recorded generation: rc=1 {"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op5","requested_generation":"op5","actual_generation":null,"previous_generation":"op4","disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+pre-fix predecessor rc=6
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op6","requested_generation":"op6","actual_generation":null,"previous_generation":"opa","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: generation-mismatch: the host incarnation is not the reserved predecessor; nothing was changed
+PASS: the older confirmed generation is still refused (the loop the fix removes)
+
+### S3 a retirement retry refuses to delete a reseeded public home
+
+# iteration 4: after the S2 restructure
+### S2 a replacement replaces the host-recorded generation from a cancelled launch
+served ios2 policy=798092721-84 epoch=r179358672723510421061.1 holders=1
+first launch rc=1 {"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"opa","requested_generation":"opa","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+FAIL: the first (observing) launch failed: rc=1
+fleet-seats: retained - the host cannot yet account for ios2 generation opa (the seat stays counted until evidence resolves it)
+FAIL: confirming the older generation failed
+fleet-seats: released id=ios2 generation=op4 reason=cancelled
+[{"generation":"opa","lifecycle":"reserved","reason":null,"route":null},{"generation":"op4","lifecycle":"released","reason":"cancelled","route":"fm-lab-live-seat-2027822-8197:w7:p3"}]
+fleet-seats: retained - the host did not report a disposition for ios2 operation opa (the seat stays counted until evidence resolves it)
+reclaim opa rc=3: 
+FAIL: the parent could not reclaim its earlier generation: 
+resolved predecessor: op4
+PASS: the parent resolves the cancelled launch as the generation the host records
+fleet-seats: no seat - remote secondmate(s) ios2 have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+FAIL: reserve/dispatch opc failed
+fleet-seats: refused - no seat is reserved for ios2 generation opc
+FAIL: recording the cancelled launch failed
+resolved predecessor (host-recorded): 
+FAIL: the parent offered '' instead of the cancelled host generation opc
+Usage:
+  fm-fleet-seats.sh reserve <id> --generation <gen> [--previous-generation <gen|->]
+      --harness <harness> --model <model|default> --holder-pid <pid>
+      [--kind ship|scout|secondmate] [--raw-launch]
+      Prints nothing and exits 0 with no declaration for a new holder key.
+      Existing holders still record successors during policy opt-out.
+      With a declaration, records the holder and prints
+      "fleet-seats: reserved pool=..." (pooled) or "fleet-seats: recorded ..."
+      (a model in no pool).
+  fm-fleet-seats.sh dispatch <id> --generation <gen> --route-file <private-json>
+      Exit 0 "fleet-seats: dispatched ..." permits the one launch delivery;
+      exit 3 "already-dispatched" forbids delivering again.
+  fm-fleet-seats.sh confirm <id> --generation <gen>
+  fm-fleet-seats.sh release <id> --generation <gen> --reason <prelaunch|cancelled|replaced|teardown>
+  fm-fleet-seats.sh reclaim <id> --generation <gen> [--state-dir <canonical-state>]
+  fm-fleet-seats.sh reconcile-remote <id> --generation <gen> --response-file <private-json>
+  fm-fleet-seats.sh reconcile --limit <n>
+      Bounded maintenance: try reclaim on up to <n> holders whose owner has
+      ended, skipping busy episodes; nothing is killed to free a seat.
+  fm-fleet-seats.sh show <id>
+      Print this home's holder record for <id> (read-only).
+  fm-fleet-seats.sh serve-remotes
+      Root only (a no-op anywhere else): serve every registered remote
+      secondmate and print one "served <id> ..." or "unreachable <id>" line
+      each. A remote that failed is skipped for a fixed backoff.
+  fm-fleet-seats.sh serve --digest <digest> --epoch <epoch> [--allowance <pool>=<n>]...
+      Remote home only; the root runs it through bin/fm-on.sh with the pool
+      declaration on stdin.
+
+FAIL: reserve/dispatch op7 failed
+replacement rc=1
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op7","requested_generation":"op7","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: operation op7 has no verified dispatched parent reservation; nothing was changed
+FAIL: the replacement did not confirm the host-recorded generation: rc=1 {"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op7","requested_generation":"op7","actual_generation":null,"previous_generation":null,"disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+pre-fix predecessor rc=6
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios2","operation":"op6","requested_generation":"op6","actual_generation":null,"previous_generation":"opa","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: generation-mismatch: the host incarnation is not the reserved predecessor; nothing was changed
+PASS: the older confirmed generation is still refused (the loop the fix removes)
+
+### S3 a retirement retry refuses to delete a reseeded public home
