@@ -241,6 +241,10 @@ test_2x_pins_model_through_project_config() {
   assert_contains "$out" 'requested=john-remote/qwen3.8-flash-next observed=john-remote/qwen3.8-flash-next' \
     "the post-launch assertion did not report the observed effective model"
   assert_contains "$out" "spawned $ID harness=opencode" "the spawn did not report success"
+  # The launcher's own components must all be callable at the point they run: a
+  # helper resolved too late surfaces here as a shell error in normal output.
+  assert_not_contains "$out" 'command not found' \
+    "a supported launch must not emit shell errors from its own components: $out"
   pass "a 2.x build pins the model through the worktree project config and asserts it"
 }
 

@@ -2507,6 +2507,13 @@ shell_quote() {
   printf "'"
 }
 
+# Escapes text for JSON string content. Defined here, ahead of the first caller
+# (the OpenCode model axis below), because shell functions exist only once their
+# definition has been evaluated in this script's linear flow.
+json_escape() {
+  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
 resolve_pi_executable() {
   local candidate dir
   candidate=$(type -P -- "$1" 2>/dev/null) || return 1
@@ -3889,10 +3896,6 @@ case "$LAUNCH" in
   LAUNCH=${LAUNCH//__ROVOBIN__/$(shell_quote "$ROVO_BIN")}
   ;;
 esac
-
-json_escape() {
-  printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
-}
 
 # rovo confines every file-tool operation (open_files, create_file, grep, ...)
 # to its worktree by default; toolPermissions.allowedExternalPaths
