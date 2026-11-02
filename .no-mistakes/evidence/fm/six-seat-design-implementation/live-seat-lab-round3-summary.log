@@ -1,0 +1,42 @@
+# Live fleet-seat-pool scenarios (round 3)
+# branch fm/six-seat-design-implementation, target a91ed1a1
+# session: disposable fm-lab-* Herdr lab with real Pi agents, torn down in the same turn
+### S1 observing receipt recognizes the running model; pools are not blocked fleet-wide
+PASS: a real Herdr pane with a real agent classifies alive (fm-lab-seatpool-3364787-15029:wD:p2)
+PASS: the primary adopted the pre-pool supervisor once, at generation host.a1
+PASS: the receipt observed generation host.a1 running model pool-model-a (requested pool-model-b)
+PASS: the durable host receipt records the observing phase
+PASS: the primary served the remote after the observing receipt
+PASS: a pooled launch on pool-model-b was granted beside the adopted supervisor
+PASS: a replacement naming the host-recorded generation host.a1 was accepted
+### S2 a replacement replaces the host-recorded generation from a cancelled launch
+PASS: a real agent endpoint is alive in the lab session
+PASS: the ledger records the cancelled launch as terminal with the route the host reached
+PASS: the parent offers the cancelled launch as the generation the host records
+PASS: the parent reserved and dispatched the replacement against the cancelled predecessor
+PASS: the host replaced the generation it recorded for the cancelled launch
+PASS: the replacement outcome binds the host-recorded generation op4 to the candidate
+PASS: the host still refuses a predecessor it does not record
+### S3 a retirement retry refuses to delete a reseeded public home
+PASS: the retirement retry refused instead of deleting the reseeded home
+PASS: the refusal names the missing ownership proof
+PASS: the reseeded home and its data survived the retry
+PASS: a successor generation at the same path is refused
+PASS: the successor home survived the refusal
+PASS: a different endpoint cannot consume the pending retirement evidence
+PASS: the home survived the endpoint-mismatch refusal
+PASS: no Herdr call outside this run's lab session was attempted
+### S4 primary, local secondmate and remote host share one capacity without over-dispatching
+PASS: the remote serve published a complete certificate holding its supervisor
+PASS: the certificate proves the supervisor's generation cert.a1
+PASS: the local secondmate home is charged to the shared capacity
+PASS: a fourth launch is refused as full (exit 4), not as unaccounted (exit 5)
+PASS: the full-pool refusal lists the remote-host and local-secondmate holders it counted
+PASS: the counted host supervisor is not recorded as a ledger-issued generation
+PASS: releasing the local seat frees exactly one shared seat
+### S5 a certificate-proved generation is counted, not refused as a ledger-unknown generation
+PASS: the serve certificate proves the running supervisor at generation cert.b1
+PASS: counting the certificate-proved generation admits a pooled launch (no ledger-history refusal)
+PASS: the certificate generation is exempt from the ledger-history check
+PASS: the certificate generation stays out of the ledger history
+RESULT: all driven live scenarios passed
