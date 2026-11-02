@@ -1,0 +1,51 @@
+
+=== S1 ready queued work escalates instead of being absorbed ===
+--- real backlog consumer: ready + queued
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  unit-next,queued,task,"-",ready queued unit
+count: 1
+tasks[1]{id,state,kind,repo,title}:
+  unit-next,queued,task,"-",ready queued unit
+--- real watcher process (FM_HEARTBEAT=1, FM_CHECK_INTERVAL=999999, no status events, no live worker)
+watcher stdout: heartbeat
+durable wake queue: 1793576478 1 heartbeat heartbeat heartbeat
+--- real drain of that wake
+1793576478	1	heartbeat	heartbeat	heartbeat
+S1 PASS
+
+=== S2 empty queue stays quiet (no unnecessary dispatch wake) ===
+heartbeat streak: 1
+watcher stdout (empty expected): ''
+wake queue present: no
+S2 PASS
+
+=== S3 unreadable readiness escalates rather than reading as an empty queue ===
+--- real backlog consumer fails on the misconfigured backend:
+error: "Unsupported backend \"not-a-real-backend\" — P1 ships the markdown backend only"
+code: UNSUPPORTED
+help[1]: "Set `backend = \"markdown\"` in .tasks.toml, or omit --backend"
+rc=0
+watcher stdout: heartbeat
+S3 PASS
+
+=== S4 an unconfirmed start stays off the queue-drop path (bootstrap heal) ===
+--- backlog row before bootstrap: queued
+--- real bootstrap run (FM_BOOTSTRAP_NETWORK=skip), backlog reconcile sweep:
+BOOTSTRAP_INFO: marked unit-start in flight to match the worker this home already owns
+--- backlog row after bootstrap: in_flight
+--- ready count after bootstrap (a reopen would drop the unit here without a confirmed starter):
+count: 0
+S4 PASS
+
+=== S5 every unprocessed captain outcome and its ready-work handoff stays visible ===
+--- first real drain (MAIN):
+BRANCH OUTCOMES (captain outcomes the supervision session recorded for you, one line per outcome, oldest first; each says what was true when it was recorded, so check the task's current state first, including its still-open decisions listed above under OPEN DECISIONS, and sort them into still open and already settled, such as a decision since answered, a PR since merged, or a task since finished - process the still-open ones as firstmate: tell the captain, land or merge what is ready, answer or escalate a decision, or act on a blocker; your reply to the captain covers only those, as if the settled ones had never been listed, and a settled one needs only the acknowledgement apart from any ready-work handoff; before acknowledging any outcome, including one whose source task has settled, act on every ready-work handoff it contains: check each named unit and dispatch it in this turn, or record its not-ready reason and the condition that must change before retrying on its backlog note; an applicable recorded reason suppresses repeat handoffs):
+[seq 1, recorded 0m ago] source: ready-work handoff: dispatch unit-next; its dependency landed
+[seq 2, recorded 0m ago] source: source task finished; no new handoff
+BRANCH OUTCOMES: after processing them run bin/fm-branch-outcome.sh mark-processed --through 2; until then every drain presents them again
+--- presented acknowledgement target: through 2
+--- unprocessed after presentation: {"seq":1,"epoch":1793576484,"task":"source","wake":"","verdict":"captain","summary":"ready-work handoff: dispatch unit-next; its dependency landed","silent":false,"statusEndpoint":0,"statusIdent":"-","recordedAgo":"0m"} {"seq":2,"epoch":1793576484,"task":"source","wake":"","verdict":"captain","summary":"source task finished; no new handoff","silent":false,"statusEndpoint":0,"statusIdent":"-","recordedAgo":"0m"} 
+--- drain after acknowledgement (handoff must not repeat):
+
+S5 PASS

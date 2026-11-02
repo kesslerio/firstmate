@@ -1,0 +1,16 @@
+ok - teardown leaves opencode's busy plugin in the returned pool worktree as on main
+ok - hidden untracked work is refused before return while a clean control returns
+ok - content fallback distinguishes unavailable Git proof, containment, conflicts, and unlanded content
+ok - status archival is opt-in and preserves the complete log
+ok - config-absent teardown does not read or invoke record export
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 0s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CPKT1A9G7ANE7A4B33H9PY/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6CPKT1A9G7ANE7A4B33H9PY/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning: lsof is unavailable; cannot resolve the tmux pane process group for task-x1
+ok - teardown closes its own backlog item before reporting success
+ok - no-mistakes worktree with HEAD on origin is torn down (no regression)
+SUBSET_DONE
