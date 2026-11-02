@@ -1,0 +1,22 @@
+$ tmux -L fm-lab list-windows -a
+primary:bash bash
+primary:fm-task-b bash
+
+$ cat state/live-a.meta (kind/mode) state/live-a.status
+project=/tmp/fm-lab.xENIjN/proj/project
+kind=ship
+mode=no-mistakes
+done [at=1793658810]: finished
+
+$ fm-spawn.sh task-c <project> --mode local-only --yolo off   # live-a is a no-mistakes ship that reported done
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+deferred: project project admits 1 worker(s) at once on this machine (/tmp/fm-lab.xENIjN/config/project-capacity) and 1 already hold a place (live-a); task task-c was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+
+exit=75
+$ ls state/
+home-summary.json
+live-a.meta
+live-a.status
+task-b.git-hooks
+task-b.meta
+task-b.status

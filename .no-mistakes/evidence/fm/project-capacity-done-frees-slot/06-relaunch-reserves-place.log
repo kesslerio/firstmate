@@ -1,0 +1,19 @@
+$ cat state/task-d.status   # finished scout
+working [at=1793658784]: spawn admitted
+done [at=1793659400]: scout finished
+status bytes before relaunch: 77
+
+$ fm-spawn.sh task-d --relaunch
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+spawned task-d harness=codex kind=scout window=primary:fm-task-d worktree=/home/art/.treehouse/project-50b582/3/project
+
+exit=0
+$ cat state/task-d.capacity-reservation
+gen=s1793658814.719404.20147
+status_offset=77
+status bytes after relaunch: 77 (unchanged: yes)
+$ tmux -L fm-lab list-panes -a
+bash cmd=bash cwd=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6F4747NZFQHJP8TZDC79MXD
+fm-task-b cmd=bash cwd=/home/art/.treehouse/project-50b582/1/project
+fm-task-c cmd=node cwd=/home/art/.treehouse/project-50b582/2/project
+fm-task-d cmd=node cwd=/home/art/.treehouse/project-50b582/3/project

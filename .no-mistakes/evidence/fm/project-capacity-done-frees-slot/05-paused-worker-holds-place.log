@@ -1,0 +1,11 @@
+$ cat state/paused-p.meta state/paused-p.status   # paused worker with no completion event
+project=/tmp/fm-lab.xENIjN/proj/project
+kind=ship
+mode=no-mistakes
+paused [at=1793659450]: waiting on external review
+
+$ fm-spawn.sh task-e <project> --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+deferred: project project admits 1 worker(s) at once on this machine (/tmp/fm-lab.xENIjN/config/project-capacity) and 1 already hold a place (paused-p); task task-e was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+
+exit=75

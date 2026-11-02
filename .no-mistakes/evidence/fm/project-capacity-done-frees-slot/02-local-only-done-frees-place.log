@@ -1,0 +1,34 @@
+$ grep -E "kind|mode" state/live-a.meta; cat state/live-a.status   # finished local-only ship with later bookkeeping
+kind=ship
+mode=local-only
+done [at=1793658810]: finished
+captain-held [at=1793658900]: decision transferred
+
+$ fm-spawn.sh task-c <project> --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+warning: /tmp/fm-lab.xENIjN/data/task-c/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-c
+notice: task-c ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned task-c harness=codex kind=ship mode=local-only yolo=off window=primary:fm-task-c worktree=/home/art/.treehouse/project-50b582/2/project
+
+exit=0
+$ tmux -L fm-lab list-windows -a
+primary:bash bash /home/art/.no-mistakes/worktrees/9f75ec418609/01M6F4747NZFQHJP8TZDC79MXD
+primary:fm-task-b bash /home/art/.treehouse/project-50b582/1/project
+primary:fm-task-c node /home/art/.treehouse/project-50b582/2/project
+
+$ cat state/task-c.status state/task-c.meta
+working [at=1793658759]: spawn admitted
+window=primary:fm-task-c
+endpoint_task_id=task-c
+worktree=/home/art/.treehouse/project-50b582/2/project
+project=/tmp/fm-lab.xENIjN/proj/project
+harness=codex
+approval_mode=bypass
+kind=ship
+mode=local-only
+yolo=off
+branch=fm/task-c
+tasktmp=/tmp/fm-task-c
+model=default
+effort=default
+spawn_gen=s1793658759.569401.1552

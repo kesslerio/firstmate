@@ -1,0 +1,13 @@
+$ cat state/task-c.status state/live-a.status   # task-c finished; live-a had done then working
+working [at=1793658759]: spawn admitted
+done [at=1793659000]: finished
+--
+done [at=1793658810]: finished
+captain-held [at=1793658900]: decision transferred
+working [at=1793659100]: steered back into work
+
+$ fm-spawn.sh task-d <project> --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+deferred: project project admits 1 worker(s) at once on this machine (/tmp/fm-lab.xENIjN/config/project-capacity) and 1 already hold a place (live-a); task task-d was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+
+exit=75

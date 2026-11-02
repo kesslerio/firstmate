@@ -1,0 +1,24 @@
+$ cat state/scout-s.meta state/scout-s.status   # finished scout with later bookkeeping
+project=/tmp/fm-lab.xENIjN/proj/project
+kind=scout
+done [at=1793659300]: scouting finished
+captain-held [at=1793659310]: decision transferred
+$ tail -n2 state/live-a.status
+working [at=1793659100]: steered back into work
+done [at=1793659200]: finished
+
+$ fm-spawn.sh task-d <project> --scout
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+spawned task-d harness=codex kind=scout window=primary:fm-task-d worktree=/home/art/.treehouse/project-50b582/3/project
+
+exit=0
+$ tmux -L fm-lab list-windows -a
+primary:bash bash
+primary:fm-task-b bash
+primary:fm-task-c node
+primary:fm-task-d node
+
+$ cat state/task-d.status state/task-d.meta
+working [at=1793658784]: spawn admitted
+window=primary:fm-task-d
+kind=scout

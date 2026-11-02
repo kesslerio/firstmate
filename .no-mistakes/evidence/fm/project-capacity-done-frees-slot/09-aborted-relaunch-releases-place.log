@@ -1,0 +1,19 @@
+$ cat state/task-e.status state/task-e.capacity-reservation   # before aborting
+working [at=1793658837]: spawn admitted
+done [at=1793659900]: finished local-only ship
+gen=s1793658893.904643.17221
+status_offset=87
+
+$ ls -ld /tmp/fm-task-e+<home-token>   # public staging directory forces a proven non-launch
+drwxrwxrwx 2 art users 4096 Nov  2 14:34 /tmp/fm-task-e+639636f71c66908ed1115c09e2e49ae117e6b09553c749d016f494399197e2b5
+
+$ fm-spawn.sh task-e --relaunch
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+warning: /tmp/fm-lab.xENIjN/data/task-e/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-e
+notice: task-e ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+error: task launch directory /tmp/fm-task-e+639636f71c66908ed1115c09e2e49ae117e6b09553c749d016f494399197e2b5 already exists and is not a private directory owned by this user; refusing to stage the launch command there; inspect and remove it, then retry
+
+exit=1
+status bytes before=87 after=87 (unchanged: yes)
+$ ls state/task-e.capacity-reservation
+ls: cannot access '/tmp/fm-lab.xENIjN/state/task-e.capacity-reservation': No such file or directory

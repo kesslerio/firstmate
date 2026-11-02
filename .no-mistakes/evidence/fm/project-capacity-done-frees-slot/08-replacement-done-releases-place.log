@@ -1,0 +1,26 @@
+$ printf "done [at=...]: replacement scout finished" >> state/task-d.status   # replacement worker completes past the reservation offset
+$ cat state/task-d.status
+working [at=1793658784]: spawn admitted
+done [at=1793659400]: scout finished
+captain-held [at=1793659600]: decision transferred after relaunch
+done [at=1793659700]: replacement scout finished
+
+$ fm-spawn.sh task-e <project> --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+warning: /tmp/fm-lab.xENIjN/data/task-e/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-e
+notice: task-e ships mode=local-only while the standing posture for project is no-mistakes - less rigor than the captain's standing posture; proceed only on a current explicit captain instruction or an intake judgment you can state
+spawned task-e harness=codex kind=ship mode=local-only yolo=off window=primary:fm-task-e worktree=/home/art/.treehouse/project-50b582/4/project
+
+exit=0
+$ tmux -L fm-lab list-panes -a
+bash cmd=bash cwd=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6F4747NZFQHJP8TZDC79MXD
+fm-task-b cmd=bash cwd=/home/art/.treehouse/project-50b582/1/project
+fm-task-c cmd=node cwd=/home/art/.treehouse/project-50b582/2/project
+fm-task-d cmd=node cwd=/home/art/.treehouse/project-50b582/3/project
+fm-task-e cmd=node cwd=/home/art/.treehouse/project-50b582/4/project
+
+$ grep -E "^(kind|mode|window)=" state/task-e.meta; cat state/task-e.status
+window=primary:fm-task-e
+kind=ship
+mode=local-only
+working [at=1793658837]: spawn admitted

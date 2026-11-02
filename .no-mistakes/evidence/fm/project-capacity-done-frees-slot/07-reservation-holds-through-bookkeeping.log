@@ -1,0 +1,18 @@
+$ cat state/task-d.capacity-reservation state/task-d.status   # relaunched worker holds an unexpired reservation
+gen=s1793658814.719404.20147
+status_offset=77
+working [at=1793658784]: spawn admitted
+done [at=1793659400]: scout finished
+
+$ fm-spawn.sh task-e <project> --mode local-only --yolo off   # while the reservation holds
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+deferred: project project admits 1 worker(s) at once on this machine (/tmp/fm-lab.xENIjN/config/project-capacity) and 1 already hold a place (task-d); task task-e was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+
+exit=75
+
+$ printf "captain-held [at=...]: decision transferred after relaunch" >> state/task-d.status   # bookkeeping only
+$ fm-spawn.sh task-e <project> --mode local-only --yolo off
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.xENIjN
+deferred: project project admits 1 worker(s) at once on this machine (/tmp/fm-lab.xENIjN/config/project-capacity) and 1 already hold a place (task-d); task task-e was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
+
+exit=75
