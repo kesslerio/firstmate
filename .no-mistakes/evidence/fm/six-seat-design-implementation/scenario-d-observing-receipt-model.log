@@ -1,0 +1,34 @@
+########## D: a launch that asked for model-b found a supervisor already running on model-a and is recognized by its observing receipt  (run worktree /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2 @ 4a6b402b)
+$ fm-fleet-seats.sh serve-remotes   (empty host: confirms the current declaration)
+served ios policy=3362657698-126 epoch=r179357826740454405687.1 holders=0
+exit=0
+PASS the remote confirms the declaration before any grant (expected 0)
+$ fm-fleet-seats.sh reserve ios --generation op4 --model demo/model-b   (the launch asks for model-b)   (FM_HOME=primary)
+fleet-seats: reserved pool=pool-b id=ios generation=op4 used=1 capacity=1
+exit=0
+PASS the launch reserves the model route it asked for (expected 0)
+$ fm-fleet-seats.sh dispatch ios --generation op4 --route-file state/route-op4   (FM_HOME=primary)
+fleet-seats: dispatched id=ios generation=op4
+exit=0
+host supervisor record: kind=secondmate harness=claude model=demo/model-a backend=herdr spawn_gen=host.4 home=/tmp/fm-lab.7FUfYO/d/rem 
+host observing receipt: schema=fm-remote-seat-operation.v1 operation=op4 verb=launch actual_generation=host.4 actual_model=demo/model-a 
+$ fm-fleet-seats.sh reconcile-remote ios --generation op4 --response-file state/resp-op4   (FM_HOME=primary)
+fleet-seats: existing id=ios generation=host.4 (candidate op4 released)
+exit=0
+PASS the observing disposition applies (expected 0)
+holder after reconcile: {"generation":"op4","lifecycle":"released","model":"demo/model-b","requested_model":null,"target":null}
+{"generation":"host.4","lifecycle":"confirmed","model":"demo/model-a","requested_model":null,"target":"fm-remote:w1:p1"}
+$ fm-fleet-seats.sh serve-remotes   (the host reservation keeps the requested model-b; its receipt proves model-a)
+served ios policy=3362657698-126 epoch=r179357826740454405687.2 holders=0
+exit=0
+PASS the host serves instead of refusing unaccounted occupancy (expected 0)
+PASS the served remote is accepted (found: served ios)
+$ fm-fleet-seats.sh reserve other-a --model demo/model-a   (the model the supervisor actually runs)
+fleet-seats: pool pool-a is full (1 of 1 seats held); other-a gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/d/primary/state ios
+exit=4
+PASS the observed supervisor spends the seat on the model it runs (expected 4)
+$ fm-fleet-seats.sh reserve other-b --model demo/model-b   (the model the launch asked for)
+fleet-seats: reserved pool=pool-b id=other-b generation=g-ob used=1 capacity=1
+exit=0
+PASS the requested model takes no seat (expected 0)

@@ -1,0 +1,57 @@
+=== SCENARIO 1: primary + local secondmate share one capacity ===
+--- primary home reserves the first seat (capacity 2)
+fleet-seats: reserved pool=shared id=primary-worker generation=g-primary-worker used=1 capacity=2
+rc=0
+--- local secondmate home reserves the second seat
+fleet-seats: reserved pool=shared id=mate-worker generation=g-mate-worker used=2 capacity=2
+rc=0
+--- primary home asks for a third seat
+fleet-seats: pool shared is full (2 of 2 seats held); overflow-worker gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.93dIbV/mate-s1/state mate-worker
+  holder /tmp/fm-lab.93dIbV/root-s1/state primary-worker
+rc=4
+
+=== SCENARIO 2: supervisor already running before pools existed counted once ===
+--- pre-pool supervisor record (no ledger holder):
+kind=secondmate
+model=pool-model-a
+harness=pi
+home=/tmp/fm-lab.93dIbV/mate-s2
+live session lock pid=832097
+--- enable pools at capacity 2, then reserve one new launch
+fleet-seats: reserved pool=shared id=new-worker generation=g-new-worker used=2 capacity=2
+rc=0
+--- show the ledger has exactly one holder record (the new launch)
+3472817075-43.json
+--- release the new launch, then ask for two more seats
+fleet-seats: released id=new-worker generation=g-new-worker reason=prelaunch
+rc=0
+fleet-seats: reserved pool=shared id=next-worker generation=g-next-worker used=2 capacity=2
+rc=0
+fleet-seats: pool shared is full (2 of 2 seats held); third-worker gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.93dIbV/root-s2/state next-worker
+  holder /tmp/fm-lab.93dIbV/root-s2/state prepool
+rc=4
+--- full-pool refusal holder list (pre-pool supervisor must appear once):
+fleet-seats: pool shared is full (2 of 2 seats held); fourth-worker gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.93dIbV/root-s2/state next-worker
+  holder /tmp/fm-lab.93dIbV/root-s2/state prepool
+rc=4
+occurrences of prepool in the refusal: 1
+
+=== SCENARIO 1b: simultaneous launches from both homes cannot oversubscribe ===
+race1 rc=4 fleet-seats: pool shared is full (2 of 2 seats held); race1 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+race2 rc=4 fleet-seats: pool shared is full (2 of 2 seats held); race2 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+race3 rc=0 fleet-seats: reserved pool=shared id=race3 generation=g-race3 used=2 capacity=2
+race4 rc=0 fleet-seats: reserved pool=shared id=race4 generation=g-race4 used=1 capacity=2
+race5 rc=4 fleet-seats: pool shared is full (2 of 2 seats held); race5 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+race6 rc=4 fleet-seats: pool shared is full (2 of 2 seats held); race6 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+race7 rc=4 fleet-seats: pool shared is full (2 of 2 seats held); race7 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+race8 rc=4 fleet-seats: pool shared is full (2 of 2 seats held); race8 gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+granted=2 refused=6 at capacity 2
+
+=== SCENARIO 5 (adversarial): no declaration keeps dispatch uncapped ===
+rc=0 (no output above == inert seat guard)
+--- a harness default model is also allowed while unpooled
+rc=0
+--- ledger directories written for the unpooled home: none

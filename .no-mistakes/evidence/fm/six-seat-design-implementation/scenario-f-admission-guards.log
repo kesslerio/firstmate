@@ -1,0 +1,26 @@
+########## F (adversarial): a full pool refuses a real spawn, an unverified model cannot slip past, and a pooled host refuses an unaccounted supervisor launch  (run worktree /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2 @ 4a6b402b)
+$ fm-spawn.sh spawn-live-t1 <project> --mode local-only --yolo off --harness claude --model demo/model-a
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7FUfYO/f/home
+fleet-seats: pool shared is full (1 of 1 seats held); spawn-live-t1 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/f/home/state busy
+error: spawn refused - spawn-live-t1 has no fleet seat for model demo/model-a (see the fleet-seats line above)
+exit=1
+PASS a real spawn into a full pool refuses (expected 1)
+PASS the refusal names the full pool (found: pool shared is full)
+PASS no task record is published for the refused launch (expected no)
+$ fm-spawn.sh spawn-live-t2 <project> --mode local-only --yolo off --harness claude   (no explicit model)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7FUfYO/f/home
+fleet-seats: no seat - harness claude launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+error: spawn refused - spawn-live-t2 has no fleet seat for model default (see the fleet-seats line above)
+exit=1
+PASS a harness-default model cannot slip past the pool (expected 1)
+PASS the refusal names the unverified default model (found: unverified default model)
+PASS no task record is published for the unverified launch (expected no)
+$ fm-remote-secondmate-control.sh launch unaccounted claude demo/model-a - herdr   (host has pools, no seat operation)
+relaunch_failure=prelaunch
+error: this home has fleet seat pools, so a supervisor launch must come from the parent's seat operation (bin/fm-remote-secondmate-relaunch.sh or fm-spawn); nothing was changed
+exit=1
+PASS the pooled host refuses an unaccounted supervisor launch (exit=1)
+PASS the host refusal names the parent seat operation (found: must come from the parent)
+
+ALL SCENARIOS PASSED (run worktree 4a6b402b)

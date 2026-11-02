@@ -1,0 +1,80 @@
+FM_TEST_BEGIN 2026-11-02T00:08:21Z tests/fm-fleet-seats.test.sh family=unclassified expected_gate_skip=none
+ok - without config/fleet-seats a reservation is a silent no-op
+ok - remote serve adopts an unrecorded supervisor once, binds observed generations, and honors parent accounting
+ok - policies require one object at root admission, remote admission, and serve
+ok - admission rejects mixed policy versions and accepts unchanged policy
+ok - path-like pool names refuse while ordinary dotted names reserve
+ok - legacy default, empty, and missing models occupy every declared pool
+ok - the primary and a local secondmate share one capacity and pre-existing agents count
+ok - nested local homes count existing agents once and refuse ambiguous occupancy
+ok - orphaned direct and intermediate secondmates cannot create independent seat authorities
+ok - a marked home inherits its root's authority and never owns one of its own
+ok - pooled supervisors hold seats while idle and after unproven death
+ok - declared pools reject harness defaults and raw launch commands
+ok - maintenance reclaims a proven-undispatched reservation while a live task record keeps its seat
+ok - twelve simultaneous reservations from two homes grant exactly six seats
+ok - a held lock, a dead holder, a missing or unreadable home, and malformed records refuse
+ok - the primary requires a current policy and readable snapshot for every remote
+ok - primary, local, and remote homes share one capacity; remote grants, denials, retries, and proven release hold
+ok - an unreachable remote keeps its counted seats and an unanswered remote request refuses
+ok - declared remote launches require current confirmation and clearing restores opt-out
+ok - newly pooled and moved models refuse stale remote requests before a current grant
+ok - an in-flight remote seat follows its model across pools and frees only on proven release
+ok - undeclared and cleared remote policies leave launches unchanged
+ok - simultaneous remote and local reservations grant exactly the fleet capacity
+ok - the primary watcher's poll grants a waiting remote request
+ok - a pooled spawn into a full pool refuses before any record, and another route still launches
+ok - spawn rejects unverified default and raw-command models before publication
+ok - a spawned pooled worker holds its seat until cleanup releases its generation
+ok - a secondmate supervisor on a pooled model needs a seat to launch
+ok - a buffered supervisor launch keeps its seat until it starts and later dies
+ok - only a proven endpoint cancellation frees a submitted launch
+ok - one lifecycle episode excludes other supervisor mutations and stale evidence never frees a newer generation
+ok - seat collection completes without waiting on task metadata locks
+ok - serve epochs fence lost, late, replayed, and truncated responses
+ok - hidden pool names reach every path and invalid names refuse before any write
+ok - same-pool handoffs keep one seat, cross-pool candidates need destination capacity, and counting follows the current policy
+ok - managed records follow the ledger and conflicting or malformed ledgers refuse
+ok - cleanup releases exactly its own generation and stale cleanup never frees a successor
+ok - confirmed absence needs destruction proof and policy removal preserves cleanup
+ok - replacement retains buffered predecessors until confirmed startup and subsequent death
+ok - terminal generations never revive and removed aliases refuse
+ok - serve delivery permits concurrent fleet transitions and publishes its fenced certificate
+ok - unpooled grants are materialized before certificates and remain counted across policy changes
+ok - remote certificates and descendant transitions share one host authority
+ok - remote descendants block new and replayed certificates until occupancy is accountably complete
+ok - policy opt-out preserves existing holder handoffs and leaves new admissions untracked
+ok - terminal holders record local and remote opt-out readmissions without reviving old generations or undercounting defaults
+ok - bounded reconciliation rotates across watcher ticks and retains every uncertain launch
+ok - maintenance retains matching process owners and reclaims reservations with reused PIDs
+ok - nested remote delivery uses its registry owner and shared root accounting
+ok - Rex absence requires generation, endpoint, and server ownership
+ok - metadata-free Rex reclaim and releases require durable server evidence and proven absence
+ok - alive and dead observations require the same creation server before and after the read
+ok - empty delivered policies opt out and startup probes share the wait budget
+ok - generationless predecessors remain counted beside reserved and terminal replacements
+FM_TEST_END 2026-11-02T00:12:56Z tests/fm-fleet-seats.test.sh exit=0 duration_ms=275043 gate_skip=false
+FM_TEST_BEGIN 2026-11-02T00:12:56Z tests/fm-remote-seat-adoption.test.sh family=unclassified expected_gate_skip=none
+ok - failed existing-generation persistence is unknown and retains its receipt
+ok - an owned-process crash before binding leaves received retries unknown
+ok - received crash and retries retain parent capacity without repeating lifecycle effects
+ok - successful existing-generation import keeps the legacy supervisor counted
+ok - foreign operations and stale generation evidence stay unknown
+ok - captured stale launch and relaunch operations cannot control a successor
+ok - host operation fences survive removal of home-local receipts
+ok - damaged-home retries preserve started receipts and proven absence reclaims the exact generation
+ok - verified fresh refusals remain prelaunch before opening a receipt
+ok - retirement retries preserve exact generation and clean/residue exits without touching reused homes
+FM_TEST_END 2026-11-02T00:13:03Z tests/fm-remote-seat-adoption.test.sh exit=0 duration_ms=6936 gate_skip=false
+FM_TEST_BEGIN 2026-11-02T00:13:03Z tests/fm-remote-generation.test.sh family=unclassified expected_gate_skip=none
+error: remote generations are unresolved or do not match the registered route; preserving the host home
+cat: /tmp/fm-remote-generation.WuxQDO/route: No such file or directory
+cat: /tmp/fm-remote-generation.WuxQDO/route: No such file or directory
+remote generation regressions passed
+FM_TEST_END 2026-11-02T00:13:04Z tests/fm-remote-generation.test.sh exit=0 duration_ms=456 gate_skip=false
+FM_TEST_SUMMARY total=3 failed=0 skipped_gate=0 duration_ms=282606
+FM_TEST_SUMMARY_FAMILY family=unclassified count=3 duration_ms=282435 failed=0
+FM_TEST_SLOWEST rank=1 script=tests/fm-fleet-seats.test.sh duration_ms=275043
+FM_TEST_SLOWEST rank=2 script=tests/fm-remote-seat-adoption.test.sh duration_ms=6936
+FM_TEST_SLOWEST rank=3 script=tests/fm-remote-generation.test.sh duration_ms=456
+EXIT=0

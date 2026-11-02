@@ -1,0 +1,55 @@
+=== SCENARIO A1: the serve boundary adopts a pre-pool supervisor exactly once ===
+delivered policy: {"pools":[{"name":"shared","capacity":2,"models":["pool-model-a","pool-model-b"]}]} digest=866016619-84
+serve rc=0
+certificate: {"schema":"fm-fleet-seats-serve.v2","policy_digest":"866016619-84","epoch":"root.1","complete":true,"holders":[{"state_dir":"/tmp/fm-lab.rmTEpS/remote-a/state/parent-route","task":"theshop","generation":"host.1","model":"pool-model-a","lifecycle":"confirmed"}]}
+adopted rows for theshop: 1
+
+=== SCENARIO A2: an observing receipt recognizes a supervisor found on another model ===
+replacement launch asked for pool-model-b; host runs pool-model-a (per its receipt)
+serve rc=0
+certificate holders: [{"task":"theshop","generation":"host.1","model":"pool-model-a"}]
+theshop4 adopted (0 means the receipt proved parent accounting): 0
+
+--- A2 adversarial: without its receipt the same supervisor is adopted once, never free
+serve rc=0 (expect 0: an unproven supervisor is adopted)
+adopted rows for theshop4: 1
+
+--- A2 adversarial: a receipt bound to another model refuses instead of mis-counting
+serve rc=5 (expect 5)
+fleet-seats: no seat - host supervisor theshop4 has unaccounted occupancy (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+
+=== SCENARIO B1: a pre-pool remote supervisor is counted exactly once at the root ===
+--- root serve pass (publishes the certificate):
+served theshop policy=1739607917-84 epoch=r17935787805215856918.1 holders=1
+serve-remotes rc=0
+certificate: {"epoch":"r17935787805215856918.1","holders":[{"state_dir":"/tmp/fm-lab.rmTEpS/remote-b/state/parent-route","task":"theshop","generation":"host.1","model":"pool-model-a","lifecycle":"confirmed"}]}
+first pooled launch beside the pre-pool supervisor: fleet-seats: reserved pool=shared id=probe1 generation=g-probe1 used=2 capacity=5 (rc=0) [used=2 means the supervisor holds exactly one seat]
+--- now the primary also records the same remote route and generation
+served theshop policy=1739607917-84 epoch=r17935787805215856918.2 holders=1
+serve-remotes rc=0
+pooled launch with the parent route record too: fleet-seats: reserved pool=shared id=probe2 generation=g-probe2 used=2 capacity=5 (rc=0) [still used=2: one supervisor, one seat]
+--- adversarial: a parent route record naming a different host must stay counted (never free, never doubled)
+serve-remotes rc=0
+pooled launch beside the unmatched record: fleet-seats: reserved pool=shared id=probe3 generation=g-probe3 used=2 capacity=5 (rc=0) [used=2 too: an unmatched record stays counted fail-closed and its charge replaces the certificate row, never adds to it]
+
+=== SCENARIO B2: a replacement replaces the generation the host records ===
+serve-remotes rc=0
+--- launch 1: generation host.1 dispatched and confirmed by the host
+owner host.1: fleet-seats: reserved pool=shared id=theshop generation=host.1 (already held) used=1 capacity=4
+fleet-seats: dispatched id=theshop generation=host.1
+fleet-seats: confirmed id=theshop generation=host.1
+confirm rc=0
+--- launch 2: replacement op2 dispatched but cancelled before it confirmed a startup
+owner op2: fleet-seats: reserved pool=shared id=theshop generation=op2 (already held) used=1 capacity=4
+fleet-seats: dispatched id=theshop generation=op2
+fleet-seats: released id=theshop generation=op2 reason=cancelled
+cancel rc=0
+ledger: [{"generation":"host.1","lifecycle":"released","target":"session:p1","reason":"old-stopped"},{"generation":"op2","lifecycle":"released","target":null,"reason":"cancelled"}]
+host-recorded generation: host.1
+next launch would replace (--previous): host.1
+--- launch 3: a candidate whose route reached the host is the recorded generation when cancelled
+owner op3: fleet-seats: reserved pool=shared id=theshop generation=op3 used=2 capacity=4
+fleet-seats: dispatched id=theshop generation=op3
+fleet-seats: released id=theshop generation=op3 reason=cancelled
+cancel rc=0
+next launch would replace (--previous): op3

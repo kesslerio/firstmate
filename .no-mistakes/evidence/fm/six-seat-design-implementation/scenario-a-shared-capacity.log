@@ -1,0 +1,22 @@
+########## A: primary home + local secondmate share one capacity; a pre-pool agent counts once; release frees exactly its generation  (run worktree /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2 @ 4a6b402b)
+pre-pool agent record in the local mate: kind=ship model=demo/model-a harness=claude 
+$ fm-fleet-seats.sh reserve r1 --generation g-r1 --kind ship --harness claude --model demo/model-a --holder-pid 3237910   (FM_HOME=primary)
+fleet-seats: reserved pool=shared id=r1 generation=g-r1 used=2 capacity=2
+exit=0
+PASS primary launch gets the last seat beside the pre-pool agent (expected 0)
+$ fm-fleet-seats.sh reserve a1   (FM_HOME=android, the local secondmate)
+fleet-seats: pool shared is full (2 of 2 seats held); a1 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/a/android/state legacy-ship
+  holder /tmp/fm-lab.7FUfYO/a/primary/state r1
+exit=4
+PASS the local mate is refused at the same shared capacity (expected 4)
+PASS the refusal names one row per counted holder (found: holder /tmp/fm-lab.7FUfYO/a/android/state legacy-ship)
+PASS the primary's own holder is named too (found: holder /tmp/fm-lab.7FUfYO/a/primary/state r1)
+$ fm-fleet-seats.sh release r1 --generation g-r1 --reason prelaunch   (FM_HOME=primary)
+fleet-seats: released id=r1 generation=g-r1 reason=prelaunch
+exit=0
+$ fm-fleet-seats.sh reserve a1   (retry after the primary released exactly g-r1)
+fleet-seats: reserved pool=shared id=a1 generation=g-a1 used=2 capacity=2
+exit=0
+PASS releasing one generation admits the waiting local launch (expected 0)
+holder of a1 after admission: [{"generation":"g-a1","lifecycle":"reserved"}]

@@ -1,0 +1,30 @@
+########## E: after a replacement was cancelled before it confirmed a startup, the next launch replaces the generation the host records  (run worktree /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2 @ 4a6b402b)
+$ fm-fleet-seats.sh reserve ios --generation A --kind secondmate --model demo/model-a   (FM_HOME=primary)
+fleet-seats: reserved pool=shared id=ios generation=A used=1 capacity=2
+exit=0
+$ fm-fleet-seats.sh reserve ios --generation B --previous-generation A --model demo/model-a   (FM_HOME=primary)
+fleet-seats: reserved pool=shared id=ios generation=B (already held) used=1 capacity=2
+exit=0
+$ fm-fleet-seats.sh reconcile-remote ios --generation B --response-file state/resp-b   (cancelled before the host received it)   (FM_HOME=primary)
+fleet-seats: released id=ios generation=B reason=cancelled
+exit=0
+PASS the unsubmitted cancellation is applied (expected 0)
+host-recorded predecessor after the unsubmitted cancellation: A
+PASS an unsubmitted cancellation leaves the host-recorded predecessor (expected A)
+$ fm-fleet-seats.sh reconcile-remote ios --generation C --response-file state/resp-c   (cancelled after the host received it)   (FM_HOME=primary)
+fleet-seats: released id=ios generation=C reason=cancelled
+exit=0
+host-recorded predecessor after the submitted cancellation: C
+PASS a submitted cancellation becomes the host-recorded predecessor (expected C)
+$ fm-remote-secondmate-control.sh relaunch ios ... --operation E --previous B   (the host records A)
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"E","requested_generation":"E","actual_generation":null,"previous_generation":"B","disposition":"prelaunch","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+error: generation-mismatch: the host incarnation is not the reserved predecessor; nothing was changed
+exit=6
+PASS naming the cancelled candidate is fenced as generation-mismatch (expected 6)
+PASS the host names the mismatch (found: generation-mismatch)
+$ fm-remote-secondmate-control.sh relaunch ios ... --operation F --previous A   (the generation the host records)
+seat_disposition={"schema":"fm-remote-seat-operation.v2","task":"ios","operation":"F","requested_generation":"F","actual_generation":null,"previous_generation":"A","disposition":"unknown","startup_confirmed":false,"old_stopped":false,"old_destroyed":false,"route":null,"actual_model":null,"complete":true}
+relaunch_failure=prelaunch
+error: operation F has no verified dispatched parent reservation; nothing was changed
+exit=1
+PASS the host accepts the resolved predecessor (it fails later only because no Herdr endpoint exists: exit=1)

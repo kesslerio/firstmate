@@ -1,0 +1,25 @@
+########## B (adversarial): eight simultaneous launches from the primary and its local mate against a capacity-two pool  (run worktree /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2 @ 4a6b402b)
+contender c1 from primary: exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c1 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/b/android/state c2
+  holder /tmp/fm-lab.7FUfYO/b/android/state c4
+contender c2 from android: exit=0  fleet-seats: reserved pool=shared id=c2 generation=g-c2 used=1 capacity=2
+contender c3 from primary: exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c3 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/b/android/state c2
+  holder /tmp/fm-lab.7FUfYO/b/android/state c4
+contender c4 from android: exit=0  fleet-seats: reserved pool=shared id=c4 generation=g-c4 used=2 capacity=2
+contender c5 from primary: exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c5 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/b/android/state c2
+  holder /tmp/fm-lab.7FUfYO/b/android/state c4
+contender c6 from android: exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c6 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/b/android/state c2
+  holder /tmp/fm-lab.7FUfYO/b/android/state c4
+contender c7 from primary: exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c7 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/b/android/state c2
+  holder /tmp/fm-lab.7FUfYO/b/android/state c4
+contender c8 from android: exit=4  fleet-seats: pool shared is full (2 of 2 seats held); c8 gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/b/android/state c2
+  holder /tmp/fm-lab.7FUfYO/b/android/state c4
+granted=2 refused_full=6 other=0
+PASS exactly two launches are granted (expected 2)
+PASS every other launch is refused as full (expected 6)
+PASS no contender fails for another reason (expected 0)

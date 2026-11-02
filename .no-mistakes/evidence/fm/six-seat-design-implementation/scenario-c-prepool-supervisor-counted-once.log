@@ -1,0 +1,45 @@
+########## C: a supervisor already running on a remote host before pools existed is counted exactly once  (run worktree /home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2 @ 4a6b402b)
+host supervisor record: kind=secondmate harness=claude model=demo/model-a backend=herdr spawn_gen=legacyA home=/tmp/fm-lab.7FUfYO/c/rem 
+primary pre-pool route record (no generation): kind=secondmate harness=claude model=demo/model-a remote_host=shop-host remote_root=/home/art/.no-mistakes/worktrees/9f75ec418609/01M6C9SWQNBG6SEW2D54GQAQJ2 home=/tmp/fm-lab.7FUfYO/c/rem 
+$ fm-fleet-seats.sh serve-remotes   (FM_HOME=primary, real ssh to the lab host)
+served rem policy=2710665829-69 epoch=r1793578260401500011840.1 holders=1
+exit=0
+PASS the first pooled serve completes (expected 0)
+PASS the remote is served (found: served rem)
+PASS the pre-pool supervisor is reported once (found: holders=1)
+certificate holders: [{"state_dir":"/tmp/fm-lab.7FUfYO/c/rem/state/parent-route","task":"rem","generation":"legacyA","model":"demo/model-a","lifecycle":"confirmed"}]
+$ fm-fleet-seats.sh reserve spare   (capacity 2; the supervisor must spend exactly one seat)
+fleet-seats: reserved pool=shared id=spare generation=g-spare used=2 capacity=2
+exit=0
+PASS one more launch fits beside the counted supervisor (expected 0)
+PASS the admission counts the supervisor once (found: used=2 capacity=2)
+$ fm-fleet-seats.sh reserve over   (the third seat must be refused)
+fleet-seats: pool shared is full (2 of 2 seats held); over gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.7FUfYO/c/primary/state rem
+  holder /tmp/fm-lab.7FUfYO/c/primary/state spare
+exit=4
+PASS the pool is refused once full (expected 4)
+holder rows named by the refusal: 2
+PASS the refusal names exactly the two counted holders (expected 2)
+$ fm-fleet-seats.sh release spare --generation g-spare --reason prelaunch   (FM_HOME=primary)
+fleet-seats: released id=spare generation=g-spare reason=prelaunch
+exit=0
+the remote worker filed a seat request with the fleet root: 2094168152-41.req 
+$ fm-fleet-seats.sh serve-remotes   (answer the waiting remote worker)
+served rem policy=2710665829-69 epoch=r1793578260401500011840.2 holders=2
+exit=0
+remote worker result: exit=0 fleet-seats: reserved pool=shared id=rem-worker generation=g-rw (granted by the fleet root)
+PASS a remote worker is granted from the shared pool (expected 0)
+PASS the host reports the grant came from the fleet root (found: by the fleet root)
+$ fm-fleet-seats.sh reserve over-remote   (the supervisor plus the granted remote worker fill capacity two)
+fleet-seats: pool shared is full (2 of 2 seats held); over-remote gets no seat for model demo/model-a - choose an overflow route or wait for a holder to finish
+  holder remote:rem:/tmp/fm-lab.7FUfYO/c/rem/state rem-worker
+  holder /tmp/fm-lab.7FUfYO/c/primary/state rem
+exit=4
+PASS a remote worker spends the same shared capacity (expected 4)
+PASS the refusal names the remote worker and the supervisor (expected 2)
+$ fm-fleet-seats.sh reserve after-loss   (the host certificate was removed)
+fleet-seats: no seat - remote secondmate(s) rem have not confirmed the current seat policy, so their agents cannot be counted yet (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+PASS an uncounted remote host refuses admission instead of freeing seats (expected 5)
+PASS the refusal names the unconfirmed policy (found: have not confirmed the current seat policy)
