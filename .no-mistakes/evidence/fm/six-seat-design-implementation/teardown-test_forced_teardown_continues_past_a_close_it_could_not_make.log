@@ -1,0 +1,1 @@
+ok - fm-teardown: --force continues past a close it could not make while still reporting it, and the same case refuses without --force

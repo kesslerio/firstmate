@@ -1,0 +1,50 @@
+# Lab home: /tmp/fm-lab.CLVSJ6 (disposable; removed at end of run)
+# Pool declaration shipped by the operator:
+{"pools":[{"name":"anthropic","capacity":2,"models":["claude-sonnet-4-5"]}]}
+
+## 1. first launch of a pooled model
+fleet-seats: reserved pool=anthropic id=alpha generation=g-alpha used=1 capacity=2
+exit=0
+
+## 2. second launch of the same pooled model
+fleet-seats: reserved pool=anthropic id=beta generation=g-beta used=2 capacity=2
+exit=0
+
+## 3. third launch: capacity is 2, so this must refuse
+fleet-seats: pool anthropic is full (2 of 2 seats held); gamma gets no seat for model claude-sonnet-4-5 - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.CLVSJ6/state alpha
+  holder /tmp/fm-lab.CLVSJ6/state beta
+exit=4
+
+## 4. concurrent seats ledger as the operator can read it
+-- alpha --
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/tmp/fm-lab.CLVSJ6/state","task":"alpha","revision":1,"incarnations":[{"generation":"g-alpha","previous_generation":null,"kind":"ship","model":"claude-sonnet-4-5","policy_digest_at_reserve":"60680248-77","lifecycle":"reserved","launch_phase":"prepared","owner_pid":4141545,"owner_pid_identity":"linux-starttime=1060561 cmdline-hex=736c6565700033303000","route":null,"startup_confirmed":false,"disposition":null}]}
+-- beta --
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/tmp/fm-lab.CLVSJ6/state","task":"beta","revision":1,"incarnations":[{"generation":"g-beta","previous_generation":null,"kind":"ship","model":"claude-sonnet-4-5","policy_digest_at_reserve":"60680248-77","lifecycle":"reserved","launch_phase":"prepared","owner_pid":4141547,"owner_pid_identity":"linux-starttime=1060561 cmdline-hex=736c6565700033303000","route":null,"startup_confirmed":false,"disposition":null}]}
+
+## 5. teardown of alpha releases exactly alpha's generation
+fleet-seats: released id=alpha generation=g-alpha reason=teardown
+exit=0
+{"generation":"g-alpha","lifecycle":"released"}
+
+## 6. a stale teardown for alpha's already-released generation frees nothing
+fleet-seats: already terminal id=alpha generation=g-alpha
+exit=0
+
+## 7. a successor reservation fits again, and a stale alpha release cannot free it
+fleet-seats: reserved pool=anthropic id=gamma generation=g-gamma2 used=2 capacity=2
+exit=0
+fleet-seats: no seat held id=alpha generation=g-gamma
+exit=0
+fleet-seats: pool anthropic is full (2 of 2 seats held); delta gets no seat for model claude-sonnet-4-5 - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-lab.CLVSJ6/state beta
+  holder /tmp/fm-lab.CLVSJ6/state gamma
+exit=4
+
+## 8. an explicit model is required while a pool is configured
+fleet-seats: no seat - harness claude launches an unverified default model; pass an explicit --model while fleet seat pools are configured (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5
+
+## 9. an unprovable authority refuses instead of counting the seat free
+fleet-seats: no seat - /tmp/fm-lab.CLVSJ6/config/fleet-seats is malformed or unreadable (see docs/configuration.md "Fleet seat pools") (a pooled model is never launched without a counted seat; choose another route or repair the authority)
+exit=5

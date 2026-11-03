@@ -1,0 +1,24 @@
+fm-afk-launch: away-posture record archived at /tmp/fmtest.axuumQ/fm-backend-t3code-tests.kUKplX/restart-unknown-completed/home/state/afk-contracts/1793680068.afk-contract
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+fm-afk-launch: away-posture record archived at /tmp/fmtest.axuumQ/fm-backend-t3code-tests.kUKplX/restart-unknown-failed/home/state/afk-contracts/1793680074.afk-contract
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+ok - native restart re-arms discarded T3 stale warnings exactly once and preserves delivered suppression
+ok - away housekeeping preserves unknown stale rechecks and reports possible wedges until work resumes
+ok - away daemon on T3: a stall reported while unknown is not reported again once T3 reads idle
+ok - T3 stale watcher: harness=codex status=failed turn=fresh -> dead
+ok - t3code: a failed thread read reports unknown busy state, submits no away-mode injection, and keeps stale rechecks uncertain
+ok - T3 stale lookup honors paused and captain-held declarations
+ok - T3 stale watcher: harness=codex status=running turn=fresh -> absorb
+ok - T3 stale watcher: harness=claude status=running turn=fresh -> absorb
+ok - T3 stale watcher: harness=codex status=waiting turn=fresh -> absorb
+ok - T3 stale watcher: harness=codex status=starting turn=fresh -> surface
+ok - T3 stale watcher: harness=codex status=completed turn=fresh -> surface
+ok - T3 stale watcher: harness=codex status=failed turn=fresh -> dead
+ok - T3 stale watcher: harness=codex status=running turn=hung -> surface
+not ok - a missing credential must name the captain's sign-in (missing: 'fm-t3-mcp.mjs login --access full-access')
+--- output ---
+
+
+real	0m50.216s
+user	0m36.065s
+sys	0m22.955s

@@ -1,0 +1,4 @@
+test_cleanup_refuses_switched_server_credential exit=0 secs=1
+test_t3_watch_refuses_mixed_recorded_servers exit=0 secs=1
+test_discovered_t3_supervisor_delivers_without_task_metadata exit=0 secs=2
+test_recorded_t3_callers_refuse_server_switch exit=0 secs=3

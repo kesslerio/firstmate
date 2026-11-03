@@ -1,0 +1,35 @@
+fm-afk-launch: away-posture record archived at /tmp/fmtest.58OoSO/fm-backend-t3code-tests.yuWlKE/restart-unknown-completed/home/state/afk-contracts/1793680172.afk-contract
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+fm-afk-launch: away-posture record archived at /tmp/fmtest.58OoSO/fm-backend-t3code-tests.yuWlKE/restart-unknown-failed/home/state/afk-contracts/1793680176.afk-contract
+fm-afk-launch: away mode stopped; no daemon terminal was running, .afk cleared, and the posture record archived
+ok - native restart re-arms discarded T3 stale warnings exactly once and preserves delivered suppression
+ok - away housekeeping preserves unknown stale rechecks and reports possible wedges until work resumes
+ok - away daemon on T3: a stall reported while unknown is not reported again once T3 reads idle
+ok - T3 stale watcher: harness=codex status=failed turn=fresh -> dead
+ok - t3code: a failed thread read reports unknown busy state, submits no away-mode injection, and keeps stale rechecks uncertain
+ok - T3 stale lookup honors paused and captain-held declarations
+ok - T3 stale watcher: harness=codex status=running turn=fresh -> absorb
+ok - T3 stale watcher: harness=claude status=running turn=fresh -> absorb
+ok - T3 stale watcher: harness=codex status=waiting turn=fresh -> absorb
+ok - T3 stale watcher: harness=codex status=starting turn=fresh -> surface
+ok - T3 stale watcher: harness=codex status=completed turn=fresh -> surface
+ok - T3 stale watcher: harness=codex status=failed turn=fresh -> dead
+ok - T3 stale watcher: harness=codex status=running turn=hung -> surface
+ok - fm_backend_t3code_runtime_check: a missing credential names the sign-in
+ok - fm_backend_t3code_runtime_check: a 401 names the fresh sign-in
+warning: T3 telemetry at http://127.0.0.1:45143 is not confirmed off; run the server that hosts Firstmate workers with T3CODE_TELEMETRY_ENABLED=false (docs/t3code-backend.md)
+ok - fm_backend_t3code_runtime_check: the tools/list gate and environment pin refuse control and teardown without a mutation
+ok - fm_backend_t3code_project_ensure: matches by realpath, otherwise creates with the fm- title
+ok - fm_backend_t3code_model_selection: T3's catalog decides driver, model, and effort; overrides keep other options; default handling, instances file
+ok - fm_backend_t3code_thread_create/turn_start: verified t3_thread_launch and t3_thread_send payloads
+ok - fm_backend_t3code_thread_create: a lost reply is uncertain and never retried; a mis-bound thread is archived and refused
+ok - fm_backend_t3code_thread_for_home: zero, one, ambiguous, and unreachable
+ok - T3 requires explicit selection and does not query the server during runtime detection
+ok - fm_backend_t3code_capture: renders the activity tail and the thread's status line
+ok - fm_backend_t3code_send_key: Escape and C-c interrupt, Enter no-ops, others refuse
+ok - fm_backend_t3code_send_text_submit: empty on accept, send-failed on rejection
+not ok - a retry against an unreachable server must stay unconfirmed, got 'send-failed'
+
+real	0m55.916s
+user	0m42.987s
+sys	0m25.697s

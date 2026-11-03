@@ -1,0 +1,3 @@
+test_forced_secondmate_child_close_failure_still_refuses exit=0
+test_forced_teardown_continues_past_a_close_it_could_not_make exit=0
+test_unreadable_close_read_refuses_while_a_definitive_absence_completes exit=0

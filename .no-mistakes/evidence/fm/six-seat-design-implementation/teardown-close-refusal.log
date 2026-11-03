@@ -1,0 +1,5 @@
+ok - fm-teardown: a close that genuinely failed refuses and keeps the record naming the surviving endpoint, and the same teardown finishes once the close works
+
+real	0m2.696s
+user	0m1.255s
+sys	0m1.506s
