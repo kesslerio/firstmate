@@ -3373,6 +3373,20 @@ On 2.0.22 the brief is submitted on its own, yet the composer still reads pendin
 `opencode debug config` on 2.0.11 normalized the launch's legacy `{"permission":{"*":"allow"}}` into an allow-all `permissions` rule; the same command printed no configuration on 2.0.22, so on 2.0.22 the legacy shape rests on the earlier 2.0.21 verification recorded in the OpenCode harness reference.
 `tests/fm-spawn-dispatch-profile.test.sh` pins the gate's outcomes portably: an auto-submitted brief gets no extra Enter, a prefilled brief gets exactly one, a composer that reads unknown before it draws gets its one Enter only once it reads pending, a composer that only reads unknown gets its one Enter at the submit deadline, and a turn that never starts fails the spawn.
 
+## OpenCode model selection
+
+The portable regression is `tests/fm-spawn-opencode-model.test.sh`.
+It drives a real `bin/fm-spawn.sh` launch against a fake `opencode` whose own CLI output describes each build generation, so it pins which surface a launch uses (a top-level `--model` flag or the worktree's `.opencode/opencode.jsonc`), the pin's content and ownership record, mapped and unmapped effort, every model refusal, the wiring table that relaunch and teardown retire the pin through, the retirement each failed-launch path performs, and the post-launch assertion against the worker's session record.
+The installed build is exercised by the opt-in live guard:
+
+```sh
+FM_OPENCODE_MODEL_LIVE=1 bin/fm-test-run.sh tests/fm-opencode-model-live-e2e.test.sh
+```
+
+No live result is recorded here yet, so read this section as coverage rather than a pass.
+The scenarios still owed are a supported model plus effort being selected and verified, an unsupported inline `provider/model#variant` being refused rather than overriding `--effort`, the installed build's observed session model matching the pin, and a dispatch through the worker environment behaving as expected.
+Record the dated per-release result here when the host's providers have capacity.
+
 ## Pi repeated-read containment
 
 Verified on 2026-10-27 UTC on Linux x86_64 with Node 24.22.1 and npm 11.19.1.

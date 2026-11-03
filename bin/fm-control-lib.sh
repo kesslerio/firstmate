@@ -503,7 +503,9 @@ fm_control_endpoint_absence_verdict() {  # <backend> <target> [meta]
 # table for Polytoken; both consumers preserve git-tracked Polytoken layers.
 # Prints zero or more absolute paths, one per line: worktree-resident
 # hook files and firstmate-owned state tokens only, never a harness's own
-# managed config.
+# managed config. An OpenCode model pin follows the same ownership rule: only
+# the pin this task's own record names is returned, so a project's own
+# .opencode/opencode.jsonc is never listed.
 fm_control_harness_wiring_paths() {  # <harness> <worktree> <state-dir> <id> [kind]
   local harness=${1-} wt=${2-} state=${3-} id=${4-} kind=${5-}
   [ -n "$wt" ] && [ -n "$state" ] && [ -n "$id" ] || return 1
@@ -520,7 +522,21 @@ fm_control_harness_wiring_paths() {  # <harness> <worktree> <state-dir> <id> [ki
         printf '%s\n' "$wt/.claude/settings.local.json"
       fi
       ;;
-    opencode) printf '%s\n' "$wt/.opencode/plugins/fm-busy-state.js" ;;
+    opencode)
+      printf '%s\n' "$wt/.opencode/plugins/fm-busy-state.js"
+      # A build without the top-level --model flag is pinned through the
+      # worktree's project configuration, and that file is retired only while
+      # this task's own record names it: a project's own
+      # .opencode/opencode.jsonc predates firstmate and is never its to remove.
+      # A stale pin must not outlive the task either, because a returned pool
+      # slot is reused and a later launch that names no model would silently
+      # inherit it.
+      if [ -f "$state/$id.opencode-model-config" ] &&
+        [ "$(cat "$state/$id.opencode-model-config" 2>/dev/null)" = "$wt/.opencode/opencode.jsonc" ]; then
+        printf '%s\n' "$wt/.opencode/opencode.jsonc"
+        printf '%s\n' "$state/$id.opencode-model-config"
+      fi
+      ;;
     pi|pi-signed) printf '%s\n' "$state/$id.pi-ext.ts" ;;
     omp) printf '%s\n' "$state/$id.omp-ext.ts" ;;
     grok)
@@ -622,4 +638,13 @@ fm_control_harness_turnend_auth_path() {  # <harness> <token>
     kimi) printf '%s\n' "$HOME/.kimi-code/fm-turn-end.d/$token" ;;
     *) return 0 ;;
   esac
+}
+
+fm_control_retire_opencode_model_pin() {
+  local id=$1 state=$3 record="$3/$1.opencode-model-config" pin="$2/.opencode/opencode.jsonc" owned
+  [ -e "$record" ] || [ -L "$record" ] || return 0
+  owned=$(cat "$record") || return 1
+  [ "$owned" = "$pin" ] || return 1
+  rm -f -- "$pin" || return 1
+  rm -f -- "$state/$id.opencode-model-config"
 }

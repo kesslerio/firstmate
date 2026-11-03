@@ -76,7 +76,7 @@ in_home() {  # <command...>: run one real script against the case home
 
 # Spawn, write status lines, poll once, land locally, clean up.
 run_lifecycle() {
-  local out
+  local out rc
   out=$(in_home "$ROOT/bin/fm-spawn.sh" "$TASK" "$PROJ_DIR" --mode local-only --yolo off 2>&1) \
     || fail "spawn failed: $out"
   {
@@ -85,9 +85,11 @@ run_lifecycle() {
     printf 'resolved: [key=pick-one]  chose a\n'
     printf 'partial line without its newline'
   } >> "$HOME_DIR/state/$TASK.status"
+  rc=0
   out=$(in_home env FM_POLL=1 FM_SIGNAL_GRACE=1 FM_CHECK_INTERVAL=999999 \
-    "$ROOT/bin/fm-watch-checkpoint.sh" --seconds 2 2>&1)
-  case "$out" in *"checkpoint:"*|*"signal:"*) ;; *) fail "watcher checkpoint did not run: $out" ;; esac
+    "$ROOT/bin/fm-watch-checkpoint.sh" --seconds 12 2>&1) || rc=$?
+  case "$out" in *"checkpoint:"*|*"signal:"*) ;; *) fail "watcher checkpoint did not run: $out (exit $rc)" ;; esac
+  [ "$rc" -eq 0 ] || [ "$rc" -eq 124 ] || fail "watcher checkpoint failed (exit $rc): $out"
   LEDGER_AFTER_POLL=$(cat "$HOME_DIR/state/fleet-ledger.jsonl" 2>/dev/null || true)
   printf ' finished\ndone: ready in branch\n' >> "$HOME_DIR/state/$TASK.status"
   printf 'landed\n' > "$WT_DIR/landed.txt"
