@@ -1,0 +1,6 @@
+== S5: ambiguous selector (two live panes in the recorded window), stale handle ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.RxJcd2/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell did not reach term_9d0a13b3-1d2c-429c-b9b1-a30dbae147e5; the steer is durably recorded at /tmp/fm-orca-lab.RxJcd2/fmhome/state/t5.inbox/001.msg and the watcher will re-ring
+-- lines accepted by either pane --
+(none)

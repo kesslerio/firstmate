@@ -1,0 +1,7 @@
+== environment ==
+host: Linux 7.3.1 x86_64
+orca CLI: ~/.local/bin/orca 1.4.232
+isolated runtime: HOME=/tmp/fm-orca-t2.mpKKbm, endpoint ws://127.0.0.1:6799 (orca serve --no-pairing)
+lab FM_HOME: /tmp/fm-orca-t2.mpKKbm/fmhome (bin/fm-lab-home.sh create)
+orca appVersion: 1.4.232 (real Linux orcad-server, real PTY terminals)
+worktrees: /tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t1 .. (fm-t1..fm-t8)

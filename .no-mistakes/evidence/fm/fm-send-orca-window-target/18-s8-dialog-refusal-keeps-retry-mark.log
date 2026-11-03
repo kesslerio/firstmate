@@ -1,0 +1,30 @@
+== S8: inbox ring to a stale handle whose replacement pane shows a blocking dialog (fire-and-forget record) ==
+recorded (stale) terminal: term_8efb419d-ccd4-4262-8517-79e17076a0ad
+live replacement pane in window fm-t8: term_1ae4e0f8-1517-46fb-bdd1-27403e2a2db8
+replacement screen before the ring:
+Background work is running
+❯ 1. Exit and stop tasks
+  2. Keep running
+Enter to confirm · Esc to cancel
+--- fm-send output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t2.mpKKbm/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell did not reach term_8efb419d-ccd4-4262-8517-79e17076a0ad; the steer is durably recorded at /tmp/fm-orca-t2.mpKKbm/fmhome/state/t8.inbox/001.msg and the watcher will ring it once more
+--- orca calls:
+terminal read --terminal term_8efb419d-ccd4-4262-8517-79e17076a0ad
+terminal send --terminal term_8efb419d-ccd4-4262-8517-79e17076a0ad --text <doorbell>   # stale: terminal_not_writable
+terminal list --worktree name:fm-t8 --limit 200 --json
+terminal read --terminal term_1ae4e0f8-1517-46fb-bdd1-27403e2a2db8 --screen --limit 20 --json   # dialog guard refuses text and Enter
+--- no doorbell send and no Enter on the dialog pane
+--- durable record and retry mark:
+.
+..
+001.msg
+handled
+.retry-ring
+001.msg
+--- replacement screen after (dialog intact, nothing typed):
+Background work is running
+❯ 1. Exit and stop tasks
+  2. Keep running
+Enter to confirm · Esc to cancel

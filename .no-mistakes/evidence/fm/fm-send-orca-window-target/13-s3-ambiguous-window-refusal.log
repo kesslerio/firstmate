@@ -1,0 +1,30 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t2.mpKKbm/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not sent to term_aa3e7e3e-40e9-470a-a92c-45748de7e947 (orca send failed; tried meta=/tmp/fm-orca-t2.mpKKbm/fmhome/state/t3.meta; backend=from-meta)
+--- selector result:
+{
+  "id": "ed461237-6402-4007-ba79-173db638c02e",
+  "ok": true,
+  "result": {
+    "terminals": [
+      {
+        "handle": "term_09c0fee5-faf9-4faf-82e5-9c4d89a44d94",
+        "ptyId": "16b9ab9b-9d9f-4cb4-8d63-dc50603e9016::/tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t3@@e6ce3df7",
+        "incarnationId": "0b86ad09-f30c-4a8a-8c4f-b13485aff712",
+        "orphaned": false,
+        "worktreeId": "16b9ab9b-9d9f-4cb4-8d63-dc50603e9016::/tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t3",
+        "worktreePath": "/tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t3",
+        "branch": "refs/heads/t/fm-t3",
+        "tabId": "c416f3fc-56b5-4b86-9ff3-5297cc22586a",
+        "leafId": "cf238dac-c75b-4f2f-b4e6-802b5ada3208",
+        "title": null,
+        "connected": true,
+        "writable": true,
+        "lastOutputAt": null,
+        "preview": "",
+--- orca calls:
+terminal read --terminal term_aa3e7e3e-40e9-470a-a92c-45748de7e947
+terminal send --terminal term_aa3e7e3e-40e9-470a-a92c-45748de7e947 --text /usr/bin/touch ...   # stale
+terminal list --worktree name:fm-t3 --limit 200 --json   # 3 live panes -> ambiguous, no retarget
+--- marker absent (nothing typed):
+ls: cannot access '/tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t3/DELIVERED-t3': No such file or directory

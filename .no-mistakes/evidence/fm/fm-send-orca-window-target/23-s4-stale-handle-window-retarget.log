@@ -1,0 +1,9 @@
+== S4 rerun with captured submissions: typed send to a task whose recorded Orca handle went stale; retarget through the recorded window= alias ==
+recorded (closed) terminal term_eae0ec14-ebc9-4ac1-bd79-0e5a6b2a2fc4 ; window=fm-t4 ; single live pane term_5fd72c0a-f3a8-4f0b-93b3-0f5262d75b32
+fm-send exit=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.RxJcd2/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+-- lines accepted by the replacement pane (typed once, one Enter) --
+/status
+-- metadata unchanged --
+UNCHANGED

@@ -1,0 +1,16 @@
+== S3: healthy recorded Orca handle, typed-plane send (success path proves delivery from an empty composer read after an accepted Enter) ==
+fm-send exit=0
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.RxJcd2/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+-- lines accepted by the harness (typed once, one Enter) --
+/status
+-- composer after delivery (empty -> delivery proven) --
+draft_field_present= False
+agent transcript:
+  you asked: : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 't1.inbox' steering inbox, read and a
+  you asked: /status
+  you asked: : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 't1.inbox' steering inbox, read and a
+  you asked: /status
+╭────────────────────────────────────────────────────────────────────╮
+│                                                                    │
+╰────────────────────────────────────────────────────────────────────╯

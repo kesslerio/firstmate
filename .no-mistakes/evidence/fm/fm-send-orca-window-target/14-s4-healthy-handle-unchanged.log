@@ -1,0 +1,11 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t2.mpKKbm/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not submitted to term_59c4a1e0-6c16-48cd-b9a5-114b2c8cdeb8 (delivery unconfirmed; verdict=unknown; tried meta=/tmp/fm-orca-t2.mpKKbm/fmhome/state/t4.meta; backend=from-meta)
+--- orca calls:
+terminal read --terminal term_59c4a1e0-6c16-48cd-b9a5-114b2c8cdeb8
+terminal send --terminal term_59c4a1e0-6c16-48cd-b9a5-114b2c8cdeb8 --text /usr/bin/touch ...
+terminal send --terminal term_59c4a1e0-6c16-48cd-b9a5-114b2c8cdeb8 --text '' --enter
+terminal read --terminal term_59c4a1e0-6c16-48cd-b9a5-114b2c8cdeb8 --screen
+--- no 'terminal list' selector call: healthy handle keeps its sequence
+--- marker created:
+-rw-r--r-- 1 art users 0 Nov  2 23:52 /tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t4/DELIVERED-t4

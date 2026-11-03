@@ -1,0 +1,31 @@
+== S1: inbox ring to a healthy Orca pane whose composer already holds this ring's own doorbell (orca 1.4.232 publishes no result.terminal.draft) ==
+-- composer before the ring --
+agent transcript:
+  you asked: : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 't1.inbox' steering inbox, read and a
+  you asked: /status
+╭────────────────────────────────────────────────────────────────────╮
+│                                                                    │
+╰────────────────────────────────────────────────────────────────────╯
+-- composer holding the pending own doorbell (typed, never submitted) --
+agent transcript:
+  you asked: : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 't1.inbox' steering inbox, read and a
+  you asked: /status
+╭────────────────────────────────────────────────────────────────────╮
+│ : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in yo │
+│ ur 't1.inbox' steering inbox, read and act on each in numeric orde │
+│ r, then mv each into its handled/.                                 │
+╰────────────────────────────────────────────────────────────────────╯
+rc=0
+-- fm-send (exit  0) --
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.RxJcd2/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+-- lines the harness actually accepted (exactly one Enter submitted the pending doorbell, no duplicate copy) --
+: Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 't1.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/.
+-- composer after the ring --
+agent transcript:
+  you asked: : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 't1.inbox' steering inbox, read and a
+  you asked: /status
+  you asked: : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 't1.inbox' steering inbox, read and a
+╭────────────────────────────────────────────────────────────────────╮
+│                                                                    │
+╰────────────────────────────────────────────────────────────────────╯

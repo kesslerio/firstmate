@@ -1,0 +1,21 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t2.mpKKbm/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not submitted to term_e0d3923b-bace-47c9-9efd-2e0d99fa9146 (delivery unconfirmed; verdict=unknown; tried meta=/tmp/fm-orca-t2.mpKKbm/fmhome/state/t1.meta; backend=from-meta)
+--- orca calls (wrapped):
+terminal read --terminal term_e0d3923b-bace-47c9-9efd-2e0d99fa9146 --screen --limit 20 --json
+terminal send --terminal term_e0d3923b-bace-47c9-9efd-2e0d99fa9146 --text /usr/bin/touch ... --json   # stale: terminal_not_writable
+terminal list --worktree name:fm-t1 --limit 200 --json   # exactly one live pane
+terminal read --terminal term_ea7d9e0a-12b9-4f87-9221-55f4f699fcb1 --screen --limit 20 --json
+terminal send --terminal term_ea7d9e0a-12b9-4f87-9221-55f4f699fcb1 --text /usr/bin/touch ... --json
+terminal send --terminal term_ea7d9e0a-12b9-4f87-9221-55f4f699fcb1 --text '' --enter --json
+--- marker created in the live pane's worktree:
+-rw-r--r-- 1 art users 0 Nov  2 23:52 /tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t1/DELIVERED-t1
+--- metadata after send:
+window=fm-t1
+endpoint_task_id=t1
+terminal=term_e0d3923b-bace-47c9-9efd-2e0d99fa9146
+worktree=/tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t1
+project=/tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t1
+harness=claude
+kind=crew
+backend=orca

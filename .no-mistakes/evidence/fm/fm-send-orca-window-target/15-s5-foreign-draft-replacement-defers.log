@@ -1,0 +1,27 @@
+== S5: inbox ring to a task whose recorded handle is stale and whose replacement pane holds a foreign draft ==
+recorded (stale) terminal: term_c0aed397-8d94-4ae9-8576-6f93aa4e097c
+live replacement pane in window fm-t5: term_0b535145-486b-4a7e-8d89-8a164381aab0
+replacement composer screen before the ring:
+bash: please: command not found
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/repo/fm-t5$ please rebuild the auth service
+--- fm-send output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t2.mpKKbm/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /tmp/fm-orca-t2.mpKKbm/fmhome/state/t5.inbox/001.msg and the watcher will re-ring
+--- orca calls:
+terminal read --terminal term_c0aed397-8d94-4ae9-8576-6f93aa4e097c   # composer pre-check, stale read -> unknown
+terminal send --terminal term_c0aed397-8d94-4ae9-8576-6f93aa4e097c --text <doorbell>   # stale: terminal_not_writable
+terminal list --worktree name:fm-t5 --limit 200 --json   # exactly one live pane
+terminal read --terminal term_0b535145-486b-4a7e-8d89-8a164381aab0 --screen --limit 20 --json   # replacement gate sees pending text
+--- no doorbell send and no Enter on the replacement (deferral)
+--- durable inbox record:
+001.msg
+handled
+schema=fm-task-inbox.v1
+at=2026-11-03T07:53:44Z
+body-terminator=1
+--
+please check the build
+--- replacement composer after the ring (unchanged, no doorbell appended):
+bash: please: command not found
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/repo/fm-t5$ please rebuild the auth service

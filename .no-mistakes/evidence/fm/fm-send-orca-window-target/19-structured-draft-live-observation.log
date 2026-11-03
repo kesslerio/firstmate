@@ -1,0 +1,11 @@
+== Why the structured-draft ownership scenarios could not be driven live here ==
+Real orca 1.4.232 terminal read --screen --json keys, shell pane and agent-launched pane:
+["handle","latestCursor","limited","nextCursor","oldestCursor","returnedLineCount","source","status","tail","tailRows","truncated"]
+Shell pane read has no draft key. The CLI documents: "When present, draft is UI-only composer text excluded from tail."
+The lab's only reachable agent launched as a terminal (orca agent launch --agent claude) and rendered Claude Code 2.1.317 onboarding;
+a draft-bearing Orca chat surface was not reachable in this headless serve (no paired desktop/web client),
+and the disposable lab had no Claude credentials (onboarding stops before any composer).
+Verdict of the live composer adapter for these panes (bin/fm-backend.sh):
+  state=term_1ae4e0f8-1517-46fb-bdd1-27403e2a2db8 -> unknown
+  draft rc/output:
+   [rc=3]

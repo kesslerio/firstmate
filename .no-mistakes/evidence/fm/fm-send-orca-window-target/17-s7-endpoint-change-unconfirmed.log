@@ -1,0 +1,18 @@
+== S7: the pane bound to the recorded handle was replaced between the accepted text and Enter ==
+recorded handle: term_2d3824f6-8aed-4056-ab67-66cbf2c2bece
+fresh replacement pane in the same worktree (fm-t7): term_00dd610f-dddb-4718-9f14-9839dfc31236
+--- fm-send output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t2.mpKKbm/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: submission to term_2d3824f6-8aed-4056-ab67-66cbf2c2bece is unconfirmed because Enter changed terminal endpoints; do not retype or blindly resend - inspect the replacement pane for the recorded worktree in Orca's UI before deciding whether to resend
+--- orca calls in order:
+terminal read --terminal term_2d3824f6-8aed-4056-ab67-66cbf2c2bece
+terminal send --terminal term_2d3824f6-8aed-4056-ab67-66cbf2c2bece --text /status --json   # accepted on the original endpoint
+terminal send --terminal term_2d3824f6-8aed-4056-ab67-66cbf2c2bece --text '' --enter --json   # stale after the recorded pane was closed
+terminal list --worktree name:fm-t7 --limit 200 --json   # one live pane = the fresh replacement
+terminal read --terminal term_00dd610f-dddb-4718-9f14-9839dfc31236 --screen   # replacement gate
+terminal send --terminal term_00dd610f-dddb-4718-9f14-9839dfc31236 --text '' --enter --json   # Enter changed endpoints
+--- replacement pane after (no typed text reached it - empty Enter only):
+-i
+>
+>

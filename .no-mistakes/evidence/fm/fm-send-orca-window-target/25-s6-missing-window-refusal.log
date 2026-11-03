@@ -1,0 +1,6 @@
+== S6: missing selector (window name with no live pane), stale handle ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.RxJcd2/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell did not reach term_eae0ec14-ebc9-4ac1-bd79-0e5a6b2a2fc4; the steer is durably recorded at /tmp/fm-orca-lab.RxJcd2/fmhome/state/t6.inbox/001.msg and the watcher will re-ring
+-- lines accepted --
+(none)

@@ -1,0 +1,11 @@
+== S6: Orca accepted the typed text, then its Enter failed (runtime went away during the pre-Enter settle) ==
+recorded live terminal: term_0268d487-b6cc-4db9-b475-8fdf434e036e
+--- fm-send output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t2.mpKKbm/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: text delivered to term_0268d487-b6cc-4db9-b475-8fdf434e036e but submission is unconfirmed (verdict=pending; tried meta=/tmp/fm-orca-t2.mpKKbm/fmhome/state/t6.meta; backend=from-meta); do not retype or blindly resend - verify with fm-peek.sh, then re-send '--key Enter' only if the composer still holds the text
+--- orca calls in order:
+terminal read --terminal term_0268d487-b6cc-4db9-b475-8fdf434e036e --screen --limit 20 --json
+terminal send --terminal term_0268d487-b6cc-4db9-b475-8fdf434e036e --text /status --json   # accepted before the failure
+terminal send --terminal term_0268d487-b6cc-4db9-b475-8fdf434e036e --text '' --enter --json   # failed: runtime gone
+--- exactly one literal text send (no retype), exactly one Enter attempt, no composer read after the failure

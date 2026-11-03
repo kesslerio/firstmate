@@ -1,0 +1,8 @@
+== S7: Orca accepted the typed text, then Enter failed (pane closed during the pre-Enter settle) ==
+typed_seen=yes polls=3
+rc=3
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.RxJcd2/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: text delivered to term_9824efab-3a85-4d01-abac-d69275fe1935 but submission is unconfirmed (verdict=pending; tried meta=/tmp/fm-orca-lab.RxJcd2/fmhome/state/t7.meta; backend=from-meta); do not retype or blindly resend - verify with fm-peek.sh, then re-send '--key Enter' only if the composer still holds the text
+-- lines accepted by the harness --
+(none)

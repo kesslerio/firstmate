@@ -1,0 +1,9 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t2.mpKKbm/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not sent to term_9e8ea9c2-04f0-4257-8ee1-65387ccb628a (orca send failed; tried meta=/tmp/fm-orca-t2.mpKKbm/fmhome/state/t2.meta; backend=from-meta)
+--- orca calls:
+terminal read --terminal term_9e8ea9c2-04f0-4257-8ee1-65387ccb628a --screen --limit 20 --json
+terminal send --terminal term_9e8ea9c2-04f0-4257-8ee1-65387ccb628a --text /usr/bin/touch ... --json   # stale
+terminal list --worktree name:fm-absent-window --limit 200 --json   # selector_not_found
+--- marker absent (nothing typed):
+ls: cannot access '/tmp/fm-orca-t2.mpKKbm/orca/workspaces/repo/fm-t2/DELIVERED-t2': No such file or directory

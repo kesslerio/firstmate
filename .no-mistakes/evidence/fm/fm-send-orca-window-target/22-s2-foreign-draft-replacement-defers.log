@@ -1,0 +1,30 @@
+== Live Orca lab: real orca 1.4.232 (//tmp/fm-orca-lab.RxJcd2/.local/bin/orca) headless runtime, isolated HOME and FM_HOME ==
+host: Linux 7.3.1
+orca: 1.4.232
+runtime: 
+"endpoint":"ws://0.0.0.0:6799"
+lab HOME: /tmp/fm-orca-lab.RxJcd2
+lab FM_HOME: /tmp/fm-orca-lab.RxJcd2/fmhome (bin/fm-lab-home.sh create)
+visual surfaces: headless serve has no desktop/web client, so no screenshots exist; the rendered terminal grid read back through 'orca terminal read --screen' is the reviewer-visible product surface used as evidence
+
+== S2: inbox ring, recorded handle stale, exactly one live replacement pane holding a FOREIGN draft ==
+recorded stale terminal: term_b8854cf8-2dc6-4928-ba03-6902d67ca283
+live replacement pane: term_14a382c3-d65d-4db9-ba08-ca3b0dff74e8
+-- fm-send --
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.RxJcd2/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /tmp/fm-orca-lab.RxJcd2/fmhome/state/t2.inbox/002.msg and the watcher will re-ring
+-- lines accepted by the harness (none: no doorbell text, no Enter) --
+(empty)
+-- replacement composer after the ring (foreign draft untouched) --
+agent transcript:
+  (no turns yet)
+╭────────────────────────────────────────────────────────────────────╮
+│ please rebuild the auth service                                    │
+╰────────────────────────────────────────────────────────────────────╯
+-- metadata unchanged (no rewrite) --
+UNCHANGED
+-- durable record --
+001.msg
+002.msg
+handled
