@@ -1,0 +1,10 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.2Vnhr6/home
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6F7VZX10G69D1FFP2MWBGCY/.pi/extensions/fm-primary-turnend-guard.ts -e /home/art/.no-mistakes/worktrees/9f75ec418609/01M6F7VZX10G69D1FFP2MWBGCY/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: text not submitted to term_db7f0f01-0e76-4575-a3f2-29078c0f9a33 (delivery unconfirmed; verdict=unknown; tried meta=/tmp/fm-orca-lab.2Vnhr6/home/state/live2.meta; backend=from-meta)
+exit=1

@@ -1,0 +1,12 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.2Vnhr6/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /tmp/fm-orca-lab.2Vnhr6/home/state/live2.inbox/001.msg and the watcher will re-ring
+exit=0
+/tmp/fm-orca-lab.2Vnhr6/home/state
+/tmp/fm-orca-lab.2Vnhr6/home/state/.guard-watcher-stale-banner
+/tmp/fm-orca-lab.2Vnhr6/home/state/live1.meta
+/tmp/fm-orca-lab.2Vnhr6/home/state/live2.inbox
+/tmp/fm-orca-lab.2Vnhr6/home/state/live2.inbox/001.msg
+/tmp/fm-orca-lab.2Vnhr6/home/state/live2.inbox/handled
+/tmp/fm-orca-lab.2Vnhr6/home/state/live2.meta
+/tmp/fm-orca-lab.2Vnhr6/home/state/live3.meta

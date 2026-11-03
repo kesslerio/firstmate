@@ -1,0 +1,30 @@
+=== deferred orca retry: replacement composer unreadable (mark must survive) ===
+mark before: 002.msg
+watcher target: term_db7f0f01-0e76-4575-a3f2-29078c0f9a33 (backend=orca agent_state=unverified)
+due action before: ring /tmp/fm-orca-lab.2Vnhr6/home/state/live2.inbox/001.msg
+retry mark after: 002.msg
+due action after: ring /tmp/fm-orca-lab.2Vnhr6/home/state/live2.inbox/001.msg
+mark file exists after: yes
+
+=== retry that reaches a live original endpoint (mark must be spent) ===
+mark before: 001.msg
+watcher target: term_c36a5518-fb23-4639-909b-947262f78503 (backend=orca agent_state=unverified)
+due action before: retry /tmp/fm-orca-lab.2Vnhr6/home/state/live3.inbox/001.msg
+retry mark after: <cleared>
+due action after: quiet
+mark file exists after: no
+
+=== live3 pane after the successful retry ring ===
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/repo/fm-live3$ exec sleep 100000
+: Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 'live3.inbox' steering inbox, read and act on each
+in numeric order, then mv each into its handled/.
+watcher target: term_db7f0f01-0e76-4575-a3f2-29078c0f9a33 (backend=orca agent_state=unverified)
+due action before: retry /tmp/fm-orca-lab.2Vnhr6/home/state/live2.inbox/002.msg
+retry mark before: 002.msg
+retry mark after: 002.msg
+due action after: retry /tmp/fm-orca-lab.2Vnhr6/home/state/live2.inbox/002.msg
+[2026-11-02T16:26:47-0800] steer-inbox delivery attempt: live2 001.msg result=2
+[2026-11-02T16:26:50-0800] steer-inbox retry ring: live3 001.msg result=2
+[2026-11-02T16:27:36-0800] steer-inbox delivery attempt: live2 001.msg result=1
+[2026-11-02T16:27:41-0800] steer-inbox retry ring: live3 001.msg result=0
+[2026-11-02T16:27:53-0800] steer-inbox retry ring: live2 002.msg result=1

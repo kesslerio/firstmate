@@ -1,0 +1,4 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab.2Vnhr6/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: submission to term_0e9dd554-052e-4cb4-9f76-6e3d40f113b6 is unconfirmed (verdict=pending-replacement; tried meta=/tmp/fm-orca-lab.2Vnhr6/home/state/live6.meta; backend=from-meta); do not retype or blindly resend - inspect the replacement pane for the recorded worktree in Orca's UI before deciding whether to resend
+fm-send exit=3

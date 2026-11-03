@@ -1,0 +1,6 @@
+=== watcher triage log (state/.watch-triage.log) ===
+[2026-11-02T16:26:47-0800] steer-inbox delivery attempt: live2 001.msg result=2
+[2026-11-02T16:26:50-0800] steer-inbox retry ring: live3 001.msg result=2
+[2026-11-02T16:27:36-0800] steer-inbox delivery attempt: live2 001.msg result=1
+[2026-11-02T16:27:41-0800] steer-inbox retry ring: live3 001.msg result=0
+[2026-11-02T16:27:53-0800] steer-inbox retry ring: live2 002.msg result=1

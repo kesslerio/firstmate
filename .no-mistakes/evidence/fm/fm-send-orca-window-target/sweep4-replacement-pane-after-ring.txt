@@ -1,0 +1,9 @@
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/repo/fm-live2$ claude '--dangerously-skip-permiss
+ions'
+ ▐▛███▛█   Claude Code v2.1.316
+▝▜██████▀  Opus 5.5 · API Usage Billing
+ ▝▝   ▝▝   ~/orca/workspaces/repo/fm-live2
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ Try "refactor <filepath>"
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ bypass permissions on (shift+tab to cycle)                                                     ◐ medium · /effort

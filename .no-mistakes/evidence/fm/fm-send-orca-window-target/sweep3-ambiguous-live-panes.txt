@@ -1,0 +1,7 @@
+live count: 6
+term_bdbc659d-aa9e-4007-8644-587ed9746bbd writable=true connected=true orphaned=false
+term_bdea004b-ade9-4854-ac1f-b3cb05d708a0 writable=true connected=true orphaned=false
+term_d9e5ac26-82c0-475e-9ce8-6a9ecbf33e7a writable=true connected=true orphaned=false
+term_fc0dc035-5e2c-4b35-8eb8-e87244c22727 writable=true connected=true orphaned=false
+term_409da6c9-9ff3-44ca-912e-e7d6032d06f7 writable=true connected=true orphaned=false
+term_c9b5454b-1674-4132-9a49-681d0de1c654 writable=true connected=true orphaned=false

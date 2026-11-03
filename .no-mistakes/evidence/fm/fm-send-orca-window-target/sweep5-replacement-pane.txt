@@ -1,0 +1,4 @@
+=== replacement pane (T2) after fm-send ===
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/repo/fm-live8$ echo SECOND-ENDPOINT-READY; exec s
+leep 100000
+SECOND-ENDPOINT-READY

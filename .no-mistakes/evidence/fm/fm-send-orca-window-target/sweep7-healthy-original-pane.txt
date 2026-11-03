@@ -1,0 +1,24 @@
+=== live3 pane after a typed send on the healthy recorded handle (no restart) ===
+ ▐▛███▛█   Claude Code v2.1.316
+▝▜██████▀  Opus 5.5 · API Usage Billing
+ ▝▝   ▝▝   ~/orca/workspaces/repo/fm-live3
+❯ /status
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Settings  Status   Config   Usage   Stats
+  Version:                    2.1.316
+  Session name:               /rename to add a name
+  Session ID:                 703717c6-f1f4-4325-af02-ca014fffd8d7
+  Session kind:               interactive
+  Peer address:               uds:/run/user/1000/cc-socks/2895286.sock
+  cwd:                        /home/art/orca/workspaces/repo/fm-live3
+  Auth token:                 ANTHROPIC_AUTH_TOKEN
+  Anthropic base URL:         http://127.0.0.1:8317
+  Model:                      Default (claude-opus-5-5)
+  MCP servers:                2 connected · /mcp
+  Setting sources:            User settings
+  Managed settings (remote):  not fetched — not available with a custom ANTHROPIC_BASE_URL
+  Organization policy:        not fetched with a custom ANTHROPIC_BASE_URL
+  Auto mode server:           Disabled
+  System diagnostics
+   ⚠ Leftover npm global installation at /home/art/.npm-packages/bin/claude
+  Esc to cancel
