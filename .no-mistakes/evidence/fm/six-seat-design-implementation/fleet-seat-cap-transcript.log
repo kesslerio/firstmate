@@ -1,0 +1,22 @@
+$ fm-fleet-seats.sh reserve worker-a --generation g-a --model pool-model-a   # holder pid 1st
+fleet-seats: reserved pool=shared id=worker-a generation=g-a used=1 capacity=1
+exit=0
+
+$ fm-fleet-seats.sh show worker-a
+{"schema":"fm-fleet-seat-holder.v2","state_dir":"/tmp/fm-seat-transcript.YiOiHo/primary/state","task":"worker-a","revision":1,"incarnations":[{"generation":"g-a","previous_generation":null,"kind":"ship","model":"pool-model-a","policy_digest_at_reserve":"1630862893-69","lifecycle":"reserved","launch_phase":"prepared","owner_pid":979265,"owner_pid_identity":"linux-starttime=1370926 cmdline-hex=736c6565700033303000","route":null,"startup_confirmed":false,"disposition":null}]}
+
+$ fm-fleet-seats.sh reserve worker-b --generation g-b --model pool-model-a   # same pool, still held
+fleet-seats: pool shared is full (1 of 1 seats held); worker-b gets no seat for model pool-model-a - choose an overflow route or wait for a holder to finish
+  holder /tmp/fm-seat-transcript.YiOiHo/primary/state worker-a
+exit=4
+
+$ fm-fleet-seats.sh show worker-b   # the refused launch left no record
+(empty above)
+
+$ fm-fleet-seats.sh release worker-a --generation g-a --reason prelaunch
+fleet-seats: released id=worker-a generation=g-a reason=prelaunch
+exit=0
+
+$ fm-fleet-seats.sh reserve worker-b --generation g-b --model pool-model-a   # capacity now free
+fleet-seats: reserved pool=shared id=worker-b generation=g-b used=1 capacity=1
+exit=0

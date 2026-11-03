@@ -1,0 +1,6 @@
+ok - remote serve adopts an unrecorded supervisor once, binds observed generations, and honors parent accounting
+ok - remote certificates and descendant transitions share one host authority
+ok - generationless predecessors remain counted beside reserved and terminal replacements
+ok - a buffered supervisor launch keeps its seat until it starts and later dies
+ok - alive and dead observations require the same creation server before and after the read
+EXIT=0

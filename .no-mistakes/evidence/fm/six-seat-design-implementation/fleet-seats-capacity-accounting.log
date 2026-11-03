@@ -1,0 +1,7 @@
+ok - nested local homes count existing agents once and refuse ambiguous occupancy
+ok - a pooled spawn into a full pool refuses before any record, and another route still launches
+ok - a spawned pooled worker holds its seat until cleanup releases its generation
+ok - cleanup releases exactly its own generation and stale cleanup never frees a successor
+ok - orphaned direct and intermediate secondmates cannot create independent seat authorities
+ok - a marked home inherits its root's authority and never owns one of its own
+EXIT=0

@@ -1,0 +1,15 @@
+### test_reassigned_pool_slot_finishes_own_cleanup_without_touching_the_slot
+ok - fm-teardown: a pool slot claimed by another task is left alone while the task's own cleanup finishes
+### rc=0
+### test_stale_record_on_claimed_slot_retires_then_claimant_tears_down
+ok - fm-teardown: a stale record on a claimed slot retires, then the claimant tears down
+### rc=0
+### test_failed_endpoint_close_refuses_before_removing_the_record
+ok - fm-teardown: a close that genuinely failed refuses and keeps the record naming the surviving endpoint, and the same teardown finishes once the close works
+### rc=0
+### test_recorded_endpoint_that_changed_directory_still_tears_down
+ok - fm-teardown: an exact recorded endpoint still tears down after changing cwd outside its worktree
+### rc=0
+### test_legacy_t3_record_refuses_cleanup_without_creation_server
+ok - fm-teardown: legacy T3 origin refuses ordinary cleanup and permits explicit force
+### rc=0

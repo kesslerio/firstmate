@@ -1,37 +1,32 @@
-# Live validation: fleet seat pools (fm/six-seat-design-implementation, e8118e5e)
+# Live validation: fleet seat capacity, generation/endpoint-bound lifecycle, T3 server identity
 
-All live drives used a disposable marked lab home (`bin/fm-lab-home.sh create`) with
-`FM_HOME` pointing at it, a throwaway git project, real `bin/fm-spawn.sh`,
-`bin/fm-fleet-seats.sh`, `bin/fm-teardown.sh`, and a real private tmux server
-(`TMUX_TMPDIR=$LAB/tmux`) launching the machine's real `claude` harness. Every lab was
-removed in the same turn; no fleet state or operator home was touched.
+Change under test: `fm/six-seat-design-implementation` head `ea3aa739`
+(opt-in fleet seat pools, generation/endpoint-bound seat + remote lifecycle,
+failed-startup lifecycle episode, T3 admitted-server identity for discovery and
+multi-thread watch).
 
-| # | Scenario | Result | Artifact |
-| --- | --- | --- | --- |
-| 1 | Pooled worker spawn into a full pool refuses before any endpoint/worktree/record, naming the holder | pass | `scenario-01-capacity-and-model-refusals.log` |
-| 2 | Harness-default model and raw launch command refused while pools are configured | pass | `scenario-01-capacity-and-model-refusals.log` |
-| 3 | Real spawned worker holds seat 1 of 1, second pooled launch refused, teardown frees the generation, next launch admitted | pass | `scenario-02-second-launch-refused.log`, `scenario-03-teardown-release.log`, `scenario-04-release-admits-next.log` |
-| 4 | A local second mate home's pooled record spends the fleet root's seat | pass | `scenario-05-shared-capacity-remote-and-generations.log` |
-| 5 | An unresolved legacy model occupies every declared pool | pass | `scenario-05-shared-capacity-remote-and-generations.log` |
-| 6 | A registered remote with no served certificate refuses admission; removing it restores admission | pass | `scenario-05-shared-capacity-remote-and-generations.log` |
-| 7 | Released generations never revive; a successor is admitted on the freed seat | pass | `scenario-05-shared-capacity-remote-and-generations.log` |
-| 8 | A live primary session lock holds the pooled seat; after it ends the launch is admitted | pass | `scenario-06-primary-seat.log` |
-| 9 | Malformed/unreadable pool declaration refuses admission; no declaration leaves launches uncapped | pass | `scenario-07-authority-boundaries.log` |
-| 10 | Remote serve/adoption and Rex ownership across a real home | pass (e2e suite) | `suite-fm-fleet-seats.log`, `suite-t3-teardown-remote-seat.log` |
-| 11 | A reclaimed pooled T3 generation cannot resume beside its replacement | pass (e2e suite) | `suite-t3-teardown-remote-seat.log` |
-| 12 | Lab-session and Rex retirement retry identity | pass (e2e suite) | `suite-fm-remote-secondmate-session.log` |
-| 13 | Archive generation naming from `remote_spawn_gen`/`fleet_seat_generation` | pass (e2e suite) | `suite-fm-record-export.log` |
-| 14 | Malformed Rex route reply refused at the parent boundary with a host endpoint already recorded (HEAD fixture fix) | untested | `suite-fm-remote-secondmate-lifecycle-e2e.log` |
+Every scenario below was driven against the real firstmate binaries
+(`bin/fm-fleet-seats.sh`, `bin/fm-spawn.sh`, `bin/fm-teardown.sh`,
+`bin/fm-bootstrap.sh`/liveness, `bin/fm-supervise-daemon.sh`,
+`bin/backends/t3code.sh` + `bin/fm-t3-mcp.mjs`) in disposable fixture homes and a
+disposable lab home, with a throwaway fake T3 Orchestrator server on 127.0.0.1
+and fake tmux/fake ssh endpoints. No operator home, fleet state, or live default
+session was touched.
 
-## Local environment limits observed (reproduced on the base commit or host-specific)
+## Artifacts
 
-- `tests/fm-teardown-endpoint-safety.test.sh` case
-  `teardown reported success after a close that failed` fails identically on the
-  unmodified base tree (`git archive 9224c90` in `/tmp`), so it is pre-existing here.
-- `tests/fm-backend-t3code.test.sh` case `installed Codex failed the tracked
-  configuration guard` fails because it calls `/usr/bin/printenv`, which this host
-  does not have (the branch's base tree fails earlier in that suite).
-- `tests/fm-remote-secondmate-lifecycle-e2e.test.sh` aborts with exit 127 after the
-  unreachable-remote case because its remote-job PATH (`/usr/bin:/bin`) lacks the
-  standard toolchain on this host (`/usr/bin` has 2 entries, `/bin` a 12-tool subset),
-  so the later Rex-reply section never runs.
+| Artifact | Scenario |
+| --- | --- |
+| `fleet-seat-cap-transcript.sh` / `.log` | End-user CLI transcript: pool of capacity 1 admits `worker-a`, refuses `worker-b` (exit 4, "pool shared is full (1 of 1 seats held)"), writes no record for the refused launch, then admits `worker-b` after `release`. |
+| `fleet-seats-capacity-accounting.log` | `tests/fm-fleet-seats.test.sh` focused cases: nested local homes share one count, a spawn into a full pool refuses before any record, a spawned worker holds its seat until cleanup, cleanup releases only its own generation, orphan secondmates cannot become authorities, a marked home inherits its root authority. |
+| `fleet-seats-remote-and-buffered-seats.log` | Remote host adoption and descendant authority, generationless predecessors stay counted, a buffered supervisor launch keeps its seat, alive/dead observations require the same creation server. |
+| `teardown-endpoint-and-generation-safety.log` | `tests/fm-teardown-endpoint-safety.test.sh` cases: a pool slot claimed by another task is left alone, a stale record retires without touching the claimant, a genuinely failed endpoint close refuses and keeps the record, a moved-cwd recorded endpoint still tears down, a legacy T3 record without a creation server refuses. |
+| `secondmate-recovery-generation-binding.log` | `tests/fm-secondmate-liveness.test.sh` recovery cases: reclaim exactly the probed generation, abandon a verdict whose generation changed, refuse unknown/stale routes before mutation, never let a late startup confirmation authorize destruction, close only the generation's owning socket. |
+| `t3-supervisor-and-watch-bindings.log` | `tests/fm-backend-t3code.test.sh` head-fix cases: discovered supervisor delivers with its verified server, an explicitly targeted idle/completed supervisor binds without an active turn, mixed-server watch refuses in both thread orders, and failed-startup cleanup holds the lifecycle episode through the T3 archive for capped and uncapped mates. |
+
+## Result
+
+All six scenario groups passed (`EXIT=0`, one `ok` per case). The previously
+flaky `test_failed_endpoint_close_refuses_before_removing_the_record` reached its
+refusal and passed in this run, so the earlier failure was gate-environment
+interference rather than a product regression.
