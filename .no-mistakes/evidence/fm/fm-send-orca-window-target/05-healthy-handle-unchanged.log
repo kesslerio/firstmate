@@ -1,0 +1,21 @@
+== S4 healthy recorded handle (window= names no worktree, so delivery proves no retarget) ==
+recorded terminal (live): term_624a7f89-a129-44fe-b08f-2bb29838936f
+meta:
+  window=fm-live2
+  endpoint_task_id=live2
+  terminal=term_624a7f89-a129-44fe-b08f-2bb29838936f
+  worktree=/tmp/fm-orca-live.4055249/orca/workspaces/repo/fm-live1
+  project=/tmp/fm-orca-live.4055249/orca/workspaces/repo/fm-live1
+  harness=claude
+  kind=crew
+  backend=orca
+--- fm-send output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-live.4055249/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not submitted to term_624a7f89-a129-44fe-b08f-2bb29838936f (delivery unconfirmed; verdict=unknown; tried meta=/tmp/fm-orca-live.4055249/fmhome/state/live2.meta; backend=from-meta)
+--- delivered command side effect: -rw-r--r-- 1 art users 0 Nov  2 22:38 /tmp/fm-orca-live.4055249/orca/workspaces/repo/fm-live1/DELIVERED-healthy
+--- pane screen captured after the send:
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/repo/fm-live1$ env PS1='> ' bash --noprofile --no
+rc -i
+> /usr/bin/touch /tmp/fm-orca-live.4055249/orca/workspaces/repo/fm-live1/DELIVERED-healthy
+>

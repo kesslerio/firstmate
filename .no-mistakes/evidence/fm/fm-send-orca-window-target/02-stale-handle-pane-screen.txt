@@ -1,0 +1,6 @@
+== S1 live pane screen captured immediately after the retargeted send ==
+note: this pane was closed afterwards by the missing-window scenario, so it is quoted from the live capture taken at send time.
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/repo/fm-live1$ env PS1='> ' bash --noprofile --no
+rc -i
+> /usr/bin/touch /tmp/fm-orca-live.4055249/orca/workspaces/repo/fm-live1/DELIVERED-live1
+>

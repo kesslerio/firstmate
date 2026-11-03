@@ -1,0 +1,7 @@
+== S3 missing window: no live pane for the recorded window= alias ==
+selector result: {"totalCount":1}
+--- fm-send output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-live.4055249/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not sent to term_4bbb9f6e-a3ea-4554-9343-225acf8ae4c3 (orca send failed; tried meta=/tmp/fm-orca-live.4055249/fmhome/state/live1.meta; backend=from-meta)
+--- marker in worktree (expect absent): absent - nothing typed

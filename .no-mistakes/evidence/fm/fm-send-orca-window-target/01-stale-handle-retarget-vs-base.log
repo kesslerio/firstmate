@@ -1,0 +1,27 @@
+== environment ==
+host: Linux 7.3.1 x86_64
+orca CLI: ~/.local/bin/orca 1.4.232
+isolated runtime: HOME=/tmp/fm-orca-live.4055249  endpoint=ws://127.0.0.1:6799 (orca serve --no-pairing)
+{"runtime":{"state":"ready","reachable":true,"appVersion":"1.4.232"},"app":{"running":true,"pid":4059604,"desktopWindowStatus":"blocked"}}
+lab FM_HOME: /tmp/fm-orca-live.4055249/fmhome  (bin/fm-lab-home.sh create)
+orca worktree: /tmp/fm-orca-live.4055249/orca/workspaces/repo/fm-live1
+
+== S1 stale recorded handle -> window= singleton (head 63c99770) ==
+recorded stale terminal: term_4bbb9f6e-a3ea-4554-9343-225acf8ae4c3
+meta window=: window=fm-live1
+live pane in that window: term_86b86b38-6fef-41a3-9025-2b7bd05a6a34
+--- fm-send output (exit 1 = composer read unknown on this shell pane, delivery proven below):
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-live.4055249/fmhome
+error: text not submitted to term_4bbb9f6e-a3ea-4554-9343-225acf8ae4c3 (delivery unconfirmed; verdict=unknown; tried meta=/tmp/fm-orca-live.4055249/fmhome/state/live1.meta; backend=from-meta)
+--- delivered command side effect:
+-rw-r--r-- 1 art users 0 Nov  2 22:37 /tmp/fm-orca-live.4055249/orca/workspaces/repo/fm-live1/DELIVERED-live1
+--- live pane screen after send:
+--- metadata untouched:
+meta-before: eaaeb03091a73ef57f1ecd8220de4a3b67ce556d301253b10f1fb1409f0bac90  /tmp/fm-orca-live.4055249/fmhome/state/live1.meta
+eaaeb03091a73ef57f1ecd8220de4a3b67ce556d301253b10f1fb1409f0bac90  /tmp/fm-orca-live.4055249/fmhome/state/live1.meta
+
+== S1 baseline (base f641b44b, same stale handle, same window) ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-live.4055249/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not sent to term_4bbb9f6e-a3ea-4554-9343-225acf8ae4c3 (orca send failed; tried meta=/tmp/fm-orca-live.4055249/fmhome/state/live1.meta; backend=from-meta)
+--- marker present? no - nothing delivered

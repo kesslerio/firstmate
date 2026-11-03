@@ -1,0 +1,21 @@
+== S6 inbox plane: stale handle, replacement pane with unproven composer ==
+recorded stale terminal: term_21177539-eb02-41b6-aad4-2590b00ff6af
+live replacement pane in window fm-live8: term_529d932b-d925-448c-be81-69a61d310c85
+--- fm-send output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-live.4055249/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell did not reach term_21177539-eb02-41b6-aad4-2590b00ff6af; the steer is durably recorded at /tmp/fm-orca-live.4055249/fmhome/state/live8.inbox/001.msg and the watcher will re-ring
+--- durable inbox record:
+total 8
+-rw------- 1 art users   92 Nov  2 22:41 001.msg
+drwxr-xr-x 2 art users 4096 Nov  2 22:41 handled
+--- record body:
+schema=fm-task-inbox.v1
+at=2026-11-03T06:41:34Z
+body-terminator=1
+--
+please check the build
+--- replacement pane screen (no doorbell line, no Enter):
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/repo/fm-live1$ env PS1='> ' bash --noprofile --no
+rc -i
+>
