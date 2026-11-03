@@ -1,0 +1,24 @@
+== scenario 2a: no live pane in the recorded window; one unrelated live pane
+worktree=fm-live-miss stale_handle=term_16646812-efa9-473c-94d4-a6cda66f0a2c unrelated_pane=term_a3ce7192-0054-47b3-a277-210c7ff6a481 (worktree fm-live-decoy)
+== inventory of the recorded window
+{
+  "id": "00854523-596b-4354-ab74-2f2daa58d787",
+  "ok": true,
+  "result": {
+    "terminals": [],
+    "hostScope": {
+      "hostIds": [
+        "local"
+      ],
+      "omittedHostIds": []
+    },
+    "topologyRevisions": {},
+    "totalCount": 0,
+    "truncated": false
+  },
+  "_meta": {
+    "runtimeId": "a77bcb2b-e517-405c-b66f-e5e6a4890a83"
+  }
+}
+== inventory of the unrelated worktree
+[('term_a3ce7192-0054-47b3-a277-210c7ff6a481', True)]

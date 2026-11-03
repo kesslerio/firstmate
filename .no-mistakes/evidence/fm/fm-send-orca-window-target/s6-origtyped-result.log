@@ -1,0 +1,14 @@
+== scenario: send on the healthy original recorded handle (no restart)
+worktree=fm-live-orig handle=term_152d944b-20fa-4446-881c-003f0b7ea3cd agent_mode=normal message=/status
+fm-send rc=0
+== submitted lines in the pane log
+/status
+== pane tail
+╰──────────╯
+╭───────────╮
+│ > /status │
+╰───────────╯
+submitted
+╭────╮
+│ >  │
+╰────╯

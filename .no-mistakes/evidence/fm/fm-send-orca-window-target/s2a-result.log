@@ -1,0 +1,10 @@
+fm-send rc=1
+== unrelated pane log (must be empty)
+(none)
+== unrelated pane tail
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/fmrepo/fm-live-decoy$ python3 /tmp/oc1/agent.py /tmp/oc1/ev-decoy.log normal
+╭────╮
+│ >  │
+╰────╯
+== miss worktree inventory after the send
+[]

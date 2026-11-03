@@ -1,0 +1,14 @@
+== scenario: send on the healthy original recorded handle (no restart)
+worktree=fm-live-orig handle=term_dbb0e85b-f084-491e-b723-4d4e79d5e619 agent_mode=swallow-first message=please check the build
+fm-send rc=0
+== submitted lines in the pane log
+: Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 'originbox.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/.
+== pane tail
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ > : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 'originbox.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/. │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+submitted
+╭────╮
+│ >  │
+╰────╯

@@ -1,0 +1,12 @@
+== scenario: the replacement composer goes empty during the settle after the doorbell was typed
+worktree=fm-live-draft stale_handle=term_d8e93fa8-371d-4159-a624-75ae68070333 replacement_handle=term_e277234f-feee-48bf-aed4-f58775f24177 replacement_mode=clear-after-line
+fm-send rc=0
+== replacement pane log (must be empty: no bare Enter into the emptied composer)
+(none)
+== replacement pane tail (empty composer, nothing submitted)
+╭────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ > : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 'clear-after-line.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/. │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭────╮
+│ >  │
+╰────╯

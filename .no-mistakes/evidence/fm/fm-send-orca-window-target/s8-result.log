@@ -1,0 +1,16 @@
+== retry mark after the watcher polls (must survive: ring was deferred by replacement protection)
+present: 001.msg
+== durable record still unhandled
+/tmp/oc1/watchhome/state/wret.inbox/001.msg
+== replacement pane log (foreign draft must be untouched)
+(none)
+== replacement pane tail
+╭─────────────────────────────╮
+│ > user draft - do not submi │
+╰─────────────────────────────╯
+╭──────────────────────────────╮
+│ > user draft - do not submit │
+╰──────────────────────────────╯
+== triage log
+[2026-11-02T17:20:05-0800] secondmate wret liveness: agent recovery classifier unverified (backend=orca)
+[2026-11-02T17:20:10-0800] steer-inbox retry ring: wret 001.msg result=1

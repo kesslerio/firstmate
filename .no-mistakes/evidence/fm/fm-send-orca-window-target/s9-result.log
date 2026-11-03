@@ -1,0 +1,12 @@
+== scenario: the replacement composer changes during the settle after the doorbell was typed
+worktree=fm-live-draft stale_handle=term_c4c8f6ce-7d15-46dd-be75-38f7aa748880 replacement_handle=term_c23899a3-1217-4ae7-bef5-75746d449756 replacement_mode=hijack
+fm-send rc=0
+== replacement pane log (must be empty: no Enter on the foreign draft)
+(none)
+== replacement pane tail (foreign draft still pending, nothing submitted)
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ > : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 'hijack.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/. │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────╮
+│ > user draft now present │
+╰──────────────────────────╯

@@ -1,0 +1,12 @@
+== scenario: hand restart during the /status settle, after the text was typed
+worktree=fm-live-restart stale_handle=term_d6d41eb3-a356-4dc2-ac11-17c2c8d36453 replacement_handle=term_6bd96f6e-a68b-4283-a252-e276e68ba77d replacement_mode=dialog
+fm-send rc=3
+== replacement pane log
+(none)
+== replacement pane tail
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/fmrepo/fm-live-restart$ python3 /tmp/oc1/agent.py /tmp/oc1/ev-restdlg-b.log dialog
+Background work is running
+❯ 1. Exit and stop tasks
+Enter to confirm · Esc to cancel
+== stale pane log
+(none)

@@ -1,0 +1,25 @@
+== replacement pane log (submitted lines)
+/status
+== stale pane log (must stay empty: text never resubmitted to it)
+(none)
+== replacement pane tail
+╰──────╯
+╭───────╮
+│ > /st │
+╰───────╯
+╭────────╮
+│ > /sta │
+╰────────╯
+╭─────────╮
+│ > /stat │
+╰─────────╯
+╭──────────╮
+│ > /statu │
+╰──────────╯
+╭───────────╮
+│ > /status │
+╰───────────╯
+submitted
+╭────╮
+│ >  │
+╰────╯

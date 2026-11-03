@@ -1,0 +1,5 @@
+== scenario: real watcher poll with a fire-and-forget retry mark on a stale Orca handle
+window=fm-live-draft stale_handle=term_9334955c-982f-41cb-904d-e804334adf2b replacement_handle=term_1c76a936-2227-4869-b33d-f9ff035165af mark=001.msg
+== watcher output (10s of real polling)
+Terminated                 sleep "$POLL"
+watcher exit=124

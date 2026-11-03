@@ -1,0 +1,17 @@
+== scenario 3/empty: stale handle ringed on its single live replacement (empty composer)
+worktree=fm-live-draft stale_handle=term_8fb4e3f2-fefc-4c40-bea2-7a92e96723db replacement_handle=term_ef66e145-cd70-4ead-91d4-a290f69dc55b
+fm-send rc=0
+durable record=/tmp/oc1/fmhome/state/draft2.inbox/001.msg
+retry-mark(ordinary record, watcher-owned)=(absent)
+ring message: fm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /tmp/oc1/fmhome/state/draft2.inbox/001.msg and the watcher will re-ring
+== replacement pane log
+: Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 'draft2.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/.
+== replacement pane tail
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ > : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 'draft2.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/. │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+submitted
+╭────╮
+│ >  │
+╰────╯

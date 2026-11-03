@@ -1,0 +1,11 @@
+== scenario: text accepted into the live pane, then Enter fails (pane exited during settle)
+worktree=fm-live-enterfail handle=term_d3a30bc1-0e9f-4d86-9b8d-2b016adb9f4f message=/quit agent_mode=exit-pending-hard
+fm-send rc=3
+== text accepted into the pane (agent recorded, never submitted)
+/quit
+== submitted lines (must be empty)
+(none)
+== pane state after the failed Enter
+status=exited tail=[]
+== orca rejects Enter on the exited pane
+False terminal_not_writable

@@ -1,0 +1,17 @@
+== scenario: typed send to a stale recorded Orca handle resolves the one live replacement
+worktree=fm-live-st1 stale_handle=term_155da420-6510-4eb0-aca9-cee4096d4cdd recorded_window=fm-live-st1 replacement_handle=term_17247df9-c522-4aea-b1d1-f295b9f96407
+== live terminal inventory for the recorded window after the restart
+[('term_17247df9-c522-4aea-b1d1-f295b9f96407', True, True, False)]
+== orca rejects the recorded handle
+{
+  "id": "f9f7e02c-bd4f-4f2b-8e7c-be56fba8bc52",
+  "ok": false,
+  "error": {
+    "code": "terminal_not_writable",
+    "message": "terminal_not_writable"
+  },
+  "_meta": {
+    "runtimeId": "a77bcb2b-e517-405c-b66f-e5e6a4890a83"
+  }
+}
+send-to-stale rc=1

@@ -1,0 +1,4 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/oc1/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: blocked on a prompt: Claude background-task exit picker
+fm-send: submission to term_d6d41eb3-a356-4dc2-ac11-17c2c8d36453 is unconfirmed because Enter changed terminal endpoints; do not retype or blindly resend - inspect the replacement pane for the recorded worktree in Orca's UI before deciding whether to resend

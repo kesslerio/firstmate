@@ -1,0 +1,17 @@
+== scenario 3/before: stale handle ringed on its single live replacement (before composer)
+worktree=fm-live-draft stale_handle=term_4ce6100f-cdaf-4698-9e02-3e5b86ac88ba replacement_handle=term_63700586-e7fb-4c00-9261-ba32771ddcb5
+fm-send rc=0
+durable record=/tmp/oc1/fmhome/state/draft.inbox/001.msg
+retry-mark(ordinary record, watcher-owned)=(absent)
+ring message: fm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /tmp/oc1/fmhome/state/draft.inbox/001.msg and the watcher will re-ring
+== replacement pane log
+(none)
+== replacement pane tail
+│ > user draft - do not subm │
+╰────────────────────────────╯
+╭─────────────────────────────╮
+│ > user draft - do not submi │
+╰─────────────────────────────╯
+╭──────────────────────────────╮
+│ > user draft - do not submit │
+╰──────────────────────────────╯

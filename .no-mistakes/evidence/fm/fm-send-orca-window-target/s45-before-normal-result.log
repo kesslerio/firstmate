@@ -1,0 +1,16 @@
+== scenario: hand restart before typing
+worktree=fm-live-restart stale_handle=term_c8a967b3-ceea-4429-a44e-81bb07fffcfb replacement_handle=term_17aebd16-d6eb-466a-b2d2-d3f41b303343 replacement_mode=normal
+fm-send rc=0
+== replacement pane log
+/status
+== replacement pane tail
+╰──────────╯
+╭───────────╮
+│ > /status │
+╰───────────╯
+submitted
+╭────╮
+│ >  │
+╰────╯
+== stale pane log
+(none)
