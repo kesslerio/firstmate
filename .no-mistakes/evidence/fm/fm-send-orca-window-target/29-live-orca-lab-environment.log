@@ -1,0 +1,14 @@
+== Live Orca lab for this test phase (head 78d2d709) ==
+host: Linux 7.3.1 x86_64 (zeppola)
+product under test: firstmate CLI bin/fm-send.sh from the run worktree, driven against a REAL Orca runtime
+orca CLI: ~/.local/bin/orca 1.4.232
+runtime: `orca serve --port 6977 --no-pairing` under a disposable HOME (fresh orcad-server, real PTY terminals)
+lab FM_HOME: <tmp>/fmhome minted with bin/fm-lab-home.sh create (marked lab home)
+worktrees: disposable git repo + orca worktrees fm-t1..fm-t4 under <tmp>/orca/workspaces/repo/
+peer inside each PTY: a disposable agent-TUI fixture rendering a transcript plus a bordered composer box
+  (real terminal grid; the fixture stands in for the agent peer, not for the product)
+visual surface: headless `orca serve` has no desktop/web client, so no screenshots exist; the rendered
+  terminal grid read back through `orca terminal read --screen` is the reviewer-visible product surface
+  captured in every log below.
+teardown: every lab terminal closed, serve killed, the whole <tmp> lab removed in the same evidence turn;
+  the operator's own orca daemon (port 6768) was never touched.

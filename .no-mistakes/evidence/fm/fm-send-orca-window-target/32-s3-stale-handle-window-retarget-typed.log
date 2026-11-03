@@ -1,0 +1,21 @@
+== S3: typed send to a task whose recorded Orca handle went stale; retarget through the recorded window= alias to the single live pane ==
+recorded (closed) terminal: term_62c83630-ba66-48c3-a0ad-fac08fb465cd
+live pane in worktree name:fm-t3: term_df86cbba-6c2a-436b-b6c7-209d170d3b9f
+-- composer before (rendered screen) --
+agent transcript:
+  (no turns yet)
+╭────────────────────────────────────────────────────────────────────╮
+│                                                                    │
+╰────────────────────────────────────────────────────────────────────╯
+-- fm-send t3 '/status' (parser-native slash command: typed plane) --
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t3.h4N2Xi/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send exit=0
+-- composer after (typed once, one accepted Enter, empty read proves delivery) --
+agent transcript:
+  you asked: /status
+╭────────────────────────────────────────────────────────────────────╮
+│                                                                    │
+╰────────────────────────────────────────────────────────────────────╯
+-- metadata --
+UNCHANGED

@@ -1,0 +1,62 @@
+== S2: inbox ring to a task whose recorded Orca handle is stale; the single live replacement pane holds a FOREIGN draft ==
+recorded (closed) terminal: term_00fee2ff-d12e-42ca-896f-210b716cd849
+live replacement pane: term_2753a0ef-e994-419f-87d9-b2cdeaeed331
+-- draft read: orca 1.4.232 publishes no result.terminal.draft, so ownership falls back to the rendered screen (exit 1 = no structured draft) --
+-- composer before the ring (rendered screen) --
+agent transcript:
+  (no turns yet)
+╭────────────────────────────────────────────────────────────────────╮
+│ please rebuild the auth service                                    │
+╰────────────────────────────────────────────────────────────────────╯
+-- fm-send t2 'please check the build' --
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t3.h4N2Xi/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell did not reach term_00fee2ff-d12e-42ca-896f-210b716cd849; the steer is durably recorded at /tmp/fm-orca-t3.h4N2Xi/fmhome/state/t2.inbox/001.msg and the watcher will re-ring
+fm-send exit=0
+-- composer after the ring (foreign draft untouched, no Enter) --
+agent transcript:
+  (no turns yet)
+╭────────────────────────────────────────────────────────────────────╮
+│ please rebuild the auth service                                    │
+╰────────────────────────────────────────────────────────────────────╯
+-- durable record (not acknowledged: ring deferred) --
+001.msg
+handled
+-- retry mark kept for the watcher --
+001.msg
+handled
+t2.meta
+t2.inbox
+-- metadata --
+UNCHANGED
+
+== S2b: same deferred ring for a FIRE-AND-FORGET record - the watcher retry mark must be kept ==
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t3.h4N2Xi/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: --fire-and-forget delivery id must be 16 lowercase hex characters
+fm-send exit=1
+-- inbox dir contents (retry mark) --
+.
+..
+001.msg
+handled
+-- .retry-ring names the record owed a re-ring --
+(no retry mark)
+-- composer still holds the untouched foreign draft --
+agent transcript:
+  (no turns yet)
+╭────────────────────────────────────────────────────────────────────╮
+│ please rebuild the auth service                                    │
+╰────────────────────────────────────────────────────────────────────╯
+-- retry with a well-formed 16-hex delivery id --
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t3.h4N2Xi/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: --fire-and-forget requires a recorded secondmate task selector
+fm-send exit=1
+-- inbox dir contents (retry mark) --
+.
+..
+001.msg
+handled
+-- .retry-ring names the record owed a re-ring --
+(no retry mark)

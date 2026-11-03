@@ -1,0 +1,39 @@
+== S1: inbox ring to a HEALTHY Orca pane whose rendered composer already holds this ring's own pending doorbell (real orca 1.4.232, Linux headless serve) ==
+terminal: term_7c995b4c-e49a-49ff-b8fa-6a3cbca39e4b
+-- composer before the ring (rendered screen via orca terminal read --screen) --
+agent transcript:
+  (no turns yet)
+╭────────────────────────────────────────────────────────────────────╮
+│ : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in yo │
+│ ur 't1.inbox' steering inbox, read and act on each in numeric orde │
+│ r, then mv each into its handled/.                                 │
+╰────────────────────────────────────────────────────────────────────╯
+-- fm-send t1 'please check the build' --
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t3.h4N2Xi/fmhome
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  4 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+fm-send exit=0
+-- composer after the ring --
+agent transcript:
+  you asked: : Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 't1.inbox' steering inbox, read and ac
+t on each in numeric order, then mv each into its handled/.
+╭────────────────────────────────────────────────────────────────────╮
+│                                                                    │
+╰────────────────────────────────────────────────────────────────────╯
+-- durable record --
+001.msg
+handled
+-- metadata unchanged --
+backend=orca
+window=fm-t1
+worktree=fm-t1
+project=repo
+endpoint_task_id=t1
+terminal=term_7c995b4c-e49a-49ff-b8fa-6a3cbca39e4b
+orca_worktree_id=bbe78d17-9956-4c29-9766-15c4d7c5177a::/tmp/fm-orca-t3.h4N2Xi/orca/workspaces/repo/fm-t1
+harness=claude

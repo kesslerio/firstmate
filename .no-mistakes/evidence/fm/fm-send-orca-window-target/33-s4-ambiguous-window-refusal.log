@@ -1,0 +1,27 @@
+== S4: typed send to a task whose window= alias selects TWO live panes (ambiguous) ==
+-- live panes in worktree name:fm-t4 --
+term_67e9d8a2-a0b6-42e8-8966-e6d61592f6c4 writable=true
+term_41fefc85-6c52-4442-a6c4-d26965324198 writable=true
+-- fm-send t4 '/status' --
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-t3.h4N2Xi/fmhome
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not sent to term_00fee2ff-d12e-42ca-896f-210b716cd849 (orca send failed; tried meta=/tmp/fm-orca-t3.h4N2Xi/fmhome/state/t4.meta; backend=from-meta)
+fm-send exit=1
+-- neither pane received input --
+pane term_67e9d8a2-a0b6-42e8-8966-e6d61592f6c4:
+orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~/orca/workspaces/repo/fm-t4$
+pane term_41fefc85-6c52-4442-a6c4-d26965324198:
+agent transcript:
+  (no turns yet)
+╭────────────────────────────────────────────────────────────────────╮
+│                                                                    │
+╰────────────────────────────────────────────────────────────────────╯
+-- metadata --
+backend=orca
+window=fm-t4
+worktree=fm-t4
+project=repo
+endpoint_task_id=t4
+terminal=term_00fee2ff-d12e-42ca-896f-210b716cd849
+orca_worktree_id=bbe78d17-9956-4c29-9766-15c4d7c5177a::/tmp/fm-orca-t3.h4N2Xi/orca/workspaces/repo/fm-t4
+harness=claude
