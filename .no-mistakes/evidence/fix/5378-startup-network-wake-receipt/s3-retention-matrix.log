@@ -1,0 +1,42 @@
+--- matrix before prune ---
+1000.1.1 1100.1.1 1200.1.1 500.1.1 550.1.1 600.1.1 650.1.1 675.1.1 700.1.1 800.1.1 not-a-generation 
+prune rc=0; after:
+1000.1.1 1100.1.1 1200.1.1 500.1.1 800.1.1 not-a-generation 
+PASS  prune succeeded
+PASS  live obligation 500.1.1 survived (current/queued/look-back)
+PASS  live obligation 800.1.1 survived (current/queued/look-back)
+PASS  live obligation 1000.1.1 survived (current/queued/look-back)
+PASS  live obligation 1100.1.1 survived (current/queued/look-back)
+PASS  live obligation 1200.1.1 survived (current/queued/look-back)
+PASS  retired generation 600.1.1 removed whatever its record shape
+PASS  retired generation 700.1.1 removed whatever its record shape
+PASS  retired generation 650.1.1 removed whatever its record shape
+PASS  retired generation 550.1.1 removed whatever its record shape
+PASS  symlinked entry's link is gone
+PASS  symlink target directory survived
+PASS  symlink target contents survived
+PASS  non-generation name is untouched
+PASS  pruned generation's receipt is gone
+PASS  current generation keeps its receipt
+PASS  queued generation keeps its receipt
+PASS  queued wake row is not consumed
+--- report reads the retained generation ---
+completed off the startup path in 0s: GitHub authentication.
+ACTIONABLE_1000.1.1
+These ran AFTER the sections above were composed, so re-read any record a line here names.
+NETWORK_CHECKS: requested generation has no valid retained completion.
+PASS  report --generation reads a live retained completion
+PASS  report --generation printed that generation's report
+PASS  report --generation refuses a pruned generation
+PASS  the refusal names the missing completion
+--- adversarial: a symlinked receipt root is never followed ---
+prune with symlinked receipt root rc=0
+PASS  prune succeeded with a symlinked receipt root
+PASS  the retired directory is still removed
+PASS  the receipt root symlink is untouched
+PASS  no receipt was deleted through the symlink
+--- adversarial: a symlinked results root is never followed ---
+PASS  prune declined a symlinked results root without failing
+PASS  the results-root symlink is untouched
+PASS  no generation was deleted through the symlinked root
+scenario result: PASS

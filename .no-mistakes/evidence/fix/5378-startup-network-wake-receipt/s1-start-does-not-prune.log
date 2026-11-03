@@ -1,0 +1,37 @@
+seeded 30 settled generations
+--- start (worker stalled 3s in its sweep) ---
+start rc=0 elapsed=73ms
+status after start:
+state=running
+pid=1705899
+started=1793665095
+locked=0
+phases=probe
+generation=1793665095.1705810.1704309
+lock_pid=
+worker pid=1705899 alive=yes
+retained dirs immediately after start: 30
+retained-state paths opened by start/worker (record reads):
+PASS  start returned successfully
+PASS  start returned before the stalled worker finished (<2500ms)
+PASS  start deleted nothing: all 30 retained generations still present
+PASS  start opened no per-generation record or receipt
+PASS  start handed the run to a live detached worker
+--- wait for worker ---
+final state: done
+retained dirs after worker: 4
+1027.1.1
+1028.1.1
+1029.1.1
+1793665095.1705810.1704309
+PASS  worker pruned the 27 superseded generations
+PASS  look-back generation 1027.1.1 survived the worker's pass
+PASS  look-back generation 1028.1.1 survived the worker's pass
+PASS  look-back generation 1029.1.1 survived the worker's pass
+PASS  the worker's own completion is retained
+PASS  the pruned generation's receipt is gone
+--- latency with an empty home vs 300 retained generations (start only) ---
+start latency: empty=87ms, 300 retained=81ms
+PASS  start latency does not grow with retained state (<2500ms)
+PASS  start opened no retained record even with 300 generations (zero opens during start)
+scenario result: PASS

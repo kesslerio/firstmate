@@ -1,0 +1,6 @@
+prune rc=0; wake-queue reads in one pass over 67 entries: 1
+PASS  prune succeeded
+PASS  the wake queue was read exactly once for the whole pass
+PASS  the queued generation survived
+PASS  the queued row is still queued
+scenario result: PASS

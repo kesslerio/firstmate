@@ -1,0 +1,13 @@
+seeded 3 old settled + 70 newer incomplete; before: 73 directories
+pass 1 rc=0 remaining=9: 2061.1.1 2062.1.1 2063.1.1 2064.1.1 2065.1.1 2066.1.1 2067.1.1 2068.1.1 2069.1.1 
+PASS  pass 1 succeeded
+PASS  older settled generation 100.1.1 was deleted on the first pass (no starvation)
+PASS  older settled generation 200.1.1 was deleted on the first pass (no starvation)
+PASS  older settled generation 300.1.1 was deleted on the first pass (no starvation)
+PASS  pass 1 deleted the three old entries plus 61 backlog entries
+pass 2 rc=0 remaining=3: 2067.1.1 2068.1.1 2069.1.1 
+PASS  pass 2 drained the backlog remainder
+PASS  look-back name 2067.1.1 survived
+PASS  look-back name 2068.1.1 survived
+PASS  look-back name 2069.1.1 survived
+scenario result: PASS

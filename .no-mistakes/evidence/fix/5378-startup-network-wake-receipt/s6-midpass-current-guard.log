@@ -1,0 +1,11 @@
+before: 100.1.1 101.1.1 102.1.1 103.1.1 104.1.1 105.1.1 106.1.1 107.1.1 108.1.1 109.1.1 110.1.1 ; status present: no
+prune rc=0; after: 105.1.1 108.1.1 109.1.1 110.1.1 
+status now: state=done pid=0 started=1 locked=0 phases=probe generation=105.1.1 report_published=1 
+PASS  the pass completed
+PASS  the generation that became current mid-pass was not deleted
+PASS  the newest three names survive
+PASS  the look-back window keeps 109.1.1
+PASS  the look-back window keeps 110.1.1
+PASS  every other superseded generation was retired
+PASS  the pass did not stop early at the new current
+scenario result: PASS

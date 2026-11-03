@@ -1,0 +1,25 @@
+--- real start with the real bootstrap (no delay injection) ---
+start rc=0 elapsed=67ms; retained immediately after start: 20
+final state=done current=1793665161.1843454.1841959 retained=5
+1000.1.1 1017.1.1 1018.1.1 1019.1.1 1793665161.1843454.1841959 
+PASS  start returned before the worker finished (retained state intact for the worker)
+PASS  the real worker finished cleanly
+PASS  the worker retired the superseded generations down to the bound
+PASS  the worker's own completion is retained
+PASS  look-back generation 1017.1.1 survived the real run
+PASS  look-back generation 1018.1.1 survived the real run
+PASS  look-back generation 1019.1.1 survived the real run
+PASS  a queued generation survived the real run
+PASS  the queued wake row survived the real run
+PASS  a retired generation's receipt went with it
+PASS  report shows the finished retained result
+--- harvest and report on the startup path never scan or prune ---
+harvest rc=0 report rc=0 retained=30
+completed off the startup path in -1s: GitHub authentication.
+(silent - no problems found)
+completed off the startup path in 0s: GitHub authentication.
+ACTIONABLE_100.1.1
+PASS  harvest succeeded
+PASS  harvest left every retained generation untouched
+PASS  report left every retained generation untouched
+scenario result: PASS

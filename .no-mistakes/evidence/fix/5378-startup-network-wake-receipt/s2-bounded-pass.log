@@ -1,0 +1,23 @@
+seeded 67 settled generations, no current generation
+pass 1 rc=0 remaining=3
+1064.1.1 1065.1.1 1066.1.1 
+record opens during pass 1:
+PASS  pass 1 succeeded
+PASS  pass 1 deleted exactly the 64-entry budget
+PASS  pass 1 deleted at the old end (1000..1063 gone)
+PASS  pass 1 left the newest name 1066 untouched
+PASS  pass 1 opened no per-generation record
+PASS  a pruned generation's receipt went with it
+PASS  a surviving generation keeps its receipt
+pass 2 rc=0 remaining=3
+PASS  pass 2 succeeded
+PASS  the leftover set is exactly the three-name look-back window
+PASS  the window keeps the three newest names
+PASS  a third pass changes nothing because those names are protected
+PASS  protected entries are not even opened
+--- adversarial: a receipt the pass cannot remove defers the deletion, and a later pass retries ---
+prune with locked receipt root rc=0 retained=5
+PASS  an unremovable receipt does not abort the pass
+PASS  deferred entries stay for a retryable later pass
+PASS  the retried pass removes the deferred generations once the receipt is removable
+scenario result: PASS
