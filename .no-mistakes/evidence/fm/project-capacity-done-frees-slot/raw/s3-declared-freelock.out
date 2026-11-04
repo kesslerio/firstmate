@@ -1,0 +1,2 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.oRK9Cn
+spawned task-a harness=codex kind=scout window=firstmate:fm-task-a worktree=/tmp/fm-lab.oRK9Cn/wt-task-a

@@ -1,0 +1,27 @@
+=== pane fm-task-b ===
+  Folder access
+  ~/.treehouse/heavysuite-181c36/1/heavysuite
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the
+  repository root:
+  /tmp/fm-lab.oRK9Cn/heavysuite
+  Trust this folder? Codex can read, edit, and run files here, subject to your
+  permission settings. Folder settings can run code automatically, even
+  without a model request. Continue only if you trust these files. Your trust
+=== pane fm-task-c ===
+  Folder access
+  ~/.treehouse/heavysuite-181c36/2/heavysuite
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the
+  repository root:
+  /tmp/fm-lab.oRK9Cn/heavysuite
+  Trust this folder? Codex can read, edit, and run files here, subject to your
+  permission settings. Folder settings can run code automatically, even
+  without a model request. Continue only if you trust these files. Your trust
+=== pane fm-task-d ===
+  Folder access
+  ~/.treehouse/heavysuite-181c36/3/heavysuite
+  Note: You’re in a subdirectory of a Git project. Trusting will apply to the
+  repository root:
+  /tmp/fm-lab.oRK9Cn/heavysuite
+  Trust this folder? Codex can read, edit, and run files here, subject to your
+  permission settings. Folder settings can run code automatically, even
+  without a model request. Continue only if you trust these files. Your trust

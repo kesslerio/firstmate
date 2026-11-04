@@ -1,0 +1,4 @@
+firstmate:primary pid=1858751 cmd=bash
+firstmate:fm-task-b pid=1870048 cmd=codex
+firstmate:fm-task-c pid=1890845 cmd=codex
+firstmate:fm-task-d pid=1915261 cmd=codex

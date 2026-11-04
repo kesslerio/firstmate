@@ -1,0 +1,2 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.oRK9Cn
+error: another Treehouse slot allocation or return is in progress for /tmp/fm-lab.oRK9Cn/heavysuite; refusing to race it

@@ -1,0 +1,103 @@
+# lab home: /tmp/fm-lab.oRK9Cn (marked disposable lab away from the operator's FM_HOME)
+# project: /tmp/fm-lab.oRK9Cn/heavysuite (origin /tmp/fm-lab.oRK9Cn/heavysuite.origin.git, clone dir name heavysuite)
+
+## config/project-capacity at end of run
+heavysuite 3
+
+## state/task-a.meta
+window=firstmate:fm-task-a
+endpoint_task_id=task-a
+worktree=/tmp/fm-lab.oRK9Cn/wt-task-a
+project=/tmp/fm-lab.oRK9Cn/heavysuite
+harness=codex
+approval_mode=bypass
+kind=scout
+tasktmp=/tmp/fm-task-a
+model=default
+effort=default
+spawn_gen=s1793772435.1844796.12545
+
+## state/task-a.status
+working [at=1791700200]: previous incarnation active
+working [at=1793772435]: spawn admitted
+
+## state/task-b.meta
+window=firstmate:fm-task-b
+endpoint_task_id=task-b
+worktree=~/.treehouse/heavysuite-181c36/1/heavysuite
+project=/tmp/fm-lab.oRK9Cn/heavysuite
+harness=codex
+approval_mode=bypass
+kind=scout
+tasktmp=/tmp/fm-task-b
+model=default
+effort=default
+spawn_gen=s1793772481.1868148.24426
+
+## state/task-b.status
+(no status file)
+
+## state/task-c.meta
+window=firstmate:fm-task-c
+endpoint_task_id=task-c
+worktree=~/.treehouse/heavysuite-181c36/2/heavysuite
+project=/tmp/fm-lab.oRK9Cn/heavysuite
+harness=codex
+approval_mode=bypass
+kind=scout
+tasktmp=/tmp/fm-task-c
+model=default
+effort=default
+spawn_gen=s1793772504.1888435.10584
+
+## state/task-c.status
+working [at=1793772504]: spawn admitted
+done [at=1793772600]: scout finished
+
+## state/task-d.meta
+window=firstmate:fm-task-d
+endpoint_task_id=task-d
+worktree=~/.treehouse/heavysuite-181c36/3/heavysuite
+project=/tmp/fm-lab.oRK9Cn/heavysuite
+harness=codex
+approval_mode=bypass
+kind=scout
+tasktmp=/tmp/fm-task-d
+model=default
+effort=default
+spawn_gen=s1793772530.1913922.24379
+
+## state/task-d.status
+working [at=1793772530]: spawn admitted
+
+## capacity reservations
+(none)
+
+## project lock dirs (must be absent when no spawn is running)
+(none)
+
+## backlog rows
+task:
+  id: task-a
+  title: item for task-a
+  state: in_flight
+  blocked: no
+
+task:
+  id: task-b
+  title: item for task-b
+  state: in_flight
+  blocked: no
+
+task:
+  id: task-c
+  title: item for task-c
+  state: in_flight
+  blocked: no
+
+task:
+  id: task-d
+  title: item for task-d
+  state: in_flight
+  blocked: no
+

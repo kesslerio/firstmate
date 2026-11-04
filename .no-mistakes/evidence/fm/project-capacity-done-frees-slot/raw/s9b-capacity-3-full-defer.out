@@ -1,0 +1,2 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.oRK9Cn
+deferred: project heavysuite admits 3 worker(s) at once on this machine (/tmp/fm-lab.oRK9Cn/config/project-capacity) and 3 already hold a place (task-a, task-b, task-c); task task-d was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR, reports done as a scout or local-only ship, or is cleaned up
