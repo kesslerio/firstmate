@@ -1,67 +1,46 @@
-# Live validation — session lock vs. a denied `ps` (issue 5238)
+# Live validation: ps-denied session-lock identity (fix/5238-session-lock-ps-denial @ 6060cdf0)
 
-Change under test: `fix/5238-session-lock-ps-denial`
-Head `bb17a785892dbe8e5ee8e5c95c293b0764d24364`, base `095db3bc7e57b4d50b7e2ac66f9671ba66be692b`.
+Host: Linux (zeppola) 7.3.1. Everything below ran in a disposable lab home minted with
+`bin/fm-lab-home.sh create` and removed in the same turn; no operator fleet state touched.
 
-The invariant the change must keep: a **live or unreadable lock owner blocks reclaim on
-every supported platform**, while **proven-dead, reused non-harness, malformed and
-zero-valued owners stay reclaimable** — and a host whose `ps` binary refuses to execute
-no longer wedges the home read-only.
+## How the product was driven
 
-## Environment
+`ps` denial is produced exactly as an EDR policy presents it: a `ps` on PATH that prints
+"Operation not permitted" and exits 126 for every call, including `ps -V` (the shape
+`bin/fm-session-lock-lib.sh` requires before it routes identity off ps). The process tree,
+the `/proc` provider, and the CLI are real:
 
-* Host: Linux (x86_64). `python3`, `git`, `jq` present; the real `bin/fm-lock.sh`,
-  `bin/fm-inbox.sh` and the hook scripts were executed from the change's worktree.
-* Disposable lab: `mktemp -d` home (never the operator home), deleted at the end of the
-  run. Every scenario used a private `FM_HOME`, `PATH`, `TMPDIR`.
-* Fixtures, and only where this host cannot supply the real surface:
-  * a **verified-harness process**: a `bash` symlink named `claude`, so the kernel's exec
-    name — the fact `ps -o comm=` and `/proc/<pid>/stat` report — is `claude`;
-  * a **denied `ps`**: a `ps` on `PATH` that exits 126 with "Operation not permitted",
-    the refused-exec status (EDR-style policy);
-  * the repo's documented **Cygwin process-table fixture** (`uname` → `MINGW64`,
-    `ps -W` fed by `FM_TEST_WIN_TABLE`, `-o` rejected, `FM_TEST_WIN_PS_FAIL`) for the
-    Windows-tagged owner cases, because there is no Cygwin userspace on this host;
-  * a **provider root** (`FM_PROC_ROOT_OVERRIDE`, the override the repo's other `/proc`
-    readers already honor) of real `/proc` symlinks, used only to make one live owner's
-    identity unreadable while the session's own identity stays readable.
+- harness = a copy of bash at `<lab>/bin/claude` (kernel comm `claude`)
+- Cursor harness = copy of bash at `<lab>~/.local/share/cursor-agent/versions/test/agent`,
+  launched through the legacy alias symlink `<lab>~/.local/bin/agent` (comm `agent`,
+  argv0 carries the non-ASCII path)
+- CLI = `bin/fm-lock.sh` from this worktree, `FM_HOME=<lab>`
 
-## Scenarios (all driven through the real public executables)
+Driver: `live-drive.sh` (this directory). Transcript: `live-drive-transcript.log`.
+
+## Scenarios and results
 
 | # | Scenario | Result |
 |---|----------|--------|
-| 1 | `ps` denied: a session acquires its own home lock instead of wedging read-only | pass |
-| 2 | `ps` denied: a second session refuses a lock held by a live harness owner, lock untouched, and `fm-lock.sh status` reads `held` | pass |
-| 3 | `ps` denied: a lock left by a dead owner is reclaimed | pass |
-| 4 | Adversarial: a live owner whose identity cannot be read is refused; the same live owner is reclaimed when readable; a dead owner is reclaimed under the same unreadable provider | pass |
-| 5 | Zero-form and malformed records (`''`, whitespace, `0`, `00`, `000`, `0000`, `not-a-pid`, `win:`, `win:7abc`, 21-digit) stay reclaimable | pass |
-| 6 | A live numeric harness holder reads `held` on `fm-lock.sh status` and `lock.state=held / live_harness=true` on `fm-inbox.sh ready`; a live non-harness stays fail-closed | pass |
-| 7 | Windows-tagged owner: live tagged harness and unreadable Windows table refuse takeover; tagged pid gone, reused by a non-harness, or malformed is reclaimed | pass |
-| 8 | Stop auto-arm hook: reclaims a readable non-harness owner (with and without `ps`), stays inert for an unreadable live owner | pass |
-| 9 | Cursor turn-end guard (the second moved call site): same two arms | pass |
+| S1 | A primary acquires the lock while ps is denied | PASS — `lock acquired: harness pid N`, exit 0, `state/.lock` = N |
+| S2 | A second primary cannot take a live owner's lock while ps is denied | PASS — refused with `another live firstmate session holds the lock (pid OWNER)`, exit 1, lock unchanged |
+| S3 | A dead owner's lock is still reclaimable while ps is denied | PASS — reclaim succeeded, exit 0, `state/.lock` rewritten to the new pid |
+| S4 | `fm-lock.sh status` agrees with the lock verdict while ps is denied | PASS — `held by live harness pid N` while alive, `stale` after the owner exits |
+| S5 | A live Cursor owner behind a non-ASCII (`José`) alias path keeps its lock | PASS — ps and /proc routes report byte-identical comm/args, `José` preserved, harness verdict `alive` on both routes, contender refused, lock unchanged |
 
-`results.tsv` holds every individual assertion (72 checks, all pass).
+## What could not be driven here
 
-## Pre-fix reproductions (same fixtures, that commit's own executable)
+`bin/fm-procinfo.py` is the Darwin-only identity provider (sysctl KERN_PROCARGS2 /
+KERN_PROC_PID). This host is Linux, so only the `/proc` provider could be exercised live; the
+suite's own `fm-procinfo.py` cases report "macOS-only, skipped" here as well. Re-running
+`tests/fm-session-lock-ps-denied.test.sh` (its e2e blocked-ps case) on a macOS host exercises
+the sysctl route.
 
-* `095db3bc` (base): `ps` denied, own-lock acquisition →
-  `error: cannot locate harness process in ancestry`, no lock written (scenario 1)
-  — this is the read-only wedge the change removes.
-* `a3a31fca`: `state/.lock` of `00`, `000`, `0000` → `another live firstmate session
-  holds the lock (pid 00 …)`, lock kept (scenario 5).
-* `1e81e69d`: a genuinely live, verified numeric harness holder →
-  `lock: stale (pid N dead or not a harness)` and `lock.state=unknown /
-  live_harness=false` (scenario 6); `3c1e4684` (fork point) reports `held` for the same
-  holder, so the correction restores the fork-point behaviour.
+## Focused suites
 
-## Targeted suites
-
-* `tests/fm-session-lock-ps-denied.test.sh` — ALL PASS.
-* `tests/fm-inbox.test.sh` — PASS.
-* `tests/fm-session-lock-ancestry.test.sh` — one failing assertion,
-  `the pty-host was not reparented to init after the daemon ended`. It is **pre-existing
-  and environmental**: the identical assertion fails at base `095db3bc`
-  (`suite-fm-session-lock-ancestry-BASE-095db3bc.out`), because orphans on this host
-  reparent to a nested user `systemd` (pid 1310, a child subreaper) instead of pid 1
-  (`logs/pty-host-reparent-environment.txt`). Nothing in this change touches process
-  reparenting.
+- `tests/fm-session-lock-ps-denied.test.sh` — ALL PASS (`suite-ps-denied.log`)
+- `tests/fm-session-lock-windows-consumers.test.sh` — pass (`suite-windows-consumers.log`)
+- `tests/fm-inbox.test.sh` — pass (`suite-inbox.log`)
+- `tests/fm-session-lock-ancestry.test.sh` — 21 ok, 1 pre-existing failure
+  `the pty-host was not reparented to init after the daemon ended` (pid-1 reparent assertion,
+  already reported in earlier rounds; unrelated to this change) (`suite-ancestry.log`)

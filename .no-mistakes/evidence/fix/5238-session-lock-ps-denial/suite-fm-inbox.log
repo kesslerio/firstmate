@@ -14,7 +14,3 @@ ok - readiness says unknown (or not-receivable) instead of inferring liveness fr
 ok - empty bodies and unsafe request ids are refused
 ok - a note body that opens with a double dash is queued as text
 ok - drain --ack still moves the note to handled
-
-real	1m0.387s
-user	0m6.431s
-sys	0m6.389s

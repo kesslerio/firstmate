@@ -1,0 +1,56 @@
+=== host: Linux 7.3.1; lab: /tmp/fm-lab.m3OoHG
+=== denied ps probe:
+    ps -o comm= -> rc=126
+    ps -V -> rc=126
+
+=== S1: a primary acquires the session lock while ps is denied
+harness-pid=961880
+lock acquired: harness pid 961880
+cli-rc=0
+lock-line1=961880
+PASS S1 the CLI reported acquisition
+PASS S1 the CLI exited 0
+PASS S1 state/.lock records the live harness pid 961880
+PASS S1 no ancestry failure on the denied-ps host
+
+=== S2/S3/S4: live foreign owner refused, dead owner reclaimable, status agrees
+    owner harness pid=962021 : lock acquired: harness pid 962021 acquire-rc=0 
+    S4 live status (denied ps): lock: held by live harness pid 962021
+PASS S4 a live harness holder reads held
+error: another live firstmate session holds the lock (pid 962021); operate read-only until resolved
+contender-rc=1
+lock-line1=962021
+PASS S2 the contender was refused, naming the live owner
+PASS S2 the contender exited 1
+PASS S2 the takeover attempt left the owner pid 962021 in state/.lock
+Terminated                 env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_PID -u CLAUDE_CONFIG_DIR -u NO_MISTAKES_GATE -u FM_GATE_REFUSE_BYPASS -u FM_ROOT_OVERRIDE -u FM_STATE_OVERRIDE -u FM_DATA_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_PROJECTS_OVERRIDE FM_HOME="$LAB" FM_LAB="$LAB" FM_WT="$WT" FM_TAG="$2" PATH="$DENIED_PATH" "$1" --norc --noprofile -c "$3"
+    owner 962021 stopped
+    S4 dead status (denied ps): lock: stale (pid 962021 dead or not a harness)
+PASS S4 a dead holder reads stale (no permanent read-only wedge)
+harness-pid=962388
+lock acquired: harness pid 962388
+cli-rc=0
+lock-line1=962388
+PASS S3 the stale lock was reclaimed by the new primary
+PASS S3 the reclaiming CLI exited 0
+PASS S3 state/.lock was rewritten to the new harness pid 962388
+
+=== S5: a live Cursor owner behind a non-ASCII alias path still blocks reclaim
+    cursor alias harness pid=962676 : lock acquired: harness pid 962676 acquire-rc=0 
+    alias path: /tmp/fm-lab.m3OoHG/Users/José/.local/bin/agent
+    kernel comm: agent
+    ps route   : comm=[agent] args=[/tmp/fm-lab.m3OoHG/Users/José/.local/bin/agent --norc --noprofile -c  printf "%s" $$ > "$FM_LAB/$FM_TAG.pid" cd "$FM_WT" || exit 9 bin/fm-lock.sh > "$FM_LAB/$FM_TAG.acquire" 2>&1 printf "acquire-rc=%s\n" "$?" >> "$FM_LAB/$FM_TAG.acquire" : > "$FM_LAB/$FM_TAG.ready" sleep 300 : ]
+    /proc route: comm=[agent] args=[/tmp/fm-lab.m3OoHG/Users/José/.local/bin/agent --norc --noprofile -c  printf "%s" $$ > "$FM_LAB/$FM_TAG.pid" cd "$FM_WT" || exit 9 bin/fm-lock.sh > "$FM_LAB/$FM_TAG.acquire" 2>&1 printf "acquire-rc=%s\n" "$?" >> "$FM_LAB/$FM_TAG.acquire" : > "$FM_LAB/$FM_TAG.ready" sleep 300 : ]
+PASS S5 comm is identical across the ps and /proc routes
+PASS S5 args are identical across the ps and /proc routes
+PASS S5 the /proc route preserved the UTF-8 bytes of the alias path
+    harness verdict with ps available: [alive]
+    harness verdict with ps denied   : [alive]
+error: another live firstmate session holds the lock (pid 962676); operate read-only until resolved
+contender-rc=1
+lock-line1=962676
+PASS S5 the contender was refused, naming the live Cursor owner
+PASS S5 state/.lock still records the Cursor owner pid 962676
+Terminated                 env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_PID -u CLAUDE_CONFIG_DIR -u NO_MISTAKES_GATE -u FM_GATE_REFUSE_BYPASS -u FM_ROOT_OVERRIDE -u FM_STATE_OVERRIDE -u FM_DATA_OVERRIDE -u FM_CONFIG_OVERRIDE -u FM_PROJECTS_OVERRIDE FM_HOME="$LAB" FM_LAB="$LAB" FM_WT="$WT" FM_TAG="$2" PATH="$DENIED_PATH" "$1" --norc --noprofile -c "$3"
+
+=== RESULT rc=0
