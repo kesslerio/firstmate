@@ -1,0 +1,44 @@
+
+In bin/backends/rex.sh line 1347:
+  local fields="state=$1" msg=${4:-} title=${5:-} progress=${6:-}
+        ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+
+
+In bin/backends/rex.sh line 1348:
+  [ -z "${3:-}" ] || fields="$fields:kind=$3"
+                     ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+                             ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+
+
+In bin/backends/rex.sh line 1349:
+  fields="$fields:app=$FM_BACKEND_REX_MARK_APP:id=$2"
+  ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+          ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+
+
+In bin/backends/rex.sh line 1353:
+        fields="$fields:progress=$progress"
+        ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+                ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+
+
+In bin/backends/rex.sh line 1358:
+      fields="$fields:title=$(printf '%s' "$title" | base64 | tr -d '\n')"
+      ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+              ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+
+
+In bin/backends/rex.sh line 1362:
+      fields="$fields:msg=$(printf '%s' "$msg" | base64 | tr -d '\n')"
+      ^----^ SC2178 (warning): Variable was used as an array but is now assigned a string.
+              ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+
+
+In bin/backends/rex.sh line 1365:
+  printf '\033]7501;%s\033\134' "$fields"
+                                 ^-----^ SC2128 (warning): Expanding an array without an index only gives the first element.
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2128 -- Expanding an array without an ind...
+  https://www.shellcheck.net/wiki/SC2178 -- Variable was used as an array but...
+rc=1
