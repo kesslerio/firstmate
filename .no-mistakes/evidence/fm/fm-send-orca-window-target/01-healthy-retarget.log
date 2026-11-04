@@ -1,0 +1,42 @@
+### scenario: healthy recorded Orca handle (real orca 1.4.232, lab runtime)
+$ ./bin/fm-send.sh s1 '/lab-one'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab/lab2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+rc=0
+--- submitted lines recorded by the peer:
+/lab-one
+--- meta diff:
+meta byte-identical
+
+### scenario: stale recorded handle retargets through window= (recorded handle closed, replacement live)
+recorded(stale)=term_f149d54e-ebfe-4fe8-910b-1fb508e0738f live replacement=term_f2d8f954-2aa8-4f7d-9241-6a58dd682327
+live in window: term_f2d8f954-2aa8-4f7d-9241-6a58dd682327 
+$ ./bin/fm-send.sh s2 '/lab-two'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab/lab2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+rc=0
+--- submitted lines recorded by the replacement peer:
+/lab-two
+--- meta diff:
+meta byte-identical
+
+### adversarial: ambiguous selector (two live panes in the recorded window)
+live in window: term_f7fd7a79-0ac6-4433-bfc8-0ca8cee20fd3 term_8322ff9c-2cc5-4b04-81ce-7a224fdb2aad 
+$ ./bin/fm-send.sh amb '/lab-amb'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab/lab2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not sent to term_f149d54e-ebfe-4fe8-910b-1fb508e0738f (orca send failed; tried meta=/tmp/fm-orca-lab/lab2/home/state/amb.meta; backend=from-meta)
+rc=1
+--- any text typed into amb1/amb2:
+(none)
+
+### adversarial: missing selector (recorded window name matches no worktree)
+$ ./bin/fm-send.sh miss '/lab-miss'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab/lab2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: text not sent to term_f149d54e-ebfe-4fe8-910b-1fb508e0738f (orca send failed; tried meta=/tmp/fm-orca-lab/lab2/home/state/miss.meta; backend=from-meta)
+rc=1
+--- any text typed into the live pane:
+(none)
+--- meta diff:
+meta byte-identical

@@ -1,0 +1,18 @@
+### adversarial: Orca replaces the endpoint between accepted typed text and Enter -> unconfirmed exit 3, no text into the replacement
+recorded live handle=term_f42e46b1-69e2-4cee-80fe-d3dfba556477  pre-created replacement=term_3b15bda7-968e-44f2-b260-ecbf95dea393
+typed text observed in recorded pane: 1
+--- fm-send output:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab/lab2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: submission to term_f42e46b1-69e2-4cee-80fe-d3dfba556477 is unconfirmed because Enter changed terminal endpoints; do not retype or blindly resend - inspect the replacement pane for the recorded worktree in Orca's UI before deciding whether to resend
+rc=3
+--- submitted lines recorded by the replacement pane (must be empty):
+(none)
+--- replacement rendered screen:
+PEER HARNESS v1
+status: ready
++--------------------------------+
+|                                |
++--------------------------------+
+--- meta diff:
+meta byte-identical

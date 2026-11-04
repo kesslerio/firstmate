@@ -1,0 +1,62 @@
+### scenario: inbox ring retargets to a replacement pane already holding THIS ring's own pending doorbell (exactly one Enter, no duplicate copy)
+--- replacement rendered screen before the ring:
+PEER HARNESS v1
+status: ready
++--------------------------------+
+| : Firstmate instruction waitin |
+| g: list "$FM_TASK_INBOX"/*.msg |
+|  in your 'own.inbox' steering  |
+| inbox, read and act on each in |
+|  numeric order, then mv each i |
+| nto its handled/.              |
++--------------------------------+
+$ ./bin/fm-send.sh own 'own-doorbell inbox test'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab/lab2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /tmp/fm-orca-lab/lab2/home/state/own.inbox/003.msg and the watcher will re-ring
+rc=0
+--- submitted lines recorded by the replacement peer:
+: Firstmate instruction waiting: list "$FM_TASK_INBOX"/*.msg in your 'own.inbox' steering inbox, read and act on each in numeric order, then mv each into its handled/.
+--- submitted line count (must be 1): 1
+--- rendered screen after:
+PEER HARNESS v1
+status: ready
++--------------------------------+
+|                                |
++--------------------------------+
+--- meta diff:
+meta byte-identical
+
+### adversarial (latest fix): replacement rendered composer holds FOREIGN text while accumulated stream still shows an earlier own doorbell -> defer, no input
+--- accumulated stream rows still carrying the earlier own doorbell:
+0
+--- rendered screen now:
+PEER HARNESS v1
+status: ready
++--------------------------------+
+| DRAFT-MARKER keep me           |
++--------------------------------+
+$ ./bin/fm-send.sh foreign 'foreign-draft inbox test'
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab/lab2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /tmp/fm-orca-lab/lab2/home/state/foreign.inbox/003.msg and the watcher will re-ring
+rc=0
+--- new submitted lines after the ring (must be 0): 0
+--- rendered screen after (must still be the foreign draft):
+PEER HARNESS v1
+status: ready
++--------------------------------+
+| DRAFT-MARKER keep me           |
++--------------------------------+
+--- meta diff:
+meta byte-identical
+
+### scenario: a deferred fire-and-forget Orca ring keeps the watcher retry mark
+--- retry mark before:
+/tmp/fm-orca-lab/lab2/home/state/faf.inbox/.retry-ring
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-orca-lab/lab2/home
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+fm-send: doorbell skipped (composer visibly holds pending text); the steer is durably recorded at /tmp/fm-orca-lab/lab2/home/state/faf.inbox/001.msg and the watcher will ring it once more
+rc=0
+--- retry mark after (must name the record):
+001.msg
