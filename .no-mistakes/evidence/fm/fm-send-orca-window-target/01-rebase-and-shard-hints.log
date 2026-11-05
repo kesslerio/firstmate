@@ -1,0 +1,35 @@
+=== S1: rebase + shard-hint integrity (real planner + git state) ===
+merge_base=4bd1e3aa72c85ae4ba7a7c7f69bc3168702b28da
+origin_main=4bd1e3aa72c85ae4ba7a7c7f69bc3168702b28da
+is_rebased_onto_main=yes
+conflict_markers=0
+--- planner schedule for the two Orca restart suites and the backend suite (serial lane, real hint weights) ---
+8:tests/fm-watch-wedge-cap.test.sh
+30:tests/fm-backend-orca.test.sh
+58:tests/fm-agy-primary.test.sh
+112:tests/fm-codex-stop-park.test.sh
+123:tests/fm-watch-wedge-cap-unconfigured-parity.test.sh
+136:tests/fm-orca-submit-restart.test.sh
+172:tests/fm-live-lab-isolation.test.sh
+189:tests/fm-orca-typed-restart.test.sh
+247:tests/fm-agy-primary-live-e2e.test.sh
+253:tests/fm-watch-wedge-cap-live.test.sh
+--- assert: hints both sides present and consume the documented values ---
+hint tests/fm-backend-orca.test.sh = 73062 (expected 73062) ok=True
+  documented in shard doc: True
+hint tests/fm-orca-submit-restart.test.sh = 17591 (expected 17591) ok=True
+  documented in shard doc: True
+hint tests/fm-orca-typed-restart.test.sh = 3458 (expected 3458) ok=True
+  documented in shard doc: True
+main-side hint retained for fm-watch-wedge-cap.test.sh: True
+main-side hint retained for fm-codex-stop-park.test.sh: True
+main-side hint retained for fm-agy-primary.test.sh: True
+main-side hint retained for fm-live-lab-isolation.test.sh: True
+--- planner consumes the hints: longest-hint-first order for the serial lane ---
+tests/fm-grok-continuity-live-e2e.test.sh
+tests/fm-pi-seeded-home-trust-live-e2e.test.sh
+tests/fm-backend-paseo-smoke.test.sh
+tests/fm-backend-cmux-smoke.test.sh
+tests/fm-backend-zellij-smoke.test.sh
+--- coverage guard (planner, no suite execution) ---
+FM_TEST_COVERAGE ok total=331 parallel=26 parallel_max_ms=814249 parallel_imbalance_ms=552 parallel_unhinted=0 serial=289 serial_shards=11 serial_unhinted=42 serial_max_ms=1179394 serial_budget_ms=1200000 herdr=16

@@ -1,0 +1,16 @@
+=== S2: composer read from rendered screen (live codex TUI pane term_de711e32-f21c-4ef3-8574-371c49a66c44) ===
+-- baseline (idle composer) --
+state=unknown
+-- typed text, no Enter --
+state=pending
+source=screen
+ansi_bytes=0
+last_rows=["  permissions: YOLO mode","›","  GPT-6-Astra medium · ~"]
+-- clear the typed text with C-c, then state --
+state=unknown
+
+=== S3: absent structured draft -> plain-capture ownership fallback ===
+structured_draft_exit=1
+-- put OUR doorbell line in the live composer --
+own_doorbell_holds_rc=0
+foreign_draft_holds_rc=1

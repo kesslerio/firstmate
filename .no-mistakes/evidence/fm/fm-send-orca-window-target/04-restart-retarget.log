@@ -1,0 +1,27 @@
+stale=term_dcd33a4f-26de-4313-b469-f016e530010f replacement=term_e5f98e99-fba2-47a6-9a19-9a43222b1d06
+=== live terminals in worktree art (must be exactly one for window resolution) ===
+[{"handle":"term_e5f98e99-fba2-47a6-9a19-9a43222b1d06","title":"fm-lab-replacement","writable":true}]
+=== S4: typed send to the STALE recorded handle (bin/fm-send.sh, daemon on the real runtime) ===
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.kUV0Oc
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.kUV0Oc
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the requested message WILL still be sent.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: text not submitted to term_dcd33a4f-26de-4313-b469-f016e530010f (delivery unconfirmed; verdict=unknown; tried explicit target 'term_dcd33a4f-26de-4313-b469-f016e530010f' matched /tmp/fm-lab.kUV0Oc/state/fmlab.meta; backend=orca)
+error: text not submitted to term_dcd33a4f-26de-4313-b469-f016e530010f (delivery unconfirmed; verdict=unknown; tried explicit target 'term_dcd33a4f-26de-4313-b469-f016e530010f' matched /tmp/fm-lab.kUV0Oc/state/fmlab.meta; backend=orca)
+fm-send exit=1
+--- replacement pane screen after the send ---
+["orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~$ bash --norc -i","orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~$ RETARGET-PROOF-OK","bash: RETARGET-PROOF-OK: command not found","orca-ide-1.4.232-pi-wake-parakeet-fhsenv:art@zeppola:~$"]
+--- recorded meta unchanged? ---
+meta-unchanged=yes

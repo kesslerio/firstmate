@@ -1,0 +1,7 @@
+=== S5 adversarial: ring into a replacement Orca pane holding a foreign draft ===
+stale=term_5e48d3b0-d4e7-4359-8538-13c679a3d12d  replacement(codex holding foreign draft)=term_cd25dccc-38aa-4940-81f5-0fa448288d11
+live=["term_cd25dccc-38aa-4940-81f5-0fa448288d11"]
+record=/tmp/fm-lab.kUV0Oc/state/fmforeign.inbox/001.msg
+ ring_status=1
+--- replacement screen after the ring (foreign text must be intact, no doorbell, no submission) ---
+["  >_ OpenAI Codex (v0.166.0)","     ~","  permissions: YOLO mode","›","  GPT-6-Astra medium · ~"]

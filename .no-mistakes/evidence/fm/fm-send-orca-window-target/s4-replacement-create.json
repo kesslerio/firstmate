@@ -1,0 +1,22 @@
+{
+  "id": "3822b08a-e521-42c9-97ff-5599e83b7046",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_e5f98e99-fba2-47a6-9a19-9a43222b1d06",
+      "tabId": "74ff9bad-0f73-4d17-9798-a4130a32389a",
+      "paneKey": "74ff9bad-0f73-4d17-9798-a4130a32389a:c8cc58a3-8f90-41ae-baa3-bbfaf41134da",
+      "ptyId": "13b02dc3-ade3-4dbc-92a0-112590c0cbeb::~@@91edbde9",
+      "worktreeId": "13b02dc3-ade3-4dbc-92a0-112590c0cbeb::~",
+      "title": "fm-lab-replacement",
+      "executionHostId": "local",
+      "incarnationId": "35945ac1-0873-47b7-bc9f-bb6f6e867b1e",
+      "hostPlatform": "linux",
+      "surface": "background",
+      "warning": "Terminal term_e5f98e99-fba2-47a6-9a19-9a43222b1d06 is running, but Orca could not make it discoverable. Run `orca terminal focus --terminal term_e5f98e99-fba2-47a6-9a19-9a43222b1d06` to reveal and focus it."
+    }
+  },
+  "_meta": {
+    "runtimeId": "87e28d2a-1e06-4f35-9fc9-a00fdaad1c70"
+  }
+}

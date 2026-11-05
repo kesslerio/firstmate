@@ -1,0 +1,3 @@
+### ownership via plain capture (absent draft) on live bash pane holding text
+ own-line rc=1
+ foreign rc=1
