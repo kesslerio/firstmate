@@ -2009,7 +2009,8 @@ test_terminal_holders_survive_opt_out_readmission() {
         printf '{"pools":[]}\n' > "$home/state/fleet-seats/policy.json"
       fi
       gen="new$n"
-      out=$(reserve_gen "$home" original "$gen" - "$model") || fail "terminal opt-out readmission: $out"
+      out=$(seats "$home" reserve original --generation "$gen" --harness pi --model "$model" \
+        --kind ship --holder-pid "$LAST_HOLDER") || fail "terminal opt-out readmission: $out"
       assert_contains "$out" "recorded id=original" "a historical holder silently opted out"
       assert_equals reserved "$(lifecycle_of "$home" original "$gen")" "readmission did not record its generation"
       assert_equals true "$(seats "$home" show original | jq --arg g "$gen" 'any(.incarnations[]; .generation == $g and .previous_generation == "old" and .model == null)')" "the successor lost its predecessor or unresolved model"
@@ -2038,6 +2039,24 @@ test_terminal_holders_survive_opt_out_readmission() {
     done
   done
   pass "terminal holders record local and remote opt-out readmissions without reviving old generations or undercounting defaults"
+}
+
+test_opt_out_honors_explicit_no_predecessor() {
+  local home out
+  home="$TMP_ROOT/optout-explicit-no-predecessor"
+  make_home "$home"
+  pools "$home" 1
+  new_holder
+  reserve_gen "$home" original old - pool-model-a >/dev/null || fail "initial holder"
+  seats "$home" release original --generation old --reason prelaunch >/dev/null || fail "terminal predecessor"
+  rm "$home/config/fleet-seats"
+  out=$(reserve_gen "$home" original new - pool-model-a) || fail "explicit no-predecessor opt-out: $out"
+  assert_contains "$out" "recorded id=original" "the historical holder was not retained during opt-out"
+  assert_equals true "$(seats "$home" show original | jq -e '
+    any(.incarnations[]; .generation == "new" and .previous_generation == null
+      and .lifecycle == "reserved")')" \
+    "an explicit no-predecessor reservation inherited a terminal generation"
+  pass "policy opt-out preserves an explicit absence of a predecessor"
 }
 
 test_reconciliation_distinguishes_matching_and_reused_owner_pids() {
@@ -2477,6 +2496,7 @@ test_remote_descendants_prevent_incomplete_certificates
 test_opt_out_records_only_existing_holder_successors
 
 test_terminal_holders_survive_opt_out_readmission
+test_opt_out_honors_explicit_no_predecessor
 test_bounded_reconciliation_progresses_past_uncertain_holders
 test_reconciliation_distinguishes_matching_and_reused_owner_pids
 

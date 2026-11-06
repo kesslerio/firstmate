@@ -1068,7 +1068,7 @@ remote_disposition_fetch() {
 CMD=${1:-}
 shift 2>/dev/null || true
 TASK='' MODEL='' HOLDER='' HARNESS='' DIGEST_ARG='' EPOCH_ARG='' RAW_LAUNCH=0
-GEN='' PREV_GEN='-' KIND='' ROUTE_FILE='' RESPONSE_FILE='' REASON='' LIMIT='' STATE_DIR_ARG=''
+GEN='' PREV_GEN='-' PREV_GEN_SET=0 KIND='' ROUTE_FILE='' RESPONSE_FILE='' REASON='' LIMIT='' STATE_DIR_ARG=''
 ALLOWANCES=''
 case "$CMD" in
   show-t3)
@@ -1088,7 +1088,7 @@ case "$CMD" in
     while [ "$#" -gt 0 ]; do
       case "$1" in
         --generation) GEN=${2:-}; shift 2 || usage ;;
-        --previous-generation) PREV_GEN=${2:-}; shift 2 || usage ;;
+        --previous-generation) PREV_GEN=${2:-}; PREV_GEN_SET=1; shift 2 || usage ;;
         --model) MODEL=${2:-}; shift 2 || usage ;;
         --harness) HARNESS=${2:-}; shift 2 || usage ;;
         --holder-pid) HOLDER=${2:-}; shift 2 || usage ;;
@@ -1480,7 +1480,7 @@ if [ "$CMD" = reserve ] && [ "$OPT_OUT" -eq 1 ]; then
   lock_or_refuse "$LOCK"
   declared && unavailable "the fleet seat policy returned before the successor was recorded; retry admission"
   load_or_refuse
-  if ! inc_exists "$GEN" && [ "$PREV_GEN" = - ]; then
+  if ! inc_exists "$GEN" && [ "$PREV_GEN" = - ] && [ "$PREV_GEN_SET" -eq 0 ]; then
     PREV_GEN=$(printf '%s\n' "$HOLDER_JSON" | jq -r '.incarnations | last | select(.lifecycle == "released" or .lifecycle == "reclaimed") | .generation // "-"')
     [ -n "$PREV_GEN" ] || PREV_GEN=-
   fi
