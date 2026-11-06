@@ -139,6 +139,9 @@ cleanup() {
     . "$ROOT/bin/fm-remote-job-lib.sh"
     fm_remote_job_stop_worker_tree "$worker_pid" || true
   fi
+  if [ "$status" -ne 0 ] && [ -n "${FM_PRESERVE_FIXTURE_ROOT:-}" ]; then
+    cp -a -- "$TMP_ROOT" "$FM_PRESERVE_FIXTURE_ROOT"
+  fi
   fm_test_remove_tree "$TMP_ROOT"
 }
 trap cleanup EXIT
@@ -1923,10 +1926,66 @@ pass "remote secondmate backend selection is strict on both sides of the boundar
 # The remote host itself launches on rex: with no recorded endpoint (a
 # never-launched route) the remote control script runs the host-local spawn on
 # the remote's own rex server and both sides record the rex route.
+#
+# Getting there is a backend migration, not a file deletion. The herdr endpoint
+# the policy-opt-out launch left running is still the counted predecessor of
+# this route, and the parent refuses to reserve a replacement until it can
+# resolve a counted generation (bin/fm-spawn.sh "REMOTE SUPERVISORS"), so the
+# endpoint is retired on its own host and its generation is settled on that
+# host's destruction proof - the same evidence bin/fm-teardown.sh feeds the
+# release. Deleting the endpoint record alone would leave a generation the host
+# can no longer bind to a route, which is exactly what the reclaim refuses.
 install_remote_rex_fixture "$REMOTE_ROOT" "$REX_FAKE" "unix://$REX_FAKE/rex.sock" codex
-rm -f "$remote_route_meta"
-remote_env "$ROOT/bin/fm-spawn.sh" ios --secondmate --backend rex >/dev/null \
-  || fail "a remote rex secondmate launch was refused"
+# The current endpoint is still herdr, so a rex request is refused until the
+# existing route is retired through the host's lifecycle contract. This refusal
+# must preserve the parent route, host route, and counted predecessor.
+cp "$PARENT/state/ios.meta" "$TMP_ROOT/parent-ios-before-rex-migration.meta"
+cp "$remote_route_meta" "$TMP_ROOT/remote-ios-before-rex-migration.meta"
+predecessor_generation=$(sed -n 's/^fleet_seat_generation=//p' "$PARENT/state/ios.meta")
+[ -n "$predecessor_generation" ] || fail "the herdr predecessor has no recorded fleet-seat generation"
+if remote_env "$ROOT/bin/fm-spawn.sh" ios --secondmate --backend rex \
+  >"$TMP_ROOT/spawn-rex-before-retirement.out" 2>&1; then
+  fail "a rex launch replaced the live herdr endpoint without explicit retirement"
+fi
+assert_grep "endpoint is recorded on backend 'herdr', expected 'rex'" \
+  "$TMP_ROOT/spawn-rex-before-retirement.out" \
+  "the rex refusal did not identify the existing herdr route: $(cat "$TMP_ROOT/spawn-rex-before-retirement.out" 2>/dev/null)"
+cmp -s "$TMP_ROOT/parent-ios-before-rex-migration.meta" "$PARENT/state/ios.meta" \
+  || fail "the refused rex migration rewrote the parent route"
+cmp -s "$TMP_ROOT/remote-ios-before-rex-migration.meta" "$remote_route_meta" \
+  || fail "the refused rex migration rewrote the host route"
+seat_state=$(remote_env "$ROOT/bin/fm-fleet-seats.sh" show ios) \
+  || fail "the counted herdr predecessor could not be read after the rex refusal"
+jq -e --arg generation "$predecessor_generation" \
+  '.incarnations[] | select(.generation == $generation and .lifecycle == "confirmed")' \
+  <<<"$seat_state" >/dev/null \
+  || fail "the refused rex migration lost the counted herdr predecessor"
+retire_out=$(remote_env "$ROOT/bin/fm-on.sh" ios fm-remote-secondmate-control.sh retire ios 2>&1) \
+  || fail "the counted herdr endpoint refused retirement before the rex handoff: $retire_out"
+case "$retire_out" in
+  *seat_retirement=*) ;;
+  *) fail "the herdr endpoint retirement published no destruction proof: $retire_out" ;;
+esac
+printf '%s\n' "${retire_out#*seat_retirement=}" > "$TMP_ROOT/rex-handoff-retirement.json"
+chmod 0600 "$TMP_ROOT/rex-handoff-retirement.json"
+while IFS= read -r counted_gen; do
+  [ -n "$counted_gen" ] || continue
+  remote_env "$ROOT/bin/fm-fleet-seats.sh" release ios --generation "$counted_gen" \
+    --reason teardown --response-file "$TMP_ROOT/rex-handoff-retirement.json" >/dev/null \
+    || fail "the rex handoff left counted generation $counted_gen counted"
+done <<EOF_COUNTED
+$(remote_env "$ROOT/bin/fm-fleet-seats.sh" show ios | jq -r \
+  '.incarnations[] | select(.lifecycle == "reserved" or .lifecycle == "confirmed") | .generation')
+EOF_COUNTED
+[ ! -e "$remote_route_meta" ] || fail "the retired herdr endpoint kept its host record"
+FM_SECONDMATE_CHARTER='Own iOS delivery on the build Mac.' \
+FM_SECONDMATE_SCOPE='iOS implementation and Xcode validation' \
+  remote_env "$ROOT/bin/fm-remote-home-seed.sh" ios remote-mac "$REMOTE_ROOT" "$REMOTE_HOME" alpha \
+  >/dev/null || fail "the remote home was not re-provisioned for the rex handoff"
+if ! remote_env "$ROOT/bin/fm-spawn.sh" ios --secondmate --backend rex \
+  >"$TMP_ROOT/spawn-rex-legit.out" 2>&1; then
+  fail "a remote rex secondmate launch was refused: $(cat "$TMP_ROOT/spawn-rex-legit.out" 2>/dev/null)"
+fi
 assert_grep 'remote_backend=rex' "$PARENT/state/ios.meta" "the rex launch did not record its backend"
 assert_grep 'remote_rex_session_id=session:' "$PARENT/state/ios.meta" "the rex launch did not record its session"
 assert_grep 'remote_rex_server=unix://' "$PARENT/state/ios.meta" "the rex launch did not record its server"

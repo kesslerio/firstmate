@@ -75,14 +75,19 @@ fm_remote_generation_resolve() {
 # confirmed generation even though it never confirmed a startup. A launch that
 # never reached the host keeps a null target, so a prelaunch refusal and an
 # unsubmitted cancellation cannot displace it, and a stopped predecessor stays
-# the host's record until its successor's own route proves otherwise. The
-# route's shipped spawn_gen wins over the ledger generation because it is the
-# identity the host stores. Prints "-" when this home holds no such generation.
+# the host's record until its successor's own route proves otherwise. A proved
+# teardown release fences all earlier generations for that same host home: the
+# host has removed the route they described. The route's shipped spawn_gen wins
+# over the ledger generation because it is the identity the host stores. Prints
+# "-" when this home holds no such generation.
 fm_remote_launch_predecessor() {
   printf '%s\n' "$1" | jq -r --arg host "$2" --arg root "$3" --arg home "$4" '
-    [.incarnations[]?
-      | select(.route.placement == "remote" and .route.host == $host
-          and .route.remote_root == $root and .route.home == $home)
+    [(.incarnations // []) | to_entries[]
+      | select(.value.route.placement == "remote" and .value.route.host == $host
+          and .value.route.remote_root == $root and .value.route.home == $home)] as $bound
+    | ($bound | map(select(.value.lifecycle == "released"
+        and .value.disposition.reason == "teardown") | .key) | max // -1) as $retired
+    | [$bound[] | select(.key > $retired) | .value
       | select(.lifecycle == "confirmed"
           or ((.disposition.reason // "") | IN("cancelled", "dead-after-start", "old-stopped"))
             and (.route.target | type == "string" and length > 0))

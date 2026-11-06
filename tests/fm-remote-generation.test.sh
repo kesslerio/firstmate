@@ -80,6 +80,12 @@ assert_equals B "$(fm_remote_launch_predecessor "{\"incarnations\":[$STOPPED_A,$
 STOPPED_B=$(printf '%s' "$LEDGER_B" | jq '.disposition.reason = "old-stopped"')
 assert_equals B "$(fm_remote_launch_predecessor "{\"incarnations\":[$STOPPED_A,$STOPPED_B,$UNSUBMITTED_B]}" remote /srv/fm /srv/home)" \
   'a stopped unconfirmed host generation was lost after an unsubmitted cancellation'
+TEARDOWN_B=$(printf '%s' "$LEDGER_B" | jq '.disposition.reason = "teardown"')
+assert_equals - "$(fm_remote_launch_predecessor "{\"incarnations\":[$STOPPED_A,$TEARDOWN_B]}" remote /srv/fm /srv/home)" \
+  'a proven host retirement kept an older stopped generation as its predecessor'
+POST_TEARDOWN_C=$(printf '%s' "$LEDGER_B" | jq '.generation = "C" | .route.spawn_gen = null | .route.target = "session:p3" | .disposition.reason = "cancelled"')
+assert_equals C "$(fm_remote_launch_predecessor "{\"incarnations\":[$STOPPED_A,$TEARDOWN_B,$POST_TEARDOWN_C]}" remote /srv/fm /srv/home)" \
+  'a new host-bound generation after retirement did not become its own predecessor'
 assert_equals B "$(fm_remote_launch_predecessor \
   "{\"incarnations\":[$LEDGER_A,{\"generation\":\"B\",\"lifecycle\":\"reclaimed\",\"startup_confirmed\":true,\"disposition\":{\"reason\":\"dead-after-start\"},\"route\":$(bound_route '"B"' '"session:p1"')}]}" \
   remote /srv/fm /srv/home)" 'a started generation that died did not become the predecessor'
