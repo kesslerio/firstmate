@@ -1,0 +1,8 @@
+### S3c: unreadable readiness escalates rather than being absorbed as empty
+watcher exit=0 stdout=heartbeat
+$ cat state/.wake-queue
+1794252929	1	heartbeat	heartbeat	heartbeat
+### S3d: the same unreadable probe is not suppressed by FM_INJECT_SKIP=heartbeat in the away daemon
+$ cat state/.subsuper-escalations
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+remaining wake records: 0

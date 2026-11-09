@@ -1,0 +1,5 @@
+=== in-run parent ancestry receipt (runner process) ===
+1520798    1121 bash            bash /tmp/fm-live-s7.DZoeCi/run-tagged.sh
+   1121       1 systemd         /run/current-system/systemd/lib/systemd/systemd --user --deserialize=89
+      1       0 systemd         /run/current-system/systemd/lib/systemd/systemd --switched-root --system --deserialize=41
+=== end receipt ===

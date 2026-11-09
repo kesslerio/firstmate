@@ -1,0 +1,46 @@
+### S1: landed dependency makes queued work visible to attended supervision
+$ bin/fm-tasks-axi.sh ready
+count: 1
+ready[1]{id,state,kind,repo,title}:
+  cap-ready,queued,task,"-",beyond current spend cap
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi start <id>` to dispatch one of these
+$ bin/fm-tasks-axi.sh show cap-ready --full | head
+task:
+  id: cap-ready
+  title: beyond current spend cap
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: task
+  repo: "-"
+$ fm-watch.sh (no away record, no new status event, stale spending title)
+watcher exit=0 stdout=heartbeat
+$ cat state/.wake-queue
+1794252902	1	heartbeat	heartbeat	heartbeat
+$ bin/fm-wake-drain.sh
+1794252902	1	heartbeat	heartbeat	heartbeat
+
+### S3a: an empty readable backlog stays quiet (no dispatch wake)
+watcher stdout bytes=0 heartbeat-streak=2
+no wake queue (no dispatch wake)
+
+### S3b: a held queued unit stays quiet despite readiness
+$ bin/fm-tasks-axi.sh ready
+count: 0
+ready: 0 unblocked queued tasks
+ready_public_followups: 0 delivery-ready obligations
+help[1]:
+  - Run `tasks-axi list --state queued` to see all queued work (incl. blocked)
+watcher stdout bytes=0 heartbeat-streak=2
+no wake queue (no dispatch wake)
+
+### S3c: unreadable readiness escalates rather than being absorbed as empty
+watcher exit=127 stdout=
+$ cat state/.wake-queue
+(none)
