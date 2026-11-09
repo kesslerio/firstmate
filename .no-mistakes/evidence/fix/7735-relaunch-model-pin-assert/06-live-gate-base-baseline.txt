@@ -1,0 +1,10 @@
+# base-commit c8d8fdad tests/fm-live-gate.test.sh, run unchanged against this host (throwaway tree /tmp/fm-livegate.Er0Cwm)
+ok - a default-on guard runs wherever its tools are installed
+not ok - a capability skip must name the tool this host does not have (missing: 'skip: live: fmmissingharness absent')
+--- output ---
+0
+/tmp/fm-livegate.Er0Cwm/bin/fm-wake-lib.sh: line 19: mkdir: command not found
+/tmp/fm-livegate.Er0Cwm/bin/fm-wake-lib.sh: line 108: tr: command not found
+/tmp/fm-live-gate.p7lVxt/default-absent.test.sh: line 4: fm_live_gate: command not found
+ran
+exit=1

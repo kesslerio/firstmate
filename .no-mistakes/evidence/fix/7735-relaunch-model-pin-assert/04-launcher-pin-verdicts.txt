@@ -1,0 +1,8 @@
+# real bin/fm-spawn.sh driven in a throwaway full-tree git copy: /tmp/fm-spawn-drive2.7PLrNT
+# test_claude_model_pin_snapshot_verdicts is the suite's own table (both directions, family alias, decorated id)
+# test_reverse_snapshot_date_is_a_mismatch_unless_documented is this Test phase's added case for the intent's
+# 'never open-ended alias matching' boundary: undocumented reverse date, different snapshot date, other family
+ok - Claude snapshot equivalence and distinct model stderr verdicts
+ok - an undocumented snapshot date and another family stay mismatches
+# pin-verdict subset passed
+exit=0

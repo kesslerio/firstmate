@@ -1,0 +1,4 @@
+# the documented harness-free entry point with pi and claude shadowed by tripwire shims (/tmp/fm-shim.78f1AN)
+# a tripwire that ran would print 'HARNESS INVOKED' and exit 97
+ok - claude_pin_matches: documented alias/snapshot pairs hold in either direction while the snapshot wildcard stays one-directional
+exit=0

@@ -1,0 +1,14 @@
+FM_TEST_BEGIN 2026-11-09T19:27:46Z tests/fm-live-gate.test.sh family=standalone expected_gate_skip=none
+ok - a default-on guard runs wherever its tools are installed
+not ok - a capability skip must name the tool this host does not have (missing: 'skip: live: fmmissingharness absent')
+--- output ---
+0
+{run-worktree}/bin/fm-wake-lib.sh: line 19: mkdir: command not found
+{run-worktree}/bin/fm-wake-lib.sh: line 108: tr: command not found
+/tmp/fm-live-gate.UgIwn8/default-absent.test.sh: line 4: fm_live_gate: command not found
+ran
+FM_TEST_END 2026-11-09T19:27:46Z tests/fm-live-gate.test.sh exit=1 duration_ms=345 gate_skip=false
+FM_TEST_SUMMARY total=1 failed=1 skipped_gate=0 duration_ms=416
+FM_TEST_SUMMARY_FAMILY family=standalone count=1 duration_ms=345 failed=1
+FM_TEST_SLOWEST rank=1 script=tests/fm-live-gate.test.sh duration_ms=345
+exit=1

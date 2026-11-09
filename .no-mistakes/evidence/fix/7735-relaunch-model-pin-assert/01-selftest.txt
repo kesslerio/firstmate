@@ -1,0 +1,2 @@
+ok - claude_pin_matches: documented alias/snapshot pairs hold in either direction while the snapshot wildcard stays one-directional
+exit=0

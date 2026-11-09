@@ -1,0 +1,2 @@
+skip: live: opt-in; set FM_MODEL_PIN_READBACK_LIVE=1 to run
+exit=0

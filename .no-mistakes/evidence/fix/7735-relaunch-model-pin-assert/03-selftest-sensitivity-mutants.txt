@@ -1,0 +1,14 @@
+# sensitivity check: run the guard's real selftest entry point against three copies
+# of a throwaway full copy of bin/ and tests/ (/tmp/fm-pin-mut.T9LcOF)
+
+=== control: the change under validation, unmodified ===
+ok - claude_pin_matches: documented alias/snapshot pairs hold in either direction while the snapshot wildcard stays one-directional
+exit=0
+
+=== mutant A: documented alias/snapshot normalization removed (the pre-fix comparator) ===
+not ok - claude_pin_matches: pin 'claude-haiku-4-5-20251001' reported 'claude-haiku-4-5' must be match, comparator said mismatch
+exit=1
+
+=== mutant B: the eight-digit snapshot-date wildcard made bidirectional ===
+not ok - claude_pin_matches: pin 'claude-haiku-4-5-19990101' reported 'claude-haiku-4-5' must be mismatch, comparator said match
+exit=1
