@@ -1,0 +1,65 @@
+lab home: /tmp/fm-lab.7i7L8e
+private tmux socket: /tmp/fml.c8Ynia/tmux-1000/fm-lab
+
+######## S1 opt-in: with no config/sol-cap the guard is inert and a covered dispatch launches
+-- ceiling: inert
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7i7L8e
+warning: /tmp/fm-lab.7i7L8e/data/live-s1/launch-brief.md records no ship branch; defaulting to legacy branch fm/live-s1
+spawned live-s1 harness=sleep kind=ship mode=no-mistakes yolo=off window=primary:fm-live-s1 worktree=~/.treehouse/project-3895a5/1/project
+RESULT S1: PASS (launched without a Sol refusal in an undeclared home; registry: none)
+
+######## S2 under ceiling=2 with one live session, a covered dispatch is admitted and claims its row
+-- registry with the holder: live-h1	gpt-6.1-sol	1794186614	1503864
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7i7L8e
+error: Sol ceiling reached: 2 concurrent capped session(s) already active and this ceiling is 2 (declared in config/sol-cap); the dispatch of task live-s2 (sleep, gpt-6.1-sol) was refused. Active sessions: live-h1 (gpt-6.1-sol, age 1s); live-s1 (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+RESULT S2: FAIL (admitted=no row)
+
+######## S3 at the ceiling a covered dispatch is refused, names the active sessions, and creates nothing
+-- registry at the ceiling:
+live-h1	gpt-6.1-sol	1794186614	1503864
+live-s1	gpt-6.1-sol	1794186615	-2
+live-h2	gpt-6.1-sol	1794186616	1508054
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7i7L8e
+error: Sol ceiling reached: 3 concurrent capped session(s) already active and this ceiling is 2 (declared in config/sol-cap); the dispatch of task live-s3 (sleep, gpt-6.1-sol) was refused. Active sessions: live-h1 (gpt-6.1-sol, age 3s); live-h2 (gpt-6.1-sol, age 1s); live-s1 (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+RESULT S3: FAIL
+
+######## S4 at the ceiling an uncovered model is not capped and is not refused
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7i7L8e
+warning: /tmp/fm-lab.7i7L8e/data/live-s4/launch-brief.md records no ship branch; defaulting to legacy branch fm/live-s4
+spawned live-s4 harness=sleep kind=ship mode=no-mistakes yolo=off window=primary:fm-live-s4 worktree=~/.treehouse/project-3895a5/2/project
+RESULT S4: PASS (uncovered model dispatched at the ceiling)
+
+######## S5a a row whose worker process ended no longer counts
+-- registry after the holders ended:
+live-h1	gpt-6.1-sol	1794186614	1503864
+live-h2	gpt-6.1-sol	1794186616	1508054
+live-s1	gpt-6.1-sol	1794186617	-2
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7i7L8e
+warning: /tmp/fm-lab.7i7L8e/data/live-s5a/launch-brief.md records no ship branch; defaulting to legacy branch fm/live-s5a
+spawned live-s5a harness=sleep kind=ship mode=no-mistakes yolo=off window=primary:fm-live-s5a worktree=~/.treehouse/project-3895a5/3/project
+RESULT S5a: PASS (dead rows released their slots; dispatch admitted)
+
+######## S5b a live session of an ancient age still holds its slot (age never releases a live worker)
+-- registry with an ancient live row:
+ancient-session	gpt-6.1-sol	1000000000	1556755
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7i7L8e
+error: Sol ceiling reached: 3 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task live-s5b (sleep, gpt-6.1-sol) was refused. Active sessions: ancient-session (gpt-6.1-sol, age 9191d23h); live-s1 (gpt-6.1-sol, age 0s); live-s5a (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+RESULT S5b: FAIL
+
+######## S6 a malformed declaration refuses loudly, naming the file and the problem
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7i7L8e
+error: Sol ceiling unavailable: /tmp/fm-lab.7i7L8e/config/sol-cap must declare ceiling as an integer from 1 through 2, not '9'; task live-s6 with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+RESULT S6: PASS (malformed declaration named, dispatch refused, no record created)
+
+######## S7 a relaunch at the ceiling is refused, naming the live session
+-- first launch: fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7i7L8e
+error: Sol ceiling reached: 2 concurrent capped session(s) already active and this ceiling is 2 (declared in config/sol-cap); the dispatch of task live-r1 (sleep, gpt-6.1-sol) was refused. Active sessions: live-s1 (gpt-6.1-sol, age 0s); live-s5a (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+-- registry: live-s1	gpt-6.1-sol	1794186641	-2;live-s5a	gpt-6.1-sol	1794186641	-2
+-- registry before relaunch: live-h7	gpt-6.1-sol	1794186657	1604576
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.7i7L8e
+error: --relaunch needs an existing task record; no /tmp/fm-lab.7i7L8e/state/live-r1.meta
+RESULT S7: FAIL
+
+######## done
+-- final registry:
+live-h7	gpt-6.1-sol	1794186657	1604576
