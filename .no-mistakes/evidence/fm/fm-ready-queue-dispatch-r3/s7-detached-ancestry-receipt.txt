@@ -1,0 +1,6 @@
+-- pid=2112435
+2112435    1121 bash            bash -c p=$$; : > /tmp/anc.receipt; while [ -n "$p" ] && [ "$p" -ge 1 ]; do echo "-- pid=$p" >> /tmp/anc.receipt; ps -o pid=,ppid=,comm=,args= -p "$p" 2>/dev/null >> /tmp/anc.receipt || break; p=$(ps -o ppid= -p "$p" 2>/dev/null | tr -d " "); done
+-- pid=1121
+   1121       1 systemd         /run/current-system/systemd/lib/systemd/systemd --user --deserialize=89
+-- pid=1
+      1       0 systemd         /run/current-system/systemd/lib/systemd/systemd --switched-root --system --deserialize=41

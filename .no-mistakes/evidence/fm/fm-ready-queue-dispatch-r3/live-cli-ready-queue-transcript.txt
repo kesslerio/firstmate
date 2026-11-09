@@ -1,0 +1,32 @@
+== throwaway home: /tmp/fm-ready-live.RWkEsG
+== queue a unit whose title names a stale spend-cap restriction, blocked by a dependency
+== current backlog (real backlog consumer)
+count: 1
+tasks[1]{id,state,kind,repo,title}:
+  cap-ready,queued,task,"-",beyond current spend cap
+help[1]:
+  - Run `tasks-axi show <id>` for full notes on a task
+== readiness verdict from the shared owner (bin/fm-ready-queue-lib.sh)
+needs review: yes (ready work or unknown readiness)
+
+== run the real watcher heartbeat backstop (FM_HEARTBEAT=1, no away record, no status events)
+watcher exit=0 output: heartbeat
+durable wake queue after watcher:
+1794185137	1	heartbeat	heartbeat	heartbeat
+
+== real wake drain presents the queued heartbeat durably
+1794185137	1	heartbeat	heartbeat	heartbeat
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 2185524.1794185137.hvRpGw
+
+== daemon path: a heartbeat wake is classified before FM_INJECT_SKIP suppression
+daemon escalation digest written for dispatch:
+ready-queue fleet check: evaluate tasks-axi ready and launch every authorized ready unit; if readiness is unavailable, resolve or report the blocker
+wake queue after the daemon's durable handoff:
+
+== emitted branch prompt's ready-work / away-scope contract (generated agent interface)
+31:Ready-work check: re-evaluate the queued backlog after every finish and every fleet check, including heartbeats and landed-task cleanup found by any wake. Run `bin/fm-tasks-axi.sh ready` and `bin/fm-tasks-axi.sh list --state queued`, then `bin/fm-tasks-axi.sh show <unit> --full` for each candidate; these commands ad
+32:Attended, including quiet mode, you cannot spawn: report verdict captain through the wake's report surface, naming every ready unit and asking MAIN to dispatch it in the same turn it receives the outcome, before acknowledging that outcome. This is the durable handoff, even for an unsolicited cleanup or heartbeat; a 
+33:Away, standing autonomy does not widen: dispatch only the queued unblocked work the recorded away words name or a standing grant covers, using `bin/fm-spawn.sh` under the required leases and within the existing spend cap, and confirm a live worker before counting it started. Every other ready unit waits for MAIN, an
+
+== cleanup
+removed /tmp/fm-ready-live.RWkEsG
