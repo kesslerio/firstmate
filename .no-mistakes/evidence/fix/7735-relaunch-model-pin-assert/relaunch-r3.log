@@ -1,0 +1,3 @@
+=== fm-control exit r3drift
+stopped r3drift harness=claude backend=tmux endpoint=firstmate:fm-r3drift worktree=~/.treehouse/notes-eeb271/2/notes
+exit rc=0

@@ -1,0 +1,5 @@
+=== fm-control relaunch r3drift --model sonnet (pinned relaunch)
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+model pin asserted: pin 'sonnet' actual 'claude-sonnet-5-5' (pinned Claude session 6be55a2f-55e9-4901-92ec-b7df4dc1580c)
+relaunched r3drift harness=claude from=claude model=sonnet effort=low backend=tmux endpoint=firstmate:fm-r3drift worktree=~/.treehouse/notes-eeb271/2/notes
+control relaunch rc=0 elapsed_s=14

@@ -1,0 +1,6 @@
+=== guard oracle sensitivity (function under test: tests/fm-model-pin-readback-live-e2e.test.sh claude_pin_matches)
+pin=sonnet             reported=claude-sonnet-5-5            expected=match got=match OK
+pin=claude-haiku-4-5   reported=claude-haiku-4-5-20251001    expected=match got=match OK
+pin=sonnet             reported=claude-opus-5-5              expected=mismatch got=mismatch OK
+pin=claude-sonnet-4-5  reported=claude-sonnet-5-5            expected=mismatch got=mismatch OK
+pin=sonnet             reported=sonnet-ish-extra             expected=mismatch got=mismatch OK

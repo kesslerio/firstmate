@@ -1,0 +1,9 @@
+# live assert probe: real Claude worker spawn through bin/fm-spawn.sh in lab /tmp/fmlab-pin-r3, pinned --model sonnet
+session transcript: ~/.claude/projects/-home-art--treehouse-notes-eeb271-1-notes/a02de7f7-df50-49a9-87ea-cf025c989b44.jsonl
+## assistant models the vendor wrote (model | stop_reason)
+claude-sonnet-5-5	tool_use
+claude-sonnet-5-5	tool_use
+claude-sonnet-5-5	end_turn
+
+## product verdict (bin/fm-spawn.sh stderr during that launch)
+model pin asserted: pin 'sonnet' actual 'claude-sonnet-5-5' (pinned Claude session a02de7f7-df50-49a9-87ea-cf025c989b44)

@@ -1,0 +1,3 @@
+model pin unverified: pin 'sonnet' has no session model this launcher can read back for harness 'sh'
+spawned r3raw2 harness=sh kind=ship mode=local-only yolo=on window=firstmate:fm-r3raw2 worktree=~/.treehouse/notes-eeb271/4/notes
+spawn rc=0 elapsed_s=11

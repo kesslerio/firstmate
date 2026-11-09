@@ -1,0 +1,11 @@
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 5s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+model pin mismatch: pin 'sonnet[1m]' but pinned Claude session 9883d894-98b9-440c-a0e1-2b832163d268 reports 'claude-sonnet-5-5'
+spawned r3drift harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-r3drift worktree=~/.treehouse/notes-eeb271/2/notes
+spawn rc=0 elapsed_s=17
