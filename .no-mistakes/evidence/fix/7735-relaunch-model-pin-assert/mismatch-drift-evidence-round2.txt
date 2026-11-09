@@ -1,0 +1,13 @@
+# live drift probe: real Claude launch pinned to 'sonnet[1m]'
+session transcript: ~/.claude/projects/-home-art--treehouse-notes-ff7ea2-4-notes/66555177-e7ff-4d25-b18c-6478fa49fb8f.jsonl
+## assistant turns the vendor wrote (model | stop)
+claude-sonnet-5-5	tool_use
+claude-sonnet-5-5	tool_use
+claude-sonnet-5-5	tool_use
+claude-sonnet-5-5	tool_use
+claude-sonnet-5-5	tool_use
+claude-sonnet-5-5	end_turn
+
+## product verdict on that launch (bin/fm-spawn.sh stderr)
+model pin mismatch: pin 'sonnet[1m]' but pinned Claude session 66555177-e7ff-4d25-b18c-6478fa49fb8f reports 'claude-sonnet-5-5'
+spawn rc=0

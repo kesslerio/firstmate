@@ -1,0 +1,13 @@
+spawn rc=0 elapsed_s=26
+--- stdout
+spawned labe4579afd6f7a-drift harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labe4579afd6f7a-drift worktree=~/.treehouse/notes-ff7ea2/4/notes
+--- stderr
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  3 task(s) in flight, but no live watcher process holds this home lock (last beat: 36s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  After draining queued wakes, repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+model pin mismatch: pin 'sonnet[1m]' but pinned Claude session 66555177-e7ff-4d25-b18c-6478fa49fb8f reports 'claude-sonnet-5-5'

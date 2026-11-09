@@ -1,0 +1,4 @@
+=== fm-control relaunch (exit + relaunch on the pinned worker)
+model pin asserted: pin 'sonnet' actual 'claude-sonnet-5-5' (pinned Claude session 34627516-663a-4d28-8680-9bf47b53f21b)
+relaunched labe4579afd6f7a-worker harness=claude from=claude model=sonnet effort=low backend=tmux endpoint=firstmate:fm-labe4579afd6f7a-worker worktree=~/.treehouse/notes-ff7ea2/1/notes
+control relaunch rc=0

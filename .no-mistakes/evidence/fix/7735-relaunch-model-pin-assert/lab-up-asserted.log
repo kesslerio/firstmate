@@ -1,0 +1,6 @@
+lab: /tmp/fmlab-pin-asserted (tear down with: bin/fm-live-lab.sh down /tmp/fmlab-pin-asserted)
+tree: 4b17e2be6349e0578d7b9be215b956ce1bd377f5 from {run-worktree}
+model pin asserted: pin 'sonnet' actual 'claude-sonnet-5-5' (pinned Claude session 375f678c-3b2e-4298-828f-68ac494d6110)
+spawned labef884383e730-worker harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labef884383e730-worker worktree=~/.treehouse/notes-657972/1/notes
+gate: /tmp/fmlab-pin-asserted/home/data/labef884383e730-worker/gate (touch, then message the worker to resume)
+primary: claude --setting-sources project,local --model sonnet --effort low --permission-mode auto

@@ -1,0 +1,5 @@
+spawn rc=0 elapsed_s=16 (a 100-poll wait at 0.5s would add ~50s)
+--- stdout
+spawned labe4579afd6f7a-rawpin2 harness=sh kind=ship mode=local-only yolo=on window=firstmate:fm-labe4579afd6f7a-rawpin2 worktree=~/.treehouse/notes-ff7ea2/3/notes
+--- stderr
+model pin unverified: pin 'sonnet' has no session model this launcher can read back for harness 'sh'

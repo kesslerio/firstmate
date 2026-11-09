@@ -1,0 +1,14 @@
+lab: /tmp/fmlab-pin-r2 (tear down with: bin/fm-live-lab.sh down /tmp/fmlab-pin-r2)
+tree: a8b9f0ac7f12e3990f5626733ca19b0e2ac5146f from {run-worktree}
+model pin asserted: pin 'sonnet' actual 'claude-sonnet-5-5' (pinned Claude session f8af29c9-971b-4e01-be2f-83f00d4d4901)
+spawned labe4579afd6f7a-worker harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labe4579afd6f7a-worker worktree=~/.treehouse/notes-ff7ea2/1/notes
+gate: /tmp/fmlab-pin-r2/home/data/labe4579afd6f7a-worker/gate (touch, then message the worker to resume)
+primary: claude --setting-sources project,local --model sonnet --effort medium --permission-mode auto
+ok primary: claude pid 2508615 in /tmp/fmlab-pin-r2/home
+ok probe: the primary answered LABREADY-e4579afd6f7a
+ok trust: /tmp/fmlab-pin-r2/home is trusted in the Claude store
+fail host: supervision host pid 2552832 runs (expected none)
+ok watcher: live watcher with a fresh beacon
+ok worker: labe4579afd6f7a-worker parked on /tmp/fmlab-pin-r2/home/data/labe4579afd6f7a-worker/gate
+fail treehouse: new ~/.treehouse entries: notes-ff7ea2
+not ready after 600s; the lab is left up for inspection: bin/fm-live-lab.sh pane /tmp/fmlab-pin-r2, then bin/fm-live-lab.sh down /tmp/fmlab-pin-r2
