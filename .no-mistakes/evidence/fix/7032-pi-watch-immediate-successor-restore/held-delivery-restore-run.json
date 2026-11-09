@@ -1,0 +1,166 @@
+{
+ "steps": [
+  {
+   "t": 0.387,
+   "id": "arm-1",
+   "type": "response",
+   "command": "prompt",
+   "success": true,
+   "data": {
+    "disposition": "handled"
+   }
+  },
+  true,
+  true,
+  true,
+  "start arm=3 gen=gen3 arm_pid=2058023 watcher_pid=2058023 ts=1794185100793564189 release_seen=no",
+  true,
+  "start arm=4 gen=gen4 arm_pid=2058201 watcher_pid=2058201 ts=1794185100860139095 release_seen=no",
+  [
+   {
+    "ts": 1794185100723,
+    "event": "offer",
+    "n": 1,
+    "eligible": true,
+    "message": "signal: lab-project/task-1 (wake 1 from arm 1)"
+   },
+   {
+    "ts": 1794185100723,
+    "event": "accepted",
+    "n": 1,
+    "message": "signal: lab-project/task-1 (wake 1 from arm 1)"
+   }
+  ],
+  true,
+  true,
+  true
+ ],
+ "checks": {
+  "arm_command_response": {
+   "id": "arm-1",
+   "type": "response",
+   "command": "prompt",
+   "success": true,
+   "data": {
+    "disposition": "handled"
+   }
+  },
+  "successor_restored_after_close_1": true,
+  "delivery_1_held_by_branch": true,
+  "successor_restored_with_delivery_held": true,
+  "arm3_row": "start arm=3 gen=gen3 arm_pid=2058023 watcher_pid=2058023 ts=1794185100793564189 release_seen=no",
+  "third_successor_restored_with_delivery_held": true,
+  "arm4_row": "start arm=4 gen=gen4 arm_pid=2058201 watcher_pid=2058201 ts=1794185100860139095 release_seen=no",
+  "offers_before_release": [
+   {
+    "ts": 1794185100723,
+    "event": "offer",
+    "n": 1,
+    "eligible": true,
+    "message": "signal: lab-project/task-1 (wake 1 from arm 1)"
+   },
+   {
+    "ts": 1794185100723,
+    "event": "accepted",
+    "n": 1,
+    "message": "signal: lab-project/task-1 (wake 1 from arm 1)"
+   }
+  ],
+  "queued_wake_2_reached_branch_after_release": true,
+  "queued_wake_3_reached_branch_after_release": true,
+  "successor_arm4_still_alive": true
+ },
+ "hold_log": [
+  {
+   "ts": 1794185100723,
+   "event": "offer",
+   "n": 1,
+   "eligible": true,
+   "message": "signal: lab-project/task-1 (wake 1 from arm 1)"
+  },
+  {
+   "ts": 1794185100723,
+   "event": "accepted",
+   "n": 1,
+   "message": "signal: lab-project/task-1 (wake 1 from arm 1)"
+  },
+  {
+   "ts": 1794185102885,
+   "event": "settled",
+   "n": 1
+  },
+  {
+   "ts": 1794185102886,
+   "event": "offer",
+   "n": 2,
+   "eligible": true,
+   "message": "signal: lab-project/task-2 (wake 2 from arm 2)"
+  },
+  {
+   "ts": 1794185102886,
+   "event": "accepted",
+   "n": 2,
+   "message": "signal: lab-project/task-2 (wake 2 from arm 2)"
+  },
+  {
+   "ts": 1794185102929,
+   "event": "settled",
+   "n": 2
+  },
+  {
+   "ts": 1794185102930,
+   "event": "offer",
+   "n": 3,
+   "eligible": true,
+   "message": "signal: lab-project/task-3 (wake 3 from arm 3)"
+  },
+  {
+   "ts": 1794185102930,
+   "event": "accepted",
+   "n": 3,
+   "message": "signal: lab-project/task-3 (wake 3 from arm 3)"
+  },
+  {
+   "ts": 1794185102970,
+   "event": "settled",
+   "n": 3
+  }
+ ],
+ "arm_log": [
+  "start arm=1 gen=gen1 arm_pid=2057619 watcher_pid=2057619 ts=1794185100644282648 release_seen=no",
+  "start arm=2 gen=gen2 arm_pid=2057796 watcher_pid=2057796 ts=1794185100716329881 release_seen=no",
+  "start arm=3 gen=gen3 arm_pid=2058023 watcher_pid=2058023 ts=1794185100793564189 release_seen=no",
+  "start arm=4 gen=gen4 arm_pid=2058201 watcher_pid=2058201 ts=1794185100860139095 release_seen=no"
+ ],
+ "extension_log": [
+  "2026-11-09T00:45:00.698Z pid=2056652 restore attempt=0 predecessor=2057619 start=ok pid=2057796",
+  "2026-11-09T00:45:00.722Z pid=2056652 confirm generation=gen2 watcherPid=2057796 result=confirmed",
+  "2026-11-09T00:45:00.780Z pid=2056652 restore attempt=0 predecessor=2057796 start=ok pid=2058023",
+  "2026-11-09T00:45:00.834Z pid=2056652 restore attempt=0 predecessor=2058023 start=ok pid=2058201",
+  "2026-11-09T00:45:02.886Z pid=2056652 confirm generation=gen3 watcherPid=2058023 result=confirmed",
+  "2026-11-09T00:45:02.929Z pid=2056652 confirm generation=gen4 watcherPid=2058201 result=confirmed"
+ ],
+ "confirm_log": [
+  "confirm-ok gen=gen2 pid=2057796 ts=1794185100721400503",
+  "confirm-ok gen=gen3 pid=2058023 ts=1794185100801337861",
+  "confirm-ok gen=gen4 pid=2058201 ts=1794185100867531164"
+ ],
+ "messages_response": {
+  "id": "msgs",
+  "type": "response",
+  "command": "get_messages",
+  "success": true,
+  "data": {
+   "messages": []
+  }
+ },
+ "events_tail": [
+  {
+   "type": "extension_ui_request",
+   "id": "01ed8dbb-7115-4481-8c67-8651391d57c3",
+   "method": "notify",
+   "message": "watcher: unchanged - Pi extension already owns an arm child; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy",
+   "notifyType": "info"
+  }
+ ]
+}

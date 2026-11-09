@@ -1,0 +1,42 @@
+{
+ "checks": {
+  "first_arm_started": true,
+  "unready_successors_attempted": true,
+  "typed_restoration_failure_reached_main": true,
+  "branch_never_offered_the_failure": true
+ },
+ "arm_command_response": {
+  "id": "arm-1",
+  "type": "response",
+  "command": "prompt",
+  "success": true,
+  "data": {
+   "disposition": "handled"
+  }
+ },
+ "main_messages": [
+  {
+   "role": "user",
+   "content": [
+    {
+     "type": "text",
+     "text": "\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: signal: lab-project/task-1 (wake 1 from arm 1)\n\nwatcher: FAILED - Pi extension could not verify a ready successor watcher\nwatcher: FAILED - Pi extension could not restore watcher continuity after 1 retries\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned."
+    }
+   ],
+   "timestamp": 1794185152718
+  }
+ ],
+ "arm_log": [
+  "start arm=1 gen=gen1 arm_pid=2218340 watcher_pid=2218340 ts=1794185152521732627 release_seen=no",
+  "start arm=2 gen=gen2 arm_pid=2218683 watcher_pid=2218683 ts=1794185152652278788 release_seen=no",
+  "start arm=3 gen=gen3 arm_pid=2218809 watcher_pid=2218809 ts=1794185152706054198 release_seen=no"
+ ],
+ "hold_log": [],
+ "extension_log": [
+  "2026-11-09T00:45:52.629Z pid=2217887 restore attempt=0 predecessor=2218340 start=ok pid=2218683",
+  "2026-11-09T00:45:52.654Z pid=2217887 restore attempt=0 readiness=timeout pid=2218683",
+  "2026-11-09T00:45:52.688Z pid=2217887 restore attempt=1 predecessor=2218340 start=ok pid=2218809",
+  "2026-11-09T00:45:52.707Z pid=2217887 restore attempt=1 readiness=timeout pid=2218809",
+  "2026-11-09T00:45:52.708Z pid=2217887 restore exhausted attempts=2 outcome=hand-to-main"
+ ]
+}

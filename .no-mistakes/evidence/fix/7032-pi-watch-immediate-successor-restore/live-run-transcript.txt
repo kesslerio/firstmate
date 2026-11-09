@@ -1,0 +1,110 @@
+LIVE VALIDATION: Pi watch extension, held branch delivery vs successor restoration
+Product: real pi 1.5.0 (RPC mode, private lab home, no session file), extension source loaded
+directly from the run worktree: .pi/extensions/fm-primary-pi-watch.ts
+Lab: /tmp/fm-lab.QzngI3 (disposable, removed after this evidence turn)
+Synthetic boundary: bin/fm-watch-arm.sh arm cycles in the lab project, and a supervision-branch
+stand-in that accepts the documented fm-branch-supervision:dispatch offer and withholds settlement.
+
+SCENARIO A: successive actionable closes while wake delivery 1 is held by the branch
+arm starts (wall clock ns, real arm child processes):
+  start arm=1 gen=gen1 arm_pid=2057619 watcher_pid=2057619 ts=1794185100644282648 release_seen=no
+  start arm=2 gen=gen2 arm_pid=2057796 watcher_pid=2057796 ts=1794185100716329881 release_seen=no
+  start arm=3 gen=gen3 arm_pid=2058023 watcher_pid=2058023 ts=1794185100793564189 release_seen=no
+  start arm=4 gen=gen4 arm_pid=2058201 watcher_pid=2058201 ts=1794185100860139095 release_seen=no
+
+branch dispatch handshake (offer/accepted/settled):
+  {"ts": 1794185100723, "event": "offer", "n": 1, "eligible": true, "message": "signal: lab-project/task-1 (wake 1 from arm 1)"}
+  {"ts": 1794185100723, "event": "accepted", "n": 1, "message": "signal: lab-project/task-1 (wake 1 from arm 1)"}
+  {"ts": 1794185102885, "event": "settled", "n": 1}
+  {"ts": 1794185102886, "event": "offer", "n": 2, "eligible": true, "message": "signal: lab-project/task-2 (wake 2 from arm 2)"}
+  {"ts": 1794185102886, "event": "accepted", "n": 2, "message": "signal: lab-project/task-2 (wake 2 from arm 2)"}
+  {"ts": 1794185102929, "event": "settled", "n": 2}
+  {"ts": 1794185102930, "event": "offer", "n": 3, "eligible": true, "message": "signal: lab-project/task-3 (wake 3 from arm 3)"}
+  {"ts": 1794185102930, "event": "accepted", "n": 3, "message": "signal: lab-project/task-3 (wake 3 from arm 3)"}
+  {"ts": 1794185102970, "event": "settled", "n": 3}
+
+extension diagnostics:
+  2026-11-09T00:45:00.698Z pid=2056652 restore attempt=0 predecessor=2057619 start=ok pid=2057796
+  2026-11-09T00:45:00.722Z pid=2056652 confirm generation=gen2 watcherPid=2057796 result=confirmed
+  2026-11-09T00:45:00.780Z pid=2056652 restore attempt=0 predecessor=2057796 start=ok pid=2058023
+  2026-11-09T00:45:00.834Z pid=2056652 restore attempt=0 predecessor=2058023 start=ok pid=2058201
+  2026-11-09T00:45:02.886Z pid=2056652 confirm generation=gen3 watcherPid=2058023 result=confirmed
+  2026-11-09T00:45:02.929Z pid=2056652 confirm generation=gen4 watcherPid=2058201 result=confirmed
+
+handling-delivery confirmations the extension actually executed (fixture confirm log):
+      77.1ms  confirm-ok gen=gen2 pid=2057796
+     157.1ms  confirm-ok gen=gen3 pid=2058023
+     223.2ms  confirm-ok gen=gen4 pid=2058201
+
+  gen3's confirmation ran at 157ms, inside the continuity operation, while arm 3 (pid 2058023) was
+  still the live arm. By the time wake 2 was delivered at ~2242ms that pid was gone (arm 4 had
+  replaced it), and the arm contract rejects a dead named pid (exit 1, see the ORACLE below).
+  Delivery nevertheless logged result=confirmed and sent wake 2 to the branch with no failure
+  appendix, because it consumed the outcome cached in the restoration instead of re-confirming
+  the stale token.
+
+assertions:
+  successor_restored_after_close_1 = True
+  delivery_1_held_by_branch = True
+  successor_restored_with_delivery_held = True
+  arm3_row = start arm=3 gen=gen3 arm_pid=2058023 watcher_pid=2058023 ts=1794185100793564189 release_seen=no
+  third_successor_restored_with_delivery_held = True
+  arm4_row = start arm=4 gen=gen4 arm_pid=2058201 watcher_pid=2058201 ts=1794185100860139095 release_seen=no
+  offers_before_release = [{'ts': 1794185100723, 'event': 'offer', 'n': 1, 'eligible': True, 'message': 'signal: lab-project/task-1 (wake 1 from arm 1)'}, {'ts': 1794185100723, 'event': 'accepted', 'n': 1, 'message': 'signal: lab-project/task-1 (wake 1 from arm 1)'}]
+  queued_wake_2_reached_branch_after_release = True
+  queued_wake_3_reached_branch_after_release = True
+  successor_arm4_still_alive = True
+
+derived timeline (ms after the first arm start):
+       0.0ms  start arm=1 gen=gen1
+      72.0ms  start arm=2 gen=gen2
+     149.3ms  start arm=3 gen=gen3
+     215.9ms  start arm=4 gen=gen4
+    2240.7ms  wake 1 delivery settlement released by the lab branch
+  Arms 3 and 4 are the successors of the closes whose wakes queued behind the held
+  wake 1; both started ~2s before the branch released wake 1 (release_seen=no), so
+  restoration never waited on delivery. Wake 2 and wake 3 reached the branch only
+  after wake 1 settled, in order, with no restoration-failure text appended.
+
+
+SCENARIO B: adversarial, a genuinely failed restoration must still alarm main
+arm starts:
+  start arm=1 gen=gen1 arm_pid=2218340 watcher_pid=2218340 ts=1794185152521732627 release_seen=no
+  start arm=2 gen=gen2 arm_pid=2218683 watcher_pid=2218683 ts=1794185152652278788 release_seen=no
+  start arm=3 gen=gen3 arm_pid=2218809 watcher_pid=2218809 ts=1794185152706054198 release_seen=no
+
+extension diagnostics (bounded retry, typed hand-to-main outcome):
+  2026-11-09T00:45:52.629Z pid=2217887 restore attempt=0 predecessor=2218340 start=ok pid=2218683
+  2026-11-09T00:45:52.654Z pid=2217887 restore attempt=0 readiness=timeout pid=2218683
+  2026-11-09T00:45:52.688Z pid=2217887 restore attempt=1 predecessor=2218340 start=ok pid=2218809
+  2026-11-09T00:45:52.707Z pid=2217887 restore attempt=1 readiness=timeout pid=2218809
+  2026-11-09T00:45:52.708Z pid=2217887 restore exhausted attempts=2 outcome=hand-to-main
+
+main-conversation user message delivered to the real Pi session:
+  [{"type": "text", "text": "\u2063FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: signal: lab-project/task-1 (wake 1 from arm 1)\n\nwatcher: FAILED - Pi extension could not verify a ready successor watcher\nwatcher: FAILED - Pi extension could not restore watcher continuity after 1 retries\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned."}]
+
+assertions:
+  first_arm_started = True
+  unready_successors_attempted = True
+  typed_restoration_failure_reached_main = True
+  branch_never_offered_the_failure = True
+
+
+ORACLE: the arm contract rejects a dead successor watcher pid before it compares generations,
+which is exactly the false restoration failure the cached in-restore confirmation avoids.
+bin/fm-watch-arm.sh (unchanged by this change):
+if [ "$mode" = handling-delivered ]; then
+  fm_pid_alive "$handling_watcher_pid" \
+    && fm_watcher_lock_matches_pid "$STATE" "$WATCH" "$handling_watcher_pid" "$FM_HOME" \
+    && fm_recovery_marker_begin_handling "$STATE/.watcher-down" "$handling_generation"
+  exit $?
+
+lab fixture arm, exercised directly:
+  $ fm-watch-arm.sh --handling-delivered gen3 --watcher-pid <dead arm3 pid>
+  watcher: handling delivery confirmation rejected: successor watcher pid=2058023 is not alive
+  exit=1 (rejected)
+  $ fm-watch-arm.sh --handling-delivered gen3 --watcher-pid <live pid>, marker moved to gen4
+  watcher: handling delivery confirmation superseded: marker generation=gen4 requested=gen3
+  exit=3 (superseded)
+  $ fm-watch-arm.sh --handling-delivered gen4 --watcher-pid <same live pid>
+    exit=0 (accepted)
