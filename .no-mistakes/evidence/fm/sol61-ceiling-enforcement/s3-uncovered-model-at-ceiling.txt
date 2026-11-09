@@ -1,0 +1,12 @@
+### S3 uncovered model at the ceiling (task-c, model glm-4.6, harness codex)
+--- declaration:
+max=1
+models=gpt-6.1-sol
+--- spawn result:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ge6gA7
+WARNING: watcher still down (same stale episode; last beat: 225s ago, grace 300s) - full banner already printed this episode.
+warning: /tmp/fm-lab.ge6gA7/data/task-c/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-c
+spawned task-c harness=codex kind=ship mode=no-mistakes yolo=off window=lab:fm-task-c worktree=~/.treehouse/project-1977d2/1/project
+rc=0
+--- registry (no row for task-c: it is not covered, so it reserves nothing):
+task-a	gpt-6.1-sol	1794264922	2386571

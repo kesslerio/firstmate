@@ -1,0 +1,8 @@
+### S5 malformed declaration refuses loudly (task-e, config/sol-cap max=invalid)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ge6gA7
+WARNING: watcher still down (same stale episode; last beat: 253s ago, grace 300s) - full banner already printed this episode.
+error: Sol ceiling unavailable: /tmp/fm-lab.ge6gA7/config/sol-cap must declare max as a positive integer of at most nine digits, not 'invalid'; task task-e with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+rc=1
+--- registry unchanged (no row for task-e):
+task-a	gpt-6.1-sol	1794264922	2386571
+task-d	gpt-6.1-sol	1794265158	2453616

@@ -1,0 +1,18 @@
+### S7 redirected config (malformed home declaration, valid redirected config) launched through the real spawn
+--- home config/sol-cap:
+max=invalid
+--- redirected config:
+max=4
+models=gpt-6.1-sol
+--- spawn result:
+WARNING: watcher still down (same stale episode; last beat: 284s ago, grace 300s) - full banner already printed this episode.
+warning: /tmp/fm-lab.ge6gA7/data/task-f/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-f
+spawned task-f harness=sleep kind=ship mode=no-mistakes yolo=off window=lab:fm-task-f worktree=~/.treehouse/project-1977d2/4/project
+rc=0
+--- registry row for task-f (promoted to the live worker pid):
+task-f	gpt-6.1-sol	1794265202	2458529
+--- staged launch line the pane received:
+FM_HOME='/tmp/fm-lab.ge6gA7' FM_CONFIG_OVERRIDE='/tmp/fm-lab.ge6gA7/redir-config' bash '{run-worktree}/bin/fm-sol-cap-lib.sh' run-launch 'task-f' '/tmp/fm-lab.ge6gA7/state' 'export DISABLE_AUTOUPDATER='\''1'\''; export COMPACT_ADVISER_DISABLE=1; export FM_TASK_I
+--- worker environment (FM_CONFIG_OVERRIDE reached the worker):
+FM_CONFIG_OVERRIDE=/tmp/fm-lab.ge6gA7/redir-config
+FM_HOME=/tmp/fm-lab.ge6gA7

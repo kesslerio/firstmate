@@ -1,0 +1,12 @@
+### S9 two concurrent capped dispatches against a ceiling of one (fresh lab home, max=1)
+--- declaration:
+max=1
+models=gpt-6.1-sol
+--- dispatch 1 (admitted):
+spawned task-1 harness=sleep kind=ship mode=no-mistakes yolo=off window=lab:fm-task-1 worktree=~/.treehouse/project-1977d2/5/project
+rc=0
+--- dispatch 2 (refused, no over-admission):
+error: this home's task set is locked by another spawn; refusing to create task task-2 rather than racing it
+rc=1
+--- registry holds exactly one counting row:
+task-1	gpt-6.1-sol	1794265385	2496772

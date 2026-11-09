@@ -1,0 +1,9 @@
+### S6 absent declaration leaves the guard inert (task-e, capped model, task-d live, no config/sol-cap)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ge6gA7
+WARNING: watcher still down (same stale episode; last beat: 261s ago, grace 300s) - full banner already printed this episode.
+warning: /tmp/fm-lab.ge6gA7/data/task-e/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-e
+spawned task-e harness=sleep kind=ship mode=no-mistakes yolo=off window=lab:fm-task-e worktree=~/.treehouse/project-1977d2/3/project
+rc=0
+--- registry (task-e reserves nothing):
+task-a	gpt-6.1-sol	1794264922	2386571
+task-d	gpt-6.1-sol	1794265158	2453616

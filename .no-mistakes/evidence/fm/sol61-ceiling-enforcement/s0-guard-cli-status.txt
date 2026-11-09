@@ -1,0 +1,7 @@
+### operator CLI surface of the guard (fresh lab home, max=1)
+$ fm-sol-cap-lib.sh status <config-dir>
+active max=1 ceiling=1 models=gpt-6.1-sol pattern=
+$ fm-sol-cap-lib.sh ceiling <config-dir>
+1
+$ fm-sol-cap-lib.sh models <config-dir>
+gpt-6.1-sol

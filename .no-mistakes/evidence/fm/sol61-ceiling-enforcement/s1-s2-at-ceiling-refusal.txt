@@ -1,0 +1,17 @@
+### S1/S2 at-ceiling refusal (task-b, capped model gpt-6.1-sol, ceiling max=1, task-a live)
+--- declaration:
+max=1
+models=gpt-6.1-sol
+--- registry before/after:
+task-a	gpt-6.1-sol	1794264922	2386571
+--- spawn stderr/stdout:
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.ge6gA7
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 59s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-b (sleep, gpt-6.1-sol) was refused. Active sessions: task-a (gpt-6.1-sol, age 56s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+rc=1

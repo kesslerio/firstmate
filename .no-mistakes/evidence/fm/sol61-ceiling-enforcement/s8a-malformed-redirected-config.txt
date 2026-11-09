@@ -1,0 +1,15 @@
+### S8a malformed redirected declaration fails admission without a reservation (task-h)
+--- redirected config:
+max=invalid
+--- spawn result:
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  5 task(s) in flight, but no watcher has a fresh beacon (last beat: 336s ago, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: Sol ceiling unavailable: /tmp/fm-lab.ge6gA7/redir-bad/sol-cap must declare max as a positive integer of at most nine digits, not 'invalid'; task task-h with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+rc=1
+--- registry has no row for task-h:
+0

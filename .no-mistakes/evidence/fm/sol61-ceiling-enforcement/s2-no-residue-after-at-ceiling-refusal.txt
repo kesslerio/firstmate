@@ -1,0 +1,9 @@
+### S2 the at-ceiling refusal leaves nothing behind (recorded from the live run)
+$ ls <lab>/state/task-b.meta <lab>/data/task-b/launch-brief.md
+ls: cannot access '<lab>/state/task-b.meta': No such file or directory
+ls: cannot access '<lab>/data/task-b/launch-brief.md': No such file or directory
+$ tmux list-windows -t lab     # before and after the refused task-b dispatch, unchanged
+1: bash*         (the lab driver pane)
+2: fm-task-a     (the one admitted capped worker)
+$ ls <lab>/state/sol-sessions.tsv
+task-a	gpt-6.1-sol	1794264922	2386571      # no row was written for the refused task-b

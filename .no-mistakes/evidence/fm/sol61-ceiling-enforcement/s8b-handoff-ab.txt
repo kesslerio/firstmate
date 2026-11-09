@@ -1,0 +1,28 @@
+### S8b the capped launch handoff carries the resolved configuration (recorded from the live run)
+Fixture: lab home whose own config/sol-cap is malformed (max=invalid); a valid
+redirected declaration max=4 models=gpt-6.1-sol. A reservation for task-g is
+claimed under the redirected declaration:
+
+$ FM_HOME=<lab> FM_CONFIG_OVERRIDE=<lab>/redir-config bash bin/fm-sol-cap-lib.sh \
+    refuse-claim task-g ship sleep gpt-6.1-sol <lab>/redir-config <lab>/state
+claimed
+task-g	gpt-6.1-sol	1794265304	2467941
+
+$ cat <lab>/config/sol-cap
+max=invalid
+
+A) run-launch with no FM_CONFIG_OVERRIDE - the pre-fix handoff shape:
+$ env -u FM_CONFIG_OVERRIDE FM_HOME=<lab> bash bin/fm-sol-cap-lib.sh \
+    run-launch task-g <lab>/state 'echo WORKER-RAN-A'
+A_rc=1
+error: Sol ceiling unavailable: <lab>/config/sol-cap must declare max as a positive
+integer of at most nine digits, not 'invalid'; the occupancy of task task-g was
+retained rather than released against an undeclared ceiling
+(worker never ran; the reservation is retained)
+
+B) run-launch with the resolved override - the fixed handoff shape:
+$ FM_HOME=<lab> FM_CONFIG_OVERRIDE=<lab>/redir-config bash bin/fm-sol-cap-lib.sh \
+    run-launch task-g <lab>/state 'echo WORKER-RAN-B'
+B_rc=0
+WORKER-RAN-B
+task-g	gpt-6.1-sol	1794265304	2468247      # promoted to the launched process

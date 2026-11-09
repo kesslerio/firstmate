@@ -1,0 +1,16 @@
+### S1 a capped dispatch under the declared ceiling launches and claims its slot (recorded from the live run)
+Fixture: a marked disposable lab home (bin/fm-lab-home.sh create <lab>) with
+config/sol-cap max=1 models=gpt-6.1-sol, a private tmux server (TMUX_TMPDIR=<lab>/tmux),
+and a fixture project with a lab-private origin. The dispatch is the real
+bin/fm-spawn.sh run from inside that tmux pane, capped model gpt-6.1-sol:
+
+$ FM_HOME=<lab> bash bin/fm-spawn.sh task-a <lab>/project \
+    --harness 'sleep 600' --model gpt-6.1-sol --mode no-mistakes --yolo off
+warning: <lab>/data/task-a/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-a
+spawned task-a harness=sleep kind=ship mode=no-mistakes yolo=off window=lab:fm-task-a worktree=.../project-1977d2/1/project
+rc=0
+
+registry row, promoted from the spawn's reservation to the launched worker:
+task-a	gpt-6.1-sol	1794264922	2386571
+$ ps -p 2386571 -o cmd=     # the live worker the row names
+/run/current-system/sw/bin/bash -c ... sleep 600 ...

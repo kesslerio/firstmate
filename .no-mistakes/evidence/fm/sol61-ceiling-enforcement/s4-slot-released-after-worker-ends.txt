@@ -1,0 +1,11 @@
+### S4 ending the capped worker frees the slot (recorded from the live run)
+registry immediately before:
+task-a	gpt-6.1-sol	1794264922	2386571
+$ kill 2386571        # the task-a worker (the promoted pane process running the worker command)
+WORKER_ENDED
+$ # a capped dispatch of task-d (gpt-6.1-sol) at ceiling max=1, with task-a's row still in the registry
+spawned task-d harness=sleep kind=ship mode=no-mistakes yolo=off window=lab:fm-task-d worktree=.../project-1977d2/2/project
+rc=0
+registry after (the stale task-a row is retained as evidence and does not count; task-d holds the slot):
+task-a	gpt-6.1-sol	1794264922	2386571
+task-d	gpt-6.1-sol	1794265158	2453616
