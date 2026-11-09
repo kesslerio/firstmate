@@ -1,0 +1,11 @@
+### ceiling full (max=1) - covered model dispatch
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-b (codex, gpt-6.1-sol) was refused. Active sessions: live-1 (gpt-6.1-sol, age 28s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+rc=1
+### ceiling full - model the declaration does not cover
+not-capped
+rc=0
+### registry after uncovered dispatch (only live-1 expected)
+live-1	gpt-6.1-sol	1794260850	451453
+### declared pattern coverage, uncovered by regex? gpt-6.1-sol matches pattern too
+not-capped
+rc=0

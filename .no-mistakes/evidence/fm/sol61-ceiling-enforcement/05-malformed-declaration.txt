@@ -1,0 +1,36 @@
+--- inline comment on max
+/tmp/fm-lab.bm6GjE/badconfig/sol-cap must declare max as a positive integer of at most nine digits, not '4  # the plan limit'
+rc=1
+  dispatch:
+error: Sol ceiling unavailable: /tmp/fm-lab.bm6GjE/badconfig/sol-cap must declare max as a positive integer of at most nine digits, not '4  # the plan limit'; task task-z with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+  rc=1
+--- ceiling above max
+/tmp/fm-lab.bm6GjE/badconfig/sol-cap must declare ceiling as an integer from 1 through 2, not '5'
+rc=1
+  dispatch:
+error: Sol ceiling unavailable: /tmp/fm-lab.bm6GjE/badconfig/sol-cap must declare ceiling as an integer from 1 through 2, not '5'; task task-z with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+  rc=1
+--- no model coverage
+/tmp/fm-lab.bm6GjE/badconfig/sol-cap must declare models or model-pattern, the model ids the ceiling covers
+rc=1
+  dispatch:
+error: Sol ceiling unavailable: /tmp/fm-lab.bm6GjE/badconfig/sol-cap must declare models or model-pattern, the model ids the ceiling covers; task task-z with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+  rc=1
+--- unknown key
+/tmp/fm-lab.bm6GjE/badconfig/sol-cap declares an unknown key: model
+rc=1
+  dispatch:
+error: Sol ceiling unavailable: /tmp/fm-lab.bm6GjE/badconfig/sol-cap declares an unknown key: model; task task-z with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+  rc=1
+--- non-integer max
+/tmp/fm-lab.bm6GjE/badconfig/sol-cap must declare max as a positive integer of at most nine digits, not 'four'
+rc=1
+  dispatch:
+error: Sol ceiling unavailable: /tmp/fm-lab.bm6GjE/badconfig/sol-cap must declare max as a positive integer of at most nine digits, not 'four'; task task-z with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+  rc=1
+--- unusable pattern
+/tmp/fm-lab.bm6GjE/badconfig/sol-cap declares an unusable model-pattern: [unclosed
+rc=1
+  dispatch:
+error: Sol ceiling unavailable: /tmp/fm-lab.bm6GjE/badconfig/sol-cap declares an unusable model-pattern: [unclosed; task task-z with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+  rc=1

@@ -1,0 +1,3 @@
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fm-lab.bm6GjE
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-a (codex, gpt-6.1-sol) was refused. Active sessions: live-1 (gpt-6.1-sol, age 4s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+rc=1

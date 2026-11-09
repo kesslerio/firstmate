@@ -1,0 +1,18 @@
+== lab: /tmp/fm-lab.EASn4D
+-- declaration (excludes gpt-6.1-sol, so these replacements reserve no slot):
+max=4
+models=gpt-6-sol
+-- registry before
+live-hold	gpt-6.1-sol	1794261227	592770
+task-c	gpt-6.1-sol	1794261227	-1
+task-live	gpt-6.1-sol	1794261227	592770
+
+== A. replacement of a stopped incarnation with the admission boundary free
+refuse-claim task-c (gpt-6.1-sol, uncovered) -> rc=0 out='not-capped'
+task-c row after: task-c	gpt-6.1-sol	-3
+pending marker present: no
+
+== B. the same replacement for a task whose session is still live
+refuse-claim task-live (gpt-6.1-sol, uncovered) -> rc=0 out='not-capped'
+task-live row after: task-live	gpt-6.1-sol	592770  (live pid 592770)
+the live session's process is still alive

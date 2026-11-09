@@ -1,0 +1,11 @@
+### state dir after refusal
+.
+..
+sol-sessions.tsv
+### task records / launch brief
+ls: cannot access '/tmp/fm-lab.bm6GjE/state/task-a.meta': No such file or directory
+ls: cannot access '/tmp/fm-lab.bm6GjE/data/task-a/launch-brief.md': No such file or directory
+### worktrees
+/tmp/fm-lab.bm6GjE/project c1fa8a0 [main]
+### registry
+live-1	gpt-6.1-sol	1794260850	451453

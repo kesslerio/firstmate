@@ -1,0 +1,13 @@
+### head-commit fixture (before this run's repair), first spawn case:
+ok - adopted exits free capacity while uncertain and in-flight claims remain
+ok - confirmed-stop paths remember legacy workers with missing registries or rows
+ok - pruning and explicit release preserve stop evidence while metadata survives
+ok - unpinned workers remain exempt during broad-pattern and explicit-list adoption
+ok - admission adopts preserved live or uncertain Sol workers without duplicating or counting stopped/non-Sol workers
+ok - proven local stops and unpublished remote recovery release conservative occupancy
+ok - remote parent-route ownership shares the ceiling and recovery preserves uncertain claims
+ok - retries preserve occupancy and only confirmed teardown releases it
+ok - local homes share admission lock and preserve distinct task identities
+/tmp/fm-sol-cap.y6yfyv/review/home/config/sol-cap must declare ceiling as an integer from 1 through 4, not '5'
+ok - exact identities, worker lifetime, live age, bounded declarations and non-Sol isolation
+not ok - an under-cap Sol spawn was refused: error: config/crew-dispatch.json is active and task task-c has no recorded dispatch resolution; run bin/fm-dispatch-resolve.sh /tmp/fm-sol-cap.y6yfyv/under-cap/home/data/task-c/brief.md --project <name> first

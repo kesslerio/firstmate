@@ -1,0 +1,41 @@
+== lab: /tmp/fm-lab.84NZ3I  (real tmux server: /tmp/fm-lab.84NZ3I/tmux/tmux-1000/fm-lab)
+1: task-x* (1 panes) [80x24] [layout b25d,80x24,0,0,0] @0 (active)
+-- declaration excludes gpt-6.1-sol so the replacement reserves no slot:
+max=3
+models=gpt-6-sol
+-- registry before:
+live-hold	gpt-6.1-sol	1794261311	616522
+task-x	gpt-6.1-sol	1794261311	-1
+
+== C1. hold the admission boundary in a live process
+boundary held by pid 616515 (holder shell 616526)
+
+== C2. uncapped replacement of task-x runs while the boundary is busy
+replacement rc=0 out='not-capped'
+pending marker: present
+marker witness: 1794261311 -1
+staging temp files left behind: 0
+task-x row while boundary held: task-x	gpt-6.1-sol	-1
+boundary still held: yes
+
+== C3. the declaration is restored and a concurrent admitted claim takes the boundary
+admission is blocked on the held boundary (no output yet)
+admission process still running while the boundary is held
+task-x row while the admission waits: task-x	gpt-6.1-sol	-1
+admission rc=0 out='claimed'
+
+== C4. state after the sequence
+pending marker: consumed
+staging temp files left behind: 0
+-- registry:
+live-hold	gpt-6.1-sol	1794261311	616522
+task-x	gpt-6.1-sol	1794261315	-2
+task-y	gpt-6.1-sol	1794261315	616790
+task-x row (the replacement, adopted as a counted claim): task-x	gpt-6.1-sol	-2
+task-y row (the concurrent admitted claim): task-y	gpt-6.1-sol	616790
+live-hold row (an independent live session): live-hold	gpt-6.1-sol	616522
+
+== C5. the captain lowers the ceiling to the two sessions now counted, then dispatches again
+refuse-claim task-z -> rc=1
+error: Sol ceiling reached: 2 concurrent capped session(s) already active and this ceiling is 2 (declared in config/sol-cap); the dispatch of task task-z (codex, gpt-6.1-sol) was refused. Active sessions: live-hold (gpt-6.1-sol, age 5s); task-x (gpt-6.1-sol, age 0s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+task-z row created: no

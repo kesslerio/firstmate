@@ -1,0 +1,15 @@
+### no declaration
+inert
+rc=0
+inert
+rc=0
+### declared
+active max=4 ceiling=2 models=gpt-6.1-sol|gpt-6-sol pattern=^gpt-[0-9.]+-sol$
+rc=0
+gpt-6.1-sol|gpt-6-sol
+rc=0
+2
+rc=0
+### unknown mode hint
+unknown fm-sol-cap-lib.sh mode: bogus-mode (try: status | models | ceiling | refuse-claim | record-actual | run | run-launch)
+rc=2
