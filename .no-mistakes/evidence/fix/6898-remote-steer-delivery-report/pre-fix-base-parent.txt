@@ -1,0 +1,17 @@
+# Pre-change parent (base commit) on the same live hop: no delivery report
+
+Ran bin/fm-send.sh from the base commit tree
+(git archive 14d06b0 bin) against the same live loopback SSH hop and the
+current far-side leg, to reproduce the reported symptom.
+
+exit status: 0
+
+## stdout (base parent leaks the raw internal report line)
+steer_record=/tmp/fmlab/lab1/rhome-prefix3/state/parent-route/rsm.inbox/001.msg
+
+## stderr (base parent: a notice is the only delivery-related report)
+notice: steer durably recorded at /tmp/fmlab/lab1/rhome-prefix3/state/parent-route/rsm.inbox/001.msg for recovery; doorbell not typed because the agent in fm-remote:p1 has exited
+
+## observation: no `sent:` line exists in the base parent output
+/tmp/fmlab/out3/prefix.err:0
+/tmp/fmlab/out3/prefix.out:0

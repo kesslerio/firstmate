@@ -1,0 +1,46 @@
+# S5 lost transport makes no delivery claim
+
+Command: bin/fm-send.sh rsm "please rename the metric" (FM_HOME=/tmp/fmlab/lab1/phome-s5,
+FM_SSH_BIN=<lab ssh wrapper>, real ssh to 127.0.0.1 sshd)
+exit status: 1
+
+## stdout
+
+## stderr (delivery-relevant lines)
+ssh: connect to host 127.0.0.1 port 20491: Connection refused
+ssh: connect to host 127.0.0.1 port 20491: Connection refused
+error: steer to remote secondmate rsm is unconfirmed (transport lost twice; remote completion unknown). Only the correlation-reusing resend below is idempotent and lands on the same remote inbox record:
+FM_HOME=/tmp/fmlab/lab1/phome-s5 FM_PENDING_REPLY_EXISTING_CORR=9b496b50fc3363e3 {run-worktree}/bin/fm-send.sh rsm please\ rename\ the\ metric
+
+## far-side records under the remote home
+  count=0 (expected 0)
+
+## pending-reply state (parent home)
+  /tmp/fmlab/lab1/phome-s5/state/pending-replies/9b496b50fc3363e3
+    schema=fm-pending-reply.v1
+    corr_id=9b496b50fc3363e3
+    task_id=rsm
+    parent_home=/tmp/fmlab/lab1/phome-s5
+    parent_status=/tmp/fmlab/lab1/phome-s5/state/rsm.status
+    parent_status_scan_signature=
+    request_summary=please rename the metric
+    created_epoch=1794185473
+    delivered_epoch=
+    turn_seen_busy=0
+    request_turn_completed_epoch=
+    recovery_attempted_epoch=
+    recovery_sender_pid=
+    recovery_sender_identity=
+    recovery_sent_epoch=
+    recovery_delivery_outcome=
+    recovery_turn_seen_busy=0
+    recovery_turn_completed_epoch=
+    escalated_epoch=
+    resolved_epoch=
+    resolved_via=
+    wrong_home_hits=0
+    wrong_home_first_sighting=
+    wrong_home_sightings=
+    wrong_home_scan_signature=
+    grace_secs=120
+    phase=delivery_unknown

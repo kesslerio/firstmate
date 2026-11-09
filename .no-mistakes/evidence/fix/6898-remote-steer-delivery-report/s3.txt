@@ -1,0 +1,53 @@
+# S3 lost reply bookkeeping prints a labelled advisory on a delivered steer
+
+Command: bin/fm-send.sh rsm "please rename the metric" (FM_HOME=/tmp/fmlab/lab1/phome-s3,
+FM_SSH_BIN=<lab ssh wrapper>, real ssh to 127.0.0.1 sshd)
+exit status: 0
+
+## stdout
+
+## stderr (delivery-relevant lines)
+notice: steer durably recorded at /tmp/fmlab/lab1/rhome-s3/state/parent-route/rsm.inbox/001.msg for recovery; doorbell not typed because the agent in fm-remote:p1 has exited
+sent: steer to remote secondmate rsm durably recorded at /tmp/fmlab/lab1/rhome-s3/state/parent-route/rsm.inbox/001.msg - delivery is complete, do not resend
+advisory (steer delivered): reply-tracking-degraded - the steer is durably recorded at /tmp/fmlab/lab1/rhome-s3/state/parent-route/rsm.inbox/001.msg, but its pending-reply delivery commit and recovery marker both failed, so the reply expectation for this request may not reconcile on its own; inspect /tmp/fmlab/lab1/phome-s3/state; do not resend.
+
+## far-side records under the remote home
+  /tmp/fmlab/lab1/rhome-s3/state/parent-route/rsm.inbox/001.msg
+  count=1 (expected 1)
+
+## body of the record the confirmation named
+schema=fm-task-inbox.v1
+at=2026-11-09T00:49:45Z
+body-terminator=1
+--
+[fm-from-firstmate]⁣corr=49ec7815548134fd please rename the metric
+
+## pending-reply state (parent home)
+  /tmp/fmlab/lab1/phome-s3/state/pending-replies/49ec7815548134fd
+    schema=fm-pending-reply.v1
+    corr_id=49ec7815548134fd
+    task_id=rsm
+    parent_home=/tmp/fmlab/lab1/phome-s3
+    parent_status=/tmp/fmlab/lab1/phome-s3/state/rsm.status
+    parent_status_scan_signature=
+    request_summary=please rename the metric
+    created_epoch=1794185384
+    delivered_epoch=
+    phase=awaiting_report
+    turn_seen_busy=0
+    request_turn_completed_epoch=
+    recovery_attempted_epoch=
+    recovery_sender_pid=
+    recovery_sender_identity=
+    recovery_sent_epoch=
+    recovery_delivery_outcome=
+    recovery_turn_seen_busy=0
+    recovery_turn_completed_epoch=
+    escalated_epoch=
+    resolved_epoch=
+    resolved_via=
+    wrong_home_hits=0
+    wrong_home_first_sighting=
+    wrong_home_sightings=
+    wrong_home_scan_signature=
+    grace_secs=120

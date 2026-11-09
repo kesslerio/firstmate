@@ -1,0 +1,16 @@
+# S4 a refused far-side leg makes no delivery claim
+
+Command: bin/fm-send.sh rsm "please rename the metric" (FM_HOME=/tmp/fmlab/lab1/phome-s4,
+FM_SSH_BIN=<lab ssh wrapper>, real ssh to 127.0.0.1 sshd)
+exit status: 1
+
+## stdout
+
+## stderr (delivery-relevant lines)
+error: remote home is not a seeded secondmate home
+error: steer not sent to remote secondmate rsm (the remote steering-inbox record could not be written; the remote leg's stderr above has the reason)
+
+## far-side records under the remote home
+  count=0 (expected 0)
+
+## pending-reply state (parent home)
