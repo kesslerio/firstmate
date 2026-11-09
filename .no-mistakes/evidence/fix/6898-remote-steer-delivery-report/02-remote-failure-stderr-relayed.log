@@ -1,0 +1,16 @@
+# Live: real remote-leg failure (unwritable far-side inbox) - buffered stderr still relayed, no sent: claim
+Command: fm-send.sh rsm 'please rename the metric' (remote state/parent-route/rsm.inbox pre-created as a regular file)
+Exit: exit=1
+
+## stderr
+mkdir: cannot create directory '/tmp/fm-lab.SQ2TDm/homes/s3-remote-error/rhome/state/parent-route/rsm.inbox': Not a directory
+error: steering-inbox record could not be written under /tmp/fm-lab.SQ2TDm/homes/s3-remote-error/rhome/state/parent-route/rsm.inbox
+error: steer not sent to remote secondmate rsm (the remote steering-inbox record could not be written; the remote leg's stderr above has the reason)
+
+## sent:/error: lines
+sent: lines = 0
+10:error: steering-inbox record could not be written under /tmp/fm-lab.SQ2TDm/homes/s3-remote-error/rhome/state/parent-route/rsm.inbox
+11:error: steer not sent to remote secondmate rsm (the remote steering-inbox record could not be written; the remote leg's stderr above has the reason)
+
+## far-side records: 0
+## parent pending-reply records left behind: 0

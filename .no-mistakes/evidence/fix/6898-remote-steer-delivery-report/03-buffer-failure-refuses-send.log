@@ -1,0 +1,11 @@
+# Live: remote stderr buffer cannot be created (unusable TMPDIR) - send refused before any remote attempt
+Command: TMPDIR=<lab>/no-such-tmpdir fm-send.sh rsm 'please rename the metric'
+Exit: exit=1
+
+## stderr
+mktemp: failed to create file via template ‘/tmp/fm-lab.SQ2TDm/no-such-tmpdir/fm-send-remote-stderr.XXXXXX’: No such file or directory
+error: steer not sent to remote secondmate rsm: could not create remote stderr buffer; check TMPDIR
+
+## far-side records written: 0
+## parent pending-reply records left behind: 0
+## sent: lines = 0

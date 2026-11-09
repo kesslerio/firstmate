@@ -1,0 +1,10 @@
+# Live: parent fm-send (this branch) + OLDER remote leg (base commit 14d06b0) that reports no steer_record line
+Remote root: base-commit tree served over the same real ssh hop
+Exit: exit=0
+
+## stderr
+sent: steer to remote secondmate rsm durably recorded in remote secondmate rsm's own steering inbox - delivery is complete, do not resend
+notice: doorbell not typed because the agent in fm-remote:p1 has exited; the steer is durably recorded at /tmp/fm-lab.SQ2TDm/homes/s5-old-remote-leg/rhome/state/parent-route/rsm.inbox/001.msg for recovery
+
+## far-side records: 1
+## steer_record= lines seen by parent: 0

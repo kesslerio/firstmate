@@ -1,0 +1,15 @@
+# A/B over the same live ssh delivery: base parent (14d06b0) vs this branch
+
+## BEFORE (base 14d06b0 bin/fm-send.sh, new remote leg) - exit exit=0
+notice: steer durably recorded at /tmp/fm-lab.SQ2TDm/homes/s6-base-parent/rhome/state/parent-route/rsm.inbox/001.msg for recovery; doorbell not typed because the agent in fm-remote:p1 has exited
+sent: lines = 0; notice: line = 9
+far-side records written = 1  (the steer WAS delivered, yet the only line was the notice)
+
+## AFTER (this branch bin/fm-send.sh, new remote leg) - exit exit=0
+sent: steer to remote secondmate rsm durably recorded at /tmp/fm-lab.SQ2TDm/homes/s1-delivery/rhome/state/parent-route/rsm.inbox/001.msg - delivery is complete, do not resend
+notice: steer durably recorded at /tmp/fm-lab.SQ2TDm/homes/s1-delivery/rhome/state/parent-route/rsm.inbox/001.msg for recovery; doorbell not typed because the agent in fm-remote:p1 has exited
+sent: line = 9; notice: line = 10
+far-side records written = 1
+
+Conclusion: the old ordering printed the remote leg's notice first and never stated delivery;
+buffering the remote stderr until the leg's status is known makes sent: precede that notice.

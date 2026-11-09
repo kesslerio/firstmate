@@ -1,0 +1,27 @@
+# Live lab run: delivered remote steer confirmation (new fm-send)
+
+Transport: real ssh to localhost -> real bin/fm-remote-entrypoint.sh -> real remote job worker -> real bin/fm-remote-secondmate-control.sh
+Parent CLI: {run-worktree}/bin/fm-send.sh
+Command: fm-send.sh rsm 'please rename the metric'
+Exit: exit=0
+
+## stderr
+sent: steer to remote secondmate rsm durably recorded at /tmp/fm-lab.SQ2TDm/homes/s1-delivery/rhome/state/parent-route/rsm.inbox/001.msg - delivery is complete, do not resend
+notice: steer durably recorded at /tmp/fm-lab.SQ2TDm/homes/s1-delivery/rhome/state/parent-route/rsm.inbox/001.msg for recovery; doorbell not typed because the agent in fm-remote:p1 has exited
+
+## ordering (line numbers)
+9:sent: steer to remote secondmate rsm durably recorded at /tmp/fm-lab.SQ2TDm/homes/s1-delivery/rhome/state/parent-route/rsm.inbox/001.msg - delivery is complete, do not resend
+10:notice: steer durably recorded at /tmp/fm-lab.SQ2TDm/homes/s1-delivery/rhome/state/parent-route/rsm.inbox/001.msg for recovery; doorbell not typed because the agent in fm-remote:p1 has exited
+
+## named far-side record exists: /tmp/fm-lab.SQ2TDm/homes/s1-delivery/rhome/state/parent-route/rsm.inbox/001.msg
+-rw------- 1 art users 138 Nov  9 13:10 /tmp/fm-lab.SQ2TDm/homes/s1-delivery/rhome/state/parent-route/rsm.inbox/001.msg
+schema=fm-task-inbox.v1
+at=2026-11-09T21:10:13Z
+body-terminator=1
+--
+[fm-from-firstmate]⁣corr=aaf2a3f45c414634 please rename the metric
+
+## far-side inbox contents
+/tmp/fm-lab.SQ2TDm/homes/s1-delivery/rhome/state/parent-route/rsm.inbox/001.msg
+
+## stdout bytes: 0
