@@ -1,0 +1,3 @@
+2026-11-09T00:55:13.889Z pid=3083352 health monitor state=retrying arm=3085709
+2026-11-09T00:55:14.737Z pid=3083352 restore attempt=0 predecessor=3343246 start=ok pid=3345649
+2026-11-09T00:55:15.398Z pid=3083352 confirm generation=3085851.1794185713.Tlfrjs watcherPid=3345812 result=confirmed

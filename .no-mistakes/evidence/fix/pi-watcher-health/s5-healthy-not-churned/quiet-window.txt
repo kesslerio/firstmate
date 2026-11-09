@@ -1,0 +1,7 @@
+healthy_watcher_window: default product behavior with FM_POLL=600 (fresh beacon, no fault injection)
+watcher_pid=3345812 unchanged for 91s across ~3 health ticks
+extension_log_rows:
+2026-11-09T00:55:13.889Z pid=3083352 health monitor state=retrying arm=3085709
+2026-11-09T00:55:14.737Z pid=3083352 restore attempt=0 predecessor=3343246 start=ok pid=3345649
+2026-11-09T00:55:15.398Z pid=3083352 confirm generation=3085851.1794185713.Tlfrjs watcherPid=3345812 result=confirmed
+cycle_log_mtime_before=2026-11-08 16:55:15.297143429 -0800 after=2026-11-08 16:55:15.297143429 -0800

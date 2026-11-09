@@ -1,0 +1,24 @@
+
+ Let me look at what rearm-resurface means — probably arming the watcher. Since
+ drain returned no wakes, and requirement is: acknowledge after handling. Let
+ me check if there's work under way.
+
+ Let me inspect fleet state quickly.
+
+
+ $ cd {run-worktree}
+ && bin/fm-crew-state.sh 2>&1 | head -60
+
+ usage: fm-crew-state.sh <id>
+
+ Took 0.1s
+
+
+ Operation aborted
+
+────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M6YVQ9QBFA8EGPDQ3FP8XTP9 (detached)
+↑155 ↓277 R54k 5.5%/500k (auto)          DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium
+🚀 TPS: 62.4 tok/s (277 tok in 4.4s · TTFT: 3274 ms)​

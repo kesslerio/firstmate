@@ -1,0 +1,21 @@
+s1: automatic health-monitor repair of a stale-heartbeat arm (no tool call, no user action)
+
+lab tuning:    config/watch.env = "export FM_POLL=300"  -> bin/fm-wake-lib.sh fm_poll_derived_grace = 360 s
+fault:         state/.last-watcher-beat aged to 400 s old (re-applied every 2 s) while the real
+               watcher process stayed alive and identity-matched in state/.watch.lock
+watcher before: pid 2663098 (owner arm 2663000)
+watcher after:  pid 2735340 (arm 2735229), confirmed by the extension
+
+evidence chain:
+  2026-11-09T00:50:18.982Z health monitor state=retrying arm=2663000
+  2026-11-09T00:50:20.188Z restore attempt=0 predecessor=2732846 start=ok pid=2735229
+  2026-11-09T00:50:20.983Z confirm generation=2663098.1794185419.JJI596 watcherPid=2735340 result=confirmed
+  cycle ledger: arm_pid=2663000 watcher_pid=2663098 exit_code=143 signal=TERM reason=arm-interrupted beacon_age=409
+  cycle ledger: arm_pid=2732846 watcher_pid=2732949 exit_code=0 signal=none reason=actionable-check beacon_age=1
+
+final live state:
+  2735229 2661269  bash .../bin/fm-watch-arm.sh --restart
+  2735340 2735229  bash .../bin/fm-watch.sh
+  state/.watch.lock/pid = 2735340
+  state/.last-watcher-beat = 2026-11-08 16:50:20.573 -0800 (fresh)
+  main received: FIRSTMATE WATCHER WAKE: check: rearm-resurface (see primary-pane-after-repair.txt)

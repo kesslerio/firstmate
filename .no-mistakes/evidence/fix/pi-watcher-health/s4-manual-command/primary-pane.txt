@@ -1,0 +1,24 @@
+ pi-multi-account v1.28.0 loaded (enabled). 4 account(s) in rotation. Config:
+ ~/.pi/agent/provider-failover.json
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set
+ -g extended-keys on` to ~/.tmux.conf and restart tmux.
+
+────────────────────────────────────────────────────────────────────────────────
+ Package Updates Available
+ Package updates are available. Run pi update --extensions
+ Packages:
+ - pi-multi-account
+ - pi-codex-goal
+────────────────────────────────────────────────────────────────────────────────
+
+ watcher: unchanged - Pi extension verified this home's watcher identity and
+ fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after
+ a later notification says the cycle is missing, failed, or unhealthy
+
+────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M6YVQ9QBFA8EGPDQ3FP8XTP9 (detached)
+0.0%/500k (auto)        (qualitycorp-oq) DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium
+🚀 TPS: --

@@ -1,0 +1,24 @@
+ Took 0.6s
+
+
+ The drain printed nothing else — no queued wakes. Hmm, so the wake is check:
+ rearm-resurface. Let me acknowledge and handle it.
+
+ Actually the wake is "check: rearm-resurface". What does that mean? It's
+ likely a watcher continuity check. Let me look at what it needs. Let me check
+ the queue state / supervisor state.
+
+ Let me acknowledge the drain first (after handling). Handle first: check
+ rearm-resurface. What's that? Probably the Pi extension notifying that watcher
+ rearm resurfaced. Let me check fleet state and supervision.
+
+ Let me look at bin/fm-wake-drain.sh help and grep for "rearm-resurface".
+
+ Operation aborted
+
+────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M6YVQ9QBFA8EGPDQ3FP8XTP9 (detached)
+↑27k ↓98 5.5%/500k (auto)                DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium
+🚀 TPS: 21.6 tok/s (98 tok in 4.5s · TTFT: 12538 ms)​

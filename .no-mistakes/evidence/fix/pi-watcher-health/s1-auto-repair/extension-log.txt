@@ -1,0 +1,3 @@
+2026-11-09T00:50:18.982Z pid=2661269 health monitor state=retrying arm=2663000
+2026-11-09T00:50:20.188Z pid=2661269 restore attempt=0 predecessor=2732846 start=ok pid=2735229
+2026-11-09T00:50:20.983Z pid=2661269 confirm generation=2663098.1794185419.JJI596 watcherPid=2735340 result=confirmed

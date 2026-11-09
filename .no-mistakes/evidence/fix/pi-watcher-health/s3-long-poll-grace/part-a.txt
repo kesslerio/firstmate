@@ -1,0 +1,2 @@
+part_a: injected beacon age 400s (below derived grace 660s for FM_POLL=600) for 90s across >=2 30s health ticks
+watcher_pid_before=3085851 watcher_pid_after=3085851 changed=no
