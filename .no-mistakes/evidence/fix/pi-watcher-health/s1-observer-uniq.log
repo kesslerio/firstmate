@@ -1,0 +1,5 @@
+root mode=700 owner=1000
+root mode= owner=
+snapshot-dir /tmp/fm-lab.MWzUQW/tmp/fm-pending-reply-1000/fm-pending-reply-decisions.1591550.7rixQq contents=
+snapshot-dir /tmp/fm-lab.MWzUQW/tmp/fm-pending-reply-1000/fm-pending-reply-decisions.1591550.7rixQq contents=0 
+snapshot-dir /tmp/fm-lab.MWzUQW/tmp/fm-pending-reply-1000/fm-pending-reply-decisions.1591550.7rixQq contents=0 1 

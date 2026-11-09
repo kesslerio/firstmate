@@ -1,0 +1,33 @@
+== victimA (private-root symlink target) ==
+total 16
+drwxr-xr-x 2 art users 4096 Nov  9 11:39 .
+drwx------ 9 art users 4096 Nov  9 11:39 ..
+-rw-r--r-- 1 art users   13 Nov  9 11:39 0
+-rw-r--r-- 1 art users    9 Nov  9 11:39 secret.txt
+-- /tmp/fm-lab.5j0AYq/victimA/secret.txt
+secret-a
+-- /tmp/fm-lab.5j0AYq/victimA/0
+private snap
+== private root path ==
+lrwxrwxrwx 1 art users 26 Nov  9 11:39 /tmp/fm-lab.5j0AYq/tmp/fm-pending-reply-1000 -> /tmp/fm-lab.5j0AYq/victimA
+== victimB (legacy symlink target) ==
+total 12
+drwxr-xr-x 2 art users 4096 Nov  9 11:39 .
+drwx------ 9 art users 4096 Nov  9 11:39 ..
+-rw-r--r-- 1 art users    9 Nov  9 11:39 keep.txt
+secret-b
+== legacy symlink path ==
+lrwxrwxrwx 1 art users 26 Nov  9 11:39 /tmp/fm-lab.5j0AYq/tmp/fm-pending-reply-decisions.1617069.swap -> /tmp/fm-lab.5j0AYq/victimB
+== legit legacy leftover dir (must be gone) ==
+ls: cannot access '/tmp/fm-lab.5j0AYq/tmp/fm-pending-reply-decisions.1617069.legacy': No such file or directory
+== TMPDIR after exit ==
+total 8
+drwxr-xr-x 2 art users 4096 Nov  9 11:40 .
+drwx------ 9 art users 4096 Nov  9 11:39 ..
+lrwxrwxrwx 1 art users   26 Nov  9 11:39 fm-pending-reply-1000 -> /tmp/fm-lab.5j0AYq/victimA
+lrwxrwxrwx 1 art users   26 Nov  9 11:39 fm-pending-reply-decisions.1617069.swap -> /tmp/fm-lab.5j0AYq/victimB
+== pending record phase (denial must still hold) ==
+phase=awaiting_report
+recovery_attempted_epoch=
+recovery_delivery_outcome=
+== watcher log ==

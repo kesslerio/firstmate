@@ -1,0 +1,11 @@
+== watcher log ==
+== TMPDIR after watcher exit ==
+total 8
+drwxr-xr-x 2 art users 4096 Nov  9 11:39 .
+drwx------ 7 art users 4096 Nov  9 11:39 ..
+== record phase ==
+phase=awaiting_report
+recovery_attempted_epoch=
+recovery_delivery_outcome=
+== status file unchanged ==
+needs-decision [key=color]: pick a color

@@ -1,0 +1,5 @@
+== TMPDIR after TERM cleanup (must hold no snapshot dirs) ==
+total 8
+drwxr-xr-x 2 art users 4096 Nov  9 11:40 .
+drwx------ 7 art users 4096 Nov  9 11:40 ..
+== watcher log ==

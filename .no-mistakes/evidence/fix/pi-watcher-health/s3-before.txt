@@ -1,0 +1,6 @@
+== planted interrupted snapshot before TERM ==
+total 12
+drwxr-xr-x 3 art users 4096 Nov  9 11:40 .
+drwxr-xr-x 3 art users 4096 Nov  9 11:40 ..
+drwxr-xr-x 2 art users 4096 Nov  9 11:40 fm-pending-reply-decisions.1632822.abandoned
+interrupted snapshot payload

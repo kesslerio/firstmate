@@ -1,0 +1,9 @@
+2026-11-09T20:08:05.199Z pid=2075955 health monitor state=retrying arm=2082321
+2026-11-09T20:08:06.199Z pid=2075955 health monitor retire=timeout arm=2082321 wait=1000ms
+2026-11-09T20:10:43.716Z pid=2075955 restore attempt=0 predecessor=2146499 start=ok pid=2147487
+2026-11-09T20:10:44.511Z pid=2075955 confirm generation=2082360.1794255014.TATj3D watcherPid=2147544 result=confirmed
+2026-11-09T20:12:03.254Z pid=2075955 restore attempt=0 predecessor=2147487 start=ok pid=2154263
+2026-11-09T20:12:04.599Z pid=2075955 confirm generation=2082360.1794255014.TATj3D watcherPid=2154290 result=confirmed
+2026-11-09T20:13:12.448Z pid=2075955 health monitor state=retrying arm=2154263
+2026-11-09T20:13:14.141Z pid=2075955 restore attempt=0 predecessor=2158672 start=ok pid=2159188
+2026-11-09T20:13:15.215Z pid=2075955 confirm generation=2082360.1794255014.TATj3D watcherPid=2159215 result=confirmed

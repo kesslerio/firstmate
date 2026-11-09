@@ -1,0 +1,18 @@
+# live lab evidence: Pi primary watcher health monitor
+lab=/tmp/fm-lab.JgLUvl
+date=2026-11-09T12:16:33-08:00
+
+## final watch.lock metadata (fm-home intentionally foreign from the preservation scenario)
+fm-home=/tmp/fm-foreign-home
+pid=2159215
+pid-identity=linux-starttime=58311157 cmdline-hex=62617368002f686f6d652f6172742f2e6e6f2d6d697374616b65732f776f726b74726565732f3966373565633431383630392f30314d37305753543356434e3830505a385a363731343832524a2f62696e2
+pid-start=proc-starttime=58311157
+watcher-path={run-worktree}/bin/fm-watch.sh
+
+## config/watch.env
+FM_POLL=600
+
+## process tree
+2075955 2075954 Ssl+ pi
+2159188 2075955 S+   bash {run-worktree}/bin/fm-watch-arm.sh --restart
+2159215 2159188 S+   bash {run-worktree}/bin/fm-watch.sh

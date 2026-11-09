@@ -1,0 +1,37 @@
+ok - Pi extension reports external healthy watcher output
+ok - Pi custom tool exposes repair-only metadata and returns automatic-continuation guidance
+ok - Pi replaces stale owned watchers and preserves unproved identities
+ok - Pi health monitor replaces a wedged watcher without another tool call
+ok - Pi health monitor tolerates a slow retire without a false failure alarm
+ok - Pi repair call re-arms when an arm outlives the bounded retire wait
+ok - Pi health monitor derives its grace from the home's poll cadence
+ok - Pi watcher health matches a shell-spelled root against the recorded watcher path
+ok - Pi unready arm receives bounded start grace without duplicate launch or healthy success
+ok - Pi scheduled retry remains extension-owned after another tool call
+ok - Pi actionable close starts one successor before wake delivery settles
+ok - Pi actionable output waits for predecessor close before successor restoration
+ok - Pi restoration retries a dead-but-ready successor before delivering the wake
+ok - Pi successor exit with a held pipe schedules the bounded retry
+ok - Pi actionable output draining after exit stays actionable
+ok - Pi dispatcher branch offer owns accepted wakes and falls back to main
+ok - Pi dispatcher flags a fleet-wide heartbeat offer as branch-eligible
+ok - a co-present check row neither vetoes nor rides a heartbeat into main
+ok - every main-only check class still reaches main, never the supervision branch
+ok - a captain-held signal trigger reaches main with routine rows present
+ok - an unread pending-reply escalation keeps later stale aliases on main
+ok - a mixed batch of two distinct files - one routine, one needs-decision - routes wholly to main
+ok - a co-present needs-decision row neither vetoes nor rides a heartbeat into main
+ok - heartbeat restoration failure stays on main
+ok - watcher-failure repair stays with main even with a live, accepting branch listener
+ok - under the away-posture record every actionable row is offered to the branch while broken-queue wakes and watcher-failure alarms still reach main
+ok - Pi refused handling handshake is classified and not swallowed
+ok - Pi confirm failure retires the named arm with distinct watcher pid
+not ok - Pi must not retire a newer arm when a stale successor's confirmation fails: file://{run-worktree}/[eval1]:47
+  throw new Error(`the stale successor's confirmation never failed: ${prompt}`);
+        ^
+
+Error: the stale successor's confirmation never failed: 
+    at file://{run-worktree}/[eval1]:47:9
+
+Node.js v24.22.1: expected exit 0, got 1
+exit=1

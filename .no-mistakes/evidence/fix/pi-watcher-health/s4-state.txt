@@ -1,0 +1,19 @@
+== lab home ==
+FM_HOME=/tmp/fm-lab.79lbVS
+config/watch.env:
+export FM_POLL=600
+session lock holder (pane pid): 1670429
+== watcher identity ==
+lock pid: 1717194
+lock watcher-path: {run-worktree}/bin/fm-watch.sh
+watcher process:
+    PID    PPID     ELAPSED COMMAND
+1717194 1717167       01:19 bash {run-worktree}/bin/fm-watch.sh
+watcher poll sleep (proves FM_POLL=600 reached the arm):
+1717615 1717194 sleep 600
+beacon age seconds: 80
+== derived grace ==
+660
+== arm scripts alive ==
+1717167 bash {run-worktree}/bin/fm-watch-arm.sh --restart
+1717194 bash {run-worktree}/bin/fm-watch.sh
