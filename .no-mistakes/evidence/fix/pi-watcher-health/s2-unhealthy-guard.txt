@@ -1,0 +1,40 @@
+description: VulnHunter sandbox-depth decision procedure. For every 2b verdict …
+             ^
+
+
+
+ pi-multi-account v1.28.0 loaded (enabled). 4 account(s) in rotation. Config:
+ ~/.pi/agent/provider-failover.json
+
+ Warning: tmux extended-keys is off. Modified Enter keys may not work. Add `set -g extended-keys on` to ~/.tmux.conf
+ and restart tmux.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Update Available
+ New version 1.5.1 is available. Run pi update
+ Changelog: https://pi.dev/changelog
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Package Updates Available
+ Package updates are available. Run pi update --extensions
+ Packages:
+ - pi-multi-account
+ - pi-codex-goal
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed;
+ call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy
+
+ Warning: watcher: unhealthy - this session cannot take ownership of this home's watcher; replacement withheld because
+ there is no verified home-bound watcher with fresh progress this session may retire
+
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed;
+ call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M70WST3VCN80PZ8Z671482RJ (detached)
+0.0%/500k (auto)                                                (qualitycorp-oq) DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium
+🚀 TPS: --

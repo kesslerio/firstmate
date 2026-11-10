@@ -1,0 +1,4 @@
+watcher pid before/after identity corruption: 3256423 (unchanged, alive)
+    PID STAT COMMAND
+3256423 S+   bash {run-worktree}/bin/fm-watch.sh
+/tmp/fm-lab.JIBBXI

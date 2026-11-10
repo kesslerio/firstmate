@@ -1,0 +1,5 @@
+poll-derived grace case (FM_POLL=600): SIGSTOP watcher, beacon set 400s old, tool call ->
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed;
+ call fm_watch_arm_pi again only after a later notification says the cycle is missing, failed, or unhealthy
+
+FM_POLL=600 (grace=max(300,600+60)=660s). Watcher pid 3279825 was SIGSTOPped and state/.last-watcher-beat set to  (400s old, past the old fixed 300s floor). Tool call reported watcher: unchanged (healthy) with the same pid 3279825 and no replacement; log was empty. A control run with a 700s-old beacon on a stopped watcher made the 30s monitor log 'health monitor state=retrying' + 'retire=timeout wait=1000ms' and pid changed to 3378933 with a fresh beacon after CONT.
