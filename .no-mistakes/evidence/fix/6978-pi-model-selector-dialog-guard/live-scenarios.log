@@ -1,0 +1,19 @@
+ok - pi idle composer reached empty
+ok - the idle pi pane names no dialog
+ok - the live /model selector is named 'Pi model selector'
+ok - the base-commit matcher names no dialog on the same live capture (guard was dead)
+ok - the typed send onto the open selector was refused (rc 1)
+ok - the refusal names 'Pi model selector'
+ok - the probe text never appeared on the pane
+ok - the selector is still open after the refused send
+ok - the pane returned to an idle composer after Escape
+ok - the pane quotes the recorded selector footer above its live composer
+ok - quoted selector text above the live composer names no dialog
+ok - the send with a quoted selector above was accepted (verdict 'empty')
+ok - the quoted selector did not block the send
+ok - the shell pane shows a real bare '>' continuation prompt
+ok - the changed matcher names no dialog over the bare '>' prompt
+ok - the pre-fix matcher named 'Pi model selector' over that same live pane
+ok - the pre-fix send path refused that pane as the model selector (rc 1)
+ok - the changed send path did not block on a prompt (rc 0, verdict 'unknown')
+ok - live Pi selector guard scenarios

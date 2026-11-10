@@ -1,0 +1,40 @@
+bash-5.3$ printf '%s\n' '  ✓ alpha-model-one [localfake]' '→   beta-model-two [localfake]' '  Enter
+to select · Ctrl+S to set as default · Escape/Ctrl+C to cancel' "$(printf '─%.0s' $(seq 1 96))"
+  ✓ alpha-model-one [localfake]
+→   beta-model-two [localfake]
+  Enter to select · Ctrl+S to set as default · Escape/Ctrl+C to cancel
+────────────────────────────────────────────────────────────────────────────────────────────────
+bash-5.3$ echo "unfinished
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
