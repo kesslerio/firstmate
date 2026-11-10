@@ -1,0 +1,14 @@
+cross-root refusal:
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-one (codex, gpt-6.1-sol) was refused. Active sessions: sm-task (gpt-6.1-sol, age 3s) in /tmp/fm-lab.gn4pu7/sm/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+
+effective-config refusal:
+error: Sol ceiling unavailable: /tmp/fm-lab.gn4pu7/runtime/config/sol-cap must declare max as a positive integer of at most nine digits, not 'invalid'; task task-ctl with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+
+malformed effective declaration refusal:
+error: Sol ceiling unavailable: /tmp/fm-lab.gn4pu7/cases/s3/bad-config/sol-cap must declare max as a positive integer of at most nine digits, not 'invalid'; task task-three with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+
+inferred-config-ignored refusal:
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-four-b (codex, gpt-6.1-sol) was refused. Active sessions: task-four-a (gpt-6.1-sol, age 2s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+
+permissive control admission:
+claimed

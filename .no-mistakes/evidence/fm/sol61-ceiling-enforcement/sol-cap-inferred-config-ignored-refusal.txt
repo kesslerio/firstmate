@@ -1,0 +1,1 @@
+error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-four-b (codex, gpt-6.1-sol) was refused. Active sessions: task-four-a (gpt-6.1-sol, age 2s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing

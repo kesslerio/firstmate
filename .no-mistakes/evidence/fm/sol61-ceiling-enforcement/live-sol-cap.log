@@ -1,0 +1,119 @@
+lab primary home : /tmp/fm-lab.gn4pu7
+lab secondmate   : /tmp/fm-lab.gn4pu7/sm
+lab tmux socket  : /tmp/fml.kKUgv5/fm-lab.sock
+
+== S1  registered secondmate home's separate state root holds the slot
+   secondmate admission: claimed
+   secondmate registry: sm-task	gpt-6.1-sol	1794296344	3333610
+PASS the secondmate home holds a live covered session (pid 3333610)
+
+== S1  dispatch from the primary lab home at that machine-wide ceiling (rc=1)
+   | error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-one (codex, gpt-6.1-sol) was refused. Active sessions: sm-task (gpt-6.1-sol, age 3s) in /tmp/fm-lab.gn4pu7/sm/state. A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+PASS the dispatch was refused
+PASS the refusal names the ceiling
+PASS the refusal names the secondmate's session
+PASS the refusal names the separate state root it counted
+PASS the refused dispatch published no task record
+   ceiling still declared after the secondmate worker exited: 1
+   dispatch after the secondmate session stopped: claimed
+PASS the stopped session freed the machine-wide slot
+
+== S2  separate state override reads the effective redirected configuration
+
+== S2  dispatch under separate state + redirected config (rc=0)
+   | warning: /tmp/fm-lab.gn4pu7/data/task-two/launch-brief.md records no ship branch; defaulting to legacy branch fm/task-two
+   | spawned task-two harness=codex kind=ship mode=no-mistakes yolo=off window=firstmate:fm-task-two worktree=/tmp/fm-lab.gn4pu7/cases/s2/wt-task-two
+PASS admission accepted the dispatch
+   state override registry after admission: task-two	gpt-6.1-sol	1794296349	0
+   spawn tmux calls:
+     t| display-message -p -t $0 #S
+     t| list-windows -t firstmate -F #{window_name}
+     t| new-window -dP -F #{window_id} -t firstmate: -n fm-task-two -c /tmp/fm-lab.gn4pu7/proj
+     t| set-window-option -t  automatic-rename off
+     t| set-window-option -t  allow-rename off
+     t| send-keys -t firstmate:fm-task-two treehouse get Enter
+     t| display-message -p -t firstmate:fm-task-two #{pane_current_path}
+     t| display-message -p -t firstmate:fm-task-two #{pane_current_path}
+     t| send-keys -t firstmate:fm-task-two cd -- '/tmp/fm-lab.gn4pu7/cases/s2/wt-task-two' Enter
+     t| display-message -p -t firstmate:fm-task-two #{pane_current_path}
+     t| list-windows -t =firstmate -F #{window_name}
+     t| list-windows -t =firstmate -F #{window_name}
+     t| capture-pane -p -t firstmate:fm-task-two -S -40
+     t| send-keys -t firstmate:fm-task-two export GOTMPDIR=/tmp/fm-task-two/gotmp Enter
+     t| send-keys -t firstmate:fm-task-two export COMPACT_ADVISER_DISABLE=1 Enter
+     t| send-keys -t firstmate:fm-task-two export FM_TASK_ID=task-two Enter
+     t| send-keys -t firstmate:fm-task-two -l . '/tmp/fm-task-two+3cea1f415b0eceefe7ba6653c42203df2aedfeacaf37c77ce84e5a74df90e682/launch.s1794296353.3336715.10563.sh'
+     t| list-windows -t =firstmate -F #{window_name}
+     t| send-keys -t firstmate:fm-task-two Enter
+   staged launch files under the state root:
+   staged handoff file: /tmp/fm-task-two+3cea1f415b0eceefe7ba6653c42203df2aedfeacaf37c77ce84e5a74df90e682/launch.s1794296353.3336715.10563.sh
+PASS the spawn staged a launch handoff
+   handoff: FM_HOME='/tmp/fm-lab.gn4pu7' FM_STATE_OVERRIDE='/tmp/fm-lab.gn4pu7/runtime/state' FM_CONFIG_OVERRIDE='/tmp/fm-lab.gn4pu7/redir-config' bash '{run-worktree}/bin/fm-sol-cap-lib.sh' run-launch 'task-two' '/tmp/fm-lab.gn4pu7/runtime/state' 'export COMPACT_ADVISER_DISABLE=1; export FM_TASK_INBOX='\''/tmp/fm-lab.gn4pu7/runtime/state/task-two.inbox'\''; '\''{run-worktree}/bin/fm-osc7501.sh'\'' arm --task '\''task-two'\'' --harness '\''codex'\'' --backend '\''tmux'\'' --kind '\''ship'\'' --state '\''/tmp/fm-lab.gn4pu7/runtime/state'\'' --config '\''/tmp/fm-lab.gn4pu7/redir-config'\'' --target '\''firstmate:fm-task-two'\'' --agent-bin '\''/tmp/fm-lab.gn4pu7/fakebin/codex'\'' >/dev/null || true
+'\''{run-worktree}/bin/fm-git-strip-ai-trailers.sh'\'' env-file '\''/tmp/fm-lab.gn4pu7/runtime/state/task-two.git-hooks'\'' '\''/tmp/fm-task-two+3cea1f415b0eceefe7ba6653c42203df2aedfeacaf37c77ce84e5a74df90e682/git-config.s1794296353.3336715.10563.sh'\'' && . '\''/tmp/fm-task-two+3cea1f415b0eceefe7ba6653c42203df2aedfeacaf37c77ce84e5a74df90e682/git-config.s1794296353.3336715.10563.sh'\'' || return 1 2>/dev/null || exit 1; export FM_HOME='\''/tmp/fm-lab.gn4pu7'\''; env -u CURSOR_AGENT -u CURSOR_INVOKED_AS -u GEMINI_CLI /tmp/fm-lab.gn4pu7/fakebin/codex '\''/tmp/fm-lab.gn4pu7/cases/s2/invocation.argv'\''
+'\''{run-worktree}/bin/fm-osc7501.sh'\'' disarm --state '\''/tmp/fm-lab.gn4pu7/runtime/state'\'' >/dev/null 2>/dev/null || true'
+PASS the handoff passes the resolved config override
+PASS the handoff passes the resolved state override
+PASS the worker launched in the real pane: probe-ran
+   real pane after the launch:
+     p| . '/tmp/fm-task-two+3cea1f415b0eceefe7ba6653c42203df2aedfeacaf37c77ce84e5a74df90e682/launch.s1794296353.3336715.10563.sh'
+     p| 
+     p| [art@zeppola:/tmp/fm-lab.gn4pu7/cases/s2/wt-task-two]$ . '/tmp/fm-task-two+3cea1f415b0eceefe7ba6653c42203df2aedfeacaf37c77ce84e5a74df90e682/launch.s1794296353.3336715.10563.sh'
+     p| live worker reachable, argv: probe-ran
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+     p| 
+   state override registry after launch: task-two	gpt-6.1-sol	1794296349	3340321
+PASS the reservation was promoted onto the live worker process (pid 3340321)
+
+== S2 control: same state root, path-inferred malformed declaration, no effective override (rc=1)
+   | error: Sol ceiling unavailable: /tmp/fm-lab.gn4pu7/runtime/config/sol-cap must declare max as a positive integer of at most nine digits, not 'invalid'; task task-ctl with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+PASS the path-inferred malformed declaration refuses
+PASS the refusal names the malformed declaration
+
+== S3  adversarial: a malformed effective declaration refuses and reserves nothing
+
+== S3  dispatch under a malformed effective declaration (rc=1)
+   | error: Sol ceiling unavailable: /tmp/fm-lab.gn4pu7/cases/s3/bad-config/sol-cap must declare max as a positive integer of at most nine digits, not 'invalid'; task task-three with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
+PASS the dispatch was refused
+PASS the refusal names the ceiling as unavailable
+PASS the refusal names the malformed max
+PASS the refusal names the offending file
+PASS no reservation was written for the refused dispatch
+PASS no task record was published for the refused dispatch
+
+== S4  adversarial: a permissive declaration at the inferred config path is not consulted
+PASS the first covered worker is live in the redirected state root (pid 3341143)
+
+== S4  first admission under max=1: rc=0 claimed
+
+== S4  second admission, permissive trap present at the inferred path: rc=1
+   | error: Sol ceiling reached: 1 concurrent capped session(s) already active and this ceiling is 1 (declared in config/sol-cap); the dispatch of task task-four-b (codex, gpt-6.1-sol) was refused. Active sessions: task-four-a (gpt-6.1-sol, age 2s). A session frees its slot when its worker's process ends; the dispatch contract refuses at the ceiling instead of queueing
+PASS the first admission claimed the only slot
+PASS the second admission was refused at the ceiling
+PASS the refusal names the ceiling
+PASS the refusal names the occupying session
+
+== S4 control: same state, effective config switched to the permissive one: rc=0 claimed
+PASS the permissive declaration admits, so the trap is genuinely reachable
+
+== evidence
+   wrote evidence under ~/.no-mistakes/evidence/01M725HG5Q50ECNGF4V37CVFN8
+
+== teardown
+
+lab homes and socket removed: /tmp/fm-lab.gn4pu7
+
+RESULT: all live scenarios passed

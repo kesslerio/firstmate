@@ -1,0 +1,1 @@
+error: Sol ceiling unavailable: /tmp/fm-lab.gn4pu7/cases/s3/bad-config/sol-cap must declare max as a positive integer of at most nine digits, not 'invalid'; task task-three with model gpt-6.1-sol was not dispatched rather than launched against an undeclared ceiling
