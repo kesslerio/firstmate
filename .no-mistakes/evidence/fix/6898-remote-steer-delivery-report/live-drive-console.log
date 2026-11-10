@@ -1,0 +1,127 @@
+=== s1_sent_precedes_notice ===
+worktree: {run-worktree} (HEAD 538ef9dd9)
+started: 2026-11-10T00:02:02Z
+CASE 1: delivered remote steer, remote leg emits a doorbell notice on stderr
+  cmd: fm-send.sh rsm 'please rename the metric'  (FM_HOME=<lab parent home>, ssh seam -> real remote leg)
+  exit: 0
+  stderr (numbered):
+         1	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         2	●  WATCHER DOWN - SUPERVISION IS OFF
+         3	●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+         4	●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+         5	●  This is a supervision warning only; the requested message WILL still be sent.
+         6	●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+         7	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         8	sent: steer to remote secondmate rsm durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-sent-order-rhome/state/parent-route/rsm.inbox/001.msg - delivery is complete, do not resend
+         9	notice: steer durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-sent-order-rhome/state/parent-route/rsm.inbox/001.msg; doorbell did not reach fm-remote:p1
+  stdout: 
+PASS  delivered remote steer exits 0
+PASS  the sent: confirmation names the far-side record
+PASS  the named far-side record exists in the remote home
+PASS  the remote leg's notice: line reaches the operator
+PASS  sent: precedes the buffered notice: (sent line 8 < notice line 9)
+PASS  no internal steer_record= line is replayed to the operator
+PASS  a delivered send carries no error: line
+PASS  the remote stderr buffer file is removed after the send
+  --- direct run of the remote leg (bin/fm-remote-secondmate-control.sh send-stdin rsm):
+    exit: 0
+    leg stdout: steer_record=/tmp/fm-send-remote-delivery.fd7soI/live-sent-order-leg-rhome/state/parent-route/rsm.inbox/001.msg
+    leg stderr: notice: steer durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-sent-order-leg-rhome/state/parent-route/rsm.inbox/001.msg; doorbell did not reach fm-remote:p1
+PASS  the remote leg reports its record on stdout
+PASS  the remote leg emits the notice on its own stderr
+finished: 2026-11-10T00:02:12Z
+
+=== s2_unusable_tmpdir ===
+worktree: {run-worktree} (HEAD 538ef9dd9)
+started: 2026-11-10T00:02:13Z
+CASE 2: unusable TMPDIR (stderr buffer cannot be created)
+  cmd: TMPDIR=/tmp/fm-send-remote-delivery.fd7soI/live-bad-tmp/nonexistent fm-send.sh rsm 'please rename the metric'
+  exit: 1
+  stderr (numbered):
+         1	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         2	●  WATCHER DOWN - SUPERVISION IS OFF
+         3	●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+         4	●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+         5	●  This is a supervision warning only; the requested message WILL still be sent.
+         6	●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+         7	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         8	mktemp: failed to create file via template ‘/tmp/fm-send-remote-delivery.fd7soI/live-bad-tmp/nonexistent/fm-send-remote-stderr.XXXXXX’: No such file or directory
+         9	error: steer not sent to remote secondmate rsm: could not create remote stderr buffer; check TMPDIR
+PASS  buffer failure refuses the send with a nonzero exit
+PASS  the refusal names the missing prerequisite
+PASS  no sent: line is printed (nothing was delivered)
+PASS  no remote attempt is made (ssh invocations: 0)
+PASS  no far-side record is written
+PASS  the undelivered reply expectation is discarded
+finished: 2026-11-10T00:02:16Z
+
+=== s3_real_remote_failure ===
+worktree: {run-worktree} (HEAD 538ef9dd9)
+started: 2026-11-10T00:02:16Z
+CASE 3: real remote leg failure (remote home has no parent-route endpoint)
+  cmd: fm-send.sh rsm 'please rename the metric'  (real leg refuses the record)
+  exit: 1
+  stderr (numbered):
+         1	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         2	●  WATCHER DOWN - SUPERVISION IS OFF
+         3	●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+         4	●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+         5	●  This is a supervision warning only; the requested message WILL still be sent.
+         6	●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+         7	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         8	error: remote home is not a Firstmate checkout
+         9	error: steer not sent to remote secondmate rsm (the remote steering-inbox record could not be written; the remote leg's stderr above has the reason)
+PASS  a failed remote leg exits nonzero
+PASS  the buffered remote diagnostics still reach the operator
+PASS  the send is reported as not sent
+PASS  no sent: confirmation is printed for a failed send
+PASS  no far-side record is written
+finished: 2026-11-10T00:02:21Z
+
+=== s4_ambiguous_then_success ===
+worktree: {run-worktree} (HEAD 538ef9dd9)
+started: 2026-11-10T00:02:21Z
+CASE 4: ssh 255 after the record landed, then the identical retry succeeds
+  cmd: fm-send.sh rsm 'please rename the metric'  (attempt 1 ambiguous, attempt 2 delivered)
+  exit: 0
+  ssh attempts: 2
+  stderr (numbered):
+         1	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         2	●  WATCHER DOWN - SUPERVISION IS OFF
+         3	●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+         4	●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+         5	●  This is a supervision warning only; the requested message WILL still be sent.
+         6	●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+         7	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         8	sent: steer to remote secondmate rsm durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-ambiguous-rhome/state/parent-route/rsm.inbox/001.msg - delivery is complete, do not resend
+         9	notice: steer durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-ambiguous-rhome/state/parent-route/rsm.inbox/001.msg; doorbell did not reach fm-remote:p1
+        10	notice: steer durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-ambiguous-rhome/state/parent-route/rsm.inbox/001.msg; doorbell did not reach fm-remote:p1
+PASS  the retried delivery exits 0
+PASS  the transport was retried exactly once
+PASS  exactly one far-side record exists
+PASS  stderr carries a notice from each attempt (found 2, expected 2)
+PASS  sent: precedes every buffered notice across both attempts
+finished: 2026-11-10T00:02:33Z
+
+=== s5_no_report_still_confirms ===
+worktree: {run-worktree} (HEAD 538ef9dd9)
+started: 2026-11-10T00:02:33Z
+CASE 5: remote leg older than the steer_record report (delivers, reports nothing)
+  cmd: fm-send.sh rsm 'please rename the metric'  (remote leg stdout dropped)
+  exit: 0
+  stderr (numbered):
+         1	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         2	●  WATCHER DOWN - SUPERVISION IS OFF
+         3	●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+         4	●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+         5	●  This is a supervision warning only; the requested message WILL still be sent.
+         6	●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+         7	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         8	sent: steer to remote secondmate rsm durably recorded in remote secondmate rsm's own steering inbox - delivery is complete, do not resend
+         9	notice: steer durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-noreport-rhome/state/parent-route/rsm.inbox/001.msg; doorbell did not reach fm-remote:p1
+PASS  delivery without a remote report still exits 0
+PASS  delivery is still confirmed without a named path
+PASS  exactly one far-side record exists
+finished: 2026-11-10T00:02:40Z
+
+OVERALL: PASS

@@ -1,0 +1,22 @@
+=== s3_real_remote_failure ===
+worktree: {run-worktree} (HEAD 538ef9dd9)
+started: 2026-11-10T00:02:16Z
+CASE 3: real remote leg failure (remote home has no parent-route endpoint)
+  cmd: fm-send.sh rsm 'please rename the metric'  (real leg refuses the record)
+  exit: 1
+  stderr (numbered):
+         1	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         2	●  WATCHER DOWN - SUPERVISION IS OFF
+         3	●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+         4	●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+         5	●  This is a supervision warning only; the requested message WILL still be sent.
+         6	●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+         7	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         8	error: remote home is not a Firstmate checkout
+         9	error: steer not sent to remote secondmate rsm (the remote steering-inbox record could not be written; the remote leg's stderr above has the reason)
+PASS  a failed remote leg exits nonzero
+PASS  the buffered remote diagnostics still reach the operator
+PASS  the send is reported as not sent
+PASS  no sent: confirmation is printed for a failed send
+PASS  no far-side record is written
+finished: 2026-11-10T00:02:21Z

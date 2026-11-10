@@ -1,0 +1,32 @@
+=== s1_sent_precedes_notice ===
+worktree: {run-worktree} (HEAD 538ef9dd9)
+started: 2026-11-10T00:02:02Z
+CASE 1: delivered remote steer, remote leg emits a doorbell notice on stderr
+  cmd: fm-send.sh rsm 'please rename the metric'  (FM_HOME=<lab parent home>, ssh seam -> real remote leg)
+  exit: 0
+  stderr (numbered):
+         1	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         2	●  WATCHER DOWN - SUPERVISION IS OFF
+         3	●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+         4	●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+         5	●  This is a supervision warning only; the requested message WILL still be sent.
+         6	●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+         7	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         8	sent: steer to remote secondmate rsm durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-sent-order-rhome/state/parent-route/rsm.inbox/001.msg - delivery is complete, do not resend
+         9	notice: steer durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-sent-order-rhome/state/parent-route/rsm.inbox/001.msg; doorbell did not reach fm-remote:p1
+  stdout: 
+PASS  delivered remote steer exits 0
+PASS  the sent: confirmation names the far-side record
+PASS  the named far-side record exists in the remote home
+PASS  the remote leg's notice: line reaches the operator
+PASS  sent: precedes the buffered notice: (sent line 8 < notice line 9)
+PASS  no internal steer_record= line is replayed to the operator
+PASS  a delivered send carries no error: line
+PASS  the remote stderr buffer file is removed after the send
+  --- direct run of the remote leg (bin/fm-remote-secondmate-control.sh send-stdin rsm):
+    exit: 0
+    leg stdout: steer_record=/tmp/fm-send-remote-delivery.fd7soI/live-sent-order-leg-rhome/state/parent-route/rsm.inbox/001.msg
+    leg stderr: notice: steer durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-sent-order-leg-rhome/state/parent-route/rsm.inbox/001.msg; doorbell did not reach fm-remote:p1
+PASS  the remote leg reports its record on stdout
+PASS  the remote leg emits the notice on its own stderr
+finished: 2026-11-10T00:02:12Z

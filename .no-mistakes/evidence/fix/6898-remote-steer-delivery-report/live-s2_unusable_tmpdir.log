@@ -1,0 +1,23 @@
+=== s2_unusable_tmpdir ===
+worktree: {run-worktree} (HEAD 538ef9dd9)
+started: 2026-11-10T00:02:13Z
+CASE 2: unusable TMPDIR (stderr buffer cannot be created)
+  cmd: TMPDIR=/tmp/fm-send-remote-delivery.fd7soI/live-bad-tmp/nonexistent fm-send.sh rsm 'please rename the metric'
+  exit: 1
+  stderr (numbered):
+         1	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         2	●  WATCHER DOWN - SUPERVISION IS OFF
+         3	●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+         4	●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+         5	●  This is a supervision warning only; the requested message WILL still be sent.
+         6	●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+         7	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         8	mktemp: failed to create file via template ‘/tmp/fm-send-remote-delivery.fd7soI/live-bad-tmp/nonexistent/fm-send-remote-stderr.XXXXXX’: No such file or directory
+         9	error: steer not sent to remote secondmate rsm: could not create remote stderr buffer; check TMPDIR
+PASS  buffer failure refuses the send with a nonzero exit
+PASS  the refusal names the missing prerequisite
+PASS  no sent: line is printed (nothing was delivered)
+PASS  no remote attempt is made (ssh invocations: 0)
+PASS  no far-side record is written
+PASS  the undelivered reply expectation is discarded
+finished: 2026-11-10T00:02:16Z

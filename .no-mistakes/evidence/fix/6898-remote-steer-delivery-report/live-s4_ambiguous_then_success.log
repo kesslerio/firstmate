@@ -1,0 +1,24 @@
+=== s4_ambiguous_then_success ===
+worktree: {run-worktree} (HEAD 538ef9dd9)
+started: 2026-11-10T00:02:21Z
+CASE 4: ssh 255 after the record landed, then the identical retry succeeds
+  cmd: fm-send.sh rsm 'please rename the metric'  (attempt 1 ambiguous, attempt 2 delivered)
+  exit: 0
+  ssh attempts: 2
+  stderr (numbered):
+         1	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         2	●  WATCHER DOWN - SUPERVISION IS OFF
+         3	●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+         4	●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+         5	●  This is a supervision warning only; the requested message WILL still be sent.
+         6	●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+         7	●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         8	sent: steer to remote secondmate rsm durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-ambiguous-rhome/state/parent-route/rsm.inbox/001.msg - delivery is complete, do not resend
+         9	notice: steer durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-ambiguous-rhome/state/parent-route/rsm.inbox/001.msg; doorbell did not reach fm-remote:p1
+        10	notice: steer durably recorded at /tmp/fm-send-remote-delivery.fd7soI/live-ambiguous-rhome/state/parent-route/rsm.inbox/001.msg; doorbell did not reach fm-remote:p1
+PASS  the retried delivery exits 0
+PASS  the transport was retried exactly once
+PASS  exactly one far-side record exists
+PASS  stderr carries a notice from each attempt (found 2, expected 2)
+PASS  sent: precedes every buffered notice across both attempts
+finished: 2026-11-10T00:02:33Z
