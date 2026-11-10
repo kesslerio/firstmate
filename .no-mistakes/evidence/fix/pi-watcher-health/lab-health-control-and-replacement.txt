@@ -1,0 +1,73 @@
+home=/tmp/fmlab-health.857690  poll default(15s)  guard grace default(300s derived)  health tick=30s
+--- S2 control: healthy established arm must not be churned across 3 health ticks (90s)
+t+000s pid=890485 beacon_age=7s arms=2 watchers=2 extlog=0 branchlog=0
+t+016s pid=890485 beacon_age=7s arms=2 watchers=2 extlog=0 branchlog=0
+t+031s pid=890485 beacon_age=5s arms=2 watchers=2 extlog=0 branchlog=0
+t+046s pid=890485 beacon_age=4s arms=2 watchers=2 extlog=0 branchlog=0
+t+062s pid=890485 beacon_age=4s arms=2 watchers=2 extlog=0 branchlog=0
+t+077s pid=890485 beacon_age=3s arms=2 watchers=2 extlog=0 branchlog=0
+t+092s pid=890485 beacon_age=2s arms=2 watchers=2 extlog=0 branchlog=0
+checks(control):
+watcher pid before stall: 890485
+
+--- S1: SIGSTOP the live watcher and age its beacon to 400s (stale past the 300s grace)
+ACTION t=05:45:33 SIGSTOP watcher 890485 ; beacon aged 400s
+t+000s lock_pid=890485 beacon_age=400s arms=2 watchers=2 extlog=0
+t+005s lock_pid=890485 beacon_age=405s arms=2 watchers=2 extlog=0
+t+010s lock_pid=890485 beacon_age=410s arms=2 watchers=2 extlog=0
+t+015s lock_pid=890485 beacon_age=415s arms=2 watchers=2 extlog=0
+t+020s lock_pid=890485 beacon_age=420s arms=3 watchers=2 extlog=0
+t+026s lock_pid=890485 beacon_age=426s arms=3 watchers=2 extlog=0
+t+031s lock_pid=890485 beacon_age=431s arms=3 watchers=2 extlog=0
+t+036s lock_pid=890485 beacon_age=436s arms=3 watchers=2 extlog=0
+t+041s lock_pid=890485 beacon_age=441s arms=3 watchers=2 extlog=0
+t+046s lock_pid=890485 beacon_age=446s arms=3 watchers=2 extlog=0
+t+052s lock_pid=890485 beacon_age=452s arms=3 watchers=2 extlog=0
+t+057s lock_pid=890485 beacon_age=457s arms=3 watchers=2 extlog=0
+t+062s lock_pid=890485 beacon_age=462s arms=3 watchers=2 extlog=0
+t+067s lock_pid=890485 beacon_age=467s arms=3 watchers=2 extlog=0
+t+073s lock_pid=890485 beacon_age=473s arms=2 watchers=2 extlog=0
+t+078s lock_pid=890485 beacon_age=478s arms=2 watchers=2 extlog=0
+t+083s lock_pid=890485 beacon_age=483s arms=2 watchers=2 extlog=0
+t+088s lock_pid=890485 beacon_age=488s arms=2 watchers=2 extlog=0
+
+extension log:
+
+arm output:
+
+--- S1 continued: the health monitor acted on the stalled arm (arm count rose 2->3 within one 30s tick);
+    release the frozen (TERM-unresponsive) watcher so a replacement can take the single-instance lock
+ACTION SIGKILL frozen watcher 890485
+t+000s lock_pid=890485 beacon_age=512s arms=3 watchers=1
+t+005s lock_pid=996981 beacon_age=2s arms=2 watchers=2
+t+011s lock_pid=996981 beacon_age=8s arms=2 watchers=2
+t+016s lock_pid=996981 beacon_age=13s arms=2 watchers=2
+t+021s lock_pid=996981 beacon_age=3s arms=2 watchers=2
+t+026s lock_pid=996981 beacon_age=8s arms=2 watchers=2
+t+031s lock_pid=996981 beacon_age=13s arms=2 watchers=2
+t+036s lock_pid=996981 beacon_age=2s arms=2 watchers=2
+t+041s lock_pid=996981 beacon_age=7s arms=2 watchers=2
+t+047s lock_pid=996981 beacon_age=13s arms=2 watchers=2
+t+052s lock_pid=996981 beacon_age=3s arms=2 watchers=2
+t+057s lock_pid=996981 beacon_age=8s arms=2 watchers=2
+t+062s lock_pid=996981 beacon_age=13s arms=2 watchers=2
+t+067s lock_pid=996981 beacon_age=2s arms=2 watchers=2
+checks(replacement):
+PASS replacement watcher took the lock: 890485 -> 996981
+PASS replacement watcher 996981 is alive
+PASS replacement beacon fresh (8s)
+--- S3 adversarial: identity-unproved watcher (foreign .watch.lock/fm-home) with a stale beacon
+ACTION foreign lock home + 700s beacon at t=05:48:38
+t+000s lock_pid=996981 beacon_age=700s arms=2 watchers=2
+t+006s lock_pid=996981 beacon_age=706s arms=2 watchers=2
+t+011s lock_pid=996981 beacon_age=3s arms=2 watchers=2
+t+016s lock_pid=996981 beacon_age=8s arms=2 watchers=2
+t+022s lock_pid=996981 beacon_age=14s arms=2 watchers=2
+t+027s lock_pid=996981 beacon_age=2s arms=2 watchers=2
+t+033s lock_pid=996981 beacon_age=8s arms=2 watchers=2
+t+038s lock_pid=996981 beacon_age=13s arms=2 watchers=2
+checks(guard):
+PASS identity-unproved watcher pid unchanged (996981)
+PASS no replacement arm launched (arms=2)
+PASS identity-unproved watcher process still alive
+restore lock home for teardown
