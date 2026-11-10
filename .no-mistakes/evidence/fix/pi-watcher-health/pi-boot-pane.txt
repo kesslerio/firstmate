@@ -1,0 +1,50 @@
+Warning: No models match pattern "john-lan/qwen3.8-flash-next"
+Warning: No models match pattern "john-remote/qwen3.8-flash-next"
+Model scope: gpt-6.1-sol, gpt-6-luna, gpt-6-astra, grok-4.7, grok-4.5, GLM-5.3-Flash-Abliterated-MLX-4bit, qwen3.6-35b-a3b, Youssofal/Qwen3.8-27B-MTPLX-Optimized-Speed, Youssofal/Qwen3.8-Flash-Next-MT
+PLX-Optimized-Speed, incoai/Qwen3.6-35B-A3B-Splash, incoai/Qwen3.8-27B-Splash, qwen3.8-flash-next, claude-opus-5-5, claude-sonnet-5-5, deepseek-v4.1-flash, claude-haiku-5-5, mimo-v2.6-flash, mimo-v2.6
+-pro, DeepSeek-V4.1-Flash-iQ3-3.0bpw (Ctrl+P to cycle)
+
+ ▀▀█  v1.5.0
+ █▀ █ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+
+ pi-multi-account v1.28.0: seamless in-place resume (pi.continueAgent) is not available on this Pi build — automatic recovery resumes from the preserved task context in a fresh turn. Temporary errors
+ keep the same provider/model; confirmed quota limits retain failover. This is the expected fallback, not an error.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M70WST3VCN80PZ8Z671482RJ (detached)
+0.0%/500k (auto)                                                                                                                                                 DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium
+🚀 TPS: --
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,50 @@
+ ... (75 earlier lines, ctrl+o to expand)
+ # so it can never swallow a main-owned row still waiting for main.
+ ACTOR=$(fm_lease_actor) || exit 2
+ ELIGIBLE_ROWS_FILE="$STATE/.branch-eligible-rows"
+ ELIGIBLE_OWNER_FILE="$STATE/.branch-eligible-owner"
+ MAIN_ROWS_FILE="$STATE/.main-eligible-rows"
+
+ Took 0.0s
+
+
+ The drain presented nothing, only ack required through 0, meaning there are no unacked rows to consume. The wake said "check: rearm-resurface", watcher continuity is extension-owned. So I should ack
+ through 0 with the given recovery generation.
+
+ Wait — the instruction says "Run bin/fm-wake-drain.sh first and handle the queued wake." The drain showed nothing queued. So handle = nothing to do; then run ack.
+
+ Also check the branch outcomes? This is main actor presumably. Let me run ack-through 0.
+
+
+ $ bin/fm-wake-drain.sh --ack-through 0 --recovery-generation 680892.1794271329.nAjM7p 2>&1 | tail -20
+
+ (no output)
+
+ Took 0.2s
+
+
+ Handled the check: rearm-resurface wake:
+
+ - Ran bin/fm-wake-drain.sh: nothing queued — it only required an acknowledgement at sequence 0.
+ - Acked with --ack-through 0 --recovery-generation 680892.1794271329.nAjM7p (no output, exit 0).
+ - No state markers (state/.afk, .subsuper-*) present, so no away/quiet postures apply; watcher continuity stays extension-owned and needs no manual re-arm.
+
+
+ Run the fm_watch_arm_pi tool exactly once more, then quote its full output verbatim. Do not run bash.
+
+
+
+ fm_watch_arm_pi
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+ missing, failed, or unhealthy
+
+
+ watcher: unchanged - Pi extension verified this home's watcher identity and fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after a later notification says the cycle is
+ missing, failed, or unhealthy
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M70WST3VCN80PZ8Z671482RJ (detached)
+↑2.5k ↓931 R158k CH99.5% 3.2%/500k (auto)                                                                                                       (qualitycorp-oq) DeepSeek-V4.1-Flash-iQ3-3.0bpw • medium
+🚀 TPS: 246.8 tok/s (76 tok in 0.3s · TTFT: 691 ms)​

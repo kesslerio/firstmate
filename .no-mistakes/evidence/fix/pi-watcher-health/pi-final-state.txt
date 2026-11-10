@@ -1,0 +1,5 @@
+final_lock_pid=720831
+final_beat_age_s=53
+lab_pids:
+ 720804  680607 bash {run-worktree}/bin/fm-watch-arm.sh --restart
+ 720831  720804 bash {run-worktree}/bin/fm-watch.sh

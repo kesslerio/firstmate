@@ -1,0 +1,20 @@
+pid_before_outside=680892
+pid_after_outside=720831
+extension_log:
+2026-11-10T00:42:09.538Z pid=680607 health monitor state=retrying arm=680846
+2026-11-10T00:42:10.857Z pid=680607 restore attempt=0 predecessor=720302 start=ok pid=720804
+2026-11-10T00:42:11.554Z pid=680607 confirm generation=680892.1794271329.nAjM7p watcherPid=720831 result=confirmed
+beat_age_s=32
+process:
+    PID    PPID COMMAND
+ 720831  720804 bash {run-worktree}/bin/fm-watch.sh
+children:
+    PID    PPID COMMAND
+ 721304  720831 sleep 600
+retired_pid_alive:
+    PID COMMAND
+no (retired)
+all_lab_watchers:
+ 680606    1121 tmux -L fm-lab new-session -d -s primary -c {run-worktree} -e FM_HOME=/tmp/fm-lab.fSYCLY -e FM_WATCH_EXTENSION_LOG_KEEP_LINES=200 -x 200 -y 50 bash /tmp/fm-lab.fSYCLY/launch.sh
+watchers_for_tracked_script:
+ 720831 bash {run-worktree}/bin/fm-watch.sh

@@ -1,0 +1,10 @@
+watch_lock_pid=680892
+watch_lock_watcher_path={run-worktree}/bin/fm-watch.sh
+watch_lock_home=/tmp/fm-lab.fSYCLY
+beat_age_s=123
+process:
+    PID    PPID COMMAND
+ 680892  680846 bash {run-worktree}/bin/fm-watch.sh
+children:
+    PID    PPID COMMAND
+ 681483  680892 sleep 600
