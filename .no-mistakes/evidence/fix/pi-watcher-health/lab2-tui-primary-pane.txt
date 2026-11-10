@@ -1,0 +1,24 @@
+ per section 9, "Reply exactly Captain, shipshape. only for a true no-op that
+ still needs an answer". Yes.
+
+ Watcher continuity is extension-owned so no fm_watch_arm_pi call.
+
+ Final message must address captain.
+
+ Captain, shipshape. The re-arm notification was continuity only: nothing was
+ queued, no fleet work is under way, and I acknowledged the drain so the cycle
+ resumes cleanly.
+
+
+ ⁣FIRSTMATE_OP: v1 watcher: FIRSTMATE WATCHER WAKE: check: rearm-resurface
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity
+ is extension-owned.
+
+
+── ⠏ Working ───────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M71VZS0JJAQGPHNF91Y57945 (detached)
+↑29k ↓1.7k R219k CH98.9% 5.9%/500k (auto)  DeepSeek-V4.1-Flash-iQ3-3.0bpw • medi
+🚀 TPS: 75.0 tok/s (1706 tok in 22.7s · TTFT: 11988 ms)​

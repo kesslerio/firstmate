@@ -1,0 +1,7 @@
+2026-11-10T04:55:33.476Z pid=3634927 health monitor state=retrying arm=3638718
+2026-11-10T04:55:36.568Z pid=3634927 restore attempt=0 predecessor=3698189 start=ok pid=3699998
+2026-11-10T04:55:37.995Z pid=3634927 confirm generation=3639041.1794286533.sHQTbt watcherPid=3700069 result=confirmed
+2026-11-10T04:56:53.878Z pid=3634927 health monitor state=retrying arm=3699998
+2026-11-10T04:56:54.884Z pid=3634927 health monitor retire=timeout arm=3699998 wait=1000ms
+2026-11-10T04:56:58.906Z pid=3634927 restore attempt=0 predecessor=3745890 start=ok pid=3749679
+2026-11-10T04:57:02.524Z pid=3634927 confirm generation=3700069.1794286614.0mE8uZ watcherPid=3749921 result=confirmed

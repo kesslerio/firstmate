@@ -1,0 +1,21 @@
+ACTION: hand the session lock to a different live process (3714228) and age the watcher's beacon past its grace
+t+000s lock=3714228 watcher=3700069 beacon_age=700s arms=1 retirements=1
+t+006s lock=3714228 watcher=3700069 beacon_age=706s arms=1 retirements=1
+t+011s lock=3714228 watcher=3700069 beacon_age=711s arms=1 retirements=1
+t+016s lock=3714228 watcher=3700069 beacon_age=716s arms=1 retirements=1
+t+021s lock=3714228 watcher=3700069 beacon_age=721s arms=1 retirements=1
+t+027s lock=3714228 watcher=3700069 beacon_age=727s arms=1 retirements=1
+t+032s lock=3714228 watcher=3700069 beacon_age=732s arms=1 retirements=1
+t+037s lock=3714228 watcher=3700069 beacon_age=737s arms=1 retirements=1
+checks (foreign lock owner):
+PASS the watcher 3700069 was not retired by a session that does not own the lock
+PASS the watcher process is still alive
+PASS no health-monitor retirement ran under a foreign lock
+ACTION: return the lock to this session and re-age the beacon
+t+042s lock=3634927 watcher=3700069 beacon_age=700s arms=1 retirements=1
+t+047s lock=3634927 watcher=3700069 beacon_age=705s arms=1 retirements=1
+t+051s lock=3634927 watcher=none beacon_age=709s arms=1 retirements=3
+t+055s lock=3634927 watcher=none beacon_age=2s arms=1 retirements=3
+checks (owned lock restored):
+PASS the health monitor resumed once this session owned the lock
+PASS a replacement watcher took over: 3700069 -> 3749921

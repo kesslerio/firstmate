@@ -1,0 +1,38 @@
+configured cadence: export FM_POLL=600
+_: line 1: //bin/fm-wake-lib.sh: No such file or directory
+_: line 1: fm_poll_derived_grace: command not found
+derived grace for this home: s
+baseline: t+000s pid=3639041 beacon_age=27s arms=1 watchers=1 extlog=0
+ACTION: age the idle watcher's beacon to 400s - stale under a fixed 300s floor, healthy under the 600s poll-derived grace
+t+000s pid=3639041 beacon_age=400s arms=1 watchers=1 extlog=0
+t+005s pid=3639041 beacon_age=405s arms=1 watchers=1 extlog=0
+t+010s pid=3639041 beacon_age=410s arms=1 watchers=1 extlog=0
+t+016s pid=3639041 beacon_age=416s arms=1 watchers=1 extlog=0
+t+021s pid=3639041 beacon_age=421s arms=1 watchers=1 extlog=0
+t+026s pid=3639041 beacon_age=426s arms=1 watchers=1 extlog=0
+t+032s pid=3639041 beacon_age=432s arms=1 watchers=1 extlog=0
+t+037s pid=3639041 beacon_age=437s arms=1 watchers=1 extlog=0
+t+042s pid=3639041 beacon_age=442s arms=1 watchers=1 extlog=0
+checks (400s beacon):
+PASS the 400s beacon was not treated as stalled; watcher 3639041 kept the lock
+PASS no health-monitor retirement ran at 400s
+PASS exactly one arm (no churn)
+ACTION: age the same beacon past the 660s derived grace
+t+048s pid=3639041 beacon_age=700s arms=1 watchers=1 extlog=0
+t+051s pid=3639041 beacon_age=703s arms=1 watchers=1 extlog=0
+t+054s pid=3639041 beacon_age=706s arms=1 watchers=1 extlog=0
+t+057s pid=3639041 beacon_age=709s arms=1 watchers=1 extlog=0
+t+061s pid=3639041 beacon_age=713s arms=1 watchers=1 extlog=0
+t+064s pid=none beacon_age=1s arms=1 watchers=0 extlog=1
+t+067s pid=3700069 beacon_age=2s arms=1 watchers=1 extlog=1
+checks (700s beacon):
+PASS the health monitor ran for the past-grace beacon
+PASS a replacement watcher took over: 3639041 -> 3700069
+PASS stalled watcher 3639041 was retired
+PASS replacement watcher 3700069 is alive
+PASS replacement beacon is fresh (2s)
+PASS exactly one arm supervises the home after replacement
+extension log:
+2026-11-10T04:55:33.476Z pid=3634927 health monitor state=retrying arm=3638718
+2026-11-10T04:55:36.568Z pid=3634927 restore attempt=0 predecessor=3698189 start=ok pid=3699998
+2026-11-10T04:55:37.995Z pid=3634927 confirm generation=3639041.1794286533.sHQTbt watcherPid=3700069 result=confirmed

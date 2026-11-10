@@ -1,0 +1,16 @@
+baseline: t+000s pid=3360957 beacon_age=3s arms=1 watchers=1 log_lines=2 home=/tmp/fm-lab.hANpfN
+ACTION: SIGSTOP the live watcher 3360957 and mark the lock's home as a foreign/sibling home
+t+001s pid=3360957 beacon_age=4s arms=1 watchers=1 log_lines=2 home=/tmp/fm-lab.hANpfN/../sibling-home
+t+013s pid=3360957 beacon_age=16s arms=1 watchers=1 log_lines=2 home=/tmp/fm-lab.hANpfN/../sibling-home
+t+026s pid=3360957 beacon_age=29s arms=1 watchers=1 log_lines=2 home=/tmp/fm-lab.hANpfN/../sibling-home
+t+038s pid=3360957 beacon_age=41s arms=1 watchers=1 log_lines=2 home=/tmp/fm-lab.hANpfN/../sibling-home
+t+051s pid=3360957 beacon_age=54s arms=1 watchers=1 log_lines=2 home=/tmp/fm-lab.hANpfN/../sibling-home
+t+063s pid=3360957 beacon_age=66s arms=1 watchers=1 log_lines=2 home=/tmp/fm-lab.hANpfN/../sibling-home
+t+076s pid=3360957 beacon_age=79s arms=1 watchers=1 log_lines=2 home=/tmp/fm-lab.hANpfN/../sibling-home
+checks:
+PASS recorded watcher pid unchanged (3360957)
+PASS identity-unproved watcher process 3360957 is still alive
+PASS exactly one arm (no replacement launched)
+PASS exactly one watcher (no replacement launched)
+PASS health monitor took no action on an identity-unproved watcher
+watcher-down marker: acked:handling:3358150.1794285793.IUKbDv

@@ -1,0 +1,4 @@
+2026-11-10T04:43:15.804Z pid=3354130 restore attempt=0 predecessor=3357998 start=ok pid=3360821
+2026-11-10T04:43:17.868Z pid=3354130 confirm generation=3358150.1794285793.IUKbDv watcherPid=3360957 result=confirmed
+2026-11-10T04:48:44.925Z pid=3354130 health monitor state=retrying arm=3360821
+2026-11-10T04:48:45.947Z pid=3354130 health monitor retire=timeout arm=3360821 wait=1000ms

@@ -1,0 +1,24 @@
+
+ Took 0.7s
+
+
+ Captain, shipshape.
+
+ The queued notification was the watcher's own rearm resurface: the previous
+ cycle delivered it and stood down, and the replacement cycle is confirmed and
+ running. The fleet is empty — nothing under way, nothing queued, nothing
+ awaiting your review, so there is no decision on deck for you.
+
+ Since this was a pure acknowledgement with no consequence, no action is
+ required from you.
+
+ Warning: watcher: unhealthy - this session cannot take ownership of this
+ home's watcher; replacement withheld because there is no verified home-bound
+ watcher with fresh progress this session may retire
+
+────────────────────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M71VZS0JJAQGPHNF91Y57945 (detached)
+↑29k ↓1.1k R219k CH99.6% 5.9%/500k (auto)  DeepSeek-V4.1-Flash-iQ3-3.0bpw • medi
+🚀 TPS: 88.8 tok/s (1137 tok in 12.8s · TTFT: 12575 ms)​

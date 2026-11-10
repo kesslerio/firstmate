@@ -1,0 +1,24 @@
+
+ Run bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity
+ is extension-owned.
+
+
+ Repeat wake. Run drain.
+
+ watcher: unchanged - Pi extension verified this home's watcher identity and
+ fresh progress; no manual re-arm needed; call fm_watch_arm_pi again only after
+ a later notification says the cycle is missing, failed, or unhealthy
+
+
+ $ cd {run-worktree}
+ && bin/fm-wake-drain.sh
+
+ Elapsed 0.3s
+
+
+── ⠋ Working ───────────────────────────────────────────────────────────────────
+
+────────────────────────────────────────────────────────────────────────────────
+~/.no-mistakes/worktrees/9f75ec418609/01M71VZS0JJAQGPHNF91Y57945 (detached)
+↑29k ↓1.8k R248k CH99.4% 5.9%/500k (auto)  DeepSeek-V4.1-Flash-iQ3-3.0bpw • medi
+🚀 TPS: 65.5 tok/s (41 tok in 0.6s · TTFT: 3674 ms)​
