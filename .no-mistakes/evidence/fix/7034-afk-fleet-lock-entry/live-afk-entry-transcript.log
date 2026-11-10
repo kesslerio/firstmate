@@ -1,0 +1,42 @@
+== lab home: /tmp/fm-lab.kWD8qQ (marked disposable)
+== foreign live lock holder pid: 2507554
+== state/.lock content: 2507554
+== ps of the holder: Mon Nov 9 20:00:56 2026 00:00
+
+$ bin/fm-afk-launch.sh enter --words 'merge it when green'   # away entry, live foreign holder
+another live firstmate session holds the lock (pid 2507554, started Mon Nov 9 20:00:56 2026, age 00:01); this session does not own the fleet lock, so it must not record a mandate it cannot carry out. Stopping the holder is a decision for the operator, never for this script.
+rc=1
+record present: no
+
+$ bin/fm-afk-launch.sh enter --words 'quiet down'  (FM_AFK_MODE=quiet)   # same live holder
+Quiet mode recorded at 2026-11-10T04:00:59Z: you are present, so nothing waits for your return: every action you ask for, a local landing or a merge included, proceeds now under ordinary attended authority, and quiet mode changes only which updates reach this conversation. Only an explicit /quiet off ends it.
+Quiet mode (recorded):
+  entered: 2026-11-10T04:00:59Z
+  holds: none - you are present, so nothing waits for your return: every action you ask for, a local landing or a merge included, proceeds now under ordinary attended authority, and quiet mode changes only which updates reach this conversation.
+  your words (verbatim):
+    quiet down
+rc=0
+record present: yes
+recorded mode: quiet
+recorded words: quiet down
+
+$ bin/fm-afk-contract.sh enter --words 'bypass the launcher'   # direct record write, live holder
+another live firstmate session holds the lock (pid 2507554, started Mon Nov 9 20:00:56 2026, age 00:02); this session does not own the fleet lock, so it must not record a mandate it cannot carry out. Stopping the holder is a decision for the operator, never for this script.
+rc=1
+record present: no
+
+$ bin/fm-afk-launch.sh enter --words 'merge it when green'   # stale lock, no live holder
+Away posture recorded at 2026-11-10T04:01:00Z: hold-for-return only. No phone channel is configured; anything that needs you waits for your return. Your away instructions are recorded verbatim; the away session will carry them out where it can, and anything it is unsure of, or that needs you, waits for your return. Destructive, irreversible, and security-sensitive actions are never pre-authorizable, whatever the words say. Expected return: not given. Spend cap: 4 concurrent workers.
+Away posture (recorded):
+  entered: 2026-11-10T04:01:00Z
+  expected return: not given
+  spend cap: 4 concurrent workers
+  reach: hold-for-return only. No phone channel is configured; anything that needs you waits for your return.
+  your words (verbatim):
+    merge it when green
+rc=0
+record present: yes
+recorded mode: away
+recorded words: merge it when green
+
+== done; lab homes removed by the EXIT trap

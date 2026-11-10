@@ -1,0 +1,19 @@
+== lab home: /tmp/fm-lab.AwQLpN (marked disposable)
+== stage a standing away record while no other session holds the lock
+record present: yes
+recorded mode: away
+== foreign live lock holder pid: 2520897
+
+$ bin/fm-afk-launch.sh enter   (no words: refresh over the standing away record)
+another live firstmate session holds the lock (pid 2520897, started Mon Nov 9 20:03:20 2026, age 00:00); this session does not own the fleet lock, so it must not record a mandate it cannot carry out. Stopping the holder is a decision for the operator, never for this script.
+rc=1
+record unchanged by the refresh: yes
+recorded mode after: away
+
+$ FM_AFK_MODE=quiet bin/fm-afk-launch.sh enter   (quiet refresh over the standing away record)
+another live firstmate session holds the lock (pid 2520897, started Mon Nov 9 20:03:20 2026, age 00:01); this session does not own the fleet lock, so it must not record a mandate it cannot carry out. Stopping the holder is a decision for the operator, never for this script.
+rc=1
+record unchanged by the quiet refresh: yes
+recorded mode after: away
+
+== done; lab home removed by the EXIT trap
