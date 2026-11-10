@@ -1,0 +1,27 @@
+### BASE COMMIT 14d06b0441783fc8fc80d04ce5c2745db91b0700 -- failure mode 1: an idle durable home has no protection
+scaffolded: /tmp/fm-base-lab.FnWx0C/parent/data/mate1/brief.md (secondmate charter)
+home=/tmp/fm-base-lab.FnWx0C/pool/.treehouse/code-1317e4/1/code
+   NO Git worktree lock on the seeded home (base behaviour)
+   
+   REPRODUCED: an ordinary 'git worktree remove' deleted the idle durable home (still present: no)
+
+### BASE COMMIT 14d06b0441783fc8fc80d04ce5c2745db91b0700 -- failure mode 2: a returned slot keeps the retired payload
+scaffolded: /tmp/fm-base-lab.ajNG2s/parent/data/mate2/brief.md (secondmate charter)
+home=/tmp/fm-base-lab.ajNG2s/pool/.treehouse/code-1317e4/1/code
+   
+   🌳 Worktree returned to pool.
+   teardown mate2 complete (window firstmate:fm-mate2, worktree /tmp/fm-base-lab.ajNG2s/pool/.treehouse/code-1317e4/1/code)
+   teardown rc=0
+   slot contents after the pool return:
+     PRESENT: data
+     PRESENT: state
+     PRESENT: config
+     PRESENT: projects
+     PRESENT: .fm-secondmate-home
+     PRESENT: .fm-secondmate-parent
+   A new version of treehouse is available: v2.0.1 → v3.1.8
+   Run "treehouse update" to update
+   
+   🌳 Worktree returned to pool.
+   next seed rc=1
+   REPRODUCED: the returned slot refused the next seed while it still carried the retired mate's marker

@@ -1,0 +1,6 @@
+error: durable home /tmp/fm-home-payload-return.mUxj74/slot tracks payload paths (data/notes); leaving its slot payload in place
+ok - pool return observes a clean slot and failures preserve retry ownership
+
+real	0m1.616s
+user	0m0.291s
+sys	0m0.483s
