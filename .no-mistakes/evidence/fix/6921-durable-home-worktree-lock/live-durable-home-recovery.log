@@ -1,0 +1,178 @@
+### lab /tmp/fm-lab.cijKGr (code HEAD a8680e91671d6f0b7faad5776555a0afe266f8f2)
+
+=== SCENARIO 1: a seeded durable home is Git-locked and ordinary removal refuses
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code. Run 'treehouse return /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code' to release it.
+scaffolded: /tmp/fm-lab.cijKGr/parent/data/mate1/brief.md (secondmate charter)
+home=/tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+-- identity marker: mate1
+-- git worktree lock: Firstmate durable home mate1 [fm-home-lock.drNQwr]
+PASS  seed published mate1 identity
+PASS  seeded home carries the durable-home Git lock (reason: Firstmate durable home mate1 [fm-home-lock.drNQwr])
+   fatal: cannot remove a locked working tree, lock reason: Firstmate durable home mate1 [fm-home-lock.drNQwr]
+   use 'remove -f -f' to override or unlock first
+PASS  ordinary 'git worktree remove' of the idle home is refused
+PASS  the refused removal left the home in place
+
+=== SCENARIO 2: retirement releases the lock and hands back a reusable pool slot
+-- pool before: 1     leased       /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code  (held by mate1)
+   A new version of treehouse is available: v2.0.1 → v3.1.8
+   Run "treehouse update" to update
+   
+   🌳 Worktree returned to pool.
+   teardown mate1 complete (window firstmate:fm-mate1, worktree /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code)
+PASS  teardown of the durable home succeeded
+PASS  retirement released the Git worktree lock
+PASS  retirement removed the ownership receipt
+PASS  returned slot carries no retired payload: data
+PASS  returned slot carries no retired payload: state
+PASS  returned slot carries no retired payload: config
+PASS  returned slot carries no retired payload: projects
+PASS  returned slot carries no retired payload: .fm-secondmate-home
+PASS  returned slot carries no retired payload: .fm-secondmate-parent
+PASS  returned slot keeps its checkout contents
+PASS  retirement removed the retired mate's task record
+-- pool after return: 1     available    /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+   🌳 Setting up worktree...
+   🌳 Leased worktree at /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code. Run 'treehouse return /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code' to release it.
+   scaffolded: /tmp/fm-lab.cijKGr/parent/data/mate2/brief.md (secondmate charter)
+   home=/tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+PASS  the next seed leased the very slot the retired mate returned
+PASS  the re-leased slot carries the new mate's identity, not the retired one
+PASS  the re-leased slot carries the new mate's owned lock (reason: Firstmate durable home mate2 [fm-home-lock.tlSZYE])
+PASS  the re-leased home was seeded with its own payload
+
+=== SCENARIO 3 (adversarial): foreign or unprovable lock ownership refuses retirement
+-- foreign lock installed: foreign owner
+   WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+   REFUSED: foreign Git worktree lock for durable home /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+PASS  forced retirement refused a foreign-owned durable home
+PASS  the refusal left the foreign lock byte-identical
+PASS  the refusal preserved the mate's route for retry
+PASS  the refusal preserved the home
+   WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+   REFUSED: foreign Git worktree lock for durable home /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+PASS  retirement refused a familiar lock reason with no ownership receipt
+PASS  the unknown-owner refusal preserved the route
+   
+   🌳 Worktree returned to pool.
+   teardown mate2 complete (window firstmate:fm-mate2, worktree /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code)
+PASS  retirement succeeded once owned protection was restored
+PASS  the successful retry released the lock
+PASS  the successful retry cleared the retired payload
+
+=== SCENARIO 4: a failed pool return preserves the home, lock, and lease for retry
+   🌳 Leased worktree at /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code. Run 'treehouse return /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code' to release it.
+   scaffolded: /tmp/fm-lab.cijKGr/parent/data/mate3/brief.md (secondmate charter)
+   home=/tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+   WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+   synthetic treehouse return failure
+   warning: recovering the interrupted return of durable home /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+   error: treehouse return failed for secondmate home /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code; preserving the home and its records for retry (lease may still be held)
+PASS  teardown reported the failed pool return to the operator
+PASS  the failed return restored the exact owned lock (reason: Firstmate durable home mate3 [fm-home-lock.ec8IcX])
+PASS  the failed return restored the ownership receipt
+PASS  the failed return kept the home identity
+PASS  the failed return kept the retryable home payload
+PASS  the failed return kept the route for retry
+-- pool after failed return: 1     leased       /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code  (held by mate3)
+PASS  the failed return left the slot leased to mate3 in the real pool
+   
+   🌳 Worktree returned to pool.
+   teardown mate3 complete (window firstmate:fm-mate3, worktree /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code)
+PASS  retrying the same retirement succeeded
+PASS  the successful retry returned a clean slot
+PASS  the successful retry released the lock
+
+=== SCENARIO 5: a failed seed releases attempt-owned protection and returns its acquired slot
+   error: no filled secondmate charter brief at /tmp/fm-lab.cijKGr/parent/data/mate4/brief.md; set FM_SECONDMATE_CHARTER or scaffold one and replace {TASK}
+   A new version of treehouse is available: v2.0.1 → v3.1.8
+   Run "treehouse update" to update
+   
+   🌳 Worktree returned to pool.
+PASS  the seed failed as expected on the missing charter
+-- acquired slot /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+PASS  the failed seed left no attempt-owned Git lock
+PASS  the failed seed left no ownership receipt
+PASS  the returned slot carries no attempted identity
+PASS  the returned slot carries no partial payload
+   🌳 Leased worktree at /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code. Run 'treehouse return /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code' to release it.
+   scaffolded: /tmp/fm-lab.cijKGr/parent/data/mate5/brief.md (secondmate charter)
+   home=/tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+PASS  the next seed could lease the slot the failed seed returned
+PASS  the next seed leased the same slot
+PASS  the new seed owns its own protection (reason: Firstmate durable home mate5 [fm-home-lock.3P2Zco])
+
+=== SCENARIO 6 (adversarial): a return killed mid-flight is recovered by the next retirement
+   🌳 Worktree returned to pool.
+   teardown mate5 complete (window firstmate:fm-mate5, worktree /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code)
+   🌳 Leased worktree at /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code. Run 'treehouse return /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code' to release it.
+   scaffolded: /tmp/fm-lab.cijKGr/parent/data/mate6/brief.md (secondmate charter)
+   home=/tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+PASS  the killed return reached its in-flight staging: /tmp/fm-lab.cijKGr/parent/state/.home-return.tzh8HZ
+-- crash state: home marker present? no; payload present? no
+PASS  the killed return left the home stripped of identity
+PASS  the killed return left the home stripped of payload
+PASS  the killed return left a recoverable staging record
+-- staging record: schema=fm-home-return.v1 id=mate6 home=/tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code 
+PASS  the killed return left the real pool lease held for mate6
+   warning: recovering the interrupted return of durable home /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+   A new version of treehouse is available: v2.0.1 → v3.1.8
+   Run "treehouse update" to update
+   
+   🌳 Worktree returned to pool.
+   teardown mate6 complete (window firstmate:fm-mate6, worktree /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code)
+PASS  retrying the interrupted retirement succeeded
+PASS  the recovered retirement returned a clean slot
+PASS  the recovered retirement cleared the interrupted identity
+PASS  the recovered retirement released the lock
+PASS  the recovered retirement removed the task record
+PASS  the recovered retirement cleared its staging
+
+=== SCENARIO 7 (adversarial): a crash after the slot return committed must not restore the retired payload
+   🌳 Leased worktree at /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code. Run 'treehouse return /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code' to release it.
+   scaffolded: /tmp/fm-lab.cijKGr/parent/data/mate7/brief.md (secondmate charter)
+   home=/tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+PASS  the real pool slot return completed before the crash
+-- crash log:
+   WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+-- staging after crash: /tmp/fm-lab.cijKGr/parent/state/.home-return.2Mu1rT
+PASS  the crash left the in-flight staging record for recovery
+-- crash staging record: schema=fm-home-return.v1 id=mate7 home=/tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code returning=1 
+PASS  the crash state still has an unresolved return record
+PASS  the crashed retirement left the home stripped of identity
+PASS  the crash left the mate's route record for the retry
+-- pool after crash (slot already returned): 1     available    /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+PASS  the crash happened after the real pool slot return
+   WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+   teardown mate7 complete (window firstmate:fm-mate7, worktree /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code)
+PASS  the retried retirement completed as a records-only retirement
+PASS  recovery did NOT restore the retired identity into the returned slot
+PASS  recovery did NOT restore the retired payload into the returned slot
+PASS  recovery did NOT re-lock the returned slot
+PASS  recovery did NOT republish the retired ownership receipt
+PASS  the records-only retirement removed the task record
+PASS  the records-only retirement drained its staging
+   
+   🌳 Setting up worktree...
+   🌳 Leased worktree at /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code. Run 'treehouse return /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code' to release it.
+   home=/tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code
+PASS  the same mate id leased the same returned slot again
+PASS  the replacement home published its own identity
+PASS  the replacement home carries its own owned lock (reason: Firstmate durable home mate7 [fm-home-lock.m32diI])
+PASS  the replacement home was seeded with its own payload
+   Run "treehouse update" to update
+   
+   🌳 Worktree returned to pool.
+   teardown mate7 complete (window firstmate:fm-mate7, worktree /tmp/fm-lab.cijKGr/pool/.treehouse/code-1317e4/1/code)
+PASS  retiring the replacement home succeeded
+PASS  the replacement retirement cleared its payload
+PASS  the replacement retirement cleared its identity
+PASS  the replacement retirement released its lock
+PASS  the replacement retirement removed its task record
+
+=== SUMMARY: 0 failed check(s)
+
+real	1m59.569s
+user	0m14.093s
+sys	0m22.971s
