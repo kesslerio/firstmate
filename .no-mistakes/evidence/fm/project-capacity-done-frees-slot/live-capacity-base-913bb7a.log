@@ -1,0 +1,33 @@
+
+== S1: a scout that reports done frees its project place for the next worker
+PASS - a working scout holds its place (exit 75)
+PASS - the deferral names the working scout holder
+PASS - a deferred spawn left no record
+FAIL - a done scout releases its place for the next spawn: expected exit 0, got 75: deferred: project project admits 1 worker(s) at once on this machine (/tmp/fm-capacity-live.9JI0Y5/s1-scout-done/home/config/project-capacity) and 1 already hold a place (live-s); task task-e was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR or is cleaned up
+FAIL - the next worker launched after the scout finished: output lacks [spawned task-e]: deferred: project project admits 1 worker(s) at once on this machine (/tmp/fm-capacity-live.9JI0Y5/s1-scout-done/home/config/project-capacity) and 1 already hold a place (live-s); task task-e was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR or is cleaned up
+FAIL - the admitted spawn published no record
+
+== S2: a no-mistakes ship keeps its place after done (guard)
+PASS - a shipped-mode worker still holds its place after done (exit 75)
+PASS - the no-mistakes holder is named
+
+== S3: relaunching a finished scout reserves the place until the replacement reports
+FAIL - a relaunch is deferred while another worker holds the only place: expected exit 75, got 0: spawned task-a harness=codex kind=scout window=firstmate:fm-task-a worktree=/tmp/fm-capacity-live.9JI0Y5/s3-relaunch/wt-task-a
+PASS - a refused relaunch wrote no reservation
+FAIL - no reservation during relaunch
+PASS - the reservation left prior status history byte-identical
+PASS - another spawn cannot take the place of the in-flight relaunch (exit 75)
+PASS - bookkeeping alone does not expire the reservation (exit 75)
+PASS - the relaunch succeeded (exit 0)
+FAIL - a successful relaunch dropped its reservation
+PASS - the running replacement still holds its place (exit 75)
+FAIL - the replacement reporting done frees the place again: expected exit 0, got 75: deferred: project project admits 1 worker(s) at once on this machine (/tmp/fm-capacity-live.9JI0Y5/s3-relaunch/home/config/project-capacity) and 1 already hold a place (task-a); task task-b was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR or is cleaned up
+
+== S4: an aborted relaunch releases its reservation
+PASS - a relaunch refused before launch fails (exit 1)
+PASS - a proven non-launch removed the reservation
+FAIL - the place of an aborted relaunch is free for the next worker: expected exit 0, got 75: deferred: project project admits 1 worker(s) at once on this machine (/tmp/fm-capacity-live.9JI0Y5/s4-abort/home/config/project-capacity) and 1 already hold a place (task-a); task task-b was not launched and its backlog item stays queued - dispatch it again once one of them records its ready PR or is cleaned up
+PASS - a malformed reservation holds a place instead of undercounting (exit 75)
+PASS - an unparseable reservation holds a place too (exit 75)
+
+== result: FAIL (8)

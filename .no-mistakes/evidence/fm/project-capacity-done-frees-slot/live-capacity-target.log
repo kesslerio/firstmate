@@ -1,0 +1,33 @@
+
+== S1: a scout that reports done frees its project place for the next worker
+PASS - a working scout holds its place (exit 75)
+PASS - the deferral names the working scout holder
+PASS - a deferred spawn left no record
+PASS - a done scout releases its place for the next spawn (exit 0)
+PASS - the next worker launched after the scout finished
+PASS - the admitted spawn published its task record
+
+== S2: a no-mistakes ship keeps its place after done (guard)
+PASS - a shipped-mode worker still holds its place after done (exit 75)
+PASS - the no-mistakes holder is named
+
+== S3: relaunching a finished scout reserves the place until the replacement reports
+PASS - a relaunch is deferred while another worker holds the only place (exit 75)
+PASS - a refused relaunch wrote no reservation
+PASS - the in-flight relaunch reserved the released place
+PASS - the reservation left prior status history byte-identical
+PASS - another spawn cannot take the place of the in-flight relaunch (exit 75)
+PASS - bookkeeping alone does not expire the reservation (exit 75)
+PASS - the relaunch succeeded (exit 0)
+PASS - a successful relaunch keeps its reservation
+PASS - the running replacement still holds its place (exit 75)
+PASS - the replacement reporting done frees the place again (exit 0)
+
+== S4: an aborted relaunch releases its reservation
+PASS - a relaunch refused before launch fails (exit 1)
+PASS - a proven non-launch removed the reservation
+PASS - the place of an aborted relaunch is free for the next worker (exit 0)
+PASS - a malformed reservation holds a place instead of undercounting (exit 75)
+PASS - an unparseable reservation holds a place too (exit 75)
+
+== result: PASS
