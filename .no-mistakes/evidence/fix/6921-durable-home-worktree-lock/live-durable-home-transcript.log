@@ -1,0 +1,244 @@
+
+=== S1: seeding a durable linked-worktree home locks it against ordinary git worktree remove
+ok   real treehouse seed succeeded
+seeded home: /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code
+ok   present: /tmp/fm-live-driver/labs/s1/code/.git/worktrees/code/locked
+ok   present: /tmp/fm-live-driver/labs/s1/code/.git/worktrees/code/firstmate-home-lock
+Firstmate durable home mate1 [fm-home-lock.KZJsPf]
+schema=fm-home-worktree-lock.v1
+id=mate1
+home=/tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code
+parent=/tmp/fm-live-driver/labs/s1/parent
+reason=Firstmate durable home mate1 [fm-home-lock.KZJsPf]
+ok   ordinary git worktree remove refused the protected home
+fatal: cannot remove a locked working tree, lock reason: Firstmate durable home mate1 [fm-home-lock.KZJsPf]
+use 'remove -f -f' to override or unlock first
+ok   git refused because of the worktree lock
+ok   the lock reason names the durable home
+ok   the ownership receipt is published
+ok   repeated seed accepted its own lock
+ok   repeated seed kept the lock byte-identical
+
+=== S2: retirement returns a payload-free slot and the next seed leases it again
+ok   retirement of the durable home succeeded
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-driver/labs/s1/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-driver/labs/s1/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown mate1 complete (window firstmate:fm-mate1, worktree /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code)
+ok   absent: /tmp/fm-live-driver/labs/s1/code/.git/worktrees/code/locked
+ok   absent: /tmp/fm-live-driver/labs/s1/code/.git/worktrees/code/firstmate-home-lock
+ok   absent: /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code/.fm-secondmate-home
+ok   absent: /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code/.fm-secondmate-parent
+ok   absent: /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code/data
+ok   absent: /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code/state
+ok   absent: /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code/config
+ok   absent: /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code/projects
+ok   present: /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code/AGENTS.md
+ok   absent: /tmp/fm-live-driver/labs/s1/parent/state/mate1.meta
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+1     available    /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code
+ok   the pool reports the slot available again
+the next mate leased: /tmp/fm-live-driver/labs/s1/pool/.treehouse/code-e04537/1/code
+ok   the next mate leased the same returned slot
+ok   the re-leased slot belongs to the new mate
+ok   present: /tmp/fm-live-driver/labs/s1/code/.git/worktrees/code/locked
+ok   the re-leased slot carries its own lock
+
+=== S3: guarded retirement refuses a foreign lock and unknown ownership, even with --force
+ok   forced retirement refused a foreign lock
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-driver/labs/s3/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-driver/labs/s3/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUSED: foreign Git worktree lock for durable home /tmp/fm-live-driver/labs/s3/pool/.treehouse/code-e04537/1/code
+ok   the foreign lock is untouched
+ok   the refusal explains the foreign lock
+ok   present: /tmp/fm-live-driver/labs/s3/parent/state/mate1.meta
+ok   the foreign-locked home is still leased, not returned
+ok   retirement refused a familiar reason with no ownership receipt
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: foreign Git worktree lock for durable home /tmp/fm-live-driver/labs/s3/pool/.treehouse/code-e04537/1/code
+ok   the lock survives the unknown-ownership refusal
+ok   present: /tmp/fm-live-driver/labs/s3/parent/state/mate1.meta
+ok   retirement refused a corrupt ownership receipt
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: mismatched durable-home lock ownership for /tmp/fm-live-driver/labs/s3/pool/.treehouse/code-e04537/1/code
+ok   retirement succeeds once owned protection is intact again
+
+=== S4: a failed pool return puts the whole home back so the retry is not refused
+ok   failed retirement reported failure (rc=1)
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-driver/labs/s4/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-driver/labs/s4/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+synthetic pool failure
+error: treehouse return failed for secondmate home /tmp/fm-live-driver/labs/s4/pool/.treehouse/code-e04537/1/code; preserving the home and its records for retry (lease may still be held)
+ok   the return command was reached
+ok   the owned lock is restored exactly
+ok   present: /tmp/fm-live-driver/labs/s4/code/.git/worktrees/code/firstmate-home-lock
+ok   the receipt is restored exactly
+ok   present: /tmp/fm-live-driver/labs/s4/parent/state/mate1.meta
+ok   present: /tmp/fm-live-driver/labs/s4/pool/.treehouse/code-e04537/1/code/.fm-secondmate-home
+ok   present: /tmp/fm-live-driver/labs/s4/pool/.treehouse/code-e04537/1/code/.fm-secondmate-parent
+ok   present: /tmp/fm-live-driver/labs/s4/pool/.treehouse/code-e04537/1/code/data/charter.md
+ok   no payload staging is left behind
+ok   the retried retirement is not refused
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown mate1 complete (window firstmate:fm-mate1, worktree /tmp/fm-live-driver/labs/s4/pool/.treehouse/code-e04537/1/code)
+ok   absent: /tmp/fm-live-driver/labs/s4/parent/state/mate1.meta
+ok   absent: /tmp/fm-live-driver/labs/s4/code/.git/worktrees/code/locked
+ok   absent: /tmp/fm-live-driver/labs/s4/pool/.treehouse/code-e04537/1/code/data
+
+=== S5: a handled TERM during the payload move restores the home for a retry
+signalling the returning process 667884 with TERM
+ok   the interrupted return was signalled
+ok   interrupted retirement reported failure (rc=1)
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-driver/labs/s5-termsig/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-driver/labs/s5-termsig/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: treehouse return failed for secondmate home /tmp/fm-live-driver/labs/s5-termsig/pool/.treehouse/code-e04537/1/code; preserving the home and its records for retry (lease may still be held)
+ok   the interrupted home kept its data
+ok   the interrupted home kept its identity
+ok   the interrupted home kept its parent binding
+ok   the interrupted home kept its protection
+ok   present: /tmp/fm-live-driver/labs/s5-termsig/code/.git/worktrees/code/firstmate-home-lock
+ok   present: /tmp/fm-live-driver/labs/s5-termsig/parent/state/mate1.meta
+ok   present: /tmp/fm-live-driver/labs/s5-termsig/pool/.treehouse/code-e04537/1/code/projects
+ok   the restore left no payload staging
+ok   the interrupted return did not release the slot
+ok   the retried retirement after the interrupt succeeded
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown mate1 complete (window firstmate:fm-mate1, worktree /tmp/fm-live-driver/labs/s5-termsig/pool/.treehouse/code-e04537/1/code)
+ok   absent: /tmp/fm-live-driver/labs/s5-termsig/parent/state/mate1.meta
+ok   absent: /tmp/fm-live-driver/labs/s5-termsig/code/.git/worktrees/code/locked
+ok   absent: /tmp/fm-live-driver/labs/s5-termsig/pool/.treehouse/code-e04537/1/code/data
+ok   absent: /tmp/fm-live-driver/labs/s5-termsig/pool/.treehouse/code-e04537/1/code/.fm-secondmate-home
+
+=== S5b: a handled INT during the payload move restores the home for a retry
+signalling the returning process 677110 with INT
+ok   the interrupted return was signalled
+ok   interrupted retirement reported failure (rc=1)
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-driver/labs/s5-intsig/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-driver/labs/s5-intsig/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: treehouse return failed for secondmate home /tmp/fm-live-driver/labs/s5-intsig/pool/.treehouse/code-e04537/1/code; preserving the home and its records for retry (lease may still be held)
+ok   the interrupted home kept its data
+ok   the interrupted home kept its identity
+ok   the interrupted home kept its parent binding
+ok   the interrupted home kept its protection
+ok   present: /tmp/fm-live-driver/labs/s5-intsig/code/.git/worktrees/code/firstmate-home-lock
+ok   present: /tmp/fm-live-driver/labs/s5-intsig/parent/state/mate1.meta
+ok   present: /tmp/fm-live-driver/labs/s5-intsig/pool/.treehouse/code-e04537/1/code/projects
+ok   the restore left no payload staging
+ok   the interrupted return did not release the slot
+ok   the retried retirement after the interrupt succeeded
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown mate1 complete (window firstmate:fm-mate1, worktree /tmp/fm-live-driver/labs/s5-intsig/pool/.treehouse/code-e04537/1/code)
+ok   absent: /tmp/fm-live-driver/labs/s5-intsig/parent/state/mate1.meta
+ok   absent: /tmp/fm-live-driver/labs/s5-intsig/code/.git/worktrees/code/locked
+ok   absent: /tmp/fm-live-driver/labs/s5-intsig/pool/.treehouse/code-e04537/1/code/data
+ok   absent: /tmp/fm-live-driver/labs/s5-intsig/pool/.treehouse/code-e04537/1/code/.fm-secondmate-home
+
+=== S5c: a handled HUP during the payload move restores the home for a retry
+signalling the returning process 683100 with HUP
+ok   the interrupted return was signalled
+ok   interrupted retirement reported failure (rc=1)
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-driver/labs/s5-hupsig/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-driver/labs/s5-hupsig/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: treehouse return failed for secondmate home /tmp/fm-live-driver/labs/s5-hupsig/pool/.treehouse/code-e04537/1/code; preserving the home and its records for retry (lease may still be held)
+ok   the interrupted home kept its data
+ok   the interrupted home kept its identity
+ok   the interrupted home kept its parent binding
+ok   the interrupted home kept its protection
+ok   present: /tmp/fm-live-driver/labs/s5-hupsig/code/.git/worktrees/code/firstmate-home-lock
+ok   present: /tmp/fm-live-driver/labs/s5-hupsig/parent/state/mate1.meta
+ok   present: /tmp/fm-live-driver/labs/s5-hupsig/pool/.treehouse/code-e04537/1/code/projects
+ok   the restore left no payload staging
+ok   the interrupted return did not release the slot
+ok   the retried retirement after the interrupt succeeded
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown mate1 complete (window firstmate:fm-mate1, worktree /tmp/fm-live-driver/labs/s5-hupsig/pool/.treehouse/code-e04537/1/code)
+ok   absent: /tmp/fm-live-driver/labs/s5-hupsig/parent/state/mate1.meta
+ok   absent: /tmp/fm-live-driver/labs/s5-hupsig/code/.git/worktrees/code/locked
+ok   absent: /tmp/fm-live-driver/labs/s5-hupsig/pool/.treehouse/code-e04537/1/code/data
+ok   absent: /tmp/fm-live-driver/labs/s5-hupsig/pool/.treehouse/code-e04537/1/code/.fm-secondmate-home
+
+=== S6: a failed seed rolls back its own protection and keeps earlier owned protection
+ok   seed refused an absent charter
+error: no filled secondmate charter brief at /tmp/fm-live-driver/labs/s6/parent/data/retry/brief.md; set FM_SECONDMATE_CHARTER or scaffold one and replace {TASK}
+ok   absent: /tmp/fm-live-driver/labs/s6/code/.git/worktrees/home2/locked
+ok   absent: /tmp/fm-live-driver/labs/s6/code/.git/worktrees/home2/firstmate-home-lock
+ok   the seed retry on the same worktree succeeded
+ok   repeat seed refused a populated projectless home
+error: cannot seed project-less secondmate home /tmp/fm-live-driver/labs/s6/home2 because it contains project data
+error: projects/ entries: retained
+error: retire or clean this home first before seeding with --no-projects
+ok   the failed repeat seed kept the earlier owned lock
+ok   the failed repeat seed kept the earlier receipt
+
+=== S7: a home whose tree tracks payload paths refuses the return and keeps its checkout
+ok   retirement refused a home whose tree tracks payload paths
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-driver/labs/s7/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-driver/labs/s7/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+error: durable home /tmp/fm-live-driver/labs/s7/pool/.treehouse/code-e04537/1/code tracks payload paths (data/charter.md); leaving its slot payload in place
+error: treehouse return failed for secondmate home /tmp/fm-live-driver/labs/s7/pool/.treehouse/code-e04537/1/code; preserving the home and its records for retry (lease may still be held)
+ok   the refusal names the tracked payload
+ok   the refused cleanup kept protection
+ok   present: /tmp/fm-live-driver/labs/s7/parent/state/mate1.meta
+ok   present: /tmp/fm-live-driver/labs/s7/pool/.treehouse/code-e04537/1/code/data/charter.md
+ok   the refused cleanup did not return the slot
+ok   the retried retirement after clearing the index succeeded
+ok   absent: /tmp/fm-live-driver/labs/s7/code/.git/worktrees/code/locked
+ok   absent: /tmp/fm-live-driver/labs/s7/pool/.treehouse/code-e04537/1/code/data
+
+=== summary: 0 failing assertion(s)
