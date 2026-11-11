@@ -1,0 +1,62 @@
+FM_ROOT={run-worktree}
+watcher head: 1827d0495 no-mistakes(ci): Two failing checks. (1) Test coverage guard was a real defect: the merged tree's portable serial lane packs the largest shard at 1202675ms against the 1200000ms modeled budget. The lane partition is already near-optimal LPT (total weight / shard count), so no rebalance can recover headroom; the invariant is that the largest packed serial shard must stay within 1200000ms at the merge head. Fixed at the owning boundary: bin/fm-test-run.sh PORTABLE_SERIAL_SHARDS 11 -> 12, .github/workflows/ci.yml matrix [1..12] (lane names and job-total stay consistent), and docs/fm-test-portable-shards.md count/provenance lines updated (twelve serial shards, seventeen long-lived Linux jobs). No other of11 references exist; tests derive the count from the runner and CI matrix dynamically. Verification: bin/fm-test-run.sh --check-coverage exits 0 with serial_max_ms=1095694 (simulating main's three added serial members gives ~1106953), --list-lanes exposes exactly 12 shard lanes, and 11/13-shard lane names are refused (exit 2). The focused runner-contract functions for shard partition, coverage guard, hint bounds, exact-budget boundary, and lane refusals all pass; tests/fm-watch-ready-queue.test.sh also passes (18 cases, exit 0). tests/fm-ci-workflow.test.sh could not run here because ruby is absent (it exits with 'ruby is required'); it will run in CI, where the matrix/runner consistency check derives the count. (2) Full suite failed at its first step with FM_CI_FULL=false, the by-design gate requiring a maintainer to add the full-ci label on an outside PR; its FM_CI_LANES_FAILED=true was a consequence of the coverage-guard failure. That check is external to the code (label/attestation gate), so no code change was made for it; once the coverage guard passes, it still needs the maintainer label. code_change_needed is true for the coverage-guard fix
+lab: /tmp/fm-rq-lab.IltO6g
+
+== away-ready (posture=away queue=ready)
+  watcher-exit: 0 after 1392ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 0
+  durable-wake-queue: 1794368725<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794368725<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== away-unreadable (posture=away queue=unreadable)
+  watcher-exit: 0 after 1043ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 0
+  durable-wake-queue: 1794368726<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794368726<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== away-slow-probe (posture=away queue=slow)
+  watcher-exit: 0 after 10963ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 0
+  durable-wake-queue: 1794368738<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794368738<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== attended-ready (posture=attended queue=ready)
+  watcher-exit: 0 after 1009ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 0
+  durable-wake-queue: 1794368740<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794368740<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== away-held (posture=away queue=held)
+  watcher-stopped: rc=0
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 4
+  durable-wake-queue: 1794368743<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794368743<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== away-empty (posture=away queue=empty)
+  watcher-stopped: rc=0
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 4
+  durable-wake-queue: 1794368745<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794368745<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== attended-empty (posture=attended queue=empty)
+  watcher-stopped: rc=143
+  wake-reason: 
+  heartbeat-streak-after: 4
+  durable-wake-queue: <empty>
+  drain-output: 
+
+== pre-fix baseline: e467ad8bb bin/fm-watch.sh (afk short-circuit before readiness)
+== prefix-away-ready (posture=away queue=ready watcher=/tmp/fm-rq-lab.IltO6g/prefix/bin/fm-watch.sh)
+  watcher-exit: 0 after 1090ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 4
+  durable-wake-queue: 1794368748<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794368748<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== prefix-away-empty (posture=away queue=empty)
+  watcher-stopped: rc=0
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 4
+  durable-wake-queue: 1794368750<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794368750<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+
+DONE

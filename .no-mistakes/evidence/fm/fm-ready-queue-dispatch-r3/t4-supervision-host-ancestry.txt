@@ -1,0 +1,7 @@
+route: bash tool -> bash /tmp/fm-run-host.sh -> bash tests/fm-supervision-host.test.sh
+captured chain (self -> up):
+  pid=4171714 comm=bash cmd=/bin/bash -c EV=~/.no-mistakes/evidence/01M70V29PK5C1RDPJRAN9AQZNC; cd ~/.
+  pid=3213288 comm=pi cmd=pi
+  pid=1818917 comm=no-mistakes cmd=~/.local/bin/no-mistakes daemon run --root ~/.no-mistakes
+  pid=1121 comm=systemd cmd=/run/current-system/systemd/lib/systemd/systemd --user --deserialize=70
+  pid=1 comm=systemd cmd=/run/current-system/systemd/lib/systemd/systemd --switched-root --system --deserialize=41
