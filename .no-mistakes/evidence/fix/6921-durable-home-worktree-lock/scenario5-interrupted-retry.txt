@@ -1,0 +1,42 @@
+### scenario 5: a SIGKILLed retirement is recovered by the next real teardown run
+# Real fm-home-seed.sh third -> real treehouse slot. A treehouse wrapper on PATH
+# (return -> sleep 120, everything else execs the real binary) blocks the pool
+# return after the payload is staged; the whole teardown process group is then
+# SIGKILLed, exactly like a crashed/aborted retirement.
+
+pid=4190043
+staging=/tmp/fm-lab.CY8K6e/state/.home-return.TNChIK
+kill done
+--- after kill: home payload
+ABSENT data
+ABSENT state
+ABSENT config
+ABSENT projects
+ABSENT .fm-secondmate-home
+ABSENT .fm-secondmate-parent
+--- staging contents
+config  data  .fm-secondmate-home  .fm-secondmate-parent  pool-entry
+projects  receipt  return-record  state
+--- lock
+cat: .../worktrees/firstmate-root1/locked: No such file or directory
+ls: cannot access '.../firstmate-root1/firstmate-home-lock': No such file or directory
+--- pool
+1     leased       /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root  (held by third)
+
+# Retry through the real product (no wrapper, real treehouse):
+warning: recovering the interrupted return of durable home /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+🌳 Worktree returned to pool.
+teardown third complete (window firstmate:fm-third, worktree /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root)
+TEARDOWN_RC=0
+=== post-retry state
+ABSENT data
+ABSENT state
+ABSENT config
+ABSENT projects
+ABSENT .fm-secondmate-home
+ABSENT .fm-secondmate-parent
+staging leftovers: 0
+lock: unlocked
+1     available    /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+record: removed
+registry:

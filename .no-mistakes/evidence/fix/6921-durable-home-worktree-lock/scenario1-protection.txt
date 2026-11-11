@@ -1,0 +1,24 @@
+### scenario 1: idle durable home is protected from another session's worktree removal
+home=/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+live processes holding the home: 0
+
+--- attacker 1: git worktree remove --force
+fatal: cannot remove a locked working tree, lock reason: Firstmate durable home mate [fm-home-lock.IpYefd]
+use 'remove -f -f' to override or unlock first
+remove_rc=128
+
+--- attacker 2: git worktree prune -v
+prune_rc=0
+
+--- home still present?
+.
+..
+.agents
+AGENTS.md
+assets
+bin
+.claude
+CLAUDE.md
+payload: You are a persistent second mate managed by the main firstmate. Work on your own; do not wait for a human.
+identity marker: mate
+git lock reason: locked Firstmate durable home mate [fm-home-lock.IpYefd]

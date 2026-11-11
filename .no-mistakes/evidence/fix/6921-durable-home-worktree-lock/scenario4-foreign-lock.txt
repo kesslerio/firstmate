@@ -1,0 +1,36 @@
+### scenario 4: a foreign worktree lock refuses forced retirement
+--- install a foreign lock (another session replaced the owned reason)
+unlock_rc=0
+lock_rc=0
+locked file: foreign session lock
+receipt reason: Firstmate durable home next [fm-home-lock.Gzzvcu]
+--- forced teardown output
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+REFUSED: foreign Git worktree lock for durable home /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+TEARDOWN_RC=1
+--- home/payload/lease/protection intact?
+identity: next
+data present: yes
+locked: foreign session lock
+pool: 
+record still present: yes
+registry: - next - next generation domain probe (home: /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root; scope: next probe scope; projects: ; added 2026-11-10)
+window still alive: 1: fm-firstmate- (1 panes) [80x24] [layout b25d,80x24,0,0,0] @0 2: fm-next* (1 panes) [80x24] [layout b25f,80x24,0,0,2] @2 (active) 
+--- lease state after the refusal (from the code root)
+
+1     leased       /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root  (held by next)
+
+--- restore the owned lock reason and retry the same forced retirement
+restored owned lock: Firstmate durable home next [fm-home-lock.Gzzvcu]
+--- retry output
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown next complete (window firstmate:fm-next, worktree /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root)
+TEARDOWN_RC=0
+payload after retry: cleared
+identity after retry: cleared
+lock after retry: unlocked
+
+1     available    /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root

@@ -1,0 +1,62 @@
+### scenario 2: real fm-teardown retirement clears the payload and returns the slot
+--- home dir exists?
+.
+..
+.agents
+AGENTS.md
+assets
+--- pool state
+{
+  "worktrees": [
+    {
+      "name": "1",
+      "path": "/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root",
+      "created_at": "2026-11-10T17:07:55.344799912-08:00"
+    }
+  ]
+}
+--- pool slot 1 dir
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root/.cursor
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root/.pi
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root/.tasks.toml
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root/AGENTS.md
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root/.agents
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root/tests
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root/skills
+/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root/docs
+--- worktree list
+worktree /tmp/fm-lab.CY8K6e/firstmate-root
+HEAD 0eb61557be7e01863855969987fa92a7ed6fef30
+detached
+
+worktree /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+HEAD 0eb61557be7e01863855969987fa92a7ed6fef30
+detached
+
+--- parent state staging leftovers
+.
+..
+.fm-lab-tmux-dir
+.guard-watcher-stale-banner
+home-summary.json
+--- parent records
+mate
+secondmates.md
+--- treehouse status
+Run "treehouse update" to update
+
+1     available    /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+### scenario 2 continued: payload checks on the returned slot
+ABSENT   data
+ABSENT   state
+ABSENT   config
+ABSENT   projects
+ABSENT   .fm-secondmate-home
+ABSENT   .fm-secondmate-parent
+ABSENT   locked + firstmate-home-lock receipt in /tmp/fm-lab.CY8K6e/firstmate-root/.git/worktrees/firstmate-root1
+--- record removed?
+ls: cannot access '/tmp/fm-lab.CY8K6e/state/mate.meta': No such file or directory
+--- registry
+(end)

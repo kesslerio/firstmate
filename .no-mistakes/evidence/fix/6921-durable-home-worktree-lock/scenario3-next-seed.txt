@@ -1,0 +1,43 @@
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root. Run 'treehouse return /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root' to release it.
+scaffolded: /tmp/fm-lab.CY8K6e/data/next/brief.md (secondmate charter)
+home=/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root. Run 'treehouse return /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root' to release it.
+scaffolded: /tmp/fm-lab.CY8K6e/data/next/brief.md (secondmate charter)
+home=/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+--- checks
+new home path: 
+identity: next
+charter head: You are a persistent second mate managed by the main firstmate. Work on your own; do not wait for a human.
+lock: Firstmate durable home next [fm-home-lock.Gzzvcu]
+receipt:
+schema=fm-home-worktree-lock.v1
+id=next
+home=/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root
+parent=/tmp/fm-lab.CY8K6e
+reason=Firstmate durable home next [fm-home-lock.Gzzvcu]
+--- pool state
+{
+  "worktrees": [
+    {
+      "name": "1",
+      "path": "/tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root",
+      "created_at": "2026-11-10T17:07:55.344799912-08:00",
+      "leased": true,
+      "lease_holder": "next",
+      "leased_at": "2026-11-10T17:09:53.945667403-08:00"
+    }
+  ]
+}
+--- treehouse status
+
+1     leased       /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root  (held by next)
+--- registry
+- next - next generation domain probe (home: /tmp/fm-pool.gDphVb/.treehouse/firstmate-root-1317e4/1/firstmate-root; scope: next probe scope; projects: ; added 2026-11-10)

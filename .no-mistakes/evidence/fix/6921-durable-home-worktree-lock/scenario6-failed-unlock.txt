@@ -1,0 +1,27 @@
+### scenario 6: failed Git unlock preserves the home and restores its process-event registrations
+--- forced teardown output
+retired: lavish
+swept: attempted=1
+warning: unable to unlink '/tmp/fm-lab.CY8K6e/domain-root/.git/worktrees/spacer1/locked': Permission denied
+error: cannot unlock owned durable home /tmp/fm-homes.yEoErj/spacer
+error: process-event restoration could not rearm secondmate home /tmp/fm-homes.yEoErj/spacer; active waits may remain retired; recover registrations from /tmp/fm-homes.yEoErj/.fm-procevent-restore.PUuRve
+TEARDOWN_RC=4
+--- home preserved?
+identity: spacer
+payload: You are a persistent second mate managed by the main firstmate. Work on your own; do not wait for a human.
+owned lock: Firstmate durable home spacer [fm-home-lock.OeleCD]
+receipt: Firstmate durable home spacer [fm-home-lock.OeleCD]
+process-event registration: present
+registration content intact
+parent record: retained
+registration backup dirs left: 1
+window: 0 fm-spacer window(s)
+--- retry after the unlock obstacle is cleared
+retired: lavish
+swept: attempted=1
+teardown spacer complete (window firstmate:fm-spacer, worktree /tmp/fm-homes.yEoErj/spacer)
+TEARDOWN_RC=0
+home exists: removed
+parent record: removed
+registry: 
+registration backup dirs left: 1
