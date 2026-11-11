@@ -1,0 +1,179 @@
+
+=== lab setup: clone reviewed HEAD, marked lab home, isolated pool ===
+/tmp/fml.ZOiuoc/parent
+lab=/tmp/fml.ZOiuoc
+code_root=/tmp/fml.ZOiuoc/code head=436b4c191
+pool_dir=/tmp/fml.ZOiuoc/home/.treehouse
+
+=== S1: seed a durable secondmate home and inspect its owned Git worktree lock ===
+🌳 Setting up worktree...
+🌳 Leased worktree at ~/.treehouse/code-02543c/1/code. Run 'treehouse return ~/.treehouse/code-02543c/1/code' to release it.
+scaffolded: /tmp/fml.ZOiuoc/parent/data/alpha/brief.md (secondmate charter)
+home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+PASS: seed published home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+gitdir=/tmp/fml.ZOiuoc/code/.git/worktrees/code
+locked: Firstmate durable home alpha [fm-home-lock.aBvkJm]
+receipt: schema=fm-home-worktree-lock.v1|id=alpha|home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code|parent=/tmp/fml.ZOiuoc/parent|reason=Firstmate durable home alpha [fm-home-lock.aBvkJm]|
+PASS: owned Git worktree lock present with Firstmate reason
+PASS: ownership receipt present
+git worktree remove rc=128: fatal: cannot remove a locked working tree, lock reason: Firstmate durable home alpha [fm-home-lock.aBvkJm]
+use 'remove -f -f' to override or unlock first
+PASS: plain git worktree remove refuses the protected durable home
+PASS: durable home still present after the refused removal
+
+=== S2: guarded retirement (fm-teardown.sh --force) returns a clean, reusable slot ===
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fml.ZOiuoc/parent
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fml.ZOiuoc/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fml.ZOiuoc/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌳 Worktree returned to pool.
+teardown alpha complete (window firstmate:fm-alpha, worktree /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code)
+PASS: guarded retirement succeeded
+PASS: returned slot carries no data payload
+PASS: returned slot carries no state payload
+PASS: returned slot carries no config payload
+PASS: returned slot carries no projects payload
+PASS: returned slot carries no .fm-secondmate-home payload
+PASS: returned slot carries no .fm-secondmate-parent payload
+PASS: owned Git worktree lock released
+PASS: ownership receipt removed
+PASS: pool slot is unleased again
+🌳 Setting up worktree...
+🌳 Leased worktree at ~/.treehouse/code-02543c/1/code. Run 'treehouse return ~/.treehouse/code-02543c/1/code' to release it.
+scaffolded: /tmp/fml.ZOiuoc/parent/data/alpha2/brief.md (secondmate charter)
+home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+PASS: next seed re-leases the same pool slot
+PASS: next seed succeeded on the returned slot
+🌳 Worktree returned to pool.
+teardown alpha2 complete (window firstmate:fm-alpha2, worktree /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code)
+PASS: verification home retired cleanly (slot reusable twice)
+
+=== S3: each handled INT/TERM/HUP during the payload move restores the home for retry ===
+
+=== S3.TERM: SIGTERM inside the payload staging window (home alpha3) ===
+🌳 Setting up worktree...
+🌳 Leased worktree at ~/.treehouse/code-02543c/1/code. Run 'treehouse return ~/.treehouse/code-02543c/1/code' to release it.
+scaffolded: /tmp/fml.ZOiuoc/parent/data/alpha3/brief.md (secondmate charter)
+home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+PASS: TERM round seeded a durable home
+PASS: delivered SIGTERM inside the staging window
+teardown exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fml.ZOiuoc/parent
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: treehouse return failed for secondmate home /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code; preserving the home and its records for retry (lease may still be held)
+PASS: interrupted teardown reported failure instead of success
+PASS: home payload restored
+PASS: home identity restored
+PASS: parent binding restored
+PASS: owned Git worktree lock restored
+PASS: ownership receipt restored
+PASS: slot was not released by the interrupted return
+PASS: no payload staging left behind
+PASS: task record kept for the retry
+PASS: interrupted return did not report an unrestorable payload
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+🌳 Worktree returned to pool.
+teardown alpha3 complete (window firstmate:fm-alpha3, worktree /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code)
+PASS: retried retirement released the slot cleanly
+
+=== S3.INT: SIGINT inside the payload staging window (home alpha4) ===
+🌳 Setting up worktree...
+🌳 Leased worktree at ~/.treehouse/code-02543c/1/code. Run 'treehouse return ~/.treehouse/code-02543c/1/code' to release it.
+scaffolded: /tmp/fml.ZOiuoc/parent/data/alpha4/brief.md (secondmate charter)
+home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+PASS: INT round seeded a durable home
+PASS: delivered SIGINT inside the staging window
+teardown exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fml.ZOiuoc/parent
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: treehouse return failed for secondmate home /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code; preserving the home and its records for retry (lease may still be held)
+PASS: interrupted teardown reported failure instead of success
+PASS: home payload restored
+PASS: home identity restored
+PASS: parent binding restored
+PASS: owned Git worktree lock restored
+PASS: ownership receipt restored
+PASS: slot was not released by the interrupted return
+PASS: no payload staging left behind
+PASS: task record kept for the retry
+PASS: interrupted return did not report an unrestorable payload
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+🌳 Worktree returned to pool.
+teardown alpha4 complete (window firstmate:fm-alpha4, worktree /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code)
+PASS: retried retirement released the slot cleanly
+
+=== S3.HUP: SIGHUP inside the payload staging window (home alpha5) ===
+🌳 Setting up worktree...
+🌳 Leased worktree at ~/.treehouse/code-02543c/1/code. Run 'treehouse return ~/.treehouse/code-02543c/1/code' to release it.
+scaffolded: /tmp/fml.ZOiuoc/parent/data/alpha5/brief.md (secondmate charter)
+home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+PASS: HUP round seeded a durable home
+PASS: delivered SIGHUP inside the staging window
+teardown exit=1
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fml.ZOiuoc/parent
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: treehouse return failed for secondmate home /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code; preserving the home and its records for retry (lease may still be held)
+PASS: interrupted teardown reported failure instead of success
+PASS: home payload restored
+PASS: home identity restored
+PASS: parent binding restored
+PASS: owned Git worktree lock restored
+PASS: ownership receipt restored
+PASS: slot was not released by the interrupted return
+PASS: no payload staging left behind
+PASS: task record kept for the retry
+PASS: interrupted return did not report an unrestorable payload
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+🌳 Worktree returned to pool.
+teardown alpha5 complete (window firstmate:fm-alpha5, worktree /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code)
+PASS: retried retirement released the slot cleanly
+
+=== S4 (adversarial): manual pre-V2 migration skipping the documented release leaves the slot refused ===
+🌳 Setting up worktree...
+🌳 Leased worktree at ~/.treehouse/code-02543c/1/code. Run 'treehouse return ~/.treehouse/code-02543c/1/code' to release it.
+scaffolded: /tmp/fml.ZOiuoc/parent/data/delta/brief.md (secondmate charter)
+home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+treehouse return rc=0
+🌳 Worktree returned to pool.
+PASS: manual force return left the Git worktree lock behind
+PASS: manual force return left the ownership receipt behind
+registry after manual retirement: []
+🌳 Setting up worktree...
+🌳 Leased worktree at ~/.treehouse/code-02543c/1/code. Run 'treehouse return ~/.treehouse/code-02543c/1/code' to release it.
+REFUSED: unknown durable-home lock ownership for /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+REFUSED: unknown durable-home lock ownership for /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+PASS: next seed refuses the slot when the lock and receipt survive
+PASS: refusal names the stale durable-home ownership
+PASS: slot still holds delta's stale lock after the refused seed
+doc step 1 applied alone (unlock) rc=0
+PASS: unlock alone leaves the ownership receipt in place
+🌳 Setting up worktree...
+🌳 Leased worktree at ~/.treehouse/code-02543c/1/code. Run 'treehouse return ~/.treehouse/code-02543c/1/code' to release it.
+REFUSED: unknown durable-home lock ownership for /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+REFUSED: unknown durable-home lock ownership for /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+PASS: seed still refuses a slot marked for the retired mate
+PASS: half-released refusal names the stale ownership too
+
+=== S5: following the documented manual release lets the next seed take the slot ===
+doc step 2 (rm <gitdir>/firstmate-home-lock) rc=0
+PASS: documented release cleared the Git worktree lock
+PASS: documented release cleared the ownership receipt
+released leftover lease rc=0
+🌳 Setting up worktree...
+🌳 Leased worktree at ~/.treehouse/code-02543c/1/code. Run 'treehouse return ~/.treehouse/code-02543c/1/code' to release it.
+scaffolded: /tmp/fml.ZOiuoc/parent/data/epsilon/brief.md (secondmate charter)
+home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+PASS: next seed succeeds on the released slot
+PASS: next seed took the same pool slot
+PASS: new home carries its own owned lock
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+🌳 Worktree returned to pool.
+teardown epsilon complete (window firstmate:fm-epsilon, worktree /tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code)
+PASS: re-seeded home retires cleanly (slot reusable end to end)
+
+=== result ===
+ALL SCENARIOS PASSED

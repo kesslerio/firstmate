@@ -1,0 +1,84 @@
+# Live acceptance, branch fix/6921-durable-home-worktree-lock @ 436b4c191
+# Real firstmate CLI (bin/fm-home-seed.sh, bin/fm-teardown.sh) driving a real treehouse v2.0.1 pool
+# and real Git worktrees inside one throwaway lab (isolated HOME/pool, fm-lab-home-marked FM_HOME).
+# Timestamp: 2026-11-10T21:19:56-08:00
+=== S1: seed a durable secondmate home and inspect its owned Git worktree lock ===
+PASS: seed published home=/tmp/fml.ZOiuoc/home/.treehouse/code-02543c/1/code
+PASS: owned Git worktree lock present with Firstmate reason
+PASS: ownership receipt present
+PASS: plain git worktree remove refuses the protected durable home
+PASS: durable home still present after the refused removal
+=== S2: guarded retirement (fm-teardown.sh --force) returns a clean, reusable slot ===
+PASS: guarded retirement succeeded
+PASS: returned slot carries no data payload
+PASS: returned slot carries no state payload
+PASS: returned slot carries no config payload
+PASS: returned slot carries no projects payload
+PASS: returned slot carries no .fm-secondmate-home payload
+PASS: returned slot carries no .fm-secondmate-parent payload
+PASS: owned Git worktree lock released
+PASS: ownership receipt removed
+PASS: pool slot is unleased again
+PASS: next seed re-leases the same pool slot
+PASS: next seed succeeded on the returned slot
+PASS: verification home retired cleanly (slot reusable twice)
+=== S3: each handled INT/TERM/HUP during the payload move restores the home for retry ===
+=== S3.TERM: SIGTERM inside the payload staging window (home alpha3) ===
+PASS: TERM round seeded a durable home
+PASS: delivered SIGTERM inside the staging window
+PASS: interrupted teardown reported failure instead of success
+PASS: home payload restored
+PASS: home identity restored
+PASS: parent binding restored
+PASS: owned Git worktree lock restored
+PASS: ownership receipt restored
+PASS: slot was not released by the interrupted return
+PASS: no payload staging left behind
+PASS: task record kept for the retry
+PASS: interrupted return did not report an unrestorable payload
+PASS: retried retirement released the slot cleanly
+=== S3.INT: SIGINT inside the payload staging window (home alpha4) ===
+PASS: INT round seeded a durable home
+PASS: delivered SIGINT inside the staging window
+PASS: interrupted teardown reported failure instead of success
+PASS: home payload restored
+PASS: home identity restored
+PASS: parent binding restored
+PASS: owned Git worktree lock restored
+PASS: ownership receipt restored
+PASS: slot was not released by the interrupted return
+PASS: no payload staging left behind
+PASS: task record kept for the retry
+PASS: interrupted return did not report an unrestorable payload
+PASS: retried retirement released the slot cleanly
+=== S3.HUP: SIGHUP inside the payload staging window (home alpha5) ===
+PASS: HUP round seeded a durable home
+PASS: delivered SIGHUP inside the staging window
+PASS: interrupted teardown reported failure instead of success
+PASS: home payload restored
+PASS: home identity restored
+PASS: parent binding restored
+PASS: owned Git worktree lock restored
+PASS: ownership receipt restored
+PASS: slot was not released by the interrupted return
+PASS: no payload staging left behind
+PASS: task record kept for the retry
+PASS: interrupted return did not report an unrestorable payload
+PASS: retried retirement released the slot cleanly
+=== S4 (adversarial): manual pre-V2 migration skipping the documented release leaves the slot refused ===
+PASS: manual force return left the Git worktree lock behind
+PASS: manual force return left the ownership receipt behind
+PASS: next seed refuses the slot when the lock and receipt survive
+PASS: refusal names the stale durable-home ownership
+PASS: slot still holds delta's stale lock after the refused seed
+PASS: unlock alone leaves the ownership receipt in place
+PASS: seed still refuses a slot marked for the retired mate
+PASS: half-released refusal names the stale ownership too
+=== S5: following the documented manual release lets the next seed take the slot ===
+PASS: documented release cleared the Git worktree lock
+PASS: documented release cleared the ownership receipt
+PASS: next seed succeeds on the released slot
+PASS: next seed took the same pool slot
+PASS: new home carries its own owned lock
+PASS: re-seeded home retires cleanly (slot reusable end to end)
+ALL SCENARIOS PASSED
