@@ -1,0 +1,18 @@
+=== FM_TEST_ONLY=test_heartbeat_no_change_absorbed
+ok - a heartbeat with no captain-relevant change is absorbed and backs off the cadence
+EXIT=0
+=== FM_TEST_ONLY=test_heartbeat_backstop_surfaces_unsurfaced_status
+ok - heartbeat backstop fail-safe surfaces a captain-relevant status the per-wake path missed
+EXIT=0
+=== FM_TEST_ONLY=test_heartbeat_backstop_surfaces_a_masked_status
+ok - the heartbeat backstop surfaces a captain event hidden behind a later routine append
+EXIT=0
+=== FM_TEST_ONLY=test_afk_heartbeat_preserves_idle_accounting
+ok - away-mode heartbeat keeps daemon triage and idle backoff accounting
+EXIT=0
+=== FM_TEST_ONLY=test_afk_signal_records_heartbeat_endpoint
+ok - an afk signal records its captured heartbeat endpoint
+EXIT=0
+=== FM_TEST_ONLY=test_afk_present_reverts_watcher_to_one_shot
+ok - with .afk present the watcher reverts to one-shot so the daemon owns triage (no double-triage)
+EXIT=0

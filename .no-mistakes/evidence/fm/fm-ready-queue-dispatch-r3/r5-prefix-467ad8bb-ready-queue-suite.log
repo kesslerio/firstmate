@@ -1,0 +1,9 @@
+ok - absolute backlog addressing preserves ready, empty, and unavailable verdicts
+ok - relative backlog addressing preserves ready, empty, and unavailable verdicts
+ok - trailing-slash backlog addressing preserves ready, empty, and unavailable verdicts
+ok - relative-home backlog addressing preserves ready, empty, and unavailable verdicts
+ok - trailing-slash-home backlog addressing preserves ready, empty, and unavailable verdicts
+ok - attended ready queue reaches supervision despite stale title and silent status logs
+ok - attended unreadable queue reaches supervision despite stale title and silent status logs
+not ok - away ready ready queue review doubled idle heartbeat backoff instead of resetting it
+EXIT=1

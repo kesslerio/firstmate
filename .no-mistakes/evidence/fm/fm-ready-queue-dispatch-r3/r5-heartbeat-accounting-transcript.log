@@ -1,0 +1,56 @@
+FM_ROOT={run-worktree}
+watcher head: 31b9a39a4 no-mistakes(review): Fix away readiness heartbeat backoff accounting revision
+lab: /tmp/fm-rq-lab.G0CJeO
+
+== away-ready (posture=away queue=ready)
+  watcher-exit: 0 after 4283ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 0
+  durable-wake-queue: 1794366041<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794366041<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== away-unreadable (posture=away queue=unreadable)
+  watcher-exit: 0 after 2945ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 0
+  durable-wake-queue: 1794366046<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794366046<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== away-slow-probe (posture=away queue=slow)
+  watcher-exit: 0 after 14384ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 0
+  durable-wake-queue: 1794366062<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794366062<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== attended-ready (posture=attended queue=ready)
+  watcher-exit: 0 after 6957ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 0
+  durable-wake-queue: 1794366073<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794366073<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== away-empty (posture=away queue=empty)
+  watcher-stopped: rc=0
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 4
+  durable-wake-queue: 1794366081<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794366081<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== attended-empty (posture=attended queue=empty)
+  watcher-stopped: rc=143
+  wake-reason: 
+  heartbeat-streak-after: 4
+  durable-wake-queue: <empty>
+  drain-output: 
+
+== pre-fix baseline: e467ad8bb bin/fm-watch.sh (afk short-circuit before readiness)
+== prefix-away-ready (posture=away queue=ready watcher=/tmp/fm-rq-lab.G0CJeO/prefix/bin/fm-watch.sh)
+  watcher-exit: 0 after 4321ms
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 4
+  durable-wake-queue: 1794366097<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794366097<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+== prefix-away-empty (posture=away queue=empty)
+  watcher-stopped: rc=0
+  wake-reason: heartbeat|
+  heartbeat-streak-after: 4
+  durable-wake-queue: 1794366104<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat
+  drain-output: 1794366104<TAB>1<TAB>heartbeat<TAB>heartbeat<TAB>heartbeat|
+
+DONE
