@@ -1,0 +1,11 @@
+error: cannot move durable home payload: payload staging requires the same filesystem: /tmp/fm-home-payload-return.7V6mb8/pool/1/repo and /dev
+error: cannot move durable home payload: payload staging requires the same filesystem: /dev and /tmp/fm-home-payload-return.7V6mb8/pool/1/repo
+warning: recovering the interrupted return of durable home /tmp/fm-home-payload-return.7V6mb8/pool/1/repo
+error: durable home /tmp/fm-home-payload-return.7V6mb8/pool/1/repo tracks payload paths (data/notes); leaving its slot payload in place
+warning: recovering the interrupted return of durable home /tmp/fm-home-payload-return.7V6mb8/pool/1/repo
+warning: recovering the interrupted return of durable home /tmp/fm-home-payload-return.7V6mb8/pool/1/repo
+warning: recovering the interrupted return of durable home /tmp/fm-home-payload-return.7V6mb8/pool/1/repo
+warning: recovering the interrupted return of durable home /tmp/fm-home-payload-return.7V6mb8/pool/1/repo
+warning: recovering the interrupted return of durable home /tmp/fm-home-payload-return.7V6mb8/pool/1/repo
+warning: return committed; pool reconciliation is required for /tmp/fm-home-payload-return.7V6mb8/pool/1/repo
+ok - recovery respects active child locks and replacement home incarnations

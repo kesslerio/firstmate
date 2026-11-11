@@ -1,0 +1,58 @@
+
+### fixture: throwaway firstmate root + real treehouse pool at /tmp/fm-liv.Z3tl7w
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot. Run 'treehouse return /tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot' to release it.
+scaffolded: /tmp/fm-liv.Z3tl7w/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot
+
+### seeded durable home: /tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot
+
+### 1. the seeded lease carries owned Git worktree protection
+1     leased       /tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot  (held by mate)
+PASS: pool reports the slot leased by mate
+Firstmate durable home mate [fm-home-lock.HWMvt0]
+PASS: Git records our lock reason
+PASS: owned per-worktree lock receipt exists
+locked Firstmate durable home mate [fm-home-lock.HWMvt0]
+PASS: worktree list reports the worktree locked
+--- plain git worktree remove ---
+fatal: cannot remove a locked working tree, lock reason: Firstmate durable home mate [fm-home-lock.HWMvt0]
+use 'remove -f -f' to override or unlock first
+PASS: plain git worktree remove refuses the durable home
+PASS: the refused removal left the home payload intact
+
+### 2. real teardown retires the home and returns the slot
+teardown rc=0
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+PASS: teardown exits 0
+PASS: payload, markers and owned protection are gone
+PASS: no payload staging is left behind
+PASS: the parent meta record was retired
+1     available    /tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot
+PASS: treehouse reports the slot available again
+--- pool entry after return ---
+{
+ "name": "1",
+ "path": "/tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot",
+ "created_at": "2026-11-10T18:18:21.762205043-08:00"
+}
+
+### 3. the returned slot is reusable by the next seed
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot. Run 'treehouse return /tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot' to release it.
+home=/tmp/fm-liv.Z3tl7w/pool/.treehouse/fmroot-579857/1/fmroot
+PASS: re-seed leased the same pooled slot
+PASS: re-seeded home carries its own payload
+Firstmate durable home mate [fm-home-lock.IRXNrP]
+PASS: re-seeded home carries fresh owned protection
+
+### result: 0 failure(s)

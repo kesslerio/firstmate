@@ -1,0 +1,41 @@
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-liv.MK5IrE/pool/.treehouse/fmroot-52e931/1/fmroot. Run 'treehouse return /tmp/fm-liv.MK5IrE/pool/.treehouse/fmroot-52e931/1/fmroot' to release it.
+scaffolded: /tmp/fm-liv.MK5IrE/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-liv.MK5IrE/pool/.treehouse/fmroot-52e931/1/fmroot
+
+### 1. start a forced retirement and SIGKILL the whole process tree mid-return
+
+### staged payload observed at /tmp/fm-liv.MK5IrE/lab/state/.home-return.m4kZT8
+--- crash state ---
+config
+data
+.fm-secondmate-home
+.fm-secondmate-parent
+pool-entry
+projects
+receipt
+return-record
+state
+PASS: the crash left the home stripped of its payload
+PASS: the crash left the home stripped of its identity
+PASS: the crash left a recoverable return record
+PASS: the record names the retired home
+PASS: the record names the mate
+1     leased       /tmp/fm-liv.MK5IrE/pool/.treehouse/fmroot-52e931/1/fmroot  (held by mate)
+PASS: the lease is still held by mate
+
+### 2. the next real teardown entry recovers, then completes the retirement
+retry rc=0
+warning: recovering the interrupted return of durable home /tmp/fm-liv.MK5IrE/pool/.treehouse/fmroot-52e931/1/fmroot
+PASS: the next entry exits 0
+PASS: the next entry reports that it recovered the interrupted return
+PASS: the recovered home retired cleanly
+1     available    /tmp/fm-liv.MK5IrE/pool/.treehouse/fmroot-52e931/1/fmroot
+PASS: the slot is available again
+PASS: the parent meta record was retired
+PASS: no staging is left behind
+
+### result: 0 failure(s)

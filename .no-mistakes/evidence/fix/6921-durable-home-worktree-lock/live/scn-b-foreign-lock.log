@@ -1,0 +1,29 @@
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-liv.prslmp/pool/.treehouse/fmroot-cb1861/1/fmroot. Run 'treehouse return /tmp/fm-liv.prslmp/pool/.treehouse/fmroot-cb1861/1/fmroot' to release it.
+scaffolded: /tmp/fm-liv.prslmp/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-liv.prslmp/pool/.treehouse/fmroot-cb1861/1/fmroot
+
+### 1. replace owned protection with a foreign Git worktree lock
+--- locked ---
+another tool owns this checkout
+
+### 2. forced retirement must refuse
+teardown rc=1
+REFUSED: foreign Git worktree lock for durable home /tmp/fm-liv.prslmp/pool/.treehouse/fmroot-cb1861/1/fmroot
+PASS: teardown refuses with a nonzero status
+PASS: the refusal names the foreign lock
+PASS: the home keeps its payload
+PASS: the home keeps its identity marker
+PASS: the home keeps its parent binding
+PASS: the foreign lock is untouched
+1     leased       /tmp/fm-liv.prslmp/pool/.treehouse/fmroot-cb1861/1/fmroot  (held by mate)
+PASS: the lease is still held by mate
+PASS: the parent meta record survives for retry
+PASS: no payload staging was created
+
+### 3. normalise the foreign lock so the fixture is torn down cleanly
+
+### result: 0 failure(s)

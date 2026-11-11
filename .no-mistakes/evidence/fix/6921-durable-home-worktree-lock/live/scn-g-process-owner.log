@@ -1,0 +1,44 @@
+scaffolded: /tmp/fm-liv.zZ6Gan/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-liv.zZ6Gan/pool/.treehouse/fmroot-5a5d28/1/fmroot
+PASS: the seeded home carries a payload before the crash
+--- saved pool entry before the return ---
+{
+ "name": "1",
+ "path": "/tmp/fm-liv.zZ6Gan/pool/.treehouse/fmroot-5a5d28/1/fmroot",
+ "created_at": "2026-11-10T18:19:16.976669495-08:00"
+}
+
+### 1. drive the return to its staged state, then SIGKILL it
+PASS: the crash stripped the home payload
+PASS: the crash released owned protection
+PASS: a recoverable return record survived
+
+### 2. another holder takes the freed slot through the real pool
+
+### the real pool recorded a new process owner pid 1381088
+--- pool entry after the takeover ---
+{
+ "name": "1",
+ "path": "/tmp/fm-liv.zZ6Gan/pool/.treehouse/fmroot-5a5d28/1/fmroot",
+ "created_at": "2026-11-10T18:19:16.976669495-08:00",
+ "owner_pid": 1381088,
+ "owner_started_at": 1794363557800
+}
+
+### 3. recovery must read the takeover as committed
+RETIRED=1
+PASS: recovery reports the return as retired
+PASS: recovery did not restore the retired payload
+PASS: recovery did not restore the retired identity
+PASS: recovery did not lock the new occupant out
+PASS: recovery did not restore retired lock ownership
+PASS: the new occupant's own file survives
+1     in-use       /tmp/fm-liv.zZ6Gan/pool/.treehouse/fmroot-5a5d28/1/fmroot
+PASS: the pool still reports the slot in use by the new holder
+PASS: no staging is left behind
+
+### 4. release the fixture holder
+scn-g-process-owner.sh: line 94: 1381087 Killed                     ( cd "$BASE/fmroot" && "$REAL_TREEHOUSE" get < "$BASE/get.fifo" > "$EVID/scn-g-get.log" 2>&1 )
+
+### result: 0 failure(s)
+rm: cannot remove '/tmp/fm-liv.zZ6Gan/pool/.treehouse/fmroot-5a5d28/1/fmroot': Directory not empty

@@ -1,0 +1,6 @@
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Entered worktree at /tmp/fm-liv.zZ6Gan/pool/.treehouse/fmroot-5a5d28/1/fmroot. Type 'exit' to return.
+🌳 Warning: failed to clean worktree: git clean -fd: fatal: not a git repository (or any of the parent directories): .git

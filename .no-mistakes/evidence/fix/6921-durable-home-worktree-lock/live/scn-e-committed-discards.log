@@ -1,0 +1,30 @@
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-liv.e9gFF8/pool/.treehouse/fmroot-d2851e/1/fmroot. Run 'treehouse return /tmp/fm-liv.e9gFF8/pool/.treehouse/fmroot-d2851e/1/fmroot' to release it.
+scaffolded: /tmp/fm-liv.e9gFF8/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-liv.e9gFF8/pool/.treehouse/fmroot-d2851e/1/fmroot
+return status=137 (expected 137: killed before the committed record)
+PASS: the killed return stopped on SIGKILL
+1     available    /tmp/fm-liv.e9gFF8/pool/.treehouse/fmroot-d2851e/1/fmroot
+PASS: the slot was really released by the real pool
+PASS: the payload left the home before the crash
+PASS: the identity left the home before the crash
+PASS: a recoverable return record survived
+
+### 1. next entry: recovery must treat the released lease as committed
+RETIRED=1
+PASS: recovery reports the return as retired (not restored)
+PASS: recovery did not restore the payload into the leasable slot
+PASS: recovery did not restore the identity into the leasable slot
+PASS: recovery did not relock the released slot
+PASS: recovery did not restore retired lock ownership
+
+### 2. finalization clears the staging and the slot stays leasable
+PASS: finalization exits 0
+PASS: no staging is left behind
+next lease: /tmp/fm-liv.e9gFF8/pool/.treehouse/fmroot-d2851e/1/fmroot
+PASS: the next seed can lease the same slot
+
+### result: 0 failure(s)

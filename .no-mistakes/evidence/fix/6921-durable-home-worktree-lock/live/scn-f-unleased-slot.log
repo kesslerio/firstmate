@@ -1,0 +1,37 @@
+
+### unleased pool checkout: /tmp/fm-liv.GjEiLl/pool/.treehouse/fmroot-4f50dc/1/fmroot
+--- pool entry before the explicit-path seed ---
+{
+ "name": "1",
+ "path": "/tmp/fm-liv.GjEiLl/pool/.treehouse/fmroot-4f50dc/1/fmroot",
+ "created_at": "2026-11-10T18:19:13.614995691-08:00"
+}
+scaffolded: /tmp/fm-liv.GjEiLl/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-liv.GjEiLl/pool/.treehouse/fmroot-4f50dc/1/fmroot
+PASS: the explicit-path seed landed in the pool checkout
+PASS: the seeded home carries its payload
+PASS: the seeded home carries owned protection
+1     available    /tmp/fm-liv.GjEiLl/pool/.treehouse/fmroot-4f50dc/1/fmroot
+PASS: its pool entry is still unleased
+
+### 1. a failed return of the unleased slot must not be read as a returned slot
+failed return status=1
+PASS: the failed return reports failure
+PASS: the failed return put the payload back
+PASS: the failed return put the identity back
+PASS: the failed return restored owned protection
+PASS: the failed return restored owned lock ownership
+PASS: the failed return left no staging
+
+### 2. the successful return of that same unleased slot clears the payload
+successful return status=0
+PASS: the successful return reports success
+PASS: the payload is cleared
+PASS: the identity is cleared
+PASS: owned protection is released
+PASS: owned lock ownership is forgotten
+1     available    /tmp/fm-liv.GjEiLl/pool/.treehouse/fmroot-4f50dc/1/fmroot
+PASS: the slot is still an available pool checkout
+PASS: no staging is left behind
+
+### result: 0 failure(s)

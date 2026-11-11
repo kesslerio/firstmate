@@ -1,0 +1,49 @@
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Leased worktree at /tmp/fm-liv.TmLaur/pool/.treehouse/fmroot-39702a/1/fmroot. Run 'treehouse return /tmp/fm-liv.TmLaur/pool/.treehouse/fmroot-39702a/1/fmroot' to release it.
+scaffolded: /tmp/fm-liv.TmLaur/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-liv.TmLaur/pool/.treehouse/fmroot-39702a/1/fmroot
+
+### 1. start a forced retirement whose treehouse return is slow enough to signal
+
+### staged payload observed at /tmp/fm-liv.TmLaur/lab/state/.home-return.p0cZ6e
+--- staging content at signal time ---
+config
+data
+pool-entry
+projects
+receipt
+return-record
+state
+PASS: the home payload was already staged out while the return is in flight
+
+### delivering TERM to the process performing the return (pid 1368465)
+teardown rc=1
+warning: recovering the interrupted return of durable home /tmp/fm-liv.TmLaur/pool/.treehouse/fmroot-39702a/1/fmroot
+warning: recovering the interrupted return of durable home /tmp/fm-liv.TmLaur/pool/.treehouse/fmroot-39702a/1/fmroot
+error: treehouse return failed for secondmate home /tmp/fm-liv.TmLaur/pool/.treehouse/fmroot-39702a/1/fmroot; preserving the home and its records for retry (lease may still be held)
+
+### 2. the interrupted retirement must fail honestly and keep the home whole
+PASS: teardown reports failure
+PASS: payload is restored
+PASS: identity marker is restored
+PASS: parent binding is restored
+Firstmate durable home mate [fm-home-lock.3pfOeK]
+PASS: owned Git protection is restored
+PASS: owned lock receipt is restored
+PASS: no payload staging is left behind
+1     leased       /tmp/fm-liv.TmLaur/pool/.treehouse/fmroot-39702a/1/fmroot  (held by mate)
+PASS: the lease is still held by mate
+PASS: the parent meta record survives for retry
+
+### 3. the retried retirement now completes
+retry rc=0
+PASS: retried teardown exits 0
+PASS: the retried retirement cleared the payload
+1     available    /tmp/fm-liv.TmLaur/pool/.treehouse/fmroot-39702a/1/fmroot
+PASS: the retried retirement returned the slot
+PASS: the retried retirement left no staging
+
+### result: 0 failure(s)

@@ -1,0 +1,14 @@
+{run-worktree}/bin/fm-home-payload-lib.sh: line 226: 1380954 Killed                     ( local home=$1 id=$2 parent=$3 staging path receipt='' rc=0; shift 3; fm_home_payload_recover "$home" "$parent" "$id" || return 1; [ "$FM_HOME_PAYLOAD_RETIRED" = 0 ] || return 0; fm_home_payload_check "$home" || return 1; fm_home_worktree_lock_check "$home" "$id" "$parent" || return 1; staging=$(mktemp -d "$parent/state/.home-return.XXXXXX") || return 1; fm_home_payload_check_devices "$home" "$staging" || { rmdir "$staging"; return 1; }; if [ "$FM_HOME_LOCK_LINKED" = 1 ] && [ -f "$FM_HOME_LOCK_RECEIPT" ]; then
+    receipt=$FM_HOME_LOCK_RECEIPT; cp -p "$receipt" "$staging/receipt" || { rmdir "$staging"; return 1; };
+fi; trap 'fm_home_payload_interrupted 130 "$home" "$id" "$parent" "$staging"' INT; trap 'fm_home_payload_interrupted 143 "$home" "$id" "$parent" "$staging"' TERM; trap 'fm_home_payload_interrupted 129 "$home" "$id" "$parent" "$staging"' HUP; printf 'schema=fm-home-return.v1\nid=%s\nhome=%s\n' "$id" "$FM_HOME_LOCK_HOME" > "$staging/$FM_HOME_PAYLOAD_RECORD" || { rm -rf -- "$staging"; return 1; }; fm_home_payload_pool_state save "$FM_HOME_LOCK_HOME" "$staging" || { rm -rf -- "$staging"; return 1; }; for path in "${FM_HOME_PAYLOAD_PATHS[@]}";
+do
+    if [ -e "$home/$path" ] || [ -L "$home/$path" ]; then
+        mv -- "$home/$path" "$staging/$path" || { rc=1; break; };
+    fi;
+done; if [ "$rc" = 0 ]; then
+    fm_home_worktree_lock_release "$home" "$id" "$parent" && fm_home_worktree_lock_forget "$home" "$id" "$parent" && printf 'returning=1\n' >> "$staging/$FM_HOME_PAYLOAD_RECORD" && "$@" || rc=1;
+fi; if [ "$rc" = 0 ]; then
+    printf 'committed=1\n' >> "$staging/$FM_HOME_PAYLOAD_RECORD" || echo "warning: return committed; pool reconciliation is required for $home" 1>&2;
+fi; trap - INT TERM HUP; if [ "$rc" != 0 ]; then
+    fm_home_payload_recover "$home" "$parent" "$id" || return 1; [ "$FM_HOME_PAYLOAD_RETIRED" = 0 ] || return 0; return "$rc";
+fi; return 0 )
