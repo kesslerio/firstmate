@@ -1,4 +1,4 @@
-1..13
+1..15
 ok - a progress tick refreshes the watcher beacon and throttles tight loops
 ok - progress refresh is inert outside a watcher, so no library invents liveness
 ok - crew classification refreshes watcher progress and preserves standalone verdicts
@@ -15,8 +15,6 @@ ok - an explicit FM_WATCHER_STALL_BOUND keeps a merely slow holder in place
 ok - a genuinely stalled holder is still evicted and replaced past the hard bound
 ok - an explicit FM_GUARD_GRACE wins over the derived default in both directions
 ok - an explicit FM_HEARTBEAT cadence still governs the heartbeat
+ok - child processes update the progress marker and cannot touch the beacon directly
+ok - a watcher frozen with SIGSTOP during a display sweep trips the guard
 FM_TEST_COMPLETE
-
-real	0m19.395s
-user	0m3.094s
-sys	0m3.354s

@@ -1,0 +1,53 @@
+repo={run-worktree}
+lab=/tmp/fm-lab.amoIZe
+
+===== A: live watcher, cycle longer than the 4s grace =====
+  elapsed=21s max_beacon_age=2s beacon_writes=12 completed_cycles=2 (5x2s checks per sweep)
+  cycle_marker=present
+  progress_marker=absent
+  guard output (expected none):
+  guard exit=0
+  successor arm output:
+    watcher: attached pid=2439394 (beacon 0s)
+  successor arm attached to the live working cycle instead of replacing it
+
+===== B: stalled holder still alarms and is still evicted past the hard bound =====
+  beacon age=20s, explicit grace 7s
+    ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    ●  WATCHER DOWN - SUPERVISION IS OFF
+    ●  WATCHER DOWN - SUPERVISION IS OFF
+    ●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: 20s ago, grace 7s).
+    ●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+    ●  This is a supervision warning only; the guarded operation WILL still run.
+    ●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-lab.amoIZe/root/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-lab.amoIZe/root/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+    ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  banner fired
+  banner names the explicit 7s grace
+  holder kept inside an explicit 60s hard bound
+  evicted: watcher: replaced stalled pid 2451582 (beacon 30s past hard bound 5s)
+
+===== C: home config/watch.env cadence (FM_POLL=600) governs the guard without being sourced by it =====
+  320s-old beacon read fresh under config/watch.env FM_POLL=600
+  configured FM_GUARD_GRACE=1200 beats a 300 reader environment at 700s beacon age
+  configured 60s grace at 100s beacon age raised the banner
+    fresh=false desc=100s ago
+  standalone fm_supervision_status applied the configured 60s grace
+  Relay's 15s cadence superseded the home's 600s poll
+
+===== D: SIGSTOP the watcher during a Rex display sweep =====
+~/.no-mistakes/evidence/01M76WNJ3HMP8FT35G4R5A9W7Q/drive-beacon-progress.sh: line 252: 2453002 Killed                     FM_HOME="$LAB" sleep 300
+  display child had processed 2 tasks before the freeze
+  display child processed through 6 tasks while the watcher was frozen
+  beacon age while frozen=6s (grace 4s), progress marker=present
+  guard fired: ●  WATCHER DOWN - SUPERVISION IS OFF
+
+===== F: live watcher during a long Rex display sweep stays fresh =====
+  display child processed 14 tasks over the sample window
+  max_beacon_age=2s (grace 4s), progress_marker_writes=12
+  guard stayed silent while the display sweep ran
+
+===== E: one-shot display sweep outside a watcher creates no liveness evidence =====
+  beacon after one-shot sync: absent
+  progress marker after one-shot sync: absent
+
+===== ALL MANUAL SCENARIOS PASSED =====
