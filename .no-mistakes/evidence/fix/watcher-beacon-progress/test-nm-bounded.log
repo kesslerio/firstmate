@@ -1,0 +1,10 @@
+1..3
+ok - status and resolver query descendants stop on display cancellation
+ok - owned and standalone bounded queries preserve stdout and status
+ok - expired queries close descendant output and allow the next query
+FM_TEST_COMPLETE
+
+real	0m3.592s
+user	0m0.128s
+sys	0m0.135s
+exit=0

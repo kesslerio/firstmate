@@ -1,0 +1,33 @@
+lab=/tmp/fm-lab.sqKaD1
+
+=== A: arm loads home watch.env and attaches to a 700s beacon under configured grace 1200 ===
+holder live pid=1460132 beacon_age=700s
+fm_beacon_grace in lab home = 1200
+watcher: attached pid=1460132 (beacon 700s)
+
+=== A2: the guard reads the same configured grace (silent at 700s, warns at 100s with grace 60) ===
+guard with home grace=1200, live holder, beacon 700s -> 0 WATCHER DOWN lines, output bytes=0
+guard with home grace=60, live holder, beacon 100s -> 1 WATCHER DOWN lines
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: 100s ago, grace 60s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+
+=== B: a real watcher's 16s check sweep keeps the beacon fresh under grace 8; guard stays silent ===
+watcher pid=1460990 lock=1460990
+sample: cycle_age=0s beacon_age=0s (8 checks registered)
+sample: cycle_age=3s beacon_age=1s (8 checks registered)
+sample: cycle_age=6s beacon_age=2s (8 checks registered)
+sample: cycle_age=9s beacon_age=1s (8 checks registered)
+sample: cycle_age=12s beacon_age=2s (8 checks registered)
+cycle_age=12s beacon_age=2s (grace 8s)
+guard during the working sweep -> 0 WATCHER DOWN lines, output bytes=0
+
+=== C: SIGSTOP the same working watcher mid-sweep; the guard raises WATCHER DOWN ===
+frozen watcher pid=1460990 beacon_age=13s
+guard on the frozen watcher -> 1 WATCHER DOWN lines
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: 13s ago, grace 8s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+
+lab teardown: rm -rf /tmp/fm-lab.sqKaD1

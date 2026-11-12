@@ -1,0 +1,25 @@
+1..15
+ok - a progress tick refreshes the watcher beacon and throttles tight loops
+ok - progress refresh is inert outside a watcher, so no library invents liveness
+ok - crew classification refreshes watcher progress and preserves standalone verdicts
+ok - the shared beacon grace derives from the poll cadence and honours an explicit override
+ok - readers resolve home cadence and Relay precedence without leaking configuration
+ok - every terminal wait refreshes progress and direct watchers load home settings
+ok - standalone supervision predicates share the poll-derived grace
+ok - progress refresh keeps a fixed cadence regardless of unused interval inputs
+ok - a live watcher mid-sweep refreshes its beacon, so a long cycle never reads as dead
+ok - the pull guard stays silent while a live watcher works through a long sweep
+ok - a successor attaches to a working cycle instead of refusing or replacing it
+ok - a stalled beacon still raises the banner, judged with the explicit grace
+ok - an explicit FM_WATCHER_STALL_BOUND keeps a merely slow holder in place
+ok - a genuinely stalled holder is still evicted and replaced past the hard bound
+ok - an explicit FM_GUARD_GRACE wins over the derived default in both directions
+ok - explicit short and long FM_HEARTBEAT cadences govern scheduled heartbeats
+ok - child processes update the progress marker and cannot touch the beacon directly
+ok - a watcher frozen with SIGSTOP during a display sweep trips the guard
+FM_TEST_COMPLETE
+
+real	0m26.863s
+user	0m4.050s
+sys	0m4.213s
+exit=0
