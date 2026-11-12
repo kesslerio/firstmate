@@ -1,0 +1,171 @@
+
+===== A. real watcher mid long multi-sweep cycle keeps the beacon fresh =====
+lab: /tmp/fm-live-cycle.dbWdoG  (8 registered checks x 2s = 16s sweep, explicit grace 6s)
+real watcher took lock: pid=301796
+sample=0 beacon_age=0s beacon_mtime=1794448488 cycle_mtime=1794448488
+sample=1 beacon_age=1s beacon_mtime=1794448488 cycle_mtime=1794448488
+sample=2 beacon_age=0s beacon_mtime=1794448489 cycle_mtime=1794448488
+sample=3 beacon_age=0s beacon_mtime=1794448489 cycle_mtime=1794448488
+sample=4 beacon_age=0s beacon_mtime=1794448489 cycle_mtime=1794448488
+sample=5 beacon_age=1s beacon_mtime=1794448489 cycle_mtime=1794448488
+sample=6 beacon_age=1s beacon_mtime=1794448489 cycle_mtime=1794448488
+sample=7 beacon_age=1s beacon_mtime=1794448489 cycle_mtime=1794448488
+sample=8 beacon_age=1s beacon_mtime=1794448489 cycle_mtime=1794448488
+sample=9 beacon_age=2s beacon_mtime=1794448489 cycle_mtime=1794448488
+sample=10 beacon_age=0s beacon_mtime=1794448491 cycle_mtime=1794448488
+sample=11 beacon_age=0s beacon_mtime=1794448491 cycle_mtime=1794448488
+sample=12 beacon_age=0s beacon_mtime=1794448491 cycle_mtime=1794448488
+sample=13 beacon_age=1s beacon_mtime=1794448491 cycle_mtime=1794448488
+sample=14 beacon_age=1s beacon_mtime=1794448491 cycle_mtime=1794448488
+sample=15 beacon_age=1s beacon_mtime=1794448491 cycle_mtime=1794448488
+sample=16 beacon_age=1s beacon_mtime=1794448491 cycle_mtime=1794448488
+sample=17 beacon_age=2s beacon_mtime=1794448491 cycle_mtime=1794448488
+sample=18 beacon_age=0s beacon_mtime=1794448493 cycle_mtime=1794448488
+sample=19 beacon_age=0s beacon_mtime=1794448493 cycle_mtime=1794448488
+sample=20 beacon_age=1s beacon_mtime=1794448493 cycle_mtime=1794448488
+sample=21 beacon_age=1s beacon_mtime=1794448493 cycle_mtime=1794448488
+sample=22 beacon_age=1s beacon_mtime=1794448493 cycle_mtime=1794448488
+sample=23 beacon_age=1s beacon_mtime=1794448493 cycle_mtime=1794448488
+sample=24 beacon_age=2s beacon_mtime=1794448493 cycle_mtime=1794448488
+sample=25 beacon_age=2s beacon_mtime=1794448493 cycle_mtime=1794448488
+sample=26 beacon_age=0s beacon_mtime=1794448495 cycle_mtime=1794448488
+sample=27 beacon_age=0s beacon_mtime=1794448495 cycle_mtime=1794448488
+sample=28 beacon_age=1s beacon_mtime=1794448495 cycle_mtime=1794448488
+sample=29 beacon_age=1s beacon_mtime=1794448495 cycle_mtime=1794448488
+sample=30 beacon_age=1s beacon_mtime=1794448495 cycle_mtime=1794448488
+sample=31 beacon_age=1s beacon_mtime=1794448495 cycle_mtime=1794448488
+sample=32 beacon_age=2s beacon_mtime=1794448495 cycle_mtime=1794448488
+sample=33 beacon_age=2s beacon_mtime=1794448495 cycle_mtime=1794448488
+sample=34 beacon_age=0s beacon_mtime=1794448497 cycle_mtime=1794448488
+sample=35 beacon_age=0s beacon_mtime=1794448497 cycle_mtime=1794448488
+sample=36 beacon_age=1s beacon_mtime=1794448497 cycle_mtime=1794448488
+sample=37 beacon_age=1s beacon_mtime=1794448497 cycle_mtime=1794448488
+sample=38 beacon_age=1s beacon_mtime=1794448497 cycle_mtime=1794448488
+sample=39 beacon_age=1s beacon_mtime=1794448497 cycle_mtime=1794448488
+sample=40 beacon_age=2s beacon_mtime=1794448497 cycle_mtime=1794448488
+sample=41 beacon_age=2s beacon_mtime=1794448497 cycle_mtime=1794448488
+sample=42 beacon_age=0s beacon_mtime=1794448499 cycle_mtime=1794448488
+sample=43 beacon_age=0s beacon_mtime=1794448499 cycle_mtime=1794448488
+sample=44 beacon_age=1s beacon_mtime=1794448499 cycle_mtime=1794448488
+sample=45 beacon_age=1s beacon_mtime=1794448499 cycle_mtime=1794448488
+sample=46 beacon_age=1s beacon_mtime=1794448499 cycle_mtime=1794448488
+sample=47 beacon_age=2s beacon_mtime=1794448499 cycle_mtime=1794448488
+--- real fm-guard.sh at sample 48: beacon age 2s, grace 6s ---
+guard_exit=0 output=[<empty>]
+sample=48 beacon_age=2s beacon_mtime=1794448499 cycle_mtime=1794448488
+sample=49 beacon_age=2s beacon_mtime=1794448499 cycle_mtime=1794448488
+sample=50 beacon_age=0s beacon_mtime=1794448501 cycle_mtime=1794448488
+sample=51 beacon_age=1s beacon_mtime=1794448501 cycle_mtime=1794448488
+sample=52 beacon_age=1s beacon_mtime=1794448501 cycle_mtime=1794448488
+sample=53 beacon_age=1s beacon_mtime=1794448501 cycle_mtime=1794448488
+sample=54 beacon_age=1s beacon_mtime=1794448501 cycle_mtime=1794448488
+sample=55 beacon_age=2s beacon_mtime=1794448501 cycle_mtime=1794448488
+sample=56 beacon_age=2s beacon_mtime=1794448501 cycle_mtime=1794448488
+sample=57 beacon_age=2s beacon_mtime=1794448501 cycle_mtime=1794448488
+sample=58 beacon_age=0s beacon_mtime=1794448503 cycle_mtime=1794448488
+sample=59 beacon_age=1s beacon_mtime=1794448503 cycle_mtime=1794448488
+sample=60 beacon_age=1s beacon_mtime=1794448503 cycle_mtime=1794448488
+sample=61 beacon_age=1s beacon_mtime=1794448503 cycle_mtime=1794448488
+sample=62 beacon_age=1s beacon_mtime=1794448503 cycle_mtime=1794448488
+sample=63 beacon_age=2s beacon_mtime=1794448503 cycle_mtime=1794448488
+sample=64 beacon_age=2s beacon_mtime=1794448503 cycle_mtime=1794448488
+sample=65 beacon_age=2s beacon_mtime=1794448503 cycle_mtime=1794448488
+sample=66 beacon_age=3s beacon_mtime=1794448503 cycle_mtime=1794448488
+sample=67 beacon_age=0s beacon_mtime=1794448506 cycle_mtime=1794448488
+sample=68 beacon_age=0s beacon_mtime=1794448506 cycle_mtime=1794448488
+sample=69 beacon_age=0s beacon_mtime=1794448506 cycle_mtime=1794448488
+sample=70 beacon_age=1s beacon_mtime=1794448506 cycle_mtime=1794448488
+sample=71 beacon_age=0s beacon_mtime=1794448507 cycle_mtime=1794448507
+sample=72 beacon_age=0s beacon_mtime=1794448507 cycle_mtime=1794448507
+sample=73 beacon_age=0s beacon_mtime=1794448507 cycle_mtime=1794448507
+sample=74 beacon_age=1s beacon_mtime=1794448507 cycle_mtime=1794448507
+sample=75 beacon_age=1s beacon_mtime=1794448507 cycle_mtime=1794448507
+sample=76 beacon_age=1s beacon_mtime=1794448507 cycle_mtime=1794448507
+sample=77 beacon_age=1s beacon_mtime=1794448507 cycle_mtime=1794448507
+sample=78 beacon_age=2s beacon_mtime=1794448507 cycle_mtime=1794448507
+sample=79 beacon_age=2s beacon_mtime=1794448507 cycle_mtime=1794448507
+sample=80 beacon_age=0s beacon_mtime=1794448509 cycle_mtime=1794448507
+sample=81 beacon_age=0s beacon_mtime=1794448509 cycle_mtime=1794448507
+sample=82 beacon_age=1s beacon_mtime=1794448509 cycle_mtime=1794448507
+sample=83 beacon_age=1s beacon_mtime=1794448509 cycle_mtime=1794448507
+sample=84 beacon_age=1s beacon_mtime=1794448509 cycle_mtime=1794448507
+sample=85 beacon_age=1s beacon_mtime=1794448509 cycle_mtime=1794448507
+sample=86 beacon_age=2s beacon_mtime=1794448509 cycle_mtime=1794448507
+sample=87 beacon_age=2s beacon_mtime=1794448509 cycle_mtime=1794448507
+sample=88 beacon_age=0s beacon_mtime=1794448511 cycle_mtime=1794448507
+sample=89 beacon_age=1s beacon_mtime=1794448511 cycle_mtime=1794448507
+sample=90 beacon_age=1s beacon_mtime=1794448511 cycle_mtime=1794448507
+sample=91 beacon_age=1s beacon_mtime=1794448511 cycle_mtime=1794448507
+sample=92 beacon_age=1s beacon_mtime=1794448511 cycle_mtime=1794448507
+sample=93 beacon_age=2s beacon_mtime=1794448511 cycle_mtime=1794448507
+sample=94 beacon_age=2s beacon_mtime=1794448511 cycle_mtime=1794448507
+sample=95 beacon_age=2s beacon_mtime=1794448511 cycle_mtime=1794448507
+sample=96 beacon_age=0s beacon_mtime=1794448513 cycle_mtime=1794448507
+sample=97 beacon_age=1s beacon_mtime=1794448513 cycle_mtime=1794448507
+sample=98 beacon_age=1s beacon_mtime=1794448513 cycle_mtime=1794448507
+sample=99 beacon_age=1s beacon_mtime=1794448513 cycle_mtime=1794448507
+sample=100 beacon_age=1s beacon_mtime=1794448513 cycle_mtime=1794448507
+sample=101 beacon_age=2s beacon_mtime=1794448513 cycle_mtime=1794448507
+sample=102 beacon_age=2s beacon_mtime=1794448513 cycle_mtime=1794448507
+sample=103 beacon_age=2s beacon_mtime=1794448513 cycle_mtime=1794448507
+sample=104 beacon_age=0s beacon_mtime=1794448515 cycle_mtime=1794448507
+sample=105 beacon_age=1s beacon_mtime=1794448515 cycle_mtime=1794448507
+sample=106 beacon_age=1s beacon_mtime=1794448515 cycle_mtime=1794448507
+sample=107 beacon_age=1s beacon_mtime=1794448515 cycle_mtime=1794448507
+sample=108 beacon_age=1s beacon_mtime=1794448515 cycle_mtime=1794448507
+sample=109 beacon_age=2s beacon_mtime=1794448515 cycle_mtime=1794448507
+sample=110 beacon_age=2s beacon_mtime=1794448515 cycle_mtime=1794448507
+sample=111 beacon_age=2s beacon_mtime=1794448515 cycle_mtime=1794448507
+sample=112 beacon_age=3s beacon_mtime=1794448515 cycle_mtime=1794448507
+sample=113 beacon_age=0s beacon_mtime=1794448518 cycle_mtime=1794448507
+sample=114 beacon_age=0s beacon_mtime=1794448518 cycle_mtime=1794448507
+sample=115 beacon_age=0s beacon_mtime=1794448518 cycle_mtime=1794448507
+sample=116 beacon_age=1s beacon_mtime=1794448518 cycle_mtime=1794448507
+sample=117 beacon_age=1s beacon_mtime=1794448518 cycle_mtime=1794448507
+sample=118 beacon_age=1s beacon_mtime=1794448518 cycle_mtime=1794448507
+sample=119 beacon_age=1s beacon_mtime=1794448518 cycle_mtime=1794448507
+RESULT_A max_beacon_age=3s grace=6s beacon_mtime_changes=15 cycle_advances=1 guard_ran=1
+watcher stopped; tail of watch output:
+
+===== B. adversarial: a frozen watcher mid-cycle still raises WATCHER DOWN =====
+lab: /tmp/fm-live-frozen.7MxjH4
+real watcher took lock: pid=318491
+froze watcher pid=318491 with SIGSTOP at beacon age 2s
+beacon age now 11s (grace 6s)
+guard_exit=0
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  8 registered custom check(s), but no watcher has a fresh beacon (last beat: 11s ago, grace 6s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESULT_B PASS: frozen watcher still trips the banner
+
+===== C. home-configured cadence and grace govern the real readers =====
+lab: /tmp/fm-live-cadence.CiuIyf  config/watch.env: export FM_POLL=600 (derived grace 660s)
+product code: /tmp/fm-live-fx.vB1u1v/bin (copy of this worktree's bin)
+real watcher took lock: pid=324321 path=/tmp/fm-live-fx.vB1u1v/bin/fm-watch.sh
+froze watcher; backdated beacon to 320s (inside the 600s-poll derived 660s grace)
+guard (home FM_POLL=600, no explicit grace) exit=0 output=[<empty>]
+RESULT_C1 PASS: 320s beacon stayed fresh under the configured 600s poll
+turnend guard (home FM_POLL=600, 320s beacon) exit=0 output=[<empty>]
+RESULT_C2 PASS: turn-end guard allowed the turn under the configured long poll
+guard (config FM_GUARD_GRACE=60, 100s beacon) exit=0
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  2 registered custom check(s), but no watcher has a fresh beacon (last beat: 100s ago, grace 60s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-fx.vB1u1v/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-fx.vB1u1v/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESULT_C3 PASS: configured 60s grace alarmed on the 100s beacon
+turnend guard (config grace 60, 100s beacon) exit=2
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  TURN WOULD END BLIND - SUPERVISION IS OFF
+●  2 registered custom check(s), but no live watcher holds this home lock (last beat: 101s ago).
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-fx.vB1u1v/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-fx.vB1u1v/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RESULT_C4 PASS: turn-end guard blocked with the configured short grace
+
+===== done =====
