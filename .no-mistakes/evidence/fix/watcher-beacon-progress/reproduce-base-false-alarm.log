@@ -1,0 +1,13 @@
+base-commit watcher pid 227335 holds the lock; sampling beacon age for 12s with a 4s grace
+base: max beacon age while the watcher worked: 11s (grace 4s)
+base: pull guard ran with beacon age 6s of a 4s grace:
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: 6s ago, grace 4s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-base-repro.Qsj3bo/case/root/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-base-repro.Qsj3bo/case/root/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+base: arm during the working cycle:
+watcher: lock held by live pid 227335 but heartbeat is stale for 6s (>4s); inspect or stop that watcher before re-arming.
+watcher: FAILED - watcher cycle exited 1 without an actionable reason

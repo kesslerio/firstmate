@@ -1,0 +1,79 @@
+
+=========== SCENARIO: live watcher mid-sweep keeps the beacon fresh and raises no watcher-down
+PASS  fixture watcher took the lock (pid 327161)
+sampled 12s with 2 completed cycle(s) (~6s each), max beacon age under the 4s grace: 2s
+PASS  the watched cycle itself outlasted the 4s grace
+guard(grace=4s) during the working cycle: <silent>
+PASS  beacon never aged past the 4s grace while the watcher worked
+PASS  pull guard stayed silent during the long working cycle
+PASS  cycle boundary marker exists
+
+=========== SCENARIO: successor arm attaches to the working watcher instead of replacing it
+arm output: watcher: attached pid=327161 (beacon 0s)|
+PASS  arm attached to the working watcher pid 327161
+
+=========== SCENARIO: adversarial: a wedged beacon still trips WATCHER DOWN and is evicted
+fixture holder pid 335179, beacon age 20s
+guard(grace=7s) on a 20s-old beacon: ●  WATCHER DOWN - SUPERVISION IS OFF
+PASS  wedged beacon raised WATCHER DOWN
+PASS  banner judged the explicit 7s grace
+PASS  holder inside the 60s hard bound was left in place
+PASS  no replacement attempted inside the hard bound
+holder beacon backdated to 30s, hard bound now 5s
+arm(hard bound 5s) output: watcher: started pid=336078 (beacon fresh)|watcher: replaced stalled pid 335179 (beacon 30s past hard bound 5s)|check: rearm-resurface|
+PASS  wedged holder past the hard bound was evicted and replaced
+PASS  the evicted holder process is gone
+
+=========== SCENARIO: adversarial: progress refresh is inert outside a watcher and throttled
+outside a watcher, beacon age before/after a refresh call: 25 25
+PASS  a non-watcher call left the stale beacon stale
+inside a watcher: beacon mtime before repeat, after repeat, after next second: 946713600 946713600 1794452510
+PASS  a repeat call in the same second did not rewrite the beacon
+PASS  the next second's call did refresh the beacon
+PASS  the refreshed beacon is fresh
+
+=========== SCENARIO: configured home cadence governs the guard, inbox readiness, and supervision lib
+home config: FM_POLL=600 (derived grace 660); beacon age 320s
+guard with home config 660s and caller env FM_POLL unset: <silent>
+PASS  a 320s beacon is fresh under the configured 660s cadence
+guard with caller FM_POLL=15 but home config 600: <silent>
+PASS  a caller FM_POLL=15 did not shrink the home-configured window
+fm_beacon_grace with caller FM_POLL=15 and no home: 300
+PASS  an explicit caller poll still derives the max(300, poll+60) floor
+guard with home config grace 1200 on the 320s beacon: <silent>
+PASS  a configured 1200s grace hears the 320s beacon as fresh
+fm-inbox ready under configured 1200s grace: {"schema":"fm-primary-ready.v1","home":"configured/home","observed_at":"2026-11-12T03:01:50Z","lock":{"state":"free","pid":null,"live_harness":false},"wake_consumer":{"state":"healthy","reason":"supervised","beacon_age_seconds":320},"posture":{"state":"present
+PASS  inbox readiness reports a supervised consumer, not a down one
+guard with home config poll 600 + grace 60 on a 100s beacon: ●  WATCHER DOWN - SUPERVISION IS OFF
+PASS  a configured short grace is not replaced by the long poll default
+fm-inbox ready under configured 60s grace: {"schema":"fm-primary-ready.v1","home":"configured/home","observed_at":"2026-11-12T03:01:50Z","lock":{"state":"free","pid":null,"live_harness":false},"wake_consumer":{"state":"down","reason":"stale-beacon","beacon_age_se
+PASS  inbox readiness reports the consumer down under the configured short grace
+standalone fm_supervision_status FM_SUP_WATCHER_FRESH on the same home: false
+PASS  standalone supervision agrees with the guard's configured grace
+
+=========== SCENARIO: turn-end guard blocks or allows a stop using the configured cadence
+turn-end guard, home poll 600 (grace 660) on a 320s beacon: exit 0, output <silent>
+PASS  a working supervised home lets the turn end
+turn-end guard, home poll 600 + grace 60 on a 100s beacon: exit 2
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  TURN WOULD END BLIND - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher holds this home lock (last beat: 100s ago).
+PASS  a configured 60s grace blocks the stop
+PASS  the block carries the repair banner
+
+=========== SCENARIO: pending-reply sweep refreshes the watcher beacon between records
+pending-reply tick over 3 records, beacon age before/after: 40 0
+PASS  a deep pending-reply sweep refreshed the beacon between records
+
+=========== SCENARIO: Herdr per-task display sweep refreshes the beacon and keeps its plan output
+beacon age before the Herdr plan sweep: 40s
+fm-herdr-groups.sh plan output:
+task1	repo-1	running	000.repo-1.3.task1	000.repo-1
+task2	repo-2	running	000.repo-2.3.task2	000.repo-2
+task3	repo-3	running	000.repo-3.3.task3	000.repo-3
+beacon age after the Herdr plan sweep: 0s
+PASS  the plan sweep still emitted one row per recorded Herdr task
+PASS  each planned row still resolves a running state
+PASS  the Herdr per-task sweep refreshed the watcher beacon
+
+GATE_RESULT failed_assertions=0
