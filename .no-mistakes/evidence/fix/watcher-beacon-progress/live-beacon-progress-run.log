@@ -1,0 +1,19 @@
+lab=/tmp/fm-lab.cmItuC grace=4s
+registered slow checks: 5
+--- owner arm log:
+watcher: started pid=3011725 (beacon fresh)
+--- lock pid=3011725
+--- beacon age samples (seconds, once per 0.2s):
+0
+0
+2
+2
+2
+2
+--- max beacon age over the window: 2s (grace 4s)
+--- distinct beacon touches inside that one 12s cycle: 7
+--- same live cycle still owns the lock: 3011725 (started 3011725)
+S5 RESULT: a working cycle longer than the grace kept its beacon fresh
+--- stop:
+watcher: stopped pid=3011725
+DONE

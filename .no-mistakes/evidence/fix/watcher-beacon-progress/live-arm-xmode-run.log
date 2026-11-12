@@ -1,0 +1,16 @@
+lab=/tmp/fm-lab.c2HioV
+--- config/watch.env:
+export FM_POLL=600
+--- config/x-mode.env:
+export FM_GUARD_GRACE=60
+--- owner arm log:
+watcher: started pid=2944745 (beacon fresh)
+--- beacon age 320s (x-mode grace 60 => hard bound 180s; watch.env poll 600 => derived default would be 660s)
+--- arm rc=0
+--- arm output:
+watcher: replaced stalled pid 2944745 (beacon 320s past hard bound 180s)
+check: rearm-resurface
+S4 RESULT: x-mode.env was sourced second and its grace governed the arm
+--- stop:
+watcher: none running
+DONE

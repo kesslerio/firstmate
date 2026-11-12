@@ -1,0 +1,53 @@
+
+=== S1 start: lab home with config/watch.env FM_POLL=600
+lab=/tmp/fm-lab.qsnK9K
+--- config/watch.env:
+export FM_POLL=600
+--- owner arm log:
+watcher: started pid=2927300 (beacon fresh)
+--- lock pid=2927300 heartbeat_age=1s
+--- backdated state/.last-watcher-beat to age 320s (default grace would be 300s)
+
+=== S1: arm against the live holder with the configured long poll
+rc=124 (124 = attached arm still following when the harness timeout fired)
+--- second arm output:
+watcher: attached pid=2927300 (beacon 320s)
+Terminated                 sleep "$ATTACH_POLL"
+S1 RESULT: attached to the holder with a >300s beacon under the home-configured poll
+
+=== S2 start: same home, config/watch.env now also exports FM_GUARD_GRACE=60
+export FM_POLL=600
+export FM_GUARD_GRACE=60
+--- beacon age 320s; hard bound with grace 60 is 180s
+rc=0
+--- arm output:
+watcher: replaced stalled pid 2927300 (beacon 320s past hard bound 180s)
+check: rearm-resurface
+S2 RESULT: explicit configured grace won - arm refused to attach and replaced the stalled holder
+--- stop:
+watcher: none running
+
+=== S3 start: fresh lab home with NO config/watch.env (defaults only)
+lab=/tmp/fm-lab.GKoUux
+--- config dir contents:
+.
+..
+--- owner arm log:
+watcher: started pid=2932871 (beacon fresh)
+
+=== S3a: arm WITH FM_POLL=600 in its own environment (positive control for the age)
+rc=124
+watcher: attached pid=2932871 (beacon 320s)
+Terminated                 sleep "$ATTACH_POLL"
+
+=== S3b: arm with NO settings file and NO FM_POLL/FM_GUARD_GRACE environment
+--- beacon age 320s
+rc=1
+--- arm output:
+watcher: lock held by live pid 2932871 but heartbeat is stale for 320s (>300s); inspect or stop that watcher before re-arming.
+watcher: FAILED - watcher cycle exited 1 without an actionable reason
+S3 RESULT: refused the same 320s beacon under the 300s default - the settings file is load-bearing
+--- stop:
+watcher: stopped pid=2932871
+
+=== DONE

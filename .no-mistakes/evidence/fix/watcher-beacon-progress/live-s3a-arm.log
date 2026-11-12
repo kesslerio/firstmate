@@ -1,0 +1,2 @@
+watcher: attached pid=2932871 (beacon 320s)
+Terminated                 sleep "$ATTACH_POLL"
