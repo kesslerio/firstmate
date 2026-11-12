@@ -1,0 +1,2 @@
+error: durable home /tmp/fm-home-payload-return.6Ty9wT/slot tracks payload paths (data/notes); leaving its slot payload in place
+ok - pool return observes a clean slot, failures preserve retry ownership, and a handled interrupt restores the home

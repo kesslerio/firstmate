@@ -1,0 +1,15 @@
+== step 1: start retirement and interrupt it during the payload move ==
+payload mover pid=3249691; delivering SIGTERM
+interrupted teardown rc=143
+after interrupt: home-marker=mate data-notes=charter body locked=Firstmate durable home mate [fm-home-lock.wv9d3N] receipt=present meta=present staging=0
+== step 2: retry the same retirement without the shim ==
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 0s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live.Zwknvf/int/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live.Zwknvf/int/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown mate complete (window firstmate:fm-mate, worktree /tmp/fm-live.Zwknvf/int/home)
+retry rc=0 home=gone meta=gone gitdir=present
+PASS: handled interruption restored home, protection and record; the retry completed

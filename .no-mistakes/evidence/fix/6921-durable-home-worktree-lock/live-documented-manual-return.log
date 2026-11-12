@@ -1,0 +1,19 @@
+== protected home before the documented manual return ==
+gitdir=/tmp/fm-live.Zwknvf/docmanual/code/.git/worktrees/home
+commondir firstmate-home-lock gitdir HEAD index locked logs ORIG_HEAD refs 
+== documented step: git -C <home> worktree unlock <home> ==
+unlock rc=0
+locked present: no
+== documented step: rm -f "$(git -C <home> rev-parse --absolute-git-dir)/firstmate-home-lock" ==
+rm rc=0
+receipt present: no
+== the slot is now an ordinary pool checkout again ==
+/tmp/fm-live.Zwknvf/docmanual/home 2cd5f082d (detached HEAD)
+ordinary git removal now succeeds:
+remove rc=0
+home present after removal: no; gitdir present: no
+== documented caveat: an unprotected home's unlock fails with 'is not locked' ==
+fatal: '/tmp/fm-live.Zwknvf/docmanual/plain' is not locked
+unprotected unlock rc=128
+== documented link target resolves to a real heading ==
+1309:### Provision a local home

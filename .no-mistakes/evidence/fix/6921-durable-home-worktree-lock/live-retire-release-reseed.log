@@ -1,0 +1,22 @@
+== step 1: seed mate one into the pooled-path worktree ==
+scaffolded: /tmp/fm-live.Zwknvf/lab-retire/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-live.Zwknvf/retire/home
+after seed: locked=Firstmate durable home mate [fm-home-lock.VbSzjl] receipt-id=mate
+== step 2: third-party git removal is refused ==
+fatal: cannot remove a locked working tree, lock reason: Firstmate durable home mate [fm-home-lock.VbSzjl]
+== step 3: retire with the real teardown CLI ==
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no live watcher process holds this home lock (last beat: 0s ago).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e {run-worktree}/.pi/extensions/fm-primary-turnend-guard.ts -e {run-worktree}/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+teardown mate complete (window firstmate:fm-mate, worktree /tmp/fm-live.Zwknvf/retire/home)
+teardown rc=0
+ok: home, git admin state, lock receipt and task record are gone
+== step 4: the same pool path seeds the next mate cleanly ==
+scaffolded: /tmp/fm-live.Zwknvf/lab-retire/data/second/brief.md (secondmate charter)
+home=/tmp/fm-live.Zwknvf/retire/home
+after reseed: locked=Firstmate durable home second [fm-home-lock.PbWL23] receipt-id=second home-marker=second
+PASS: retirement released protection and the slot seeded the next mate

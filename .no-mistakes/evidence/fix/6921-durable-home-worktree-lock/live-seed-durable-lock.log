@@ -1,0 +1,19 @@
+== seed a durable linked-worktree secondmate home with the real CLI ==
+scaffolded: /tmp/fm-live.ZIm5Ae/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-live.ZIm5Ae/home
+== the home's Git administrative directory now carries owned protection ==
+locked:   Firstmate durable home mate [fm-home-lock.wze7ro]
+receipt:
+  schema=fm-home-worktree-lock.v1
+  id=mate
+  home=/tmp/fm-live.ZIm5Ae/home
+  parent=/tmp/fm-live.ZIm5Ae/lab
+  reason=Firstmate durable home mate [fm-home-lock.wze7ro]
+== third-party git worktree remove refuses the idle durable home ==
+fatal: cannot remove a locked working tree, lock reason: Firstmate durable home mate [fm-home-lock.wze7ro]
+use 'remove -f -f' to override or unlock first
+remove rc=128
+  /tmp/fm-live.ZIm5Ae/code 2cd5f082d (detached HEAD)
+  /tmp/fm-live.ZIm5Ae/home 2cd5f082d (detached HEAD) locked
+== the protected checkout is otherwise intact ==
+home marker=mate agents=present data-dir=present
