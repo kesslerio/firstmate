@@ -1,0 +1,43 @@
+## typed parse of .github/workflows/ci.yml
+{"job":"tests-portable-serial","shards":[1,2,3,4,5,6,7,8,9,10,11,12],"laneExpr":"portable-serial-${{ matrix.shard }}of${{ strategy.job-total }}","shardExpr":"${{ matrix.shard }}"}
+LANES portable-serial-1of12 portable-serial-2of12 portable-serial-3of12 portable-serial-4of12 portable-serial-5of12 portable-serial-6of12 portable-serial-7of12 portable-serial-8of12 portable-serial-9of12 portable-serial-10of12 portable-serial-11of12 portable-serial-12of12
+OK typed model: 12 contiguous serial shards, lane names from job-total
+parse_rc=0
+
+## real runner accepts every CI-derived lane
+portable-serial-1of12 rc=0 scripts=16
+portable-serial-2of12 rc=0 scripts=25
+portable-serial-3of12 rc=0 scripts=25
+portable-serial-4of12 rc=0 scripts=25
+portable-serial-5of12 rc=0 scripts=26
+portable-serial-6of12 rc=0 scripts=26
+portable-serial-7of12 rc=0 scripts=25
+portable-serial-8of12 rc=0 scripts=25
+portable-serial-9of12 rc=0 scripts=27
+portable-serial-10of12 rc=0 scripts=26
+portable-serial-11of12 rc=0 scripts=25
+portable-serial-12of12 rc=0 scripts=27
+
+## runner lane list
+portable-parallel-1
+portable-parallel-2
+portable-serial
+portable-serial-1of12
+portable-serial-2of12
+portable-serial-3of12
+portable-serial-4of12
+portable-serial-5of12
+portable-serial-6of12
+portable-serial-7of12
+portable-serial-8of12
+portable-serial-9of12
+portable-serial-10of12
+portable-serial-11of12
+portable-serial-12of12
+real-herdr-gated
+
+## coverage guard
+FM_TEST_COVERAGE ok total=340 parallel=26 parallel_max_ms=814249 parallel_imbalance_ms=552 parallel_unhinted=0 serial=298 serial_shards=12 serial_unhinted=44 serial_max_ms=1102468 serial_budget_ms=1200000 herdr=16
+coverage_rc=0
+union_lines=298 serial_lines=298 unique_union=298
+PARTITION_EXACT: 12 CI lanes union equals the portable-serial lane exactly (no gaps or duplicates)

@@ -1,0 +1,20 @@
+## git ancestry at merge head
+72c20c80201af4a6b29a96e9db63e55e32ed3b27
+47df77f32 fix(watch): surface paused waits superseded by gates or terminal runs (#8014)
+36
+
+## origin/main preservation: architecture sentence carries BOTH sides
+docs/architecture.md:1
+
+## conflict markers in tracked tree
+conflict_marker_lines=0
+
+## changed-behavior suites at merge head
+EXIT=0
+EXIT=0
+~/.no-mistakes/evidence/01M76GTG0PH1GC4W23EDTK1R1S/ready-queue-suite.log:20
+~/.no-mistakes/evidence/01M76GTG0PH1GC4W23EDTK1R1S/watch-triage-suite.log:130
+EXIT_fm-supervision-host-drain=0
+EXIT_fm-branch-supervision=0
+EXIT_fm-teardown=124
+docs/architecture.md:14:Actionable wakes include captain-relevant status signals, no-verb signals without positive evide

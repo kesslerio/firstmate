@@ -1,0 +1,34 @@
+ready_count=1
+== attended + ready queue ==
+watcher_exit=0
+wake_stdout=heartbeat
+wake_queue=[1794442652 1 heartbeat heartbeat heartbeat ]
+heartbeat_streak=0
+drain_rc=0
+drain: 1794442652	1	heartbeat	heartbeat	heartbeat
+
+ready_count=1
+== away + ready queue ==
+watcher_exit=0
+wake_stdout=heartbeat
+wake_queue=[1794442654 1 heartbeat heartbeat heartbeat ]
+heartbeat_streak=0
+drain_rc=0
+drain: 1794442654	1	heartbeat	heartbeat	heartbeat
+
+ready_count=0
+== away + proven-empty queue ==
+watcher_exit=0
+wake_stdout=[heartbeat]
+wake_queue_bytes=43
+heartbeat_streak=4
+
+ready_probe=error: "Unsupported backend \"beads\" — P1 ships the markdown backend only" rc=0
+== attended + unreadable readiness ==
+watcher_exit=0
+wake_stdout=heartbeat
+wake_queue=[1794442656 1 heartbeat heartbeat heartbeat ]
+heartbeat_streak=0
+drain_rc=0
+drain: 1794442656	1	heartbeat	heartbeat	heartbeat
+
