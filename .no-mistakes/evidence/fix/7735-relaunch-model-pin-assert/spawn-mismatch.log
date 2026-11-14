@@ -1,0 +1,7 @@
+warning: /tmp/fmlab-pintest/home/data/labpintest-mm/launch-brief.md records no ship branch; defaulting to legacy branch fm/labpintest-mm
+warning: /tmp/fmlab-pintest/home/data/labpintest-mm/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+model pin mismatch: pin 'claude-opus-5[1m]' but pinned Claude session fc680ac8-448a-4fbd-b784-98799ee19cf7 reports 'claude-opus-5'
+spawned labpintest-mm harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labpintest-mm worktree=~/.treehouse/notes-65d578/2/notes
+spawn_exit=0
+--- worker status file (state/labpintest-mm.status) ---
+--- end status ---

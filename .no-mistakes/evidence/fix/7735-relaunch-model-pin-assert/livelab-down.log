@@ -1,0 +1,8 @@
+stopped: lab tmux server and lab processes
+removed: task temp /tmp/fm-lab43f4e74182e8-worker+9043edb04a3225a92fe2664bb6e3aef9bd7f9d5a2ca3a0a6bbe7f3d584ee81db
+removed: task temp /tmp/fm-lab43f4e74182e8-worker
+removed: task temp /tmp/fm-labpintest-mm+9043edb04a3225a92fe2664bb6e3aef9bd7f9d5a2ca3a0a6bbe7f3d584ee81db
+removed: task temp /tmp/fm-labpintest-unv+9043edb04a3225a92fe2664bb6e3aef9bd7f9d5a2ca3a0a6bbe7f3d584ee81db
+removed: 2 Claude project entries under /tmp/fmlab-pintest
+warning: ~/.treehouse gained entries during the lab; left as is: notes-65d578
+removed: /tmp/fmlab-pintest

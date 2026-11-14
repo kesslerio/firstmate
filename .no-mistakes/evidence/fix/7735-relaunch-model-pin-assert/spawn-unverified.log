@@ -1,0 +1,7 @@
+warning: /tmp/fmlab-pintest/home/data/labpintest-unv/launch-brief.md records no ship branch; defaulting to legacy branch fm/labpintest-unv
+warning: /tmp/fmlab-pintest/home/data/labpintest-unv/launch-brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode local-only - confirm its definition of done matches
+model pin unverified: pin 'claude-sonnet-4-5' was not confirmed by pinned Claude session 071f7f9c-7979-41fe-bb57-f1f7c3b3d815 (no session-reported model)
+spawned labpintest-unv harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labpintest-unv worktree=~/.treehouse/notes-65d578/3/notes
+spawn_exit=0
+--- worker status file (state/labpintest-unv.status) ---
+--- end status ---
