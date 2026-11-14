@@ -1,0 +1,10 @@
+--- lane portable-serial-12of12
+exit=0 count=27
+tests/fm-cortex-signals-live-e2e.test.sh
+tests/fm-backend-cmux-smoke.test.sh
+--- lane portable-serial-11of11
+exit=2 count=0
+fm-test-run: lane 'portable-serial-11of11' asks for 11 portable serial shards but this runner is configured for 12 (see --list-lanes)
+--- lane portable-serial-13of13
+exit=2 count=0
+fm-test-run: lane 'portable-serial-13of13' asks for 13 portable serial shards but this runner is configured for 12 (see --list-lanes)

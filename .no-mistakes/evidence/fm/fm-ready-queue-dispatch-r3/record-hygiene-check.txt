@@ -1,0 +1,11 @@
+=== record-hygiene check wake (posture=attended, config/record-hygiene present)
+watcher-exit: 0
+watcher-stdout: check: record hygiene: RECORD_HYGIENE: metadata has no tab: hygiene2
+RECORD_HYGIENE: metadata has no tab: hygiene
+RECORD_HYGIENE: duplicate PR https://example.test/pull/1 in records: hygiene2, hygiene
+wake-queue-rows: 1794695290	1	check	record-hygiene	check: record hygiene: RECORD_HYGIENE: metadata has no tab: hygiene2 RECORD_HYGIENE: metadata has no tab: hygiene RECORD_HYGIENE: duplicate PR https://example.test/pull/1 in records: hygiene2, hygiene;
+hygiene-last: RECORD_HYGIENE: metadata has no tab: hygiene2
+RECORD_HYGIENE: metadata has no tab: hygiene
+RECORD_HYGIENE: duplicate PR https://example.test/pull/1 in records: hygiene2, hygiene
+hygiene-meta-reportable: no
+watcher-stderr: 

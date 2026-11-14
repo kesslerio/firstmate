@@ -1,0 +1,61 @@
+=== daemon mode=empty (lab home /tmp/fm-lab.VmhGWV, private tmux socket, FM_INJECT_SKIP=heartbeat)
+--- daemon log ---
+[2026-11-14T14:26:10-0800] daemon starting (pid 3749738); target=%0; target_source=FM_SUPERVISOR_TARGET; backend=tmux; backend_source=FM_SUPERVISOR_BACKEND; afk=on; inject_skip='heartbeat'; stale_escalate=999999s; batch=1s
+[2026-11-14T14:26:26-0800] wake: heartbeat
+[2026-11-14T14:26:27-0800] wake force-self (FM_INJECT_SKIP): heartbeat
+[2026-11-14T14:26:30-0800] daemon shutting down
+--- escalation buffer after run ---
+--- wake queue / heartbeat streak / triage ---
+streak=1
+--- watcher stderr ---
+--- supervisor pane capture ---
+lab$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

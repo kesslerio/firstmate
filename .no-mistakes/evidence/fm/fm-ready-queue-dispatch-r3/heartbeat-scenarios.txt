@@ -1,0 +1,38 @@
+=== case attended-ready (posture=attended queue=ready)
+watcher-exit: 0
+watcher-stdout: heartbeat
+heartbeat-streak-after: 0
+wake-queue-rows: 1794695336	1	heartbeat	heartbeat	heartbeat
+drain-output: 1794695336	1	heartbeat	heartbeat	heartbeat;
+triage-tail: 
+
+=== case away-ready (posture=away queue=ready)
+watcher-exit: 0
+watcher-stdout: heartbeat
+heartbeat-streak-after: 0
+wake-queue-rows: 1794695338	1	heartbeat	heartbeat	heartbeat
+drain-output: 1794695338	1	heartbeat	heartbeat	heartbeat;
+triage-tail: 
+
+=== case away-unreadable (posture=away queue=unreadable)
+watcher-exit: 0
+watcher-stdout: heartbeat
+heartbeat-streak-after: 0
+wake-queue-rows: 1794695339	1	heartbeat	heartbeat	heartbeat
+drain-output: 1794695339	1	heartbeat	heartbeat	heartbeat;
+triage-tail: 
+
+=== case away-empty (posture=away queue=empty)
+watcher-exit: 0 (loop stopped once the case state was reached; an away heartbeat exits on its own, an absorbed one is stopped by this driver)
+watcher-stdout: heartbeat
+heartbeat-streak-after: 4
+wake-queue-rows: 1794695340	1	heartbeat	heartbeat	heartbeat
+triage-tail: 
+
+=== case attended-held (posture=attended queue=held)
+watcher-exit: 143 (loop stopped once the case state was reached; an away heartbeat exits on its own, an absorbed one is stopped by this driver)
+watcher-stdout: 
+heartbeat-streak-after: 4
+wake-queue-rows: 
+triage-tail: 
+
