@@ -1,0 +1,38 @@
+### SC6 evidence: a handled TERM in the middle of the payload move
+--- the interrupted return's own log records the delivered TERM inside the move:
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+Terminated                 mv -- "$home/$path" "$staging/$path"
+exit status observed for that interrupted teardown: 143
+
+--- state of the durable home immediately after the handled interrupt
+present  data/charter.md
+present  state
+present  config
+present  projects
+present  .fm-secondmate-home
+present  .fm-secondmate-parent
+git worktree lock: Firstmate durable home mate7 [fm-home-lock.j9vax6]
+ownership receipt: id=mate7
+task record: /tmp/fm-live-fix/lab/state/mate7.meta
+route: - mate7 - mate7 slot domain (home: /tmp/fm-live-fix/home/.treehouse/root-98a933/1/root; scope: mate7 slot domain; projects: ; added 2026-11-14)
+slot lease after the interrupt: 1     leased       ~/.treehouse/root-98a933/1/root  (held by mate7)
+payload staging left behind: none
+
+### retry: the same teardown now retires the restored home
+
+🌳 Worktree returned to pool.
+teardown mate7 complete (window firstmate:fm-mate7, worktree /tmp/fm-live-fix/home/.treehouse/root-98a933/1/root)
+retry rc=0
+
+### the returned slot after the retry
+absent   data
+absent   state
+absent   config
+absent   projects
+absent   .fm-secondmate-home
+absent   .fm-secondmate-parent
+git lock absent
+receipt absent
+
+1     available    ~/.treehouse/root-98a933/1/root
+2     available    ~/.treehouse/root-98a933/2/root

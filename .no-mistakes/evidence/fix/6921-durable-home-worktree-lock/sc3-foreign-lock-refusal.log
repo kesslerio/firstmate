@@ -1,0 +1,4 @@
+### SC3: a foreign Git worktree lock must refuse even --force teardown, preserving the home and records
+$ bin/fm-teardown.sh mate3 --force
+REFUSED: foreign Git worktree lock for durable home /tmp/fm-live-fix/home/.treehouse/root-98a933/1/root
+rc=1

@@ -1,0 +1,9 @@
+### SC2: retire the protected pooled home with the product's teardown
+$ bin/fm-teardown.sh mate2
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+A new version of treehouse is available: v2.0.1 → v3.1.8
+Run "treehouse update" to update
+
+🌳 Worktree returned to pool.
+teardown mate2 complete (window firstmate:fm-mate2, worktree /tmp/fm-live-fix/home/.treehouse/root-98a933/1/root)
+rc=0

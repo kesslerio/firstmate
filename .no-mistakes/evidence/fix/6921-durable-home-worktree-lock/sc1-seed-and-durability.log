@@ -1,0 +1,36 @@
+### SC1: seed a second mate into the pool slot the product just returned
+$ bin/fm-home-seed.sh mate2 <slot> --no-projects
+scaffolded: /tmp/fm-live-fix/lab/data/mate2/brief.md (secondmate charter)
+home=/tmp/fm-live-fix/home/.treehouse/root-98a933/1/root
+rc=0
+
+### identity and protection published
+mate2
+schema=fm-secondmate-parent.v1
+route=local
+parent_home=/tmp/fm-live-fix/lab
+--- gitdir/locked
+Firstmate durable home mate2 [fm-home-lock.K6QBhH]
+--- gitdir/firstmate-home-lock
+schema=fm-home-worktree-lock.v1
+id=mate2
+home=/tmp/fm-live-fix/home/.treehouse/root-98a933/1/root
+parent=/tmp/fm-live-fix/lab
+reason=Firstmate durable home mate2 [fm-home-lock.K6QBhH]
+
+### durability: plain git worktree remove must refuse
+fatal: cannot remove a locked working tree, lock reason: Firstmate durable home mate2 [fm-home-lock.K6QBhH]
+use 'remove -f -f' to override or unlock first
+git-worktree-remove rc=128
+
+### durability: treehouse return --force must refuse a protected home
+
+🌳 Worktree returned to pool.
+treehouse-return rc=0
+
+### home still intact
+/tmp/fm-live-fix/home/.treehouse/root-98a933/1/root/config
+/tmp/fm-live-fix/home/.treehouse/root-98a933/1/root/data
+/tmp/fm-live-fix/home/.treehouse/root-98a933/1/root/.fm-secondmate-home
+/tmp/fm-live-fix/home/.treehouse/root-98a933/1/root/projects
+/tmp/fm-live-fix/home/.treehouse/root-98a933/1/root/state

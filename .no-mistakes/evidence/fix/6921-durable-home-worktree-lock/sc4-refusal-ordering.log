@@ -1,0 +1,10 @@
+### SC4: an earlier teardown refusal must win over the durable-home lock check
+setup: home lost .fm-secondmate-home (marker refusal) AND its receipt is corrupt (lock-check refusal)
+$ bin/fm-teardown.sh mate3
+REFUSED: unsafe secondmate home removal target /tmp/fm-live-fix/home/.treehouse/root-98a933/1/root is not a seeded secondmate home
+rc=1
+
+### the home-lock check would have refused this same state on its own
+$ fm_home_worktree_lock_check <home> mate3 <parent>
+REFUSED: mismatched durable-home lock ownership for /tmp/fm-live-fix/home/.treehouse/root-98a933/1/root
+lock-check rc=1
