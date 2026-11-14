@@ -1,0 +1,5 @@
+IN PROGRESS - the deferred network checks have not finished yet.
+NOT yet confirmed: GitHub authentication.
+Started 0s ago, bounded at 120s.
+Only a FAILED or otherwise actionable result arrives as a `check: startup-network:<generation>` wake; a clean success stays silent.
+The durable result is readable on demand with {run-worktree}/bin/fm-startup-network.sh report; until it finishes, treat none of it as confirmed.

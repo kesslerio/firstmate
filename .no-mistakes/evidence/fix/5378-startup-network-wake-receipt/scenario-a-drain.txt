@@ -1,0 +1,4 @@
+1794694864	1	check	startup-network:1794694856.3463441.999999999	check: startup-network: deferred startup network checks finished (done); read them with {run-worktree}/bin/fm-startup-network.sh report --generation 1794694856.3463441.999999999
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 1 --recovery-generation 3464134.1794694864.J74j5u
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.

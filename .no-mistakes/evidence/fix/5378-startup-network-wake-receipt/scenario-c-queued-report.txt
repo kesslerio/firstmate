@@ -1,0 +1,3 @@
+completed off the startup path in 1s: the deferred network checks.
+ACTIONABLE_1200
+These ran AFTER the sections above were composed, so re-read any record a line here names.
