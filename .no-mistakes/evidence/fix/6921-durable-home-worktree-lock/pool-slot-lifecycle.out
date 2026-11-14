@@ -1,0 +1,51 @@
+=== 1. seed mate4 into a real treehouse pool slot
+  A new version of treehouse is available: v2.0.1 → v3.1.8
+  Run "treehouse update" to update
+  
+  🌳 Setting up worktree...
+  🌳 Leased worktree at /tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code. Run 'treehouse return /tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code' to release it.
+  scaffolded: /tmp/fmlive.P5KZew/lab/data/mate4/brief.md (secondmate charter)
+  home=/tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code
+=== 2. durable protection written by the seed
+  .fm-secondmate-home: mate4
+  git worktree lock reason: Firstmate durable home mate4 [fm-home-lock.HDwnIv]
+  receipt: schema=fm-home-worktree-lock.v1
+  receipt: id=mate4
+  receipt: home=/tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code
+  receipt: parent=/tmp/fmlive.P5KZew/lab
+  receipt: reason=Firstmate durable home mate4 [fm-home-lock.HDwnIv]
+  treehouse: 1     leased       /tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code  (held by mate4)
+=== 3. plain git worktree remove from the code root (no firstmate involvement)
+  fatal: cannot remove a locked working tree, lock reason: Firstmate durable home mate4 [fm-home-lock.HDwnIv]
+  use 'remove -f -f' to override or unlock first
+  rc=128
+  slot still present: yes
+=== 4. teardown returns the pooled slot
+  fm-gate-refuse: gate agent lifecycle permitted only against lab home /tmp/fmlive.P5KZew/lab
+  WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+  
+  🌳 Worktree returned to pool.
+  teardown mate4 complete (window firstmate:fm-mate4, worktree /tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code)
+=== 5. slot after return (must carry no home payload)
+  data: absent
+  state: absent
+  config: absent
+  projects: absent
+  .fm-secondmate-home: absent
+  .fm-secondmate-parent: absent
+  git lock: absent; receipt: absent
+  treehouse: 1     available    /tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code
+  staging leftovers: 0
+=== 6. next seed leases the same slot
+  A new version of treehouse is available: v2.0.1 → v3.1.8
+  Run "treehouse update" to update
+  
+  🌳 Setting up worktree...
+  🌳 Leased worktree at /tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code. Run 'treehouse return /tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code' to release it.
+  scaffolded: /tmp/fmlive.P5KZew/lab/data/mate5/brief.md (secondmate charter)
+  home=/tmp/fmlive.P5KZew/pool/.treehouse/code-98a933/1/code
+  identity now: mate5
+  lock now: Firstmate durable home mate5 [fm-home-lock.LrjD15]
+  receipt: id=mate5
+  receipt: parent=/tmp/fmlive.P5KZew/lab
+  charter present: charter.md projects.md 
