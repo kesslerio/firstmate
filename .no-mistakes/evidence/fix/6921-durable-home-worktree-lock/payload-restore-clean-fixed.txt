@@ -1,0 +1,43 @@
+seed rc=0 home=scaffolded: /tmp/fm-live-payload-restore.HJcmH8/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-live-payload-restore.HJcmH8/slot
+--- snapshot: after seed (/tmp/fm-live-payload-restore.HJcmH8/slot)
+home entries: .agents AGENTS.md assets bin .claude CLAUDE.md .codex config CONTRIBUTING.md .cursor data docs .fm-secondmate-home .fm-secondmate-parent .git .gitattributes .github .gitignore .greptile .grok GROK_BOT.md LICENSE .no-mistakes.yaml .omp .opencode .pi projects README.md skills state .tasks.toml tests VISION.md 
+git lock: Firstmate durable home mate [fm-home-lock.SqFDDN]
+receipt: present
+marker: mate
+parent marker: schema=fm-secondmate-parent.v1
+route=local
+parent_home=/tmp/fm-live-payload-restore.HJcmH8/lab
+state payload: live payload
+new content: absent
+data payload: durable data
+route meta: present
+staging: 
+worktree dir: present
+retirement attempt 1 exit=0
+  err1: ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  err1: ●  WATCHER DOWN - SUPERVISION IS OFF
+  err1: ●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+  err1: ●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+  err1: ●  This is a supervision warning only; the guarded operation WILL still run.
+  err1: ●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-payload-restore.HJcmH8/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-payload-restore.HJcmH8/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+  err1: ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+--- snapshot: after first retirement attempt (/tmp/fm-live-payload-restore.HJcmH8/slot)
+home entries: .agents AGENTS.md assets bin .claude CLAUDE.md .codex CONTRIBUTING.md .cursor docs .git .gitattributes .github .gitignore .greptile .grok GROK_BOT.md LICENSE .no-mistakes.yaml .omp .opencode .pi README.md skills .tasks.toml tests VISION.md 
+git lock: absent
+receipt: absent
+marker: absent
+parent marker: absent
+state payload: absent
+new content: absent
+data payload: absent
+route meta: absent
+staging: 
+worktree dir: present
+re-seed of the returned slot rc=0 home=scaffolded: /tmp/fm-live-payload-restore.HJcmH8/lab/data/next/brief.md (secondmate charter)
+home=/tmp/fm-live-payload-restore.HJcmH8/slot
+re-seeded marker=next
+re-seeded lock=Firstmate durable home next [fm-home-lock.q5PmfJ]
+re-seeded receipt=present
+re-seeded staging=
+MODE=clean attempt1=0 reseed=0

@@ -1,0 +1,45 @@
+seed rc=0 home=scaffolded: /tmp/fm-live-payload-restore.n91Etv/lab/data/mate/brief.md (secondmate charter)
+home=/tmp/fm-live-payload-restore.n91Etv/slot
+--- snapshot: after seed (/tmp/fm-live-payload-restore.n91Etv/slot)
+home entries: .agents AGENTS.md assets bin .claude CLAUDE.md .codex config CONTRIBUTING.md .cursor data docs .fm-secondmate-home .fm-secondmate-parent .git .gitattributes .github .gitignore .greptile .grok GROK_BOT.md LICENSE .no-mistakes.yaml .omp .opencode .pi projects README.md skills state .tasks.toml tests VISION.md 
+git lock: Firstmate durable home mate [fm-home-lock.PYpe7Z]
+receipt: present
+marker: mate
+parent marker: schema=fm-secondmate-parent.v1
+route=local
+parent_home=/tmp/fm-live-payload-restore.n91Etv/lab
+state payload: live payload
+new content: absent
+data payload: durable data
+route meta: present
+staging: 
+worktree dir: present
+retirement attempt 1 exit=1
+  err1: ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  err1: ●  WATCHER DOWN - SUPERVISION IS OFF
+  err1: ●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+  err1: ●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+  err1: ●  This is a supervision warning only; the guarded operation WILL still run.
+  err1: ●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-live-payload-restore.n91Etv/code/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-live-payload-restore.n91Etv/code/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+  err1: ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  err1: treehouse: pool return failed (synthetic external boundary)
+  err1: error: cannot restore staged payload path state for durable home /tmp/fm-live-payload-restore.n91Etv/slot; it exists again
+  err1: error: treehouse return failed for secondmate home /tmp/fm-live-payload-restore.n91Etv/slot; preserving the home and its records for retry (lease may still be held)
+--- snapshot: after failed return (/tmp/fm-live-payload-restore.n91Etv/slot)
+home entries: .agents AGENTS.md assets bin .claude CLAUDE.md .codex CONTRIBUTING.md .cursor data docs .git .gitattributes .github .gitignore .greptile .grok GROK_BOT.md LICENSE .no-mistakes.yaml .omp .opencode .pi README.md skills state .tasks.toml tests VISION.md 
+git lock: absent
+receipt: absent
+marker: absent
+parent marker: absent
+state payload: absent
+new content: absent
+data payload: durable data
+route meta: present
+staging: /tmp/fm-live-payload-restore.n91Etv/lab/state/.home-return.6avwiR 
+worktree dir: present
+retirement attempt 2 (retry) exit=1
+  err2: WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+  err2: REFUSED: unsafe secondmate home removal target /tmp/fm-live-payload-restore.n91Etv/slot is not a seeded secondmate home
+after retry: home worktree=present route meta=present git admin=present
+staging after retry: /tmp/fm-live-payload-restore.n91Etv/lab/state/.home-return.6avwiR 
+MODE=empty attempt1=1 attempt2=1

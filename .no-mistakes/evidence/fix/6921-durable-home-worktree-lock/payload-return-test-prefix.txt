@@ -1,0 +1,7 @@
+# tests/fm-home-payload-return.test.sh against the pre-fix library (last commit's bin/fm-home-payload-lib.sh hunk reverted)
+error: durable home /tmp/fm-home-payload-return.vfQcCk/slot tracks payload paths (data/notes); leaving its slot payload in place
+error: cannot restore staged payload path state for durable home /tmp/fm-home-payload-return.vfQcCk/slot; it exists again
+error: interrupted return of durable home /tmp/fm-home-payload-return.vfQcCk/slot could not restore /tmp/fm-home-payload-return.vfQcCk/parent/state/.home-return.79fiLx
+cat: /tmp/fm-home-payload-return.vfQcCk/slot/state/alive: No such file or directory
+not ok - handled interrupt lost state payload
+rc=1

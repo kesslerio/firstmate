@@ -1,0 +1,8 @@
+# tests/fm-home-payload-return.test.sh on {run-worktree} (target commit)
+error: durable home /tmp/fm-home-payload-return.H1v74X/slot tracks payload paths (data/notes); leaving its slot payload in place
+ok - pool return observes a clean slot, failures preserve retry ownership, and a handled interrupt restores the home
+
+real	0m1.868s
+user	0m0.321s
+sys	0m0.434s
+rc=0
