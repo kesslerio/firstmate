@@ -1,0 +1,3 @@
+RESULT 32s observation, FM_POLL=2, one cycle ~12s (6 x 2s checks): cycle_boundary_advances=2 beacon_refreshes=14
+ASSERT cycle-marker PASS (beacon tracks progress inside a cycle; boundary stays one-per-poll)
+RESULT teardown: watcher alive=no lock=released

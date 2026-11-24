@@ -1,0 +1,24 @@
+lab home: /tmp/fm-lab.NqiaE2
+watcher: {run-worktree}/bin/fm-watch.sh (FM_GUARD_GRACE=4, FM_POLL=1, 6x 2s checks)
+watcher pid=659607 started
+sentinel progress marker: /tmp/fm-lab.NqiaE2/state/.last-watcher-progress
+  t=0s beacon_age=0s guard=silent
+  t=2s beacon_age=2s guard=silent
+  t=4s beacon_age=2s guard=silent
+  t=6s beacon_age=2s guard=silent
+  t=8s beacon_age=2s guard=silent
+  t=10s beacon_age=2s guard=silent
+  t=12s beacon_age=2s guard=silent
+  t=14s beacon_age=0s guard=silent
+  t=16s beacon_age=0s guard=silent
+  t=18s beacon_age=0s guard=silent
+RESULT long-cycle: max_beacon_age=2s grace=4s guard_runs=10 guard_down=0
+RESULT long-cycle: cycle_marker_bytes=0 (cycle boundary is separate from beacon refreshes)
+ASSERT long-cycle PASS
+RESULT frozen: beacon_age=8s (grace 4s) progress_advanced=no
+RESULT frozen: guard reported WATCHER DOWN
+ASSERT frozen PASS
+RESULT teardown: fixture sweep processes before TERM=1 after TERM=0
+RESULT teardown: watcher alive=no lock=released
+ASSERT teardown PASS
+lab home removed on exit: /tmp/fm-lab.NqiaE2
