@@ -1,0 +1,27 @@
+=== tests/fm-turnend-guard.test.sh ===
+ok - fm-turnend-guard: away mode blocks on a dead away-mode daemon
+ok - fm-turnend-guard: away mode blocks on a pid-reused away-mode daemon lock
+ok - fm-turnend-guard: away-mode daemon ownership never substitutes for a fresh beacon
+ok - fm-turnend-guard: a daemon lock proves nothing while away mode is off
+ok - fm-turnend-guard: away-mode beacon freshness uses the poll-derived grace, not the flat default
+ok - fm-turnend-guard: a dead away-mode daemon still blocks under the poll-derived grace
+ok - fm-turnend-guard: the poll-derived grace is bounded, not unlimited
+ok - fm-turnend-guard: with away mode off, the poll-derived grace never applies
+exit=0
+=== tests/fm-guard-stale-banner.test.sh ===
+ok - fm-guard stale banner: healthy recovery rearms the next stale episode
+ok - fm-guard stale banner: concurrent same-episode calls claim exactly one full banner
+ok - fm-guard stale banner: deduplication is isolated per FM_HOME
+ok - fm-guard stale banner: queued-wake warning remains independent
+ok - fm-guard stale banner: read-only before writable does not consume full banner
+ok - fm-guard stale banner: read-only during episode observes without mutating marker
+ok - fm-guard stale banner: healthy read-only does not clear marker
+ok - fm-guard stale banner: read-only never mutates stale-banner state files
+exit=0
+=== tests/fm-nm-bounded-owned.test.sh ===
+1..3
+ok - status and resolver query descendants stop on display cancellation
+ok - owned and standalone bounded queries preserve stdout and status
+ok - expired queries close descendant output and allow the next query
+FM_TEST_COMPLETE
+exit=0

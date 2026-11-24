@@ -1,0 +1,36 @@
+
+=== Scenario 1: live watcher mid slow check sweep keeps the beacon inside a 4s grace ===
+fixed: grace=4s observed max beacon age=3s guard=[]
+PASS: fixed tree: beacon stayed fresh through a ~10s check sweep and the guard stayed silent
+
+=== Scenario 1 negative control: same sweep on the base commit (beacon only at cycle top) ===
+base: grace=4s observed max beacon age=16s guard=[●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ●  WATCHER DOWN - SUPERVISION IS OFF ]
+PASS: base tree reproduced the reported failure (stale beacon + watcher-down banner), fixed tree passes
+
+=== Scenario 2: watcher SIGSTOPped during an active display sweep trips the guard ===
+display reads before=2 after=6; frozen beacon age=6s; guard=[●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ●  WATCHER DOWN - SUPERVISION IS OFF ]
+display children while frozen=1; leftover after TERM=0; lock=released
+PASS: child kept working, beacon aged past grace, guard fired, children cleaned up and lock released
+
+=== Scenario 3: stalled holder still banners and is evicted past the hard bound ===
+guard at 20s-stale beacon, grace 7s: ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ●  WATCHER DOWN - SUPERVISION IS OFF 
+arm output: watcher: started pid=3698176 (beacon fresh) watcher: replaced stalled pid 3697163 (beacon 31s past hard bound 5s) check: rearm-resurface 
+PASS: banner fired for the stalled beacon and the arm replaced the holder past the hard bound
+
+=== Scenario 4: home config cadence governs beacon readers ===
+FM_POLL=600 home, 320s beacon, no explicit grace: 
+FM_POLL=600 + FM_GUARD_GRACE=60 home, same beacon: ●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ●  WATCHER DOWN - SUPERVISION IS OFF 
+PASS: home config poll raised the grace, and its explicit grace override lowered it
+
+=== Scenario 5: one-shot display helper cannot refresh a stale beacon outside a watcher ===
+plan=[task-1	clear		]
+probe run rc/progress marker age=0 (was none)
+real one-shot rc=...; beacon age before=50 after=51
+one-shot output tail: rc=0
+PASS: sync reached the progress hook but left the stale beacon untouched outside a watcher
+
+=== Scenario 6: TERM during a check sweep releases the lock with no orphan child ===
+recorded sweep pids=1 leftover=0; lock after TERM=released; successor acquired=yes
+PASS: TERM mid-sweep left no children, released the lock, and a successor took over
+
+DRIVER_RESULT failures=0

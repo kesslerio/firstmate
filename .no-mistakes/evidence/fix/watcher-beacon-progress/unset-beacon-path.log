@@ -1,0 +1,7 @@
+=== sourced fm-watch.sh, BEAT/PROGRESS_MARKER unset, set -u ===
+BEAT=<unset> PROGRESS_MARKER=<unset>
+child exit propagated as rc=7
+exit=0
+=== same snippet against the pre-fix branch commit 8d1726a3c ===
+/tmp/fm-unset-beat.M1vsQv/prev/bin/fm-watch.sh: line 3510: PROGRESS_MARKER: unbound variable
+exit=127
