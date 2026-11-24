@@ -1,0 +1,37 @@
+LAB=/tmp/fm-lab.k4eQ2w
+marker=. .. config data .fm-lab-home projects root state 
+=== SCENARIO M1: working long cycle keeps beacon fresh, guard silent, successor attaches ===
+watcher_pid=3799745 lock=3799745
+max_beacon_age_over_14s=3s grace=4s
+check_ticks=8
+progress_marker_age=5s marker_present=yes
+--- guard output (explicit grace 4) ---
+guard_exit=0
+GUARD_BANNER=no
+--- successor arm ---
+arm_output:
+watcher: attached pid=3799745 (beacon 1s)
+
+=== SCENARIO M2: frozen watcher with a still-working child ages the beacon and trips the guard ===
+frozen_id=3799745 done_lines_before=4
+done_lines_after_freeze=5 beacon_age_while_frozen=7s
+guard_exit_while_frozen=0
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: 8s ago, grace 4s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair a missing or failed watcher cycle with the Pi tool fm_watch_arm_pi, or restart Pi with -e /tmp/fm-lab.k4eQ2w/m2/root/.pi/extensions/fm-primary-turnend-guard.ts -e /tmp/fm-lab.k4eQ2w/m2/root/.pi/extensions/fm-primary-pi-watch.ts if the extensions are not loaded.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GUARD_BANNER_WHILE_FROZEN=yes
+beacon_age_after_CONT=1s
+
+=== SCENARIO M3: a long-poll home's beacon stays healthy past 300s via the shared derived grace ===
+beacon_age=320s (past the historical 300s default)
+--- guard, no explicit grace, home config FM_POLL=300 (derived grace expected 360) ---
+guard_exit=0
+GUARD_BANNER_DERIVED=no
+--- control: same beacon judged with explicit FM_GUARD_GRACE=300 ---
+guard_exit_300=0
+GUARD_BANNER_300=yes
+=== DONE ===

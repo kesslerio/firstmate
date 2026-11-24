@@ -1,0 +1,57 @@
+observing inside one cycle: cycle_marker_epoch=1795549430 beat_epoch=1795549435
+sample t=0s beat_age=0s cycle_changes=0 beat_epoch_advanced=0
+sample t=0s beat_age=0s cycle_changes=0 beat_epoch_advanced=0
+sample t=0s beat_age=0s cycle_changes=0 beat_epoch_advanced=0
+sample t=0s beat_age=0s cycle_changes=0 beat_epoch_advanced=0
+sample t=0s beat_age=1s cycle_changes=0 beat_epoch_advanced=0
+sample t=1s beat_age=1s cycle_changes=0 beat_epoch_advanced=0
+sample t=1s beat_age=1s cycle_changes=0 beat_epoch_advanced=0
+sample t=1s beat_age=1s cycle_changes=0 beat_epoch_advanced=0
+sample t=1s beat_age=2s cycle_changes=0 beat_epoch_advanced=0
+sample t=1s beat_age=2s cycle_changes=0 beat_epoch_advanced=0
+sample t=2s beat_age=2s cycle_changes=0 beat_epoch_advanced=0
+sample t=2s beat_age=2s cycle_changes=0 beat_epoch_advanced=0
+sample t=2s beat_age=3s cycle_changes=0 beat_epoch_advanced=0
+sample t=2s beat_age=3s cycle_changes=0 beat_epoch_advanced=0
+sample t=2s beat_age=0s cycle_changes=0 beat_epoch_advanced=1
+sample t=3s beat_age=0s cycle_changes=0 beat_epoch_advanced=1
+sample t=3s beat_age=1s cycle_changes=0 beat_epoch_advanced=1
+sample t=3s beat_age=1s cycle_changes=0 beat_epoch_advanced=1
+sample t=3s beat_age=1s cycle_changes=0 beat_epoch_advanced=1
+sample t=3s beat_age=1s cycle_changes=0 beat_epoch_advanced=1
+sample t=4s beat_age=2s cycle_changes=0 beat_epoch_advanced=1
+sample t=4s beat_age=2s cycle_changes=0 beat_epoch_advanced=1
+sample t=4s beat_age=2s cycle_changes=0 beat_epoch_advanced=1
+sample t=4s beat_age=2s cycle_changes=0 beat_epoch_advanced=1
+sample t=4s beat_age=3s cycle_changes=0 beat_epoch_advanced=1
+sample t=5s beat_age=3s cycle_changes=0 beat_epoch_advanced=1
+sample t=5s beat_age=3s cycle_changes=0 beat_epoch_advanced=1
+sample t=5s beat_age=3s cycle_changes=0 beat_epoch_advanced=1
+sample t=5s beat_age=4s cycle_changes=0 beat_epoch_advanced=1
+sample t=5s beat_age=0s cycle_changes=0 beat_epoch_advanced=2
+sample t=6s beat_age=0s cycle_changes=0 beat_epoch_advanced=2
+sample t=6s beat_age=0s cycle_changes=0 beat_epoch_advanced=2
+sample t=6s beat_age=1s cycle_changes=0 beat_epoch_advanced=2
+sample t=6s beat_age=1s cycle_changes=0 beat_epoch_advanced=2
+sample t=6s beat_age=1s cycle_changes=0 beat_epoch_advanced=2
+sample t=7s beat_age=1s cycle_changes=0 beat_epoch_advanced=2
+sample t=7s beat_age=2s cycle_changes=0 beat_epoch_advanced=2
+sample t=7s beat_age=2s cycle_changes=0 beat_epoch_advanced=2
+sample t=7s beat_age=2s cycle_changes=0 beat_epoch_advanced=2
+sample t=7s beat_age=2s cycle_changes=0 beat_epoch_advanced=2
+sample t=8s beat_age=3s cycle_changes=0 beat_epoch_advanced=2
+sample t=8s beat_age=3s cycle_changes=0 beat_epoch_advanced=2
+sample t=8s beat_age=3s cycle_changes=0 beat_epoch_advanced=2
+sample t=8s beat_age=3s cycle_changes=0 beat_epoch_advanced=2
+sample t=8s beat_age=3s cycle_changes=0 beat_epoch_advanced=2
+total_mid_cycle_beacon_advances=2 cycle_marker_changes=0
+check_ticks:
+start slow-1 1795549432
+done slow-1 1795549435
+start slow-2 1795549435
+done slow-2 1795549438
+start slow-3 1795549439
+done slow-3 1795549442
+start slow-4 1795549442
+done slow-4 1795549445
+=== DONE ===

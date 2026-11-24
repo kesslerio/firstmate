@@ -1,0 +1,64 @@
+# shard 7 membership and scheduled (hint-weighted) order
+
+## bin/fm-test-run.sh --list --lane portable-serial-7of19
+tests/fm-teardown.test.sh
+tests/fm-task-inbox.test.sh
+tests/fm-startup-network.test.sh
+tests/fm-wake-drain-open-decisions-cursor.test.sh
+tests/fm-watch-beacon-progress.test.sh
+tests/fm-voice-relay.test.sh
+tests/fm-on.test.sh
+tests/fm-mail.test.sh
+tests/fm-secondmate-busy-contract-live-e2e.test.sh
+tests/fm-classify-decision-key.test.sh
+tests/fm-test-fixture-cleanup.test.sh
+tests/fm-claude-account-quota.test.sh
+tests/fm-install-herdr.test.sh
+tests/fm-remote-job-claim-retention.test.sh
+tests/fm-assertions.test.sh
+tests/fm-herdr-version-floor-live-e2e.test.sh
+tests/fm-kiro-signals-live-e2e.test.sh
+
+## bin/fm-test-run.sh --list-scheduled --lane portable-serial-7of19 (longest hint first) + tests/fm-test-ci-timings.tsv weight
+538585	tests/fm-teardown.test.sh
+92900	tests/fm-task-inbox.test.sh
+80174	tests/fm-startup-network.test.sh
+59223	tests/fm-wake-drain-open-decisions-cursor.test.sh
+40213	tests/fm-watch-beacon-progress.test.sh
+29000	tests/fm-voice-relay.test.sh
+18502	tests/fm-on.test.sh
+11369	tests/fm-mail.test.sh
+6458	tests/fm-secondmate-busy-contract-live-e2e.test.sh
+3785	tests/fm-classify-decision-key.test.sh
+3430	tests/fm-test-fixture-cleanup.test.sh
+697	tests/fm-claude-account-quota.test.sh
+368	tests/fm-install-herdr.test.sh
+225	tests/fm-remote-job-claim-retention.test.sh
+210	tests/fm-assertions.test.sh
+168	tests/fm-herdr-version-floor-live-e2e.test.sh
+136	tests/fm-kiro-signals-live-e2e.test.sh
+
+## modeled weight of every portable-serial shard (sum of committed TSV hints)
+shard=1 scripts=1 modeled_ms=940120
+shard=2 scripts=1 modeled_ms=900000
+shard=3 scripts=16 modeled_ms=885466
+shard=4 scripts=16 modeled_ms=885465
+shard=5 scripts=15 modeled_ms=885312
+shard=6 scripts=16 modeled_ms=885465
+shard=7 scripts=17 modeled_ms=885443
+shard=8 scripts=17 modeled_ms=885443
+shard=9 scripts=18 modeled_ms=885345
+shard=10 scripts=18 modeled_ms=885333
+shard=11 scripts=17 modeled_ms=885327
+shard=12 scripts=18 modeled_ms=885467
+shard=13 scripts=18 modeled_ms=885333
+shard=14 scripts=19 modeled_ms=885354
+shard=15 scripts=19 modeled_ms=885352
+shard=16 scripts=19 modeled_ms=885465
+shard=17 scripts=19 modeled_ms=885373
+shard=18 scripts=19 modeled_ms=885345
+shard=19 scripts=18 modeled_ms=885311
+
+## committed hint row
+tests/fm-test-ci-timings.tsv:339:tests/fm-watch-beacon-progress.test.sh	40213
+docs/fm-test-portable-shards.md:14:Two rows added afterwards carry their own samples instead: 40213 ms for `tests/fm-watch-beacon-progress.test.sh`, the slowest of its passing CI samples and a replacement for that script's earlier provisional local measurement, and 3712 ms for `tests/fm-nm-bounded-owned.test.sh`, its first hint.
